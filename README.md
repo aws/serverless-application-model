@@ -6,7 +6,7 @@ This GitHub project is the starting point for the AWS Serverless Application Def
 
 ## Current Version - 2016-10-31
 
-The current version of the AWS Serverless Application Definition specification is 2016-10-31 - and you can find it [here](versions/2016-10-31.md).
+The current version of the AWS Serverless Application Definition specification is 2016-10-31 - and you can find it here:
 
 ### [AWS Serverless Application Definition 2016-10-31 Specification](versions/2016-10-31.md)
 
