@@ -1,16 +1,15 @@
 # AWS Serverless Application Definition Specification
 
-The goal of the AWS Serverless Application Definition Specification is to define a standard application model for serverless applications.
+The goal of the AWS Serverless Application Definition specification is to define a standard application model for serverless applications.
 
-This GitHub project is the starting point for the AWS Serverless Application Definition Specification. Here you will find the information you need about the AWS Serverless Application Definition Specification, examples of common applications, and some general information regarding the project.
+This GitHub project is the starting point for the AWS Serverless Application Definition specification, and contains general information, information about the specification, and examples of common applications.
 
-## Current Version - 2016-10-31
+## Current version 
 
-The current version of the AWS Serverless Application Definition specification is 2016-10-31 - and you can find it here:
+**The current version is available at 
+[AWS Serverless Application Definition 2016-10-31 Specification](versions/2016-10-31.md).**
 
-### [AWS Serverless Application Definition 2016-10-31 Specification](versions/2016-10-31.md)
-
-This repository contains the existing AWS Serverless Application Definition 2016-10-31 specification as well as proposals for the next verson of the specification.
+This repository contains the existing specification as well as proposals for the next version.
 
 ## Structure
 
