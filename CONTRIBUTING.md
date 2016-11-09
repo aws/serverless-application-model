@@ -18,35 +18,6 @@ Keep in mind that features in the specification should be driven by real use-cas
 - How do developers work around this problem today?
 - How is the proposed feature better than the work around?
 
-## Adding features to AWS Serverless Application Specification
-
-We welcome pull requests to add new features to the AWS Serverless Application Specification. Take a look at the backlog of [Feature Requests](https://github.com/awslabs/serverless-application-specification/labels/feature-request) and pick an item that you find interesting. If the requirements have been well-scoped, feel free to make the change and send a pull request. Otherwise start a conversation in the thread with your plan for implementing the feature. When defining your feature, keep in mind that one of the core tenets of AWS Serverless Application Specification is to keep it easy to use while allowing customers access to use more advanced components should they so choose. Here are some questions you should answer in your plan:
-
-- **What is the problem you are solving?**  
-	Example: Creating API endpoints require 24 steps most of which are boilerplate and repetitive.
-
-- **Describe persona of someone who is facing this problem? This will give you an understanding of how big of a problem it actually is.**  
-    Example: John just finished coding bootcamp and wants to create a serverless app. He has basic coding skills and will be comfortable understanding infrastructure concepts, but probably be intimidated by the 24 steps required to create an API endpoint.
-
-- **How do developers work around this problem today?**  
-    Example: Manually click through every step on the website while refering to "How To" resources on the internet.
-
-- **Describe your proposed solution?**  
-    Example: We are creating a new AWS Serverless Application Specification resource called "API". Here is how it will look:
-
-        Type: 'AWS::Serverless::Api'
-        Properties:
-            # Name of API endpoint
-            Name: <string>
-            # Path to their endpoint. Example: /hello
-            Path: <string>
-            # HTTP Method for their endpoint. Example: GET, POST etc
-            Method: <string>
- 
-
-- **How is the proposed feature better than what the work around?**  
-	Example: Developers can write a simple AWS Serverless Application Specification resource which will handle generating the boilerplate for them.
-
 ## Administrivia 
 
 *Conversations*:
