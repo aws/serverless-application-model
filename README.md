@@ -1,15 +1,15 @@
-# AWS Serverless Application Specification
+# AWS Serverless Application Model (SAM)
 
-The goal of the AWS Serverless Application Specification is to define a standard application model for serverless applications.
+The goal of AWS SAM is to define a standard application model for serverless applications.
 
-This GitHub project is the starting point for the AWS Serverless Application Specification, and contains general information, information about the specification, and examples of common applications.
+This GitHub project is the starting point for AWS SAM, and contains general information, information about the model, and examples of common applications.
 
-## Current version 
+## Current version
 
-**The current version is available at 
-[AWS Serverless Application Specification 2016-10-31](versions/2016-10-31.md).**
+**The current version is available at
+[AWS Serverless Application Model 2016-10-31](versions/2016-10-31.md).**
 
-This repository contains the existing specification as well as proposals for the next version.
+This repository contains the existing model as well as proposals for the next version.
 
 ## Structure
 
