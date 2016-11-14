@@ -1,4 +1,4 @@
-# AWS Serverless Application Model (SAM)
+# AWS Serverless Application Model (AWS SAM)
 
 The goal of AWS SAM is to define a standard application model for serverless applications.
 
@@ -7,7 +7,7 @@ This GitHub project is the starting point for AWS SAM, and contains general info
 ## Current version
 
 **The current version is available at
-[AWS Serverless Application Model 2016-10-31](versions/2016-10-31.md).**
+[AWS SAM 2016-10-31](versions/2016-10-31.md).**
 
 This repository contains the existing model as well as proposals for the next version.
 
