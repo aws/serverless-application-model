@@ -20,6 +20,14 @@ Outputs:
       Description: "Decrypt endpoint URL for Stage environment"
       Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/decrypt"
 
+    EncryptFunction:
+      Description: "Encryption Lambda Function ARN"
+      Value: !GetAtt EncryptionFunction.Arn
+
+    DecryptFunction:
+      Description: "Decryption Lambda Function ARN"
+      Value: !GetAtt DecryptionFunction.Arn
+
 Resources:
 
 
