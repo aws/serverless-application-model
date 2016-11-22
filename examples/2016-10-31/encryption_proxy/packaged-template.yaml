@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "\nThis flourish example creates the following resources:\n\n  Encryption\
+  \ Proxy: Comprised of Encryption and Decryption Lambda functions + IAM Roles\n \
+  \ KMS Key: KMS Key and encrypt/decrypt permission for each IAM Role separately\n\
+  \nLast Modified: 19th November 2016 Author: Heitor Lessa <lessa@amazon.com>\n"
+Outputs:
+  DecryptURL:
+    Description: Stage Decrypt endpoint
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/decrypt
+  EncryptURL:
+    Description: Stage Encrypt endpoint
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/encrypt
+Resources:
+  DecryptionFunction:
+    Properties:
+      CodeUri: s3://lessa-eu/4743fdb947edc91f93bdfe45ebdd4a2a
+      Events:
+        decryptAction:
+          Properties:
+            Method: post
+            Path: /decrypt
+          Type: Api
+      Handler: index.post
+      Role:
+        Fn::GetAtt:
+        - DecryptionServiceIAMRole
+        - Arn
+      Runtime: python2.7
+    Type: AWS::Serverless::Function
+  DecryptionServiceIAMRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Sid: AllowLambdaServiceToAssumeRole
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - logs:CreateLogStream
+            - logs:CreateLogGroup
+            - logs:PutLogEvents
+            Effect: Allow
+            Resource: arn:aws:logs:*:*:*
+            Sid: AllowLambdaServiceToPushLogToCloudwatch
+          Version: '2012-10-17'
+        PolicyName: BasicExecution
+    Type: AWS::IAM::Role
+  EncryptionDecryptionKey:
+    Properties:
+      Description: Encryption and Decryption key for Lambda
+      KeyPolicy:
+        Id: LambdaEncDec
+        Statement:
+        - Action:
+          - kms:Create*
+          - kms:Describe*
+          - kms:Enable*
+          - kms:List*
+          - kms:Put*
+          - kms:Update*
+          - kms:Revoke*
+          - kms:Disable*
+          - kms:Get*
+          - kms:Delete*
+          - kms:ScheduleKeyDeletion
+          - kms:CancelKeyDeletion
+          Effect: Allow
+          Principal:
+            AWS:
+              Ref: AWS::AccountId
+          Resource: '*'
+          Sid: Allow administration of the key
+        - Action:
+          - kms:Encrypt
+          Effect: Allow
+          Principal:
+            AWS:
+              Fn::GetAtt:
+              - EncryptionServiceIAMRole
+              - Arn
+          Resource: '*'
+          Sid: Allow Encryption Service to use this key
+        - Action:
+          - kms:Decrypt
+          Effect: Allow
+          Principal:
+            AWS:
+              Fn::GetAtt:
+              - DecryptionServiceIAMRole
+              - Arn
+          Resource: '*'
+          Sid: Allow Decryption Service to use this key
+        Version: '2012-10-17'
+    Type: AWS::KMS::Key
+  EncryptionFunction:
+    Properties:
+      CodeUri: s3://lessa-eu/93e2e4755ddbaace764b1873e9960c73
+      Environment:
+        Variables:
+          keyId:
+            Ref: EncryptionDecryptionKey
+      Events:
+        encryptAction:
+          Properties:
+            Method: post
+            Path: /encrypt
+          Type: Api
+      Handler: index.post
+      Role:
+        Fn::GetAtt:
+        - EncryptionServiceIAMRole
+        - Arn
+      Runtime: python2.7
+    Type: AWS::Serverless::Function
+  EncryptionServiceIAMRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Sid: AllowLambdaServiceToAssumeRole
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - logs:CreateLogStream
+            - logs:CreateLogGroup
+            - logs:PutLogEvents
+            Effect: Allow
+            Resource: arn:aws:logs:*:*:*
+            Sid: AllowLambdaServiceToPushLogToCloudwatch
+          Version: '2012-10-17'
+        PolicyName: LambdaBasicExecution
+    Type: AWS::IAM::Role
+Transform: AWS::Serverless-2016-10-31
