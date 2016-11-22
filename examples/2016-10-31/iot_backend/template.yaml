@@ -7,7 +7,7 @@ Resources:
     Properties: 
       Handler: index.handler
       Runtime: nodejs4.3
-      CodeUri: ./iot_backend.zip
+      CodeUri: s3://<bucket>/iot_backend.zip
       Policies: AmazonDynamoDBFullAccess
       Environment: 
         Variables: 
@@ -18,7 +18,7 @@ Resources:
           Type: IoTRule
           Properties: 
             AwsIotSqlVersion: 2016-03-23
-            Sql: "SELECT * FROM 'flourish'"
+            Sql: "SELECT * FROM 'iot2ddb'"
   Table:
     Type: AWS::Serverless::SimpleTable
     PrimaryKey:
