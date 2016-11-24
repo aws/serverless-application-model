@@ -114,9 +114,9 @@ Resources:
     EncryptionFunction:
       Type: 'AWS::Serverless::Function'
       Properties:
-        Handler: index.post
+        Handler: encryption.post
         Runtime: python2.7
-        CodeUri: ./src/encryption
+        CodeUri: s3://<bucket>/encryption_proxy.zip
         Role: !GetAtt EncryptionServiceIAMRole.Arn
         Events:
           encryptAction:
@@ -131,9 +131,9 @@ Resources:
     DecryptionFunction:
       Type: 'AWS::Serverless::Function'
       Properties:
-        Handler: index.post
+        Handler: decryption.post
         Runtime: python2.7
-        CodeUri: ./src/decryption
+        CodeUri: s3://<bucket>/encryption_proxy.zip
         Role: !GetAtt DecryptionServiceIAMRole.Arn
         Events:
           decryptAction:
