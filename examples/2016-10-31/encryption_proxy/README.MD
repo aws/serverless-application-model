@@ -15,13 +15,13 @@ Firstly, you need to package both functions locally to S3 via the following comm
 
 
 ```bash
-aws cloudformation package --template template.yaml --s3-bucket <s3_bucket> --output-template packaged-template.yaml --region <aws_region>
+aws cloudformation package --template-file template.yaml --s3-bucket <s3_bucket> --output-template-file packaged-template.yaml --region <aws_region>
 ```
 
 Once complete, you should be ready to deploy it as a cloudformation stack:
 
 ```bash
-aws cloudformation deploy --template packaged-template.yaml --stack-name encryption-proxy --capabilities CAPABILITY_IAM -- region <aws_region>
+aws cloudformation deploy --template-file packaged-template.yaml --stack-name encryption-proxy --capabilities CAPABILITY_IAM --region <aws_region>
 ```
 
 **Note**: S3 bucket must reside in the same region you are launching this stack to.
