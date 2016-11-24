@@ -21,7 +21,8 @@ Resources:
             Sql: "SELECT * FROM 'iot2ddb'"
   Table:
     Type: AWS::Serverless::SimpleTable
-    PrimaryKey:
-      Name: id
-      Type: String
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
 
