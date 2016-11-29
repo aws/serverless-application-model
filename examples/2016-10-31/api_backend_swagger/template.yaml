@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Simple API based on swagger template without proxy resource that returns API call and SAM Resources information
+Resources:
+  SAMInfo:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: s3://<bucket>/api-backend-with-swagger.zip
+      Policies: AmazonDynamoDBFullAccess
+      Description: Returns API call and Resources information
+      MemorySize: 128
+      Timeout: 3
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref Table
+      Events:
+        AnyResource:
+          Type: Api
+          Properties:
+            Path: /
+            Method: any
+            RestApiId: !Ref Api
+            RestApiStage: prod
+  Api: 
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      DefinitionUri: s3://<bucket>/swagger.json
+      Variables:
+        lambdaEndpoint: !Ref SAMInfo
+  Table:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: userId
+        Type: String
