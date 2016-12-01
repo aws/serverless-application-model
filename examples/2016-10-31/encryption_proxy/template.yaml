@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >
 
-    This flourish example creates the following resources:
+    This SAM example creates the following resources:
 
       Encryption Proxy: Comprised of Encryption and Decryption Lambda functions + IAM Roles
       KMS Key: KMS Key and encrypt/decrypt permission for each IAM Role separately

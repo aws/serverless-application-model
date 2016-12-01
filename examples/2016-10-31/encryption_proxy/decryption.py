@@ -4,7 +4,11 @@ import base64
 
 kms = boto3.client('kms')
 bad_request = {
-    'error': 'Invalid argument'
+    'statusCode': 400,
+    'headers': {
+        'Content-Type': 'application/json'
+    },
+    'body': json.dumps({'error': 'Invalid argument'})
 }
 
 
@@ -15,12 +19,12 @@ def decrypt(message):
         https://docs.aws.amazon.com/kms/latest/APIReference/API_decrypt.html
     '''
     try:
-        encrypted_data = json.loads(message)
         ret = kms.decrypt(
-            CiphertextBlob=base64.decodestring(encrypted_data['data']))
+            CiphertextBlob=base64.decodestring(message))
         decrypted_data = ret.get('Plaintext')
     except Exception as e:
-        raise ("Unable to encrypt data.", e)
+        # returns http 500 back to user and log error details in Cloudwatch Logs
+        raise Exception("Unable to decrypt data: ", e)
 
     return decrypted_data
 
@@ -28,18 +32,10 @@ def decrypt(message):
 def post(event, context):
 
     try:
-        if event['body'] is None:
-            raise Exception(
-                "Nothing to decrypt or request didn't come through API")
-        message = event['body']
-    except:
-        return {
-            'statusCode': 400,
-            'headers': {
-                'Content-Type': 'application/json'
-            },
-            'body': json.dumps(bad_request)
-        }
+        payload = json.loads(event['body'])
+        message = payload['data']
+    except (KeyError, TypeError, ValueError):
+        return bad_request
 
     decrypted_message = decrypt(message)
     response = {'data': decrypted_message}
