@@ -5,7 +5,11 @@ import os
 
 kms = boto3.client('kms')
 bad_request = {
-    'error': 'Invalid argument'
+    'statusCode': 400,
+    'headers': {
+        'Content-Type': 'application/json'
+    },
+    'body': json.dumps({'error': 'Invalid argument'})
 }
 
 
@@ -19,7 +23,8 @@ def encrypt(key, message):
         ret = kms.encrypt(KeyId=key, Plaintext=message)
         encrypted_data = base64.encodestring(ret.get('CiphertextBlob'))
     except Exception as e:
-        raise ("Unable to encrypt data.", e)
+        # returns http 500 back to user and log error details in Cloudwatch Logs
+        raise Exception("Unable to encrypt data: ", e)
 
     return encrypted_data
 
@@ -28,22 +33,13 @@ def post(event, context):
 
     try:
         key_id = os.environ['keyId']
+        message = event['body']
+        if message is None:
+            raise ValueError
     except KeyError:
         raise Exception("KMS Key ID not found.")
-
-    try:
-        if event['body'] is None:
-            raise Exception(
-                "Nothing to encrypt or request didn't come through API")
-        message = event['body']
-    except:
-        return {
-            'statusCode': 400,
-            'headers': {
-                'Content-Type': 'application/json'
-            },
-            'body': json.dumps(bad_request)
-        }
+    except ValueError:
+        return bad_request
 
     encrypted_message = encrypt(key_id, message)
     response = {'data': encrypted_message}
