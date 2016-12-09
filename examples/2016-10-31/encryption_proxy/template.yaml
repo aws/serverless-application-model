@@ -1,0 +1,143 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >
+
+    This SAM example creates the following resources:
+
+      Encryption Proxy: Comprised of Encryption and Decryption Lambda functions + IAM Roles
+      KMS Key: KMS Key and encrypt/decrypt permission for each IAM Role separately
+
+    Last Modified: 22nd November 2016
+    Author: Heitor Lessa <lessa@amazon.com>
+
+Outputs:
+
+    EncryptURL:
+      Description: "Encrypt endpoint URL for Stage environment"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/encrypt"
+
+    DecryptURL:
+      Description: "Decrypt endpoint URL for Stage environment"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/decrypt"
+
+    EncryptFunction:
+      Description: "Encryption Lambda Function ARN"
+      Value: !GetAtt EncryptionFunction.Arn
+
+    DecryptFunction:
+      Description: "Decryption Lambda Function ARN"
+      Value: !GetAtt DecryptionFunction.Arn
+
+Resources:
+
+
+    EncryptionDecryptionKey:
+      Type: AWS::KMS::Key
+      Properties:
+        Description: "Encryption and Decryption key for Lambda"
+        KeyPolicy:
+          Id: "LambdaEncDec"
+          Version: "2012-10-17"
+          Statement:
+            - 
+              Sid: "Allow administration of the key"
+              Effect: "Allow"
+              Action:
+                - "kms:Create*"
+                - "kms:Describe*"
+                - "kms:Enable*"
+                - "kms:List*"
+                - "kms:Put*"
+                - "kms:Update*"
+                - "kms:Revoke*"
+                - "kms:Disable*"
+                - "kms:Get*"
+                - "kms:Delete*"
+                - "kms:ScheduleKeyDeletion"
+                - "kms:CancelKeyDeletion"
+              Principal:
+                AWS: !Ref AWS::AccountId
+              Resource: '*'
+            - 
+              Sid: "Allow Encryption Service to use this key"
+              Effect: "Allow"
+              Action:
+                - "kms:Encrypt"
+              Principal:
+                AWS: !GetAtt EncryptionServiceIAMRole.Arn
+              Resource: '*'
+            - 
+              Sid: "Allow Decryption Service to use this key"
+              Effect: "Allow"
+              Action:
+                - "kms:Decrypt"
+              Principal:
+                AWS: !GetAtt DecryptionServiceIAMRole.Arn
+              Resource: '*'
+
+    EncryptionServiceIAMRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/"
+            ManagedPolicyArns:
+                - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            AssumeRolePolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                -
+                  Sid: "AllowLambdaServiceToAssumeRole"
+                  Effect: "Allow"
+                  Action: 
+                    - "sts:AssumeRole"
+                  Principal:
+                    Service: 
+                      - "lambda.amazonaws.com"
+
+    DecryptionServiceIAMRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/"
+            ManagedPolicyArns:
+                - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            AssumeRolePolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                -
+                  Sid: "AllowLambdaServiceToAssumeRole"
+                  Effect: "Allow"
+                  Action: 
+                    - "sts:AssumeRole"
+                  Principal:
+                    Service: 
+                      - "lambda.amazonaws.com"
+
+    EncryptionFunction:
+      Type: 'AWS::Serverless::Function'
+      Properties:
+        Handler: encryption.post
+        Runtime: python2.7
+        CodeUri: s3://<bucket>/encryption_proxy.zip
+        Role: !GetAtt EncryptionServiceIAMRole.Arn
+        Events:
+          encryptAction:
+            Type: Api
+            Properties:
+              Path: /encrypt
+              Method: post
+        Environment:
+          Variables:
+            keyId: !Ref EncryptionDecryptionKey
+
+    DecryptionFunction:
+      Type: 'AWS::Serverless::Function'
+      Properties:
+        Handler: decryption.post
+        Runtime: python2.7
+        CodeUri: s3://<bucket>/encryption_proxy.zip
+        Role: !GetAtt DecryptionServiceIAMRole.Arn
+        Events:
+          decryptAction:
+            Type: Api
+            Properties:
+              Path: /decrypt
+              Method: post
