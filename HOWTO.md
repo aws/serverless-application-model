@@ -66,7 +66,7 @@ Alternatively, you can use `aws cloudformation deploy` CLI command deploy the SA
 ```
 aws cloudformation deploy \
     --template-file /path_to_template/packaged-template.json \
-    --stack-name my-new-stack 
+    --stack-name my-new-stack \
     --capabilities CAPABILITY_IAM
 ```
 
