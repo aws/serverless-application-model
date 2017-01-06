@@ -1,8 +1,18 @@
 # How to create serverless applications using AWS SAM
 AWS Serverless Application Model (AWS SAM) allows you to easily create and 
 manage resources used in your serverless application using AWS CloudFormation. 
-This document explains how to write SAM templates and deploy them to 
-AWS CloudFormation. 
+You can define your serverless application as a SAM template - a JSON or YAML 
+configuration file that describes Lambda function, API endpoints and
+other resources in your application. Using nifty commands, you upload this 
+template to CloudFormation which creates all the individual resources and
+groups them into a *CloudFormation Stack* for ease of management. 
+When you update your SAM template, you will re-deploy the changes to 
+this stack. AWS CloudFormation will take care of updating the individual
+resources for you.
+
+
+The remainder of document explains how to write SAM templates and 
+deploy them via AWS CloudFormation. 
 
 ## Writing SAM Template
 Checkout the [latest specification](versions/2016-10-31.md) for details on how to write a SAM template
