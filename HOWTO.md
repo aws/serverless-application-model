@@ -47,7 +47,7 @@ packaged template that can be readily deployed to CloudFormation.
 aws cloudformation package \
     --template-file /path_to_template/template.yaml \
     --s3-bucket bucket-name \
-    --output-template-file packaged-template.json
+    --output-template-file packaged-template.yaml
 ```
 
 The packaged template will look something like this:
@@ -71,11 +71,11 @@ SAM template is deployed to AWS CloudFormation by [creating a changeset](http://
 using the SAM template followed by [executing the changeset](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets-execute.html). 
 Think of a ChangeSet as a diff between your current stack template and the new template that you are deploying. After you create a ChangeSet, you have the opportunity to examine the diff before executing it. Both the AWS Console and AWS CLI provide commands to create and execute a changeset. 
 
-Alternatively, you can use `aws cloudformation deploy` CLI command deploy the SAM template. Under-the-hood it creates and executes a changeset and waits until the deployment completes. It also print debugging hints when the deployment fails. Run the following command to deploy the packaged template to a stack called `my-new-stack`:
+Alternatively, you can use `aws cloudformation deploy` CLI command to deploy the SAM template. Under-the-hood it creates and executes a changeset and waits until the deployment completes. It also prints debugging hints when the deployment fails. Run the following command to deploy the packaged template to a stack called `my-new-stack`:
 
 ```
 aws cloudformation deploy \
-    --template-file /path_to_template/packaged-template.json \
+    --template-file /path_to_template/packaged-template.yaml \
     --stack-name my-new-stack \
     --capabilities CAPABILITY_IAM
 ```
