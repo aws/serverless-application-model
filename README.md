@@ -18,3 +18,8 @@ version.
 
 Each section should contain folders named per version to avoid confusion between
 the versions.
+
+## Usage and Examples
+Checkout the [How-To Guide](HOWTO.md) and [examples folder](examples/) for 
+detailed instructions on how to write AWS SAM templates and deploy them 
+to AWS CloudFormation
