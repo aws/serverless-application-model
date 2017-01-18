@@ -19,8 +19,7 @@ paths:
         responses:
           default:
             statusCode: 200
-        # NOTE: Replace <<region>> and <<account>> fields
-        uri: arn:aws:apigateway:<<region>>:lambda:path/2015-03-31/functions/arn:aws:lambda:<<region>>:<<accountId>>:function:${stageVariables.LambdaFunctionName}/invocations
+        uri: arn:aws:apigateway:${stageVariables.Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${stageVariables.Region}:${stageVariables.AccountId}:function:${stageVariables.LambdaFunctionName}/invocations
 
         passthroughBehavior: when_no_match
         httpMethod: POST
