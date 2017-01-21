@@ -4,8 +4,8 @@ phases:
     commands:
       - npm install time
       - aws cloudformation package --template-file template.yaml --s3-bucket serverless-ss 
-                                   --output-template-file template.yaml
+                                   --output-template-file newTemplate.yaml
 artifacts:
   type: zip
   files:
-    - template.yaml
+    - newTemplate.yaml
