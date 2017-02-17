@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Simple API Endpoint configured using Swagger specified inline and backed by a Lambda function
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+        StageName: prod
+        DefinitionBody:
+            swagger: 2.0
+            info:
+              title:
+                Ref: AWS::StackName
+            paths:
+              "/get":
+                get:
+                  x-amazon-apigateway-integration:
+                    httpMethod: POST
+                    type: aws_proxy
+                    uri:
+                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations
+                  responses: {}
+            swagger: '2.0'
+
+
+            
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: s3://<bucket>/inline_swagger.zip
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /get
+            Method: GET
+            RestApiId: 
+                Ref: MyApi
+

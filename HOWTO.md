@@ -81,3 +81,71 @@ aws cloudformation deploy \
 ```
 
 Refer to the [documentation](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html) for more details.
+
+## Using Intrinsic Functions
+CloudFormation provides handy functions you can use to generate values at runtime. These are called [Intrinsic Functions](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html). Since SAM is deployed using CloudFormation, you can use these intrinsic functions within SAM as well. Here are some examples:
+
+#### Dynamically set S3 location of Lambda function code zip
+```
+Transform: 'AWS::Serverless-2016-10-31'
+
+# Parameters are CloudFormation features to pass input
+# to your template when you create a stack
+Parameters:
+    BucketName:
+        Type: String
+    CodeKey:
+        Type: String
+
+Resources:
+    MyFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: nodejs4.3
+            CodeUri:
+                # !Ref function allows you to fetch value 
+                # of parameters and other resources at runtime
+                Bucket: !Ref BucketName
+                Key: !Ref CodeKey
+```
+
+#### Generate a different function name for each stack
+
+```
+Transform: 'AWS::Serverless-2016-10-31'
+
+# Parameters are CloudFormation features to pass input
+# to your template when you create a stack
+Parameters:
+    FunctionNameSuffix:
+        Type: String
+    
+Resources:
+    MyFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+
+            # !Sub performs string substitution
+            FunctionName: !Sub "mylambda-${FunctionNameSuffix}"
+
+            Handler: index.handler
+            Runtime: nodejs4.3
+            CodeUri: s3://bucket/key
+```
+
+### Caveats:
+#### ImportValue is partially supported
+[`ImportValue`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html) allows one stack to refer to value of properties from another stack. ImportValue is supported on most properties, except the very few that SAM needs to parse. Following properties are *not* supported:
+
+- `RestApiId` of `AWS::Serverless::Function`
+- `Policies` of `AWS::Serverless::Function`
+- `StageName` of `AWS::Serverless::Api`
+
+
+
+
+
+
+
+
