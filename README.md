@@ -1,4 +1,4 @@
-# ![Logo](SAM_overview_github_v3.png)
+# ![Logo](SAM_overview_github_v4.png)
 # AWS Serverless Application Model (AWS SAM)
 
 The goal of AWS SAM is to define a standard application model for serverless
