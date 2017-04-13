@@ -33,7 +33,7 @@ exports.get = (event, context, callback) => {
         console.log(`RETRIEVED ITEM SUCCESSFULLY WITH doc = ${data.Item.doc}`);
         callback(null, createResponse(200, data.Item.doc));
     }).catch( (err) => { 
-        console.log(`GET ITEM FAILED FOR doc = ${data.Item.doc}, WITH ERROR: ${err}`);
+        console.log(`GET ITEM FAILED FOR doc = ${params.Key.id}, WITH ERROR: ${err}`);
         callback(null, createResponse(500, err));
     });
 };
