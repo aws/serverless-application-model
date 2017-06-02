@@ -9,10 +9,9 @@ Resources:
       DefinitionUri: s3://<bucket>/swagger.yaml
       StageName: Prod
       Variables:
-        # NOTE: Before using this template, replace the <<region>> and <<account>> fields
-        #       in Lambda integration URI in the swagger file to region and accountId 
-        #       you are deploying to
+        AccountId: !Ref AWS::AccountId
         LambdaFunctionName: !Ref LambdaFunction
+        Region: !Ref AWS::Region
 
   LambdaFunction:
     Type: AWS::Serverless::Function
