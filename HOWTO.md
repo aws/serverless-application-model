@@ -37,7 +37,7 @@ MyLambdaFunction:
 MyApi:
     Type: AWS::Serverless::Api
     Properties:
-        DefinitionUri: ./specs/swagger.yaml
+        DefinitionUri: s3://<mybucket>/specs/swagger.yaml
         ...
 ```
 
