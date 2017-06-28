@@ -12,7 +12,7 @@ Resources:
         # NOTE: Before using this template, replace the <<region>> and <<account>> fields
         #       in Lambda integration URI in the swagger file to region and accountId 
         #       you are deploying to
-        LambdaFunctionName: !Ref LambdaFunction
+        LambdaFunctionName: !GetAtt LambdaFunction.Arn
 
   LambdaFunction:
     Type: AWS::Serverless::Function
