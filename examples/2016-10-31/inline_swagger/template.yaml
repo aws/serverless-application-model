@@ -23,19 +23,17 @@ Resources:
             swagger: '2.0'
 
 
-            
+
   MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
       Runtime: nodejs4.3
-      CodeUri: s3://<bucket>/inline_swagger.zip
       Events:
         GetApi:
           Type: Api
           Properties:
             Path: /get
             Method: GET
-            RestApiId: 
+            RestApiId:
                 Ref: MyApi
-

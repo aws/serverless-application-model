@@ -5,7 +5,6 @@ Resources:
   AlexaSkillFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://<bucket>/alexa_skill.zip
       Handler: index.handler
       Runtime: nodejs4.3
       Events:
