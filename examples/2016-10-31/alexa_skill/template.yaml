@@ -7,7 +7,7 @@ Resources:
     Properties:
       CodeUri: s3://<bucket>/alexa_skill.zip
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs6.10
       Events:
         AlexaSkillEvent:
           Type: AlexaSkill
