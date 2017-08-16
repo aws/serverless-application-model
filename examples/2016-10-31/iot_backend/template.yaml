@@ -6,7 +6,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties: 
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs6.10
       CodeUri: s3://<bucket>/iot_backend.zip
       Policies: AmazonDynamoDBFullAccess
       Environment: 

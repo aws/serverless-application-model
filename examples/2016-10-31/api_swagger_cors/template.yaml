@@ -19,7 +19,7 @@ Resources:
     Properties:
       CodeUri: s3://<bucket>/api_swagger_cors.zip
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs6.10
       Events:
         ProxyApiRoot:
           Type: Api
