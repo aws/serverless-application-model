@@ -11,7 +11,7 @@ paths:
       produces:
       - application/json
       responses:
-        200:
+        '200':
           description: 200 response
           schema:
             $ref: "#/definitions/Empty"
@@ -31,7 +31,7 @@ paths:
       produces:
       - application/json
       responses:
-        200:
+        '200':
           description: 200 response
           schema:
             $ref: "#/definitions/Empty"
@@ -76,7 +76,7 @@ paths:
       produces:
       - application/json
       responses:
-        200:
+        '200':
           description: 200 response
           schema:
             $ref: "#/definitions/Empty"
