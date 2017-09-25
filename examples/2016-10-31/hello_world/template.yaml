@@ -13,5 +13,5 @@ Resources:
       Handler: index.handler
       Runtime: nodejs6.10
       CodeUri:
-        Bucket: !Bucket
-        Key: !CodeZipKey
+        Bucket: !Ref Bucket
+        Key: !Ref CodeZipKey
