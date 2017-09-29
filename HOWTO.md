@@ -27,7 +27,7 @@ To use this command, set `CodeUri` property to be the path to your
 source code folder/zip/jar and `DefinitionUri` property to be a path to 
 your OpenAPI file, as shown in the example below 
 
-```
+```YAML
 MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -43,15 +43,15 @@ MyApi:
 
 Run the following command to upload your artifacts to S3 and output a 
 packaged template that can be readily deployed to CloudFormation.
-```
-aws cloudformation package \
+```bash
+$ aws cloudformation package \
     --template-file /path_to_template/template.yaml \
     --s3-bucket bucket-name \
     --output-template-file packaged-template.yaml
 ```
 
 The packaged template will look something like this:
-```
+```YAML
 MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -73,8 +73,8 @@ Think of a ChangeSet as a diff between your current stack template and the new t
 
 Alternatively, you can use `aws cloudformation deploy` CLI command to deploy the SAM template. Under-the-hood it creates and executes a changeset and waits until the deployment completes. It also prints debugging hints when the deployment fails. Run the following command to deploy the packaged template to a stack called `my-new-stack`:
 
-```
-aws cloudformation deploy \
+```bash
+$ aws cloudformation deploy \
     --template-file /path_to_template/packaged-template.yaml \
     --stack-name my-new-stack \
     --capabilities CAPABILITY_IAM
@@ -86,7 +86,7 @@ Refer to the [documentation](http://docs.aws.amazon.com/cli/latest/reference/clo
 CloudFormation provides handy functions you can use to generate values at runtime. These are called [Intrinsic Functions](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html). Since SAM is deployed using CloudFormation, you can use these intrinsic functions within SAM as well. Here are some examples:
 
 #### Dynamically set S3 location of Lambda function code zip
-```
+```YAML
 Transform: 'AWS::Serverless-2016-10-31'
 
 # Parameters are CloudFormation features to pass input
@@ -112,7 +112,7 @@ Resources:
 
 #### Generate a different function name for each stack
 
-```
+```YAML
 Transform: 'AWS::Serverless-2016-10-31'
 
 # Parameters are CloudFormation features to pass input
