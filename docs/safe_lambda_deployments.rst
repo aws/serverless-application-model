@@ -1,6 +1,8 @@
 Safe Lambda deployments
 =======================
 
+.. contents::
+
 Pushing to production can be nerve-racking even if you have 100% unit test coverage and state-of-art full CD system. 
 It is a good practice to expose your new code to a small percentage of production traffic, run tests, watch for alarms 
 and dial up traffic as you gain more confidence. The goal is to minimize production impact as much as possible. 

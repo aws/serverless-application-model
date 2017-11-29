@@ -1,6 +1,8 @@
 Globals Section
 ===============
 
+.. contents::
+
 Lambda functions within a SAM template tend to have shared configuration such as Runtime, Memory, 
 VPC Settings, Environment Variables etc. Instead of duplicating this information in every function, you can 
 write them once in the  ``Globals`` section and let all Functions inhert it. 
