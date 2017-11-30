@@ -1,0 +1,716 @@
+{
+  "Version": "0.0.1",
+  "Templates": {
+    "SQSPollerPolicy": {
+      "Description": "Gives permissions to poll an SQS Queue",
+      "Parameters": {
+        "QueueName": {
+          "Description": "Name of the SQS Queue"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "sqs:DeleteMessage",
+              "sqs:ReceiveMessage"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                {
+                  "queueName": {
+                    "Ref": "QueueName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "LambdaInvokePolicy": {
+      "Description": "Gives permission to invoke a Lambda Function, Alias or Version",
+      "Parameters": {
+        "FunctionName": {
+          "Description": "Name of the Lambda Function"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "lambda:InvokeFunction"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
+                {
+                  "functionName": {
+                    "Ref": "FunctionName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CloudWatchPutMetricPolicy": {
+      "Description": "Gives permissions to put metrics to CloudWatch",
+      "Parameters": {
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "cloudwatch:PutMetricData"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    "EC2DescribePolicy": {
+      "Description": "Gives permission to describe EC2 instances",
+      "Parameters": {
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:DescribeRegions",
+              "ec2:DescribeInstances"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    "DynamoDBCrudPolicy": {
+      "Description": "Gives CRUD access to a DynamoDB Table",
+      "Parameters": {
+        "TableName": {
+          "Description": "Name of the DynamoDB Table"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:PutItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem",
+              "dynamodb:BatchGetItem"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                {
+                  "tableName": {
+                    "Ref": "TableName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "DynamoDBReadPolicy": {
+      "Description": "Gives read only access to a DynamoDB Table",
+      "Parameters": {
+        "TableName": {
+          "Description": "Name of the DynamoDB Table"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:GetItem",
+              "dynamodb:Scan",
+              "dynamodb:Query",
+              "dynamodb:BatchGetItem"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                {
+                  "tableName": {
+                    "Ref": "TableName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SESSendBouncePolicy": {
+      "Description": "Gives SendBounce permission to a SES identity",
+      "Parameters": {
+        "IdentityName": {
+          "Description": "Identity to give permissions to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ses:SendBounce"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                {
+                  "identityName": {
+                    "Ref": "IdentityName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ElasticsearchHttpPostPolicy": {
+      "Description": "Gives POST permissions to Elasticsearch",
+      "Parameters": {
+        "DomainName": {
+          "Description": "Name of Domain"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "es:ESHttpPost"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain/${domainName}",
+                {
+                  "domainName": {
+                    "Ref": "DomainName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "S3ReadPolicy": {
+      "Description": "Gives read permissions to objects in the S3 Bucket",
+      "Parameters": {
+        "BucketName": {
+          "Description": "Name of the Bucket"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:GetObject",
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObjectVersion",
+              "s3:GetLifecycleConfiguration"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:s3:::${bucketName}",
+                  {
+                    "bucketName": {
+                      "Ref": "BucketName"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:s3:::${bucketName}/*",
+                  {
+                    "bucketName": {
+                      "Ref": "BucketName"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "S3CrudPolicy": {
+      "Description": "Gives read permissions to objects in the S3 Bucket",
+      "Parameters": {
+        "BucketName": {
+          "Description": "Name of the Bucket"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:GetObject",
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObjectVersion",
+              "s3:PutObject",
+              "s3:GetLifecycleConfiguration",
+              "s3:PutLifecycleConfiguration"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:s3:::${bucketName}",
+                  {
+                    "bucketName": {
+                      "Ref": "BucketName"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:s3:::${bucketName}/*",
+                  {
+                    "bucketName": {
+                      "Ref": "BucketName"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "AMIDescribePolicy": {
+      "Description": "Gives permissions to describe AMIs",
+      "Parameters": {
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:DescribeImages"
+            ],
+            "Resource": {
+              "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/*"
+            }
+          }
+        ]
+      }
+    },
+    "CloudFormationDescribeStacksPolicy": {
+      "Description": "Gives permission to describe CloudFormation stacks",
+      "Parameters": {
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "cloudformation:DescribeStacks"
+            ],
+            "Resource": {
+              "Fn::Sub": "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*"
+            }
+          }
+        ]
+      }
+    },
+    "RekognitionNoDataAccessPolicy": {
+      "Description": "Gives permission to compare and detect faces and labels",
+      "Parameters": {
+        "CollectionId": {
+          "Description": "ID of the collection"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rekognition:CompareFaces",
+              "rekognition:DetectFaces",
+              "rekognition:DetectLabels",
+              "rekognition:DetectModerationLabels"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
+                {
+                  "collectionId": {
+                    "Ref": "CollectionId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "RekognitionReadPolicy": {
+      "Description": "Gives permission to list and search faces",
+      "Parameters": {
+        "CollectionId": {
+          "Description": "ID of the collection"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rekognition:ListCollections",
+              "rekognition:ListFaces",
+              "rekognition:SearchFaces",
+              "rekognition:SearchFacesByImage"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
+                {
+                  "collectionId": {
+                    "Ref": "CollectionId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "RekognitionWriteOnlyAccessPolicy": {
+      "Description": "Gives permission to create collection and index faces",
+      "Parameters": {
+        "CollectionId": {
+          "Description": "ID of the collection"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rekognition:CreateCollection",
+              "rekognition:IndexFaces"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
+                {
+                  "collectionId": {
+                    "Ref": "CollectionId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SQSSendMessagePolicy": {
+      "Description": "Gives permission to send message to SQS Queue",
+      "Parameters": {
+        "QueueName": {
+          "Description": "Name of the SQS Queue"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "sqs:SendMessage*"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                {
+                  "queueName": {
+                    "Ref": "QueueName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SNSPublishMessagePolicy": {
+      "Description": "Gives permission to publish message to SNS Topic",
+      "Parameters": {
+        "TopicName": {
+          "Description": "Name of the SNS Topic"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "sns:Publish"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:${topicName}",
+                {
+                  "topicName": {
+                    "Ref": "TopicName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "VPCAccessPolicy": {
+      "Description": "Gives access to create, delete, describe and detatch ENIs",
+      "Parameters": {
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:CreateNetworkInterface",
+              "ec2:DeleteNetworkInterface",
+              "ec2:DescribeNetworkInterfaces",
+              "ec2:DetachNetworkInterface"
+            ],
+            "Resource": {
+              "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*"
+            }
+          }
+        ]
+      }
+    },
+    "DynamoDBStreamReadPolicy": {
+      "Description": "Gives permission to describe and read a DynamoDB Stream and Records",
+      "Parameters": {
+        "TableName": {
+          "Description": "Name of DynamoDB Table"
+        },
+        "StreamName": {
+          "Description": "Name of DynamoDB Stream"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:DescribeStream",
+              "dynamodb:GetRecords",
+              "dynamodb:GetShardIterator",
+              "dynamodb:ListStreams"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/${streamName}",
+                {
+                  "tableName": {
+                    "Ref": "TableName"
+                  },
+                  "streamName": {
+                    "Ref": "StreamName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "KinesisStreamReadPolicy": {
+      "Description": "Gives permission to list and read a Kinesis stream",
+      "Parameters": {
+        "StreamName": {
+          "Description": "Name of Kinesis Stream"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "kinesis:ListStreams",
+              "kinesis:DescribeLimits"
+            ],
+            "Resource": {
+              "Fn::Sub": "arn:${AWS::Partition}:kinesis:${AWS::Region}:${AWS::AccountId}:stream/*"
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "kinesis:DescribeStream",
+              "kinesis:GetRecords",
+              "kinesis:GetShardIterator"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${streamName}",
+                {
+                  "streamName": {
+                    "Ref": "StreamName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SESCrudPolicy": {
+      "Description": "Gives permission to send email and verify identity",
+      "Parameters": {
+        "IdentityName": {
+          "Description": "Identity to give permissions to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ses:GetIdentityVerificationAttributes",
+              "ses:SendEmail",
+              "ses:VerifyEmailIdentity"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                {
+                  "identityName": {
+                    "Ref": "IdentityName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SNSCrudPolicy": {
+      "Description": "Gives permissions to create, publish and subscribe to SNS topics",
+      "Parameters": {
+        "TopicName": {
+          "Description": "Name of the SNS topic"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "sns:ListSubscriptionsByTopic",
+              "sns:CreateTopic",
+              "sns:SetTopicAttributes",
+              "sns:Subscribe",
+              "sns:Publish"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:${topicName}*",
+                {
+                  "topicName": {
+                    "Ref": "TopicName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "KinesisCrudPolicy": {
+      "Description": "Gives permission to create, publish and delete Kinesis Stream",
+      "Parameters": {
+        "StreamName": {
+          "Description": "Name of Kinesis Stream"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "kinesis:AddTagsToStream",
+              "kinesis:CreateStream",
+              "kinesis:DecreaseStreamRetentionPeriod",
+              "kinesis:DeleteStream",
+              "kinesis:DescribeStream",
+              "kinesis:GetShardIterator",
+              "kinesis:IncreaseStreamRetentionPeriod",
+              "kinesis:ListTagsForStream",
+              "kinesis:MergeShards",
+              "kinesis:PutRecord",
+              "kinesis:PutRecords",
+              "kinesis:SplitShard",
+              "kinesis:RemoveTagsFromStream"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${streamName}",
+                {
+                  "streamName": {
+                    "Ref": "StreamName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "KMSDecryptPolicy": {
+      "Description": "Gives permission to decrypt with KMS Key",
+      "Parameters": {
+        "KeyId": {
+          "Description": "ID of the KMS Key"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "kms:Decrypt",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                {
+                  "keyId": {
+                    "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

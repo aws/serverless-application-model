@@ -1,0 +1,79 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: .
+      Handler: index.handler
+      Runtime: nodejs4.3
+      Policies:
+
+        - SQSPollerPolicy:
+            QueueName: name
+
+        - LambdaInvokePolicy:
+            FunctionName: name
+
+        - CloudWatchPutMetricPolicy: {}
+
+        - EC2DescribePolicy: {}
+
+        - DynamoDBCrudPolicy:
+            TableName: name
+
+        - DynamoDBReadPolicy:
+            TableName: name
+
+        - SESSendBouncePolicy:
+            IdentityName: name
+
+        - ElasticsearchHttpPostPolicy:
+            DomainName: name
+
+        - S3ReadPolicy:
+            BucketName: name
+
+        - S3CrudPolicy:
+            BucketName: name
+
+        - AMIDescribePolicy: {}
+
+        - CloudFormationDescribeStacksPolicy: {}
+
+        - RekognitionNoDataAccessPolicy:
+            CollectionId: id
+
+        - RekognitionReadPolicy:
+            CollectionId: id
+
+        - RekognitionWriteOnlyAccessPolicy:
+            CollectionId: id
+
+        - SQSSendMessagePolicy:
+            QueueName: name
+
+        - SNSPublishMessagePolicy:
+            TopicName: name
+
+        - VPCAccessPolicy: {}
+
+        - DynamoDBStreamReadPolicy:
+            TableName: name
+            StreamName: name
+
+        - KinesisStreamReadPolicy:
+            StreamName: name
+
+        - SESCrudPolicy:
+            IdentityName: name
+
+        - SNSCrudPolicy:
+            TopicName: name
+
+        - KinesisCrudPolicy:
+            StreamName: name
+
+        - KMSDecryptPolicy:
+            KeyId: keyId
+
+
