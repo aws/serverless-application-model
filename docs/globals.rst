@@ -121,15 +121,15 @@ Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource
             TABLE_NAME: resource-table
             NEW_VAR: hello
 
-Lists are replaced
+Lists are additivie
 ~~~~~~~~~~~~~~~~~~
 *Also called as arrays*
 
-List value in the resource will **replace** with the map value from Global. 
+List values in the resource will be **appended** with the map value from Global. 
 
 Example:
 
-SecurityGroupIds of VpcConfig will be set to ``["sg-first"]``
+SecurityGroupIds of VpcConfig will be set to ``["sg-first", "sg-123", "sg-456"]``
 
 .. code:: yaml
 
