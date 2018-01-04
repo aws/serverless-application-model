@@ -6,17 +6,18 @@ Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
-      DefinitionUri: s3://<bucket>/swagger.yaml
       StageName: Prod
-      Variables:
-        # NOTE: Before using this template, replace the <<region>> and <<account>> fields
-        #       in Lambda integration URI in the swagger file to region and accountId 
-        #       you are deploying to
-        LambdaFunctionName: !Ref LambdaFunction
+      DefinitionBody:
+          'Fn::Transform':
+            Name: 'AWS::Include'
+            # Replace <bucket> with your bucket name
+            Parameters:
+              Location: s3://<bucket>/swagger.yaml
 
   LambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
+      # Replace <bucket> with your bucket name
       CodeUri: s3://<bucket>/api_swagger_cors.zip
       Handler: index.handler
       Runtime: nodejs6.10
