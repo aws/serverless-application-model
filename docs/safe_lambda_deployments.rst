@@ -60,14 +60,11 @@ property to your ``AWS::Serverless::Function`` resource:
 
 This will:
 
-- Creates a Alias with ``<alias-name>`` 
-- Creates & publishes
-a Lambda version with the latest code & configuration derived from
-``CodeUri`` property 
-- Point the Alias to the latest published version 
+- Creates a Alias with ``<alias-name>``
+- Creates & publishes a Lambda version with the latest code & configuration derived from ``CodeUri`` property
+- Point the Alias to the latest published version
 - Points all event sources to the Alias & not the function
-- When the``CodeUri`` property of ``AWS::Serverless::Function`` changes, SAM will
-automatically publish a new version & point the alias to the new version
+- When the``CodeUri`` property of ``AWS::Serverless::Function`` changes, SAM will automatically publish a new version & point the alias to the new version
 
 In other words, your traffic will shift "instantly" to your new code.
 
@@ -124,26 +121,13 @@ resource:
 When you update your function code and deploy the SAM template using
 CloudFormation, the following happens:
 
--  Cloudformation pubilshes a new Lambda Version from the new code
--  Since a deployment preference is set, CodeDeploy takes over the job
-   of actually shifting traffic from old version to new version.
--  Before traffic shifting starts, CodeDeploy will invoke the
-   **PreTraffic Hook** Lambda Function. This Lambda function must call
-   back to CodeDeploy with an explicit status of Success or Failure, via the [PutLifecycleEventHookExecutionStatus API](https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_PutLifecycleEventHookExecutionStatus.html). On Failure, CodeDeploy
-   will abort and report a failure back to CloudFormation. On Success,
-   CodeDeploy will proceed with the specified traffic shifting. Here is a [sample Lambda Hook](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-section-structure-lambda-sample-function) function.
--  ``Type: Linear10PercentEvery10Minutes`` instructs CodeDeploy to start with
-   10% traffic on new version and add 10% every 10 minutes. It will complete traffic shifting in 100 minutes.
--  During traffic shifting, if any of the CloudWatch Alarms go to
-   *Alarm* state, CodeDeploy will immediately flip the Alias back to old
-   version and report a failure to CloudFormation.
--  After traffic shifting completes, CodeDeploy will invoke the
-   **PostTraffic Hook** Lambda Function. This is similar to PreTraffic
-   Hook where the function must callback to CodeDeploy to report a
-   Success or Failure. PostTraffic hook is a great place to run
-   integration tests or other validation actions.
--  If everything went well, the Alias will be pointing to the new Lambda
-   Version.
+- Cloudformation pubilshes a new Lambda Version from the new code
+- Since a deployment preference is set, CodeDeploy takes over the job of actually shifting traffic from old version to new version.
+- Before traffic shifting starts, CodeDeploy will invoke the **PreTraffic Hook** Lambda Function. This Lambda function must call back to CodeDeploy with an explicit status of Success or Failure, via the [PutLifecycleEventHookExecutionStatus API](https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_PutLifecycleEventHookExecutionStatus.html). On Failure, CodeDeploy will abort and report a failure back to CloudFormation. On Success, CodeDeploy will proceed with the specified traffic shifting. Here is a [sample Lambda Hook](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-section-structure-lambda-sample-function) function.
+- ``Type: Linear10PercentEvery10Minutes`` instructs CodeDeploy to start with 10% traffic on new version and add 10% every 10 minutes. It will complete traffic shifting in 100 minutes.
+- During traffic shifting, if any of the CloudWatch Alarms go to *Alarm* state, CodeDeploy will immediately flip the Alias back to old version and report a failure to CloudFormation.
+- After traffic shifting completes, CodeDeploy will invoke the **PostTraffic Hook** Lambda Function. This is similar to PreTraffic Hook where the function must callback to CodeDeploy to report a Success or Failure. PostTraffic hook is a great place to run integration tests or other validation actions.
+- If everything went well, the Alias will be pointing to the new Lambda Version.
 
 Traffic Shifting Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -214,7 +198,7 @@ Hooks are extremely powerful because:
     NOTE: If the Hook functions are created by the same SAM template that is deployed, then make sure to turn off
     traffic shifting deployments for the hook functions. Also, you should not rely on SAM to create the default function Role, since it
     will not contain the necessary permissions to call the CodeDepoloy APIs or Invoke your new Lambda function for testing.
-    Instead, either use the [Role](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction) attibute to specify your own custom Role or use the [Policies](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types) attribute to provide the permissions needed. Finally, use the FunctionName property to control the exact name of the Lambda function Cloudformation creates.
+    Instead, either use the [Role](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction) property to specify your own custom Role or use the [Policies](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types) attribute to provide the permissions needed. Finally, use the ``FunctionName`` property to control the exact name of the Lambda function Cloudformation creates. Otherwise, Cloudformation will create your Lambda function with the Stack name and a unique ID added as part of the name.
 
         .. code:: yaml
             FunctionName: 'CodeDeployHook_preTrafficHook'
@@ -242,7 +226,7 @@ CodeDeploy assumes that there are no dependencies between Deployment Groups and 
 Since every Lambda function is to its own CodeDeploy DeploymentGroup, they will be deployed in parallel.
 The CodeDeploy service will assume the new CodeDeployServiceRole to Invoke any Pre/Post hook functions and perform the traffic shifting and Alias updates.
 
-  NOTE: The CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  "CodeDeploy_". For example,  you should name your Hook functions as such: "CodeDeploy_PreTrafficHook".
+  NOTE: The CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  ``CodeDeploy_``. For example,  you should name your Hook functions as such: ``CodeDeploy_PreTrafficHook``.
 
 
 .. _Globals: globals.rst
