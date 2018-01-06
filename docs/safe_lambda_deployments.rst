@@ -58,11 +58,14 @@ property to your ``AWS::Serverless::Function`` resource:
 
     AutoPublishAlias: <alias-name>
 
-This will: - Creates a Alias with ``<alias-name>`` - Creates & publishes
+This will: 
+- Creates a Alias with ``<alias-name>`` 
+- Creates & publishes
 a Lambda version with the latest code & configuration derived from
-``CodeUri`` property - Point the Alias to the latest published version -
-Points all event sources to the Alias & not the function - When the
-``CodeUri`` property of ``AWS::Serverless::Function`` changes, SAM will
+``CodeUri`` property 
+- Point the Alias to the latest published version 
+- Points all event sources to the Alias & not the function 
+- When the``CodeUri`` property of ``AWS::Serverless::Function`` changes, SAM will
 automatically publish a new version & point the alias to the new version
 
 In other words, your traffic will shift "instantly" to your new code.
@@ -89,7 +92,7 @@ resource:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs6.10
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery10Minutes
@@ -102,17 +105,32 @@ resource:
           PreTraffic: !Ref PreTrafficLambdaFunction
           PostTraffic: !Ref PostTrafficLambdaFunction
 
+  PreTrafficLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: preTrafficHook.handler
+      Role: [arn To IAM Role With Code DeployAndInvoke Permissions]
+      Runtime: nodejs6.10
+      Tracing: Active
+      Timeout: 10
+      FunctionName: 'CodeDeployHook_preTrafficHook'
+      DeploymentPreference:
+        Enabled: false
+      Environment:
+        Variables:
+          CurrentVersion: !Ref MyLambdaFunction.Version
+
 When you update your function code and deploy the SAM template using
 CloudFormation, the following happens:
 
--  A new Lambda Version is published from the new code
+-  Cloudformation pubilshes a new Lambda Version from the new code
 -  Since a deployment preference is set, CodeDeploy takes over the job
    of actually shifting traffic from old version to new version.
 -  Before traffic shifting starts, CodeDeploy will invoke the
    **PreTraffic Hook** Lambda Function. This Lambda function must call
-   back to CodeDeploy with explicit Success or Failure. On Failure, it
+   back to CodeDeploy with an explicit status of Success or Failure, via the [PutLifecycleEventHookExecutionStatus API](https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_PutLifecycleEventHookExecutionStatus.html). On Failure, CodeDeploy
    will abort and report a failure back to CloudFormation. On Success,
-   CodeDeploy will proceed to traffic shifting.
+   CodeDeploy will proceed with the specified traffic shifting. Here is a [sample Lambda Hook](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-section-structure-lambda-sample-function) function.
 -  ``Type: Linear10PercentEvery10Minutes`` instructs CodeDeploy to start with
    10% traffic on new version and add 10% every 10 minutes. It will complete traffic shifting in 100 minutes. 
 -  During traffic shifting, if any of the CloudWatch Alarms go to
@@ -130,7 +148,7 @@ Traffic Shifting Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the above example ``Linear10PercentEvery10Minutes`` is one of several preselected traffic shifting configurations 
-available in CodeDeploy. You can pick the configuration that best suits your application. Here is the complete list:
+available in CodeDeploy. You can pick the configuration that best suits your application. See [here](https://docs.aws.amazon.com/lambda/latest/dg/automating-updates-to-serverless-apps.html) for the complete:
 
 - Canary10Percent30Minutes
 - Canary10Percent5Minutes
@@ -171,28 +189,39 @@ checks.
 Hooks are extremely powerful because:
 
 - **Not limited by Lambda function duration**: CodeDeploy invokes the hook function asynchrnously. The function will
-  receive an identifier that should be used with an explicit call with CodeDeploy API to report success or failure. 
+  receive a ``deploymentId`` and ``lifecycleEventHookExecutinId`` that should be used with a call to the CodeDeploy API to report success or failure. 
   Therefore you can build a workflow that runs for several minutes or hours before completing the hook by calling
   CodeDeploy API.
 
 - **New Version is created before PreTraffic Hook runs**: Before PreTraffic hook runs, the Lambda Version containing 
   the new code has been created. But this version is not serving any traffic yet. Therefore, in your hook function, 
   you can directly invoke the version to run integration tests or even pre-warm the Lambda containers before exposing
-  to production traffic.
+  to production traffic. ``Note`` - The event payload delivered to the Hook function will not contain the Lambda ARN to be tested.
+  We recommend adding an Envrionment variable to the Hook function that maintains the current version of the function requiring safe deployments
+
+    	.. code: yaml
+
+          CurrentVersion: !Ref MySafeLambdaFunction.Version
+
 
 - **Hooks are executed per-function**: Each Lambda function gets its own PreTraffic and PostTraffic hook (technically
   speaking hooks are executed once per DeploymentGroup, but in this case the DeploymentGroup contains only one Lambda
   Function). So you can customize the hooks logic to the function that is being deployed.
 
-Checkout the examples folder for an example for how to create a hook function.
-
     NOTE: If the Hook functions are created by the same SAM template that is deployed, then make sure to turn off
-    traffic shifting deployments for the hook functions. 
+    traffic shifting deployments for the hook functions. Also, you should not rely on SAM to create the default function Role, since it
+    will not contain the necessary permissions to call the CodeDepoloy APIs or Invoke your Lambda function requiring Safe Deployments for testing.
+    Instead, either use the [Role](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction) attibute to specify your own custom Role or use the [Policies](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types) attribute to provide the permissions needed.
 
         .. code:: yaml
-
-            DeploymentPreference: 
+            FunctionName: 'CodeDeployHook_preTrafficHook'
+            DeploymentPreference:
                 Enabled: false
+            Role: [yourCustomRoleArnHere]
+            Policies:
+             - [YourPolicyTemplateHere]
+             
+  Checkout the [lambda_safe_deployments](https://github.com/awslabs/serverless-application-model/tree/master/examples/2016-10-31/lambda_safe_deployments) folder for an example for how to create SAM template that contains a hook function.
             
 Internals
 ~~~~~~~~~
@@ -204,9 +233,11 @@ Internally, SAM will create the following resources in your CloudFormation stack
    SAM template belongs to its own Deployment Group.
 -  Adds ``UpdatePolicy`` on ``AWS::Lambda::Alias`` resource that is
    connected to the function's Deployment Group resource.
+-  One ``AWS::IAM::Role`` called "CodeDeployServiceRole". 
 
 CodeDeploy assumes that there are no dependencies between Deployment Groups and hence will deploy them in parallel.
-Since every Lambda function is to its own CodeDeploy DeploymentGroup, they will be deployed in parallel. 
+Since every Lambda function is to its own CodeDeploy DeploymentGroup, they will be deployed in parallel.
+The CodeDeploy service will assume the new CodeDeployServiceRole to Invoke any Pre/Post hook functions and perform the traffic shifting and Alias updates. ``Note``, the CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  "CodeDeploy_". For example,  you should name your Hook functions as such: "CodeDeploy_PreTrafficHook".
 
 
 .. _Globals: globals.rst

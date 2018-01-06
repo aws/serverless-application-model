@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A hello world application.
+
+Resources:
+
+  safeTest:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: safeTest.handler
+      Runtime: nodejs6.10
+      Tracing: Active
+      Timeout: 10
+      AutoPublishAlias: live
+      DeploymentPreference:
+          Type: Linear10PercentEvery1Minute
+          Hooks:
+            PreTraffic: !Ref preTrafficHook
+
+  preTrafficHook:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: preTrafficHook.handler
+      Role: [arn To IAM Role With Code DeployAndInvoke Permissions]
+      Runtime: nodejs6.10
+      Tracing: Active
+      Timeout: 10
+      FunctionName: 'CodeDeployHook_preTrafficHook'
+      DeploymentPreference:
+        Enabled: false
+      Environment:
+        Variables:
+          CurrentVersion: !Ref safeTest.Version
