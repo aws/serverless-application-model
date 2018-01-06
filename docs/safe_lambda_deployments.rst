@@ -58,13 +58,14 @@ property to your ``AWS::Serverless::Function`` resource:
 
     AutoPublishAlias: <alias-name>
 
-This will: 
+This will:
+
 - Creates a Alias with ``<alias-name>`` 
 - Creates & publishes
 a Lambda version with the latest code & configuration derived from
 ``CodeUri`` property 
 - Point the Alias to the latest published version 
-- Points all event sources to the Alias & not the function 
+- Points all event sources to the Alias & not the function
 - When the``CodeUri`` property of ``AWS::Serverless::Function`` changes, SAM will
 automatically publish a new version & point the alias to the new version
 
@@ -132,7 +133,7 @@ CloudFormation, the following happens:
    will abort and report a failure back to CloudFormation. On Success,
    CodeDeploy will proceed with the specified traffic shifting. Here is a [sample Lambda Hook](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-section-structure-lambda-sample-function) function.
 -  ``Type: Linear10PercentEvery10Minutes`` instructs CodeDeploy to start with
-   10% traffic on new version and add 10% every 10 minutes. It will complete traffic shifting in 100 minutes. 
+   10% traffic on new version and add 10% every 10 minutes. It will complete traffic shifting in 100 minutes.
 -  During traffic shifting, if any of the CloudWatch Alarms go to
    *Alarm* state, CodeDeploy will immediately flip the Alias back to old
    version and report a failure to CloudFormation.
@@ -189,15 +190,17 @@ checks.
 Hooks are extremely powerful because:
 
 - **Not limited by Lambda function duration**: CodeDeploy invokes the hook function asynchrnously. The function will
-  receive a ``deploymentId`` and ``lifecycleEventHookExecutinId`` that should be used with a call to the CodeDeploy API to report success or failure. 
+  receive a ``deploymentId`` and ``lifecycleEventHookExecutionId`` that should be used with a call to the CodeDeploy API to report success or failure. 
   Therefore you can build a workflow that runs for several minutes or hours before completing the hook by calling
   CodeDeploy API.
 
 - **New Version is created before PreTraffic Hook runs**: Before PreTraffic hook runs, the Lambda Version containing 
   the new code has been created. But this version is not serving any traffic yet. Therefore, in your hook function, 
   you can directly invoke the version to run integration tests or even pre-warm the Lambda containers before exposing
-  to production traffic. ``Note`` - The event payload delivered to the Hook function will not contain the Lambda ARN to be tested.
-  We recommend adding an Envrionment variable to the Hook function that maintains the current version of the function requiring safe deployments
+  to production traffic.
+
+    NOTE: The event payload delivered to the Hook function will not contain the Lambda ARN to be tested.
+    We recommend adding an Envrionment variable to the Hook function that maintains the current version of the function requiring safe deployments
 
     	.. code: yaml
 
@@ -210,19 +213,19 @@ Hooks are extremely powerful because:
 
     NOTE: If the Hook functions are created by the same SAM template that is deployed, then make sure to turn off
     traffic shifting deployments for the hook functions. Also, you should not rely on SAM to create the default function Role, since it
-    will not contain the necessary permissions to call the CodeDepoloy APIs or Invoke your Lambda function requiring Safe Deployments for testing.
-    Instead, either use the [Role](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction) attibute to specify your own custom Role or use the [Policies](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types) attribute to provide the permissions needed.
+    will not contain the necessary permissions to call the CodeDepoloy APIs or Invoke your new Lambda function for testing.
+    Instead, either use the [Role](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction) attibute to specify your own custom Role or use the [Policies](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types) attribute to provide the permissions needed. Finally, use the FunctionName property to control the exact name of the Lambda function Cloudformation creates.
 
         .. code:: yaml
             FunctionName: 'CodeDeployHook_preTrafficHook'
             DeploymentPreference:
                 Enabled: false
-            Role: [yourCustomRoleArnHere]
+            Role: [your Custom RoleArn Here]
             Policies:
              - [YourPolicyTemplateHere]
-             
-  Checkout the [lambda_safe_deployments](https://github.com/awslabs/serverless-application-model/tree/master/examples/2016-10-31/lambda_safe_deployments) folder for an example for how to create SAM template that contains a hook function.
-            
+
+  Checkout the [lambda_safe_deployments](https://github.com/awslabs/serverless-application-model/tree/master/examples/2016-10-31/lambda_safe_deployments folder for an example for how to create SAM template that contains a hook function.
+
 Internals
 ~~~~~~~~~
 Internally, SAM will create the following resources in your CloudFormation stack to make all of this work:
@@ -233,11 +236,13 @@ Internally, SAM will create the following resources in your CloudFormation stack
    SAM template belongs to its own Deployment Group.
 -  Adds ``UpdatePolicy`` on ``AWS::Lambda::Alias`` resource that is
    connected to the function's Deployment Group resource.
--  One ``AWS::IAM::Role`` called "CodeDeployServiceRole". 
+-  One ``AWS::IAM::Role`` called "CodeDeployServiceRole".
 
 CodeDeploy assumes that there are no dependencies between Deployment Groups and hence will deploy them in parallel.
 Since every Lambda function is to its own CodeDeploy DeploymentGroup, they will be deployed in parallel.
-The CodeDeploy service will assume the new CodeDeployServiceRole to Invoke any Pre/Post hook functions and perform the traffic shifting and Alias updates. ``Note``, the CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  "CodeDeploy_". For example,  you should name your Hook functions as such: "CodeDeploy_PreTrafficHook".
+The CodeDeploy service will assume the new CodeDeployServiceRole to Invoke any Pre/Post hook functions and perform the traffic shifting and Alias updates.
+
+  NOTE: The CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  "CodeDeploy_". For example,  you should name your Hook functions as such: "CodeDeploy_PreTrafficHook".
 
 
 .. _Globals: globals.rst
