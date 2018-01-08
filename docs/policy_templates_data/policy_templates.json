@@ -258,7 +258,7 @@
       }
     },
     "S3CrudPolicy": {
-      "Description": "Gives read permissions to objects in the S3 Bucket",
+      "Description": "Gives CRUD permissions to objects in the S3 Bucket",
       "Parameters": {
         "BucketName": {
           "Description": "Name of the Bucket"
