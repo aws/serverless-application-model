@@ -58,12 +58,16 @@ property to your ``AWS::Serverless::Function`` resource:
 
     AutoPublishAlias: <alias-name>
 
-This will: - Creates a Alias with ``<alias-name>`` - Creates & publishes
-a Lambda version with the latest code & configuration derived from
-``CodeUri`` property - Point the Alias to the latest published version -
-Points all event sources to the Alias & not the function - When the
-``CodeUri`` property of ``AWS::Serverless::Function`` changes, SAM will
-automatically publish a new version & point the alias to the new version
+This will:
+
+- Create an Alias with ``<alias-name>`` 
+- Create & publishe a Lambda version with the latest code & configuration 
+  derived from ``CodeUri`` property 
+- Point the Alias to the latest published version 
+- Point all event sources to the Alias & not the function 
+- When the ``CodeUri`` property of ``AWS::Serverless::Function`` changes, 
+  SAM will automatically publish a new version & point the alias to the 
+  new version
 
 In other words, your traffic will shift "instantly" to your new code.
 
