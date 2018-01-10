@@ -60,11 +60,14 @@ property to your ``AWS::Serverless::Function`` resource:
 
 This will:
 
-- Creates a Alias with ``<alias-name>``
-- Creates & publishes a Lambda version with the latest code & configuration derived from ``CodeUri`` property
-- Point the Alias to the latest published version
-- Points all event sources to the Alias & not the function
-- When the ``CodeUri`` property of ``AWS::Serverless::Function`` changes, SAM will automatically publish a new version & point the alias to the new version
+- Create an Alias with ``<alias-name>`` 
+- Create & publishes a Lambda version with the latest code & configuration 
+  derived from ``CodeUri`` property 
+- Point the Alias to the latest published version 
+- Point all event sources to the Alias & not the function 
+- When the ``CodeUri`` property of ``AWS::Serverless::Function`` changes, 
+  SAM will automatically publish a new version & point the alias to the 
+  new version
 
 In other words, your traffic will shift "instantly" to your new code.
 
@@ -107,10 +110,20 @@ resource:
     Type: AWS::Serverless::Function
     Properties:
       Handler: preTrafficHook.handler
-      Role: [arn To IAM Role With Code DeployAndInvoke Permissions]
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "codedeploy:PutLifecycleEventHookExecutionStatus"
+            Resource: "*"
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "lambda:InvokeFunction"
+            Resource: !Ref MyLambdaFunction.Version
       Runtime: nodejs6.10
-      Tracing: Active
-      Timeout: 10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: false
@@ -129,17 +142,19 @@ CloudFormation, the following happens:
 - After traffic shifting completes, CodeDeploy will invoke the **PostTraffic Hook** Lambda Function. This is similar to PreTraffic Hook where the function must callback to CodeDeploy to report a Success or Failure. PostTraffic hook is a great place to run integration tests or other validation actions.
 - If everything went well, the Alias will be pointing to the new Lambda Version.
 
+  NOTE: Verify that your AWS SDK version supports PutLifecycleEventHookExecutionStatus. For example, Python requires SDK version 1.4.8 or newer.
+
 .. _PutLifecycleEventHookExecutionStatus: https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_PutLifecycleEventHookExecutionStatus.html
 
-.. _Here: https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-section-structure-lambda-sample-function
+.. _Here: https://github.com/awslabs/serverless-application-model/tree/master/examples/2016-10-31/lambda_safe_deployments/preTraffichook.js
 
 Traffic Shifting Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the above example ``Linear10PercentEvery10Minutes`` is one of several preselected traffic shifting configurations 
-available in CodeDeploy. You can pick the configuration that best suits your application. See docs_ for the complete:
+available in CodeDeploy. You can pick the configuration that best suits your application. See docs_ for the complete list:
 
-.. _docs: https://docs.aws.amazon.com/lambda/latest/dg/automating-updates-to-serverless-apps.html
+.. _docs: https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst#traffic-shifting-configurations
 
 - Canary10Percent30Minutes
 - Canary10Percent5Minutes
@@ -193,8 +208,9 @@ Hooks are extremely powerful because:
     We recommend adding an Envrionment variable to the Hook function that maintains the current version of the function requiring safe deployments
 
 .. code:: yaml
-
-  CurrentVersion: !Ref MySafeLambdaFunction.Version
+  Environment:
+    Variables:
+      CurrentVersion: !Ref MySafeLambdaFunction.Version
 
 
 - **Hooks are executed per-function**: Each Lambda function gets its own PreTraffic and PostTraffic hook (technically
@@ -204,9 +220,8 @@ Hooks are extremely powerful because:
     NOTE: If the Hook functions are created by the same SAM template that is deployed, then make sure to turn off
     traffic shifting deployments for the hook functions. Also, you should not rely on SAM to create the default function Role, since it
     will not contain the necessary permissions to call the CodeDepoloy APIs or Invoke your new Lambda function for testing.
-    Instead, either use the Role_ property to specify your own custom Role or use the Policies_ attribute to provide the permissions needed. Finally, use the ``FunctionName`` property to control the exact name of the Lambda function Cloudformation creates. Otherwise, Cloudformation will create your Lambda function with the Stack name and a unique ID added as part of the name.
+    Instead, use the Policies_ attribute to provide the CodeDeploy and Lambda permissions needed. Finally, use the ``FunctionName`` property to control the exact name of the Lambda function Cloudformation creates. Otherwise, Cloudformation will create your Lambda function with the Stack name and a unique ID added as part of the name.
 
-.. _Role: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 .. _Policies: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types
 
 .. code:: yaml
@@ -214,9 +229,19 @@ Hooks are extremely powerful because:
     FunctionName: 'CodeDeployHook_preTrafficHook'
     DeploymentPreference:
         Enabled: false
-    Role: [your Custom RoleArn Here]
     Policies:
-     - [YourPolicyTemplateHere]
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "codedeploy:PutLifecycleEventHookExecutionStatus"
+            Resource: "*"
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "lambda:InvokeFunction"
+            Resource: !Ref MyLambdaFunction.Version
 
 Checkout the lambda_safe_deployments_ folder for an example for how to create SAM template that contains a hook function.
 

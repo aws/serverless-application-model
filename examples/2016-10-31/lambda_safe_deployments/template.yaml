@@ -9,8 +9,6 @@ Resources:
     Properties:
       Handler: safeTest.handler
       Runtime: nodejs6.10
-      Tracing: Active
-      Timeout: 10
       AutoPublishAlias: live
       DeploymentPreference:
           Type: Linear10PercentEvery1Minute
@@ -21,10 +19,20 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: preTrafficHook.handler
-      Role: [arn To IAM Role With Code DeployAndInvoke Permissions]
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "codedeploy:PutLifecycleEventHookExecutionStatus"
+            Resource: "*"
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "lambda:InvokeFunction"
+            Resource: !Ref safeTest.Version
       Runtime: nodejs6.10
-      Tracing: Active
-      Timeout: 10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: false
