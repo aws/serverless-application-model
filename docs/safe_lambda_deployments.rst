@@ -142,11 +142,11 @@ CloudFormation, the following happens:
 - After traffic shifting completes, CodeDeploy will invoke the **PostTraffic Hook** Lambda Function. This is similar to PreTraffic Hook where the function must callback to CodeDeploy to report a Success or Failure. PostTraffic hook is a great place to run integration tests or other validation actions.
 - If everything went well, the Alias will be pointing to the new Lambda Version.
 
-  NOTE: Verify that your AWS SDK version supports PutLifecycleEventHookExecutionStatus. For example, Python requires SDK version 1.4.8 or newer.
+NOTE: Verify that your AWS SDK version supports PutLifecycleEventHookExecutionStatus. For example, Python requires SDK version 1.4.8 or newer.
 
 .. _PutLifecycleEventHookExecutionStatus: https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_PutLifecycleEventHookExecutionStatus.html
 
-.. _Here: https://github.com/awslabs/serverless-application-model/tree/master/examples/2016-10-31/lambda_safe_deployments/preTraffichook.js
+.. _Here: https://github.com/awslabs/serverless-application-model/blob/master/examples/2016-10-31/lambda_safe_deployments/preTrafficHook.js
 
 Traffic Shifting Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -245,7 +245,7 @@ Hooks are extremely powerful because:
 
 Checkout the lambda_safe_deployments_ folder for an example for how to create SAM template that contains a hook function.
 
-.. _lambda_safe_deployments: https://github.com/awslabs/serverless-application-model/tree/master/examples/2016-10-31/lambda_safe_deployments
+.. _lambda_safe_deployments: https://github.com/awslabs/serverless-application-model/blob/master/examples/2016-10-31/lambda_safe_deployments
 
 Internals
 ~~~~~~~~~
