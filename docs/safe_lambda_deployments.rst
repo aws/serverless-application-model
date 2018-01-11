@@ -61,7 +61,7 @@ property to your ``AWS::Serverless::Function`` resource:
 This will:
 
 - Create an Alias with ``<alias-name>`` 
-- Create & publishes a Lambda version with the latest code & configuration 
+- Creates & publishes a Lambda version with the latest code & configuration 
   derived from ``CodeUri`` property 
 - Point the Alias to the latest published version 
 - Point all event sources to the Alias & not the function 
@@ -116,7 +116,8 @@ resource:
           - Effect: "Allow"
             Action:
               - "codedeploy:PutLifecycleEventHookExecutionStatus"
-            Resource: "*"
+            Resource:
+              !Sub 'arn:aws:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*'
         - Version: "2012-10-17"
           Statement:
           - Effect: "Allow"
@@ -218,9 +219,10 @@ Hooks are extremely powerful because:
   Function). So you can customize the hooks logic to the function that is being deployed.
 
     NOTE: If the Hook functions are created by the same SAM template that is deployed, then make sure to turn off
-    traffic shifting deployments for the hook functions. Also, you should not rely on SAM to create the default function Role, since it
+    traffic shifting deployments for the hook functions. Also, the Role SAM generates for a Lambda Execution Role does not include all permissions needed for Per and Post hook functions, since it
     will not contain the necessary permissions to call the CodeDepoloy APIs or Invoke your new Lambda function for testing.
-    Instead, use the Policies_ attribute to provide the CodeDeploy and Lambda permissions needed. Finally, use the ``FunctionName`` property to control the exact name of the Lambda function Cloudformation creates. Otherwise, Cloudformation will create your Lambda function with the Stack name and a unique ID added as part of the name.
+    Instead, use the Policies_ attribute to provide the CodeDeploy and Lambda permissions needed. The example also shows a Policy that provides access to the CodeDeploy resource that SAM automatically generates.
+    Finally, use the ``FunctionName`` property to control the exact name of the Lambda function Cloudformation creates. Otherwise, Cloudformation will create your Lambda function with the Stack name and a unique ID added as part of the name.
 
 .. _Policies: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types
 
@@ -251,7 +253,7 @@ Internals
 ~~~~~~~~~
 Internally, SAM will create the following resources in your CloudFormation stack to make all of this work:
 
--  One ``AWS::CodeDeploy::Application`` per stack.
+-  One ``AWS::CodeDeploy::Application`` per stack, that is referencable via ${ServerlessDeploymentApplication}
 -  One ``AWS::CodeDeploy::DeploymentGroup`` per
    ``AWS::Serverless::Function`` resource. Each Lambda Function in your
    SAM template belongs to its own Deployment Group.

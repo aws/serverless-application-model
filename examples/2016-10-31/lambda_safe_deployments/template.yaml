@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: A hello world application.
+Description: A sample Lambda Safe Deployment Application
 
 Resources:
 
@@ -25,7 +25,8 @@ Resources:
           - Effect: "Allow"
             Action:
               - "codedeploy:PutLifecycleEventHookExecutionStatus"
-            Resource: "*"
+            Resource:
+              !Sub 'arn:aws:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*'
         - Version: "2012-10-17"
           Statement:
           - Effect: "Allow"
