@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A sample Lambda Safe Deployment Application
+
+Resources:
+
+  safeTest:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: safeTest.handler
+      Runtime: nodejs6.10
+      AutoPublishAlias: live
+      DeploymentPreference:
+          Type: Linear10PercentEvery1Minute
+          Hooks:
+            PreTraffic: !Ref preTrafficHook
+
+  preTrafficHook:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: preTrafficHook.handler
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "codedeploy:PutLifecycleEventHookExecutionStatus"
+            Resource:
+              !Sub 'arn:aws:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*'
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action:
+              - "lambda:InvokeFunction"
+            Resource: !Ref safeTest.Version
+      Runtime: nodejs6.10
+      FunctionName: 'CodeDeployHook_preTrafficHook'
+      DeploymentPreference:
+        Enabled: false
+      Environment:
+        Variables:
+          CurrentVersion: !Ref safeTest.Version
