@@ -209,6 +209,7 @@ Hooks are extremely powerful because:
     We recommend adding an Envrionment variable to the Hook function that maintains the current version of the function requiring safe deployments
 
 .. code:: yaml
+
   Environment:
     Variables:
       CurrentVersion: !Ref MySafeLambdaFunction.Version
