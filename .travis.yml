@@ -2,6 +2,11 @@
 branches:
   only:
     - docs
+
+# Enable container based builds
+sudo: false
+language: python
+
 install:            # Install requirement as "Environment Setup Section"
 - pip install -r docs/website/requirements.txt
 script:             # build sphinx document
