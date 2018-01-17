@@ -1,0 +1,18 @@
+# Build only docs branch
+branches:
+  only:
+    - docs
+install:            # Install requirement as "Environment Setup Section"
+- pip install -r docs/website/requirements.txt
+script:             # build sphinx document
+- cd docs/website
+- make html
+- cd -
+deploy:              # deploy to github page
+- provider: pages
+  skip_cleanup: true
+  local_dir: docs/website/_build/html
+  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+  keep-history: true
+  on:
+      branch: docs
