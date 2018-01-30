@@ -31,14 +31,12 @@ def encrypt(key, message):
 
 def post(event, context):
 
-    try:
-        key_id = os.environ['keyId']
-        message = event['body']
-        if message is None:
-            raise ValueError
-    except KeyError:
+    key_id = os.environ.get('keyId')
+    if key_id is None:
         raise Exception("KMS Key ID not found.")
-    except ValueError:
+
+    message = event.get('body')
+    if message is None:
         return bad_request
 
     encrypted_message = encrypt(key_id, message)
