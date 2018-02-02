@@ -265,7 +265,7 @@ CodeDeploy assumes that there are no dependencies between Deployment Groups and 
 Since every Lambda function is to its own CodeDeploy DeploymentGroup, they will be deployed in parallel.
 The CodeDeploy service will assume the new CodeDeployServiceRole to Invoke any Pre/Post hook functions and perform the traffic shifting and Alias updates.
 
-  NOTE: The CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  ``CodeDeploy_``. For example,  you should name your Hook functions as such: ``CodeDeploy_PreTrafficHook``.
+  NOTE: The CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  ``CodeDeployHook_``. For example,  you should name your Hook functions as such: ``CodeDeployHook_PreTrafficHook``.
 
 
 .. _Globals: globals.rst
