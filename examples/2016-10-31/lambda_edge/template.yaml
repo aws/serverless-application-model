@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample SAM configuration for Lambda@Edge to ease deployment and further updates
+Resources:
+
+    CFDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Enabled: 'true'
+          Comment: Lambda@Edge SAM Sample
+          DefaultRootObject: index.html
+          Origins:
+            -
+              Id: MyOrigin
+              DomainName: aws.amazon.com/lambda/edge/
+              CustomOriginConfig:
+                HTTPPort: 80
+                OriginProtocolPolicy: match-viewer
+          DefaultCacheBehavior:
+            TargetOriginId: MyOrigin
+            # Lambda@Edge configuration requires a function version not alias
+            LambdaFunctionAssociations:
+              - 
+                EventType: origin-request
+                # <SAM-Function.Version> provides {FunctionARN}:{Version} which is exactly what Cloudfront expects
+                # SAM Benefit here is upon function changes this function version will also be updated in Cloudfront
+                LambdaFunctionARN: !Ref LambdaEdgeFunctionSample.Version
+            ForwardedValues:
+              QueryString: 'false'
+              Headers:
+                - Origin
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: allow-all
+
+    LambdaEdgeFunctionSample:
+        Type: AWS::Serverless::Function
+        Properties:
+          CodeUri: s3://<bucket>/lambda_edge.zip
+          Role: !GetAtt LambdaEdgeFunctionRole.Arn
+          Runtime: nodejs6.10
+          Handler: app.handler
+          Timeout: 5
+          # More info at https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
+          AutoPublishAlias: live 
+
+    LambdaEdgeFunctionRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+          Path: "/"
+          ManagedPolicyArns:
+              - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Sid: "AllowLambdaServiceToAssumeRole"
+                Effect: "Allow"
+                Action: 
+                  - "sts:AssumeRole"
+                Principal:
+                  Service: 
+                    - "lambda.amazonaws.com"
+                    - "edgelambda.amazonaws.com"
+
+Outputs:
+
+    LambdaEdgeFunctionSample: 
+      Description: Lambda@Edge Sample Function ARN
+      Value: !GetAtt LambdaEdgeFunctionSample.Arn
+
+    LambdaEdgeFunctionSampleVersion: 
+      Description: Lambda@Edge Sample Function ARN with Version
+      Value: !Ref LambdaEdgeFunctionSample.Version
+
+    CFDistribution: 
+      Description: Cloudfront Distribution Domain Name
+      Value: !GetAtt CFDistribution.DomainName
