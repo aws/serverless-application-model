@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Demonstrates using a built-in Node.js module to make an HTTPS request.
+Resources:
+  httpsrequest:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: .
+      Description: Demonstrates using a built-in Node.js module to make an HTTPS request.
+      MemorySize: 128
+      Timeout: 60
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ses:SendBounce'
+              Resource: '*'

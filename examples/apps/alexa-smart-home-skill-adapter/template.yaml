@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Provides the basic framework for a skill adapter for a smart home skill.
+Resources:
+  alexasmarthomeskilladapter:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: .
+      Description: Provides the basic framework for a skill adapter for a smart home skill.
+      MemorySize: 128
+      Timeout: 7
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'sns:Publish'
+              Resource: 'arn:aws:sns:*:*:*'

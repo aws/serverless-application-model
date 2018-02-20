@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >-
+  An Amazon Kinesis Firehose stream processor that extracts individual log
+  events from records sent by Cloudwatch Logs subscription filters.
+Resources:
+  kinesisfirehosecloudwatchlogsprocessor:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: .
+      Description: >-
+        An Amazon Kinesis Firehose stream processor that extracts individual log
+        events from records sent by Cloudwatch Logs subscription filters.
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:GetObject'
+              Resource: 'arn:aws:s3:::*'

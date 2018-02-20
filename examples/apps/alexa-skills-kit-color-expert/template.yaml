@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Demonstrates a basic skill built with the Amazon Alexa Skills Kit.
+Resources:
+  alexaskillskitcolorexpert:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: .
+      Description: Demonstrates a basic skill built with the Amazon Alexa Skills Kit.
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'sns:Publish'
+              Resource: 'arn:aws:sns:*:*:*'
+      Events:
+        AlexaSkillEvent:
+          Type: AlexaSkill

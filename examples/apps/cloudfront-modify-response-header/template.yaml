@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Blueprint for modifying CloudFront response header implemented in NodeJS.
+Resources:
+  cloudfrontmodifyresponseheader:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: .
+      Description: >-
+        Blueprint for modifying CloudFront response header implemented in
+        NodeJS.
+      MemorySize: 128
+      Timeout: 1
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'kms:Decrypt'
+              Resource: '*'

@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'Blueprint for API Gateway custom authorizers, implemented in Python 2.7.'
+Resources:
+  apigatewayauthorizerpython:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python2.7
+      CodeUri: .
+      Description: 'Blueprint for API Gateway custom authorizers, implemented in Python 2.7.'
+      MemorySize: 256
+      Timeout: 5
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'sns:Publish'
+              Resource: 'arn:aws:sns:*:*:*'
