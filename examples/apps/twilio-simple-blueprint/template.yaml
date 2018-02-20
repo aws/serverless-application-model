@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: A simple backend for handling events sent from Twilio.
+Resources:
+  twiliosimpleblueprint:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: .
+      Description: A simple backend for handling events sent from Twilio.
+      MemorySize: 128
+      Timeout: 15
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudwatch:PutMetricData'
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - 'ec2:DescribeRegions'
+                - 'ec2:DescribeVpnConnections'
+              Resource: '*'
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /MyResource
+            Method: ANY

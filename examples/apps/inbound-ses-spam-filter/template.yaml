@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >-
+  A simple email filter for protection against spam and viruses as well as DKIM
+  and SPF failures.
+Resources:
+  inboundsesspamfilter:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: .
+      Description: >-
+        A simple email filter for protection against spam and viruses as well as
+        DKIM and SPF failures.
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ses:SendBounce'
+              Resource: '*'
+      Environment:
+        Variables:
+          emailDomain: <enter value here>

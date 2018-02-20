@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'Order flowers, using Amazon Lex to perform natural language understanding'
+Resources:
+  lexorderflowers:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: .
+      Description: >-
+        Order flowers, using Amazon Lex to perform natural language
+        understanding
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'kms:Decrypt'
+              Resource: '*'

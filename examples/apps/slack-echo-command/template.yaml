@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >-
+  A function that handles a Slack slash command and echoes the details back to
+  the user.
+Resources:
+  slackechocommand:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: .
+      Description: >-
+        A function that handles a Slack slash command and echoes the details
+        back to the user.
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'kms:Decrypt'
+              Resource: '*'
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /MyResource
+            Method: ANY
+      Environment:
+        Variables:
+          kmsEncryptedToken: <enter value here>

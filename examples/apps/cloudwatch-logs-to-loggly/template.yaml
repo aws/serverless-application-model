@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Sends logs from Cloudwatch logs to Loggly using a Lambda function.
+Resources:
+  cloudwatchlogstologgly:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs4.3
+      CodeUri: .
+      Description: Sends logs from Cloudwatch logs to Loggly using a Lambda function.
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'kms:Decrypt'
+              Resource: '*'
+      Environment:
+        Variables:
+          kmsEncryptedCustomerToken: <enter value here>
+          logglyTags: CloudWatch2Loggly
+          logglyHostName: <enter value here>
