@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Stream events from AWS Kinesis to Splunk's HTTP event collector
+Resources:
+  splunkkinesisstreamprocessor:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: .
+      Description: Stream events from AWS Kinesis to Splunk's HTTP event collector
+      MemorySize: 512
+      Timeout: 10
+      Policies: []
+      Events:
+        Kinesis1:
+          Type: Kinesis
+          Properties:
+            Stream:
+              'Fn::GetAtt':
+                - KinesisStream1
+                - Arn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 100
+      Environment:
+        Variables:
+          SPLUNK_HEC_URL: <enter value here>
+          SPLUNK_HEC_TOKEN: <enter value here>
+  KinesisStream1:
+    Type: 'AWS::Kinesis::Stream'
+    Properties:
+      ShardCount: 1

@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Amazon SNS trigger that sends CloudWatch alarm notifications to Slack.
+Resources:
+  cloudwatchalarmtoslackpython3:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: .
+      Description: >-
+        An Amazon SNS trigger that sends CloudWatch alarm notifications to
+        Slack.
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'kms:Decrypt'
+              Resource: '*'
+      Events:
+        SNS1:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: SNSTopic1
+      Environment:
+        Variables:
+          slackChannel: <enter value here>
+          kmsEncryptedHookUrl: <enter value here>
+  SNSTopic1:
+    Type: 'AWS::SNS::Topic'
