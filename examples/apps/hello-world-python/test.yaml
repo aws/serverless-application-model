@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A starter AWS Lambda function.
+Resources:
+  helloworldpython:
+    Properties:
+      CodeUri: s3://oak-test-1249/e7e05ba6039858b2112bdd9f80ee716a
+      Description: A starter AWS Lambda function.
+      Handler: lambda_function.lambda_handler
+      MemorySize: 128
+      Policies:
+      - Statement:
+        - Action:
+          - ses:SendBounce
+          Effect: Allow
+          Resource: '*'
+        Version: '2012-10-17'
+      Runtime: python2.7
+      Timeout: 3
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31

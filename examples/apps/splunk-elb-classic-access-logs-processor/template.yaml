@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Stream Classic ELB access logs from S3 to Splunk's HTTP event collector
+Resources:
+  splunkelbclassicaccesslogsprocessor:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: .
+      Description: Stream Classic ELB access logs from S3 to Splunk's HTTP event collector
+      MemorySize: 512
+      Timeout: 10
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:GetObject'
+              Resource: 'arn:aws:s3:::*'
+      Events:
+        BucketEvent1:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket1
+            Events:
+              - 's3:ObjectCreated:*'
+      Environment:
+        Variables:
+          SPLUNK_HEC_URL: <enter value here>
+          SPLUNK_HEC_TOKEN: <enter value here>
+  Bucket1:
+    Type: 'AWS::S3::Bucket'

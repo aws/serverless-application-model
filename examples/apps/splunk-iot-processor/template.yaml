@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Stream events from AWS IoT to Splunk's HTTP event collector
+Resources:
+  splunkiotprocessor:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: .
+      Description: Stream events from AWS IoT to Splunk's HTTP event collector
+      MemorySize: 512
+      Timeout: 10
+      Policies: []
+      Environment:
+        Variables:
+          SPLUNK_HEC_URL: <enter value here>
+          SPLUNK_HEC_TOKEN: <enter value here>

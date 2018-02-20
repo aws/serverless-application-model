@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Upgrade deprecated Nodejs v0.10 functions to a newer runtime.
+Resources:
+  nodejsupgradefunctions:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: .
+      Description: Upgrade deprecated Nodejs v0.10 functions to a newer runtime.
+      MemorySize: 128
+      Timeout: 300
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:GetObject'
+              Resource: 'arn:aws:s3:::*'
+            - Effect: Allow
+              Action:
+                - 'rekognition:CompareFaces'
+                - 'rekognition:DetectFaces'
+                - 'rekognition:DetectLabels'
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - 'rekognition:CreateCollection'
+                - 'rekognition:IndexFaces'
+              Resource: '*'
+      Environment:
+        Variables:
+          EXCEPTIONS: <ENTER_COMMA_SEPARATED_FUNCTION_NAMES>
+          TARGET_RUNTIME: nodejs4.3
+          MODE: List
