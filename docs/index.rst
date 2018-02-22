@@ -13,6 +13,7 @@ What's New?
 - ``Globals`` section 
 - Support for Traffic Shifting Lambda deployments 
 - Refer to resources automatically created by SAM 
+- ``FAQ`` section 
 
 .. toctree::
     :hidden:
@@ -22,3 +23,4 @@ What's New?
     safe_lambda_deployments.rst
     policy_templates.rst
     internals/index
+    faq.rst
