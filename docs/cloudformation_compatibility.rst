@@ -1,5 +1,5 @@
 CloudFormation Compatibility Section
-===============
+====================================
 
 .. contents::
 
@@ -30,7 +30,7 @@ DependsOn Attribute:
     ...
 
 CloudFormation Intrinsic Funtions
--------------------
+---------------------------------
 Currently, we do not support all Intrinsic Functions for all Property Values in `AWS::Serverless::*` resources but is fully available in other CloudFormation resources. Please see below tables for a details on which Intrinsic Functions can be used on a given field.
 
 The Condition Function is not currently supported on any ``AWS::Serverless::*`` Resource type
