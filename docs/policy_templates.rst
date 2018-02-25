@@ -68,7 +68,7 @@ folder.
   NOTE: If a policy template does not require a parameter, you should still specify the value to be an empty dictionary
   like this:
   
-  .. code: yaml
+  .. code:: yaml
   
     Policies:
       - CloudWatchPutMetricPolicy: {}      
