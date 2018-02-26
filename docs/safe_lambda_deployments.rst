@@ -25,7 +25,7 @@ adding the following lines to your ``AWS::Serverless::Function`` resource proper
     DeploymentPreference:
       Type: Linear10PercentEvery10Minutes
 
-Rest of this document dives deep into how this snippet works, available configurations, and debugging techniques 
+The rest of this document dives deep into how this snippet works, available configurations, and debugging techniques
 when deployments don't work as expected.
 
 Instant traffic shifting using Lambda Aliases
@@ -135,7 +135,7 @@ resource:
 When you update your function code and deploy the SAM template using
 CloudFormation, the following happens:
 
-- Cloudformation pubilshes a new Lambda Version from the new code
+- CloudFormation publishes a new Lambda Version from the new code
 - Since a deployment preference is set, CodeDeploy takes over the job of actually shifting traffic from old version to new version.
 - Before traffic shifting starts, CodeDeploy will invoke the **PreTraffic Hook** Lambda Function. This Lambda function must call back to CodeDeploy with an explicit status of Success or Failure, via the PutLifecycleEventHookExecutionStatus_ API. On Failure, CodeDeploy will abort and report a failure back to CloudFormation. On Success, CodeDeploy will proceed with the specified traffic shifting. Here_ is a sample Lambda Hook function.
 - ``Type: Linear10PercentEvery10Minutes`` instructs CodeDeploy to start with 10% traffic on new version and add 10% every 10 minutes. It will complete traffic shifting in 100 minutes.
@@ -209,6 +209,7 @@ Hooks are extremely powerful because:
     We recommend adding an Envrionment variable to the Hook function that maintains the current version of the function requiring safe deployments
 
 .. code:: yaml
+
   Environment:
     Variables:
       CurrentVersion: !Ref MySafeLambdaFunction.Version
@@ -222,7 +223,7 @@ Hooks are extremely powerful because:
     traffic shifting deployments for the hook functions. Also, the Role SAM generates for a Lambda Execution Role does not include all permissions needed for Per and Post hook functions, since it
     will not contain the necessary permissions to call the CodeDepoloy APIs or Invoke your new Lambda function for testing.
     Instead, use the Policies_ attribute to provide the CodeDeploy and Lambda permissions needed. The example also shows a Policy that provides access to the CodeDeploy resource that SAM automatically generates.
-    Finally, use the ``FunctionName`` property to control the exact name of the Lambda function Cloudformation creates. Otherwise, Cloudformation will create your Lambda function with the Stack name and a unique ID added as part of the name.
+    Finally, use the ``FunctionName`` property to control the exact name of the Lambda function CloudFormation creates. Otherwise, CloudFormation will create your Lambda function with the Stack name and a unique ID added as part of the name.
 
 .. _Policies: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#resource-types
 
