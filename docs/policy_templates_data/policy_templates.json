@@ -258,7 +258,7 @@
       }
     },
     "S3CrudPolicy": {
-      "Description": "Gives CRUD permissions to objects in the S3 Bucket",
+      "Description": "Gives read permissions to objects in the S3 Bucket",
       "Parameters": {
         "BucketName": {
           "Description": "Name of the Bucket"
@@ -704,6 +704,178 @@
                 {
                   "keyId": {
                     "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "PollyFullAccessPolicy": {
+      "Description": "Gives full access permissions to Polly lexicon resources",
+      "Parameters": {
+        "LexiconName": {
+          "Description": "Name of the Lexicon"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "polly:GetLexicon",
+              "polly:DeleteLexicon"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:polly:${AWS::Region}:${AWS::AccountId}:lexicon/${lexiconName}",
+                  {
+                    "lexiconName": {
+                      "Ref": "LexiconName"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "polly:DescribeVoices",
+              "polly:ListLexicons",
+              "polly:PutLexicon",
+              "polly:SynthesizeSpeech"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": "arn:${AWS::Partition}:polly:${AWS::Region}:${AWS::AccountId}:lexicon/*"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "S3FullAccessPolicy": {
+      "Description": "Gives full access permissions to objects in the S3 Bucket",
+      "Parameters": {
+        "BucketName": {
+          "Description": "Name of the Bucket"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:GetObject",
+              "s3:GetObjectAcl",
+              "s3:GetObjectVersion",
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:DeleteObject"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:s3:::${bucketName}/*",
+                  {
+                    "bucketName": {
+                      "Ref": "BucketName"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetLifecycleConfiguration",
+              "s3:PutLifecycleConfiguration"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:s3:::${bucketName}",
+                  {
+                    "bucketName": {
+                      "Ref": "BucketName"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "CodePipelineLambdaExecutionPolicy": {
+      "Description": "Gives permission for a Lambda function invoked by AWS CodePipeline to report back status of the job",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "codepipeline:PutJobSuccessResult",
+              "codepipeline:PutJobFailureResult"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "ServerlessRepoReadWriteAccessPolicy": {
+      "Description": "Gives access permissions to create and list applications in the AWS Serverless Application Repository service",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "serverlessrepo:CreateApplication",
+              "serverlessrepo:CreateApplicationVersion",
+              "serverlessrepo:GetApplication",
+              "serverlessrepo:ListApplications",
+              "serverlessrepo:ListApplicationVersions"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": "arn:${AWS::Partition}:serverlessrepo:${AWS::Region}:${AWS::AccountId}:applications/*"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "EC2CopyImagePolicy": {
+      "Description": "Gives permission top copy EC2 Images",
+      "Parameters": {
+        "ImageId": {
+          "Description": "The id of the image"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:CopyImage"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/${imageId}",
+                {
+                  "imageId": {
+                    "Ref": "ImageId"
                   }
                 }
               ]
