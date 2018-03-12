@@ -7,6 +7,11 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+
+      # Allows www.example.com to call these APIs
+      # SAM will automatically add AllowMethods with a list of methods for this API
+      Cors: "'www.example.com'"
+
       DefinitionBody:
           'Fn::Transform':
             Name: 'AWS::Include'

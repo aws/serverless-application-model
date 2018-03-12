@@ -3,9 +3,9 @@ Globals Section
 
 .. contents::
 
-Lambda functions within a SAM template tend to have shared configuration such as Runtime, Memory, 
-VPC Settings, Environment Variables etc. Instead of duplicating this information in every function, you can 
-write them once in the  ``Globals`` section and let all Functions inhert it. 
+Resources in a SAM template tend to have shared configuration such as Runtime, Memory, 
+VPC Settings, Environment Variables, Cors etc. Instead of duplicating this information in every resource, you can 
+write them once in the  ``Globals`` section and let all resources inhert it. 
 
 Example:
 
@@ -44,22 +44,64 @@ inherited TABLE_NAME. ``ThumbnailFunction`` inherits all the Globals properties 
 
 Supported Resources
 -------------------
-Properties of ``AWS::Serverless::Function`` are only supported in Globals section presently. 
+Properties of ``AWS::Serverless::Function`` and ``AWS::Serverless::Api`` are only supported in Globals section 
+presently. 
 
 .. code:: yaml
 
   Globals:
     Function:
-      # Properties of AWS::Serverless::Function
+      # Some properties of AWS::Serverless::Function
+      Handler:
+      Runtime:
+      CodeUri:
+      DeadLetterQueue:
+      Description:
+      MemorySize:
+      Timeout:
+      VpcConfig:
+      Environment:
+      Tags:
+      Tracing:
+      KmsKeyArn:
+      AutoPublishAlias:
+      DeploymentPreference:
+    
+    Api:
+      # Some properties of AWS::Serverless::Api
+      # Also works with Implicit APIs
+      Name:
+      DefinitionUri:
+      CacheClusterEnabled:
+      CacheClusterSize:
+      Variables:
+      EndpointConfiguration:
+      MethodSettings:
+      BinaryMediaTypes:
+      Cors:
 
-Following properties of ``AWS::Serverless::Function`` are **not** supported in Globals section. We made the explicitly
+Implicit APIs
+~~~~~~~~~~~~~
+
+APIs created by SAM when you have an API declared in the ``Events`` section are called "Implicit APIs". You can use 
+Globals to override all properties of Implicit APIs as well. 
+
+Unsupported Properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+Following properties of are **not** supported in Globals section. We made the explicitly
 call to not support them because it either made the template hard to understand or opens scope for potential security 
 issues.
 
+**AWS::Serverless::Function:**
 * Role
 * Policies
 * FunctionName
 * Events
+
+**AWS::Serverless::Api:**
+* StageName
+* DefinitionBody
 
 Overridable
 -----------
@@ -148,7 +190,3 @@ SecurityGroupIds of VpcConfig will be set to ``["sg-first", "sg-123", "sg-456"]`
           SecurityGroupIds:
             - sg-first
  
-
-
-
-

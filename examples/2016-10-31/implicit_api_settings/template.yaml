@@ -1,0 +1,90 @@
+---
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Api:
+    # Allows www.example.com to call these APIs
+    # SAM will automatically add AllowMethods with a list of methods for this API
+    Cors: "'https://www.www.example.com'"
+
+    # API Gateway regional endpoints
+    EndpointConfiguration: REGIONAL
+
+    # Send/receive binary data through the APIs
+    BinaryMediaTypes:
+      # This is equivalent to image/gif when deployed
+      - image~1gif
+      - iimage~1png
+
+    # Logging, Metrics, Throttling, and all other Stage settings
+    MethodSettings: [{
+        # Turn on Info logging
+        "LoggingLevel": "INFO",
+
+        # Enable Metrics
+        "MetricsEnabled": True,
+
+        # Trace-level Logging
+        "DataTraceEnabled": True,
+
+        # On all Paths & methods
+        "ResourcePath": "/*",
+        "HttpMethod": "*",
+    }]
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      # Replace <bucket> with your bucket name
+      CodeUri: s3://<bucket>/code.zip
+      Handler: index.handler
+      Runtime: nodejs6.10
+      Events:
+        ProxyApiRoot:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+        ProxyApiGreedy:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+  ####### Necessary for API Gateway Logging ########
+  # Add the CloudWatchRole and Account resource to your template to give API Gateway permissions write to CloudWatch logs
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-account.html#aws-resource-apigateway-account-examples
+  # 
+  # NOTE: This is a one time process. As long as you have this enabled once in a region, you can deploy other stacks
+  #       without the need for each stack to create this role. As a good practice, create a separate stack altogether
+  #       with just the API Gateway logging role so none of your application stacks need them.
+  ApiGwAccountConfig: 
+    Type: "AWS::ApiGateway::Account"
+    Properties: 
+      CloudWatchRoleArn: !GetAtt "ApiGatewayLoggingRole.Arn"
+  ApiGatewayLoggingRole: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: Allow
+            Principal: 
+              Service: 
+                - "apigateway.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns: 
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+
+Outputs:
+  ApiUrl:
+    Description: URL of your API endpoint
+    Value: !Join
+      - ''
+      - - https://
+        - !Ref ServerlessRestApi
+        - '.execute-api.'
+        - !Ref 'AWS::Region'
+        - '.amazonaws.com/Prod'
