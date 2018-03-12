@@ -164,7 +164,7 @@ Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource
             NEW_VAR: hello
 
 Lists are additivie
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 *Also called as arrays*
 
 List values in the resource will be **appended** with the map value from Global. 
