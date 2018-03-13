@@ -4,8 +4,8 @@ Globals Section
 .. contents::
 
 Resources in a SAM template tend to have shared configuration such as Runtime, Memory, 
-VPC Settings, Environment Variables, Cors etc. Instead of duplicating this information in every resource, you can 
-write them once in the  ``Globals`` section and let all resources inhert it. 
+VPC Settings, Environment Variables, Cors, etc. Instead of duplicating this information in every resource, you can 
+write them once in the ``Globals`` section and let all resources inherit it. 
 
 Example:
 
@@ -39,7 +39,7 @@ Example:
 
 
 In the above example, both ``HelloWorldFunction`` and ``ThumbnailFunction`` will use nodejs6.10 runtime, 180 seconds 
-timeout and index.handler Handler. ``HelloWorldFunction`` adds MESSAGE environnment variable in addition to the 
+timeout and index.handler Handler. ``HelloWorldFunction`` adds MESSAGE environment variable in addition to the 
 inherited TABLE_NAME. ``ThumbnailFunction`` inherits all the Globals properties and adds an API Event source.
 
 Supported Resources
@@ -89,8 +89,8 @@ Globals to override all properties of Implicit APIs as well.
 Unsupported Properties
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Following properties of are **not** supported in Globals section. We made the explicitly
-call to not support them because it either made the template hard to understand or opens scope for potential security 
+Following properties are **not** supported in Globals section. We made the explicit
+call to not support them because it either made the template hard to understand or opened scope for potential security 
 issues.
 
 **AWS::Serverless::Function:**
@@ -163,7 +163,7 @@ Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource
             TABLE_NAME: resource-table
             NEW_VAR: hello
 
-Lists are additivie
+Lists are additive
 ~~~~~~~~~~~~~~~~~~~
 *Also called as arrays*
 
