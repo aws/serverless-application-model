@@ -163,7 +163,7 @@ Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource
             TABLE_NAME: resource-table
             NEW_VAR: hello
 
-Lists are additivie
+Lists are additive
 ~~~~~~~~~~~~~~~~~~~
 *Also called as arrays*
 
