@@ -39,13 +39,13 @@ The Condition Function is not currently supported on any ``AWS::Serverless::*`` 
 AWS::Serverless::Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-======================== ================================== ========================
-     Property Name        Intrinsic(s) Supported            Reasons
-======================== ================================== ========================
+============================ ================================== ========================
+     Property Name           Intrinsic(s) Supported            Reasons
+============================ ================================== ========================
 Handler                            All
 Runtime                            All
 CodeUri (String - S3Uri)          None                      SAM does not parse any Parameters, which is needed to support Ref
-CodeUri (Bucket & Key)             All    
+CodeUri (Bucket & Key)             All
 FunctionName                       All
 Description                        All
 MemorySize                         All
@@ -60,8 +60,9 @@ Tracing                            All
 KmsKeyArn                          All
 DeadLetterQueue                    All
 DeploymentPreference               All
-AutoPublishAlias         Ref of a CloudFormation Parameter  Alias resources created by SAM uses a LocicalId <FunctionLogicalId+AliasName>. So SAM either needs a string for alias name, or a Ref to template Parameter that SAM can resolve into a string.
-======================== ================================== ========================
+AutoPublishAlias             Ref of a CloudFormation Parameter  Alias resources created by SAM uses a LocicalId <FunctionLogicalId+AliasName>. So SAM either needs a string for alias name, or a Ref to template Parameter that SAM can resolve into a string.
+ReservedConcurrentExecutions       All
+============================ ================================== ========================
 
 Events Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -161,6 +162,10 @@ DefinitionBody                      All
 CacheClusterEnabled                 All
 CacheClusterSize                    All
 Variables                           All
+EndpointConfiguration               All
+MethodSettings                      All
+BinaryMediaTypes                    All
+Cors                                All
 ================================== ======================== ========================
 
 
@@ -171,5 +176,7 @@ AWS::Serverless::SimpleTable
      Property Name        Intrinsic(s) Supported          Reasons
 ======================== ======================== ========================
 PrimaryKey               None
-ProvisionedThroughput    None
+ProvisionedThroughput    All
+TableName                All
+Tags                     All
 ======================== ======================== ========================
