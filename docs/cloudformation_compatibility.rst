@@ -162,6 +162,10 @@ DefinitionBody                      All
 CacheClusterEnabled                 All
 CacheClusterSize                    All
 Variables                           All
+EndpointConfiguration
+MethodSettings
+BinaryMediaTypes
+Cors
 ================================== ======================== ========================
 
 
