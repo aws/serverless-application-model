@@ -13,7 +13,7 @@ Resources:
           Origins:
             -
               Id: MyOrigin
-              DomainName: aws.amazon.com/lambda/edge/
+              DomainName: aws.amazon.com
               CustomOriginConfig:
                 HTTPPort: 80
                 OriginProtocolPolicy: match-viewer
