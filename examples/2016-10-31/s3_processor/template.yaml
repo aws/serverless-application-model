@@ -7,7 +7,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs6.10
-      CodeUri: s3://<bucket>/s3_processor.zip
+      CodeUri: src/
       Policies: AmazonS3ReadOnlyAccess
       Events:
         PhotoUpload:
@@ -18,3 +18,9 @@ Resources:
 
   Bucket:
     Type: AWS::S3::Bucket
+
+Outputs:
+
+    S3Bucket:
+      Description: "S3 Bucket name that will trigger a Lambda function upon new objects insertion"
+      Value: !Ref Bucket
