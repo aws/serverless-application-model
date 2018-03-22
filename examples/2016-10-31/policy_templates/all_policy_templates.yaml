@@ -3,7 +3,7 @@ Resources:
   MyFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: .
+      CodeUri: src/
       Handler: index.handler
       Runtime: nodejs4.3
       Policies:
