@@ -38,3 +38,27 @@ CFDistribution:
 ```
 
 In this example, ``LambdaEdgeFunctionSample.Version`` will be evaluated as ``arn:aws:lambda:<aws-region>:<aws-account-id>:function:<lambda-function-name>:<version>`` which is expected input for Lambda@Edge. 
+
+### Deploying this sample
+
+Before you go and deploy this it is important to note that Lambda@Edge expects your Lambda function to be deployed in N.**us-east-1** (N. Virginia) and therefore you must have both a S3 Bucket and this stack to be deployed in **us-east-1**.
+
+```bash
+aws cloudformation package \
+    --template-file template.yaml \
+    --output-template-file packaged.yaml \
+    --s3-bucket S3_BUCKET_IN_US_EAST_1 \
+    --region us-east-1
+
+aws cloudformation deploy \
+    --template-file packaged.yaml \
+    --stack-name lambda-edge-sample2 \
+    --capabilities CAPABILITY_IAM \
+    --region us-east-1
+```
+
+If you don't have a S3 bucket in us-east-1 you can quickly create one and replace the placeholder in the command above:
+
+```bash
+aws s3 mb s3://S3-BUCKET-NAME --region us-east-1
+```
