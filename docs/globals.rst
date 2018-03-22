@@ -94,12 +94,14 @@ call to not support them because it either made the template hard to understand 
 issues.
 
 **AWS::Serverless::Function:**
+
 * Role
 * Policies
 * FunctionName
 * Events
 
 **AWS::Serverless::Api:**
+
 * StageName
 * DefinitionBody
 
