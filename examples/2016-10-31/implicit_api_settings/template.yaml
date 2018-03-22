@@ -37,7 +37,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       # Replace <bucket> with your bucket name
-      CodeUri: s3://<bucket>/code.zip
+      CodeUri: src/
       Handler: index.handler
       Runtime: nodejs6.10
       Events:
@@ -81,10 +81,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: URL of your API endpoint
-    Value: !Join
-      - ''
-      - - https://
-        - !Ref ServerlessRestApi
-        - '.execute-api.'
-        - !Ref 'AWS::Region'
-        - '.amazonaws.com/Prod'
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
