@@ -8,9 +8,9 @@ The following Lambda function snippet uses ``AutoPublishAlias`` property which p
 LambdaEdgeFunctionSample:
     Type: AWS::Serverless::Function
     Properties:
-        CodeUri: s3://<bucket>/lambda_edge.zip
+        CodeUri: src/
         Runtime: nodejs6.10
-        Handler: app.handler
+        Handler: index.handler
         Timeout: 5
         # More info at https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
         AutoPublishAlias: live 
