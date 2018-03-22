@@ -22,19 +22,19 @@ We can now configure our [Cloudfront Distribution Lambda Association Property](h
 CFDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
-    DistributionConfig:
-        Enabled: 'true'
-        ....
-        DefaultCacheBehavior:
-        
-        # Lambda@Edge configuration requires a function version not alias
-        LambdaFunctionAssociations:
-            - 
-            EventType: origin-request
-            # <SAM-Function.Version> provides {FunctionARN}:{Version} which is exactly what Cloudfront expects
-            # SAM Benefit here is upon function changes this function version will also be updated in Cloudfront
-            LambdaFunctionARN: !Ref LambdaEdgeFunctionSample.Version
-        ...
+        DistributionConfig:
+            Enabled: 'true'
+            ....
+            DefaultCacheBehavior:
+            
+            # Lambda@Edge configuration requires a function version not alias
+            LambdaFunctionAssociations:
+                - 
+                EventType: origin-request
+                # <SAM-Function.Version> provides {FunctionARN}:{Version} which is exactly what Cloudfront expects
+                # SAM Benefit here is upon function changes this function version will also be updated in Cloudfront
+                LambdaFunctionARN: !Ref LambdaEdgeFunctionSample.Version
+            ...
 ```
 
 In this example, ``LambdaEdgeFunctionSample.Version`` will be evaluated as ``arn:aws:lambda:<aws-region>:<aws-account-id>:function:<lambda-function-name>:<version>`` which is expected input for Lambda@Edge. 
