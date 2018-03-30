@@ -43,3 +43,9 @@ Work is underway to make this functionality part of the SAM specification. Until
 The command above can be run as a post deployment CI step or it could be triggered by a `custom resource <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html/>`_ within the same CloudFormation template.
 
 Please note that in either case you will see metric gaps between the time CloudFormation updates API Gateway and the time this command runs.
+
+
+How to deploy Lambda\@Edge functions with SAM?
+----------------------------------------------
+
+At present, SAM doesn't support `Lambda@Edge <https://aws.amazon.com/lambda/edge/>`_ as a native event. However you can follow this example to ease deployment: `Lambda Edge Example <https://github.com/awslabs/serverless-application-model/tree/master/examples/2016-10-31/lambda_edge>`_.

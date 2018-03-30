@@ -4,43 +4,43 @@ Description: Sample SAM configuration for Lambda@Edge to ease deployment and fur
 Resources:
 
     CFDistribution:
-      Type: AWS::CloudFront::Distribution
-      Properties:
-        DistributionConfig:
-          Enabled: 'true'
-          Comment: Lambda@Edge SAM Sample
-          DefaultRootObject: index.html
-          Origins:
-            -
-              Id: MyOrigin
-              DomainName: aws.amazon.com/lambda/edge/
-              CustomOriginConfig:
-                HTTPPort: 80
-                OriginProtocolPolicy: match-viewer
-          DefaultCacheBehavior:
-            TargetOriginId: MyOrigin
-            # Lambda@Edge configuration requires a function version not alias
-            LambdaFunctionAssociations:
-              - 
-                EventType: origin-request
-                # <SAM-Function.Version> provides {FunctionARN}:{Version} which is exactly what Cloudfront expects
-                # SAM Benefit here is upon function changes this function version will also be updated in Cloudfront
-                LambdaFunctionARN: !Ref LambdaEdgeFunctionSample.Version
-            ForwardedValues:
-              QueryString: 'false'
-              Headers:
-                - Origin
-              Cookies:
-                Forward: none
-            ViewerProtocolPolicy: allow-all
+        Type: AWS::CloudFront::Distribution
+        Properties:
+          DistributionConfig:
+            Enabled: 'true'
+            Comment: Lambda@Edge SAM Sample
+            DefaultRootObject: index.html
+            Origins:
+              -
+                Id: MyOrigin
+                DomainName: aws.amazon.com # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-origin.html
+                CustomOriginConfig:
+                  HTTPPort: 80
+                  OriginProtocolPolicy: match-viewer
+            DefaultCacheBehavior:
+              TargetOriginId: MyOrigin
+              # Lambda@Edge configuration requires a function version not alias
+              LambdaFunctionAssociations:
+                - 
+                  EventType: origin-request
+                  # <SAM-Function.Version> provides {FunctionARN}:{Version} which is exactly what Cloudfront expects
+                  # SAM Benefit here is upon function changes this function version will also be updated in Cloudfront
+                  LambdaFunctionARN: !Ref LambdaEdgeFunctionSample.Version
+              ForwardedValues:
+                QueryString: 'false'
+                Headers:
+                  - Origin
+                Cookies:
+                  Forward: none
+              ViewerProtocolPolicy: allow-all
 
     LambdaEdgeFunctionSample:
         Type: AWS::Serverless::Function
         Properties:
-          CodeUri: s3://<bucket>/lambda_edge.zip
+          CodeUri: src/
           Role: !GetAtt LambdaEdgeFunctionRole.Arn
           Runtime: nodejs6.10
-          Handler: app.handler
+          Handler: index.handler
           Timeout: 5
           # More info at https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
           AutoPublishAlias: live 
