@@ -7,7 +7,7 @@ Resources:
     Properties:
       Handler: index.get
       Runtime: nodejs6.10
-      CodeUri: s3://<bucket>/api_backend.zip
+      CodeUri: src/
       Policies: AmazonDynamoDBReadOnlyAccess
       Environment:
         Variables:
@@ -24,7 +24,7 @@ Resources:
     Properties:
       Handler: index.put
       Runtime: nodejs6.10
-      CodeUri: s3://<bucket>/api_backend.zip
+      CodeUri: src/
       Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
@@ -41,7 +41,7 @@ Resources:
     Properties:
       Handler: index.delete
       Runtime: nodejs6.10
-      CodeUri: s3://<bucket>/api_backend.zip
+      CodeUri: src/
       Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
@@ -55,3 +55,9 @@ Resources:
 
   Table:
     Type: AWS::Serverless::SimpleTable
+
+Outputs:
+    ApiURL:
+      Description: "API endpoint URL for Prod environment"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resource/"
+

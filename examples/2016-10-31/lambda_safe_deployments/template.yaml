@@ -8,6 +8,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: safeTest.handler
+      CodeUri: src/
       Runtime: nodejs6.10
       AutoPublishAlias: live
       DeploymentPreference:
@@ -19,6 +20,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: preTrafficHook.handler
+      CodeUri: src/      
       Policies:
         - Version: "2012-10-17"
           Statement:

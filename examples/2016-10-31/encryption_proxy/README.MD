@@ -4,7 +4,6 @@ This template creates the following resources:
 
 * 2 Lambda functions (Encryption, Decryption)
     - SAM takes care of creating 2 stages API Gateway {Stage,Prod} that sits on top
-* IAM Role for each function
 * KMS Key and KMS Decrypt/Encrypt permissions for each IAM Role separately
     - KMS Key ID is then passed to Encryption Lambda via Env vars
 

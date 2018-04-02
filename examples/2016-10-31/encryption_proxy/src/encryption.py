@@ -26,7 +26,7 @@ def encrypt(key, message):
         # returns http 500 back to user and log error details in Cloudwatch Logs
         raise Exception("Unable to encrypt data: ", e)
 
-    return encrypted_data
+    return encrypted_data.decode()
 
 
 def post(event, context):

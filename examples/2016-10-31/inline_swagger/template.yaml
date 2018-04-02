@@ -29,7 +29,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs6.10
-      CodeUri: s3://<bucket>/inline_swagger.zip
+      CodeUri: src/
       Events:
         GetApi:
           Type: Api
@@ -39,3 +39,8 @@ Resources:
             RestApiId: 
                 Ref: MyApi
 
+Outputs:
+
+    ApiURL:
+      Description: "API endpoint URL for Prod environment"
+      Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/prod/get"

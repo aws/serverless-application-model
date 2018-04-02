@@ -7,7 +7,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs6.10
-      CodeUri: s3://<bucket>/stream_processor.zip
+      CodeUri: src/
       Events:
         Stream:
           Type: Kinesis
@@ -19,3 +19,9 @@ Resources:
     Type: AWS::Kinesis::Stream
     Properties:
       ShardCount: 1
+
+Outputs:
+
+    KinesisStream:
+      Description: "Kinesis Stream that will trigger Lambda function upon new records"
+      Value: !GetAtt Stream.Arn
