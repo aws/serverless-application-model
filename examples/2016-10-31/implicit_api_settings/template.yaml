@@ -12,9 +12,9 @@ Globals:
 
     # Send/receive binary data through the APIs
     BinaryMediaTypes:
-      # This is equivalent to image/gif when deployed
+      # These are equivalent to image/gif and image/png when deployed
       - image~1gif
-      - iimage~1png
+      - image~1png
 
     # Logging, Metrics, Throttling, and all other Stage settings
     MethodSettings: [{
