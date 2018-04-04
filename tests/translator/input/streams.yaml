@@ -1,0 +1,27 @@
+Resources:
+  KinesisFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/streams.zip
+      Handler: stream.kinesis_handler
+      Runtime: python2.7
+      Events:
+        MyKinesisStream:
+          Type: Kinesis
+          Properties:
+            Stream: arn:aws:kinesis:us-west-2:012345678901:stream/my-stream
+            BatchSize: 100
+            StartingPosition: TRIM_HORIZON
+  DynamoDBFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/streams.zip
+      Handler: stream.ddb_handler
+      Runtime: python2.7
+      Events:
+        MyDDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream: arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291
+            BatchSize: 200
+            StartingPosition: LATEST

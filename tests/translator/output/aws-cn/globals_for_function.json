@@ -1,0 +1,194 @@
+{
+  "Resources": {
+    "FunctionWithOverridesRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "FunctionWithOverrides": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "TracingConfig": {
+          "Mode": "PassThrough"
+        }, 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip"
+        }, 
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-edcd9784", 
+            "sg-123"
+          ]
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }, 
+          {
+            "Value": "newvalue1", 
+            "Key": "newtag1"
+          }, 
+          {
+            "Value": "value1", 
+            "Key": "tag1"
+          }
+        ], 
+        "MemorySize": 512, 
+        "Environment": {
+          "Variables": {
+            "Var1": "value1", 
+            "Var3": "value3", 
+            "Var2": "value2"
+          }
+        }, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionWithOverridesRole", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 100, 
+        "Runtime": "nodejs4.3"
+      }
+    }, 
+    "MinimalFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "FunctionWithOverridesAliasprod": {
+      "Type": "AWS::Lambda::Alias", 
+      "Properties": {
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "FunctionWithOverridesVersion640128d35d", 
+            "Version"
+          ]
+        }, 
+        "FunctionName": {
+          "Ref": "FunctionWithOverrides"
+        }, 
+        "Name": "prod"
+      }
+    }, 
+    "MinimalFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "TracingConfig": {
+          "Mode": "Active"
+        }, 
+        "Code": {
+          "S3Bucket": "global-bucket", 
+          "S3Key": "global.zip"
+        }, 
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-edcd9784"
+          ]
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }, 
+          {
+            "Value": "value1", 
+            "Key": "tag1"
+          }
+        ], 
+        "MemorySize": 1024, 
+        "Environment": {
+          "Variables": {
+            "Var1": "value1", 
+            "Var2": "value2"
+          }
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MinimalFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 30, 
+        "Runtime": "python2.7"
+      }
+    }, 
+    "MinimalFunctionAliaslive": {
+      "Type": "AWS::Lambda::Alias", 
+      "Properties": {
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MinimalFunctionVersionfb7aeaa544", 
+            "Version"
+          ]
+        }, 
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        }, 
+        "Name": "live"
+      }
+    }, 
+    "FunctionWithOverridesVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
+      "Type": "AWS::Lambda::Version", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FunctionWithOverrides"
+        }
+      }
+    }, 
+    "MinimalFunctionVersionfb7aeaa544": {
+      "DeletionPolicy": "Retain", 
+      "Type": "AWS::Lambda::Version", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        }
+      }
+    }
+  }
+}

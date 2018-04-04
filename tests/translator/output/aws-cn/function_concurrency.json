@@ -1,0 +1,101 @@
+{
+  "Parameters": {
+    "Concurrency": {
+      "Type": "Number"
+    }
+  },
+  "Resources": {
+    "ConcurrentFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }]
+        }
+      }
+    },
+    "ConcurrentFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ConcurrentFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "ReservedConcurrentExecutions": 100,
+        "Tags": [{
+          "Value": "SAM",
+          "Key": "lambda:createdBy"
+        }]
+      }
+    },
+    "AnotherFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }]
+        }
+      }
+    },
+    "AnotherFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "AnotherFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "ReservedConcurrentExecutions": {
+          "Ref": "Concurrency"
+        },
+        "Tags": [{
+          "Value": "SAM",
+          "Key": "lambda:createdBy"
+        }]
+      }
+    }
+  }
+}

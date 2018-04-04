@@ -1,0 +1,4 @@
+{
+  "errors": [{"errorMessage": "Resource with id [UnknownTemplate] is invalid. Policy at index 2 in the 'Policies' property is not valid"}],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [UnknownTemplate] is invalid. Policy at index 2 in the 'Policies' property is not valid"
+}

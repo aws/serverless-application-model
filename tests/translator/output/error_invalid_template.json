@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Structure of the SAM template is invalid. 'Resources' section is required"
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Structure of the SAM template is invalid. 'Resources' section is required"
+}

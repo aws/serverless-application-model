@@ -1,0 +1,22 @@
+Resources:
+  HtmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /
+            Method: get
+
+  HtmlApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
+      CacheClusterEnabled: true
+      CacheClusterSize: "1.6"

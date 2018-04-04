@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Example CloudWatch Logs + Lambda
+Parameters:
+  LogGroupName:
+    Type: String
+    Default: MyCWLogGroup
+  FilterPattern:
+    Type: String
+    Default: My filter pattern
+    
+Resources:
+  TriggeredFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        CWLogEvent:
+          Type: CloudWatchLogs
+          Properties:
+            LogGroupName: !Ref LogGroupName
+            FilterPattern: !Ref FilterPattern
+            

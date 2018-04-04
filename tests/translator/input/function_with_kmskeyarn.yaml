@@ -1,0 +1,34 @@
+Resources:
+  FunctionWithKeyArn:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      KmsKeyArn: thisIsaKey
+
+  FunctionWithReferenceToKeyArn:
+     Type: 'AWS::Serverless::Function'
+     Properties:
+       CodeUri: s3://sam-demo-bucket/hello.zip
+       Handler: hello.handler
+       Runtime: python2.7
+       KmsKeyArn:
+        Ref: myKey
+
+  myKey:
+     Type: "AWS::KMS::Key"
+     Properties:
+       Description: "A sample key"
+       KeyPolicy:
+         Version: "2012-10-17"
+         Id: "key-default-1"
+         Statement:
+           -
+             Sid: "Allow administration of the key"
+             Effect: "Allow"
+             Principal:
+               AWS: "arn:aws:iam::123456789012:user/Alice"
+             Action:
+               - "kms:Create*"
+             Resource: "*"

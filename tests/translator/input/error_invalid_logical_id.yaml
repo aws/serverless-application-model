@@ -1,0 +1,7 @@
+Resources:
+  Bad-Function-Name-@#$%^&:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Runtime: python2.7
+      Handler: hello.handler
+      CodeUri: s3://bucket/code.zip

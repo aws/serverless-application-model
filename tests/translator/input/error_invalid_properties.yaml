@@ -1,0 +1,4 @@
+Resources:
+  Function:
+    Type: 'AWS::Serverless::Function'
+    Properties: I'm not valid

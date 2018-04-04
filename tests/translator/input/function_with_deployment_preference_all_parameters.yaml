@@ -1,0 +1,44 @@
+Resources:
+  MinimalFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Enabled: true
+        Type: Linear10PercentEvery1Minute
+        Hooks:
+          PreTraffic: !Ref MySanityTestFunction
+          PostTraffic: !Ref MyValidationTestFunction
+        Alarms:
+          - !Ref MyCloudWatchAlarm
+
+  MySanityTestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://my-bucket/mySanityTestFunction.zip
+      DeploymentPreference:
+        Enabled: false
+
+  MyValidationTestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://my-bucket/myValidationTestFunction.zip
+      DeploymentPreference:
+        Enabled: false
+
+  MyCloudWatchAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+     ComparisonOperator: GreaterThanThreshold
+     EvaluationPeriods: 1
+     MetricName: MyMetric
+     Namespace: AWS/EC2
+     Period: 300
+     Threshold: 10

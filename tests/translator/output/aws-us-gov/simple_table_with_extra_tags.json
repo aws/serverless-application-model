@@ -1,0 +1,45 @@
+{
+  "Resources": {
+    "MinimalTableWithTags": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 5,
+          "ReadCapacityUnits": 5
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "KeyType": "HASH",
+            "AttributeName": "id"
+          }
+        ],
+        "Tags": [
+          {
+            "Value": "TagValue1",
+            "Key": "TagKey1"
+          },
+          {
+            "Value": "",
+            "Key": "TagKey2"
+          },
+          {
+            "Value": {
+              "Ref": "TagValueParam"
+            },
+            "Key": "TagKey3"
+          },
+          {
+            "Value": 123,
+            "Key": "TagKey4"
+          }
+        ]
+      }
+    }
+  }
+}

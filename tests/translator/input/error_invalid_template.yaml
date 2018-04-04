@@ -1,0 +1,6 @@
+# The error here is that this key should be "Resources" and not "Resource"
+Resource:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: node6.10

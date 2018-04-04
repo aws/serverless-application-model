@@ -1,0 +1,27 @@
+# For Implicit APIs, StageName is automatically set by SAM. Due to a limitation of the current architecture,
+# StageName **cannot** be overridden for Implicit APIs.
+#
+# This test captures this behavior and serves as a reminder for us to fix this future
+
+Globals:
+  Api:
+    Name: "some api"
+
+    # This stage name will *not* be reflected in Implicit API
+    StageName: "foo"
+
+Resources:
+  ImplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+
+

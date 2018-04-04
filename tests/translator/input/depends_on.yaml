@@ -1,0 +1,48 @@
+# SAM template containing DependsOn property on resources. Output resources should
+# also have this property set
+Resources:
+  MyFunction:
+    Type: 'AWS::Serverless::Function'
+    DependsOn: ["MyExplicitApi", "MySamTable"]
+    Properties:
+      CodeUri: s3://sam-demo-bucket/code.zip
+      Handler: index.handler
+      Runtime: nodejs4.3
+      Events:
+        MyApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId: MyExplicitApi
+
+  MyExplicitApi:
+    Type: AWS::Serverless::Api
+    DependsOn: "MySamTable"
+    Properties:
+      DefinitionUri: s3://sam-translator-tests-dont-delete/swagger-http.json
+      StageName: dev
+
+
+  MySamTable:
+    Type: AWS::Serverless::SimpleTable
+
+
+  MyOtherTable:
+    # Test DependsOn property a non-SAM resource
+    Type: AWS::DynamoDB::Table
+    DependsOn: "MySamTable"
+    Properties:
+
+      AttributeDefinitions:
+        - { AttributeName : id, AttributeType : S }
+
+      KeySchema:
+        - { "AttributeName" : "id", "KeyType" : "HASH"}
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+      StreamSpecification:
+        StreamViewType: "NEW_IMAGE"

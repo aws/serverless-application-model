@@ -1,0 +1,12 @@
+Resources:
+  MinimalTable:
+    Type: 'AWS::Serverless::SimpleTable'
+  CompleteTable:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      PrimaryKey:
+        Name: member-number
+        Type: Number
+      ProvisionedThroughput:
+        ReadCapacityUnits: 20
+        WriteCapacityUnits: 10

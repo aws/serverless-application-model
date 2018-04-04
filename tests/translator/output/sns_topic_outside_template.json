@@ -1,0 +1,84 @@
+{
+  "Parameters": {
+    "SNSTopicArn": {
+      "Type": "String"
+    }
+  }, 
+  "Resources": {
+    "SaveNotificationFunctionNotificationTopic": {
+      "Type": "AWS::SNS::Subscription", 
+      "Properties": {
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "SaveNotificationFunction", 
+            "Arn"
+          ]
+        }, 
+        "Protocol": "lambda", 
+        "TopicArn": {
+          "Ref": "SNSTopicArn"
+        }
+      }
+    }, 
+    "SaveNotificationFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "SaveNotificationFunctionNotificationTopicPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "sns.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "SaveNotificationFunction"
+        }, 
+        "SourceArn": {
+          "Ref": "SNSTopicArn"
+        }
+      }
+    }, 
+    "SaveNotificationFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "notifications.zip"
+        }, 
+        "Handler": "index.save_notification", 
+        "Role": {
+          "Fn::GetAtt": [
+            "SaveNotificationFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs4.3", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

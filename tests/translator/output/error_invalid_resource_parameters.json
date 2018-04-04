@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [UnknownPropertyInResource] is invalid. property SomeProperty not defined for resource of type AWS::Serverless::Api"
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [UnknownPropertyInResource] is invalid. property SomeProperty not defined for resource of type AWS::Serverless::Api"
+}

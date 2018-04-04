@@ -1,0 +1,55 @@
+Parameters:
+  FunctionNameParam:
+    Type: String
+
+Resources:
+
+  OnePolicyTemplate:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+        SQSPollerPolicy:
+          QueueName:
+            Fn::Sub: ["Some${value}", {"value": "KeyId"}]
+
+          # Extra parameters will be skipped, and not appear in output
+          ExtraParam1: Value1
+          ExtraParam2: Value2
+
+  MultiplePolicyTemplates:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: "Somekey"
+        - LambdaInvokePolicy:
+            FunctionName: "Some function"
+
+  AllCombinations:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+        # Inline statement
+        - Statement:
+          - Action: [ 'dynamodb:*' ]
+            Effect: Allow
+            Resource: '*'
+        # Regular managed policy
+        - AmazonDynamoDBFullAccess
+
+        - LambdaInvokePolicy:
+            FunctionName:
+              # Refer to something
+              Ref: FunctionNameParam
+
+        # Regular managed policy
+        - AWSLambdaRole

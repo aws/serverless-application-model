@@ -1,0 +1,74 @@
+{
+  "Resources": {
+    "MinimalTableWithTableName": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "MySimpleTable",
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 5,
+          "ReadCapacityUnits": 5
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "KeyType": "HASH",
+            "AttributeName": "id"
+          }
+        ]
+      }
+    },
+    "MinimalTableWithRefTableName": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Ref": "MySimpleTableParameter"
+        },
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 5,
+          "ReadCapacityUnits": 5
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "KeyType": "HASH",
+            "AttributeName": "id"
+          }
+        ]
+      }
+    },
+    "MinimalTableWithSubTableName": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": {
+          "Fn::Sub": "${AWS::StackName}MySimpleTable"
+        },
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 5,
+          "ReadCapacityUnits": 5
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "KeyType": "HASH",
+            "AttributeName": "id"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+# This is specifically testing a invalid SAM template, that is currently accepted by SAM, and some customers rely on this behavior.
+# We will eventually change the behavior to error on this invalid template, but until then, this test will guard against
+# inadvertently changing this behavior.
+
+# When a Function's Event contains a path that is "not" in the Swagger, the behavior would be just add Lambda::Permissions
+# and leaving the Swagger unmodified.
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: nodejs4.3
+      Events:
+        AddApi:
+          Type: Api
+          Properties:
+            # /add is NOT present in the Swagger.
+            Path: /add
+            Method: post
+            RestApiId: ApiWithInlineSwagger
+
+
+  ApiWithInlineSwagger:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody: {
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {
+            "/foo": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                },
+                "responses": {}
+              }
+            }
+          },
+          "swagger": "2.0"
+        }

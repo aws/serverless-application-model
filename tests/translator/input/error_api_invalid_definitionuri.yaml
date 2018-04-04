@@ -1,0 +1,22 @@
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: http://sam-demo-bucket/webpage_swagger.json
+
+  # API With no definition URI and body
+  ApiNoBody:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  # Both Body & definitionUri can't be specified
+  ApiWithBodyAndDefinitionUri:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://foo/bar
+      DefinitionBody:
+        a: b
+        c: d

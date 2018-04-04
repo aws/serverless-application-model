@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Example of processing CloudWatch Logs with Lambda
+Resources:
+  LogsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./index.js
+      Handler: index.handler
+      Runtime: nodejs6.10
+      Events:
+        LogsProcessor:
+          Type: CloudWatchLogs
+          Properties:
+            LogGroupName: !Ref CloudWatchLambdaLogsGroup
+            FilterPattern: Hello log processor
+
+  CloudWatchLambdaLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+  
+  CloudWatchLambdaLogsStream:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName: !Ref CloudWatchLambdaLogsGroup
+      LogStreamName: sam-log-stream
