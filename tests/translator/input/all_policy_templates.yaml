@@ -1,0 +1,113 @@
+# "Kitchen Sink" test containing all supported policy templates. The idea is to know every one of them is
+# transformable and fail on any changes in the policy template definition without updating the test
+# Since this not about testing the transformation logic, we will keep the policy template parameter values as literal
+# string
+
+Resources:
+  KitchenSinkFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+
+        - SQSPollerPolicy:
+            QueueName: name
+
+        - LambdaInvokePolicy:
+            FunctionName: name
+
+        - CloudWatchPutMetricPolicy: {}
+
+        - EC2DescribePolicy: {}
+
+        - DynamoDBCrudPolicy:
+            TableName: name
+
+        - DynamoDBReadPolicy:
+            TableName: name
+
+        - SESSendBouncePolicy:
+            IdentityName: name
+
+        - ElasticsearchHttpPostPolicy:
+            DomainName: name
+
+        - S3ReadPolicy:
+            BucketName: name
+
+        - S3CrudPolicy:
+            BucketName: name
+
+        - AMIDescribePolicy: {}
+
+        - CloudFormationDescribeStacksPolicy: {}
+
+        - RekognitionNoDataAccessPolicy:
+            CollectionId: id
+
+        - RekognitionReadPolicy:
+            CollectionId: id
+
+        - RekognitionWriteOnlyAccessPolicy:
+            CollectionId: id
+
+        - SQSSendMessagePolicy:
+            QueueName: name
+
+        - SNSPublishMessagePolicy:
+            TopicName: name
+
+        - VPCAccessPolicy: {}
+
+        - DynamoDBStreamReadPolicy:
+            TableName: name
+            StreamName: name
+
+        - KinesisStreamReadPolicy:
+            StreamName: name
+
+        - SESCrudPolicy:
+            IdentityName: name
+
+        - SNSCrudPolicy:
+            TopicName: name
+
+        - KinesisCrudPolicy:
+            StreamName: name
+
+        - KMSDecryptPolicy:
+            KeyId: keyId
+
+        - PollyFullAccessPolicy:
+            LexiconName: name
+
+        - S3FullAccessPolicy:
+            BucketName: name
+
+        - CodePipelineLambdaExecutionPolicy: {}
+
+        - ServerlessRepoReadWriteAccessPolicy: {}
+
+        - EC2CopyImagePolicy:
+            ImageId: id
+
+
+        - CodePipelineReadOnlyPolicy:
+            PipelineName: pipeline
+
+        - CloudWatchDashboardPolicy: {}
+
+        - RekognitionFacesPolicy:
+            CollectionId: collection
+
+        - RekognitionLabelsPolicy: {}
+
+        - DynamoDBBackupFullAccessPolicy:
+            TableName: table
+
+        - DynamoDBRestoreFromBackupPolicy:
+            TableName: table
+
+        - ComprehendBasicAccessPolicy: {}

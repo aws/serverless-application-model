@@ -1,0 +1,22 @@
+Resources:
+  Function:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+        - Statement:
+          - Action: [ 'dynamodb:*' ]
+            Effect: Allow
+            Resource: '*'
+        - AmazonDynamoDBFullAccess
+        # Duplicate Policies should get de-duped
+        - AmazonDynamoDBFullAccess
+        - AWSLambdaBasicExecutionRole
+
+        - AWSLambdaRole
+
+        # Intrinsic functions & custom policy ARNs must be supported
+        - {"Ref": "SomeManagedPolicyArn"}
+        - arn:aws:1234:iam:policy/CustomerCreatedManagedPolicy

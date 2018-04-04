@@ -1,0 +1,44 @@
+Resources:
+  BadDefinitionUriApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: http://sam-demo-bucket/webpage_swagger.json
+
+  BadDefinitionUriTypeApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri:
+        Bucket: "somebucket"
+        # Key property is missing
+
+  BadCodeUriFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: http://dropbox.com/my-object.zip
+      Runtime: python2.7
+      Handler: hello.handler
+
+  BadCodeUriTypeFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri:
+        Key: "somebucket"
+        # Buckiet property is missing
+
+      Runtime: python2.7
+      Handler: hello.handler
+
+  ExternalS3Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/notifications.zip
+      Handler: index.save_notification
+      Runtime: nodejs4.3
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: mybucket
+            Events: s3:ObjectCreated:*

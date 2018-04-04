@@ -1,0 +1,20 @@
+# When there are unknown policy templates, we will simply skip the entry
+
+Resources:
+  UnknownTemplate:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+        - AWSLambdaRole
+
+        # This is an invalid policy statement
+        - PolicyName: PublicSearchApiGatewaySetupPermissions
+          PolicyDocument:
+            Statement:
+              Effect: 'Allow'
+              Resource: '*'
+              Action:
+                - 'apigateway:*'

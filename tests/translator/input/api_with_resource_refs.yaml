@@ -1,0 +1,31 @@
+# Test if resource references work for both Explicit API & Implicit API resources
+
+Resources:
+  MyApi:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: foo
+      DefinitionBody:
+        "this": "is"
+        "a": "swagger"
+
+  MyFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /html
+            Method: GET
+
+Outputs:
+  ImplicitApiDeployment: !Ref ServerlessRestApi.Deployment
+  ImplicitApiStage: !Ref ServerlessRestApi.Stage
+
+  ExplicitApiDeployment: !Ref MyApi.Deployment
+  ExplicitApiStage: !Ref MyApi.Stage
+

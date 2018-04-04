@@ -1,0 +1,9 @@
+Resources:
+  MinimalTableRefParamLongForm:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      ProvisionedThroughput:
+        ReadCapacityUnits:
+          Ref: ReadCapacity
+        WriteCapacityUnits:
+          Ref: WriteCapacity

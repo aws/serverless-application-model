@@ -1,0 +1,99 @@
+# Testing Alias Invoke with ALL event sources supported by Lambda
+# We are looking to check if the event sources and their associated Lambda::Permission resources are
+# connect to the Alias and *not* the function
+
+Resources:
+  MyAwesomeFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+
+      AutoPublishAlias: Live
+
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+
+        CWEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - terminated
+
+        CWLog:
+          Type: CloudWatchLogs
+          Properties:
+            LogGroupName: MyLogGroup
+            FilterPattern: My pattern
+
+        ExplicitApi:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: GetHtmlApi
+            Path: /
+            Method: get
+
+        ImplicitApi:
+          Type: Api
+          Properties:
+            Path: /add
+            Method: post
+
+        IoTRule:
+          Type: IoTRule
+          Properties:
+            Sql: SELECT * FROM 'topic/test'
+            AwsIotSqlVersion: beta
+
+        S3Trigger:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*
+
+        NotificationTopic:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: Notifications
+
+        KinesisStream:
+          Type: Kinesis
+          Properties:
+            Stream: arn:aws:kinesis:us-west-2:012345678901:stream/my-stream
+            BatchSize: 100
+            StartingPosition: TRIM_HORIZON
+
+        DDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream: arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291
+            BatchSize: 200
+            StartingPosition: LATEST
+
+  Notifications:
+    Type: AWS::SNS::Topic
+
+  Images:
+    Type: AWS::S3::Bucket
+
+  GetHtmlApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: MyGetApi
+      StageName:
+        Ref: MyStageName
+      DefinitionUri:
+        Bucket: sam-demo-bucket
+        Key: webpage_swagger.json
+      Variables:
+        LambdaFunction:
+          Fn::GetAtt: ["MyAwesomeFunction.Alias", "Arn"]

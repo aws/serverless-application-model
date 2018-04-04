@@ -1,0 +1,46 @@
+Parameters:
+  MyStageName:
+    Type: String
+    Default: Production
+
+Resources:
+  GetHtmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri:
+        Bucket: sam-demo-bucket
+        Key: webpage.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Policies: AmazonDynamoDBReadOnlyAccess
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: GetHtmlApi
+            Path: /
+            Method: get
+
+  GetHtmlApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: MyGetApi
+      StageName:
+        Ref: MyStageName
+      DefinitionUri:
+        Bucket: sam-demo-bucket
+        Key: webpage_swagger.json
+      Variables:
+        EndpointUri:
+          Ref: something
+        EndpointUri2: http://example.com
+
+  ApiWithInlineSwagger:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: MyStageName
+      DefinitionBody:
+        "this": "is"
+        "a": "inline swagger"

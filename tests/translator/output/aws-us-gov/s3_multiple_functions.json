@@ -1,0 +1,155 @@
+{
+  "Resources": {
+    "FunctionOneRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "FunctionTwoImageBucketPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        },
+        "FunctionName": {
+          "Ref": "FunctionTwo"
+        },
+        "Principal": "s3.amazonaws.com"
+      }
+    },
+    "Images": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Function": {
+                "Fn::GetAtt": [
+                  "FunctionTwo",
+                  "Arn"
+                ]
+              },
+              "Event": "s3:ObjectCreated:*"
+            },
+            {
+              "Function": {
+                "Fn::GetAtt": [
+                  "FunctionOne",
+                  "Arn"
+                ]
+              },
+              "Event": "s3:ObjectCreated:*"
+            }
+          ]
+        }
+      },
+      "DependsOn": [
+        "FunctionOneImageBucketPermission",
+        "FunctionTwoImageBucketPermission"
+      ]
+    },
+    "FunctionTwoRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "FunctionOneImageBucketPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        },
+        "FunctionName": {
+          "Ref": "FunctionOne"
+        },
+        "Principal": "s3.amazonaws.com"
+      }
+    },
+    "FunctionTwo": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "thumbnails.zip"
+        },
+        "Handler": "index.generate_thumbails",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionTwoRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "FunctionOne": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "thumbnails.zip"
+        },
+        "Handler": "index.generate_thumbails",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionOneRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs4.3",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

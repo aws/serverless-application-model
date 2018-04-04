@@ -1,0 +1,42 @@
+Globals:
+  Function:
+    CodeUri: s3://global-bucket/global.zip
+    Handler: hello.handler
+    Runtime: python2.7
+    MemorySize: 1024
+    Timeout: 30
+    VpcConfig:
+        SecurityGroupIds:
+        - sg-edcd9784
+    Environment:
+      Variables:
+        Var1: value1
+        Var2: value2
+    Tags:
+      tag1: value1
+    Tracing: Active
+    AutoPublishAlias: live
+
+Resources:
+  MinimalFunction:
+    Type: 'AWS::Serverless::Function'
+
+  FunctionWithOverrides:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: index.handler
+      Runtime: nodejs4.3
+      MemorySize: 512
+      Timeout: 100
+      VpcConfig:
+          SecurityGroupIds:
+          - sg-123
+      Environment:
+        Variables:
+          Var3: value3
+      Tags:
+        newtag1: newvalue1
+      Tracing: PassThrough
+      AutoPublishAlias: prod
+

@@ -1,0 +1,35 @@
+# File: sam.yml
+# Version: 0.9
+
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: {}
+Resources:
+  IoTRuleFunc:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: Created by SAM
+      Events:
+        MyIoTRule:
+          Type: IoTRule
+          Properties:
+            Sql: SELECT * FROM 'topic/test'
+            AwsIotSqlVersion: beta 
+      Handler: index.handler
+      MemorySize: 1024
+      Runtime: nodejs4.3
+      Timeout: 3
+  
+  IoTRuleFuncMyIoTRule:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      TopicRulePayload:
+        AwsIotSqlVersion: beta
+        Actions:
+        - Lambda:
+            FunctionArn:
+              Fn::GetAtt:
+              - IoTRuleFunc
+              - Arn
+        RuleDisabled: false
+        Sql: SELECT * FROM 'topic/test'

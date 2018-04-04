@@ -1,0 +1,146 @@
+# SAM template using intrinsic function on every property that supports it.
+# Translator should handle it properly
+Parameters:
+  CodeBucket:
+    Type: String
+    Default: sam-demo-bucket
+  FunctionName:
+    Type: String
+    Default: MySuperFunctionName
+  TracingConfigParam:
+    Type: String
+    Default: PassThrough
+  MyExplicitApiName:
+    Type: String
+    Default: SomeName
+
+Resources:
+  MyFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName:
+        Ref: FunctionName
+      CodeUri:
+        Bucket:
+          Ref: CodeBucket
+        Key:
+          "Fn::Sub": ["code.zip"]
+        Version:
+          "Fn::Join": ["", ["some", "version"]]
+
+      Handler:
+        "Fn::Sub": ["${filename}.handler", {filename: "index"}]
+
+      Runtime:
+        "Fn::Join": ["", ["nodejs", "4.3"]]
+
+      Role:
+        "Fn::GetAtt": ["MyNewRole", "Arn"]
+
+      Tracing:
+        Ref: TracingConfigParam
+
+      Events:
+        MyApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId:
+              "Ref": "MyExplicitApi"
+
+  MyExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name:
+        Ref: MyExplicitApiName
+      DefinitionUri: s3://sam-demo-bucket/swagger.yaml
+      StageName: dev
+      Variables:
+        FunctionName:
+          Fn::Sub: "${MyFunction}"
+        Var2:
+          Fn::Join: ["join ", ["some value ", "with some other value"]]
+
+  FunctionWithExplicitS3Uri:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: stream.ddb_handler
+      Runtime: python2.7
+      CodeUri:
+        Bucket: mybucket
+        Key: mykey
+        Version: MyVersion
+
+  ApiWithExplicitS3Uri:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      DefinitionUri:
+        Bucket: mybucket
+        Key: mykey
+        Version: myversion
+
+  DynamoDBFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/streams.zip
+      Handler: stream.ddb_handler
+      Runtime: python2.7
+      Events:
+        MyDDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream:
+              Fn::GetAtt: [MyTable, "StreamArn"]
+            BatchSize: 200
+            StartingPosition: LATEST
+
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+
+      AttributeDefinitions:
+        - { AttributeName : id, AttributeType : S }
+
+      KeySchema:
+        - { "AttributeName" : "id", "KeyType" : "HASH"}
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+      StreamSpecification:
+        StreamViewType: "NEW_IMAGE"
+
+  MySqsDlqLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python2.7
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn:
+          Fn::GetAtt:
+            - SqsDlqQueue
+            - Arn
+
+  SqsDlqQueue:
+    Type: AWS::SQS::Queue
+
+  MySnsDlqLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python2.7
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      DeadLetterQueue:
+        Type: SNS
+        TargetArn:
+          Fn::GetAtt:
+            - SnsDlqQueue
+            - Arn
+
+  SnsDlqQueue:
+    Type: AWS::SNS::Topic

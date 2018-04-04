@@ -1,0 +1,46 @@
+{
+  "Resources": {
+    "MinimalTable": {
+      "Type": "AWS::DynamoDB::Table", 
+      "Properties": {
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 5, 
+          "ReadCapacityUnits": 5
+        }, 
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id", 
+            "AttributeType": "S"
+          }
+        ], 
+        "KeySchema": [
+          {
+            "KeyType": "HASH", 
+            "AttributeName": "id"
+          }
+        ]
+      }
+    }, 
+    "CompleteTable": {
+      "Type": "AWS::DynamoDB::Table", 
+      "Properties": {
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 10, 
+          "ReadCapacityUnits": 20
+        }, 
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "member-number", 
+            "AttributeType": "N"
+          }
+        ], 
+        "KeySchema": [
+          {
+            "KeyType": "HASH", 
+            "AttributeName": "member-number"
+          }
+        ]
+      }
+    }
+  }
+}

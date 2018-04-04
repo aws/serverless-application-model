@@ -1,0 +1,8 @@
+{
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function] is invalid. Event with id [NotificationTopic] is invalid. SNS events must reference an SNS topic in the same template.",
+  "errors": [
+    {
+      "errorMessage": "Resource with id [Function] is invalid. Event with id [NotificationTopic] is invalid. SNS events must reference an SNS topic in the same template."
+    }
+  ]
+}

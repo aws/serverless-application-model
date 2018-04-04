@@ -1,0 +1,936 @@
+{
+  "Resources": {
+    "KitchenSinkFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip"
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "KitchenSinkFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "KitchenSinkFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Policies": [
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy0", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:ChangeMessageVisibility", 
+                    "sqs:ChangeMessageVisibilityBatch", 
+                    "sqs:DeleteMessage", 
+                    "sqs:DeleteMessageBatch", 
+                    "sqs:GetQueueAttributes", 
+                    "sqs:ReceiveMessage"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}", 
+                      {
+                        "queueName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy1", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*", 
+                      {
+                        "functionName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy2", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "cloudwatch:PutMetricData"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy3", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:DescribeRegions", 
+                    "ec2:DescribeInstances"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy4", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:GetItem", 
+                    "dynamodb:DeleteItem", 
+                    "dynamodb:PutItem", 
+                    "dynamodb:Scan", 
+                    "dynamodb:Query", 
+                    "dynamodb:UpdateItem", 
+                    "dynamodb:BatchWriteItem", 
+                    "dynamodb:BatchGetItem"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}", 
+                      {
+                        "tableName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy5", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:GetItem", 
+                    "dynamodb:Scan", 
+                    "dynamodb:Query", 
+                    "dynamodb:BatchGetItem"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}", 
+                      {
+                        "tableName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy6", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ses:SendBounce"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}", 
+                      {
+                        "identityName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy7", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "es:ESHttpPost"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain/${domainName}", 
+                      {
+                        "domainName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy8", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetObject", 
+                    "s3:ListBucket", 
+                    "s3:GetBucketLocation", 
+                    "s3:GetObjectVersion", 
+                    "s3:GetLifecycleConfiguration"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:s3:::${bucketName}", 
+                        {
+                          "bucketName": "name"
+                        }
+                      ]
+                    }, 
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:s3:::${bucketName}/*", 
+                        {
+                          "bucketName": "name"
+                        }
+                      ]
+                    }
+                  ], 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy9", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetObject", 
+                    "s3:ListBucket", 
+                    "s3:GetBucketLocation", 
+                    "s3:GetObjectVersion", 
+                    "s3:PutObject", 
+                    "s3:GetLifecycleConfiguration", 
+                    "s3:PutLifecycleConfiguration"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:s3:::${bucketName}", 
+                        {
+                          "bucketName": "name"
+                        }
+                      ]
+                    }, 
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:s3:::${bucketName}/*", 
+                        {
+                          "bucketName": "name"
+                        }
+                      ]
+                    }
+                  ], 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy10", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:DescribeImages"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/*"
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy11", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "cloudformation:DescribeStacks"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*"
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy12", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "rekognition:CompareFaces", 
+                    "rekognition:DetectFaces", 
+                    "rekognition:DetectLabels", 
+                    "rekognition:DetectModerationLabels"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}", 
+                      {
+                        "collectionId": "id"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy13", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "rekognition:ListCollections", 
+                    "rekognition:ListFaces", 
+                    "rekognition:SearchFaces", 
+                    "rekognition:SearchFacesByImage"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}", 
+                      {
+                        "collectionId": "id"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy14", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "rekognition:CreateCollection", 
+                    "rekognition:IndexFaces"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}", 
+                      {
+                        "collectionId": "id"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy15", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}", 
+                      {
+                        "queueName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy16", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sns:Publish"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:${topicName}", 
+                      {
+                        "topicName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy17", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:CreateNetworkInterface", 
+                    "ec2:DeleteNetworkInterface", 
+                    "ec2:DescribeNetworkInterfaces", 
+                    "ec2:DetachNetworkInterface"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy18", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:DescribeStream", 
+                    "dynamodb:GetRecords", 
+                    "dynamodb:GetShardIterator", 
+                    "dynamodb:ListStreams"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/${streamName}", 
+                      {
+                        "streamName": "name", 
+                        "tableName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy19", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "kinesis:ListStreams", 
+                    "kinesis:DescribeLimits"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:kinesis:${AWS::Region}:${AWS::AccountId}:stream/*"
+                  }, 
+                  "Effect": "Allow"
+                }, 
+                {
+                  "Action": [
+                    "kinesis:DescribeStream", 
+                    "kinesis:GetRecords", 
+                    "kinesis:GetShardIterator"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${streamName}", 
+                      {
+                        "streamName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy20", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ses:GetIdentityVerificationAttributes", 
+                    "ses:SendEmail", 
+                    "ses:VerifyEmailIdentity"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}", 
+                      {
+                        "identityName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy21", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sns:ListSubscriptionsByTopic", 
+                    "sns:CreateTopic", 
+                    "sns:SetTopicAttributes", 
+                    "sns:Subscribe", 
+                    "sns:Publish"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:${topicName}*", 
+                      {
+                        "topicName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy22", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "kinesis:AddTagsToStream", 
+                    "kinesis:CreateStream", 
+                    "kinesis:DecreaseStreamRetentionPeriod", 
+                    "kinesis:DeleteStream", 
+                    "kinesis:DescribeStream", 
+                    "kinesis:GetShardIterator", 
+                    "kinesis:IncreaseStreamRetentionPeriod", 
+                    "kinesis:ListTagsForStream", 
+                    "kinesis:MergeShards", 
+                    "kinesis:PutRecord", 
+                    "kinesis:PutRecords", 
+                    "kinesis:SplitShard", 
+                    "kinesis:RemoveTagsFromStream"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${streamName}", 
+                      {
+                        "streamName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy23", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "kms:Decrypt", 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}", 
+                      {
+                        "keyId": "keyId"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy24", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "polly:GetLexicon", 
+                    "polly:DeleteLexicon"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:polly:${AWS::Region}:${AWS::AccountId}:lexicon/${lexiconName}", 
+                        {
+                          "lexiconName": "name"
+                        }
+                      ]
+                    }
+                  ], 
+                  "Effect": "Allow"
+                }, 
+                {
+                  "Action": [
+                    "polly:DescribeVoices", 
+                    "polly:ListLexicons", 
+                    "polly:PutLexicon", 
+                    "polly:SynthesizeSpeech"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:polly:${AWS::Region}:${AWS::AccountId}:lexicon/*"
+                    }
+                  ], 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy25", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetObject", 
+                    "s3:GetObjectAcl", 
+                    "s3:GetObjectVersion", 
+                    "s3:PutObject", 
+                    "s3:PutObjectAcl", 
+                    "s3:DeleteObject"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:s3:::${bucketName}/*", 
+                        {
+                          "bucketName": "name"
+                        }
+                      ]
+                    }
+                  ], 
+                  "Effect": "Allow"
+                }, 
+                {
+                  "Action": [
+                    "s3:ListBucket", 
+                    "s3:GetBucketLocation", 
+                    "s3:GetLifecycleConfiguration", 
+                    "s3:PutLifecycleConfiguration"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:s3:::${bucketName}", 
+                        {
+                          "bucketName": "name"
+                        }
+                      ]
+                    }
+                  ], 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy26", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "codepipeline:PutJobSuccessResult", 
+                    "codepipeline:PutJobFailureResult"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*"
+                    }
+                  ], 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy27", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "serverlessrepo:CreateApplication", 
+                    "serverlessrepo:CreateApplicationVersion", 
+                    "serverlessrepo:GetApplication", 
+                    "serverlessrepo:ListApplications", 
+                    "serverlessrepo:ListApplicationVersions"
+                  ], 
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:serverlessrepo:${AWS::Region}:${AWS::AccountId}:applications/*"
+                    }
+                  ], 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy28", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ec2:CopyImage"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/${imageId}", 
+                      {
+                        "imageId": "id"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy29", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "codepipeline:ListPipelineExecutions"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:${pipelinename}", 
+                      {
+                        "pipelinename": "pipeline"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy30", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "cloudwatch:GetDashboard", 
+                    "cloudwatch:ListDashboards", 
+                    "cloudwatch:PutDashboard", 
+                    "cloudwatch:ListMetrics"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy31", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "rekognition:CompareFaces", 
+                    "rekognition:DetectFaces"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}", 
+                      {
+                        "collectionId": "collection"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy32", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "rekognition:DetectLabels", 
+                    "rekognition:DetectModerationLabels"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy33", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:CreateBackup", 
+                    "dynamodb:DescribeContinuousBackups"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}", 
+                      {
+                        "tableName": "table"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }, 
+                {
+                  "Action": [
+                    "dynamodb:DeleteBackup", 
+                    "dynamodb:DescribeBackup", 
+                    "dynamodb:ListBackups"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/backup/*", 
+                      {
+                        "tableName": "table"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy34", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:RestoreTableFromBackup"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/backup/*", 
+                      {
+                        "tableName": "table"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }, 
+                {
+                  "Action": [
+                    "dynamodb:PutItem", 
+                    "dynamodb:UpdateItem", 
+                    "dynamodb:DeleteItem", 
+                    "dynamodb:GetItem", 
+                    "dynamodb:Query", 
+                    "dynamodb:Scan", 
+                    "dynamodb:BatchWriteItem"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}", 
+                      {
+                        "tableName": "table"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy35", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "comprehend:BatchDetectKeyPhrases", 
+                    "comprehend:DetectDominantLanguage", 
+                    "comprehend:DetectEntities", 
+                    "comprehend:BatchDetectEntities", 
+                    "comprehend:DetectKeyPhrases", 
+                    "comprehend:DetectSentiment", 
+                    "comprehend:BatchDetectDominantLanguage", 
+                    "comprehend:BatchDetectSentiment"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

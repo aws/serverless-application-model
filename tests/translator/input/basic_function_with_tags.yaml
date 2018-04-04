@@ -1,0 +1,28 @@
+# File: sam.yml
+# Version: 0.9
+
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  TagValueParam:
+    Type: String
+    Default: Val
+Resources:
+  AlexaSkillFunc:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: Created by SAM
+      Events:
+        AlexaSkillEvent:
+          Type: AlexaSkill
+      Handler: index.handler
+      MemorySize: 1024
+      Runtime: nodejs4.3
+      Timeout: 3
+      Tags:
+        TagKey1: TagValue1
+        TagKey2: ""
+        TagKey3:
+          Ref: TagValueParam
+        TagKey4: 123
+

@@ -1,0 +1,61 @@
+Resources:
+
+  ValidFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/webpage.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ValidApiResource
+            Path: /
+            Method: get
+
+
+  FunctionWithNonExistentApiReference:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/webpage.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: NonExistentApi
+            Path: /
+            Method: get
+
+  FunctionReferingInvalidApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/webpage.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            # Pointing to an API resource that is invalid
+            RestApiId:
+              Ref: InvalidApiResource
+            Path: /
+            Method: get
+
+  InvalidApiResource:
+    Type: AWS::Serverless::Api
+    Properties:
+      # 'StageName' property is missing. This is invalid
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
+
+  ValidApiResource:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: MyStageName
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
+

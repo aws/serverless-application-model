@@ -1,0 +1,14 @@
+Resources:
+  # These resources are NOT errors from the eye of translator.
+  # Translator will simply ignore resources with unknown type in order to accept non-SAM resources
+  # in SAM template
+  ResourceMissingTypeShouldBeAccepted:
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
+
+  InvalidResourceTypeShouldBeAccepted:
+    Type: AWS::Serverless::ABCD
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json

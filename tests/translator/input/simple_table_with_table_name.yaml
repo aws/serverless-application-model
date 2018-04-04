@@ -1,0 +1,17 @@
+Resources:
+  MinimalTableWithTableName:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      TableName: MySimpleTable
+
+  MinimalTableWithRefTableName:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      TableName:
+        Ref: MySimpleTableParameter
+
+  MinimalTableWithSubTableName:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      TableName:
+        Fn::Sub: "${AWS::StackName}MySimpleTable"

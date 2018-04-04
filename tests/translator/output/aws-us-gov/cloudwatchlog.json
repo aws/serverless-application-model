@@ -1,0 +1,86 @@
+{
+  "Resources": {
+    "TriggeredFunctionCWLogEvent": {
+      "Type": "AWS::Logs::SubscriptionFilter",
+      "Properties": {
+        "DestinationArn": {
+          "Fn::GetAtt": [
+            "TriggeredFunction",
+            "Arn"
+          ]
+        },
+        "FilterPattern": "My filter pattern",
+        "LogGroupName": "MyCWLogGroup"
+      },
+      "DependsOn": [
+        "TriggeredFunctionCWLogEventPermission"
+      ]
+    },
+    "TriggeredFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip",
+          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "TriggeredFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "TriggeredFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "TriggeredFunctionCWLogEventPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "logs.amazonaws.com",
+        "FunctionName": {
+          "Ref": "TriggeredFunction"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:logs:${AWS::Region}:${AWS::AccountId}:log-group:${__LogGroupName__}:*",
+            {
+              "__LogGroupName__": "MyCWLogGroup"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

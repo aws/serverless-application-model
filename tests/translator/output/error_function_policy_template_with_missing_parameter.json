@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyFunction] is invalid. Following required parameters of template 'LambdaInvokePolicy' don't have values: ['FunctionName']"
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyFunction] is invalid. Following required parameters of template 'LambdaInvokePolicy' don't have values: ['FunctionName']"
+}

@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [ApiWithInvalidBodyType] is invalid. Type of property 'DefinitionBody' is invalid."
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ApiWithInvalidBodyType] is invalid. Type of property 'DefinitionBody' is invalid."
+}

@@ -1,0 +1,45 @@
+# Test to verify that resource references available on the Function are properly resolved
+# Currently supported references are:
+#    - Alias
+#
+# Use them by appending the property to LogicalId of the function
+
+Resources:
+  MinimalFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+
+  FunctionWithoutAlias:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      Name:
+        Fn::GetAtt: ["MinimalFunction.Alias", "Name"]
+
+Outputs:
+  AliasArn: !Ref MinimalFunction.Alias
+
+  AliasName: !GetAtt MinimalFunction.Alias.Name
+
+  # Alias doesn't exist for this function. This reference must not resolve
+  MustNotResolve: !GetAtt FunctionWithoutAlias.Alias.Name
+
+  AliasInSub:
+    Fn::Sub: ["Hello ${MinimalFunction.Alias} ${MinimalFunction.Alias.Name} ${SomeValue}", {"SomeValue": "World"}]
+
+  VersionArn: !Ref MinimalFunction.Version
+  VersionNumber:
+    Fn::GetAtt: ["MinimalFunction.Version", "Version"]
+
+  UnResolvedVersion:
+    Ref: FunctionWithoutAlias.Version
