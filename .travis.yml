@@ -1,24 +1,27 @@
-# Build only docs branch
-branches:
-  only:
-    - docs
-    - master
-
 # Enable container based builds
 sudo: false
 language: python
 
-install:            # Install requirement as "Environment Setup Section"
-- pip install -r docs/website/requirements.txt
-script:             # build sphinx document
-- cd docs/website
-- make html
-- cd -
-deploy:              # deploy to github page
+install:
+# Install the code requirements
+- make init
+
+# Install Docs requirements
+
+script:
+# Runs unit tests
+- make pr
+
+# Build docs pages only from master branch
+- if [ "$TRAVIS_BRANCH" = "master" ]; then make build-docs; fi
+
+deploy:
+# Deploy the docs to Github Pages *only* from master branch
 - provider: pages
   skip_cleanup: true
   local_dir: docs/website/_build/html
   github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
   keep-history: true
   on:
-      branch: docs
+      branch: master
+
