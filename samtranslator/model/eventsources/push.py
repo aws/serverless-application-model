@@ -484,6 +484,23 @@ class AlexaSkill(PushEventSource):
         return resources
 
 
+class AlexaSmartHome(PushEventSource):
+    resource_type = 'AlexaSmartHome'
+    principal = 'alexa-connectedhome.amazon.com'
+
+    property_types = {}
+
+    def to_cloudformation(self, **kwargs):
+        function = kwargs.get('function')
+
+        if not function:
+            raise TypeError("Missing required keyword argument: function")
+
+        resources = []
+        resources.append(self._construct_permission(function))
+
+        return resources
+
 class IoTRule(PushEventSource):
     resource_type = 'IoTRule'
     principal = 'iot.amazonaws.com'

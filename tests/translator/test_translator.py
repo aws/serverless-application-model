@@ -97,7 +97,8 @@ class TestTranslatorEndToEnd(TestCase):
         'simple_table_with_extra_tags',
         'explicit_api_with_invalid_events_config',
         'no_implicit_api_with_serverless_rest_api_resource',
-        'implicit_api_with_serverless_rest_api_resource'
+        'implicit_api_with_serverless_rest_api_resource',
+        'alexa_smart_home'
       ],
       [
        ("aws", "ap-southeast-1"),
