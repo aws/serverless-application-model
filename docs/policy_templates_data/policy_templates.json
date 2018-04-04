@@ -13,7 +13,11 @@
           {
             "Effect": "Allow",
             "Action": [
+              "sqs:ChangeMessageVisibility",
+              "sqs:ChangeMessageVisibilityBatch",
               "sqs:DeleteMessage",
+              "sqs:DeleteMessageBatch",
+              "sqs:GetQueueAttributes",
               "sqs:ReceiveMessage"
             ],
             "Resource": {
@@ -487,7 +491,7 @@
       }
     },
     "VPCAccessPolicy": {
-      "Description": "Gives access to create, delete, describe and detatch ENIs",
+      "Description": "Gives access to create, delete, describe and detach ENIs",
       "Parameters": {
       },
       "Definition": {
@@ -500,9 +504,7 @@
               "ec2:DescribeNetworkInterfaces",
               "ec2:DetachNetworkInterface"
             ],
-            "Resource": {
-              "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:network-interface/*"
-            }
+            "Resource": "*"
           }
         ]
       }
@@ -882,6 +884,253 @@
             }
           }
         ]
+      }
+    },
+    "AWSSecretsManagerRotationPolicy": {
+      "Description": "Grants permissions to APIs required to rotate a secret in AWS Secrets Manager",
+      "Parameters": {
+        "FunctionName": {
+          "Description": "Name of the Lambda Function"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "secretsmanager:DescribeSecret",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+              "secretsmanager:UpdateSecretVersionStage"
+            ],
+            "Resource": {
+              "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*"
+            },
+            "Condition": {
+              "StringEquals": {
+                "secretsmanager:resource/AllowRotationLambdaArn": {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}",
+                    {
+                      "functionName": {
+                        "Ref": "FunctionName"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "secretsmanager:GetRandomPassword"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    "CodePipelineReadOnlyPolicy": {
+      "Description": "Gives read permissions to get details about a CodePipeline pipeline",
+      "Parameters": {
+        "PipelineName": {
+          "Description": "Name of the CodePipeline pipeline"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "codepipeline:ListPipelineExecutions"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:${pipelinename}",
+                {
+                  "pipelinename": {
+                    "Ref": "PipelineName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CloudWatchDashboardPolicy": {
+      "Description": "Gives permissions to put metrics to operate on CloudWatch Dashboards",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "cloudwatch:GetDashboard",
+              "cloudwatch:ListDashboards",
+              "cloudwatch:PutDashboard",
+              "cloudwatch:ListMetrics"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    "RekognitionFacesPolicy": {
+      "Description": "Gives permission to compare and detect faces and labels",
+      "Parameters": {
+        "CollectionId": {
+          "Description": "ID of the collection"
+        }
+      },
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "rekognition:CompareFaces",
+            "rekognition:DetectFaces"
+          ],
+          "Resource": {
+            "Fn::Sub": [
+              "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
+              {
+                "collectionId": {
+                  "Ref": "CollectionId"
+                }
+              }
+            ]
+          }
+        }]
+      }
+    },
+    "RekognitionLabelsPolicy": {
+      "Description": "Gives permission to compare and detect faces and labels",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "rekognition:DetectLabels",
+            "rekognition:DetectModerationLabels"
+          ],
+          "Resource": "*"
+        }]
+      }
+    },
+    "DynamoDBBackupFullAccessPolicy": {
+      "Description": "Gives read/write permissions to DynamoDB on-demand backups for a table",
+      "Parameters": {
+        "TableName": {
+          "Description": "Name of DynamoDB Table"
+        }
+      },
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:CreateBackup",
+            "dynamodb:DescribeContinuousBackups"
+          ],
+          "Resource": {
+            "Fn::Sub": [
+              "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+              {
+                "tableName": {
+                  "Ref": "TableName"
+                }
+              }
+            ]
+          }
+        },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:DeleteBackup",
+              "dynamodb:DescribeBackup",
+              "dynamodb:ListBackups"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/backup/*",
+                {
+                  "tableName": {
+                    "Ref": "TableName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "DynamoDBRestoreFromBackupPolicy": {
+      "Description": "Gives permissions to restore a table from backup",
+      "Parameters": {
+        "TableName": {
+          "Description": "Name of DynamoDB Table"
+        }
+      },
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:RestoreTableFromBackup"
+          ],
+          "Resource": {
+            "Fn::Sub": [
+              "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/backup/*",
+              {
+                "tableName": {
+                  "Ref": "TableName"
+                }
+              }
+            ]
+          }
+        },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:GetItem",
+              "dynamodb:Query",
+              "dynamodb:Scan",
+              "dynamodb:BatchWriteItem"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                {
+                  "tableName": {
+                    "Ref": "TableName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ComprehendBasicAccessPolicy": {
+      "Description": "Gives access to Amazon Comprehend APIs for detecting entities, key phrases, languages and sentiments",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "comprehend:BatchDetectKeyPhrases",
+            "comprehend:DetectDominantLanguage",
+            "comprehend:DetectEntities",
+            "comprehend:BatchDetectEntities",
+            "comprehend:DetectKeyPhrases",
+            "comprehend:DetectSentiment",
+            "comprehend:BatchDetectDominantLanguage",
+            "comprehend:BatchDetectSentiment"
+          ],
+          "Resource": "*"
+        }]
       }
     }
   }

@@ -912,6 +912,44 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy36",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:DescribeSecret",
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:PutSecretValue",
+                    "secretsmanager:UpdateSecretVersionStage"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*"
+                  },
+                  "Condition": {
+                    "StringEquals": {
+                      "secretsmanager:resource/AllowRotationLambdaArn": {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}",
+                          {
+                            "functionName": "function"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:GetRandomPassword"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
           }
         ], 
         "AssumeRolePolicyDocument": {
