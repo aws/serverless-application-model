@@ -93,7 +93,6 @@ Resources:
         - EC2CopyImagePolicy:
             ImageId: id
 
-
         - CodePipelineReadOnlyPolicy:
             PipelineName: pipeline
 
@@ -111,3 +110,6 @@ Resources:
             TableName: table
 
         - ComprehendBasicAccessPolicy: {}
+
+        - AWSSecretsManagerRotationPolicy:
+            FunctionName: function
