@@ -106,7 +106,7 @@ def test_redeploy_implicit_api():
 def translate_and_find_deployment_ids(manifest):
     parameter_values = get_template_parameter_values()
     output_fragment = transform(manifest, parameter_values, mock_policy_loader)
-    print json.dumps(output_fragment, indent=2)
+    print(json.dumps(output_fragment, indent=2))
 
     deployment_ids = set()
     for key, value in output_fragment["Resources"].items():

@@ -1,4 +1,5 @@
 from collections import namedtuple
+from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
@@ -133,7 +134,7 @@ class ApiGenerator(object):
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
-        stage_name_prefix = self.stage_name if isinstance(self.stage_name, basestring) else ""
+        stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
 
         stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage')
         stage.RestApiId = ref(self.logical_id)
@@ -184,7 +185,7 @@ class ApiGenerator(object):
                                            "Cors works only with inline Swagger specified in "
                                            "'DefinitionBody' property")
 
-        if isinstance(self.cors, basestring) or is_instrinsic(self.cors):
+        if isinstance(self.cors, string_types) or is_instrinsic(self.cors):
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)
         elif isinstance(self.cors, dict):

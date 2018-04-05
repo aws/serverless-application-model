@@ -1,6 +1,7 @@
 """ SAM macro definitions """
 from copy import deepcopy
 
+from six import string_types
 from tags.resource_tagging import get_tag_list
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -139,7 +140,7 @@ class SamFunction(SamResourceMacro):
         # Try to resolve.
         resolved_alias_name = intrinsics_resolver.resolve_parameter_refs(original_alias_value)
 
-        if not isinstance(resolved_alias_name, basestring):
+        if not isinstance(resolved_alias_name, string_types):
             # This is still a dictionary which means we are not able to completely resolve intrinsics
             raise InvalidResourceException(self.logical_id,
                                            "'{}' must be a string or a Ref to a template parameter"
@@ -236,7 +237,7 @@ class SamFunction(SamResourceMacro):
                 #
 
                 policy_arn = policy_entry.data
-                if isinstance(policy_entry.data, basestring) and policy_entry.data in managed_policy_map:
+                if isinstance(policy_entry.data, string_types) and policy_entry.data in managed_policy_map:
                     policy_arn = managed_policy_map[policy_entry.data]
 
                 # De-Duplicate managed policy arns before inserting. Mainly useful

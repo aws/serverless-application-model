@@ -1,5 +1,6 @@
 import yaml
 from yaml import ScalarNode, SequenceNode
+from six import string_types
 
 # This helper copied almost entirely from
 # https://github.com/aws/aws-cli/blob/develop/awscli/customizations/cloudformation/yamlhelper.py
@@ -26,7 +27,7 @@ def intrinsics_multi_constructor(loader, tag_prefix, node):
 
     cfntag = prefix + tag
 
-    if tag == "GetAtt" and isinstance(node.value, basestring):
+    if tag == "GetAtt" and isinstance(node.value, string_types):
         # ShortHand notation for !GetAtt accepts Resource.Attribute format
         # while the standard notation is to use an array
         # [Resource, Attribute]. Convert shorthand to standard format
