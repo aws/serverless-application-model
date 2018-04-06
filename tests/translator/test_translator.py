@@ -1,6 +1,7 @@
 import json
 import itertools
 import os.path
+from functools import reduce
 
 from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
 from samtranslator.parser.parser import Parser
@@ -134,7 +135,7 @@ class TestTranslatorEndToEnd(TestCase):
         finally:
             os.environ["AWS_DEFAULT_REGION"] = old_region
 
-        print json.dumps(output_fragment, indent=2)
+        print(json.dumps(output_fragment, indent=2))
 
         assert deep_sorted(output_fragment) == deep_sorted(expected)
 
@@ -180,7 +181,7 @@ def test_transform_invalid_document(testcase):
 
     with pytest.raises(InvalidDocumentException) as e:
         transform(manifest, parameter_values, mock_policy_loader)
-    
+
     error_message = get_exception_error_message(e)
 
     assert error_message == expected.get('errorMessage')
@@ -200,7 +201,7 @@ def test_transform_unhandled_failure_empty_managed_policy_map():
             }
         }
     }
-    
+
     parameter_values = get_template_parameter_values()
     mock_policy_loader = MagicMock()
     mock_policy_loader.load.return_value = {}
@@ -209,7 +210,7 @@ def test_transform_unhandled_failure_empty_managed_policy_map():
         transform(document, parameter_values, mock_policy_loader)
 
     error_message = e.value.message
-    
+
     assert error_message == 'Managed policy map is empty, but should not be.'
 
 
@@ -264,7 +265,7 @@ def test_swagger_body_sha_gets_recomputed():
 
     output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-    print json.dumps(output_fragment, indent=2)
+    print(json.dumps(output_fragment, indent=2))
     deployment_key = get_deployment_key(output_fragment)
     assert deployment_key
 
@@ -302,7 +303,7 @@ def test_swagger_definitionuri_sha_gets_recomputed():
 
     output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-    print json.dumps(output_fragment, indent=2)
+    print(json.dumps(output_fragment, indent=2))
     deployment_key = get_deployment_key(output_fragment)
     assert deployment_key
 
@@ -353,7 +354,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         first_version_id, _ = get_resource_by_type(first_transformed_template, "AWS::Lambda::Version")
         second_version_id, _ = get_resource_by_type(second_transformed_template, "AWS::Lambda::Version")
-        
+
         assert first_version_id != second_version_id
 
     def test_logical_id_remains_same_without_parameter_change(self):
@@ -366,7 +367,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         first_version_id, _ = get_resource_by_type(first_transformed_template, "AWS::Lambda::Version")
         second_version_id, _ = get_resource_by_type(second_transformed_template, "AWS::Lambda::Version")
-        
+
         assert first_version_id == second_version_id
 
     def test_logical_id_without_resolving_reference(self):
@@ -377,14 +378,14 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         first_version_id, _ = get_resource_by_type(first_transformed_template, "AWS::Lambda::Version")
         second_version_id, _ = get_resource_by_type(second_transformed_template, "AWS::Lambda::Version")
-        
+
         assert first_version_id == second_version_id
 
     def _do_transform(self, document, parameter_values=get_template_parameter_values()):
         mock_policy_loader = get_policy_mock()
         output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-        print json.dumps(output_fragment, indent=2)
+        print(json.dumps(output_fragment, indent=2))
 
         return output_fragment
 

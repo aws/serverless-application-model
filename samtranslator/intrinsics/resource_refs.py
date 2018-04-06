@@ -1,3 +1,5 @@
+from six import string_types
+
 
 class SupportedResourceReferences(object):
     """
@@ -30,7 +32,7 @@ class SupportedResourceReferences(object):
         if not logical_id or not property:
             raise ValueError("LogicalId and property must be a non-empty string")
 
-        if not value or not isinstance(value, basestring):
+        if not value or not isinstance(value, string_types):
             raise ValueError("Property value must be a non-empty string")
 
         if logical_id not in self._refs:

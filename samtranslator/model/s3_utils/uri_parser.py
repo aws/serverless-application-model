@@ -1,5 +1,7 @@
 from urlparse import urlparse, parse_qs
 
+from six import string_types
+
 
 def parse_s3_uri(uri):
     """Parses a S3 Uri into a dictionary of the Bucket, Key, and VersionId
@@ -7,7 +9,7 @@ def parse_s3_uri(uri):
     :return: a BodyS3Location dict or None if not an S3 Uri
     :rtype: dict
     """
-    if not isinstance(uri, basestring):
+    if not isinstance(uri, string_types):
         return None
 
     url = urlparse(uri)
