@@ -10,6 +10,8 @@ and send a Pull Request.
 Environment Setup
 -----------------
 
+> Please Note: You need to have pyenv installed, please see the [installation instructions](https://github.com/pyenv/pyenv#installation) for more information.
+
 ``make setup`` will perform the following steps for you. You can either run ``make setup`` command or perform the
 steps manually.
 
