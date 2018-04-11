@@ -55,6 +55,8 @@ Unit tests
 ``make test`` command will run all unit tests. This command is configured to fail when code coverage for package
 drops below 95%.
 
+``pytest -k "TestMyClass"`` command will run all unit tests within the `TestMyClass` class.
+
 Pull Requests
 -------------
 Before sending pull requests make sure to run ``make pr`` command. This will run unit tests, linters, and static
