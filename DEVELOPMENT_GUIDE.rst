@@ -4,6 +4,7 @@ DEVELOPMENT GUIDE
 **Welcome hacker!**
 
 This document will make your life easier by helping you setup a development environment, IDEs, tests, coding practices,
+or anything that will help you be more productive. If you found something is missing or inaccurate, update this guide
 and send a Pull Request.
 
 Environment Setup
