@@ -10,7 +10,7 @@ and send a Pull Request.
 Environment Setup
 -----------------
 
-.. note:: You need to have pyenv installed, please see the `installation instructions`_ for more information.
+.. note:: You need to have `pyenv`_ installed, please see the `installation instructions`_ for more information.
 
 ``make setup`` will perform the following steps for you. You can either run ``make setup`` command or perform the
 steps manually.
