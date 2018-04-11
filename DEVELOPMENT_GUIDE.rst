@@ -10,7 +10,7 @@ and send a Pull Request.
 Environment Setup
 -----------------
 
-> Please Note: You need to have pyenv installed, please see the [installation instructions](https://github.com/pyenv/pyenv#installation) for more information.
+> Please Note: You need to have pyenv installed, please see the `installation instructions`_ for more information.
 
 ``make setup`` will perform the following steps for you. You can either run ``make setup`` command or perform the
 steps manually.
@@ -69,3 +69,4 @@ Tests are also a documentation of the success and failure cases, which is crucia
 .. _excellent cheatsheet: http://python-future.org/compatible_idioms.html
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: http://tox.readthedocs.io/en/latest/
+.. _installation instructions: https://github.com/pyenv/pyenv#installation
