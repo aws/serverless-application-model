@@ -4,13 +4,12 @@ DEVELOPMENT GUIDE
 **Welcome hacker!**
 
 This document will make your life easier by helping you setup a development environment, IDEs, tests, coding practices,
-or anything that will help you be more productive. If you found something is missing or inaccurate, update this guide
 and send a Pull Request.
 
 Environment Setup
 -----------------
 
-> Please Note: You need to have pyenv installed, please see the `installation instructions`_ for more information.
+.. note:: Please Note: You need to have pyenv installed, please see the `installation instructions`_ for more information.
 
 ``make setup`` will perform the following steps for you. You can either run ``make setup`` command or perform the
 steps manually.
