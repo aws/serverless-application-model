@@ -1,26 +1,26 @@
 """ SAM macro definitions """
-from copy import deepcopy
 
 from six import string_types
-from tags.resource_tagging import get_tag_list
+
 import samtranslator.model.eventsources
+import samtranslator.model.eventsources.cloudwatchlogs
 import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
-import samtranslator.model.eventsources.cloudwatchlogs
+from api.api_generator import ApiGenerator
+from s3_utils.uri_parser import parse_s3_uri
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
+from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import (InvalidEventException,
                                             InvalidResourceException)
+from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion, LambdaAlias
-from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
-from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from api.api_generator import ApiGenerator
-from s3_utils.uri_parser import parse_s3_uri
+from tags.resource_tagging import get_tag_list
 
 
 class SamFunction(SamResourceMacro):
@@ -56,7 +56,8 @@ class SamFunction(SamResourceMacro):
         'AutoPublishAlias': PropertyType(False, one_of(is_str()))
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.eventsources, samtranslator.model.eventsources.pull,
-                                          samtranslator.model.eventsources.push, samtranslator.model.eventsources.cloudwatchlogs)
+                                          samtranslator.model.eventsources.push,
+                                          samtranslator.model.eventsources.cloudwatchlogs)
 
     # DeadLetterQueue
     dead_letter_queue_policy_actions = {'SQS': 'sqs:SendMessage', 'SNS': 'sns:Publish'}
@@ -66,7 +67,6 @@ class SamFunction(SamResourceMacro):
         "Alias": LambdaAlias.resource_type,
         "Version": LambdaVersion.resource_type,
     }
-
 
     def resources_to_link(self, resources):
         try:
@@ -148,7 +148,6 @@ class SamFunction(SamResourceMacro):
 
         return resolved_alias_name
 
-
     def _construct_lambda_function(self):
         """Constructs and returns the Lambda function.
 
@@ -216,7 +215,8 @@ class SamFunction(SamResourceMacro):
         policy_documents = []
 
         if self.DeadLetterQueue:
-            policy_documents.append(IAMRolePolicies.dead_letter_queue_policy(self.dead_letter_queue_policy_actions[self.DeadLetterQueue['Type']], self.DeadLetterQueue['TargetArn']))
+            policy_documents.append(IAMRolePolicies.dead_letter_queue_policy(
+                self.dead_letter_queue_policy_actions[self.DeadLetterQueue['Type']], self.DeadLetterQueue['TargetArn']))
 
         for index, policy_entry in enumerate(function_policies.get()):
 
@@ -248,7 +248,8 @@ class SamFunction(SamResourceMacro):
             else:
                 # Policy Templates are not supported here in the "core"
                 raise InvalidResourceException(self.logical_id,
-                                               "Policy at index {} in the 'Policies' property is not valid".format(index))
+                                               "Policy at index {} in the 'Policies' property is not valid".format(
+                                                   index))
 
         execution_role.ManagedPolicyArns = list(managed_policy_arns)
         execution_role.Policies = policy_documents or None
@@ -420,7 +421,8 @@ class SamFunction(SamResourceMacro):
     def _validate_deployment_preference_and_add_update_policy(self, deployment_preference_collection, lambda_alias,
                                                               intrinsics_resolver):
         if 'Enabled' in self.DeploymentPreference:
-            self.DeploymentPreference['Enabled'] = intrinsics_resolver.resolve_parameter_refs(self.DeploymentPreference['Enabled'])
+            self.DeploymentPreference['Enabled'] = intrinsics_resolver.resolve_parameter_refs(
+                self.DeploymentPreference['Enabled'])
             if isinstance(self.DeploymentPreference['Enabled'], dict):
                 raise InvalidResourceException(self.logical_id, "'Enabled' must be a boolean value")
 
@@ -432,7 +434,8 @@ class SamFunction(SamResourceMacro):
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
                 raise InvalidResourceException(self.logical_id,
-                                               "'DeploymentPreference' requires AutoPublishAlias property to be specified")
+                                               "'DeploymentPreference' requires AutoPublishAlias property to be "
+                                               "specified")
             if lambda_alias is None:
                 raise ValueError('lambda_alias expected for updating it with the appropriate update policy')
 
@@ -522,7 +525,6 @@ class SamSimpleTable(SamResourceMacro):
         dynamodb_resources = self._construct_dynamodb_table()
 
         return [dynamodb_resources]
-
 
     def _construct_dynamodb_table(self):
         dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on)

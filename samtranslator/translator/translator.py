@@ -1,26 +1,29 @@
 import copy
 
-from samtranslator.model import ResourceTypeResolver, sam_resources
-from samtranslator.translator.verify_logical_id import verify_unique_logical_id
-from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, DuplicateLogicalIdException, \
-    InvalidEventException
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+from samtranslator.model import ResourceTypeResolver, sam_resources
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, \
+    DuplicateLogicalIdException, \
+    InvalidEventException
+from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
+from samtranslator.translator.verify_logical_id import verify_unique_logical_id
+
 
 class Translator:
     """Translates SAM templates into CloudFormation templates
     """
+
     def __init__(self, managed_policy_map, sam_parser, plugins=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
-        :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator, in addition
-            to the default ones.
+        :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator, in
+            addition to the default ones.
         """
         self.managed_policy_map = managed_policy_map
         self.plugins = plugins
@@ -33,10 +36,10 @@ class Translator:
         :param dict sam_template: the SAM manifest, as loaded by json.load() or yaml.load(), or as provided by \
                 CloudFormation transforms.
         :param dict parameter_values: Map of template parameter names to their values. It is a required parameter that
-                should at least be an empty map. By providing an empty map, the caller explicitly opts-into the idea that
-                some functionality that relies on resolving parameter references might not work as expected
-                (ex: auto-creating new Lambda Version when CodeUri contains reference to template parameter). This is why
-                this parameter is required
+                should at least be an empty map. By providing an empty map, the caller explicitly opts-into the idea
+                that some functionality that relies on resolving parameter references might not work as expected
+                (ex: auto-creating new Lambda Version when CodeUri contains reference to template parameter). This is
+                why this parameter is required
 
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
@@ -60,8 +63,8 @@ class Translator:
 
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
-                macro = macro_resolver\
-                    .resolve_resource_type(resource_dict)\
+                macro = macro_resolver \
+                    .resolve_resource_type(resource_dict) \
                     .from_dict(logical_id, resource_dict, sam_plugins=sam_plugins)
 
                 kwargs = macro.resources_to_link(sam_template['Resources'])
@@ -90,7 +93,7 @@ class Translator:
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 template['Resources'].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
-        
+
         # Cleanup
         if 'Transform' in template:
             del template['Transform']
@@ -139,8 +142,10 @@ class Translator:
 
         return functions + apis + others
 
-    # Ideally this should belong to a separate class called "Parameters" or something that knows how to manage parameters. An instance of this class should be passed as input to the Translate class.
-    def _add_default_parameter_values(self, sam_template, parameter_values):
+    # Ideally this should belong to a separate class called "Parameters" or something that knows how to manage
+    #   parameters. An instance of this class should be passed as input to the Translate class.
+    @staticmethod
+    def _add_default_parameter_values(sam_template, parameter_values):
         """
         Method to read default values for template parameters and merge with user supplied values.
 
@@ -187,6 +192,7 @@ class Translator:
         default_values.update(parameter_values)
 
         return default_values
+
 
 def prepare_plugins(plugins):
     """

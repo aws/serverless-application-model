@@ -1,7 +1,10 @@
 from unittest import TestCase
+
 from mock import Mock, patch
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
+
 from samtranslator.intrinsics.actions import Action
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
+
 
 class TestParameterReferenceResolution(TestCase):
 
@@ -170,7 +173,7 @@ class TestParameterReferenceResolution(TestCase):
 
     def test_throw_on_non_dict_parameters(self):
         with self.assertRaises(TypeError):
-            IntrinsicsResolver([1,2,3]).resolve_parameter_refs({})
+            IntrinsicsResolver([1, 2, 3]).resolve_parameter_refs({})
 
     def test_short_circuit_on_empty_parameters(self):
         resolver = IntrinsicsResolver({})
@@ -180,6 +183,7 @@ class TestParameterReferenceResolution(TestCase):
 
         self.assertEquals(resolver.resolve_parameter_refs(input), expected)
         resolver._try_resolve_parameter_refs.assert_not_called()
+
 
 class TestResourceReferenceResolution(TestCase):
 
@@ -228,6 +232,7 @@ class TestResourceReferenceResolution(TestCase):
         self.assertEquals(resolver.resolve_sam_resource_refs(input, {}), expected)
         resolver._try_resolve_sam_resource_refs.assert_not_called()
 
+
 class TestSupportedIntrinsics(TestCase):
     def test_by_default_all_intrinsics_must_be_supported(self):
         # Just make sure we never remove support for some intrinsic
@@ -254,7 +259,6 @@ class TestSupportedIntrinsics(TestCase):
         })
 
     def test_configure_supported_intrinsics_must_error_for_non_action_value(self):
-
         class SomeAction(Action):
             intrinsic_name = "Foo"
 
@@ -267,11 +271,9 @@ class TestSupportedIntrinsics(TestCase):
             IntrinsicsResolver({}, supported_intrinsics)
 
     def test_configure_supported_intrinsics_must_error_for_none_input(self):
-
         with self.assertRaises(TypeError):
             IntrinsicsResolver({}, None)
 
     def test_configure_supported_intrinsics_must_error_for_non_dict_input(self):
-
         with self.assertRaises(TypeError):
-            IntrinsicsResolver({}, [1,2,3])
+            IntrinsicsResolver({}, [1, 2, 3])

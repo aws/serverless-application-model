@@ -1,7 +1,9 @@
 import logging
 
-from samtranslator.model.exceptions import InvalidResourceException
 from enum import Enum
+
+from samtranslator.model.exceptions import InvalidResourceException
+
 
 class SamPlugins(object):
     """
@@ -27,7 +29,8 @@ class SamPlugins(object):
     ## Plugin Implementation
 
     ### Defining a plugin
-    A plugin is a subclass of `BasePlugin` that implements one or more methods capable of processing the life cycle events.
+    A plugin is a subclass of `BasePlugin` that implements one or more methods capable of processing the life cycle
+    events.
     These methods have a prefix `on_` followed by the name of the life cycle event. For example, to  handle
     `before_transform_resource` event, implement a method called `on_before_transform_resource`. We call these methods
     as "hooks" which are methods capable of handling this event.
@@ -37,7 +40,8 @@ class SamPlugins(object):
     `BasePlugin` class for detailed description of the method signature
 
     ### Raising validation errors
-    Plugins must raise an `samtranslator.model.exception.InvalidResourceException` when the input SAM template does not conform to the expectation
+    Plugins must raise an `samtranslator.model.exception.InvalidResourceException` when the input SAM template does not
+    conform to the expectation
     set by the plugin. SAM translator will convert this into a nice error message and display to the user.
     """
 
@@ -63,7 +67,8 @@ class SamPlugins(object):
         Register a plugin. New plugins are added to the end of the plugins list.
 
         :param samtranslator.plugins.BasePlugin plugin: Instance/subclass of BasePlugin class that implements hooks
-        :raises ValueError: If plugin is not an instance of samtranslator.plugins.BasePlugin or if it is already registered
+        :raises ValueError: If plugin is not an instance of samtranslator.plugins.BasePlugin or if it is already
+        registered
         :return: None
         """
 
@@ -120,7 +125,7 @@ class SamPlugins(object):
 
             if not hasattr(plugin, method_name):
                 raise NameError("'{}' method is not found in the plugin with name '{}'"
-                               .format(method_name, plugin.name))
+                                .format(method_name, plugin.name))
 
             try:
                 getattr(plugin, method_name)(*args, **kwargs)
@@ -138,6 +143,7 @@ class SamPlugins(object):
         :return integer: Number of plugins registered
         """
         return len(self._plugins)
+
 
 class LifeCycleEvents(Enum):
     """

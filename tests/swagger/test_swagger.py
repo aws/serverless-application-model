@@ -1,6 +1,6 @@
 import copy
-
 from unittest import TestCase
+
 from mock import Mock
 from parameterized import parameterized, param
 
@@ -9,11 +9,11 @@ from samtranslator.swagger.swagger import SwaggerEditor
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
 
+
 class TestSwaggerEditor_init(TestCase):
 
     def test_must_raise_on_invalid_swagger(self):
-
-        invalid_swagger = {"paths": {}} # Missing "Swagger" keyword
+        invalid_swagger = {"paths": {}}  # Missing "Swagger" keyword
         with self.assertRaises(ValueError):
             SwaggerEditor(invalid_swagger)
 
@@ -71,7 +71,7 @@ class TestSwaggerEditor_has_path(TestCase):
         Method name "ANY" is special. It must be converted to the x-amazon style value before search
         """
         self.assertTrue(self.editor.has_path("/bar", "any"))
-        self.assertTrue(self.editor.has_path("/bar", "AnY")) # Case insensitive
+        self.assertTrue(self.editor.has_path("/bar", "AnY"))  # Case insensitive
         self.assertTrue(self.editor.has_path("/bar", _X_ANY_METHOD))
         self.assertFalse(self.editor.has_path("/foo", "any"))
 
@@ -87,9 +87,9 @@ class TestSwaggerEditor_has_path(TestCase):
         self.assertFalse(self.editor.has_path("/bar", "xyz"))
 
     def test_must_not_fail_on_bad_path(self):
-
         self.assertTrue(self.editor.has_path("badpath"))
         self.assertFalse(self.editor.has_path("badpath", "somemethod"))
+
 
 class TestSwaggerEditor_has_integration(TestCase):
 
@@ -132,7 +132,6 @@ class TestSwaggerEditor_has_integration(TestCase):
 class TestSwaggerEditor_add_path(TestCase):
 
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -152,15 +151,13 @@ class TestSwaggerEditor_add_path(TestCase):
         param("/bar", "get", "existing path, new method"),
     ])
     def test_must_add_new_path_and_method(self, path, method, case):
-
         self.assertFalse(self.editor.has_path(path, method))
         self.editor.add_path(path, method)
 
-        self.assertTrue(self.editor.has_path(path, method), "must add for "+case)
+        self.assertTrue(self.editor.has_path(path, method), "must add for " + case)
         self.assertEquals(self.editor.swagger["paths"][path][method], {})
 
     def test_must_raise_non_dict_path_values(self):
-
         path = "/badpath"
         method = "get"
 
@@ -185,7 +182,6 @@ class TestSwaggerEditor_add_path(TestCase):
 class TestSwaggerEditor_add_lambda_integration(TestCase):
 
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -258,7 +254,6 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         self.assertEquals(expected, actual)
 
     def test_must_raise_on_existing_integration(self):
-
         with self.assertRaises(ValueError):
             self.editor.add_lambda_integration("/bar", "get", "integrationUri")
 
@@ -266,7 +261,6 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
 class TestSwaggerEditor_iter_on_path(TestCase):
 
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -279,7 +273,6 @@ class TestSwaggerEditor_iter_on_path(TestCase):
         self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_iterate_on_paths(self):
-
         expected = {"/foo", "/bar", "/baz"}
         actual = set([path for path in self.editor.iter_on_path()])
 
@@ -289,7 +282,6 @@ class TestSwaggerEditor_iter_on_path(TestCase):
 class TestSwaggerEditor_add_cors(TestCase):
 
     def setUp(self):
-
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
@@ -335,15 +327,13 @@ class TestSwaggerEditor_add_cors(TestCase):
             self.editor.add_cors(path, "origins", "headers", "methods")
 
     def test_must_fail_for_invalid_allowed_origin(self):
-
         path = "/foo"
         with self.assertRaises(ValueError):
             self.editor.add_cors(path, None, "headers", "methods")
 
     def test_must_work_for_optional_allowed_headers(self):
-
         allowed_origins = "origins"
-        allowed_headers = None # No Value
+        allowed_headers = None  # No Value
         allowed_methods = "methods"
         max_age = 60
 
@@ -363,7 +353,6 @@ class TestSwaggerEditor_add_cors(TestCase):
                                                                          max_age)
 
     def test_must_make_default_value_with_optional_allowed_methods(self):
-
         allowed_origins = "origins"
         allowed_headers = "headers"
         allowed_methods = None  # No Value
@@ -398,7 +387,7 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         self.maxDiff = None
         headers = "foo"
         methods = {"a": "b"}
-        origins = [1,2,3]
+        origins = [1, 2, 3]
         max_age = 60
 
         expected = {
@@ -446,11 +435,12 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
             }
         }
 
-        actual = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(origins, headers, methods, max_age)
+        actual = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(origins, headers,
+                                                                                               methods, max_age)
         self.assertEquals(expected, actual)
 
     def test_allow_headers_is_skipped_with_no_value(self):
-        headers = None # No value
+        headers = None  # No value
         methods = "methods"
         origins = "origins"
 
@@ -477,7 +467,7 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
 
     def test_allow_methods_is_skipped_with_no_value(self):
         headers = "headers"
-        methods = None # No value
+        methods = None  # No value
         origins = "origins"
 
         expected = {
@@ -548,14 +538,14 @@ class TestSwaggerEditor_make_cors_allowed_methods_for_path(TestCase):
 
     def test_must_return_all_defined_methods(self):
         path = "/foo"
-        expected = "DELETE,GET,OPTIONS,POST" # Result should be sorted alphabetically
+        expected = "DELETE,GET,OPTIONS,POST"  # Result should be sorted alphabetically
 
         actual = self.editor._make_cors_allowed_methods_for_path(path)
         self.assertEquals(expected, actual)
 
     def test_must_work_for_any_method(self):
         path = "/withany"
-        expected = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT" # Result should be sorted alphabetically
+        expected = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT"  # Result should be sorted alphabetically
 
         actual = self.editor._make_cors_allowed_methods_for_path(path)
         self.assertEquals(expected, actual)
@@ -592,20 +582,19 @@ class TestSwaggerEditor_normalize_method_name(TestCase):
 class TestSwaggerEditor_swagger_property(TestCase):
 
     def test_must_return_copy_of_swagger(self):
-
         input = {
             "swagger": "2.0",
             "paths": {}
         }
 
         editor = SwaggerEditor(input)
-        self.assertEquals(input, editor.swagger) # They are equal in content
+        self.assertEquals(input, editor.swagger)  # They are equal in content
         input["swagger"] = "3"
-        self.assertEquals("2.0", editor.swagger["swagger"]) # Editor works on a diff copy of input
+        self.assertEquals("2.0", editor.swagger["swagger"])  # Editor works on a diff copy of input
 
         editor.add_path("/foo", "get")
         self.assertEquals({"/foo": {"get": {}}}, editor.swagger["paths"])
-        self.assertEquals({}, input["paths"]) # Editor works on a diff copy of input
+        self.assertEquals({}, input["paths"])  # Editor works on a diff copy of input
 
 
 class TestSwaggerEditor_is_valid(TestCase):

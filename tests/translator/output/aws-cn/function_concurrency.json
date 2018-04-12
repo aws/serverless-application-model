@@ -24,7 +24,8 @@
                   "lambda.amazonaws.com"
                 ]
               }
-            }]
+            }
+          ]
         }
       }
     },
@@ -44,10 +45,12 @@
         },
         "Runtime": "python2.7",
         "ReservedConcurrentExecutions": 100,
-        "Tags": [{
-          "Value": "SAM",
-          "Key": "lambda:createdBy"
-        }]
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     },
     "AnotherFunctionRole": {
@@ -69,7 +72,8 @@
                   "lambda.amazonaws.com"
                 ]
               }
-            }]
+            }
+          ]
         }
       }
     },
@@ -91,10 +95,12 @@
         "ReservedConcurrentExecutions": {
           "Ref": "Concurrency"
         },
-        "Tags": [{
-          "Value": "SAM",
-          "Key": "lambda:createdBy"
-        }]
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }
   }

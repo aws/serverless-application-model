@@ -1,7 +1,10 @@
 import json
+
 import jsonschema
 from jsonschema.exceptions import ValidationError
+
 import sam_schema
+
 
 class SamTemplateValidator(object):
 
@@ -28,7 +31,7 @@ class SamTemplateValidator(object):
             # Swallowing expected exception here as our caller is expecting validation errors and
             # not the valiation exception itself
             pass
-        
+
         return validation_errors
 
     @staticmethod

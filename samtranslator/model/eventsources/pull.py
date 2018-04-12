@@ -1,7 +1,6 @@
 from samtranslator.model import ResourceMacro, PropertyType
-from samtranslator.model.types import is_type, is_str
-
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
+from samtranslator.model.types import is_type, is_str
 from samtranslator.translator.arn_generator import ArnGenerator
 
 
@@ -15,9 +14,9 @@ class PullEventSource(ResourceMacro):
     """
     resource_type = None
     property_types = {
-            'Stream': PropertyType(True, is_str()),
-            'BatchSize': PropertyType(False, is_type(int)),
-            'StartingPosition': PropertyType(True, is_str())
+        'Stream': PropertyType(True, is_str()),
+        'BatchSize': PropertyType(False, is_type(int)),
+        'StartingPosition': PropertyType(True, is_str())
     }
 
     def get_policy_arn(self):
@@ -32,7 +31,7 @@ class PullEventSource(ResourceMacro):
         :rtype: list
         """
         function = kwargs.get('function')
-        
+
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
@@ -40,7 +39,7 @@ class PullEventSource(ResourceMacro):
 
         lambda_eventsourcemapping = LambdaEventSourceMapping(self.logical_id)
         resources.append(lambda_eventsourcemapping)
-        
+
         try:
             # Name will not be available for Alias resources
             function_name_or_arn = function.get_runtime_attr("name")

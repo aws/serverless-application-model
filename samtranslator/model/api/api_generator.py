@@ -1,23 +1,27 @@
 from collections import namedtuple
+
 from six import string_types
 
-from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage)
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.intrinsics import is_instrinsic
+from samtranslator.model.intrinsics import ref
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.model.intrinsics import is_instrinsic
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge"])
 # Default the Cors Properties to '*' wildcard. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None)
 
+
 class ApiGenerator(object):
 
-    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, cors=None):
+    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body,
+                 definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None,
+                 cors=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -60,7 +64,6 @@ class ApiGenerator(object):
             # Since this region does not support EDGE configuration, we explicitly set the endpoint type
             # to Regional which is the only supported config.
             self._set_endpoint_configuration(rest_api, "REGIONAL")
-
 
         if self.definition_uri and self.definition_body:
             raise InvalidResourceException(self.logical_id,
@@ -205,7 +208,7 @@ class ApiGenerator(object):
 
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
-            editor.add_cors(path,  properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
+            editor.add_cors(path, properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
                             max_age=properties.MaxAge)
 
         # Assign the Swagger back to template

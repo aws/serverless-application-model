@@ -2,21 +2,21 @@
   "Resources": {
     "Notifications": {
       "Type": "AWS::SNS::Topic"
-    }, 
+    },
     "SaveNotificationFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -26,53 +26,53 @@
           ]
         }
       }
-    }, 
+    },
     "SaveNotificationFunctionNotificationTopicPermission": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "sns.amazonaws.com", 
+        "Action": "lambda:invokeFunction",
+        "Principal": "sns.amazonaws.com",
         "FunctionName": {
           "Ref": "SaveNotificationFunction"
-        }, 
+        },
         "SourceArn": {
           "Ref": "Notifications"
         }
       }
-    }, 
+    },
     "SaveNotificationFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "notifications.zip"
-        }, 
-        "Handler": "index.save_notification", 
+        },
+        "Handler": "index.save_notification",
         "Role": {
           "Fn::GetAtt": [
-            "SaveNotificationFunctionRole", 
+            "SaveNotificationFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "nodejs4.3", 
+        },
+        "Runtime": "nodejs4.3",
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
       }
-    }, 
+    },
     "SaveNotificationFunctionNotificationTopic": {
-      "Type": "AWS::SNS::Subscription", 
+      "Type": "AWS::SNS::Subscription",
       "Properties": {
         "Endpoint": {
           "Fn::GetAtt": [
-            "SaveNotificationFunction", 
+            "SaveNotificationFunction",
             "Arn"
           ]
-        }, 
-        "Protocol": "lambda", 
+        },
+        "Protocol": "lambda",
         "TopicArn": {
           "Ref": "Notifications"
         }

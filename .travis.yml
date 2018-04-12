@@ -4,7 +4,7 @@ language: python
 
 install:
 # Install the code requirements
-- make init
+- python setup.py develop
 
 # Install Docs requirements
 

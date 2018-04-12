@@ -2,8 +2,8 @@ from deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 
 CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = 'CodeDeployServiceRole'
@@ -63,7 +63,6 @@ class DeploymentPreferenceCollection(object):
         """
         return all(preference.role for preference in self._resource_preferences.itervalues())
 
-
     def enabled_logical_ids(self):
         """
         :return: only the logical id's for the deployment preferences in this collection which are enabled
@@ -111,7 +110,7 @@ class DeploymentPreferenceCollection(object):
                                                                  'DEPLOYMENT_STOP_ON_ALARM',
                                                                  'DEPLOYMENT_STOP_ON_REQUEST']}
         deployment_group.DeploymentConfigName = fnSub("CodeDeployDefault.Lambda${ConfigName}",
-                                                      {"ConfigName":  deployment_preference.deployment_type})
+                                                      {"ConfigName": deployment_preference.deployment_type})
         deployment_group.DeploymentStyle = {'DeploymentType': 'BLUE_GREEN',
                                             'DeploymentOption': 'WITH_TRAFFIC_CONTROL'}
 

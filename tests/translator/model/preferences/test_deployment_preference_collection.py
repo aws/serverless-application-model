@@ -45,7 +45,8 @@ class TestDeploymentPreferenceCollection(TestCase):
                 'Principal': {'Service': ['codedeploy.amazonaws.com']}
             }]
         }
-        expected_codedeploy_iam_role.ManagedPolicyArns = ['arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda']
+        expected_codedeploy_iam_role.ManagedPolicyArns = [
+            'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda']
 
         self.assertEqual(DeploymentPreferenceCollection().codedeploy_iam_role.to_dict(),
                          expected_codedeploy_iam_role.to_dict())

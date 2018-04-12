@@ -1,10 +1,11 @@
 import json
-
 from unittest import TestCase
+
 from mock import MagicMock, patch
-from tests.translator.helpers import get_template_parameter_values
-from samtranslator.translator.transform import transform
+
 from samtranslator.model.apigateway import ApiGatewayDeployment
+from samtranslator.translator.transform import transform
+from tests.translator.helpers import get_template_parameter_values
 
 mock_policy_loader = MagicMock()
 mock_policy_loader.load.return_value = {
@@ -137,7 +138,7 @@ class TestApiGatewayDeploymentResource(TestCase):
 
         LogicalIdGeneratorMock.assert_called_once_with(prefix, str(swagger))
         generator_mock.gen.assert_called_once_with()
-        generator_mock.get_hash.assert_called_once_with(length=40) # getting full SHA
+        generator_mock.get_hash.assert_called_once_with(length=40)  # getting full SHA
         stage.update_deployment_ref.assert_called_once_with(id_val)
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")

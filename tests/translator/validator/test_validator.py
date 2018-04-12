@@ -1,10 +1,12 @@
 import os.path
+
 import pytest
-from unittest import TestCase
-from tests.translator.yaml_helper import yaml_parse
+
 from samtranslator.validator.validator import SamTemplateValidator
+from tests.translator.yaml_helper import yaml_parse
 
 input_folder = 'tests/translator/input'
+
 
 @pytest.mark.parametrize('testcase', [
     'basic_function',

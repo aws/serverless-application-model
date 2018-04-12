@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from samtranslator.sdk.resource import SamResource, SamResourceType
 
+
 class TestSamResource(TestCase):
 
     def setUp(self):
@@ -83,7 +84,6 @@ class TestSamResourceTypeEnum(TestCase):
         self.assertEquals(SamResourceType.SimpleTable.value, "AWS::Serverless::SimpleTable")
 
     def test_has_value_must_work_for_sam_types(self):
-
         self.assertTrue(SamResourceType.has_value("AWS::Serverless::Function"))
         self.assertTrue(SamResourceType.has_value("AWS::Serverless::Api"))
         self.assertTrue(SamResourceType.has_value("AWS::Serverless::SimpleTable"))

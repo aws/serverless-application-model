@@ -2,6 +2,7 @@ import re
 
 from six import string_types
 
+
 class Action(object):
     """
     Base class for intrinsic function actions. Each intrinsic function must subclass this,
@@ -38,15 +39,14 @@ class Action(object):
         :return: True if it matches expected structure, False otherwise
         """
 
-        return input_dict is not None \
-                   and isinstance(input_dict, dict) \
-                   and len(input_dict) == 1 \
-                   and self.intrinsic_name in input_dict
+        return input_dict is not None and isinstance(input_dict, dict) and len(input_dict) == 1 and \
+            self.intrinsic_name in input_dict
 
     @classmethod
     def _parse_resource_reference(cls, ref_value):
         """
-        Splits a resource reference of structure "LogicalId.Property" and returns the "LogicalId" and "Property" separately.
+        Splits a resource reference of structure "LogicalId.Property" and returns the "LogicalId" and "Property"
+        separately.
 
         :param string ref_value: Input reference value which *may* contain the structure "LogicalId.Property"
         :return string, string: Returns two values - logical_id, property. If the input does not contain the structure,
@@ -126,6 +126,7 @@ class RefAction(Action):
         return {
             self.intrinsic_name: resolved_value
         }
+
 
 class SubAction(Action):
     intrinsic_name = "Fn::Sub"
@@ -228,7 +229,6 @@ class SubAction(Action):
 
         return input_dict
 
-
     def _handle_sub_value(self, sub_value, handler_method):
         """
         Generic method to handle value to Fn::Sub key. We are interested in parsing the ${} syntaxes inside
@@ -266,15 +266,15 @@ class SubAction(Action):
 
         :param string text: Input text
         :param handler_method: Method to be called to handle each occurrence of ${blah} reference structure.
-            First parameter to this method is the full reference structure Ex: ${LogicalId.Property}. Second parameter is just the
-            value of the reference such as "LogicalId.Property"
+            First parameter to this method is the full reference structure Ex: ${LogicalId.Property}. Second parameter
+            is just the value of the reference such as "LogicalId.Property"
 
         :return string: Text with all reference structures replaced as necessary
         """
 
         # RegExp to find pattern "${logicalId.property}" and return the word inside bracket
         logical_id_regex = '[A-Za-z0-9\.]+'
-        ref_pattern = re.compile(r'\$\{('+logical_id_regex+')\}')
+        ref_pattern = re.compile(r'\$\{(' + logical_id_regex + ')\}')
 
         # Find all the pattern, and call the handler to decide how to substitute them.
         # Do the substitution and return the final text
@@ -284,13 +284,13 @@ class SubAction(Action):
                       lambda match: handler_method(match.group(0), match.group(1)),
                       text)
 
+
 class GetAttAction(Action):
     intrinsic_name = "Fn::GetAtt"
 
     def resolve_parameter_refs(self, input_dict, parameters):
         # Parameters can never be referenced within GetAtt value
         return input_dict
-
 
     def resolve_resource_refs(self, input_dict, supported_resource_refs):
         """
@@ -342,7 +342,7 @@ class GetAttAction(Action):
         splits = value_str.split(self._resource_ref_separator)
         logical_id = splits[0]
         property = splits[1]
-        remaining = splits[2:] # if any
+        remaining = splits[2:]  # if any
 
         resolved_value = supported_resource_refs.get(logical_id, property)
         if resolved_value:

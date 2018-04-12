@@ -9,6 +9,7 @@ the Permissions property is an ARN or list of ARNs. In this situation, we valida
 either a string or a list of strings, but do not validate whether the string(s) are valid IAM policy ARNs.
 """
 from six import string_types
+
 import samtranslator.model.exceptions
 
 
@@ -19,6 +20,7 @@ def is_type(valid_type):
     :returns: a function which returns True its input is an instance of valid_type, and raises TypeError otherwise
     :rtype: callable
     """
+
     def validate(value, should_raise=True):
         if not isinstance(value, valid_type):
             if should_raise:
@@ -26,6 +28,7 @@ def is_type(valid_type):
                     expected=valid_type, actual=type(value)))
             return False
         return True
+
     return validate
 
 
@@ -37,6 +40,7 @@ def list_of(validate_item):
     :returns: a function which returns True its input is an list of valid items, and raises TypeError otherwise
     :rtype: callable
     """
+
     def validate(value, should_raise=True):
         validate_type = is_type(list)
         if not validate_type(value, should_raise=should_raise):
@@ -51,6 +55,7 @@ def list_of(validate_item):
                     raise
                 return False
         return True
+
     return validate
 
 
@@ -63,6 +68,7 @@ def dict_of(validate_key, validate_item):
     :returns: a function which returns True its input is an dict of valid items, and raises TypeError otherwise
     :rtype: callable
     """
+
     def validate(value, should_raise=True):
         validate_type = is_type(dict)
         if not validate_type(value, should_raise=should_raise):
@@ -85,6 +91,7 @@ def dict_of(validate_key, validate_item):
                     raise
                 return False
         return True
+
     return validate
 
 
@@ -96,6 +103,7 @@ def one_of(*validators):
               otherwise
     :rtype: callable
     """
+
     def validate(value, should_raise=True):
         if any(validate(value, should_raise=False) for validate in validators):
             return True
@@ -103,6 +111,7 @@ def one_of(*validators):
         if should_raise:
             raise TypeError("value did not match any allowable type")
         return False
+
     return validate
 
 
@@ -113,6 +122,7 @@ def is_str():
     :rtype: callable
     """
     return is_type(string_types)
+
 
 def any_type():
     def validate(value, should_raise=False):

@@ -1,12 +1,14 @@
 from unittest import TestCase
+
 from mock import patch, Mock
+
 from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+
 
 class TestAction(TestCase):
 
     def test_subclass_must_override_type(self):
-
         # Subclass must override the intrinsic_name
         class MyAction(Action):
             pass
@@ -118,6 +120,7 @@ class TestAction(TestCase):
 
         self.assertEquals(expected, Action._parse_resource_reference(input))
 
+
 class TestRefCanResolveParameterRefs(TestCase):
 
     def test_can_resolve_ref(self):
@@ -172,7 +175,7 @@ class TestRefCanResolveParameterRefs(TestCase):
         }
 
         ref = RefAction()
-        can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
+        can_handle_mock.return_value = False  # Simulate failure to handle the input. Result should be same as input
         self.assertEquals(expected, ref.resolve_parameter_refs(input, parameters))
 
 
@@ -244,8 +247,9 @@ class TestRefCanResolveResourceRefs(TestCase):
         }
 
         ref = RefAction()
-        can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
+        can_handle_mock.return_value = False  # Simulate failure to handle the input. Result should be same as input
         self.assertEquals(expected, ref.resolve_resource_refs(input, self.supported_resource_refs_mock))
+
 
 class TestSubCanResolveParameterRefs(TestCase):
 
@@ -270,7 +274,7 @@ class TestSubCanResolveParameterRefs(TestCase):
             "key1": "value1"
         }
         input = {
-            "Fn::Sub": ["Hello ${key1} ${a}", {"a":"b"}]
+            "Fn::Sub": ["Hello ${key1} ${a}", {"a": "b"}]
         }
 
         expected = {
@@ -295,7 +299,7 @@ class TestSubCanResolveParameterRefs(TestCase):
         }
 
         sub = SubAction()
-        can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
+        can_handle_mock.return_value = False  # Simulate failure to handle the input. Result should be same as input
         self.assertEquals(expected, sub.resolve_parameter_refs(input, parameters))
 
     def test_sub_all_refs_multiple_references(self):
@@ -367,6 +371,7 @@ class TestSubCanResolveParameterRefs(TestCase):
 
         self.assertEqual(expected, result)
 
+
 class TestSubInternalMethods(TestCase):
 
     @patch.object(SubAction, "_sub_all_refs")
@@ -397,8 +402,8 @@ class TestSubInternalMethods(TestCase):
 
     @patch.object(SubAction, "_sub_all_refs")
     def test_handle_sub_value_must_skip_no_string(self, sub_all_refs_mock):
-        input = [{"a":"b"}]
-        expected = [{"a":"b"}]
+        input = [{"a": "b"}]
+        expected = [{"a": "b"}]
         handler_mock = Mock()
 
         sub = SubAction()
@@ -434,6 +439,7 @@ class TestSubInternalMethods(TestCase):
         handler_mock.assert_not_called()
         sub_all_refs_mock.assert_not_called()
 
+
 class TestSubCanResolveResourceRefs(TestCase):
 
     def setUp(self):
@@ -442,11 +448,12 @@ class TestSubCanResolveResourceRefs(TestCase):
         self.supported_resource_refs.add("id1", "prop2", "value2")
         self.supported_resource_refs.add("id2", "prop3", "value3")
 
-        self.input_sub_value = "Hello ${id1.prop1} ${id1.prop2}${id2.prop3} ${id1.prop1.arn} ${id1.prop2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
-        self.expected_output_sub_value = "Hello ${value1} ${value2}${value3} ${value1.arn} ${value2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
+        self.input_sub_value = "Hello ${id1.prop1} ${id1.prop2}${id2.prop3} ${id1.prop1.arn} " \
+                               "${id1.prop2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
+        self.expected_output_sub_value = "Hello ${value1} ${value2}${value3} ${value1.arn} ${value2.arn.name.foo} " \
+                                         "${!id1.prop1} ${unknown} ${some.arn} World"
 
     def test_must_resolve_string_value(self):
-
         input = {
             "Fn::Sub": self.input_sub_value
         }
@@ -461,7 +468,7 @@ class TestSubCanResolveResourceRefs(TestCase):
 
     def test_must_resolve_array_value(self):
         input = {
-            "Fn::Sub": [self.input_sub_value, {"unknown":"a"}]
+            "Fn::Sub": [self.input_sub_value, {"unknown": "a"}]
         }
 
         expected = {
@@ -520,7 +527,7 @@ class TestSubCanResolveResourceRefs(TestCase):
         }
 
         sub = SubAction()
-        can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
+        can_handle_mock.return_value = False  # Simulate failure to handle the input. Result should be same as input
         self.assertEquals(expected, sub.resolve_resource_refs(input, parameters))
 
 
@@ -681,5 +688,5 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         }
 
         getatt = GetAttAction()
-        can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
+        can_handle_mock.return_value = False  # Simulate failure to handle the input. Result should be same as input
         self.assertEquals(expected, getatt.resolve_resource_refs(input, self.supported_resource_refs))

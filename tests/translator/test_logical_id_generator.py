@@ -1,9 +1,11 @@
 import hashlib
 import json
-
 from unittest import TestCase
+
 from mock import patch
+
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
+
 
 class TestLogicalIdGenerator(TestCase):
     """
@@ -15,7 +17,6 @@ class TestLogicalIdGenerator(TestCase):
 
     @patch.object(LogicalIdGenerator, "_stringify")
     def test_gen_no_data(self, stringify_mock):
-
         generator = LogicalIdGenerator(self.prefix)
 
         self.assertEquals(self.prefix, generator.gen())
@@ -29,7 +30,7 @@ class TestLogicalIdGenerator(TestCase):
     @patch.object(LogicalIdGenerator, "_stringify")
     def test_gen_dict_data(self, stringify_mock, get_hash_mock):
         data = {"foo": "bar"}
-        stringified_data =  "stringified data"
+        stringified_data = "stringified data"
         hash_value = "some hash value"
         get_hash_mock.return_value = hash_value
         stringify_mock.return_value = stringified_data
@@ -48,7 +49,7 @@ class TestLogicalIdGenerator(TestCase):
         generator = LogicalIdGenerator(self.prefix, data_obj=data)
 
         old = generator.gen()
-        new = LogicalIdGenerator(self.prefix, data_obj=data.copy()).gen() # Create a copy of data obj
+        new = LogicalIdGenerator(self.prefix, data_obj=data.copy()).gen()  # Create a copy of data obj
         self.assertEqual(old, new)
 
     def test_gen_stability_with_different_dict_ordering(self):
@@ -62,7 +63,7 @@ class TestLogicalIdGenerator(TestCase):
 
     def test_gen_changes_on_different_dict_data(self):
         data = {"foo": "bar", "nested": {"a": "b", "c": "d"}}
-        data_other = {"foo2": "bar", "nested": {"a": "b", "c": "d"}} # Just changing one key
+        data_other = {"foo2": "bar", "nested": {"a": "b", "c": "d"}}  # Just changing one key
 
         old = LogicalIdGenerator(self.prefix, data_obj=data)
         new = LogicalIdGenerator(self.prefix, data_obj=data_other).gen()
@@ -118,14 +119,14 @@ class TestLogicalIdGenerator(TestCase):
         stringify_mock.assert_called_once_with(data)
 
     def test_stringify_basic_objects(self):
-        data = {"a": "b", "c": [4,3,1]}
+        data = {"a": "b", "c": [4, 3, 1]}
         expected = '{"a":"b","c":[4,3,1]}'
         generator = LogicalIdGenerator(self.prefix, data_obj=data)
 
         self.assertEqual(expected, generator._stringify(data))
 
     def test_stringify_basic_objects_sorting(self):
-        data = {"c": [4,3,1],   "a": "b"}
+        data = {"c": [4, 3, 1], "a": "b"}
         expected = '{"a":"b","c":[4,3,1]}'
         generator = LogicalIdGenerator(self.prefix, data_obj=data)
 

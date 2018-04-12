@@ -1,4 +1,5 @@
 from mock import MagicMock
+
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
 
 
@@ -6,6 +7,7 @@ def create_page(policies):
     return {
         'Policies': map(lambda x: {'PolicyName': x[0], 'Arn': x[1]}, policies)
     }
+
 
 def test_load():
     paginator = MagicMock()
@@ -26,7 +28,6 @@ def test_load():
             ('Policy-final', 'Arn-final'),
         ]),
     ]
-
 
     iam = MagicMock()
     iam.get_paginator.return_value = paginator

@@ -48,9 +48,8 @@ def is_instrinsic(input):
     """
 
     if input is not None \
-        and isinstance(input, dict) \
-        and len(input) == 1:
-
+            and isinstance(input, dict) \
+            and len(input) == 1:
         key = input.keys()[0]
         return key == "Ref" or key == "Condition" or key.startswith("Fn::")
 

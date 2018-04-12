@@ -1,18 +1,19 @@
 import copy
-from six import string_types
-from samtranslator.model import ResourceMacro, PropertyType
-from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
-from samtranslator.model.intrinsics import ref, fnSub, make_shorthand
 
+from six import string_types
+
+from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model.events import EventsRule
+from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.intrinsics import ref, fnSub, make_shorthand
+from samtranslator.model.iot import IotTopicRule
+from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
-from samtranslator.model.lambda_ import LambdaPermission
-from samtranslator.model.events import EventsRule
-from samtranslator.model.log import SubscriptionFilter
-from samtranslator.model.iot import IotTopicRule
-from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.translator.arn_generator import ArnGenerator
+
 
 class PushEventSource(ResourceMacro):
     """Base class for push event sources for SAM Functions.
@@ -65,8 +66,8 @@ class Schedule(PushEventSource):
     resource_type = 'Schedule'
     principal = 'events.amazonaws.com'
     property_types = {
-            'Schedule': PropertyType(True, is_str()),
-            'Input': PropertyType(False, is_str())
+        'Schedule': PropertyType(True, is_str()),
+        'Input': PropertyType(False, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
@@ -102,8 +103,8 @@ class Schedule(PushEventSource):
         :rtype: dict
         """
         target = {
-                'Arn': function.get_runtime_attr("arn"),
-                'Id':  self.logical_id + 'LambdaTarget'
+            'Arn': function.get_runtime_attr("arn"),
+            'Id': self.logical_id + 'LambdaTarget'
         }
         if self.Input is not None:
             target['Input'] = self.Input
@@ -116,9 +117,9 @@ class CloudWatchEvent(PushEventSource):
     resource_type = 'CloudWatchEvent'
     principal = 'events.amazonaws.com'
     property_types = {
-            'Pattern': PropertyType(False, is_type(dict)),
-            'Input': PropertyType(False, is_str()),
-            'InputPath': PropertyType(False, is_str())
+        'Pattern': PropertyType(False, is_type(dict)),
+        'Input': PropertyType(False, is_str()),
+        'InputPath': PropertyType(False, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
@@ -154,8 +155,8 @@ class CloudWatchEvent(PushEventSource):
         :rtype: dict
         """
         target = {
-                'Arn': function.get_runtime_attr("arn"),
-                'Id':  self.logical_id + 'LambdaTarget'
+            'Arn': function.get_runtime_attr("arn"),
+            'Id': self.logical_id + 'LambdaTarget'
         }
         if self.Input is not None:
             target['Input'] = self.Input
@@ -164,14 +165,15 @@ class CloudWatchEvent(PushEventSource):
             target['InputPath'] = self.InputPath
         return target
 
+
 class S3(PushEventSource):
     """S3 bucket event source for SAM Functions."""
     resource_type = 'S3'
     principal = 's3.amazonaws.com'
     property_types = {
-            'Bucket': PropertyType(True, is_str()),
-            'Events': PropertyType(True, one_of(is_str(), list_of(is_str()))),
-            'Filter': PropertyType(False, dict_of(is_str(), is_str()))
+        'Bucket': PropertyType(True, is_str()),
+        'Events': PropertyType(True, one_of(is_str(), list_of(is_str()))),
+        'Filter': PropertyType(False, dict_of(is_str(), is_str()))
     }
 
     def resources_to_link(self, resources):
@@ -261,7 +263,6 @@ class S3(PushEventSource):
 
         event_mappings = []
         for event_type in event_types:
-
             lambda_event = copy.deepcopy(base_event_mapping)
             lambda_event['Event'] = event_type
 
@@ -293,7 +294,7 @@ class SNS(PushEventSource):
     resource_type = 'SNS'
     principal = 'sns.amazonaws.com'
     property_types = {
-            'Topic': PropertyType(True, is_str())
+        'Topic': PropertyType(True, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
@@ -325,11 +326,11 @@ class Api(PushEventSource):
     resource_type = 'Api'
     principal = 'apigateway.amazonaws.com'
     property_types = {
-            'Path': PropertyType(True, is_str()),
-            'Method': PropertyType(True, is_str()),
+        'Path': PropertyType(True, is_str()),
+        'Method': PropertyType(True, is_str()),
 
-            # Api Event sources must "always" be paired with a Serverless::Api
-            'RestApiId': PropertyType(True, is_str())
+        # Api Event sources must "always" be paired with a Serverless::Api
+        'RestApiId': PropertyType(True, is_str())
     }
 
     def resources_to_link(self, resources):
@@ -354,8 +355,8 @@ class Api(PushEventSource):
         if isinstance(rest_api_id, string_types):
 
             if rest_api_id in resources \
-               and "Properties" in resources[rest_api_id] \
-               and "StageName" in resources[rest_api_id]["Properties"]:
+                    and "Properties" in resources[rest_api_id] \
+                    and "StageName" in resources[rest_api_id]["Properties"]:
 
                 explicit_api = resources[rest_api_id]["Properties"]
                 permitted_stage = explicit_api["StageName"]
@@ -451,8 +452,8 @@ class Api(PushEventSource):
 
         function_arn = function.get_runtime_attr('arn')
         partition = ArnGenerator.get_partition_name()
-        uri = fnSub('arn:'+partition+':apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/'
-                    + make_shorthand(function_arn) + '/invocations')
+        uri = fnSub('arn:' + partition + ':apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/' +
+                    make_shorthand(function_arn) + '/invocations')
 
         editor = SwaggerEditor(swagger_body)
 

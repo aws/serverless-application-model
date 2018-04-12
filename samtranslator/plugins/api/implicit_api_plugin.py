@@ -1,12 +1,11 @@
 import copy
 
 from samtranslator.model.naming import GeneratedLogicalId
-
-from samtranslator.public.plugins import BasePlugin
-from samtranslator.public.swagger import SwaggerEditor
 from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException
+from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.sdk.resource import SamResourceType, SamResource
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.public.swagger import SwaggerEditor
 
 
 class ImplicitApiPlugin(BasePlugin):
@@ -87,15 +86,14 @@ class ImplicitApiPlugin(BasePlugin):
         :param SamResource function: Function Resource object
         :return dict: Dictionary of API events along with any other configuration passed to it.
             Example: {
-                FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>}, Cors: {<something>}},
+                FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>},
+                    Cors: {<something>}},
                 BarEvent: {Path: "/bar", Method: "any", MethodSettings: {<something>}, Cors: {<something>}}"
             }
         """
 
-        if not (function.valid() and
-                isinstance(function.properties, dict) and
-                isinstance(function.properties.get("Events"), dict)
-                ):
+        if not (function.valid() and isinstance(function.properties, dict) and
+                isinstance(function.properties.get("Events"), dict)):
             # Function resource structure is invalid.
             return {}
 
@@ -167,8 +165,8 @@ class ImplicitApiPlugin(BasePlugin):
         # Make sure Swagger is valid
         resource = template.get(api_id)
         if not (resource and
-                    isinstance(resource.properties, dict) and
-                    SwaggerEditor.is_valid(resource.properties.get("DefinitionBody"))):
+                isinstance(resource.properties, dict) and
+                SwaggerEditor.is_valid(resource.properties.get("DefinitionBody"))):
             # This does not have an inline Swagger. Nothing can be done about it.
             return
 
@@ -212,6 +210,7 @@ class ImplicitApiPlugin(BasePlugin):
                 template.set(self.implicit_api_logical_id, self.existing_implicit_api_resource)
             else:
                 template.delete(self.implicit_api_logical_id)
+
 
 class ImplicitApiResource(SamResource):
     """

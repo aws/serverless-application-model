@@ -1,25 +1,23 @@
-import json
 import itertools
+import json
 import os.path
 from functools import reduce
-
-from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
-from samtranslator.parser.parser import Parser
-from samtranslator.model.exceptions import InvalidDocumentException
-from samtranslator.model import Resource
-from samtranslator.model.sam_resources import SamSimpleTable
-from samtranslator.public.plugins import BasePlugin
-
-from tests.translator.helpers import get_template_parameter_values
-from tests.translator.yaml_helper import yaml_parse
-from parameterized import parameterized, param
+from unittest import TestCase
 
 import pytest
 import yaml
-from unittest import TestCase
-from samtranslator.translator.transform import transform
 from mock import Mock, MagicMock, patch
+from parameterized import parameterized, param
 
+from samtranslator.model import Resource
+from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.model.sam_resources import SamSimpleTable
+from samtranslator.parser.parser import Parser
+from samtranslator.public.plugins import BasePlugin
+from samtranslator.translator.transform import transform
+from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
+from tests.translator.helpers import get_template_parameter_values
+from tests.translator.yaml_helper import yaml_parse
 
 input_folder = 'tests/translator/input'
 output_folder = 'tests/translator/output'
@@ -33,6 +31,7 @@ def deep_sorted(value):
     else:
         return value
 
+
 # implicit_api, explicit_api, explicit_api_ref, api_cache tests currently have deployment IDs hardcoded in output file.
 # These ids are generated using sha1 hash of the swagger body for implicit
 # api and s3 location for explicit api.
@@ -40,82 +39,82 @@ def deep_sorted(value):
 class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
-      itertools.product([
-        'basic_function',
-        'cloudwatchevent',
-        'cloudwatch_logs_with_ref',
-        'cloudwatchlog',
-        'streams',
-        'simpletable',
-        'implicit_api',
-        'explicit_api',
-        'api_endpoint_configuration',
-        'api_with_method_settings',
-        'api_with_binary_media_types',
-        'api_with_resource_refs',
-        'api_with_cors',
-        'api_with_cors_and_only_methods',
-        'api_with_cors_and_only_headers',
-        'api_with_cors_and_only_origins',
-        'api_with_cors_and_only_maxage',
-        'api_cache',
-        's3',
-        's3_create_remove',
-        's3_existing_lambda_notification_configuration',
-        's3_existing_other_notification_configuration',
-        's3_filter',
-        's3_multiple_events_same_bucket',
-        's3_multiple_functions',
-        'sns',
-        'sns_existing_other_subscription',
-        'sns_topic_outside_template',
-        'alexa_skill',
-        'iot_rule',
-        'function_managed_inline_policy',
-        'unsupported_resources',
-        'intrinsic_functions',
-        'basic_function_with_tags',
-        'depends_on',
-        'function_with_dlq',
-        'function_with_kmskeyarn',
-        'function_with_alias',
-        'function_with_alias_intrinsics',
-        'function_with_disabled_deployment_preference',
-        'function_with_deployment_preference',
-        'function_with_deployment_preference_all_parameters',
-        'function_with_deployment_preference_multiple_combinations',
-        'function_with_alias_and_event_sources',
-        'function_with_resource_refs',
-        'function_with_deployment_and_custom_role',
-        'function_with_deployment_no_service_role',
-        'function_with_policy_templates',
-        'globals_for_function',
-        'globals_for_api',
-        'all_policy_templates',
-        'simple_table_ref_parameter_intrinsic',
-        'simple_table_with_table_name',
-        'function_concurrency',
-        'simple_table_with_extra_tags',
-        'explicit_api_with_invalid_events_config',
-        'no_implicit_api_with_serverless_rest_api_resource',
-        'implicit_api_with_serverless_rest_api_resource'
-      ],
-      [
-       ("aws", "ap-southeast-1"),
-       ("aws-cn", "cn-north-1"),
-       ("aws-us-gov", "us-gov-west-1")
-      ] # Run all the above tests against each of the list of partitions to test against
-      )
-    )
+        itertools.product([
+            'basic_function',
+            'cloudwatchevent',
+            'cloudwatch_logs_with_ref',
+            'cloudwatchlog',
+            'streams',
+            'simpletable',
+            'implicit_api',
+            'explicit_api',
+            'api_endpoint_configuration',
+            'api_with_method_settings',
+            'api_with_binary_media_types',
+            'api_with_resource_refs',
+            'api_with_cors',
+            'api_with_cors_and_only_methods',
+            'api_with_cors_and_only_headers',
+            'api_with_cors_and_only_origins',
+            'api_with_cors_and_only_maxage',
+            'api_cache',
+            's3',
+            's3_create_remove',
+            's3_existing_lambda_notification_configuration',
+            's3_existing_other_notification_configuration',
+            's3_filter',
+            's3_multiple_events_same_bucket',
+            's3_multiple_functions',
+            'sns',
+            'sns_existing_other_subscription',
+            'sns_topic_outside_template',
+            'alexa_skill',
+            'iot_rule',
+            'function_managed_inline_policy',
+            'unsupported_resources',
+            'intrinsic_functions',
+            'basic_function_with_tags',
+            'depends_on',
+            'function_with_dlq',
+            'function_with_kmskeyarn',
+            'function_with_alias',
+            'function_with_alias_intrinsics',
+            'function_with_disabled_deployment_preference',
+            'function_with_deployment_preference',
+            'function_with_deployment_preference_all_parameters',
+            'function_with_deployment_preference_multiple_combinations',
+            'function_with_alias_and_event_sources',
+            'function_with_resource_refs',
+            'function_with_deployment_and_custom_role',
+            'function_with_deployment_no_service_role',
+            'function_with_policy_templates',
+            'globals_for_function',
+            'globals_for_api',
+            'all_policy_templates',
+            'simple_table_ref_parameter_intrinsic',
+            'simple_table_with_table_name',
+            'function_concurrency',
+            'simple_table_with_extra_tags',
+            'explicit_api_with_invalid_events_config',
+            'no_implicit_api_with_serverless_rest_api_resource',
+            'implicit_api_with_serverless_rest_api_resource'
+        ], [
+            ("aws", "ap-southeast-1"),
+            ("aws-cn", "cn-north-1"),
+            ("aws-us-gov", "us-gov-west-1")
+        ]  # Run all the above tests against each of the list of partitions to test against
+        ))
     def test_transform_success(self, testcase, partition_with_region):
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
+        print(os.path.join(input_folder, testcase + '.yaml'))
+        print(os.getcwd())
         manifest = yaml_parse(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(output_folder,partition_folder, testcase + '.json'), 'r'))
+        expected = json.load(open(os.path.join(output_folder, partition_folder, testcase + '.json'), 'r'))
 
         old_region = os.environ.get("AWS_DEFAULT_REGION", "")
         os.environ["AWS_DEFAULT_REGION"] = region
@@ -124,7 +123,8 @@ class TestTranslatorEndToEnd(TestCase):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
             mock_policy_loader.load.return_value = {
-                'AWSLambdaBasicExecutionRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'.format(partition),
+                'AWSLambdaBasicExecutionRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'.format(
+                    partition),
                 'AmazonDynamoDBFullAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess'.format(partition),
                 'AmazonDynamoDBReadOnlyAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess'.format(partition),
                 'AWSLambdaRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaRole'.format(partition),
@@ -180,11 +180,11 @@ def test_transform_invalid_document(testcase):
     parameter_values = get_template_parameter_values()
 
     with pytest.raises(InvalidDocumentException) as e:
-        transform(manifest, parameter_values, mock_policy_loader)
+        print(transform(manifest, parameter_values, mock_policy_loader))
 
     error_message = get_exception_error_message(e)
-
     assert error_message == expected.get('errorMessage')
+
 
 def test_transform_unhandled_failure_empty_managed_policy_map():
     document = {
@@ -242,7 +242,6 @@ def assert_metric_call(mock, transform, transform_failure=0, invalid_document=0)
 
 
 def test_swagger_body_sha_gets_recomputed():
-
     document = {
         'Transform': 'AWS::Serverless-2016-10-31',
         'Resources': {
@@ -283,7 +282,6 @@ def test_swagger_body_sha_gets_recomputed():
 
 
 def test_swagger_definitionuri_sha_gets_recomputed():
-
     document = {
         'Transform': 'AWS::Serverless-2016-10-31',
         'Resources': {
@@ -318,6 +316,7 @@ def test_swagger_definitionuri_sha_gets_recomputed():
     # Now let's re-deploy the document without any changes. Deployment Key must NOT change
     output_fragment = transform(document, parameter_values, mock_policy_loader)
     assert get_deployment_key(output_fragment) == deployment_key_changed
+
 
 class TestFunctionVersionWithParameterReferences(TestCase):
     """
@@ -417,7 +416,7 @@ class TestParameterValuesHandling(TestCase):
         sam_parser = Parser()
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(sam_template,
-            parameter_values)
+                                                          parameter_values)
         self.assertEquals(expected, result)
 
     def test_add_default_parameter_values_must_override_user_specified_values(self):
@@ -437,7 +436,6 @@ class TestParameterValuesHandling(TestCase):
         expected = {
             "Param1": "value1"
         }
-
 
         sam_parser = Parser()
         translator = Translator({}, sam_parser)
@@ -469,7 +467,6 @@ class TestParameterValuesHandling(TestCase):
         result = translator._add_default_parameter_values(sam_template, parameter_values)
         self.assertEquals(expected, result)
 
-
     @parameterized.expand([
         # Array
         param(["1", "2"]),
@@ -494,7 +491,6 @@ class TestParameterValuesHandling(TestCase):
         sam_template = {
             "Parameters": template_parameters
         }
-
 
         sam_parser = Parser()
         translator = Translator({}, sam_parser)
@@ -525,10 +521,9 @@ class TestTemplateValidation(TestCase):
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
 
-
     def test_throws_when_resource_is_not_dict(self):
         template = {
-            "Resources": [1,2,3]
+            "Resources": [1, 2, 3]
         }
 
         with self.assertRaises(InvalidDocumentException):
@@ -536,12 +531,12 @@ class TestTemplateValidation(TestCase):
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
 
+
 class TestPluginsUsage(TestCase):
     # Tests if plugins are properly injected into the translator
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     def test_prepare_plugins_must_add_required_plugins(self, make_policy_template_for_function_plugin_mock):
-
         # This is currently the only required plugin
         plugin_instance = BasePlugin("something")
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
@@ -551,7 +546,6 @@ class TestPluginsUsage(TestCase):
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     def test_prepare_plugins_must_merge_input_plugins(self, make_policy_template_for_function_plugin_mock):
-
         required_plugin = BasePlugin("something")
         make_policy_template_for_function_plugin_mock.return_value = required_plugin
 
@@ -560,16 +554,14 @@ class TestPluginsUsage(TestCase):
         self.assertEquals(4, len(sam_plugins))
 
     def test_prepare_plugins_must_handle_empty_input(self):
-
         sam_plugins = prepare_plugins(None)
-        self.assertEquals(3, len(sam_plugins)) # one required plugin
+        self.assertEquals(3, len(sam_plugins))  # one required plugin
 
     @patch("samtranslator.translator.translator.PolicyTemplatesProcessor")
     @patch("samtranslator.translator.translator.PolicyTemplatesForFunctionPlugin")
     def test_make_policy_template_for_function_plugin_must_work(self,
                                                                 policy_templates_for_function_plugin_mock,
                                                                 policy_templates_processor_mock):
-
         default_templates = {"some": "value"}
         policy_templates_processor_mock.get_default_policy_templates_json.return_value = default_templates
 
@@ -611,15 +603,16 @@ class TestPluginsUsage(TestCase):
         prepare_plugins_mock.return_value = sam_plugins_object_mock
         resource_from_dict_mock.return_value = SamSimpleTable("MyFunction")
 
-        initial_plugins = [1,2,3]
+        initial_plugins = [1, 2, 3]
         sam_parser = Parser()
         translator = Translator({}, sam_parser, plugins=initial_plugins)
         translator.translate(manifest, {})
 
         resource_from_dict_mock.assert_called_with("MyTable",
-                                                        manifest["Resources"]["MyTable"],
-                                                        sam_plugins=sam_plugins_object_mock)
+                                                   manifest["Resources"]["MyTable"],
+                                                   sam_plugins=sam_plugins_object_mock)
         prepare_plugins_mock.assert_called_once_with(initial_plugins)
+
 
 def get_policy_mock():
     mock_policy_loader = MagicMock()
@@ -631,9 +624,11 @@ def get_policy_mock():
 
     return mock_policy_loader
 
+
 def get_deployment_key(fragment):
     logical_id, value = get_resource_by_type(fragment, "AWS::ApiGateway::Deployment")
     return logical_id
+
 
 def get_resource_by_type(template, type):
     resources = template["Resources"]
@@ -641,6 +636,7 @@ def get_resource_by_type(template, type):
         value = resources[key]
         if "Type" in value and value.get("Type") == type:
             return key, value
+
 
 def get_exception_error_message(e):
     return reduce(lambda message, error: message + ' ' + error.message, e.value.causes, e.value.message)

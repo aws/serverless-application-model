@@ -1,4 +1,5 @@
 import copy
+
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
@@ -44,8 +45,8 @@ class SwaggerEditor(object):
         result = path in self.paths
         if method:
             result = result and \
-                    isinstance(self.paths[path], dict) and \
-                    method in self.paths[path]
+                     isinstance(self.paths[path], dict) and \
+                     method in self.paths[path]
 
         return result
 
@@ -59,8 +60,7 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)
 
-        return self.has_path(path, method) and \
-            isinstance(self.paths[path][method], dict) and \
+        return self.has_path(path, method) and isinstance(self.paths[path][method], dict) and \
             bool(self.paths[path][method].get(self._X_APIGW_INTEGRATION))  # Key should be present & Value is non-empty
 
     def add_path(self, path, method=None):
@@ -98,10 +98,10 @@ class SwaggerEditor(object):
         self.add_path(path, method)
 
         self.paths[path][method][self._X_APIGW_INTEGRATION] = {
-                'type': 'aws_proxy',
-                'httpMethod': 'POST',
-                'uri': integration_uri
-            }
+            'type': 'aws_proxy',
+            'httpMethod': 'POST',
+            'uri': integration_uri
+        }
 
         # If 'responses' key is *not* present, add it with an empty dict as value
         self.paths[path][method].setdefault('responses', {})
@@ -186,11 +186,13 @@ class SwaggerEditor(object):
         ALLOW_HEADERS = "Access-Control-Allow-Headers"
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
-        HEADER_RESPONSE = lambda x: "method.response.header."+x
+
+        def header_response(x):
+            return "method.response.header." + x
 
         response_parameters = {
             # AllowedOrigin is always required
-            HEADER_RESPONSE(ALLOW_ORIGIN): allowed_origins
+            header_response(ALLOW_ORIGIN): allowed_origins
         }
 
         response_headers = {
@@ -207,14 +209,14 @@ class SwaggerEditor(object):
         #    https://fetch.spec.whatwg.org/#http-new-header-syntax
         #
         if allowed_headers:
-            response_parameters[HEADER_RESPONSE(ALLOW_HEADERS)] = allowed_headers
+            response_parameters[header_response(ALLOW_HEADERS)] = allowed_headers
             response_headers[ALLOW_HEADERS] = {"type": "string"}
         if allowed_methods:
-            response_parameters[HEADER_RESPONSE(ALLOW_METHODS)] = allowed_methods
+            response_parameters[header_response(ALLOW_METHODS)] = allowed_methods
             response_headers[ALLOW_METHODS] = {"type": "string"}
         if max_age is not None:
             # MaxAge can be set to 0, which is a valid value. So explicitly check against None
-            response_parameters[HEADER_RESPONSE(MAX_AGE)] = max_age
+            response_parameters[header_response(MAX_AGE)] = max_age
             response_headers[MAX_AGE] = {"type": "integer"}
 
         return {
@@ -269,7 +271,7 @@ class SwaggerEditor(object):
             allow_methods = all_http_methods
         else:
             allow_methods = methods
-            allow_methods.append("options") # Always add Options to the CORS methods response
+            allow_methods.append("options")  # Always add Options to the CORS methods response
 
         # Clean up the result:
         #
@@ -305,10 +307,8 @@ class SwaggerEditor(object):
         :param dict data: Data to be validated
         :return: True, if data is a Swagger
         """
-        return bool(data) and \
-                isinstance(data, dict) and \
-                bool(data.get("swagger")) and \
-                isinstance(data.get('paths'), dict)
+        return bool(data) and isinstance(data, dict) and bool(data.get("swagger")) and \
+            isinstance(data.get('paths'), dict)
 
     @staticmethod
     def gen_skeleton():

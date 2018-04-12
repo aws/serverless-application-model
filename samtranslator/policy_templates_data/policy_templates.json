@@ -65,7 +65,6 @@
     "CloudWatchPutMetricPolicy": {
       "Description": "Gives permissions to put metrics to CloudWatch",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -82,7 +81,6 @@
     "EC2DescribePolicy": {
       "Description": "Gives permission to describe EC2 instances",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -312,7 +310,6 @@
     "AMIDescribePolicy": {
       "Description": "Gives permissions to describe AMIs",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -331,7 +328,6 @@
     "CloudFormationDescribeStacksPolicy": {
       "Description": "Gives permission to describe CloudFormation stacks",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -497,7 +493,6 @@
     "VPCAccessPolicy": {
       "Description": "Gives access to create, delete, describe and detach ENIs",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -823,7 +818,6 @@
     "CodePipelineLambdaExecutionPolicy": {
       "Description": "Gives permission for a Lambda function invoked by AWS CodePipeline to report back status of the job",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -845,7 +839,6 @@
     "ServerlessRepoReadWriteAccessPolicy": {
       "Description": "Gives access permissions to create and list applications in the AWS Serverless Application Repository service",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -926,7 +919,6 @@
     "CloudWatchDashboardPolicy": {
       "Description": "Gives permissions to put metrics to operate on CloudWatch Dashboards",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -975,7 +967,6 @@
     "RekognitionLabelsPolicy": {
       "Description": "Gives permission to compare and detect faces and labels",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [
@@ -1090,7 +1081,6 @@
     "ComprehendBasicAccessPolicy": {
       "Description": "Gives access to Amazon Comprehend APIs for detecting entities, key phrases, languages and sentiments",
       "Parameters": {
-        
       },
       "Definition": {
         "Statement": [

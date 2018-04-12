@@ -5,12 +5,13 @@ class InvalidDocumentException(Exception):
         message -- explanation of the error
         causes -- list of errors which caused this document to be invalid
     """
+
     def __init__(self, causes):
         self._causes = causes
 
     @property
     def message(self):
-        return 'Invalid Serverless Application Specification document. Number of errors found: {}.'\
+        return 'Invalid Serverless Application Specification document. Number of errors found: {}.' \
             .format(len(self.causes))
 
     @property
@@ -23,6 +24,7 @@ class DuplicateLogicalIdException(Exception):
     Attributes:
         message -- explanation of the error
     """
+
     def __init__(self, logical_id, duplicate_id, type):
         self._logical_id = logical_id
         self._duplicate_id = duplicate_id
@@ -30,10 +32,11 @@ class DuplicateLogicalIdException(Exception):
 
     @property
     def message(self):
-        return 'Transforming resource with id [{logical_id}] attempts to create a new' \
-               ' resource with id [{duplicate_id}] and type "{type}". A resource with that id already' \
-               ' exists within this template. Please use a different id for that resource.'.format(
-                   logical_id=self._logical_id, type=self._type, duplicate_id=self._duplicate_id)
+        msg = 'Transforming resource with id [{logical_id}] attempts to create a new' \
+              ' resource with id [{duplicate_id}] and type "{type}". A resource with that id already' \
+              ' exists within this template. Please use a different id for that resource.'
+        msg.format(logical_id=self._logical_id, type=self._type, duplicate_id=self._duplicate_id)
+        return msg
 
 
 class InvalidTemplateException(Exception):
@@ -57,7 +60,8 @@ class InvalidResourceException(Exception):
     Attributes:
         message -- explanation of the error
     """
-    def __init__(self, logical_id,  message):
+
+    def __init__(self, logical_id, message):
         self._logical_id = logical_id
         self._message = message
 
@@ -72,6 +76,7 @@ class InvalidEventException(Exception):
     Attributes:
         message -- explanation of the error
     """
+
     def __init__(self, event_id, message):
         self._event_id = event_id
         self._message = message
@@ -91,5 +96,5 @@ def prepend(exception, message, end=': '):
     :returns: the exception
     """
     exception.args = exception.args or ('',)
-    exception.args = (message + end + exception.args[0], ) + exception.args[1:]
+    exception.args = (message + end + exception.args[0],) + exception.args[1:]
     return exception

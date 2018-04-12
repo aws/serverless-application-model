@@ -11,7 +11,6 @@ class TestResourceTagging(TestCase):
 
         self.assertEquals(tag_list, expected_tag_list)
 
-
     def test_get_tag_list_with_tag_dictionary_with_key_only(self):
         tag_list = get_tag_list({"key": None})
         expected_tag_list = [{"Key": "key",
