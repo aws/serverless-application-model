@@ -4,13 +4,13 @@ language: python
 
 install:
 # Install the code requirements
-- python setup.py develop
+- python setup.py install[dev]
 
 # Install Docs requirements
 
 script:
 # Runs unit tests
-- make pr
+- tox
 
 # Build docs pages only from master branch
 - if [ "$TRAVIS_BRANCH" = "master" ]; then make build-docs; fi
