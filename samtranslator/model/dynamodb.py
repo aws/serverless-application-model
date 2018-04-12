@@ -14,7 +14,7 @@ class DynamoDBTable(Resource):
             'StreamSpecification': PropertyType(False, is_type(dict)),
             'TableName': PropertyType(False, one_of(is_str(), is_type(dict))),
             'Tags': PropertyType(False, list_of(is_type(dict))),
-            'SSESpecification': PropertyType(False, list_of(is_type(dict)))
+            'SSESpecification': PropertyType(False, is_type(dict))
     }
 
     runtime_attrs = {
