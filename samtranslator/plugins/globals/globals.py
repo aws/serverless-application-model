@@ -1,6 +1,7 @@
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
 
+
 class Globals(object):
     """
     Class to parse and process Globals section in SAM template. If a property is specified at Global section for
@@ -44,6 +45,10 @@ class Globals(object):
             "MethodSettings",
             "BinaryMediaTypes",
             "Cors"
+        ],
+
+        SamResourceType.SimpleTable.value: [
+            "SSESpecification"
         ]
     }
 
@@ -133,9 +138,6 @@ class Globals(object):
 
     def _make_resource_type(self, key):
         return self._RESOURCE_PREFIX + key
-
-
-
 
 class GlobalProperties(object):
     """
@@ -298,7 +300,6 @@ class GlobalProperties(object):
             raise TypeError(
                 "Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local))
 
-
     def _merge_lists(self, global_list, local_list):
         """
         Merges the global list with the local list. List merging is simply a concatenation = global + local
@@ -368,7 +369,6 @@ class GlobalProperties(object):
 
         else:
             return self.TOKEN.PRIMITIVE
-
 
     class TOKEN:
         """

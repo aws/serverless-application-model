@@ -92,6 +92,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_policy_templates',
         'globals_for_function',
         'globals_for_api',
+        'globals_for_simpletable',
         'all_policy_templates',
         'simple_table_ref_parameter_intrinsic',
         'simple_table_with_table_name',
