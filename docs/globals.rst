@@ -81,7 +81,7 @@ presently.
       Cors:
 
     SimpleTable:
-      SSESpecifiction
+      SSESpecification
 
 Implicit APIs
 ~~~~~~~~~~~~~
