@@ -80,6 +80,9 @@ presently.
       BinaryMediaTypes:
       Cors:
 
+    SimpleTable:
+      SSESpecifiction
+
 Implicit APIs
 ~~~~~~~~~~~~~
 
