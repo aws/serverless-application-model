@@ -130,7 +130,6 @@ class Globals(object):
                                                    "Must be one of the following values - {supported}"
                                                    .format(key=key, section=section_name, supported=supported))
 
-
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type
             globals[resource_type] = GlobalProperties(properties)
 
@@ -138,6 +137,7 @@ class Globals(object):
 
     def _make_resource_type(self, key):
         return self._RESOURCE_PREFIX + key
+
 
 class GlobalProperties(object):
     """
@@ -385,7 +385,7 @@ class InvalidGlobalsSectionException(Exception):
     Attributes:
         message -- explanation of the error
     """
-    def __init__(self, logical_id,  message):
+    def __init__(self, logical_id, message):
         self._logical_id = logical_id
         self._message = message
 
