@@ -1,15 +1,6 @@
 NAME=samtranslator27
 PYTHON_VERSION=2.7.14
 PYENV := $(shell command -v pyenv 2> /dev/null)
-UNAME := $(shell uname -s)
-
-ifeq ($(UNAME),Darwin)
-	# Mac OS X https://github.com/pyenv/pyenv/wiki/Common-build-problems#build-failed-error-the-python-zlib-extension-was-not-compiled-missing-the-zlib
-	CFLAGS="-O2 -I$$(xcrun --show-sdk-path)/usr/include"
-else
-	# See: https://github.com/pyenv/pyenv/wiki/Common-build-problems#make-your-pythons-a-little-faster
-	CFLAGS="-O2"
-endif
 
 # Make sure that pyenv is configured properly and that we can use it in our setup target.
 validation:
@@ -25,7 +16,7 @@ endif
 
 # Setup the pyenv environment
 setup: validation
-	CFLAGS=$(CFLAGS) pyenv install $(PYTHON_VERSION)
+	pyenv install $(PYTHON_VERSION)
 	pyenv local $(PYTHON_VERSION) 
 	pyenv virtualenv $(PYTHON_VERSION) $(NAME)
 	make activate
@@ -34,9 +25,12 @@ setup: validation
 activate:
 	$(shell eval "$$(pyenv init -)" && eval "$$(pyenv virtualenv-init -)" && pyenv activate $(NAME) && pyenv local $(NAME))
 	
-# Remove all pyenv versions to start fresh	
+# Clean the environment
 clean:
-	rm -rf ~/.pyenv/versions/*
+	@find . | grep -E "(__pycache__|\.pyc|\.pyo$$)" | xargs rm -rf
+	@test -f .coverage && rm .coverage || true
+	@test -f .python-version && rm .python-version || true
+	@rm -r ~/.pyenv/versions/*
 
 init:
 	pip install -r requirements-dev.txt -r requirements.txt
