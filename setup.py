@@ -59,8 +59,7 @@ setup(
     url='https://github.com/awslabs/serverless-application-model',
     license='Apache Software License',
     # Exclude all but the code folders
-    # packages=find_packages(exclude=('docs', 'examples', 'versions')),
-    packages=find_packages(),
+    packages=find_packages(exclude=('docs', 'examples', 'versions')),
     package_data={'': '*.yaml'},
     install_requires=read_requirements('base.txt'),
     extras_require={
