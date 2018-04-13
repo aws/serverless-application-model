@@ -1,8 +1,6 @@
 import json
-
 import jsonschema
 from jsonschema.exceptions import ValidationError
-
 import sam_schema
 
 

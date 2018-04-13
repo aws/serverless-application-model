@@ -7,7 +7,7 @@ setup:
 	pyenv local samtranslator27
 
 init:
-	pip install -r requirements-dev.txt -r requirements.txt
+	pip install -r requirements/dev.txt -r requirements/base.txt
 
 test:
 	# Run unit tests

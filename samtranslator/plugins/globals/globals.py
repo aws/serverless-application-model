@@ -1,5 +1,5 @@
-from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.public.sdk.resource import SamResourceType
+from samtranslator.public.intrinsics import is_intrinsics
 
 
 class Globals(object):

@@ -1,11 +1,10 @@
-from unittest import TestCase
-
 import pytest
-from mock import Mock
 
-from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
-from samtranslator.model import PropertyType, Resource, SamResourceMacro, ResourceTypeResolver
+from unittest import TestCase
+from mock import Mock, call, ANY
 from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model import PropertyType, Resource, SamResourceMacro, ResourceTypeResolver
+from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.plugins import LifeCycleEvents
 
 
@@ -52,22 +51,21 @@ class DummyResource(Resource):
     ('invalid_id', {'Type': 'AWS::Dummy::Resource', 'Properties': {'RequiredProperty': True, 'OptionalProperty': True}},
      InvalidResourceException),
     # intrinsic function
-    ('id', {'Type': 'AWS::Dummy::Resource', 'Properties': {'RequiredProperty': {'Fn::Any': ['logicalid', 'Arn']}}},
-     None)
+    (
+    'id', {'Type': 'AWS::Dummy::Resource', 'Properties': {'RequiredProperty': {'Fn::Any': ['logicalid', 'Arn']}}}, None)
 ])
 def test_resource_type_validation(logical_id, resource_dict, expected_exception):
     if not expected_exception:
         resource = DummyResource.from_dict(logical_id, resource_dict)
         for name, value in resource_dict['Properties'].items():
             assert getattr(resource,
-                           name) == value, "resource did not have expected property attribute {property_name} with " \
-                                           "value {property_value}".format(property_name=name, property_value=value)
+                           name) == value, "resource did not have expected property attribute {property_name} with value {property_value}".format(
+                property_name=name, property_value=value)
 
         actual_to_dict = resource.to_dict()
         expected_to_dict = {'id': resource_dict}
-        assert actual_to_dict == expected_to_dict, \
-            "to_dict() returned different values from what was passed to from_dict(); expected {expected}, " \
-            "got {actual}".format(expected=expected_to_dict, actual=actual_to_dict)
+        assert actual_to_dict == expected_to_dict, "to_dict() returned different values from what was passed to from_dict(); expected {expected}, got {actual}".format(
+            expected=expected_to_dict, actual=actual_to_dict)
     else:
         with pytest.raises(expected_exception):
             resource = DummyResource.from_dict(logical_id, resource_dict)
@@ -93,7 +91,7 @@ class TestResourceAttributes(TestCase):
         self.assertEqual(r.to_dict(), dict_with_attributes)
 
     def test_invalid_attr(self):
-        with pytest.raises(KeyError):
+        with pytest.raises(KeyError) as ex:
             # Unsupported attributes cannot be added to the resource
             self.MyResource("id", attributes={"foo": "bar"})
 

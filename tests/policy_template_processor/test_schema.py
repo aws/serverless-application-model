@@ -1,8 +1,7 @@
-from unittest import TestCase
+from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 
 from parameterized import parameterized
-
-from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
+from unittest import TestCase
 
 
 class TestTemplates(object):

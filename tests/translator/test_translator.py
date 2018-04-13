@@ -1,23 +1,24 @@
-import itertools
 import json
+import itertools
 import os.path
 from functools import reduce
-from unittest import TestCase
+
+from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
+from samtranslator.parser.parser import Parser
+from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.model import Resource
+from samtranslator.model.sam_resources import SamSimpleTable
+from samtranslator.public.plugins import BasePlugin
+
+from tests.translator.helpers import get_template_parameter_values
+from tests.translator.yaml_helper import yaml_parse
+from parameterized import parameterized, param
 
 import pytest
 import yaml
-from mock import Mock, MagicMock, patch
-from parameterized import parameterized, param
-
-from samtranslator.model import Resource
-from samtranslator.model.exceptions import InvalidDocumentException
-from samtranslator.model.sam_resources import SamSimpleTable
-from samtranslator.parser.parser import Parser
-from samtranslator.public.plugins import BasePlugin
+from unittest import TestCase
 from samtranslator.translator.transform import transform
-from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
-from tests.translator.helpers import get_template_parameter_values
-from tests.translator.yaml_helper import yaml_parse
+from mock import Mock, MagicMock, patch
 
 input_folder = 'tests/translator/input'
 output_folder = 'tests/translator/output'
@@ -98,18 +99,18 @@ class TestTranslatorEndToEnd(TestCase):
             'explicit_api_with_invalid_events_config',
             'no_implicit_api_with_serverless_rest_api_resource',
             'implicit_api_with_serverless_rest_api_resource'
-        ], [
-            ("aws", "ap-southeast-1"),
-            ("aws-cn", "cn-north-1"),
-            ("aws-us-gov", "us-gov-west-1")
-        ]  # Run all the above tests against each of the list of partitions to test against
-        ))
+        ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1")
+            ]  # Run all the above tests against each of the list of partitions to test against
+        )
+    )
     def test_transform_success(self, testcase, partition_with_region):
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
-        print(os.path.join(input_folder, testcase + '.yaml'))
-        print(os.getcwd())
         manifest = yaml_parse(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
@@ -180,9 +181,10 @@ def test_transform_invalid_document(testcase):
     parameter_values = get_template_parameter_values()
 
     with pytest.raises(InvalidDocumentException) as e:
-        print(transform(manifest, parameter_values, mock_policy_loader))
+        transform(manifest, parameter_values, mock_policy_loader)
 
     error_message = get_exception_error_message(e)
+
     assert error_message == expected.get('errorMessage')
 
 

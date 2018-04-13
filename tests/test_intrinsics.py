@@ -1,6 +1,5 @@
-from unittest import TestCase
-
 from parameterized import parameterized
+from unittest import TestCase
 
 from samtranslator.model.intrinsics import is_instrinsic, make_shorthand
 

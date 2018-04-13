@@ -1,7 +1,5 @@
 from unittest import TestCase
-
 from mock import patch, Mock
-
 from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 
@@ -448,10 +446,8 @@ class TestSubCanResolveResourceRefs(TestCase):
         self.supported_resource_refs.add("id1", "prop2", "value2")
         self.supported_resource_refs.add("id2", "prop3", "value3")
 
-        self.input_sub_value = "Hello ${id1.prop1} ${id1.prop2}${id2.prop3} ${id1.prop1.arn} " \
-                               "${id1.prop2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
-        self.expected_output_sub_value = "Hello ${value1} ${value2}${value3} ${value1.arn} ${value2.arn.name.foo} " \
-                                         "${!id1.prop1} ${unknown} ${some.arn} World"
+        self.input_sub_value = "Hello ${id1.prop1} ${id1.prop2}${id2.prop3} ${id1.prop1.arn} ${id1.prop2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
+        self.expected_output_sub_value = "Hello ${value1} ${value2}${value3} ${value1.arn} ${value2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
 
     def test_must_resolve_string_value(self):
         input = {

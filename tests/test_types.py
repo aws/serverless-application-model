@@ -24,8 +24,9 @@ def test_is_type_validator():
         for _, other_type in example_properties:
             if value_type != other_type:
                 validate = is_type(other_type)
-                assert not validate(value, should_raise=False), \
-                    "is_type validator unexpectedly succeeded for type {}, value {}".format(value_type, value)
+                assert not validate(value,
+                                    should_raise=False), "is_type validator unexpectedly succeeded for type {}, value {}".format(
+                    value_type, value)
                 with pytest.raises(TypeError):
                     validate(value)
 
@@ -43,8 +44,9 @@ def test_list_of_validator(value, item_type, should_pass):
     if should_pass:
         assert validate(value), "list_of validator failed for item type {}, value {}".format(item_type, value)
     else:
-        assert not validate(value, should_raise=False), \
-            "list_of validator unexpectedly succeeded for item type {}, value {}".format(item_type, value)
+        assert not validate(value,
+                            should_raise=False), "list_of validator unexpectedly succeeded for item type {}, value {}".format(
+            item_type, value)
         with pytest.raises(TypeError):
             validate(value)
 
@@ -68,10 +70,9 @@ def test_dict_of_validator(value, key_type, value_type, should_pass):
                                                                                                           value_type,
                                                                                                           value)
     else:
-        assert not validate(value, should_raise=False), \
-            "dict_of validator unexpectedly succeeded for key type {}, item type {}, value {}".format(key_type,
-                                                                                                      value_type,
-                                                                                                      value)
+        assert not validate(value,
+                            should_raise=False), "dict_of validator unexpectedly succeeded for key type {}, item type {}, value {}".format(
+            key_type, value_type, value)
         with pytest.raises(TypeError):
             validate(value)
 
@@ -89,7 +90,8 @@ def test_one_of_validator(value, validators, should_pass):
     if should_pass:
         assert validate(value), "one_of validator failed for validators {}, value {}".format(validators, value)
     else:
-        assert not validate(value, should_raise=False), \
-            "one_of validator unexpectedly succeeded for validators {}, value {}".format(validators, value)
+        assert not validate(value,
+                            should_raise=False), "one_of validator unexpectedly succeeded for validators {}, value {}".format(
+            validators, value)
         with pytest.raises(TypeError):
             validate(value)

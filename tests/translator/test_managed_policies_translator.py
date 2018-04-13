@@ -1,5 +1,4 @@
 from mock import MagicMock
-
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
 
 

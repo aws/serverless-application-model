@@ -1,9 +1,7 @@
 from unittest import TestCase
-
 from mock import Mock, patch
-
-from samtranslator.intrinsics.actions import Action
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from samtranslator.intrinsics.actions import Action
 
 
 class TestParameterReferenceResolution(TestCase):

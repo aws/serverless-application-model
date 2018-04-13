@@ -1,7 +1,8 @@
-from samtranslator.plugins.globals.globals import Globals, InvalidGlobalsSectionException
-from samtranslator.public.exceptions import InvalidDocumentException
-from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.public.plugins import BasePlugin
+from samtranslator.public.exceptions import InvalidDocumentException
+
+from samtranslator.plugins.globals.globals import Globals, InvalidGlobalsSectionException
 
 
 class GlobalsPlugin(BasePlugin):

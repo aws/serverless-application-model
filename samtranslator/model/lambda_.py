@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.model.types import is_type, one_of, is_str, list_of, any_type
+from samtranslator.model.intrinsics import fnGetAtt, ref
 
 
 class LambdaFunction(Resource):

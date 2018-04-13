@@ -4,3 +4,5 @@
 # This is essentially our Public API
 #
 
+from samtranslator.translator.translator import Translator
+from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader

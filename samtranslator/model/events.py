@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.intrinsics import fnGetAtt, ref
 from samtranslator.model.types import is_type, list_of, is_str
+from samtranslator.model.intrinsics import fnGetAtt, ref
 
 
 class EventsRule(Resource):

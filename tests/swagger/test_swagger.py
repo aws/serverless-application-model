@@ -1,6 +1,6 @@
 import copy
-from unittest import TestCase
 
+from unittest import TestCase
 from mock import Mock
 from parameterized import parameterized, param
 

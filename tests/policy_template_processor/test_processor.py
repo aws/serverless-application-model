@@ -1,13 +1,13 @@
-import json
 from unittest import TestCase
-
-import jsonschema
-from jsonschema.exceptions import ValidationError
 from mock import mock_open, Mock, patch
 
-from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
+import jsonschema
+import json
+
+from jsonschema.exceptions import ValidationError
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.policy_template_processor.template import Template
+from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
 
 
 class TestPolicyTemplateProcessor(TestCase):

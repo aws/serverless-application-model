@@ -12,8 +12,8 @@ class IntrinsicsResolver(object):
         """
         Instantiate the resolver
         :param dict parameters: Map of parameter names to their values
-        :param dict supported_intrinsics: Dictionary of intrinsic functions this class supports along with the Action
-            class that can process this intrinsic
+        :param dict supported_intrinsics: Dictionary of intrinsic functions this class supports along with the Action class that
+            can process this intrinsic
         :raises TypeError: If parameters or the supported_intrinsics arguments are invalid
         """
 
@@ -179,4 +179,6 @@ class IntrinsicsResolver(object):
         :return: True, if the input contains a supported intrinsic function.  False otherwise
         """
         # All intrinsic functions are dictionaries with just one key
-        return isinstance(input, dict) and len(input) == 1 and input.keys()[0] in self.supported_intrinsics
+        return isinstance(input, dict) \
+               and len(input) == 1 \
+               and input.keys()[0] in self.supported_intrinsics

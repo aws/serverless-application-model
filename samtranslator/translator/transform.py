@@ -1,5 +1,5 @@
-from samtranslator.parser.parser import Parser
 from samtranslator.translator.translator import Translator
+from samtranslator.parser.parser import Parser
 
 
 def transform(input_fragment, parameter_values, managed_policy_loader):

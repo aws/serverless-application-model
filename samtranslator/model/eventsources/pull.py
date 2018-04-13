@@ -1,6 +1,7 @@
 from samtranslator.model import ResourceMacro, PropertyType
-from samtranslator.model.lambda_ import LambdaEventSourceMapping
 from samtranslator.model.types import is_type, is_str
+
+from samtranslator.model.lambda_ import LambdaEventSourceMapping
 from samtranslator.translator.arn_generator import ArnGenerator
 
 

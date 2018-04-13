@@ -1,11 +1,10 @@
 from unittest import TestCase
-
 from mock import Mock, patch, call
 
-from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin, ImplicitApiResource
-from samtranslator.public.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
-from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.sdk.resource import SamResource, SamResourceType
+from samtranslator.public.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
+from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin, ImplicitApiResource
+from samtranslator.public.plugins import BasePlugin
 
 IMPLICIT_API_LOGICAL_ID = "ServerlessRestApi"
 

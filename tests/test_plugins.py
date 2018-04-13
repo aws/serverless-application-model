@@ -1,9 +1,8 @@
-from unittest import TestCase
-
 from enum import Enum
-from mock import Mock, call
-
 from samtranslator.plugins import SamPlugins, BasePlugin, LifeCycleEvents
+
+from unittest import TestCase
+from mock import Mock, patch, call
 
 
 class TestSamPluginsRegistration(TestCase):
@@ -138,11 +137,11 @@ class TestSamPluginsAct(TestCase):
 
     def test_act_must_invoke_hook_on_all_plugins(self):
         # Create three plugins, and setup hook methods on it
-        plugin1 = _make_mock_plugin("plugin1")
+        plugin1 = _make_mock_plugin("plugin1");
         setattr(plugin1, "on_" + self.my_event.name, Mock())
-        plugin2 = _make_mock_plugin("plugin2")
+        plugin2 = _make_mock_plugin("plugin2");
         setattr(plugin2, "on_" + self.my_event.name, Mock())
-        plugin3 = _make_mock_plugin("plugin3")
+        plugin3 = _make_mock_plugin("plugin3");
         setattr(plugin3, "on_" + self.my_event.name, Mock())
 
         self.sam_plugins.register(plugin1)
@@ -162,11 +161,11 @@ class TestSamPluginsAct(TestCase):
 
     def test_act_must_invoke_plugins_in_sequence(self):
         # Create three plugins, and setup hook methods on it
-        plugin1 = _make_mock_plugin("plugin1")
+        plugin1 = _make_mock_plugin("plugin1");
         setattr(plugin1, "on_" + self.my_event.name, Mock())
-        plugin2 = _make_mock_plugin("plugin2")
+        plugin2 = _make_mock_plugin("plugin2");
         setattr(plugin2, "on_" + self.my_event.name, Mock())
-        plugin3 = _make_mock_plugin("plugin3")
+        plugin3 = _make_mock_plugin("plugin3");
         setattr(plugin3, "on_" + self.my_event.name, Mock())
 
         # Create a parent mock and attach child mocks to help assert order of the calls
@@ -188,7 +187,7 @@ class TestSamPluginsAct(TestCase):
 
     def test_act_must_skip_if_no_plugins_are_registered(self):
         # Create three plugins, and setup hook methods on it
-        plugin1 = _make_mock_plugin("plugin1")
+        plugin1 = _make_mock_plugin("plugin1");
         setattr(plugin1, "on_" + self.my_event.name, Mock())
 
         # Don't register any plugin
@@ -226,7 +225,7 @@ class TestSamPluginsAct(TestCase):
 
     def test_act_must_raise_exceptions_raised_by_plugins(self):
         # Create a plugin but setup hook method with wrong name
-        plugin1 = _make_mock_plugin("plugin1")
+        plugin1 = _make_mock_plugin("plugin1");
         setattr(plugin1, "on_" + self.my_event.name, Mock())
         self.sam_plugins.register(plugin1)
 
@@ -242,11 +241,11 @@ class TestSamPluginsAct(TestCase):
         # ie. after a hook raises an exception, subsequent hooks must NOT be run
 
         # Create three plugins, and setup hook methods on it
-        plugin1 = _make_mock_plugin("plugin1")
+        plugin1 = _make_mock_plugin("plugin1");
         setattr(plugin1, "on_" + self.my_event.name, Mock())
-        plugin2 = _make_mock_plugin("plugin2")
+        plugin2 = _make_mock_plugin("plugin2");
         setattr(plugin2, "on_" + self.my_event.name, Mock())
-        plugin3 = _make_mock_plugin("plugin3")
+        plugin3 = _make_mock_plugin("plugin3");
         setattr(plugin3, "on_" + self.my_event.name, Mock())
 
         # Create a parent mock and attach child mocks to help assert order of the calls

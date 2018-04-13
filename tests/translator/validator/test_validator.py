@@ -1,9 +1,8 @@
 import os.path
-
 import pytest
-
-from samtranslator.validator.validator import SamTemplateValidator
+from unittest import TestCase
 from tests.translator.yaml_helper import yaml_parse
+from samtranslator.validator.validator import SamTemplateValidator
 
 input_folder = 'tests/translator/input'
 

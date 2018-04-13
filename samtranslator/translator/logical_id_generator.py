@@ -1,6 +1,5 @@
 import hashlib
 import json
-
 from six import string_types
 
 

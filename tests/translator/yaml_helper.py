@@ -1,6 +1,6 @@
 import yaml
-from six import string_types
 from yaml import ScalarNode, SequenceNode
+from six import string_types
 
 
 # This helper copied almost entirely from

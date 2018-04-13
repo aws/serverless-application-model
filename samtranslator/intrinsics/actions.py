@@ -39,14 +39,15 @@ class Action(object):
         :return: True if it matches expected structure, False otherwise
         """
 
-        return input_dict is not None and isinstance(input_dict, dict) and len(input_dict) == 1 and \
-            self.intrinsic_name in input_dict
+        return input_dict is not None \
+               and isinstance(input_dict, dict) \
+               and len(input_dict) == 1 \
+               and self.intrinsic_name in input_dict
 
     @classmethod
     def _parse_resource_reference(cls, ref_value):
         """
-        Splits a resource reference of structure "LogicalId.Property" and returns the "LogicalId" and "Property"
-        separately.
+        Splits a resource reference of structure "LogicalId.Property" and returns the "LogicalId" and "Property" separately.
 
         :param string ref_value: Input reference value which *may* contain the structure "LogicalId.Property"
         :return string, string: Returns two values - logical_id, property. If the input does not contain the structure,
@@ -266,8 +267,8 @@ class SubAction(Action):
 
         :param string text: Input text
         :param handler_method: Method to be called to handle each occurrence of ${blah} reference structure.
-            First parameter to this method is the full reference structure Ex: ${LogicalId.Property}. Second parameter
-            is just the value of the reference such as "LogicalId.Property"
+            First parameter to this method is the full reference structure Ex: ${LogicalId.Property}. Second parameter is just the
+            value of the reference such as "LogicalId.Property"
 
         :return string: Text with all reference structures replaced as necessary
         """

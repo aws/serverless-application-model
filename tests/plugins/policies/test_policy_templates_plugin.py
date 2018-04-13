@@ -1,10 +1,9 @@
 from unittest import TestCase
-
 from mock import Mock, MagicMock, patch, call
 
-from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.function_policies import PolicyTypes, PolicyEntry
 from samtranslator.plugins import BasePlugin
+from samtranslator.model.function_policies import PolicyTypes, PolicyEntry
+from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 

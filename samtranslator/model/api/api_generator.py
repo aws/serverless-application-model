@@ -1,15 +1,14 @@
 from collections import namedtuple
-
 from six import string_types
 
+from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage)
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.intrinsics import is_instrinsic
-from samtranslator.model.intrinsics import ref
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.model.intrinsics import is_instrinsic
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge"])

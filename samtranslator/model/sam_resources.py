@@ -1,26 +1,26 @@
 """ SAM macro definitions """
+from copy import deepcopy
 
 from six import string_types
-
+from tags.resource_tagging import get_tag_list
 import samtranslator.model.eventsources
-import samtranslator.model.eventsources.cloudwatchlogs
 import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
-from api.api_generator import ApiGenerator
-from s3_utils.uri_parser import parse_s3_uri
+import samtranslator.model.eventsources.cloudwatchlogs
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
-from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import (InvalidEventException,
                                             InvalidResourceException)
-from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion, LambdaAlias
+from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
+from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from tags.resource_tagging import get_tag_list
+from api.api_generator import ApiGenerator
+from s3_utils.uri_parser import parse_s3_uri
 
 
 class SamFunction(SamResourceMacro):
@@ -434,8 +434,7 @@ class SamFunction(SamResourceMacro):
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
                 raise InvalidResourceException(self.logical_id,
-                                               "'DeploymentPreference' requires AutoPublishAlias property to be "
-                                               "specified")
+                                               "'DeploymentPreference' requires AutoPublishAlias property to be specified")
             if lambda_alias is None:
                 raise ValueError('lambda_alias expected for updating it with the appropriate update policy')
 

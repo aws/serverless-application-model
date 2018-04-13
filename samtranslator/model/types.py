@@ -9,7 +9,6 @@ the Permissions property is an ARN or list of ARNs. In this situation, we valida
 either a string or a list of strings, but do not validate whether the string(s) are valid IAM policy ARNs.
 """
 from six import string_types
-
 import samtranslator.model.exceptions
 
 

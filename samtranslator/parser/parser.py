@@ -1,8 +1,8 @@
-from samtranslator.model import ResourceTypeResolver, sam_resources
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, \
-    InvalidResourceException, InvalidEventException
-from samtranslator.plugins import LifeCycleEvents
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException, \
+    InvalidEventException, DuplicateLogicalIdException
 from samtranslator.validator.validator import SamTemplateValidator
+from samtranslator.model import ResourceTypeResolver, sam_resources
+from samtranslator.plugins import LifeCycleEvents
 
 
 class Parser:
@@ -37,8 +37,8 @@ class Parser:
         if parameter_values is None:
             raise ValueError("`parameter_values` argument is required")
 
-        if "Resources" not in sam_template or not isinstance(sam_template["Resources"], dict) or not \
-                sam_template["Resources"]:
+        if "Resources" not in sam_template or not isinstance(sam_template["Resources"], dict) or not sam_template[
+            "Resources"]:
             raise InvalidDocumentException(
                 [InvalidTemplateException("'Resources' section is required")])
 

@@ -1,11 +1,10 @@
 import json
-
 import jsonschema
-from jsonschema.exceptions import ValidationError
-
 from samtranslator import policy_templates_data
-from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
+
+from jsonschema.exceptions import ValidationError
 from samtranslator.policy_template_processor.template import Template
+from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
 
 
 class PolicyTemplatesProcessor(object):

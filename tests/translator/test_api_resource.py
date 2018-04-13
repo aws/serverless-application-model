@@ -1,11 +1,10 @@
 import json
+
 from unittest import TestCase
-
 from mock import MagicMock, patch
-
-from samtranslator.model.apigateway import ApiGatewayDeployment
-from samtranslator.translator.transform import transform
 from tests.translator.helpers import get_template_parameter_values
+from samtranslator.translator.transform import transform
+from samtranslator.model.apigateway import ApiGatewayDeployment
 
 mock_policy_loader = MagicMock()
 mock_policy_loader.load.return_value = {

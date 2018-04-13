@@ -1,18 +1,18 @@
 import copy
-
 from six import string_types
-
 from samtranslator.model import ResourceMacro, PropertyType
-from samtranslator.model.events import EventsRule
-from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
 from samtranslator.model.intrinsics import ref, fnSub, make_shorthand
-from samtranslator.model.iot import IotTopicRule
-from samtranslator.model.lambda_ import LambdaPermission
+
 from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
-from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
-from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.model.lambda_ import LambdaPermission
+from samtranslator.model.events import EventsRule
+from samtranslator.model.log import SubscriptionFilter
+from samtranslator.model.iot import IotTopicRule
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.swagger.swagger import SwaggerEditor
 
 
 class PushEventSource(ResourceMacro):
@@ -452,8 +452,8 @@ class Api(PushEventSource):
 
         function_arn = function.get_runtime_attr('arn')
         partition = ArnGenerator.get_partition_name()
-        uri = fnSub('arn:' + partition + ':apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/' +
-                    make_shorthand(function_arn) + '/invocations')
+        uri = fnSub('arn:' + partition + ':apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/'
+                    + make_shorthand(function_arn) + '/invocations')
 
         editor = SwaggerEditor(swagger_body)
 

@@ -1,6 +1,6 @@
-from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.plugins import BasePlugin
+from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
+from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
 
