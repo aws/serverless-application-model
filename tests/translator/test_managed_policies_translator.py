@@ -7,7 +7,6 @@ def create_page(policies):
         'Policies': map(lambda x: {'PolicyName': x[0], 'Arn': x[1]}, policies)
     }
 
-
 def test_load():
     paginator = MagicMock()
     paginator.paginate.return_value = [
@@ -27,6 +26,7 @@ def test_load():
             ('Policy-final', 'Arn-final'),
         ]),
     ]
+
 
     iam = MagicMock()
     iam.get_paginator.return_value = paginator

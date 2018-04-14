@@ -9,7 +9,6 @@ from samtranslator.policy_template_processor.processor import PolicyTemplatesPro
 from samtranslator.policy_template_processor.template import Template
 from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
 
-
 class TestPolicyTemplateProcessor(TestCase):
 
     @patch.object(PolicyTemplatesProcessor, "_is_valid_templates_dict")
@@ -47,8 +46,7 @@ class TestPolicyTemplateProcessor(TestCase):
 
     @patch.object(PolicyTemplatesProcessor, "_is_valid_templates_dict")
     @patch.object(Template, "from_dict")
-    def test_init_must_convert_template_value_dict_to_object(self, template_from_dict_mock,
-                                                             is_valid_templates_dict_mock):
+    def test_init_must_convert_template_value_dict_to_object(self, template_from_dict_mock, is_valid_templates_dict_mock):
         policy_templates_dict = {
             "Templates": {
                 "key1": "value1",
@@ -100,8 +98,7 @@ class TestPolicyTemplateProcessor(TestCase):
 
     @patch.object(PolicyTemplatesProcessor, "_is_valid_templates_dict")
     @patch.object(Template, "from_dict")
-    def test_get_method_must_return_template_object_for_known_template_names(self, template_from_dict_mock,
-                                                                             is_valid_templates_dict):
+    def test_get_method_must_return_template_object_for_known_template_names(self, template_from_dict_mock, is_valid_templates_dict):
         policy_templates_dict = {
             "Templates": {
                 "key1": "value1"
@@ -117,8 +114,7 @@ class TestPolicyTemplateProcessor(TestCase):
 
     @patch.object(PolicyTemplatesProcessor, "_is_valid_templates_dict")
     @patch.object(Template, "from_dict")
-    def test_get_method_must_return_none_for_unknown_template_names(self, template_from_dict_mock,
-                                                                    is_valid_templates_dict):
+    def test_get_method_must_return_none_for_unknown_template_names(self, template_from_dict_mock, is_valid_templates_dict):
         policy_templates_dict = {
             "Templates": {
                 "key1": "value1"
@@ -272,6 +268,7 @@ class TestPolicyTemplateProcessor(TestCase):
 
         open_mock = mock_open()
         with patch("samtranslator.policy_template_processor.processor.open", open_mock):
+
             result = PolicyTemplatesProcessor._read_json(filepath)
             self.assertEquals(result, json_return)
 

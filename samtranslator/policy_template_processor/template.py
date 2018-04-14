@@ -4,7 +4,6 @@ from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import RefAction
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
-
 class Template(object):
     """
     Class representing a single policy template. It includes the name, parameters and template dictionary.

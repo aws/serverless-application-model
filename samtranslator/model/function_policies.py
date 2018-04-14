@@ -7,7 +7,6 @@ from samtranslator.model.intrinsics import is_instrinsic
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
 
-
 class FunctionPolicies(object):
     """
     Class encapsulating the policies property of AWS::Serverless::Function. This class strictly encapsulates the data
@@ -88,7 +87,7 @@ class FunctionPolicies(object):
         result = []
         for policy in policies:
             policy_type = self._get_type(policy)
-            entry = PolicyEntry(data=policy, type=policy_type)
+            entry = PolicyEntry(data = policy, type = policy_type)
             result.append(entry)
 
         return result
@@ -139,9 +138,10 @@ class FunctionPolicies(object):
         """
 
         return self._policy_template_processor is not None and \
-               isinstance(policy, dict) and \
-               len(policy) == 1 and \
-               self._policy_template_processor.has(policy.keys()[0]) is True
+                isinstance(policy, dict) and \
+                len(policy) == 1 and \
+                self._policy_template_processor.has(policy.keys()[0]) is True
+
 
 
 class PolicyTypes(Enum):

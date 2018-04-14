@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from samtranslator.model.intrinsics import is_instrinsic, make_shorthand
 
-
 class TestIntrinsics(TestCase):
 
     @parameterized.expand([
@@ -14,6 +13,7 @@ class TestIntrinsics(TestCase):
         "Fn::something"
     ])
     def test_is_intrinsic_must_detect_intrinsics(self, intrinsic_name):
+
         input = {
             intrinsic_name: ["some value"]
         }
@@ -24,7 +24,7 @@ class TestIntrinsics(TestCase):
         self.assertFalse(is_instrinsic(None))
 
     def test_is_intrinsic_on_non_dict_input(self):
-        self.assertFalse(is_instrinsic([1, 2, 3]))
+        self.assertFalse(is_instrinsic([1,2,3]))
 
     def test_is_intrinsic_on_intrinsic_like_dict_input(self):
         self.assertFalse(is_instrinsic({
@@ -40,7 +40,7 @@ class TestIntrinsics(TestCase):
         self.assertEqual(make_shorthand(input), expected)
 
     def test_make_short_hand_failure(self):
-        input = {"Fn::Sub": "something"}
+        input = { "Fn::Sub": "something" }
 
         with self.assertRaises(NotImplementedError):
             make_shorthand(input)

@@ -9,7 +9,9 @@ from samtranslator.model.preferences.deployment_preference import DeploymentPref
 
 class TestVersionsAndAliases(TestCase):
 
+
     def setUp(self):
+
         self.intrinsics_resolver_mock = Mock()
         self.intrinsics_resolver_mock.resolve = Mock()
 
@@ -45,8 +47,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
-        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"S3Bucket": "bucket", "S3Key": "key",
-                                                                             "S3ObjectVersion": "version"}
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"S3Bucket": "bucket", "S3Key": "key", "S3ObjectVersion": "version"}
         get_resolved_alias_name_mock.return_value = alias_name
 
         resources = sam_func.to_cloudformation(**kwargs)
@@ -64,10 +65,10 @@ class TestVersionsAndAliases(TestCase):
         # We don't need to do any deeper validation here because there is a separate SAM template -> CFN template conversion test
         # that will care of validating all properties & connections
 
-        sam_func._get_resolved_alias_name.assert_called_once_with("AutoPublishAlias", alias_name,
-                                                                  self.intrinsics_resolver_mock)
+        sam_func._get_resolved_alias_name.assert_called_once_with("AutoPublishAlias", alias_name, self.intrinsics_resolver_mock)
 
     def test_sam_function_with_alias_cannot_be_list(self):
+
         # Alias cannot be a list
         with self.assertRaises(InvalidResourceException):
             self.func_dict["Properties"]["AutoPublishAlias"] = ["a", "b"]
@@ -112,8 +113,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(aliases[0].values()[0]["UpdatePolicy"], self.update_policy().to_dict())
 
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_missing_collection_raises_error(self,
-                                                                                     get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_missing_collection_raises_error(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
         deploy_preference_dict = {"Type": "LINEAR"}
         func = {
@@ -141,8 +141,7 @@ class TestVersionsAndAliases(TestCase):
             sam_func.to_cloudformation(**kwargs)
 
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_disabled_deployment_preference_does_not_add_update_policy(self,
-                                                                                         get_resolved_alias_name_mock):
+    def test_sam_function_with_disabled_deployment_preference_does_not_add_update_policy(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
         enabled = False
         deploy_preference_dict = {"Enabled": enabled}
@@ -231,8 +230,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEquals(len(resources), 2)
 
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_instrinsic_ref_enabled_boolean_parameter(self,
-                                                                                              get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_instrinsic_ref_enabled_boolean_parameter(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
         enabled = {"Ref": "MyEnabledFlag"}
         deploy_preference_dict = {"Type": "LINEAR", "Enabled": enabled}
@@ -271,8 +269,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(aliases[0].values()[0]["UpdatePolicy"], self.update_policy().to_dict())
 
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_instrinsic_ref_enabled_dict_parameter(self,
-                                                                                           get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_instrinsic_ref_enabled_dict_parameter(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
         enabled = {"Ref": "MyEnabledFlag"}
         deploy_preference_dict = {"Type": "LINEAR", "Enabled": enabled}
@@ -465,11 +462,13 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(alias.FunctionName, {"Ref": self.lambda_func.logical_id})
         self.assertEqual(alias.FunctionVersion, {"Fn::GetAtt": [self.lambda_version.logical_id, "Version"]})
 
+
     def test_alias_creation_error(self):
         with self.assertRaises(ValueError):
             self.sam_func._construct_alias(None, self.lambda_func, self.lambda_version)
 
     def test_get_resolved_alias_name_must_work(self):
+
         property_name = "something"
         alias_value = {"Ref": "param1"}
         alias_name = "AliasName"
@@ -479,8 +478,9 @@ class TestVersionsAndAliases(TestCase):
         self.assertEquals(alias_name, result)
 
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved(self):
+
         property_name = "something"
-        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter" \
+        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter"\
             .format(self.sam_func.logical_id, property_name)
 
         alias_value = {"Ref": "param1"}
@@ -494,8 +494,9 @@ class TestVersionsAndAliases(TestCase):
         self.assertEquals(expected_exception_msg, ex.message)
 
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved_with_list(self):
+
         property_name = "something"
-        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter" \
+        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter"\
             .format(self.sam_func.logical_id, property_name)
 
         alias_value = ["Ref", "param1"]
@@ -507,6 +508,7 @@ class TestVersionsAndAliases(TestCase):
 
         ex = raises_assert.exception
         self.assertEquals(expected_exception_msg, ex.message)
+
 
     def _make_lambda_function(self, logical_id):
         func = LambdaFunction(logical_id)
@@ -535,6 +537,7 @@ class TestVersionsAndAliases(TestCase):
 class TestSupportedResourceReferences(TestCase):
 
     def test_must_not_break_support(self):
+
         func = SamFunction("LogicalId")
         self.assertEquals(2, len(func.referable_properties))
         self.assertEquals(func.referable_properties["Alias"], "AWS::Lambda::Alias")

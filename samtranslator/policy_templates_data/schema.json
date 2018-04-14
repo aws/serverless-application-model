@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Schema for AWS SAM Policy Templates",
+
   "definitions": {
     "semver": {
       "type": "string",
@@ -47,6 +48,7 @@
       ],
       "additionalProperties": false
     },
+
     "policy_statements": {
       "type": "object",
       "properties": {
@@ -80,8 +82,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "Version",
-    "Templates"
-  ]
+  "required": ["Version", "Templates"]
 }

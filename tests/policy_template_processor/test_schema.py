@@ -3,7 +3,6 @@ from samtranslator.policy_template_processor.processor import PolicyTemplatesPro
 from parameterized import parameterized
 from unittest import TestCase
 
-
 class TestTemplates(object):
     """
     Write your test cases here as different variables that store the entire template file. Start the variable with
@@ -118,7 +117,7 @@ class TestTemplates(object):
                     "Statement": [{
                         "key": "value"
                     }]
-                }
+                 }
             }
         }
     }
@@ -205,7 +204,6 @@ class TestTemplates(object):
             }
         }
     }
-
 
 class TestPolicyTemplateSchema(TestCase):
     """

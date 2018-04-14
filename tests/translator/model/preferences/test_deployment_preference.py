@@ -13,33 +13,30 @@ class TestDeploymentPreference(TestCase):
         self.alarms = ['alarm1ref', 'alarm2ref']
         self.role = {"Ref": "MyRole"}
         self.expected_deployment_preference = DeploymentPreference(self.deployment_type, self.pre_traffic_hook,
-                                                                   self.post_traffic_hook, self.alarms, True, self.role)
+                                                              self.post_traffic_hook, self.alarms, True, self.role)
 
     def test_from_dict_with_intrinsic_function_type(self):
+
         type = {"Ref": "SomeType"}
         expected_deployment_preference = DeploymentPreference(type, self.pre_traffic_hook,
                                                               self.post_traffic_hook, self.alarms, True, self.role)
 
         deployment_preference_yaml_dict = dict()
         deployment_preference_yaml_dict['Type'] = type
-        deployment_preference_yaml_dict['Hooks'] = {'PreTraffic': self.pre_traffic_hook,
-                                                    'PostTraffic': self.post_traffic_hook}
+        deployment_preference_yaml_dict['Hooks'] = {'PreTraffic': self.pre_traffic_hook, 'PostTraffic': self.post_traffic_hook}
         deployment_preference_yaml_dict['Alarms'] = self.alarms
         deployment_preference_yaml_dict['Role'] = self.role
-        deployment_preference_from_yaml_dict = DeploymentPreference.from_dict('logical_id',
-                                                                              deployment_preference_yaml_dict)
+        deployment_preference_from_yaml_dict = DeploymentPreference.from_dict('logical_id', deployment_preference_yaml_dict)
 
         self.assertEqual(expected_deployment_preference, deployment_preference_from_yaml_dict)
 
     def test_from_dict(self):
         deployment_preference_yaml_dict = dict()
         deployment_preference_yaml_dict['Type'] = self.deployment_type
-        deployment_preference_yaml_dict['Hooks'] = {'PreTraffic': self.pre_traffic_hook,
-                                                    'PostTraffic': self.post_traffic_hook}
+        deployment_preference_yaml_dict['Hooks'] = {'PreTraffic': self.pre_traffic_hook, 'PostTraffic': self.post_traffic_hook}
         deployment_preference_yaml_dict['Alarms'] = self.alarms
         deployment_preference_yaml_dict['Role'] = self.role
-        deployment_preference_from_yaml_dict = DeploymentPreference.from_dict('logical_id',
-                                                                              deployment_preference_yaml_dict)
+        deployment_preference_from_yaml_dict = DeploymentPreference.from_dict('logical_id', deployment_preference_yaml_dict)
 
         self.assertEqual(self.expected_deployment_preference, deployment_preference_from_yaml_dict)
 

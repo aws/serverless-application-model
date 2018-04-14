@@ -3,33 +3,33 @@ from unittest import TestCase
 from samtranslator.sdk.template import SamTemplate
 from samtranslator.sdk.resource import SamResource
 
-
 class TestSamTemplate(TestCase):
 
     def setUp(self):
+
         self.template_dict = {
-            "Properties": {
-                "c": "d"
-            },
-            "Metadata": {
-                "a": "b"
-            },
-            "Resources": {
-                "Function1": {
-                    "Type": "AWS::Serverless::Function",
-                    "DependsOn": "SomeOtherResource"
-                },
-                "Function2": {
-                    "Type": "AWS::Serverless::Function",
-                    "a": "b"
-                },
-                "Api": {
-                    "Type": "AWS::Serverless::Api"
-                },
-                "NonSam": {
-                    "Type": "AWS::Lambda::Function"
-                }
-            }
+          "Properties": {
+              "c": "d"
+          },
+          "Metadata": {
+              "a": "b"
+          },
+          "Resources": {
+             "Function1": {
+                "Type": "AWS::Serverless::Function",
+                 "DependsOn": "SomeOtherResource"
+             },
+             "Function2": {
+                "Type": "AWS::Serverless::Function",
+                 "a": "b"
+             },
+             "Api": {
+                "Type": "AWS::Serverless::Api"
+             },
+             "NonSam": {
+                "Type": "AWS::Lambda::Function"
+             }
+          }
         }
 
     def test_iterate_must_yield_sam_resources_only(self):
@@ -45,6 +45,7 @@ class TestSamTemplate(TestCase):
         self.assertEquals(expected, actual)
 
     def test_iterate_must_filter_by_resource_type(self):
+
         template = SamTemplate(self.template_dict)
 
         type = "AWS::Serverless::Function"
@@ -91,9 +92,9 @@ class TestSamTemplate(TestCase):
     def test_get_must_return_resource(self):
         expected = {
             "Type": "AWS::Serverless::Function",
-            "DependsOn": "SomeOtherResource",
+             "DependsOn": "SomeOtherResource",
             "Properties": {}
-        }
+         }
 
         template = SamTemplate(self.template_dict)
 

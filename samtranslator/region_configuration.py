@@ -1,6 +1,5 @@
 from translator.arn_generator import ArnGenerator
 
-
 class RegionConfiguration(object):
     """
     There are times when certain services, or certain configurations of a service are not supported in a region. This

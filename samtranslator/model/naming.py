@@ -1,3 +1,4 @@
+
 class GeneratedLogicalId(object):
     """
     Class to generate LogicalIDs for various scenarios.  SAM generates LogicalIds for new resources based on code

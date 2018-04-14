@@ -1,6 +1,5 @@
 import boto3
 
-
 class ArnGenerator(object):
 
     @classmethod
@@ -9,6 +8,7 @@ class ArnGenerator(object):
             raise RuntimeError("Could not construct ARN for resource.")
 
         return 'arn:{0}:{1}:${{AWS::Region}}:${{AWS::AccountId}}:{2}'.format(partition, service, resource)
+
 
     @classmethod
     def generate_aws_managed_policy_arn(cls, policy_name):
@@ -34,6 +34,7 @@ class ArnGenerator(object):
         :param region: Optional name of the region
         :return: Partition name
         """
+
 
         if region is None:
             # Use Boto3 to get the region where code is running. This uses Boto's regular region resolution

@@ -2,7 +2,6 @@ import yaml
 from yaml import ScalarNode, SequenceNode
 from six import string_types
 
-
 # This helper copied almost entirely from
 # https://github.com/aws/aws-cli/blob/develop/awscli/customizations/cloudformation/yamlhelper.py
 def yaml_parse(yamlstr):

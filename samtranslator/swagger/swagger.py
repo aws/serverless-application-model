@@ -44,8 +44,8 @@ class SwaggerEditor(object):
         result = path in self.paths
         if method:
             result = result and \
-                     isinstance(self.paths[path], dict) and \
-                     method in self.paths[path]
+                    isinstance(self.paths[path], dict) and \
+                    method in self.paths[path]
 
         return result
 
@@ -60,9 +60,8 @@ class SwaggerEditor(object):
         method = self._normalize_method_name(method)
 
         return self.has_path(path, method) and \
-               isinstance(self.paths[path][method], dict) and \
-               bool(self.paths[path][method].get(
-                   self._X_APIGW_INTEGRATION))  # Key should be present & Value is non-empty
+            isinstance(self.paths[path][method], dict) and \
+            bool(self.paths[path][method].get(self._X_APIGW_INTEGRATION))  # Key should be present & Value is non-empty
 
     def add_path(self, path, method=None):
         """
@@ -99,10 +98,10 @@ class SwaggerEditor(object):
         self.add_path(path, method)
 
         self.paths[path][method][self._X_APIGW_INTEGRATION] = {
-            'type': 'aws_proxy',
-            'httpMethod': 'POST',
-            'uri': integration_uri
-        }
+                'type': 'aws_proxy',
+                'httpMethod': 'POST',
+                'uri': integration_uri
+            }
 
         # If 'responses' key is *not* present, add it with an empty dict as value
         self.paths[path][method].setdefault('responses', {})
@@ -187,7 +186,7 @@ class SwaggerEditor(object):
         ALLOW_HEADERS = "Access-Control-Allow-Headers"
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
-        HEADER_RESPONSE = lambda x: "method.response.header." + x
+        HEADER_RESPONSE = lambda x: "method.response.header."+x
 
         response_parameters = {
             # AllowedOrigin is always required
@@ -270,7 +269,7 @@ class SwaggerEditor(object):
             allow_methods = all_http_methods
         else:
             allow_methods = methods
-            allow_methods.append("options")  # Always add Options to the CORS methods response
+            allow_methods.append("options") # Always add Options to the CORS methods response
 
         # Clean up the result:
         #
@@ -307,9 +306,9 @@ class SwaggerEditor(object):
         :return: True, if data is a Swagger
         """
         return bool(data) and \
-               isinstance(data, dict) and \
-               bool(data.get("swagger")) and \
-               isinstance(data.get('paths'), dict)
+                isinstance(data, dict) and \
+                bool(data.get("swagger")) and \
+                isinstance(data.get('paths'), dict)
 
     @staticmethod
     def gen_skeleton():

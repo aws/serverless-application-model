@@ -14,7 +14,6 @@ class PropertyType(object):
     :ivar supports_intrinsics True to allow intrinsic function support on this property. Setting this to False will
         raise an error when intrinsic function dictionary is supplied as value
     """
-
     def __init__(self, required, validate=lambda value: True, supports_intrinsics=True):
         self.required = required
         self.validate = validate
@@ -151,8 +150,8 @@ class Resource(object):
         if resource_dict['Type'] != cls.resource_type:
             raise InvalidResourceException(logical_id, "Resource has incorrect Type; expected '{expected}', "
                                                        "got '{actual}'".format(
-                expected=cls.resource_type,
-                actual=resource_dict['Type']))
+                                                            expected=cls.resource_type,
+                                                            actual=resource_dict['Type']))
 
         if 'Properties' in resource_dict and not isinstance(resource_dict['Properties'], dict):
             raise InvalidResourceException(logical_id, "Properties of a resource must be an object.")
@@ -333,7 +332,6 @@ class ResourceMacro(Resource):
         """
         raise NotImplementedError("Method to_cloudformation() must be implemented in a subclass of ResourceMacro")
 
-
 class SamResourceMacro(ResourceMacro):
     """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources.
     """
@@ -367,7 +365,7 @@ class SamResourceMacro(ResourceMacro):
             raise ValueError("`supported_resource_refs` object is required")
 
         # Create a map of {ResourceType: LogicalId} for quick access
-        resource_id_by_type = {resource.resource_type: resource.logical_id for resource in generated_cfn_resources}
+        resource_id_by_type = {resource.resource_type:resource.logical_id for resource in generated_cfn_resources}
 
         for property, cfn_type in self.referable_properties.iteritems():
             if cfn_type in resource_id_by_type:
@@ -390,8 +388,8 @@ class ResourceTypeResolver(object):
             # Get all classes in the specified module which have a class variable resource_type.
             for _, resource_class in inspect.getmembers(module,
                                                         lambda cls: inspect.isclass(cls)
-                                                                    and cls.__module__ == module.__name__
-                                                                    and hasattr(cls, 'resource_type')):
+                                                        and cls.__module__ == module.__name__
+                                                        and hasattr(cls, 'resource_type')):
                 self.resource_types[resource_class.resource_type] = resource_class
 
     def can_resolve(self, resource_dict):

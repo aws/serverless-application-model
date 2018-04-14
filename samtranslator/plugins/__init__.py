@@ -3,7 +3,6 @@ import logging
 from samtranslator.model.exceptions import InvalidResourceException
 from enum import Enum
 
-
 class SamPlugins(object):
     """
     Class providing support for arbitrary plugins that can extend core SAM translator in interesting ways.
@@ -121,7 +120,7 @@ class SamPlugins(object):
 
             if not hasattr(plugin, method_name):
                 raise NameError("'{}' method is not found in the plugin with name '{}'"
-                                .format(method_name, plugin.name))
+                               .format(method_name, plugin.name))
 
             try:
                 getattr(plugin, method_name)(*args, **kwargs)
@@ -139,7 +138,6 @@ class SamPlugins(object):
         :return integer: Number of plugins registered
         """
         return len(self._plugins)
-
 
 class LifeCycleEvents(Enum):
     """

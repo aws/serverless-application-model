@@ -7,15 +7,15 @@ from samtranslator.translator import logical_id_generator
 class ApiGatewayRestApi(Resource):
     resource_type = 'AWS::ApiGateway::RestApi'
     property_types = {
-        'Body': PropertyType(False, is_type(dict)),
-        'BodyS3Location': PropertyType(False, is_type(dict)),
-        'CloneFrom': PropertyType(False, is_str()),
-        'Description': PropertyType(False, is_str()),
-        'FailOnWarnings': PropertyType(False, is_type(bool)),
-        'Name': PropertyType(False, is_str()),
-        'Parameters': PropertyType(False, is_type(dict)),
-        'EndpointConfiguration': PropertyType(False, is_type(dict)),
-        "BinaryMediaTypes": PropertyType(False, is_type(list))
+            'Body': PropertyType(False, is_type(dict)),
+            'BodyS3Location': PropertyType(False, is_type(dict)),
+            'CloneFrom': PropertyType(False, is_str()),
+            'Description': PropertyType(False, is_str()),
+            'FailOnWarnings': PropertyType(False, is_type(bool)),
+            'Name': PropertyType(False, is_str()),
+            'Parameters': PropertyType(False, is_type(dict)),
+            'EndpointConfiguration': PropertyType(False, is_type(dict)),
+            "BinaryMediaTypes": PropertyType(False, is_type(list))
     }
 
     runtime_attrs = {
@@ -26,15 +26,15 @@ class ApiGatewayRestApi(Resource):
 class ApiGatewayStage(Resource):
     resource_type = 'AWS::ApiGateway::Stage'
     property_types = {
-        'CacheClusterEnabled': PropertyType(False, is_type(bool)),
-        'CacheClusterSize': PropertyType(False, is_str()),
-        'ClientCertificateId': PropertyType(False, is_str()),
-        'DeploymentId': PropertyType(True, is_str()),
-        'Description': PropertyType(False, is_str()),
-        'RestApiId': PropertyType(True, is_str()),
-        'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
-        'Variables': PropertyType(False, is_type(dict)),
-        "MethodSettings": PropertyType(False, is_type(list))
+            'CacheClusterEnabled': PropertyType(False, is_type(bool)),
+            'CacheClusterSize': PropertyType(False, is_str()),
+            'ClientCertificateId': PropertyType(False, is_str()),
+            'DeploymentId': PropertyType(True, is_str()),
+            'Description': PropertyType(False, is_str()),
+            'RestApiId': PropertyType(True, is_str()),
+            'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
+            'Variables': PropertyType(False, is_type(dict)),
+            "MethodSettings": PropertyType(False, is_type(list))
     }
 
     runtime_attrs = {
@@ -55,10 +55,10 @@ class ApiGatewayAccount(Resource):
 class ApiGatewayDeployment(Resource):
     resource_type = 'AWS::ApiGateway::Deployment'
     property_types = {
-        'Description': PropertyType(False, is_str()),
-        'RestApiId': PropertyType(True, is_str()),
-        'StageDescription': PropertyType(False, is_type(dict)),
-        'StageName': PropertyType(True, is_str())
+            'Description': PropertyType(False, is_str()),
+            'RestApiId': PropertyType(True, is_str()),
+            'StageDescription': PropertyType(False, is_type(dict)),
+            'StageName': PropertyType(True, is_str())
     }
 
     runtime_attrs = {

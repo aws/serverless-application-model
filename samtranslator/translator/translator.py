@@ -3,8 +3,7 @@ import copy
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, \
-    DuplicateLogicalIdException, \
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, DuplicateLogicalIdException, \
     InvalidEventException
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
@@ -13,11 +12,9 @@ from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 
-
 class Translator:
     """Translates SAM templates into CloudFormation templates
     """
-
     def __init__(self, managed_policy_map, sam_parser, plugins=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
@@ -63,8 +60,8 @@ class Translator:
 
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
-                macro = macro_resolver \
-                    .resolve_resource_type(resource_dict) \
+                macro = macro_resolver\
+                    .resolve_resource_type(resource_dict)\
                     .from_dict(logical_id, resource_dict, sam_plugins=sam_plugins)
 
                 kwargs = macro.resources_to_link(sam_template['Resources'])
@@ -93,7 +90,7 @@ class Translator:
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 template['Resources'].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
-
+        
         # Cleanup
         if 'Transform' in template:
             del template['Transform']
@@ -190,7 +187,6 @@ class Translator:
         default_values.update(parameter_values)
 
         return default_values
-
 
 def prepare_plugins(plugins):
     """

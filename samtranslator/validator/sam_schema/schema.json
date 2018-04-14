@@ -60,12 +60,8 @@
             },
             "StageName": {
               "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object"
-                }
+                { "type": "string" },
+                { "type": "object" }
               ]
             },
             "Variables": {
@@ -73,12 +69,8 @@
               "patternProperties": {
                 "^[a-zA-Z0-9]+$": {
                   "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "object"
-                    }
+                    { "type": "string" },
+                    { "type": "object" }
                   ]
                 }
               },
@@ -222,12 +214,8 @@
             },
             "Role": {
               "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object"
-                }
+                { "type": "string" },
+                { "type": "object" }
               ]
             },
             "Runtime": {
@@ -297,13 +285,9 @@
           "type": "string"
         },
         "RestApiId": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
+          "anyOf":[
+            { "type": "string" },
+            { "type": "object" }
           ]
         }
       },
@@ -501,13 +485,9 @@
       "additionalProperties": false,
       "properties": {
         "Bucket": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
+          "anyOf":[
+            { "type": "string" },
+            { "type": "object" }
           ]
         },
         "Events": {
@@ -558,13 +538,9 @@
       "additionalProperties": false,
       "properties": {
         "S3Key": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
+          "anyOf":[
+            { "type": "string" },
+            { "type": "object" }
           ]
         }
       },
@@ -620,7 +596,7 @@
             "type": "object"
           },
           "type": "array"
-        }
+        }        
       },
       "required": [
         "SecurityGroupIds",
@@ -802,13 +778,9 @@
           "type": "string"
         },
         "Value": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
+          "anyOf":[
+            { "type": "string" },
+            { "type": "object" }
           ]
         }
       },

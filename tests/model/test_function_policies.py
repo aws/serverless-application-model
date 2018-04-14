@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes, PolicyEntry
 
-
 class TestFunctionPolicies(TestCase):
 
     def setUp(self):
@@ -12,6 +11,7 @@ class TestFunctionPolicies(TestCase):
 
         self.function_policies = FunctionPolicies({}, self.policy_template_processor_mock)
         self.function_policies._is_policy_template = self.is_policy_template_mock
+
 
     @patch.object(FunctionPolicies, "_get_policies")
     def test_initialization_must_ingest_policies_from_resource_properties(self, get_policies_mock):
@@ -25,9 +25,10 @@ class TestFunctionPolicies(TestCase):
         get_policies_mock.assert_called_once_with(resource_properties)
         self.assertEquals(expected_length, len(function_policies))
 
+
     @patch.object(FunctionPolicies, "_get_policies")
     def test_get_must_yield_results_on_every_call(self, get_policies_mock):
-        resource_properties = {}  # Just some input
+        resource_properties = {} # Just some input
         dummy_policy_results = ["some", "policy", "statements"]
         expected_results = ["some", "policy", "statements"]
 
@@ -38,9 +39,10 @@ class TestFunctionPolicies(TestCase):
         # `list()` will implicitly call the `get()` repeatedly because it is a generator
         self.assertEquals(list(function_policies.get()), expected_results)
 
+
     @patch.object(FunctionPolicies, "_get_policies")
     def test_get_must_yield_no_results_with_no_policies(self, get_policies_mock):
-        resource_properties = {}  # Just some input
+        resource_properties = {} # Just some input
         dummy_policy_results = []
         expected_result = []
 
@@ -152,7 +154,7 @@ class TestFunctionPolicies(TestCase):
         resource_properties = {
             "Policies": policies
         }
-        self.is_policy_template_mock.side_effect = [True, False]  # Return True for policy template, False for the list
+        self.is_policy_template_mock.side_effect = [True, False] # Return True for policy template, False for the list
 
         expected = [
             PolicyEntry(data="managed policy 1", type=PolicyTypes.MANAGED_POLICY),
@@ -240,7 +242,7 @@ class TestFunctionPolicies(TestCase):
                 "InvalidPolicyTemplate": "some template"
             }
         }
-        self.is_policy_template_mock.return_value = False  # Invalid policy template
+        self.is_policy_template_mock.return_value = False # Invalid policy template
         expected = [
             PolicyEntry(data={"InvalidPolicyTemplate": "some template"}, type=PolicyTypes.UNKNOWN)
         ]
@@ -282,7 +284,7 @@ class TestFunctionPolicies(TestCase):
         self.policy_template_processor_mock.has.assert_called_once_with(template_name)
 
     def test_is_policy_template_must_ignore_non_dict_policies(self):
-        policy = [1, 2, 3]
+        policy = [1,2,3]
 
         self.policy_template_processor_mock.has.return_value = True
         function_policies = FunctionPolicies({}, self.policy_template_processor_mock)
@@ -327,7 +329,7 @@ class TestFunctionPolicies(TestCase):
             "template_name": {"param1": "foo"}
         }
 
-        function_policies_obj = FunctionPolicies({}, None)  # No policy template processor
+        function_policies_obj = FunctionPolicies({}, None) # No policy template processor
 
         self.assertFalse(function_policies_obj._is_policy_template(policy))
         self.policy_template_processor_mock.has.assert_not_called()

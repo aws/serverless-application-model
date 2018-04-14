@@ -1,3 +1,4 @@
+
 # Constants for Tagging
 _KEY = "Key"
 _VALUE = "Value"
@@ -28,6 +29,7 @@ def get_tag_list(resource_tag_dict):
         return tag_list
 
     for tag_key, tag_value in resource_tag_dict.items():
+
         tag = {_KEY: tag_key, _VALUE: tag_value if tag_value else ""}
         tag_list.append(tag)
 

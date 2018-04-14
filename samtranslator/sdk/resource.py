@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class SamResource(object):
     """
     Class representing a SAM resource. It is designed to make minimal assumptions about the resource structure.
@@ -33,6 +32,7 @@ class SamResource(object):
         return SamResourceType.has_value(self.type)
 
     def to_dict(self):
+
         if self.valid():
             # Touch a resource dictionary ONLY if it is valid
             # Modify only Type & Properties section to preserve CloudFormation properties like DependsOn, Conditions etc

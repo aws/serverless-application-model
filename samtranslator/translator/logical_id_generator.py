@@ -2,8 +2,8 @@ import hashlib
 import json
 from six import string_types
 
-
 class LogicalIdGenerator(object):
+
     # NOTE: Changing the length of the hash will change backwards compatibility. This will break the stability contract
     #       given by this class
     HASH_LENGTH = 10
@@ -22,6 +22,7 @@ class LogicalIdGenerator(object):
 
         self._prefix = prefix
         self.data_str = data_str
+
 
     def gen(self):
         """

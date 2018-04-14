@@ -3,8 +3,7 @@
 from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
 
 # All intrinsics are supported by default
-DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
-
+DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name:action() for action in [RefAction, SubAction, GetAttAction]}
 
 class IntrinsicsResolver(object):
 
@@ -26,6 +25,7 @@ class IntrinsicsResolver(object):
 
         self.supported_intrinsics = supported_intrinsics
         self.parameters = parameters
+
 
     def resolve_parameter_refs(self, input):
         """

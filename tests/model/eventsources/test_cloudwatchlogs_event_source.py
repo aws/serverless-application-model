@@ -2,7 +2,6 @@ from mock import Mock
 from unittest import TestCase
 from samtranslator.model.eventsources.cloudwatchlogs import CloudWatchLogs
 
-
 class CloudWatchLogsEventSource(TestCase):
 
     def setUp(self):
@@ -22,8 +21,7 @@ class CloudWatchLogsEventSource(TestCase):
     def test_get_source_arn(self):
         source_arn = self.cloudwatch_logs_event_source.get_source_arn()
         expected_source_arn = {'Fn::Sub': [
-            'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${__LogGroupName__}:*',
-            {'__LogGroupName__': 'MyLogGroup'}]}
+            'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${__LogGroupName__}:*', {'__LogGroupName__': 'MyLogGroup'}]}
         self.assertEquals(source_arn, expected_source_arn)
 
     def test_get_subscription_filter(self):

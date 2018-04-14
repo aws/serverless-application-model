@@ -95,7 +95,7 @@ class ImplicitApiPlugin(BasePlugin):
         if not (function.valid() and
                 isinstance(function.properties, dict) and
                 isinstance(function.properties.get("Events"), dict)
-        ):
+                ):
             # Function resource structure is invalid.
             return {}
 
@@ -167,8 +167,8 @@ class ImplicitApiPlugin(BasePlugin):
         # Make sure Swagger is valid
         resource = template.get(api_id)
         if not (resource and
-                isinstance(resource.properties, dict) and
-                SwaggerEditor.is_valid(resource.properties.get("DefinitionBody"))):
+                    isinstance(resource.properties, dict) and
+                    SwaggerEditor.is_valid(resource.properties.get("DefinitionBody"))):
             # This does not have an inline Swagger. Nothing can be done about it.
             return
 
@@ -212,7 +212,6 @@ class ImplicitApiPlugin(BasePlugin):
                 template.set(self.implicit_api_logical_id, self.existing_implicit_api_resource)
             else:
                 template.delete(self.implicit_api_logical_id)
-
 
 class ImplicitApiResource(SamResource):
     """

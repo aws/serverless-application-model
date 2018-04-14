@@ -122,8 +122,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             {"Statement2": {"key2": "value2"}},
         ]
 
-        expected = [{"Statement1": {"key1": "value1"}}, {"regular policy": "something"},
-                    {"Statement2": {"key2": "value2"}}]
+        expected = [{"Statement1": {"key1": "value1"}}, {"regular policy": "something"}, {"Statement2": {"key2": "value2"}}]
         self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # This will overwrite the resource_properties input array
@@ -133,6 +132,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             call("MyTemplate1", {"Param1": "value1"}),
             call("MyTemplate2", {"Param2": "value2"})
         ])
+
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_must_raise_on_insufficient_parameter_values(self, function_policies_class_mock):
@@ -167,7 +167,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
+        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_must_raise_on_invalid_parameter_values(self, function_policies_class_mock):
@@ -201,7 +201,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
+        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_must_bubble_exception(self, function_policies_class_mock):
@@ -235,9 +235,10 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
+        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
 
     def test_on_before_transform_resource_must_skip_unsupported_resources(self):
+
         is_supported_mock = Mock()
         data_mock = Mock()
 

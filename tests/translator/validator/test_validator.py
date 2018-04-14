@@ -6,7 +6,6 @@ from samtranslator.validator.validator import SamTemplateValidator
 
 input_folder = 'tests/translator/input'
 
-
 @pytest.mark.parametrize('testcase', [
     'basic_function',
     'cloudwatchevent',

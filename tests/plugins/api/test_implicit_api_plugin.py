@@ -8,7 +8,6 @@ from samtranslator.public.plugins import BasePlugin
 
 IMPLICIT_API_LOGICAL_ID = "ServerlessRestApi"
 
-
 class TestImplicitApiPluginEndtoEnd(TestCase):
 
     def test_must_work_for_single_function(self):
@@ -72,6 +71,7 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_process_functions(self, SamTemplateMock):
+
         template_dict = {"a": "b"}
         function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
         api_events = ["event1", "event2"]
@@ -100,8 +100,10 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
 
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
 
+
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_skip_functions_without_events(self, SamTemplateMock):
+
         template_dict = {"a": "b"}
         function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
         # NO EVENTS for any function
@@ -123,6 +125,7 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_skip_without_functions(self, SamTemplateMock):
+
         template_dict = {"a": "b"}
         # NO FUNCTIONS
         function_resources = []
@@ -143,10 +146,10 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
     def test_must_collect_errors_and_raise_on_invalid_events(self, SamTemplateMock):
+
         template_dict = {"a": "b"}
         function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
-        api_event_errors = [InvalidEventException("eventid1", "msg"), InvalidEventException("eventid3", "msg"),
-                            InvalidEventException("eventid3", "msg")]
+        api_event_errors = [InvalidEventException("eventid1", "msg"), InvalidEventException("eventid3", "msg"), InvalidEventException("eventid3", "msg")]
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
@@ -182,6 +185,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
         self.plugin = ImplicitApiPlugin()
 
     def test_must_get_all_api_events_in_function(self):
+
         properties = {
             "Events": {
                 "Api1": {
@@ -225,6 +229,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
         self.assertEquals(expected, result)
 
     def test_must_work_with_no_api_events(self):
+
         properties = {
             "Events": {
                 "Event1": {
@@ -256,6 +261,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
         self.assertEquals(expected, result)
 
     def test_must_skip_with_bad_events_structure(self):
+
         function = SamResource({
             "Type": SamResourceType.Function.value,
             "Properties": {
@@ -268,6 +274,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
         self.assertEquals(expected, result)
 
     def test_must_skip_if_no_events_property(self):
+
         function = SamResource({
             "Type": SamResourceType.Function.value,
             "Properties": {
@@ -280,6 +287,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
         self.assertEquals(expected, result)
 
     def test_must_skip_if_no_property_dictionary(self):
+
         function = SamResource({
             "Type": SamResourceType.Function.value,
             "Properties": "bad value"
@@ -311,6 +319,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
         self.assertTrue(result["Api1"] is function.properties["Events"]["Api1"])
 
     def test_must_skip_if_function_is_not_valid(self):
+
         function = SamResource({
             # NOT a SAM resource
             "Type": "AWS::Lambda::Function",
@@ -373,6 +382,7 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         function_events_mock.update.assert_called_with(api_events)
 
     def test_must_skip_events_without_properties(self):
+
         api_events = {
             "Api1": {
                 "Type": "Api"
@@ -465,6 +475,7 @@ class TestImplicitApiPlugin_add_implicit_api_id_if_necessary(TestCase):
         self.plugin = ImplicitApiPlugin()
 
     def test_must_add_if_not_present(self):
+
         input = {
             "a": "b"
         }
@@ -477,7 +488,9 @@ class TestImplicitApiPlugin_add_implicit_api_id_if_necessary(TestCase):
         self.plugin._add_implicit_api_id_if_necessary(input)
         self.assertEquals(input, expected)
 
+
     def test_must_skip_if_present(self):
+
         input = {
             "a": "b",
             "RestApiId": "Something"
@@ -610,6 +623,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
     def test_must_skip_invalid_swagger(self, SwaggerEditorMock):
+
         event_id = "id"
         properties = {
             "RestApiId": {"Ref": "restid"},
@@ -642,6 +656,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
     def test_must_skip_if_definition_body_is_not_present(self, SwaggerEditorMock):
+
         event_id = "id"
         properties = {
             "RestApiId": {"Ref": "restid"},
@@ -672,6 +687,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_resource_properties_are_invalid(self, SwaggerEditorMock):
+
         event_id = "id"
         properties = {
             "RestApiId": {"Ref": "restid"},
@@ -699,6 +715,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_manage_swagger_flag_is_false(self, SwaggerEditorMock):
+
         event_id = "id"
         properties = {
             "RestApiId": {"Ref": "restid"},
@@ -733,6 +750,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_manage_swagger_flag_is_not_present(self, SwaggerEditorMock):
+
         event_id = "id"
         properties = {
             "RestApiId": {"Ref": "restid"},
@@ -763,7 +781,6 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         template_mock.get.assert_called_with('restid')
         SwaggerEditorMock.assert_not_called()
         template_mock.set.assert_not_called()
-
 
 class TestImplicitApiPlugin_maybe_remove_implicit_api(TestCase):
 
