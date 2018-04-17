@@ -57,7 +57,7 @@ setup(
     author='Amazon Web Services',
     author_email='aws-sam-developers@amazon.com',
     url='https://github.com/awslabs/serverless-application-model',
-    license='Apache Software License',
+    license='Apache License 2.0',
     # Exclude all but the code folders
     packages=find_packages(exclude=('docs', 'examples', 'versions')),
     package_data={'': '*.yaml'},
@@ -75,8 +75,7 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 2.7',
         'Topic :: Internet',
         'Topic :: Software Development :: Build Tools',
         'Topic :: Utilities',
