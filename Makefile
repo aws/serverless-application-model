@@ -35,14 +35,6 @@ activate:
 	$(info [*] Activate virtualenv $(NAME)...)
 	$(shell eval "$$(pyenv init -)" && eval "$$(pyenv virtualenv-init -)" && pyenv activate $(NAME) && pyenv local $(NAME))
 	
-clean:
-	$(info [*] Cleaning up...)
-	@find . | grep -E "(__pycache__|\.pyc|\.pyo$$)" | xargs rm -rf
-	@test -f .coverage && rm .coverage || true
-	@test -f .python-version && rm .python-version || true
-	@test -d ~/.pyenv/versions/$(NAME) && rm -r ~/.pyenv/versions/$(NAME) || true
-	@test -d ~/.pyenv/versions/$(PYTHON_VERSION) && rm -r ~/.pyenv/versions/$(PYTHON_VERSION) || true
-
 init:
 	$(info [*] Install requirements...)
 	@pip install -r requirements-dev.txt -r requirements.txt
@@ -75,6 +67,5 @@ TARGETS
 	dev         Run all development tests after a change.
 	build-docs  Generate the documentation.
 	pr          Perform all checks before submitting a Pull Request.
-	clean       Cleans the virtualenv and all the cached files and test generated files.
 
 endef
