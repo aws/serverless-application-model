@@ -1,1 +1,3 @@
 include LICENSE
+include samtranslator/policy_templates_data/policy_templates.json
+include samtranslator/policy_templates_data/schema.json
