@@ -4,7 +4,7 @@ language: python
 
 install:
 # Install the code requirements
-- pip install -e .[dev]
+- make init
 
 # Install Docs requirements
 
