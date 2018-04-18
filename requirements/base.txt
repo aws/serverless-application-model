@@ -1,5 +1,5 @@
-boto3==1.6.2
-botocore==1.9.2
+boto3>=1.6.2
+botocore>=1.9.2
 docutils==0.14
 enum34==1.1.6
 functools32==3.2.3.post2

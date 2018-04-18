@@ -37,7 +37,7 @@ activate:
 	
 init:
 	$(info [*] Install requirements...)
-	@pip install -r requirements-dev.txt -r requirements.txt
+	@pip install -r requirements/dev.txt -r requirements/base.txt
 
 test:
 	$(info [*] Run the unit test with minimum code coverage of $(CODE_COVERAGE)%...)
