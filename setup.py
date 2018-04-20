@@ -60,7 +60,7 @@ setup(
     license='Apache License 2.0',
     # Exclude all but the code folders
     packages=find_packages(exclude=('tests', 'docs', 'examples', 'versions')),
-    package_data={'': ['*.yaml', '*.json']},
+    package_data={'': ['*.yaml']},
     install_requires=read_requirements('base.txt'),
     extras_require={
         'dev': read_requirements('dev.txt')
