@@ -43,7 +43,7 @@ a different virtualenv for each project. `pyenv`_ comes with a handy plugin that
 ~~~~~~~~~~~~~~~~~~~~~~~
 Install dependencies by running the following command. Make sure the Virtualenv you created above is active.
 
-``pip install -r requirements.txt -r requirements-dev.txt``
+``pip install -r requirements/base.txt -r requirements/dev.txt``
 
 
 Running Tests
