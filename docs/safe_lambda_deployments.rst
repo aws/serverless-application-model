@@ -195,7 +195,7 @@ checks.
 
 Hooks are extremely powerful because:
 
-- **Not limited by Lambda function duration**: CodeDeploy invokes the hook function asynchrnously. The function will
+- **Not limited by Lambda function duration**: CodeDeploy invokes the hook function asynchronously. The function will
   receive a ``deploymentId`` and ``lifecycleEventHookExecutionId`` that should be used with a call to the CodeDeploy API to report success or failure. 
   Therefore you can build a workflow that runs for several minutes or hours before completing the hook by calling the 
   CodeDeploy API.
