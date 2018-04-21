@@ -1,5 +1,7 @@
 import re
 
+from six import string_types
+
 class Action(object):
     """
     Base class for intrinsic function actions. Each intrinsic function must subclass this,
@@ -53,7 +55,7 @@ class Action(object):
         """
         no_result = (None, None)
 
-        if not isinstance(ref_value, basestring):
+        if not isinstance(ref_value, string_types):
             return no_result
 
         splits = ref_value.split(cls._resource_ref_separator, 1)
@@ -84,7 +86,7 @@ class RefAction(Action):
 
         param_name = input_dict[self.intrinsic_name]
 
-        if not isinstance(param_name, basestring):
+        if not isinstance(param_name, string_types):
             return input_dict
 
         if param_name in parameters:
@@ -240,11 +242,11 @@ class SubAction(Action):
 
         # Just handle known references within the string to be substituted and return the whole dictionary
         # because that's the best we can do here.
-        if isinstance(sub_value, basestring):
+        if isinstance(sub_value, string_types):
             # Ex: {Fn::Sub: "some string"}
             sub_value = self._sub_all_refs(sub_value, handler_method)
 
-        elif isinstance(sub_value, list) and len(sub_value) > 0 and isinstance(sub_value[0], basestring):
+        elif isinstance(sub_value, list) and len(sub_value) > 0 and isinstance(sub_value[0], string_types):
             # Ex: {Fn::Sub: ["some string", {a:b}] }
             sub_value[0] = self._sub_all_refs(sub_value[0], handler_method)
 

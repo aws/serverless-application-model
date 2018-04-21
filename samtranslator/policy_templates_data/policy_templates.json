@@ -1110,6 +1110,51 @@
           }
         ]
       }
+    },
+    "AWSSecretsManagerRotationPolicy": {
+      "Description": "Grants permissions to APIs required to rotate a secret in AWS Secrets Manager",
+      "Parameters": {
+        "FunctionName": {
+          "Description": "Name of the Lambda Function"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "secretsmanager:DescribeSecret",
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+              "secretsmanager:UpdateSecretVersionStage"
+            ],
+            "Resource": {
+              "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*"
+            },
+            "Condition": {
+              "StringEquals": {
+                "secretsmanager:resource/AllowRotationLambdaArn": {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}",
+                    {
+                      "functionName": {
+                        "Ref": "FunctionName"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "secretsmanager:GetRandomPassword"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
     }
   }
 }

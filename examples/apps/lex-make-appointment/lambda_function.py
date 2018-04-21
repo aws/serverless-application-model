@@ -67,6 +67,7 @@ import json
 import boto3
 from base64 import b64decode
 
+from six import string_types
 
 print('Loading function')
 
@@ -191,7 +192,7 @@ def lambda_handler(event, context):
                   args['arn'] + "- checking event details...")
             # Identify ARN in event detail
             for key, value in event['detail'].iteritems():
-                if isinstance(value, basestring):
+                if isinstance(value, string_types):
                     if 'arn' in value:
                         args['arn'] = value
                         # Search for LM devices based on identified ARN

@@ -1,4 +1,5 @@
 import copy
+from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
 from samtranslator.model.intrinsics import ref, fnSub, make_shorthand
@@ -76,7 +77,7 @@ class Schedule(PushEventSource):
         :rtype: list
         """
         function = kwargs.get('function')
-        
+
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
@@ -129,7 +130,7 @@ class CloudWatchEvent(PushEventSource):
         :rtype: list
         """
         function = kwargs.get('function')
-        
+
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
@@ -191,7 +192,7 @@ class S3(PushEventSource):
         :rtype: list
         """
         function = kwargs.get('function')
-        
+
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
@@ -255,7 +256,7 @@ class S3(PushEventSource):
             base_event_mapping['Filter'] = self.Filter
 
         event_types = self.Events
-        if isinstance(self.Events, basestring):
+        if isinstance(self.Events, string_types):
             event_types = [self.Events]
 
         event_mappings = []
@@ -350,7 +351,7 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        if isinstance(rest_api_id, basestring):
+        if isinstance(rest_api_id, string_types):
 
             if rest_api_id in resources \
                and "Properties" in resources[rest_api_id] \
@@ -360,7 +361,7 @@ class Api(PushEventSource):
                 permitted_stage = explicit_api["StageName"]
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, basestring):
+                if isinstance(permitted_stage, string_types):
                     stage_suffix = permitted_stage
                 else:
                     stage_suffix = "Stage"
@@ -474,7 +475,7 @@ class AlexaSkill(PushEventSource):
 
     def to_cloudformation(self, **kwargs):
         function = kwargs.get('function')
-        
+
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
@@ -495,7 +496,7 @@ class IoTRule(PushEventSource):
 
     def to_cloudformation(self, **kwargs):
         function = kwargs.get('function')
-        
+
         if not function:
             raise TypeError("Missing required keyword argument: function")
 

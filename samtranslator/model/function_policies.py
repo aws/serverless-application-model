@@ -1,6 +1,8 @@
 from enum import Enum
 from collections import namedtuple
 
+from six import string_types
+
 from samtranslator.model.intrinsics import is_instrinsic
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
@@ -112,7 +114,7 @@ class FunctionPolicies(object):
         # Must handle intrinsic functions. Policy could be a primitive type or an intrinsic function
 
         # Managed policies are either string or an intrinsic function that resolves to a string
-        if isinstance(policy, basestring) or is_instrinsic(policy):
+        if isinstance(policy, string_types) or is_instrinsic(policy):
             return PolicyTypes.MANAGED_POLICY
 
         # Policy statement is a dictionary with the key "Statement" in it

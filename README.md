@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/awslabs/serverless-application-model.svg?branch=develop)](https://travis-ci.org/awslabs/serverless-application-model)
+[![PyPI version](https://badge.fury.io/py/aws-sam-translator.svg)](https://badge.fury.io/py/aws-sam-translator)
+
 ![Logo](aws_sam_introduction.png)
 
 # AWS Serverless Application Model (AWS SAM)

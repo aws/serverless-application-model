@@ -1,4 +1,5 @@
 import copy
+from six import string_types
 
 from samtranslator.model.intrinsics import ref
 
@@ -337,7 +338,7 @@ class SwaggerEditor(object):
         :param string method: Name of the HTTP Method
         :return string: Normalized method name
         """
-        if not method or not isinstance(method, basestring):
+        if not method or not isinstance(method, string_types):
             return method
 
         method = method.lower()

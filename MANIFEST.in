@@ -1,1 +1,4 @@
 include LICENSE
+include requirements/base.txt
+include requirements/dev.txt
+purge tests

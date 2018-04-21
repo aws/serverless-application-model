@@ -103,6 +103,6 @@ def test_validate_template_success(testcase):
     validation_errors = SamTemplateValidator.validate(manifest)
     has_errors = len(validation_errors)
     if has_errors:
-        print "\nFailing template: {0}\n".format(testcase)
-        print validation_errors
+        print("\nFailing template: {0}\n".format(testcase))
+        print(validation_errors)
     assert len(validation_errors) == 0
