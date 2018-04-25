@@ -4,5 +4,6 @@ include requirements/dev.txt
 include samtranslator/validator/sam_schema/schema.json
 include samtranslator/policy_templates_data/policy_templates.json
 include samtranslator/policy_templates_data/schema.json
+include README.md
 
 prune tests
