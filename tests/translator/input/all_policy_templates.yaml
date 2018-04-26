@@ -113,3 +113,5 @@ Resources:
 
         - AWSSecretsManagerRotationPolicy:
             FunctionName: function
+        
+        - MobileAnalyticsWriteOnlyAccessPolicy: {}

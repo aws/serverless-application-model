@@ -950,6 +950,20 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy37", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "mobileanalytics:PutEvents"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "AssumeRolePolicyDocument": {

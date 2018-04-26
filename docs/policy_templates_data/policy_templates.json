@@ -1132,6 +1132,19 @@
           "Resource": "*"
         }]
       }
+    },
+    "MobileAnalyticsWriteOnlyAccessPolicy": {
+      "Description": "Gives write only permissions to put event data for all application resources",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "mobileanalytics:PutEvents"
+          ],
+          "Resource": "*"
+        }]
+      }
     }
   }
 }
