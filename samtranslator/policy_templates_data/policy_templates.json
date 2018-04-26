@@ -973,7 +973,7 @@
       }
     },
     "RekognitionLabelsPolicy": {
-      "Description": "Gives permission to compare and detect faces and labels",
+      "Description": "Gives permission to detect object and moderation labels",
       "Parameters": {
         
       },
