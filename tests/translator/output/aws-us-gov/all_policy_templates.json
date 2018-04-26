@@ -975,16 +975,15 @@
                     "mobiletargeting:UpdateEndpoint",
                     "mobiletargeting:UpdateEndpointsBatch"
                   ],
-                  "Resource": [
-                    {
-                      "Fn::Sub": [
-                        "arn:${AWS::Partition}:mobiletargeting:${AWS::Region}:${AWS::AccountId}:apps/${pinpointApplicationId}/endpoints/*",
-                        {
-                          "pinpointApplicationId": "id"
-                        }
-                      ]
-                    }
-                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:mobiletargeting:${AWS::Region}:${AWS::AccountId}:apps/${pinpointApplicationId}/endpoints/*",
+                      {
+                        "pinpointApplicationId": "id"
+                      }
+                    ]
+                  }
+                  ,
                   "Effect": "Allow"
                 }
               ]
