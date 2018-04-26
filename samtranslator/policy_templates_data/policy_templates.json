@@ -1172,6 +1172,36 @@
           }
         ]
       }
+    },
+    "PinpointEndpointAccessPolicy": {
+      "Description": "Gives permissions to get and update endpoints for a Pinpoint application",
+      "Parameters": {
+        "PinpointApplicationId": {
+          "Description": "The id of your Pinpoint application"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "mobiletargeting:GetEndpoint",
+              "mobiletargeting:UpdateEndpoint",
+              "mobiletargeting:UpdateEndpointsBatch"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:mobiletargeting:${AWS::Region}:${AWS::AccountId}:apps/${pinpointApplicationId}/endpoints/*",
+                {
+                  "pinpointApplicationId": {
+                    "Ref": "PinpointApplicationId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }

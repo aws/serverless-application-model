@@ -115,3 +115,6 @@ Resources:
             FunctionName: function
         
         - MobileAnalyticsWriteOnlyAccessPolicy: {}
+
+        - PinpointEndpointAccessPolicy:
+            PinpointApplicationId: id
