@@ -26,7 +26,7 @@ def lambda_handler(event, context):
     PUT, or DELETE request respectively, passing in the payload to the
     DynamoDB API as a JSON body.
     '''
-    #print("Received event: " + json.dumps(event, indent=2))
+    print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
         'DELETE': lambda dynamo, x: dynamo.delete_item(**x),
