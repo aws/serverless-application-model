@@ -10,6 +10,8 @@
 
 http POST $1 TableName=$2 Item:=@$3
 
+exit
+
 # eg:
 # http https://k0dagiifr0.execute-api.us-west-2.amazonaws.com/Prod/MyResource TableName=http-ep-p3 Item:=@test-payload.json
 
