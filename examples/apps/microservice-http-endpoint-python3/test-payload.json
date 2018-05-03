@@ -1,5 +1,5 @@
 {
-  "name": {
-    "S": "name_string"
+  "id": {
+    "S": "id_string"
   }
 }

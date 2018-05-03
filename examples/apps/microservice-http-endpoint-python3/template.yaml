@@ -11,6 +11,10 @@ Globals:
     #VpcConfig:
     #Tracing:
     #AutoPublishAlias:
+    Environment:
+      Variables:
+        TABLE_NAME:
+          Ref: Table
 
 
     
@@ -42,10 +46,15 @@ Resources:
                     - Ref: 'AWS::Region'
                     - ':'
                     - Ref: 'AWS::AccountId'
-                    - ':table/*'
+                    - ':table/'
+                    - Ref: Table
       Events:
         Api1:
           Type: Api
           Properties:
             Path: /MyResource
             Method: ANY
+
+  Table:
+    Type: AWS::Serverless::SimpleTable
+
