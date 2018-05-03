@@ -1,5 +1,5 @@
-boto3~=1.5.0
-enum34~=1.1.6
-jsonschema~=2.6.0
-six~=1.11.0
+boto3~=1.5
+enum34~=1.1
+jsonschema~=2.6
+six~=1.11
 
