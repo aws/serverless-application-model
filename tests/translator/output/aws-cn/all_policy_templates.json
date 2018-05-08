@@ -502,6 +502,7 @@
                   "Action": [
                     "ses:GetIdentityVerificationAttributes", 
                     "ses:SendEmail", 
+                    "ses:SendRawEmail",
                     "ses:VerifyEmailIdentity"
                   ], 
                   "Resource": {
@@ -1039,6 +1040,37 @@
                     "eks:ListClusters"
                   ],
                   "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy42", 
+            "PolicyDocument": {
+              "Statement": [{
+                "Effect": "Allow",
+                "Action": [
+                  "ce:GetCostAndUsage",
+                  "ce:GetDimensionValues",
+                  "ce:GetReservationCoverage",
+                  "ce:GetReservationPurchaseRecommendation",
+                  "ce:GetReservationUtilization",
+                  "ce:GetTags"
+                ],
+                "Resource": "*"
+              }]
+            }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy43", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "organizations:ListAccounts"
+                  ], 
+                  "Resource": "*", 
                   "Effect": "Allow"
                 }
               ]
