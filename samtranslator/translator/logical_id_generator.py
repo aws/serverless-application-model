@@ -53,9 +53,9 @@ class LogicalIdGenerator(object):
         :rtype string
         """
 
-        data_hash = ""
+        data_hash = u""
         if self.data_str:
-            data_hash = hashlib.sha1(bytes(self.data_str)).hexdigest()
+            data_hash = hashlib.sha1(bytes(self.data_str, "utf-8")).hexdigest()
 
         return data_hash[:length]
 

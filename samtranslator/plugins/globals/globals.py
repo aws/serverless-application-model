@@ -104,7 +104,7 @@ class Globals(object):
         if not isinstance(globals_dict, dict):
             raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary".format(self._KEYWORD))
 
-        for section_name, properties in globals_dict.iteritems():
+        for section_name, properties in globals_dict.items():
             resource_type = self._make_resource_type(section_name)
 
             if resource_type not in self.supported_properties:
@@ -117,7 +117,7 @@ class Globals(object):
             if not isinstance(properties, dict):
                 raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")
 
-            for key, value in properties.iteritems():
+            for key, value in properties.items():
                 supported = self.supported_properties[resource_type]
                 if key not in supported:
                     raise InvalidGlobalsSectionException(self._KEYWORD,
