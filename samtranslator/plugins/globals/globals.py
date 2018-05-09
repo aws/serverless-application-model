@@ -47,14 +47,14 @@ class Globals(object):
         ]
     }
 
-    supported_resource_section_names = [x.replace(_RESOURCE_PREFIX, "") for x in supported_properties.keys()]
-
     def __init__(self, template):
         """
         Constructs an instance of this object
 
         :param dict template: SAM template to be parsed
         """
+        self.supported_resource_section_names = [x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties.keys()]
+
         self.template_globals = {}
 
         if self._KEYWORD in template:
