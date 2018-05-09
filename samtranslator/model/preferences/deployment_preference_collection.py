@@ -1,9 +1,9 @@
-from deployment_preference import DeploymentPreference
+from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 
 CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = 'CodeDeployServiceRole'
