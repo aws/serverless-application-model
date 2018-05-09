@@ -2,6 +2,7 @@ import hashlib
 import json
 from six import string_types
 
+
 class LogicalIdGenerator(object):
 
     # NOTE: Changing the length of the hash will change backwards compatibility. This will break the stability contract
@@ -53,9 +54,10 @@ class LogicalIdGenerator(object):
         :rtype string
         """
 
-        data_hash = u""
+        data_hash = ""
         if self.data_str:
-            data_hash = hashlib.sha1(bytes(self.data_str, "utf-8")).hexdigest()
+            utf_encoded_data_str = str(self.data_str).encode("utf8")
+            data_hash = hashlib.sha1(bytes(utf_encoded_data_str)).hexdigest()
 
         return data_hash[:length]
 

@@ -71,7 +71,7 @@ class Template(object):
         if not self._is_valid_parameter_values(parameter_values):
             raise InvalidParameterValues("Parameter values are required to process a policy template")
 
-        return list(self.parameters.keys() - parameter_values.keys())
+        return list(set(self.parameters.keys()) - set(parameter_values.keys()))
 
     @staticmethod
     def _is_valid_parameter_values(parameter_values):
