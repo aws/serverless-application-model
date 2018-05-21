@@ -1,7 +1,9 @@
 import json
 import itertools
 import os.path
-from functools import reduce
+import hashlib
+import sys
+from functools import reduce, cmp_to_key
 
 from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
 from samtranslator.parser.parser import Parser
@@ -29,9 +31,33 @@ def deep_sorted(value):
     if isinstance(value, dict):
         return {k: deep_sorted(v) for k, v in value.items()}
     if isinstance(value, list):
-        return sorted(deep_sorted(x) for x in value)
+        # To keep Py2 consistent with the previous state, we keep the sort the same
+        if sys.version_info[0] < 3:
+            return sorted((deep_sorted(x) for x in value))
+        else:
+            # In Py3, how lists are sorted and compared has changed. To keep this as consistent as possible with Py2,
+            # we need to provide the key kwarg
+            return sorted((deep_sorted(x) for x in value), key=cmp_to_key(py2_compare_order))
     else:
         return value
+
+def py2_compare_order(obj1, obj2):
+    """
+    This is a comparison function that mimics the results of Py2 Comparisons.
+    """
+    if isinstance(obj1, dict) and isinstance(obj2, dict):
+        obj1 = json.dumps(obj1, sort_keys=True)
+        obj2 = json.dumps(obj2, sort_keys=True)
+
+    try:
+        return (obj1 > obj2) - (obj1 < obj2)
+    # In Py3 a TypeError will be raised if obj1 and obj2 are different types or uncomparable
+    except TypeError:
+        s1, s2 = type(obj1).__name__, type(obj2).__name__
+        return (s1 > s2) - (s1 < s2)
+
+
+
 
 # implicit_api, explicit_api, explicit_api_ref, api_cache tests currently have deployment IDs hardcoded in output file.
 # These ids are generated using sha1 hash of the swagger body for implicit
@@ -137,7 +163,81 @@ class TestTranslatorEndToEnd(TestCase):
 
         print(json.dumps(output_fragment, indent=2))
 
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info[0] >= (3):
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
+
         assert deep_sorted(output_fragment) == deep_sorted(expected)
+
+    def _update_logical_id_hash(self, resources):
+        """
+        Brute force method for updating all APIGW Deployment LogicalIds and references to a consistent hash
+        """
+        output_resources = resources.get("Resources", {})
+        deployment_logical_id_dict = {}
+        rest_api_to_swagger_hash = {}
+        dict_of_things_to_delete = {}
+
+        # Find all RestApis in the template
+        for logical_id, resource_dict in output_resources.items():
+            if "AWS::ApiGateway::RestApi" == resource_dict.get("Type"):
+                resource_properties = resource_dict.get("Properties", {})
+                if "Body" in resource_properties:
+                    self._generate_new_deployment_hash(logical_id, resource_properties.get("Body"), rest_api_to_swagger_hash)
+
+                elif "BodyS3Location" in resource_dict.get("Properties"):
+                    self._generate_new_deployment_hash(logical_id,
+                                                       resource_properties.get("BodyS3Location"),
+                                                       rest_api_to_swagger_hash)
+
+        # Collect all APIGW Deployments LogicalIds and generate the new ones
+        for logical_id, resource_dict in output_resources.items():
+            if "AWS::ApiGateway::Deployment" == resource_dict.get("Type"):
+                resource_properties = resource_dict.get("Properties", {})
+
+                rest_id = resource_properties.get("RestApiId").get("Ref")
+
+                data_hash = rest_api_to_swagger_hash.get(rest_id)
+
+                description = resource_properties.get("Description")[:-len(data_hash)]
+
+                resource_properties["Description"] = description + data_hash
+
+                new_logical_id = logical_id[:-10] + data_hash[:10]
+
+                deployment_logical_id_dict[logical_id] = new_logical_id
+                dict_of_things_to_delete[logical_id] = (new_logical_id, resource_dict)
+
+        # Update References to APIGW Deployments
+        for logical_id, resource_dict in output_resources.items():
+            if "AWS::ApiGateway::Stage" == resource_dict.get("Type"):
+                resource_properties = resource_dict.get("Properties", {})
+
+                rest_id = resource_properties.get("RestApiId", {}).get("Ref", "")
+
+                data_hash = rest_api_to_swagger_hash.get(rest_id)
+
+                deployment_id = resource_properties.get("DeploymentId", {}).get("Ref")
+                new_logical_id = deployment_logical_id_dict.get(deployment_id, "")[:-10]
+                new_logical_id = new_logical_id + data_hash[:10]
+
+                resource_properties.get("DeploymentId", {})["Ref"] = new_logical_id
+
+        # To avoid mutating the template while iterating, delete only after find everything to update
+        for logical_id_to_remove, tuple_to_add in dict_of_things_to_delete.items():
+            output_resources[tuple_to_add[0]] = tuple_to_add[1]
+            del output_resources[logical_id_to_remove]
+
+        # Update any Output References in the template
+        for output_key, output_value in resources.get("Outputs", {}).items():
+            if output_value.get("Ref") in deployment_logical_id_dict:
+                output_value["Ref"] = deployment_logical_id_dict[output_value.get("Ref")]
+
+    def _generate_new_deployment_hash(self, logical_id, dict_to_hash, rest_api_to_swagger_hash):
+        data_bytes = bytes(json.dumps(dict_to_hash, separators=(',', ':'), sort_keys=True).encode("utf8"))
+        data_hash = hashlib.sha1(data_bytes).hexdigest()
+        rest_api_to_swagger_hash[logical_id] = data_hash
 
 
 @pytest.mark.parametrize('testcase', [
