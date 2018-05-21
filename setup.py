@@ -60,8 +60,8 @@ setup(
     license='Apache License 2.0',
     # Exclude all but the code folders
     packages=find_packages(exclude=('tests', 'docs', 'examples', 'versions')),
-    package_data={'': '*.yaml'},
     install_requires=read_requirements('base.txt'),
+    include_package_data=True,
     extras_require={
         'dev': read_requirements('dev.txt')
     },
@@ -78,6 +78,6 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: Internet',
         'Topic :: Software Development :: Build Tools',
-        'Topic :: Utilities',
+        'Topic :: Utilities'
     ]
 )
