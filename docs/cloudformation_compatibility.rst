@@ -103,6 +103,7 @@ DynamoDB
 Stream                   All
 StartingPosition         All
 BatchSize                All
+SSESpecification         All
 ======================== ================================== ========================
 
 Api

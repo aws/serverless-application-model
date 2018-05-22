@@ -17,6 +17,11 @@
             "AttributeType": "S"
           }
         ],
+        "SSESpecification": {
+          "SSEEnabled": {
+            "Ref": "EnableSSE"
+          }
+        },
         "KeySchema": [
           {
             "KeyType": "HASH",
