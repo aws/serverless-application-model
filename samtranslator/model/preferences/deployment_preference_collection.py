@@ -1,4 +1,4 @@
-from deployment_preference import DeploymentPreference
+from samtranslator.model.preferences.deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.iam import IAMRole

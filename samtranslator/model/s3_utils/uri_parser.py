@@ -1,4 +1,7 @@
-from urlparse import urlparse, parse_qs
+try:
+    from urlparse import urlparse, parse_qs
+except ImportError:
+    from urllib.parse import urlparse, parse_qs
 
 from six import string_types
 

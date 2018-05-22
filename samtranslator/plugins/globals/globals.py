@@ -1,15 +1,16 @@
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
 
+# Key of the dictionary containing Globals section in SAM template
+_KEYWORD = "Globals"
+_RESOURCE_PREFIX = "AWS::Serverless::"
+
+
 class Globals(object):
     """
     Class to parse and process Globals section in SAM template. If a property is specified at Global section for
     say Function, then this class will add it to each resource of AWS::Serverless::Function type.
     """
-
-    # Key of the dictionary containing Globals section in SAM template
-    _KEYWORD = "Globals"
-    _RESOURCE_PREFIX = "AWS::Serverless::"
 
     supported_properties = {
         # Everything on Serverless::Function except Role, Policies, FunctionName, Events
@@ -57,8 +58,8 @@ class Globals(object):
         """
         self.template_globals = {}
 
-        if self._KEYWORD in template:
-            self.template_globals = self._parse(template[self._KEYWORD])
+        if _KEYWORD in template:
+            self.template_globals = self._parse(template[_KEYWORD])
 
     def merge(self, resource_type, resource_properties):
         """
@@ -102,25 +103,25 @@ class Globals(object):
         globals = {}
 
         if not isinstance(globals_dict, dict):
-            raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary".format(self._KEYWORD))
+            raise InvalidGlobalsSectionException(_KEYWORD, "It must be a non-empty dictionary".format(_KEYWORD))
 
         for section_name, properties in globals_dict.iteritems():
             resource_type = self._make_resource_type(section_name)
 
             if resource_type not in self.supported_properties:
-                raise InvalidGlobalsSectionException(self._KEYWORD,
+                raise InvalidGlobalsSectionException(_KEYWORD,
                                                "'{section}' is not supported. "
                                                "Must be one of the following values - {supported}"
                                                .format(section=section_name,
                                                        supported=self.supported_resource_section_names))
 
             if not isinstance(properties, dict):
-                raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")
+                raise InvalidGlobalsSectionException(_KEYWORD, "Value of ${section} must be a dictionary")
 
             for key, value in properties.iteritems():
                 supported = self.supported_properties[resource_type]
                 if key not in supported:
-                    raise InvalidGlobalsSectionException(self._KEYWORD,
+                    raise InvalidGlobalsSectionException(_KEYWORD,
                                                    "'{key}' is not a supported property of '{section}'. "
                                                    "Must be one of the following values - {supported}"
                                                    .format(key=key, section=section_name, supported=supported))
@@ -132,7 +133,7 @@ class Globals(object):
         return globals
 
     def _make_resource_type(self, key):
-        return self._RESOURCE_PREFIX + key
+        return _RESOURCE_PREFIX + key
 
 
 
