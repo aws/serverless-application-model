@@ -117,6 +117,37 @@ class SwaggerEditor(object):
         for path, value in self.paths.items():
             yield path
 
+    def _add_security_definition(self, name, parameters):
+        if "securityDefinitions" not in self._doc:
+            self._doc.setdefault("securityDefinitions", {})
+
+        if name not in self._doc["securityDefinitions"]:
+            self._doc["securityDefinitions"][name] = parameters
+
+    def add_api_key_required(self, path, method):
+        """
+        Add API key security definitions to the given path/method
+        :param string path: Path to add the security configuration to.
+        :param string method: The method on the path to apply the security configuration.
+        """
+        method = self._normalize_method_name(method)
+
+        self._add_security_definition("api_key", {
+            "type": "apiKey",
+            "name": "x-api-key",
+            "in": "header"
+        })
+
+        if not self.has_path(path, method):
+            self.add_path(path, method)
+
+        self.paths[path][method].setdefault('security', [
+            {
+                "api_key": []
+            }
+        ])
+        return self
+
     def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None):
         """
         Add CORS configuration to this path. Specifically, we will add a OPTIONS response config to the Swagger that

@@ -391,6 +391,41 @@ class TestSwaggerEditor_add_cors(TestCase):
                                                                          default_allow_methods_value_with_quotes,
                                                                          max_age)
 
+class TestSwaggerEditor_ApiKey(TestCase):
+
+    def test_api_key_security_is_added(self):
+        self.maxDiff = None
+
+        expected = {
+            "swagger": "2.0",
+            "info": {
+                "version": "1.0",
+                "title": {
+                    "Ref": "AWS::StackName"
+                },
+            },
+            "securityDefinitions": {
+                "api_key": {
+                    "type": "apiKey",
+                    "name": "x-api-key",
+                    "in": "header"
+                }
+            },
+            "paths": {
+                "/foo/bar": {
+                    "post": {
+                        "security": [
+                            {
+                                "api_key": []
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+
+        actual = SwaggerEditor(SwaggerEditor.gen_skeleton()).add_api_key_required("/foo/bar", "post").swagger
+        self.assertEquals(expected, actual)
 
 class TestSwaggerEditor_options_method_response_for_cors(TestCase):
 

@@ -190,6 +190,11 @@ class ImplicitApiPlugin(BasePlugin):
         editor = SwaggerEditor(swagger)
         editor.add_path(path, method)
 
+        if "ApiKeyRequired" in event_properties:
+            if event_properties["ApiKeyRequired"]:
+                editor.add_api_key_required(path, method)
+            del event_properties["ApiKeyRequired"]
+
         resource.properties["DefinitionBody"] = editor.swagger
         template.set(api_id, resource)
 
