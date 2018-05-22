@@ -1,8 +1,6 @@
 """ SAM macro definitions """
-from copy import deepcopy
-
 from six import string_types
-from tags.resource_tagging import get_tag_list
+from samtranslator.model.tags.resource_tagging import get_tag_list
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
@@ -19,8 +17,8 @@ from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of,
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from api.api_generator import ApiGenerator
-from s3_utils.uri_parser import parse_s3_uri
+from samtranslator.model.api.api_generator import ApiGenerator
+from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 
 
 class SamFunction(SamResourceMacro):
