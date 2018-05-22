@@ -27,7 +27,6 @@ Resources:
       Description: >-
         A simple backend (read/write to DynamoDB) with a RESTful API endpoint
         using Amazon API Gateway.
-      #MemorySize: 512
       Timeout: 10
       Policies:
         - Version: '2012-10-17'
