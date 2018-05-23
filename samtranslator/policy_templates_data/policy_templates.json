@@ -1202,7 +1202,7 @@
           }
         ]
       }
-    }
+    },
     "FirehoseWritePolicy": {
       "Description": "Gives permission to write to a Kinesis Firehose Delivery Stream",
       "Parameters": {
