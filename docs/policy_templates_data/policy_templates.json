@@ -1132,6 +1132,68 @@
           "Resource": "*"
         }]
       }
+    },
+    "FirehoseWritePolicy": {
+      "Description": "Gives permission to write to a Kinesis Firehose Delivery Stream",
+      "Parameters": {
+        "DeliveryStreamName": {
+          "Description": "Name of Kinesis Firehose Delivery Stream"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "firehose:PutRecord",
+              "firehose:PutRecordBatch"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:firehose:${AWS::Region}:${AWS::AccountId}:deliverystream/${deliveryStreamName}",
+                {
+                  "deliveryStreamName": {
+                    "Ref": "DeliveryStreamName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "FirehoseCrudPolicy": {
+      "Description": "Gives permission to create, write to, update, and delete a Kinesis Firehose Delivery Stream",
+      "Parameters": {
+        "DeliveryStreamName": {
+          "Description": "Name of Kinesis Firehose Delivery Stream"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "firehose:CreateDeliveryStream",
+              "firehose:DeleteDeliveryStream",
+              "firehose:DescribeDeliveryStream",
+              "firehose:PutRecord",
+              "firehose:PutRecordBatch",
+              "firehose:UpdateDestination"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:firehose:${AWS::Region}:${AWS::AccountId}:deliverystream/${deliveryStreamName}",
+                {
+                  "deliveryStreamName": {
+                    "Ref": "DeliveryStreamName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
