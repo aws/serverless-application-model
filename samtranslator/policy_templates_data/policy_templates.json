@@ -1156,6 +1156,53 @@
         ]
       }
     },
+    "MobileAnalyticsWriteOnlyAccessPolicy": {
+      "Description": "Gives write only permissions to put event data for all application resources",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "mobileanalytics:PutEvents"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    "PinpointEndpointAccessPolicy": {
+      "Description": "Gives permissions to get and update endpoints for a Pinpoint application",
+      "Parameters": {
+        "PinpointApplicationId": {
+          "Description": "The id of your Pinpoint application"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "mobiletargeting:GetEndpoint",
+              "mobiletargeting:UpdateEndpoint",
+              "mobiletargeting:UpdateEndpointsBatch"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:mobiletargeting:${AWS::Region}:${AWS::AccountId}:apps/${pinpointApplicationId}/endpoints/*",
+                {
+                  "pinpointApplicationId": {
+                    "Ref": "PinpointApplicationId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "FirehoseWritePolicy": {
       "Description": "Gives permission to write to a Kinesis Firehose Delivery Stream",
       "Parameters": {

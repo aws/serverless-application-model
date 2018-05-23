@@ -950,6 +950,44 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy37", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "mobileanalytics:PutEvents"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy38",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "mobiletargeting:GetEndpoint",
+                    "mobiletargeting:UpdateEndpoint",
+                    "mobiletargeting:UpdateEndpointsBatch"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:mobiletargeting:${AWS::Region}:${AWS::AccountId}:apps/${pinpointApplicationId}/endpoints/*",
+                      {
+                        "pinpointApplicationId": "id"
+                      }
+                    ]
+                  }
+                  ,
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "AssumeRolePolicyDocument": {
