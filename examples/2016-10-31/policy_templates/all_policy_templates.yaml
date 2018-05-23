@@ -49,6 +49,8 @@ Resources:
         - RekognitionWriteOnlyAccessPolicy:
             CollectionId: id
 
+        - RekognitionLabelsPolicy: {}
+
         - SQSSendMessagePolicy:
             QueueName: name
 

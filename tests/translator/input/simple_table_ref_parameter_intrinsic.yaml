@@ -7,3 +7,6 @@ Resources:
           Ref: ReadCapacity
         WriteCapacityUnits:
           Ref: WriteCapacity
+      SSESpecification:
+        SSEEnabled:
+          Ref: EnableSSE
