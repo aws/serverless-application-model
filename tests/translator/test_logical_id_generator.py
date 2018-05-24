@@ -100,7 +100,8 @@ class TestLogicalIdGenerator(TestCase):
         # We are essentially duplicating the implementation here. This is done on purpose to prevent
         # accidental change of the algorithm. Any changes to the hash generation must be backwards compatible.
         # This test will help catch such issues before hand.
-        expected = hashlib.sha1(bytes(stringified_data)).hexdigest()[:10]
+        utf_data = str(stringified_data).encode("utf8")
+        expected = hashlib.sha1(bytes(utf_data)).hexdigest()[:10]
         self.assertEqual(expected, generator.get_hash())
 
         stringify_mock.assert_called_once_with(data)

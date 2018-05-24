@@ -211,7 +211,7 @@ def test_transform_unhandled_failure_empty_managed_policy_map():
     with pytest.raises(Exception) as e:
         transform(document, parameter_values, mock_policy_loader)
 
-    error_message = e.value.message
+    error_message = str(e.value)
 
     assert error_message == 'Managed policy map is empty, but should not be.'
 

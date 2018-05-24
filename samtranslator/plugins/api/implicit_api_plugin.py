@@ -100,7 +100,7 @@ class ImplicitApiPlugin(BasePlugin):
             return {}
 
         api_events = {}
-        for event_id, event in function.properties["Events"].iteritems():
+        for event_id, event in function.properties["Events"].items():
 
             if event and isinstance(event, dict) and event.get("Type") == "Api":
                 api_events[event_id] = event
@@ -117,7 +117,7 @@ class ImplicitApiPlugin(BasePlugin):
         :param SamTemplate template: SAM Template where Serverless::Api resources can be found
         """
 
-        for logicalId, event in api_events.iteritems():
+        for logicalId, event in api_events.items():
 
             event_properties = event.get("Properties", {})
             if not event_properties:
