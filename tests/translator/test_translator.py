@@ -101,9 +101,9 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_api_with_serverless_rest_api_resource'
       ],
       [
-       ("aws", "ap-southeast-1"),
-       ("aws-cn", "cn-north-1"),
-       ("aws-us-gov", "us-gov-west-1")
+       ("aws", "ap-southeast-1")
+    #    ("aws-cn", "cn-north-1"),
+    #    ("aws-us-gov", "us-gov-west-1")
       ] # Run all the above tests against each of the list of partitions to test against
       )
     )

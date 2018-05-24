@@ -382,6 +382,9 @@
               "$ref": "#/definitions/AWS::Serverless::Function.KinesisEvent"
             },
             {
+              "$ref": "#/definitions/AWS::Serverless::Function.SQSEvent"
+            },
+            {
               "$ref": "#/definitions/AWS::Serverless::Function.DynamoDBEvent"
             },
             {
@@ -478,6 +481,21 @@
       "required": [
         "StartingPosition",
         "Stream"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Function.SQSEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "BatchSize": {
+          "type": "number"
+        },
+        "Queue": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Queue"
       ],
       "type": "object"
     },

@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Example of processing messages on an SQS queue with Lambda
+Resources:
+  MySQSQueueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./index.js
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Ref MyQueue
+
+  MyQueue:
+    Type: AWS::SQS::Queue
+    Properties:

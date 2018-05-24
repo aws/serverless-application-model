@@ -25,3 +25,15 @@ Resources:
             Stream: arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291
             BatchSize: 200
             StartingPosition: LATEST
+  SQSFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/queues.zip
+      Handler: queue.sqs_handler
+      Runtime: python2.7
+      Events:
+        MySqsQueue:
+          Type: SQS
+          Properties:
+            Queue: arn:aws:sqs:us-west-2:012345678901:my-queue
+            BatchSize: 200
