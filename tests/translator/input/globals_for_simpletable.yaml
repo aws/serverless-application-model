@@ -1,0 +1,8 @@
+Globals:
+  SimpleTable:
+    SSESpecification:
+      SSEEnabled: true
+
+Resources:
+  MinimalTable:
+    Type: AWS::Serverless::SimpleTable

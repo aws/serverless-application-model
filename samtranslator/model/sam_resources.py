@@ -55,7 +55,8 @@ class SamFunction(SamResourceMacro):
         'AutoPublishAlias': PropertyType(False, one_of(is_str()))
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.eventsources, samtranslator.model.eventsources.pull,
-                                          samtranslator.model.eventsources.push, samtranslator.model.eventsources.cloudwatchlogs)
+                                          samtranslator.model.eventsources.push,
+                                          samtranslator.model.eventsources.cloudwatchlogs)
 
     # DeadLetterQueue
     dead_letter_queue_policy_actions = {'SQS': 'sqs:SendMessage', 'SNS': 'sns:Publish'}
@@ -65,7 +66,6 @@ class SamFunction(SamResourceMacro):
         "Alias": LambdaAlias.resource_type,
         "Version": LambdaVersion.resource_type,
     }
-
 
     def resources_to_link(self, resources):
         try:
@@ -147,7 +147,6 @@ class SamFunction(SamResourceMacro):
 
         return resolved_alias_name
 
-
     def _construct_lambda_function(self):
         """Constructs and returns the Lambda function.
 
@@ -215,7 +214,9 @@ class SamFunction(SamResourceMacro):
         policy_documents = []
 
         if self.DeadLetterQueue:
-            policy_documents.append(IAMRolePolicies.dead_letter_queue_policy(self.dead_letter_queue_policy_actions[self.DeadLetterQueue['Type']], self.DeadLetterQueue['TargetArn']))
+            policy_documents.append(IAMRolePolicies.dead_letter_queue_policy(
+                self.dead_letter_queue_policy_actions[self.DeadLetterQueue['Type']],
+                self.DeadLetterQueue['TargetArn']))
 
         for index, policy_entry in enumerate(function_policies.get()):
 
@@ -246,8 +247,9 @@ class SamFunction(SamResourceMacro):
                     managed_policy_arns.append(policy_arn)
             else:
                 # Policy Templates are not supported here in the "core"
-                raise InvalidResourceException(self.logical_id,
-                                               "Policy at index {} in the 'Policies' property is not valid".format(index))
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Policy at index {} in the 'Policies' property is not valid".format(index))
 
         execution_role.ManagedPolicyArns = list(managed_policy_arns)
         execution_role.Policies = policy_documents or None
@@ -419,7 +421,8 @@ class SamFunction(SamResourceMacro):
     def _validate_deployment_preference_and_add_update_policy(self, deployment_preference_collection, lambda_alias,
                                                               intrinsics_resolver):
         if 'Enabled' in self.DeploymentPreference:
-            self.DeploymentPreference['Enabled'] = intrinsics_resolver.resolve_parameter_refs(self.DeploymentPreference['Enabled'])
+            self.DeploymentPreference['Enabled'] = intrinsics_resolver.resolve_parameter_refs(
+                self.DeploymentPreference['Enabled'])
             if isinstance(self.DeploymentPreference['Enabled'], dict):
                 raise InvalidResourceException(self.logical_id, "'Enabled' must be a boolean value")
 
@@ -430,8 +433,9 @@ class SamFunction(SamResourceMacro):
 
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
-                raise InvalidResourceException(self.logical_id,
-                                               "'DeploymentPreference' requires AutoPublishAlias property to be specified")
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "'DeploymentPreference' requires AutoPublishAlias property to be specified")
             if lambda_alias is None:
                 raise ValueError('lambda_alias expected for updating it with the appropriate update policy')
 
@@ -509,7 +513,8 @@ class SamSimpleTable(SamResourceMacro):
         'PrimaryKey': PropertyType(False, dict_of(is_str(), is_str())),
         'ProvisionedThroughput': PropertyType(False, dict_of(is_str(), one_of(is_type(int), is_type(dict)))),
         'TableName': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'Tags': PropertyType(False, is_type(dict))
+        'Tags': PropertyType(False, is_type(dict)),
+        'SSESpecification': PropertyType(False, is_type(dict))
     }
     attribute_type_conversions = {
         'String': 'S',
@@ -521,7 +526,6 @@ class SamSimpleTable(SamResourceMacro):
         dynamodb_resources = self._construct_dynamodb_table()
 
         return [dynamodb_resources]
-
 
     def _construct_dynamodb_table(self):
         dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on)
@@ -547,6 +551,9 @@ class SamSimpleTable(SamResourceMacro):
             provisioned_throughput = {'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
 
         dynamodb_table.ProvisionedThroughput = provisioned_throughput
+
+        if self.SSESpecification:
+            dynamodb_table.SSESpecification = self.SSESpecification
 
         if self.TableName:
             dynamodb_table.TableName = self.TableName

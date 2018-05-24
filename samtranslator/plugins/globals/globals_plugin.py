@@ -5,6 +5,7 @@ from samtranslator.public.exceptions import InvalidDocumentException
 
 from samtranslator.plugins.globals.globals import Globals, InvalidGlobalsSectionException
 
+
 class GlobalsPlugin(BasePlugin):
     """
     Plugin to process Globals section of a SAM template before the template is translated to CloudFormation.
