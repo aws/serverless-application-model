@@ -5,9 +5,13 @@ language: python
 matrix:
   include:
     - python: 3.6
-      env: TOXENV=py36
+      env:
+        - TOXENV=py36
+        - AWS_DEFAULT_REGION=ap-south-1
     - python: 2.7
-      env: TOXENV=py27
+      env:
+        - TOXENV=py27
+        - AWS_DEFAULT_REGION=ap-south-1
 
 
 install:
