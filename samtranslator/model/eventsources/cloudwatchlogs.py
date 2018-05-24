@@ -1,9 +1,9 @@
 from samtranslator.model import PropertyType
-from samtranslator.model.types import is_str
-from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.intrinsics import fnSub
 from samtranslator.model.log import SubscriptionFilter
-from push import PushEventSource
+from samtranslator.model.types import is_str
+from samtranslator.translator.arn_generator import ArnGenerator
+from .push import PushEventSource
 
 class CloudWatchLogs(PushEventSource):
     """CloudWatch Logs event source for SAM Functions."""
