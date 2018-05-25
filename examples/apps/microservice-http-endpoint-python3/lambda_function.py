@@ -1,9 +1,11 @@
 
 import boto3
 import json
+import os
 
 print('Loading function')
 dynamo = boto3.client('dynamodb')
+table_name = os.environ['TABLE_NAME']
 
 
 def respond(err, res=None):
@@ -21,18 +23,19 @@ def lambda_handler(event, context):
     access to the request and response payload, including headers and
     status code.
 
-    To scan a DynamoDB table, make a GET request with the TableName as a
-    query string parameter. To put, update, or delete an item, make a POST,
-    PUT, or DELETE request respectively, passing in the payload to the
-    DynamoDB API as a JSON body.
+	TableName provided by template.yaml.
+
+    To scan a DynamoDB table, make a GET request with optional query string parameter.
+	To put, update, or delete an item, make a POST, PUT, or DELETE request respectively,
+	passing in the payload to the DynamoDB API as a JSON body.
     '''
-    #print("Received event: " + json.dumps(event, indent=2))
+    print("Received event: " + json.dumps(event, indent=2))
 
     operations = {
-        'DELETE': lambda dynamo, x: dynamo.delete_item(**x),
-        'GET': lambda dynamo, x: dynamo.scan(**x),
-        'POST': lambda dynamo, x: dynamo.put_item(**x),
-        'PUT': lambda dynamo, x: dynamo.update_item(**x),
+        'DELETE': lambda dynamo, x: dynamo.delete_item(TableName=table_name, **x),
+		'GET': lambda dynamo, x: dynamo.scan(TableName=table_name, **x) if x else dynamo.scan(TableName=table_name),
+        'POST': lambda dynamo, x: dynamo.put_item(TableName=table_name, **x),
+        'PUT': lambda dynamo, x: dynamo.update_item(TableName=table_name, **x),
     }
 
     operation = event['httpMethod']
