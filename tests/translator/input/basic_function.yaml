@@ -14,6 +14,14 @@ Resources:
       Runtime: python2.7
       Tracing: Active
 
+  FunctionWithZipFile:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      ZipFile: "hello world"
+      Handler: hello.handler
+      Runtime: python2.7
+      Tracing: Active
+
   FunctionWithCodeUriObject:
     Type: 'AWS::Serverless::Function'
     Properties:
