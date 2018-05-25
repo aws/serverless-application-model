@@ -659,6 +659,9 @@
             },
             "ProvisionedThroughput": {
               "$ref": "#/definitions/AWS::Serverless::SimpleTable.ProvisionedThroughput"
+            },
+            "SSESpecification": {
+              "$ref": "#/definitions/AWS::Serverless::SimpleTable.SSESpecification"
             }
           },
           "type": "object"
@@ -702,6 +705,18 @@
       },
       "required": [
         "WriteCapacityUnits"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::SimpleTable.SSESpecification": {
+      "additionalProperties": false,
+      "properties": {
+        "SSEEnabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "SSEEnabled"
       ],
       "type": "object"
     },
