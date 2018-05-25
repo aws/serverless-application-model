@@ -6,13 +6,7 @@ const dynamo = new AWS.DynamoDB.DocumentClient();
 
 const tableName = process.env.TABLE_NAME;
 
-const createResponse = (statusCode, body) => {
-    
-    return {
-        statusCode: statusCode,
-        body: body
-    }
-};
+const createResponse = (statusCode, body) => ({ statusCode, body });
 
 exports.get = (event, context, callback) => {
     
