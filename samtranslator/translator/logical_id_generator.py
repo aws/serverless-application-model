@@ -1,5 +1,6 @@
 import hashlib
 import json
+import sys
 from six import string_types
 
 
@@ -55,9 +56,19 @@ class LogicalIdGenerator(object):
         """
 
         data_hash = ""
-        if self.data_str:
-            utf_encoded_data_str = str(self.data_str).encode("utf8")
-            data_hash = hashlib.sha1(bytes(utf_encoded_data_str)).hexdigest()
+        if not self.data_str:
+            return data_hash
+
+        encoded_data_str = self.data_str
+        if sys.version_info.major == 2:
+            # In Py2, only unicode needs to be encoded.
+            if isinstance(self.data_str, unicode):
+                encoded_data_str = self.data_str.encode('utf-8')
+        else:
+            # data_str should always be unicode on python 3
+            encoded_data_str = self.data_str.encode('utf-8')
+
+        data_hash = hashlib.sha1(bytes(encoded_data_str)).hexdigest()
 
         return data_hash[:length]
 

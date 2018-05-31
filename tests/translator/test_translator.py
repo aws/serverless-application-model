@@ -27,24 +27,52 @@ input_folder = 'tests/translator/input'
 output_folder = 'tests/translator/output'
 
 
-def deep_sorted(value):
+def deep_sort_lists(value):
+    """
+    Custom sorting implemented as a wrapper on top of Python's built-in ``sorted`` method. This is necessary because
+    the previous behavior assumed lists were unordered. As part of migration to Py3, we are trying to
+    retain the same behavior. But in Py3, lists with complex data types like dict cannot be sorted. Hence
+    we provide a custom sort function that tries best sort the lists in a stable order. The actual order
+    does not matter as long as it is stable between runs.
+
+    This implementation assumes that the input was parsed from a JSON data. So it can have one of the
+    following types: a primitive type, list or other dictionaries.
+    We traverse the dictionary like how we would traverse a tree. If a value is a list, we recursively sort the members
+    of the list, and then sort the list itself.
+
+    This assumption that lists are unordered is a problem at the first place. As part of dropping support for Python2,
+    we should remove this assumption. We have to update SAM Translator to output lists in a predictable ordering so we
+    can assume lists are ordered and compare them.
+    """
     if isinstance(value, dict):
-        return {k: deep_sorted(v) for k, v in value.items()}
+        return {k: deep_sort_lists(v) for k, v in value.items()}
     if isinstance(value, list):
-        # To keep Py2 consistent with the previous state, we keep the sort the same
-        if sys.version_info[0] < 3:
-            return sorted((deep_sorted(x) for x in value))
+        if sys.version_info.major < 3:
+            # Py2 can sort lists with complex types like dictionaries
+            return sorted((deep_sort_lists(x) for x in value))
         else:
-            # In Py3, how lists are sorted and compared has changed. To keep this as consistent as possible with Py2,
-            # we need to provide the key kwarg
-            return sorted((deep_sorted(x) for x in value), key=cmp_to_key(py2_compare_order))
+            # Py3 cannot sort lists with complex types. Hence a custom comparator function
+            return sorted((deep_sort_lists(x) for x in value), key=cmp_to_key(custom_list_data_comparator))
     else:
         return value
 
-def py2_compare_order(obj1, obj2):
+
+def custom_list_data_comparator(obj1, obj2):
     """
-    This is a comparison function that mimics the results of Py2 Comparisons.
+    Comparator function used to sort lists with complex data types in them. This is meant to be used only within the
+    context of sorting lists for use with unit tests.
+
+    Given any two objects, this function will return the "difference" between the two objects. This difference obviously
+    does not make sense for complex data types like dictionaries & list. This function implements a custom logic that
+    is partially borrowed from Python2's implementation of such a comparison:
+
+    * Both objects are dict: Convert them JSON strings and compare
+    * Both objects are comparable data types (ie. ones that have > and < operators): Compare them directly
+    * Objects are non-comparable (ie. one is a dict other is a list): Compare the names of the data types.
+      ie. dict < list because of alphabetical order. This is Python2's behavior.
+
     """
+
     if isinstance(obj1, dict) and isinstance(obj2, dict):
         obj1 = json.dumps(obj1, sort_keys=True)
         obj2 = json.dumps(obj2, sort_keys=True)
@@ -55,9 +83,6 @@ def py2_compare_order(obj1, obj2):
     except TypeError:
         s1, s2 = type(obj1).__name__, type(obj2).__name__
         return (s1 > s2) - (s1 < s2)
-
-
-
 
 # implicit_api, explicit_api, explicit_api_ref, api_cache tests currently have deployment IDs hardcoded in output file.
 # These ids are generated using sha1 hash of the swagger body for implicit
@@ -166,11 +191,11 @@ class TestTranslatorEndToEnd(TestCase):
         print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info[0] >= (3):
+        if sys.version_info.major >= 3:
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
 
-        assert deep_sorted(output_fragment) == deep_sorted(expected)
+        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
 
     def _update_logical_id_hash(self, resources):
         """
