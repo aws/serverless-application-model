@@ -158,6 +158,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_invalid_deployment_preference_hook_property',
     'error_invalid_logical_id',
     'error_missing_queue',
+    'error_missing_startingposition',
     'error_missing_stream',
     'error_multiple_resource_errors',
     'error_s3_not_in_template',

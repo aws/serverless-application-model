@@ -52,6 +52,10 @@ class PullEventSource(ResourceMacro):
         if not self.Stream and not self.Queue:
             raise InvalidEventException(
                 self.relative_id, "No Queue (for SQS) or Stream (for Kinesis or DynamoDB) provided.")
+        
+        if self.Stream and not self.StartingPosition:
+            raise InvalidEventException(
+                self.relative_id, "StartingPosition is required for Kinesis and DynamoDB.")
 
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
         lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue
