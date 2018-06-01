@@ -46,6 +46,7 @@ class TestTranslatorEndToEnd(TestCase):
         'cloudwatch_logs_with_ref',
         'cloudwatchlog',
         'streams',
+        'sqs',
         'simpletable',
         'simpletable_with_sse',
         'implicit_api',

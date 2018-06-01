@@ -12,6 +12,7 @@ input_folder = 'tests/translator/input'
     'cloudwatch_logs_with_ref',
     'cloudwatchlog',
     'streams',
+    'sqs',
     'simpletable',
     'simpletable_with_sse',
     'implicit_api',
