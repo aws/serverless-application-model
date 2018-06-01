@@ -9,7 +9,7 @@ class PullEventSource(ResourceMacro):
     """Base class for pull event sources for SAM Functions.
 
     The pull events are Kinesis Streams, DynamoDB Streams, and SQS Queues. All of these correspond to an EventSourceMapping in
-    Lambda, and require that the execution role be given to Kinesis Streams, DynamoDB Streams, or SQS Streams, respectively.
+    Lambda, and require that the execution role be given to Kinesis Streams, DynamoDB Streams, or SQS Queues, respectively.
 
     :cvar str policy_arn: The ARN of the AWS managed role policy corresponding to this pull event source
     """
