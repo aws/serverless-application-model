@@ -3,6 +3,7 @@ from samtranslator.model.types import is_type, is_str
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.exceptions import InvalidEventException
 
 
 class PullEventSource(ResourceMacro):
@@ -47,6 +48,10 @@ class PullEventSource(ResourceMacro):
             function_name_or_arn = function.get_runtime_attr("name")
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
+
+        if not self.Stream and not self.Queue:
+            raise InvalidEventException(
+                self.relative_id, "No Queue (for SQS) or Stream (for Kinesis or DynamoDB) provided.")
 
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
         lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue
