@@ -1,0 +1,6 @@
+{
+  "errors": [{
+    "errorMessage": "Resource with id [KinesisFunction] is invalid. Event with id [MyKinesisStream] is invalid. StartingPosition is required for Kinesis and DynamoDB."
+  }],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [KinesisFunction] is invalid. Event with id [MyKinesisStream] is invalid. StartingPosition is required for Kinesis and DynamoDB."
+}

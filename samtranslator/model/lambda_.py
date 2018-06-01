@@ -61,7 +61,7 @@ class LambdaEventSourceMapping(Resource):
             'Enabled': PropertyType(False, is_type(bool)),
             'EventSourceArn': PropertyType(True, is_str()),
             'FunctionName': PropertyType(True, is_str()),
-            'StartingPosition': PropertyType(True, is_str())
+            'StartingPosition': PropertyType(False, is_str())
     }
 
     runtime_attrs = {
