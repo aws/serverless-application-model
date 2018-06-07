@@ -1,5 +1,8 @@
 """ SAM macro definitions """
 from six import string_types
+
+from samtranslator.model.cloudwatch_logs import LogGroup
+from samtranslator.model.intrinsics import fnSub
 from tags.resource_tagging import get_tag_list
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -45,6 +48,7 @@ class SamFunction(SamResourceMacro):
         'Environment': PropertyType(False, dict_of(is_str(), is_type(dict))),
         'Events': PropertyType(False, dict_of(is_str(), is_type(dict))),
         'Tags': PropertyType(False, is_type(dict)),
+        'Logs': PropertyType(False, is_type(dict)),
         'Tracing': PropertyType(False, one_of(is_type(dict), is_str())),
         'KmsKeyArn': PropertyType(False, one_of(is_type(dict), is_str())),
         'DeploymentPreference': PropertyType(False, is_type(dict)),
@@ -120,7 +124,20 @@ class SamFunction(SamResourceMacro):
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
+        if self.Logs:
+            resources.append(self._generate_log_group())
+
         return resources
+
+    def _generate_log_group(self):
+        log_group = LogGroup(self.logical_id + "LogGroup")
+        log_group.LogGroupName = fnSub("/aws/lambda/${" + self.logical_id + "}")
+        if "RetentionInDays" not in self.Logs:
+            raise InvalidResourceException(self.logical_id, "'RetentionInDays' is not defined in 'Logs'.")
+        if type(self.Logs["RetentionInDays"]) is not int:
+            raise InvalidResourceException(self.logical_id, "Type of property 'Logs.RetentionInDays' is invalid.")
+        log_group.RetentionInDays = self.Logs["RetentionInDays"]
+        return log_group
 
     def _get_resolved_alias_name(self, property_name, original_alias_value, intrinsics_resolver):
         """

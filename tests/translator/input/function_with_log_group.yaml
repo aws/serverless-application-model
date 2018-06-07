@@ -1,0 +1,10 @@
+Transform: "AWS::Serverless-2016-10-31"
+Resources:
+  LambdaFunctionWithLogGroup:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python2.7
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Logs:
+        RetentionInDays: 8
