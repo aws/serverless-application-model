@@ -429,7 +429,7 @@ class Api(PushEventSource):
             raise RuntimeError("Could not add permission to lambda function.")
 
         path = self.Path.replace('{proxy+}', '*')
-        method = '*' if self.Method == 'any' else self.Method.upper()
+        method = '*' if self.Method.lower() == 'any' else self.Method.upper()
 
         api_id = self.RestApiId
 
