@@ -31,7 +31,7 @@ class TestCodeUri(TestCase):
 
     def test_with_zip_file(self):
         function = SamFunction("foo")
-        function.ZipFile = "hello world"
+        function.InlineCode = "hello world"
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedFunctionList = [x for x in cfnResources if isinstance(x, LambdaFunction)]

@@ -157,7 +157,7 @@
               "anyOf": [
                 {
                   "properties": {
-                    "ZipFile": {
+                    "InlineCode": {
                       "type": "string"
                     }
                   }

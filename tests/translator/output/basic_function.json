@@ -361,7 +361,7 @@
         }
       }
     },
-    "FunctionWithZipFileRole": {
+    "FunctionWithInlineCodeRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
@@ -386,7 +386,7 @@
         }
       }
     },
-    "FunctionWithZipFile": {
+    "FunctionWithInlineCode": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "TracingConfig": {
@@ -404,7 +404,7 @@
         "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
-            "FunctionWithZipFileRole",
+            "FunctionWithInlineCodeRole",
             "Arn"
           ]
         },

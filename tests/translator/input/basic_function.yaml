@@ -14,10 +14,10 @@ Resources:
       Runtime: python2.7
       Tracing: Active
 
-  FunctionWithZipFile:
+  FunctionWithInlineCode:
     Type: 'AWS::Serverless::Function'
     Properties:
-      ZipFile: "hello world"
+      InlineCode: "hello world"
       Handler: hello.handler
       Runtime: python2.7
       Tracing: Active

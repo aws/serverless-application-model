@@ -35,7 +35,7 @@ class SamFunction(SamResourceMacro):
         'Handler': PropertyType(True, is_str()),
         'Runtime': PropertyType(True, is_str()),
         'CodeUri': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'ZipFile': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'InlineCode': PropertyType(False, one_of(is_str(), is_type(dict))),
         'DeadLetterQueue': PropertyType(False, is_type(dict)),
         'Description': PropertyType(False, is_str()),
         'MemorySize': PropertyType(False, is_type(int)),
@@ -316,12 +316,12 @@ class SamFunction(SamResourceMacro):
     def _construct_code_dict(self):
         if self.CodeUri:
             return self._construct_code_dict_code_uri()
-        elif self.ZipFile:
+        elif self.InlineCode:
             return {
-                "ZipFile": self.ZipFile
+                "ZipFile": self.InlineCode
             }
         else:
-            raise InvalidResourceException(self.logical_id, "Either 'ZipFile' or 'CodeUri' must be set")
+            raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
 
     def _construct_code_dict_code_uri(self):
         """Constructs the Lambda function's `Code property`_, from the SAM function's CodeUri property.
