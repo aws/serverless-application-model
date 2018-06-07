@@ -78,7 +78,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/ANY/foo", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/foo", 
             {
               "__Stage__": "Prod", 
               "__ApiId__": {
@@ -444,7 +444,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/ANY/foo", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/foo", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
