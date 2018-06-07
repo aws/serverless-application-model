@@ -11,7 +11,7 @@ from samtranslator.model.sam_resources import SamSimpleTable
 from samtranslator.public.plugins import BasePlugin
 
 from tests.translator.helpers import get_template_parameter_values
-from tests.translator.yaml_helper import yaml_parse
+from samtranslator.yaml_helper import yaml_parse
 from parameterized import parameterized, param
 
 import pytest
