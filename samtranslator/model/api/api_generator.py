@@ -11,9 +11,9 @@ from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_instrinsic
 
 _CORS_WILDCARD = "'*'"
-CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge"])
+CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge", "ExposeHeaders", "AllowCredentials"])
 # Default the Cors Properties to '*' wildcard. Other properties are actually Optional
-CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None)
+CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, None, False)
 
 class ApiGenerator(object):
 
@@ -206,7 +206,8 @@ class ApiGenerator(object):
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
             editor.add_cors(path,  properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
-                            max_age=properties.MaxAge)
+                            max_age=properties.MaxAge, exposed_headers=properties.ExposeHeaders,
+                            allow_credentials=properties.AllowCredentials)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
