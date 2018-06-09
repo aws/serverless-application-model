@@ -237,7 +237,7 @@ class SwaggerEditor(object):
         if allow_credentials is True:
             # Allow-Credentials only has a valid value of true, it should be omitted otherwise.
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
-            response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = 'true'
+            response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = "'true'"
             response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
 
         return {

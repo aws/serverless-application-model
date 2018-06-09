@@ -8,6 +8,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
+_ALLOW_CREDENTALS_TRUE = "'true'"
 
 class TestSwaggerEditor_init(TestCase):
 
@@ -308,8 +309,9 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_headers = ["headers", "2"]
         allowed_methods = {"key": "methods"}
         max_age = 60
-        exposed_headers = None
-        allow_credentials = False
+        exposed_headers = {"headers", "2"}
+        allow_credentials = True
+        options_method_response_allow_credentials = True
         path = "/foo"
         expected = {"some cors": "return value"}
 
@@ -324,7 +326,7 @@ class TestSwaggerEditor_add_cors(TestCase):
                                                                          allowed_methods,
                                                                          max_age,
                                                                          exposed_headers,
-                                                                         allow_credentials)
+                                                                         options_method_response_allow_credentials)
 
     def test_must_skip_existing_path(self):
         path = "/withoptions"
@@ -351,9 +353,9 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_headers = None # No Value
         allowed_methods = "methods"
         max_age = 60
-        exposed_headers = None
-        allow_credentials = None
-        options_method_response_allow_credentials = False
+        exposed_headers = {"headers", "2"}
+        allow_credentials = True
+        options_method_response_allow_credentials = True
 
         expected = {"some cors": "return value"}
         path = "/foo"
@@ -379,9 +381,9 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_headers = "headers"
         allowed_methods = None  # No Value
         max_age = 60
-        exposed_headers = None
-        allow_credentials = None
-        options_method_response_allow_credentials = False
+        exposed_headers = "headers"
+        allow_credentials = True
+        options_method_response_allow_credentials = True
 
         default_allow_methods_value = "some default value"
         default_allow_methods_value_with_quotes = "'{}'".format(default_allow_methods_value)
@@ -407,6 +409,53 @@ class TestSwaggerEditor_add_cors(TestCase):
                                                                          max_age,
                                                                          exposed_headers,
                                                                          options_method_response_allow_credentials)
+    def test_must_accept_none_exposed_headers(self):
+        allowed_origins = "origins"
+        allowed_headers = ["headers", "2"]
+        allowed_methods = {"key": "methods"}
+        max_age = 60
+        exposed_headers = None
+        allow_credentials = True
+        options_method_response_allow_credentials = True
+        path = "/foo"
+        expected = {"some cors": "return value"}
+
+        self.editor._options_method_response_for_cors = Mock()
+        self.editor._options_method_response_for_cors.return_value = expected
+
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, exposed_headers,
+                             allow_credentials)
+        self.assertEquals(expected, self.editor.swagger["paths"][path]["options"])
+        self.editor._options_method_response_for_cors.assert_called_with(allowed_origins,
+                                                                         allowed_headers,
+                                                                         allowed_methods,
+                                                                         max_age,
+                                                                         exposed_headers,
+                                                                         options_method_response_allow_credentials)
+
+    def test_must_accept_none_allow_credentials(self):
+        allowed_origins = "origins"
+        allowed_headers = ["headers", "2"]
+        allowed_methods = {"key": "methods"}
+        max_age = 60
+        exposed_headers = {"headers", "2"}
+        allow_credentials = None
+        options_method_response_allow_credentials = False
+        path = "/foo"
+        expected = {"some cors": "return value"}
+
+        self.editor._options_method_response_for_cors = Mock()
+        self.editor._options_method_response_for_cors.return_value = expected
+
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, exposed_headers,
+                             allow_credentials)
+        self.assertEquals(expected, self.editor.swagger["paths"][path]["options"])
+        self.editor._options_method_response_for_cors.assert_called_with(allowed_origins,
+                                                                         allowed_headers,
+                                                                         allowed_methods,
+                                                                         max_age,
+                                                                         exposed_headers,
+                                                                         options_method_response_allow_credentials)
 
 
 class TestSwaggerEditor_options_method_response_for_cors(TestCase):
@@ -419,7 +468,6 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         max_age = 60
         exposed_headers = "x-cape"
         allow_credentials = True
-        allow_credentials_value = "true"
 
         expected = {
             "summary": "CORS support",
@@ -434,7 +482,7 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
                     "default": {
                         "statusCode": "200",
                         "responseParameters": {
-                            "method.response.header.Access-Control-Allow-Credentials": allow_credentials_value,
+                            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
                             "method.response.header.Access-Control-Allow-Headers": headers,
                             "method.response.header.Access-Control-Allow-Methods": methods,
                             "method.response.header.Access-Control-Allow-Origin": origins,
@@ -486,10 +534,9 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         origins = "origins"
         exposed_headers = "x-cape"
         allow_credentials = True
-        allow_credentials_value = "true"
 
         expected = {
-            "method.response.header.Access-Control-Allow-Credentials": allow_credentials_value,
+            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
             "method.response.header.Access-Control-Allow-Methods": methods,
             "method.response.header.Access-Control-Allow-Origin": origins,
             "method.response.header.Access-Control-Expose-Headers": exposed_headers,
@@ -523,10 +570,9 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         origins = "origins"
         exposed_headers = "x-cape"
         allow_credentials = True
-        allow_credentials_value = "true"
 
         expected = {
-            "method.response.header.Access-Control-Allow-Credentials": allow_credentials_value,
+            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
             "method.response.header.Access-Control-Allow-Headers": headers,
             "method.response.header.Access-Control-Allow-Origin": origins,
             "method.response.header.Access-Control-Expose-Headers": exposed_headers,
@@ -563,10 +609,9 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         max_age = 0
         exposed_headers = "x-cape"
         allow_credentials = True
-        allow_credentials_value = "true"
 
         expected = {
-            "method.response.header.Access-Control-Allow-Credentials": allow_credentials_value,
+            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
             "method.response.header.Access-Control-Allow-Methods": methods,
             "method.response.header.Access-Control-Allow-Origin": origins,
             "method.response.header.Access-Control-Max-Age": max_age,
@@ -585,10 +630,9 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         origins = "origins"
         exposed_headers = None # No value
         allow_credentials = True
-        allow_credentials_value = "true"
 
         expected = {
-            "method.response.header.Access-Control-Allow-Credentials": allow_credentials_value,
+            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
             "method.response.header.Access-Control-Allow-Headers": headers,
             "method.response.header.Access-Control-Allow-Methods": methods,
             "method.response.header.Access-Control-Allow-Origin": origins,
