@@ -68,7 +68,17 @@
         }
       }
     }, 
-    "ImplicitApiFunctionAnyApiPermissionProd": {
+    "ServerlessRestApiDeploymentc020adc98a": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: c020adc98ab52b1180ff6477685a0d7b86ba6262",
+        "StageName": "Stage"
+      }
+    }, 
+    "ImplicitApiFunctionPostHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
@@ -78,7 +88,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/foo", 
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
             {
               "__Stage__": "Prod", 
               "__ApiId__": {
@@ -89,14 +99,28 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment1754a26207": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment2e88efef7e"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymentc020adc98a"
+        }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 1754a26207ccaa4f36c763f1f3993638ba8e8d0a", 
-        "StageName": "Stage"
+        "StageName": "Prod"
       }
     }, 
     "ExplicitApi": {
@@ -116,7 +140,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RestApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -134,11 +158,9 @@
                         "application/json": "{}\n"
                       }, 
                       "responseParameters": {
-                        "method.response.header.Access-Control-Allow-Origin": "origins", 
-                        "method.response.header.Access-Control-Allow-Methods": "methods", 
-                        "method.response.header.Access-Control-Allow-Headers": "headers",
-                        "method.response.header.Access-Control-Expose-Headers": "headers",
-                        "method.response.header.Access-Control-Allow-Credentials": "'true'"
+                        "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'", 
+                        "method.response.header.Access-Control-Expose-Headers": "headers"
                       }
                     }
                   }
@@ -153,16 +175,10 @@
                       "Access-Control-Allow-Origin": {
                         "type": "string"
                       }, 
-                      "Access-Control-Allow-Headers": {
+                      "Access-Control-Expose-Headers": {
                         "type": "string"
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
-                      },
-                      "Access-Control-Expose-Headers": {
-                        "type": "string"
-                      },
-                      "Access-Control-Allow-Credentials": {
                         "type": "string"
                       }
                     }, 
@@ -188,11 +204,9 @@
                         "application/json": "{}\n"
                       }, 
                       "responseParameters": {
-                        "method.response.header.Access-Control-Allow-Origin": "origins", 
-                        "method.response.header.Access-Control-Allow-Methods": "methods", 
-                        "method.response.header.Access-Control-Allow-Headers": "headers",
-                        "method.response.header.Access-Control-Expose-Headers": "headers",
-                        "method.response.header.Access-Control-Allow-Credentials": "'true'"
+                        "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                        "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'", 
+                        "method.response.header.Access-Control-Expose-Headers": "headers"
                       }
                     }
                   }
@@ -207,16 +221,10 @@
                       "Access-Control-Allow-Origin": {
                         "type": "string"
                       }, 
-                      "Access-Control-Allow-Headers": {
+                      "Access-Control-Expose-Headers": {
                         "type": "string"
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
-                      },
-                      "Access-Control-Expose-Headers": {
-                        "type": "string"
-                      },
-                      "Access-Control-Allow-Credentials": {
                         "type": "string"
                       }
                     }, 
@@ -232,7 +240,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -251,28 +259,14 @@
         }
       }
     }, 
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ExplicitApiDeployment2e88efef7e": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment1754a26207"
-        }, 
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeploymente1a19134ca"
-        }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "StageName": "Prod"
+        "Description": "RestApi deployment id: 2e88efef7e1035a3538562fca85d22395cb8fb3f",
+        "StageName": "Stage"
       }
     }, 
     "ImplicitApiFunctionGetHtmlPermissionProd": {
@@ -296,14 +290,25 @@
         }
       }
     }, 
-    "ExplicitApiDeploymente1a19134ca": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ImplicitApiFunctionPostHtmlPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
         }, 
-        "Description": "RestApi deployment id: e1a19134ca6f0d6afe2079a3ff60176078baa467",
-        "StageName": "Stage"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
       }
     }, 
     "ServerlessRestApi": {
@@ -317,56 +322,8 @@
             }
           }, 
           "paths": {
-            "/foo": {
-              "options": {
-                "x-amazon-apigateway-integration": {
-                  "type": "mock", 
-                  "requestTemplates": {
-                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
-                  }, 
-                  "responses": {
-                    "default": {
-                      "statusCode": "200", 
-                      "responseTemplates": {
-                        "application/json": "{}\n"
-                      }, 
-                      "responseParameters": {
-                        "method.response.header.Access-Control-Allow-Origin": {
-                          "Fn::Join": [
-                            ",", 
-                            [
-                              "www.amazon.com", 
-                              "www.google.com"
-                            ]
-                          ]
-                        }, 
-                        "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
-                      }
-                    }
-                  }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
-                "summary": "CORS support", 
-                "responses": {
-                  "200": {
-                    "headers": {
-                      "Access-Control-Allow-Origin": {
-                        "type": "string"
-                      }, 
-                      "Access-Control-Allow-Methods": {
-                        "type": "string"
-                      }
-                    }, 
-                    "description": "Default response for CORS method"
-                  }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
-              }, 
-              "x-amazon-apigateway-any-method": {
+            "/": {
+              "post": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
@@ -375,9 +332,7 @@
                   }
                 }, 
                 "responses": {}
-              }
-            }, 
-            "/": {
+              }, 
               "options": {
                 "x-amazon-apigateway-integration": {
                   "type": "mock", 
@@ -391,16 +346,9 @@
                         "application/json": "{}\n"
                       }, 
                       "responseParameters": {
-                        "method.response.header.Access-Control-Allow-Origin": {
-                          "Fn::Join": [
-                            ",", 
-                            [
-                              "www.amazon.com", 
-                              "www.google.com"
-                            ]
-                          ]
-                        }, 
-                        "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'"
+                        "method.response.header.Access-Control-Allow-Origin": "'*'", 
+                        "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS,POST'", 
+                        "method.response.header.Access-Control-Expose-Headers": "headers"
                       }
                     }
                   }
@@ -413,6 +361,9 @@
                   "200": {
                     "headers": {
                       "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      }, 
+                      "Access-Control-Expose-Headers": {
                         "type": "string"
                       }, 
                       "Access-Control-Allow-Methods": {
@@ -447,27 +398,6 @@
         }, 
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
-        }
-      }
-    }, 
-    "ImplicitApiFunctionAnyApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "ImplicitApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/foo", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
         }
       }
     }
