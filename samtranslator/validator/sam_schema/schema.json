@@ -491,7 +491,13 @@
           "type": "number"
         },
         "Queue": {
-          "type": "string"
+          "anyOf": [{
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         }
       },
       "required": [

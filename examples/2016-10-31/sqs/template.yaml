@@ -12,8 +12,8 @@ Resources:
         MySQSEvent:
           Type: SQS
           Properties:
-            Queue: !Ref MyQueue
+            Queue: !GetAtt MySqsQueue.Arn
 
-  MyQueue:
+  MySqsQueue:
     Type: AWS::SQS::Queue
     Properties:
