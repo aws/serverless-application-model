@@ -68,7 +68,7 @@ class LogicalIdGenerator(object):
             # data_str should always be unicode on python 3
             encoded_data_str = self.data_str.encode('utf-8')
 
-        data_hash = hashlib.sha1(bytes(encoded_data_str)).hexdigest()
+        data_hash = hashlib.sha1(encoded_data_str).hexdigest()
 
         return data_hash[:length]
 

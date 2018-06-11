@@ -262,7 +262,7 @@ class TestTranslatorEndToEnd(TestCase):
                 output_value["Ref"] = deployment_logical_id_dict[output_value.get("Ref")]
 
     def _generate_new_deployment_hash(self, logical_id, dict_to_hash, rest_api_to_swagger_hash):
-        data_bytes = bytes(json.dumps(dict_to_hash, separators=(',', ':'), sort_keys=True).encode("utf8"))
+        data_bytes = json.dumps(dict_to_hash, separators=(',', ':'), sort_keys=True).encode("utf8")
         data_hash = hashlib.sha1(data_bytes).hexdigest()
         rest_api_to_swagger_hash[logical_id] = data_hash
 
