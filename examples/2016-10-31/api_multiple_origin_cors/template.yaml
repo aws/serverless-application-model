@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'Example of Multiple-Origin CORS using API Gateway and Lambda'
+Resources:
+  ExampleFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: '.'
+      Handler: 'index.handler'
+      Runtime: 'nodejs8.10'
+      Events:
+        GetRoot:
+          Type: 'Api'
+          Properties:
+            Path: '/'
+            Method: 'get'
+        OptionsTest:
+          Type: 'Api'
+          Properties:
+            Path: '/test'
+            Method: 'options'
+        PostTest:
+          Type: 'Api'
+          Properties:
+            Path: '/test'
+            Method: 'delete'
+
+Outputs:
+    ExampleApi:
+      Description: "API Gateway endpoint URL for Prod stage for API Gateway Multi-Origin CORS function"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    ExampleFunction:
+      Description: "API Gateway Multi-Origin CORS Lambda Function ARN"
+      Value: !GetAtt ExampleFunction.Arn
+    ExampleFunctionIamRole:
+      Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function"
+      Value: !GetAtt ExampleFunctionRole.Arn
