@@ -2,11 +2,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: 'Example of Multiple-Origin CORS using API Gateway and Lambda'
 Resources:
-  ExampleFunction:
+  ExampleFunctionRoot:
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: '.'
-      Handler: 'index.handler'
+      Handler: 'index.handleRoot'
       Runtime: 'nodejs8.10'
       Events:
         GetRoot:
@@ -14,24 +14,37 @@ Resources:
           Properties:
             Path: '/'
             Method: 'get'
-        OptionsTest:
-          Type: 'Api'
-          Properties:
-            Path: '/test'
-            Method: 'options'
+  ExampleFunctionTest:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: '.'
+      Handler: 'index.handleTest'
+      Runtime: 'nodejs8.10'
+      Events:
         DeleteTest:
           Type: 'Api'
           Properties:
             Path: '/test'
             Method: 'delete'
+        OptionsTest:
+          Type: 'Api'
+          Properties:
+            Path: '/test'
+            Method: 'options'
 
 Outputs:
     ExampleApi:
       Description: "API Gateway endpoint URL for Prod stage for API Gateway Multi-Origin CORS function"
       Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
-    ExampleFunction:
-      Description: "API Gateway Multi-Origin CORS Lambda Function ARN"
-      Value: !GetAtt ExampleFunction.Arn
-    ExampleFunctionIamRole:
-      Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function"
-      Value: !GetAtt ExampleFunctionRole.Arn
+    ExampleFunctionRoot:
+      Description: "API Gateway Multi-Origin CORS Lambda Function (Root) ARN"
+      Value: !GetAtt ExampleFunctionRoot.Arn
+    ExampleFunctionRootIamRole:
+      Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function (Root)"
+      Value: !GetAtt ExampleFunctionRootRole.Arn
+    ExampleFunctionTest:
+      Description: "API Gateway Multi-Origin CORS Lambda Function (Test) ARN"
+      Value: !GetAtt ExampleFunctionTest.Arn
+    ExampleFunctionTestIamRole:
+      Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function (Test)"
+      Value: !GetAtt ExampleFunctionTestRole.Arn

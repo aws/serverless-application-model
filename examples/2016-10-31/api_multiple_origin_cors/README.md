@@ -12,6 +12,8 @@ Now, test the application locally using:
 
 `sam local start-api`
 
+Note that there was an [issue](https://github.com/awslabs/aws-sam-cli/issues/400) that prevented OPTIONS requests from being handled when running with the SAM CLI version 0.3.0. This does not occur when the application is deployed.
+
 Run the tests:
 
 `npm install`
