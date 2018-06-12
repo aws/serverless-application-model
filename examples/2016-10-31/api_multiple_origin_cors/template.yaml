@@ -19,7 +19,7 @@ Resources:
           Properties:
             Path: '/test'
             Method: 'options'
-        PostTest:
+        DeleteTest:
           Type: 'Api'
           Properties:
             Path: '/test'

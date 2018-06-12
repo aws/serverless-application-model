@@ -1,9 +1,12 @@
+// this is the list of headers allowed by default by the API Gateway console
+// see: https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html
+// and: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonRequestHeaders.html
 const DEFAULT_ALLOWED_HEADERS = [
-    "Content-Type",
-    "X-Amz-Date",
-    "Authorization",
-    "X-Api-Key",
-    "X-Amz-Security-Token"
+    "Content-Type",        // indicates the media type of the resource
+    "X-Amz-Date",          // the current date and time according to the requester (must be present for authorization)
+    "Authorization",       // information required for request authentication
+    "X-Api-Key",           // an AWS API key
+    "X-Amz-Security-Token" // see link above
 ];
 
 /**
@@ -12,7 +15,7 @@ const DEFAULT_ALLOWED_HEADERS = [
  * Otherwise, return an empty object literal.
  * @param event Lambda event event associated with a request
  * @param allowedOrigins A list of strings or regexes representing allowed origin URLs
- * @return {Object} an object containing a header => value mapping, or nothing
+ * @return {Object} an object containing allowed header and its value
  */
 exports.makeOriginHeader = (event, allowedOrigins) => {
     // determine origin
@@ -28,10 +31,6 @@ exports.makeOriginHeader = (event, allowedOrigins) => {
     
     allowedOrigin = origin.match(allowedPattern)[0]; // determine exact match
 
-    // console.log("origin: " + origin);
-    // console.log("allowed by: " + allowedPattern);
-    
-    // produce origin header
     return {"Access-Control-Allow-Origin": allowedOrigin};
 };
 
@@ -52,13 +51,18 @@ exports.makeHeaders = (event, allowedOrigins, allowedMethods, allowedHeaders = D
 };
 
 /**
- * Compiles a path containing wildcards into a regular expression.
+ * Compiles a URL containing wildcards into a regular expression.
  * Using this is optional.
- * @param {String} path the path to compile
+ * 
+ * Builds a regular expression that matches exactly the input URL, but with 
+ * the pattern .*? in place of any wildcard (*) characters. In practice,
+ * http://*.example.com matches http://abc.xyz.example.com but not http://example.com
+ * http://*.example.com does not match http://example.org/.example.com
+ * @param {String} url the url to compile
  * @return {RegExp} compiled regular expression
  */
-exports.compileURLWildcards = (path) => {
-    const parts = path.split("*");
+exports.compileURLWildcards = (url) => {
+    const parts = url.split("*");
     const escapeRegex = str => str.replace(/([.?*+^$(){}|[\-\]\\])/g, "\\$1");
     const escaped = parts.map(escapeRegex);
     return new RegExp("^" + escaped.join(".*?") + "$");

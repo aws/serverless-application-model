@@ -6,6 +6,10 @@
 
 ### Local development
 
+First, [set up the SAM CLI](https://github.com/awslabs/aws-sam-cli#installation).
+
+Now, test the application locally using:
+
 `sam local start-api`
 
 Run the tests:
