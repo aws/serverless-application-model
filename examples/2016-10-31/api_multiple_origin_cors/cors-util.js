@@ -62,8 +62,12 @@ exports.makeHeaders = (event, allowedOrigins, allowedMethods, allowedHeaders = D
  * @return {RegExp} compiled regular expression
  */
 exports.compileURLWildcards = (url) => {
+    // unreserved characters as per https://tools.ietf.org/html/rfc3986#section-2.3
+    const url_unreserved_pattern = "[A-Za-z0-9\-._~]";
+    const wildcard_pattern = url_unreserved_pattern + "*";
+    
     const parts = url.split("*");
     const escapeRegex = str => str.replace(/([.?*+^$(){}|[\-\]\\])/g, "\\$1");
     const escaped = parts.map(escapeRegex);
-    return new RegExp("^" + escaped.join(".*?") + "$");
+    return new RegExp("^" + escaped.join(wildcard_pattern) + "$");
 };
