@@ -1,44 +1,36 @@
 const cors = require("./cors-util");
 
-const makeMockEvent = origin => {
-    return {"headers": {"origin": origin}};
-};
-
 // makeOriginHeader
 test("use makeOriginHeader to make a header for no origin", () => {
-    const result = cors.makeOriginHeader({headers: {}}, []);
+    const result = cors.makeOriginHeader(undefined, []);
     expect(result).toEqual({});
 });
 
 test("use makeOriginHeader to make a header for a single origin", () => {
     const origin = "https://amazon.com";
-    const event = makeMockEvent(origin);
     const allowedOrigins = [origin];
-    const result = cors.makeOriginHeader(event, allowedOrigins);
+    const result = cors.makeOriginHeader(origin, allowedOrigins);
     expect(result).toEqual({"Access-Control-Allow-Origin": origin});
 });
 
 test("use makeOriginHeader to make a header for one of several origins", () => {
     const origin = "https://amazon.com";
     const allowedOrigins = ["https://example.com", origin, "http://amazon.com"];
-    const event = makeMockEvent(origin);
-    const result = cors.makeOriginHeader(event, allowedOrigins);
+    const result = cors.makeOriginHeader(origin, allowedOrigins);
     expect(result).toEqual({"Access-Control-Allow-Origin": origin});
 });
 
 test("use makeOriginHeader to make a header for a disallowed origin", () => {
     const origin = "https://not-amazon.com";
     const allowedOrigins = [];
-    const event = makeMockEvent(origin);
-    const result = cors.makeOriginHeader(event, allowedOrigins);
+    const result = cors.makeOriginHeader(origin, allowedOrigins);
     expect(result).toEqual({});
 });
 
 test("use makeOriginHeader to make a header for a disallowed origin", () => {
     const origin = "https://not-amazon.com";
     const allowedOrigins = ["https://example.com", "https://amazon.com", "http://amazon.com"];
-    const event = makeMockEvent(origin);
-    const result = cors.makeOriginHeader(event, allowedOrigins);
+    const result = cors.makeOriginHeader(origin, allowedOrigins);
     expect(result).toEqual({});
 });
 
@@ -48,8 +40,7 @@ test("use makeHeaders to make CORS preflight headers", () => {
     const allowedOrigins = [origin];
     const allowedMethods = ["CREATE", "OPTIONS"];
     const allowedHeaders = ["Authorization"]
-    const event = makeMockEvent(origin);
-    const result = cors.makeHeaders(event, allowedOrigins, allowedMethods, allowedHeaders);
+    const result = cors.makeHeaders(origin, allowedOrigins, allowedMethods, allowedHeaders);
     expect(result).toEqual({
         "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Methods": "CREATE,OPTIONS",

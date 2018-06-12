@@ -17,11 +17,12 @@ const allowedOrigins = [
  * We include all CORS headers in the GET response.
  */
 const handleRoot = (event, context, callback) => {
+    const origin = event.headers.Origin || event.headers.origin;
     const allowedMethods = ["GET"];
 
     // return an empty response, with CORS headers
     callback(null, {
-        headers: Object.assign(cors.makeHeaders(event, allowedOrigins, allowedMethods), {
+        headers: Object.assign(cors.makeHeaders(origin, allowedOrigins, allowedMethods), {
             // use Object.assign to include additional headers
         }),
         statusCode: 204
@@ -36,18 +37,19 @@ const handleRoot = (event, context, callback) => {
  * When the browser makes the DELETE request, we only need to provide the origin.
  */
 const handleTest = (event, context, callback) => {
+    const origin = event.headers.Origin || event.headers.origin;
     const allowedMethods = ["OPTIONS", "DELETE"];
 
     if (event.httpMethod === "OPTIONS") {
         // return an empty response, with all CORS headers
         callback(null, {
-            headers: cors.makeHeaders(event, allowedOrigins, allowedMethods),
+            headers: cors.makeHeaders(origin, allowedOrigins, allowedMethods),
             statusCode: 204
         });
     } else if (event.httpMethod === "DELETE") {
         // return an empty response, with CORS origin
         callback(null, {
-            headers: cors.makeOriginHeader(event, allowedOrigins),
+            headers: cors.makeOriginHeader(origin, allowedOrigins),
             statusCode: 204
         });
     }
