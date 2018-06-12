@@ -51,8 +51,8 @@ exports.makeHeaders = (origin, allowedOrigins, allowedMethods, allowedHeaders = 
  * Compiles a URL containing wildcards into a regular expression.
  * Using this is optional.
  * 
- * Builds a regular expression that matches exactly the input URL, but with 
- * the pattern .*? in place of any wildcard (*) characters. In practice,
+ * Builds a regular expression that matches exactly the input URL, but allows 
+ * any number of URL characters in place of each wildcard (*) character.
  * http://*.example.com matches http://abc.xyz.example.com but not http://example.com
  * http://*.example.com does not match http://example.org/.example.com
  * @param {String} url the url to compile
