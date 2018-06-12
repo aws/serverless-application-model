@@ -65,18 +65,24 @@ test("compile pattern with no wildcards", () => {
     expect("https://example.com").not.toMatch(regex);
 });
 
-test("compile '*'", () => {
-    const pattern = "*";
+test("test pattern with wildcard", () => {
+    const pattern = "https://*";
     const regex = cors.compileURLWildcards(pattern);
     expect("https://example.com").toMatch(regex);
-    expect("apple").toMatch(regex);
 });
 
-test("compile pattern with subdomain wildcard", () => {
+test("test pattern with subdomain wildcard", () => {
     const pattern = "https://*.amazon.com";
     const regex = cors.compileURLWildcards(pattern);
     expect("https://restaurants.amazon.com").toMatch(regex);
     expect("https://amazon.com").not.toMatch(regex);
     expect("https://x.y.z.amazon.com").toMatch(regex);
     expect("https://restaurants.example.com").not.toMatch(regex);
-})
+});
+
+test("test pattern with subdomain wildcard against malicious input", () => {
+    const pattern = "https://*.amazon.com";
+    const regex = cors.compileURLWildcards(pattern);
+    expect("https://restaurants.amazon.com").toMatch(regex);
+    expect("https://my.website/restaurants.amazon.com").not.toMatch(regex);
+});
