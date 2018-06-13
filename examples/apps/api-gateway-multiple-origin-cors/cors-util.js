@@ -10,6 +10,12 @@ const DEFAULT_ALLOWED_HEADERS = [
 ];
 
 /**
+ * Extract the Origin header from a Lambda event
+ * @param event Lambda event
+ */
+exports.getOriginFromEvent = event => event.headers.Origin || event.headers.origin;
+
+/**
  * Return an object literal that contains an Access-Control-Allow-Origin header
  * if the request origin matches a pattern for an allowed origin.
  * Otherwise, return an empty object literal.
@@ -18,7 +24,7 @@ const DEFAULT_ALLOWED_HEADERS = [
  * @return {Object} an object containing allowed header and its value
  */
 exports.makeOriginHeader = (origin, allowedOrigins) => {
-    if (origin === undefined || origin === null)
+    if (!origin)
         return {}; // no CORS headers necessary; browser will load resource
 
     // look for origin in list of allowed origins
@@ -60,11 +66,11 @@ exports.makeHeaders = (origin, allowedOrigins, allowedMethods, allowedHeaders = 
  */
 exports.compileURLWildcards = (url) => {
     // unreserved characters as per https://tools.ietf.org/html/rfc3986#section-2.3
-    const url_unreserved_pattern = "[A-Za-z0-9\-._~]";
-    const wildcard_pattern = url_unreserved_pattern + "*";
+    const urlUnreservedPattern = "[A-Za-z0-9\-._~]";
+    const wildcardPattern = urlUnreservedPattern + "*";
     
     const parts = url.split("*");
     const escapeRegex = str => str.replace(/([.?*+^$(){}|[\-\]\\])/g, "\\$1");
     const escaped = parts.map(escapeRegex);
-    return new RegExp("^" + escaped.join(wildcard_pattern) + "$");
+    return new RegExp("^" + escaped.join(wildcardPattern) + "$");
 };

@@ -17,7 +17,7 @@ const allowedOrigins = [
  * We include all CORS headers in the GET response.
  */
 exports.handleRoot = async (event, context) => {
-    const origin = event.headers.Origin || event.headers.origin;
+    const origin = cors.getOriginFromEvent(event);
     const allowedMethods = ["GET"];
 
     // return an empty response, with CORS headers
@@ -37,7 +37,7 @@ exports.handleRoot = async (event, context) => {
  * When the browser makes the DELETE request, we only need to provide the origin.
  */
 exports.handleTest = async (event, context) => {
-    const origin = event.headers.Origin || event.headers.origin;
+    const origin = cors.getOriginFromEvent(event);
     const allowedMethods = ["OPTIONS", "DELETE"];
 
     if (event.httpMethod === "OPTIONS") {
