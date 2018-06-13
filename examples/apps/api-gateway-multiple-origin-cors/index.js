@@ -7,7 +7,7 @@ const allowedOrigins = [
     "http://127.0.0.1",
     "https://*.example.com",
     "https://*.amazon.com"
-].map(cors.compileURLWildcards);
+];
 
 /**
  * Demonstrates a simple endpoint that accepts GET requests.

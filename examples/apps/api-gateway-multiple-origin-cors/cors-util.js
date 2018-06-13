@@ -26,9 +26,10 @@ exports.getOriginFromEvent = event => event.headers.Origin || event.headers.orig
 exports.makeOriginHeader = (origin, allowedOrigins) => {
     if (!origin)
         return {}; // no CORS headers necessary; browser will load resource
-
+ 
     // look for origin in list of allowed origins
-    const isAllowed = allowedOrigins.some(allowedOrigin => origin.match(allowedOrigin));
+    const allowedPatterns = allowedOrigins.map(exports.compileURLWildcards);
+    const isAllowed = allowedPatterns.some(pattern => origin.match(pattern));
     if (isAllowed)
         return {"Access-Control-Allow-Origin": origin};
 
