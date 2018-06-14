@@ -1,4 +1,4 @@
-// Demonstrates a Lambda function that provides CORS headers for many origins.
+// Demonstrates Lambda functions that provide CORS headers for many origins.
 
 const cors = require("./cors-util");
 
@@ -14,14 +14,16 @@ const allowedOrigins = [
  * 
  * In most cases, browsers do not perform CORS preflight requests when using
  * the GET method, so we do not have to handle OPTIONS requests.
- * We include all CORS headers in the GET response.
+ * Any desired additional CORS headers should be included in the GET response.
  */
 exports.handleRoot = async (event, context) => {
     const origin = cors.getOriginFromEvent(event);
-    const allowedMethods = ["GET"];
 
-    // return an empty response, with CORS headers
-    return cors.createPreflightResponse(origin, allowedOrigins, allowedMethods);
+    // return an empty response, with CORS origin
+    return {
+        headers: cors.createOriginHeader(origin, allowedOrigins),
+        statusCode: 204
+    };
 };
 
 /**
@@ -33,17 +35,16 @@ exports.handleRoot = async (event, context) => {
  */
 exports.handleTest = async (event, context) => {
     const origin = cors.getOriginFromEvent(event);
+
+    // return an empty response, with CORS origin
+    return {
+        headers: cors.createOriginHeader(origin, allowedOrigins),
+        statusCode: 204
+    };
+};
+exports.handleTestPreflight = async (event, context) => {
+    const origin = cors.getOriginFromEvent(event);
     const allowedMethods = ["OPTIONS", "DELETE"];
 
-    if (event.httpMethod === "OPTIONS") {
-        // return an empty response, with all CORS headers
-        return cors.createPreflightResponse(origin, allowedOrigins, allowedMethods);
-    } else if (event.httpMethod === "DELETE") {
-        // return an empty response, with CORS origin
-        return {
-            headers: cors.createOriginHeader(origin, allowedOrigins),
-            statusCode: 204
-        };
-    }
-    // API Gateway will produce an HTTP 403 if any other method is used
+    return cors.createPreflightResponse(origin, allowedOrigins, allowedMethods);
 };

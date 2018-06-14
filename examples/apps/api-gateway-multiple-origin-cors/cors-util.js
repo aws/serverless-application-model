@@ -8,6 +8,7 @@ const DEFAULT_ALLOWED_HEADERS = [
     "X-Api-Key",           // an AWS API key
     "X-Amz-Security-Token" // see link above
 ];
+exports.DEFAULT_ALLOWED_HEADERS = DEFAULT_ALLOWED_HEADERS;
 
 /**
  * Extract the Origin header from a Lambda event
@@ -54,13 +55,12 @@ exports.createPreflightResponse = (origin, allowedOrigins, allowedMethods, allow
         "Access-Control-Allow-Methods": allowedMethods.join(",")
     });
     if (maxAge !== undefined) 
-        headers = Object.assign(headers, {"Access-Control-Max-Age": maxAge});
+        headers["Access-Control-Max-Age"] = maxAge;
     return {headers, statusCode: 204};
 };
 
 /**
  * Compiles a URL containing wildcards into a regular expression.
- * Using this is optional.
  * 
  * Builds a regular expression that matches exactly the input URL, but allows 
  * any number of URL characters in place of each wildcard (*) character.
