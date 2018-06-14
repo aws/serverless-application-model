@@ -21,12 +21,7 @@ exports.handleRoot = async (event, context) => {
     const allowedMethods = ["GET"];
 
     // return an empty response, with CORS headers
-    return {
-        headers: Object.assign(cors.makeHeaders(origin, allowedOrigins, allowedMethods), {
-            // use Object.assign to include additional headers
-        }),
-        statusCode: 204
-    };
+    return cors.createPreflightResponse(origin, allowedOrigins, allowedMethods);
 };
 
 /**
@@ -42,16 +37,13 @@ exports.handleTest = async (event, context) => {
 
     if (event.httpMethod === "OPTIONS") {
         // return an empty response, with all CORS headers
-        return {
-            headers: cors.makeHeaders(origin, allowedOrigins, allowedMethods),
-            statusCode: 204
-        };
+        return cors.createPreflightResponse(origin, allowedOrigins, allowedMethods);
     } else if (event.httpMethod === "DELETE") {
         // return an empty response, with CORS origin
         return {
-            headers: cors.makeOriginHeader(origin, allowedOrigins),
+            headers: cors.createOriginHeader(origin, allowedOrigins),
             statusCode: 204
         };
     }
-    return {statusCode: 405}; // invalid method
+    // API Gateway will produce an HTTP 403 if any other method is used
 };

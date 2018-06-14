@@ -16,14 +16,14 @@ const DEFAULT_ALLOWED_HEADERS = [
 exports.getOriginFromEvent = event => event.headers.Origin || event.headers.origin;
 
 /**
- * Return an object literal that contains an Access-Control-Allow-Origin header
+ * Return an object that contains an Access-Control-Allow-Origin header
  * if the request origin matches a pattern for an allowed origin.
- * Otherwise, return an empty object literal.
+ * Otherwise, return an empty object.
  * @param {String} origin the origin to test against the allowed list
  * @param {Array} allowedOrigins A list of strings or regexes representing allowed origin URLs
  * @return {Object} an object containing allowed header and its value
  */
-exports.makeOriginHeader = (origin, allowedOrigins) => {
+exports.createOriginHeader = (origin, allowedOrigins) => {
     if (!origin)
         return {}; // no CORS headers necessary; browser will load resource
  
@@ -39,19 +39,23 @@ exports.makeOriginHeader = (origin, allowedOrigins) => {
 };
 
 /**
- * Return an object literal that contains all headers necessary for a CORS
- * preflight.
+ * Return an object that contains a preflight response to be returned
+ * from a Lambda function.
  * @param {String} origin the origin to test against the allowed list
- * @param {Array} allowedOrigins see documentation for makeOriginHeader() 
+ * @param {Array} allowedOrigins A list of strings or regexes representing allowed origin URLs
  * @param {Array} allowedMethods a list of strings representing allowed HTTP methods
  * @param {Array} allowedHeaders (optional) a list of strings representing allowed headers
+ * @param {Number} maxAge (optional) time in seconds until preflight response expires
  * @return {Object} an object containing several header => value mappings
  */
-exports.makeHeaders = (origin, allowedOrigins, allowedMethods, allowedHeaders = DEFAULT_ALLOWED_HEADERS) => {
-    return Object.assign(exports.makeOriginHeader(origin, allowedOrigins), {
+exports.createPreflightResponse = (origin, allowedOrigins, allowedMethods, allowedHeaders = DEFAULT_ALLOWED_HEADERS, maxAge) => {
+    let headers = Object.assign(exports.createOriginHeader(origin, allowedOrigins), {
         "Access-Control-Allow-Headers": allowedHeaders.join(","),
         "Access-Control-Allow-Methods": allowedMethods.join(",")
     });
+    if (maxAge !== undefined) 
+        headers = Object.assign(headers, {"Access-Control-Max-Age": maxAge});
+    return {headers, statusCode: 204};
 };
 
 /**

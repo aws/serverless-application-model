@@ -1,50 +1,55 @@
 const cors = require("./cors-util");
 
-// makeOriginHeader
-test("use makeOriginHeader to make a header for no origin", () => {
-    const result = cors.makeOriginHeader(undefined, []);
+// createOriginHeader
+test("use createOriginHeader to make a header for no origin", () => {
+    const result = cors.createOriginHeader(undefined, []);
     expect(result).toEqual({});
 });
 
-test("use makeOriginHeader to make a header for a single origin", () => {
+test("use createOriginHeader to make a header for a single origin", () => {
     const origin = "https://amazon.com";
     const allowedOrigins = [origin];
-    const result = cors.makeOriginHeader(origin, allowedOrigins);
+    const result = cors.createOriginHeader(origin, allowedOrigins);
     expect(result).toEqual({"Access-Control-Allow-Origin": origin});
 });
 
-test("use makeOriginHeader to make a header for one of several origins", () => {
+test("use createOriginHeader to make a header for one of several origins", () => {
     const origin = "https://amazon.com";
     const allowedOrigins = ["https://example.com", origin, "http://amazon.com"];
-    const result = cors.makeOriginHeader(origin, allowedOrigins);
+    const result = cors.createOriginHeader(origin, allowedOrigins);
     expect(result).toEqual({"Access-Control-Allow-Origin": origin});
 });
 
-test("use makeOriginHeader to make a header for a disallowed origin", () => {
+test("use createOriginHeader to make a header for a disallowed origin", () => {
     const origin = "https://not-amazon.com";
     const allowedOrigins = [];
-    const result = cors.makeOriginHeader(origin, allowedOrigins);
+    const result = cors.createOriginHeader(origin, allowedOrigins);
     expect(result).toEqual({});
 });
 
-test("use makeOriginHeader to make a header for a disallowed origin", () => {
+test("use createOriginHeader to make a header for a disallowed origin", () => {
     const origin = "https://not-amazon.com";
     const allowedOrigins = ["https://example.com", "https://amazon.com", "http://amazon.com"];
-    const result = cors.makeOriginHeader(origin, allowedOrigins);
+    const result = cors.createOriginHeader(origin, allowedOrigins);
     expect(result).toEqual({});
 });
 
-// makeHeaders
-test("use makeHeaders to make CORS preflight headers", () => {
+// createPreflightResponse
+test("use createPreflightResponse to make CORS preflight headers", () => {
     const origin = "https://amazon.com";
     const allowedOrigins = [origin];
     const allowedMethods = ["CREATE", "OPTIONS"];
-    const allowedHeaders = ["Authorization"]
-    const result = cors.makeHeaders(origin, allowedOrigins, allowedMethods, allowedHeaders);
+    const allowedHeaders = ["Authorization"];
+    const maxAge = 8400;
+    const result = cors.createPreflightResponse(origin, allowedOrigins, allowedMethods, allowedHeaders, maxAge);
     expect(result).toEqual({
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "CREATE,OPTIONS",
-        "Access-Control-Allow-Headers": "Authorization"
+        headers: {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Methods": "CREATE,OPTIONS",
+            "Access-Control-Allow-Headers": "Authorization",
+            "Access-Control-Max-Age": 8400
+        }, 
+        statusCode: 204
     });
 });
 
