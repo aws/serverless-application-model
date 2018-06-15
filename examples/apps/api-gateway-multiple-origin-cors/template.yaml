@@ -6,7 +6,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: '.'
-      Handler: 'index.handleRoot'
+      Handler: 'routes/root.handler'
       Runtime: 'nodejs8.10'
       Events:
         Get:
@@ -18,7 +18,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: '.'
-      Handler: 'index.handleTest'
+      Handler: 'routes/test.handler'
       Runtime: 'nodejs8.10'
       Events:
         Delete:
@@ -26,13 +26,6 @@ Resources:
           Properties:
             Path: '/test'
             Method: 'delete'
-  ExampleTestPreflight:
-    Type: 'AWS::Serverless::Function'
-    Properties:
-      CodeUri: '.'
-      Handler: 'index.handleTestPreflight'
-      Runtime: 'nodejs8.10'
-      Events:
         Options:
           Type: 'Api'
           Properties:
@@ -55,9 +48,3 @@ Outputs:
     ExampleTestIamRole:
       Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function (Test)"
       Value: !GetAtt ExampleTestRole.Arn
-    ExampleTestPreflight:
-      Description: "API Gateway Multi-Origin CORS Lambda Function (Test) ARN"
-      Value: !GetAtt ExampleTestPreflight.Arn
-    ExampleTestPreflightIamRole:
-      Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function (Test)"
-      Value: !GetAtt ExampleTestPreflightRole.Arn
