@@ -22,17 +22,12 @@ First, use `sam` to upload the binary to S3 and reference it in a newly created 
 $ sam package --s3-bucket test-global-config-us-east-1 \
               --template-file template.yaml \
               --output-template-file packaged.yaml
-Uploading to b193a17966260f90115915f28693d8c3  259 / 259.0  (100.00%)
-Successfully packaged artifacts and wrote output template to file packaged.yaml.
 ```
 
 Before using `sam` to deploy using the contents of `packaged.yaml`, run a quick `diff` to see what changed.
 
 ```bash
 $ diff template.yaml packaged.yaml
-<       CodeUri: src/
----
->       CodeUri: s3://test-global-config-us-east-1/b193a17966260f90115915f28693d8c3
 ```
 
 Lastly, use `sam` again to deploy the template through a CloudFormation stack named `Test`.
@@ -41,7 +36,4 @@ Lastly, use `sam` again to deploy the template through a CloudFormation stack na
 $ sam deploy --template-file packaged.yaml \
              --stack-name Test \
              --capabilities CAPABILITY_IAM
-Waiting for changeset to be created..
-Waiting for stack create/update to complete
-Successfully created/updated stack - Test
 ```
