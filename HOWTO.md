@@ -11,7 +11,7 @@ this stack. AWS CloudFormation will take care of updating the individual
 resources for you.
 
 
-The remainder of document explains how to write SAM templates and 
+The remainder of this document explains how to write SAM templates and 
 deploy them via AWS CloudFormation. 
 
 ## Writing SAM Template
@@ -136,7 +136,7 @@ Resources:
 
 ### Caveats:
 #### ImportValue is partially supported
-[`ImportValue`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html) allows one stack to refer to value of properties from another stack. ImportValue is supported on most properties, except the very few that SAM needs to parse. Following properties are *not* supported:
+[`ImportValue`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html) allows one stack to refer to the value of properties from another stack. ImportValue is supported on most properties, except the very few that SAM needs to parse. The following properties are *not* supported:
 
 - `RestApiId` of `AWS::Serverless::Function`
 - `Policies` of `AWS::Serverless::Function`
