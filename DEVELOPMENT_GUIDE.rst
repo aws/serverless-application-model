@@ -72,3 +72,13 @@ Tests are also a documentation of the success and failure cases, which is crucia
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: http://tox.readthedocs.io/en/latest/
 .. _installation instructions: https://github.com/pyenv/pyenv#installation
+
+Profiling
+---------
+
+Install snakeviz `pip install snakeviz`
+
+```
+python -m cProfile -o sam_profile_results bin/sam-translate.py translate --input-file=tests/translator/input/alexa_skill.yaml --output-file=cfn-template.json
+snakeviz sam_profile_results
+```

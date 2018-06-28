@@ -11,6 +11,11 @@
             "Ref": "ReadCapacity"
           }
         },
+        "SSESpecification": {
+          "SSEEnabled": {
+            "Ref": "EnableSSE"
+          }
+        },
         "AttributeDefinitions": [
           {
             "AttributeName": "id",

@@ -91,6 +91,7 @@ Kinesis
      Property Name        Intrinsic(s) Supported            Reasons
 ======================== ================================== ========================
 Stream                   All
+Queue                    All
 StartingPosition         All
 BatchSize                All
 ======================== ================================== ========================
@@ -103,6 +104,7 @@ DynamoDB
 Stream                   All
 StartingPosition         All
 BatchSize                All
+SSESpecification         All
 ======================== ================================== ========================
 
 Api

@@ -1,0 +1,28 @@
+{
+    "Resources": {
+      "TableWithSSE": {
+        "Type": "AWS::DynamoDB::Table", 
+        "Properties": {
+          "ProvisionedThroughput": {
+            "WriteCapacityUnits": 5, 
+            "ReadCapacityUnits": 5
+          }, 
+          "SSESpecification": {
+            "SSEEnabled": true
+          },
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "id", 
+              "AttributeType": "S"
+            }
+          ], 
+          "KeySchema": [
+            {
+              "KeyType": "HASH", 
+              "AttributeName": "id"
+            }
+          ]
+        }
+      }
+    }
+  }

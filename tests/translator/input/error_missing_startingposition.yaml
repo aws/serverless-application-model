@@ -1,0 +1,13 @@
+Resources:
+  KinesisFunction:
+      Type: 'AWS::Serverless::Function'
+      Properties:
+        CodeUri: s3://sam-demo-bucket/streams.zip
+        Handler: stream.kinesis_handler
+        Runtime: python2.7
+        Events:
+          MyKinesisStream:
+            Type: Kinesis
+            Properties:
+              Stream: arn:aws:kinesis:us-west-2:012345678901:stream/my-stream
+              BatchSize: 100
