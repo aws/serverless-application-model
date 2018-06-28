@@ -68,7 +68,7 @@ class Resource(object):
 
         self.resource_attributes = {}
         if attributes is not None:
-            for attr, value in attributes.iteritems():
+            for attr, value in attributes.items():
                 self.set_resource_attribute(attr, value)
 
     @classmethod
@@ -367,7 +367,7 @@ class SamResourceMacro(ResourceMacro):
         # Create a map of {ResourceType: LogicalId} for quick access
         resource_id_by_type = {resource.resource_type:resource.logical_id for resource in generated_cfn_resources}
 
-        for property, cfn_type in self.referable_properties.iteritems():
+        for property, cfn_type in self.referable_properties.items():
             if cfn_type in resource_id_by_type:
                 supported_resource_refs.add(self.logical_id, property, resource_id_by_type[cfn_type])
 

@@ -6,7 +6,7 @@ class InvalidDocumentException(Exception):
         causes -- list of errors which caused this document to be invalid
     """
     def __init__(self, causes):
-        self._causes = causes
+        self._causes = sorted(causes)
 
     @property
     def message(self):
@@ -60,6 +60,9 @@ class InvalidResourceException(Exception):
     def __init__(self, logical_id,  message):
         self._logical_id = logical_id
         self._message = message
+
+    def __lt__(self, other):
+        return self._logical_id < other._logical_id
 
     @property
     def message(self):

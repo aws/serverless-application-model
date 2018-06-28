@@ -117,7 +117,7 @@ class IntrinsicsResolver(object):
         :param resolver_method: Method that can actually resolve an intrinsic function, if it detects one
         :return: Modified dictionary with values resolved
         """
-        for key, value in input_dict.iteritems():
+        for key, value in input_dict.items():
             input_dict[key] = self._traverse(value, resolution_data, resolver_method)
 
         return input_dict
@@ -150,7 +150,7 @@ class IntrinsicsResolver(object):
         if not self._is_intrinsic_dict(input):
             return input
 
-        function_type = input.keys()[0]
+        function_type = list(input.keys())[0]
         return self.supported_intrinsics[function_type].resolve_parameter_refs(input, parameters)
 
     def _try_resolve_sam_resource_refs(self, input, supported_resource_refs):
@@ -168,7 +168,7 @@ class IntrinsicsResolver(object):
         if not self._is_intrinsic_dict(input):
             return input
 
-        function_type = input.keys()[0]
+        function_type = list(input.keys())[0]
         return self.supported_intrinsics[function_type].resolve_resource_refs(input, supported_resource_refs)
 
     def _is_intrinsic_dict(self, input):
@@ -181,4 +181,4 @@ class IntrinsicsResolver(object):
         # All intrinsic functions are dictionaries with just one key
         return isinstance(input, dict) \
                and len(input) == 1 \
-               and input.keys()[0] in self.supported_intrinsics
+               and list(input.keys())[0] in self.supported_intrinsics
