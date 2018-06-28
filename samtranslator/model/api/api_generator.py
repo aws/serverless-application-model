@@ -12,7 +12,7 @@ from samtranslator.model.intrinsics import is_instrinsic
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge", "ExposeHeaders", "AllowCredentials"])
-# Default the Cors Properties to '*' wildcard. Other properties are actually Optional
+# Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, None, False)
 
 class ApiGenerator(object):
@@ -202,6 +202,11 @@ class ApiGenerator(object):
         if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(self.logical_id, "Unable to add Cors configuration because "
                                                             "'DefinitionBody' does not contain a valid Swagger")
+
+        if properties.AllowCredentials is True and properties.AllowOrigin == _CORS_WILDCARD:
+            raise InvalidResourceException(self.logical_id, "Unable to add Cors configuration because "
+                                                            "'AllowCredentials' can not be true when "
+                                                            "'AllowOrigin' is \"'*'\" or not set")
 
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
