@@ -2,6 +2,16 @@
 sudo: false
 language: python
 
+matrix:
+  include:
+    - python: 3.6
+      env:
+        - TOXENV=py36
+    - python: 2.7
+      env:
+        - TOXENV=py27
+
+
 install:
 # Install the code requirements
 - make init
@@ -10,7 +20,7 @@ install:
 
 script:
 # Runs unit tests
-- make pr
+- tox
 
 # Build docs pages only from master branch
 - if [ "$TRAVIS_BRANCH" = "master" ]; then make build-docs; fi

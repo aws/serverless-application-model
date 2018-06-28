@@ -1,9 +1,9 @@
-from deployment_preference import DeploymentPreference
+from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 
 CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = 'CodeDeployServiceRole'
@@ -53,7 +53,7 @@ class DeploymentPreferenceCollection(object):
         """
         :return: boolean whether any deployment preferences in the collection are enabled
         """
-        return any(preference.enabled for preference in self._resource_preferences.itervalues())
+        return any(preference.enabled for preference in self._resource_preferences.values())
 
     def can_skip_service_role(self):
         """
@@ -61,14 +61,14 @@ class DeploymentPreferenceCollection(object):
         service role altogether.
         :return: True, if we can skip creating service role. False otherwise
         """
-        return all(preference.role for preference in self._resource_preferences.itervalues())
+        return all(preference.role for preference in self._resource_preferences.values())
 
 
     def enabled_logical_ids(self):
         """
         :return: only the logical id's for the deployment preferences in this collection which are enabled
         """
-        return [logical_id for logical_id, preference in self._resource_preferences.iteritems() if preference.enabled]
+        return [logical_id for logical_id, preference in self._resource_preferences.items() if preference.enabled]
 
     def _codedeploy_application(self):
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
