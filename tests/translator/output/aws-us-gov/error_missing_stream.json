@@ -1,0 +1,6 @@
+{
+  "errors": [{
+    "errorMessage": "Resource with id [DynamoDBFunction] is invalid. Event with id [MyDDBStream] is invalid. No Queue (for SQS) or Stream (for Kinesis or DynamoDB) provided."
+  }],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [DynamoDBFunction] is invalid. Event with id [MyDDBStream] is invalid. No Queue (for SQS) or Stream (for Kinesis or DynamoDB) provided."
+}

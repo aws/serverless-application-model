@@ -51,7 +51,7 @@ def is_instrinsic(input):
         and isinstance(input, dict) \
         and len(input) == 1:
 
-        key = input.keys()[0]
+        key = list(input.keys())[0]
         return key == "Ref" or key == "Condition" or key.startswith("Fn::")
 
     return False

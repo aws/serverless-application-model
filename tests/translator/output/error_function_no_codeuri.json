@@ -1,8 +1,8 @@
 {
   "errors": [
     {
-      "errorMessage": "Resource with id [Function] is invalid. Missing required property 'CodeUri'."
+      "errorMessage": "Resource with id [Function] is invalid. Either 'InlineCode' or 'CodeUri' must be set."
     }
   ], 
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function] is invalid. Missing required property 'CodeUri'."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function] is invalid. Either 'InlineCode' or 'CodeUri' must be set"
 }

@@ -14,6 +14,14 @@ Resources:
       Runtime: python2.7
       Tracing: Active
 
+  FunctionWithInlineCode:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      InlineCode: "hello world"
+      Handler: hello.handler
+      Runtime: python2.7
+      Tracing: Active
+
   FunctionWithCodeUriObject:
     Type: 'AWS::Serverless::Function'
     Properties:

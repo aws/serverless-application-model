@@ -262,7 +262,7 @@ class SwaggerEditor(object):
             return ""
 
         # At this point, value of Swagger path should be a dictionary with method names being the keys
-        methods = self.paths[path].keys()
+        methods = list(self.paths[path].keys())
 
         if self._X_ANY_METHOD in methods:
             # API Gateway's ANY method is not a real HTTP method but a wildcard representing all HTTP methods

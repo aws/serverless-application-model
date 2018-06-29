@@ -60,8 +60,12 @@
             },
             "StageName": {
               "anyOf": [
-                { "type": "string" },
-                { "type": "object" }
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object"
+                }
               ]
             },
             "Variables": {
@@ -69,8 +73,12 @@
               "patternProperties": {
                 "^[a-zA-Z0-9]+$": {
                   "anyOf": [
-                    { "type": "string" },
-                    { "type": "object" }
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object"
+                    }
                   ]
                 }
               },
@@ -144,108 +152,129 @@
           "type": "object"
         },
         "Properties": {
-          "additionalProperties": false,
-          "properties": {
-            "CodeUri": {
+          "allOf": [
+            {
               "anyOf": [
                 {
-                  "type": [
-                    "string"
-                  ]
+                  "properties": {
+                    "InlineCode": {
+                      "type": "string"
+                    }
+                  }
                 },
                 {
-                  "$ref": "#/definitions/AWS::Serverless::Function.S3Location"
+                  "properties": {
+                    "CodeUri": {
+                      "anyOf": [
+                        {
+                          "type": [
+                            "string"
+                          ]
+                        },
+                        {
+                          "$ref": "#/definitions/AWS::Serverless::Function.S3Location"
+                        }
+                      ]
+                    }
+                  }
                 }
               ]
             },
-            "DeadLetterQueue": {
-              "$ref": "#/definitions/AWS::Serverless::Function.DeadLetterQueue"
-            },
-            "Description": {
-              "type": "string"
-            },
-            "Environment": {
-              "$ref": "#/definitions/AWS::Serverless::Function.FunctionEnvironment"
-            },
-            "Events": {
-              "additionalProperties": false,
-              "patternProperties": {
-                "^[a-zA-Z0-9]+$": {
-                  "$ref": "#/definitions/AWS::Serverless::Function.EventSource"
-                }
-              },
-              "type": "object"
-            },
-            "FunctionName": {
-              "type": "string"
-            },
-            "Handler": {
-              "type": "string"
-            },
-            "KmsKeyArn": {
-              "type": "string"
-            },
-            "MemorySize": {
-              "type": "number"
-            },
-            "Policies": {
-              "anyOf": [
-                {
-                  "type": [
-                    "string"
-                  ]
+            {
+              "properties": {
+                "DeadLetterQueue": {
+                  "$ref": "#/definitions/AWS::Serverless::Function.DeadLetterQueue"
                 },
-                {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "#/definitions/AWS::Serverless::Function.IAMPolicyDocument"
-                },
-                {
-                  "items": {
-                    "$ref": "#/definitions/AWS::Serverless::Function.IAMPolicyDocument"
-                  },
-                  "type": "array"
-                }
-              ]
-            },
-            "Role": {
-              "anyOf": [
-                { "type": "string" },
-                { "type": "object" }
-              ]
-            },
-            "Runtime": {
-              "type": "string"
-            },
-            "Tags": {
-              "additionalProperties": false,
-              "patternProperties": {
-                "^[a-zA-Z0-9]+$": {
+                "Description": {
                   "type": "string"
+                },
+                "Environment": {
+                  "$ref": "#/definitions/AWS::Serverless::Function.FunctionEnvironment"
+                },
+                "Events": {
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[a-zA-Z0-9]+$": {
+                      "$ref": "#/definitions/AWS::Serverless::Function.EventSource"
+                    }
+                  },
+                  "type": "object"
+                },
+                "FunctionName": {
+                  "type": "string"
+                },
+                "Handler": {
+                  "type": "string"
+                },
+                "KmsKeyArn": {
+                  "type": "string"
+                },
+                "MemorySize": {
+                  "type": "number"
+                },
+                "Policies": {
+                  "anyOf": [
+                    {
+                      "type": [
+                        "string"
+                      ]
+                    },
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "$ref": "#/definitions/AWS::Serverless::Function.IAMPolicyDocument"
+                    },
+                    {
+                      "items": {
+                        "$ref": "#/definitions/AWS::Serverless::Function.IAMPolicyDocument"
+                      },
+                      "type": "array"
+                    }
+                  ]
+                },
+                "Role": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object"
+                    }
+                  ]
+                },
+                "Runtime": {
+                  "type": "string"
+                },
+                "Tags": {
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[a-zA-Z0-9]+$": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "Timeout": {
+                  "type": "number"
+                },
+                "Tracing": {
+                  "type": "string"
+                },
+                "VpcConfig": {
+                  "$ref": "#/definitions/AWS::Serverless::Function.VpcConfig"
                 }
               },
+              "required": [
+                "Handler",
+                "Runtime"
+              ],
               "type": "object"
-            },
-            "Timeout": {
-              "type": "number"
-            },
-            "Tracing": {
-              "type": "string"
-            },
-            "VpcConfig": {
-              "$ref": "#/definitions/AWS::Serverless::Function.VpcConfig"
             }
-          },
-          "required": [
-            "CodeUri",
-            "Handler",
-            "Runtime"
-          ],
-          "type": "object"
+          ]
         },
         "Type": {
           "enum": [
@@ -285,9 +314,13 @@
           "type": "string"
         },
         "RestApiId": {
-          "anyOf":[
-            { "type": "string" },
-            { "type": "object" }
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
           ]
         }
       },
@@ -380,6 +413,9 @@
             },
             {
               "$ref": "#/definitions/AWS::Serverless::Function.KinesisEvent"
+            },
+            {
+              "$ref": "#/definitions/AWS::Serverless::Function.SQSEvent"
             },
             {
               "$ref": "#/definitions/AWS::Serverless::Function.DynamoDBEvent"
@@ -481,13 +517,38 @@
       ],
       "type": "object"
     },
+    "AWS::Serverless::Function.SQSEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "BatchSize": {
+          "type": "number"
+        },
+        "Queue": {
+          "anyOf": [{
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "Queue"
+      ],
+      "type": "object"
+    },
     "AWS::Serverless::Function.S3Event": {
       "additionalProperties": false,
       "properties": {
         "Bucket": {
-          "anyOf":[
-            { "type": "string" },
-            { "type": "object" }
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
           ]
         },
         "Events": {
@@ -538,9 +599,13 @@
       "additionalProperties": false,
       "properties": {
         "S3Key": {
-          "anyOf":[
-            { "type": "string" },
-            { "type": "object" }
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
           ]
         }
       },
@@ -596,7 +661,7 @@
             "type": "object"
           },
           "type": "array"
-        }        
+        }
       },
       "required": [
         "SecurityGroupIds",
@@ -641,6 +706,9 @@
             },
             "ProvisionedThroughput": {
               "$ref": "#/definitions/AWS::Serverless::SimpleTable.ProvisionedThroughput"
+            },
+            "SSESpecification": {
+              "$ref": "#/definitions/AWS::Serverless::SimpleTable.SSESpecification"
             }
           },
           "type": "object"
@@ -684,6 +752,18 @@
       },
       "required": [
         "WriteCapacityUnits"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::SimpleTable.SSESpecification": {
+      "additionalProperties": false,
+      "properties": {
+        "SSEEnabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "SSEEnabled"
       ],
       "type": "object"
     },
@@ -778,9 +858,13 @@
           "type": "string"
         },
         "Value": {
-          "anyOf":[
-            { "type": "string" },
-            { "type": "object" }
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
           ]
         }
       },
