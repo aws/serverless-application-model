@@ -60,7 +60,6 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_headers',
         'api_with_cors_and_only_origins',
         'api_with_cors_and_only_maxage',
-        'api_with_cors_and_only_expose_headers',
         'api_with_cors_and_only_credentials_false',
         'api_cache',
         's3',

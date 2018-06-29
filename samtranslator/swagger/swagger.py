@@ -119,7 +119,7 @@ class SwaggerEditor(object):
             yield path
 
     def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None,
-                 exposed_headers=None, allow_credentials=None):
+                 allow_credentials=None):
         """
         Add CORS configuration to this path. Specifically, we will add a OPTIONS response config to the Swagger that
         will return headers required for CORS. Since SAM uses aws_proxy integration, we cannot inject the headers
@@ -140,8 +140,6 @@ class SwaggerEditor(object):
             Value can also be an intrinsic function dict.
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
-        :param string/dict exposed_headers: Comma separated list of exposed headers.
-            Value can also be an instrinsic function dict.
         :param bool/None allow_credentials: Flags whether request is allowed to contain credentials.
         :raises ValueError: When values for one of the allowed_* variables is empty
         """
@@ -169,11 +167,10 @@ class SwaggerEditor(object):
                                                                                         allowed_headers,
                                                                                         allowed_methods,
                                                                                         max_age,
-                                                                                        exposed_headers,
                                                                                         allow_credentials)
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
-                                          max_age=None, exposed_headers=None, allow_credentials=None):
+                                          max_age=None, allow_credentials=None):
         """
         Returns a Swagger snippet containing configuration for OPTIONS HTTP Method to configure CORS.
 
@@ -188,8 +185,6 @@ class SwaggerEditor(object):
             Value can also be an intrinsic function dict.
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
-        :param string/dict exposed_headers: Comma separated list of exposed headers.
-            Value can also be an instrinsic function dict.
         :param bool allow_credentials: Flags whether request is allowed to contain credentials.
 
         :return dict: Dictionary containing Options method configuration for CORS
@@ -199,7 +194,6 @@ class SwaggerEditor(object):
         ALLOW_HEADERS = "Access-Control-Allow-Headers"
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
-        EXPOSE_HEADERS = "Access-Control-Expose-Headers"
         ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
         HEADER_RESPONSE = lambda x: "method.response.header."+x
 
@@ -231,9 +225,6 @@ class SwaggerEditor(object):
             # MaxAge can be set to 0, which is a valid value. So explicitly check against None
             response_parameters[HEADER_RESPONSE(MAX_AGE)] = max_age
             response_headers[MAX_AGE] = {"type": "integer"}
-        if exposed_headers:
-            response_parameters[HEADER_RESPONSE(EXPOSE_HEADERS)] = exposed_headers
-            response_headers[EXPOSE_HEADERS] = {"type": "string"}
         if allow_credentials is True:
             # Allow-Credentials only has a valid value of true, it should be omitted otherwise.
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials

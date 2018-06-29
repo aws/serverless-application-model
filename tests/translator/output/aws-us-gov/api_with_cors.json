@@ -137,7 +137,6 @@
                         "method.response.header.Access-Control-Allow-Origin": "origins", 
                         "method.response.header.Access-Control-Allow-Methods": "methods", 
                         "method.response.header.Access-Control-Allow-Headers": "headers",
-                        "method.response.header.Access-Control-Expose-Headers": "headers",
                         "method.response.header.Access-Control-Allow-Credentials": "'true'"
                       }
                     }
@@ -157,9 +156,6 @@
                         "type": "string"
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
-                      },
-                      "Access-Control-Expose-Headers": {
                         "type": "string"
                       },
                       "Access-Control-Allow-Credentials": {
@@ -191,7 +187,6 @@
                         "method.response.header.Access-Control-Allow-Origin": "origins", 
                         "method.response.header.Access-Control-Allow-Methods": "methods", 
                         "method.response.header.Access-Control-Allow-Headers": "headers",
-                        "method.response.header.Access-Control-Expose-Headers": "headers",
                         "method.response.header.Access-Control-Allow-Credentials": "'true'"
                       }
                     }
@@ -211,9 +206,6 @@
                         "type": "string"
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
-                      },
-                      "Access-Control-Expose-Headers": {
                         "type": "string"
                       },
                       "Access-Control-Allow-Credentials": {
@@ -267,7 +259,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymente1a19134ca"
+          "Ref": "ExplicitApiDeployment3a5a78688c"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -296,13 +288,13 @@
         }
       }
     }, 
-    "ExplicitApiDeploymente1a19134ca": {
+    "ExplicitApiDeployment3a5a78688c": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: e1a19134ca6f0d6afe2079a3ff60176078baa467",
+        "Description": "RestApi deployment id: 3a5a78688c9bc377d53aa4153a11f0c4f6e7364c",
         "StageName": "Stage"
       }
     }, 

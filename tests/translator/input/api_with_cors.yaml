@@ -66,5 +66,4 @@ Resources:
         AllowMethods: "methods"
         AllowHeaders: "headers"
         AllowOrigin: "origins"
-        ExposeHeaders: "headers"
         AllowCredentials: true
