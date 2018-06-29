@@ -1,21 +1,21 @@
 # How to create serverless applications using AWS SAM
-AWS Serverless Application Model (AWS SAM) allows you to easily create and 
+The AWS Serverless Application Model (AWS SAM) allows you to easily create and 
 manage resources used in your serverless application using AWS CloudFormation. 
 You can define your serverless application as a SAM template - a JSON or YAML 
 configuration file that describes Lambda function, API endpoints and
-other resources in your application. Using nifty commands, you upload this 
-template to CloudFormation which creates all the individual resources and
+other resources in your application. Using a variety of [nifty commands](https://github.com/awslabs/aws-sam-cli#usage), you upload this 
+template to CloudFormation, which in turn creates all the individual resources and
 groups them into a *CloudFormation Stack* for ease of management. 
 When you update your SAM template, you will re-deploy the changes to 
 this stack. AWS CloudFormation will take care of updating the individual
 resources for you.
 
 
-The remainder of document explains how to write SAM templates and 
+The remainder of this document explains how to write SAM templates and 
 deploy them via AWS CloudFormation. 
 
 ## Writing SAM Template
-Checkout the [latest specification](versions/2016-10-31.md) for details on how to write a SAM template
+Check out the [latest specification](versions/2016-10-31.md) for details on how to write a SAM template
 
 ## Packing Artifacts
 Before you can deploy a SAM template, you should first upload your Lambda 
@@ -71,7 +71,7 @@ SAM template is deployed to AWS CloudFormation by [creating a changeset](http://
 using the SAM template followed by [executing the changeset](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets-execute.html). 
 Think of a ChangeSet as a diff between your current stack template and the new template that you are deploying. After you create a ChangeSet, you have the opportunity to examine the diff before executing it. Both the AWS Console and AWS CLI provide commands to create and execute a changeset. 
 
-Alternatively, you can use `aws cloudformation deploy` CLI command to deploy the SAM template. Under-the-hood it creates and executes a changeset and waits until the deployment completes. It also prints debugging hints when the deployment fails. Run the following command to deploy the packaged template to a stack called `my-new-stack`:
+Alternatively, you can use `aws cloudformation deploy` CLI command to deploy the SAM template. Under the hood it creates and executes a changeset and waits until the deployment completes. It also prints debugging hints when the deployment fails. Run the following command to deploy the packaged template to a stack called `my-new-stack`:
 
 ```bash
 $ aws cloudformation deploy \
@@ -83,7 +83,7 @@ $ aws cloudformation deploy \
 Refer to the [documentation](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html) for more details.
 
 ## Using Intrinsic Functions
-CloudFormation provides handy functions you can use to generate values at runtime. These are called [Intrinsic Functions](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html). Since SAM is deployed using CloudFormation, you can use these intrinsic functions within SAM as well. Here are some examples:
+CloudFormation provides handy functions that you can use to generate values at runtime. These are called [Intrinsic Functions](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html). Since SAM is deployed using CloudFormation, you can use these intrinsic functions within SAM as well. Here are some examples:
 
 #### Dynamically set S3 location of Lambda function code zip
 ```YAML
@@ -136,7 +136,7 @@ Resources:
 
 ### Caveats:
 #### ImportValue is partially supported
-[`ImportValue`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html) allows one stack to refer to value of properties from another stack. ImportValue is supported on most properties, except the very few that SAM needs to parse. Following properties are *not* supported:
+[`ImportValue`](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html) allows one stack to refer to value of properties from another stack. ImportValue is supported on most properties, except the very few that SAM needs to parse. The following properties are *not* supported:
 
 - `RestApiId` of `AWS::Serverless::Function`
 - `Policies` of `AWS::Serverless::Function`
