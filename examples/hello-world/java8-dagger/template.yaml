@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A simple Hello World Serverless project
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: java8
+      Handler: com.amazonaws.examples.lambda.Handler::handleRequest
+      CodeUri: ./target/java-dagger-1.0.1-SNAPSHOT.jar
