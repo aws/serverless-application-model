@@ -60,7 +60,7 @@ class TestPolicyTemplateProcessor(TestCase):
         processor = PolicyTemplatesProcessor(policy_templates_dict)
 
         self.assertEquals(2, len(processor.policy_templates))
-        self.assertEquals(set(["key1", "key2"]), set(processor.policy_templates.viewkeys()))
+        self.assertEquals(set(["key1", "key2"]), set(processor.policy_templates.keys()))
 
         # Template.from_dict must be called only once for each template entry
         self.assertEquals(2, template_from_dict_mock.call_count)
@@ -241,7 +241,7 @@ class TestPolicyTemplateProcessor(TestCase):
             PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict)
 
         ex = cm.exception
-        self.assertEquals(ex.message, exception_msg)
+        self.assertEquals(str(ex), exception_msg)
 
     @patch.object(jsonschema, "validate")
     @patch.object(PolicyTemplatesProcessor, "_read_schema")

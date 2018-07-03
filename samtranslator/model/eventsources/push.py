@@ -429,11 +429,12 @@ class Api(PushEventSource):
             raise RuntimeError("Could not add permission to lambda function.")
 
         path = self.Path.replace('{proxy+}', '*')
+        method = '*' if self.Method.lower() == 'any' else self.Method.upper()
 
         api_id = self.RestApiId
 
         # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
-        resource = '${__ApiId__}/' + '${__Stage__}/' + self.Method.upper() + path
+        resource = '${__ApiId__}/' + '${__Stage__}/' + method + path
         partition = ArnGenerator.get_partition_name()
         source_arn = fnSub(ArnGenerator.generate_arn(partition=partition, service='execute-api', resource=resource),
                            {"__ApiId__": api_id, "__Stage__": stage})

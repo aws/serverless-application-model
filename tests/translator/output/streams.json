@@ -1,120 +1,112 @@
 {
   "Resources": {
     "DynamoDBFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "streams.zip"
-        }, 
-        "Handler": "stream.ddb_handler", 
+        },
+        "Handler": "stream.ddb_handler",
         "Role": {
           "Fn::GetAtt": [
-            "DynamoDBFunctionRole", 
+            "DynamoDBFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [{
+          "Value": "SAM",
+          "Key": "lambda:createdBy"
+        }]
       }
-    }, 
+    },
     "KinesisFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "streams.zip"
-        }, 
-        "Handler": "stream.kinesis_handler", 
+        },
+        "Handler": "stream.kinesis_handler",
         "Role": {
           "Fn::GetAtt": [
-            "KinesisFunctionRole", 
+            "KinesisFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [{
+          "Value": "SAM",
+          "Key": "lambda:createdBy"
+        }]
       }
-    }, 
+    },
     "DynamoDBFunctionMyDDBStream": {
-      "Type": "AWS::Lambda::EventSourceMapping", 
+      "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
-        "BatchSize": 200, 
-        "EventSourceArn": "arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291", 
+        "BatchSize": 200,
+        "EventSourceArn": "arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291",
         "FunctionName": {
           "Ref": "DynamoDBFunction"
-        }, 
+        },
         "StartingPosition": "LATEST"
       }
-    }, 
+    },
     "DynamoDBFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole"
-        ], 
+        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Action": [
+              "sts:AssumeRole"
+            ],
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [
+                "lambda.amazonaws.com"
+              ]
             }
-          ]
+          }]
         }
       }
-    }, 
+    },
     "KinesisFunctionMyKinesisStream": {
-      "Type": "AWS::Lambda::EventSourceMapping", 
+      "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
-        "BatchSize": 100, 
-        "EventSourceArn": "arn:aws:kinesis:us-west-2:012345678901:stream/my-stream", 
+        "BatchSize": 100,
+        "EventSourceArn": "arn:aws:kinesis:us-west-2:012345678901:stream/my-stream",
         "FunctionName": {
           "Ref": "KinesisFunction"
-        }, 
+        },
         "StartingPosition": "TRIM_HORIZON"
       }
-    }, 
+    },
     "KinesisFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole"
-        ], 
+        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Action": [
+              "sts:AssumeRole"
+            ],
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [
+                "lambda.amazonaws.com"
+              ]
             }
-          ]
+          }]
         }
       }
     }

@@ -1,7 +1,7 @@
 import os.path
 import pytest
 from unittest import TestCase
-from tests.translator.yaml_helper import yaml_parse
+from samtranslator.yaml_helper import yaml_parse
 from samtranslator.validator.validator import SamTemplateValidator
 
 input_folder = 'tests/translator/input'
@@ -12,7 +12,9 @@ input_folder = 'tests/translator/input'
     'cloudwatch_logs_with_ref',
     'cloudwatchlog',
     'streams',
+    'sqs',
     'simpletable',
+    'simpletable_with_sse',
     'implicit_api',
     'explicit_api',
     'api_endpoint_configuration',
@@ -57,6 +59,7 @@ input_folder = 'tests/translator/input'
     'function_with_policy_templates',
     'globals_for_function',
     'globals_for_api',
+    'globals_for_simpletable',
     'all_policy_templates',
     'simple_table_ref_parameter_intrinsic',
     'simple_table_with_table_name',

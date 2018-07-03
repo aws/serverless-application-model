@@ -140,7 +140,7 @@ class FunctionPolicies(object):
         return self._policy_template_processor is not None and \
                 isinstance(policy, dict) and \
                 len(policy) == 1 and \
-                self._policy_template_processor.has(policy.keys()[0]) is True
+                self._policy_template_processor.has(list(policy.keys())[0]) is True
 
 
 

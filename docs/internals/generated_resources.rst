@@ -220,6 +220,33 @@ AWS::Lambda::Permissions           MyFunction\ **MyTrigger**\ Permission
 AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger** 
 ================================== ================================
 
+SQS
+^^^^^^^
+
+Example:
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        MyTrigger:
+          Type: SQS
+          Properties:
+            Queue: arn:aws:sqs:us-east-1:123456789012:my-queue
+      ...
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID 
+================================== ================================
+AWS::Lambda::Permissions           MyFunction\ **MyTrigger**\ Permission
+AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger** 
+================================== ================================
+
 DynamoDb
 ^^^^^^^^
 

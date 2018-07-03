@@ -1,6 +1,5 @@
-from urlparse import urlparse, parse_qs
-
 from six import string_types
+from six.moves.urllib.parse import urlparse, parse_qs
 
 
 def parse_s3_uri(uri):

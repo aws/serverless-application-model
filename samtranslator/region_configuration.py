@@ -1,4 +1,5 @@
-from translator.arn_generator import ArnGenerator
+from .translator.arn_generator import ArnGenerator
+
 
 class RegionConfiguration(object):
     """

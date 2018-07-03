@@ -179,7 +179,7 @@ class Translator:
             return parameter_values
 
         default_values = {}
-        for param_name, value in parameter_definition.iteritems():
+        for param_name, value in parameter_definition.items():
             if isinstance(value, dict) and "Default" in value:
                 default_values[param_name] = value["Default"]
 

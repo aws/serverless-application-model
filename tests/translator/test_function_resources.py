@@ -60,7 +60,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEquals(len(aliases), 1)
         self.assertEquals(len(versions), 1)
 
-        alias = aliases[0].values()[0]["Properties"]
+        alias = list(aliases[0].values())[0]["Properties"]
         self.assertEquals(alias["Name"], alias_name)
         # We don't need to do any deeper validation here because there is a separate SAM template -> CFN template conversion test
         # that will care of validating all properties & connections
@@ -109,8 +109,8 @@ class TestVersionsAndAliases(TestCase):
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
-        self.assertTrue("UpdatePolicy" in aliases[0].values()[0])
-        self.assertEqual(aliases[0].values()[0]["UpdatePolicy"], self.update_policy().to_dict())
+        self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
+        self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
 
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_deployment_preference_missing_collection_raises_error(self, get_resolved_alias_name_mock):
@@ -177,7 +177,7 @@ class TestVersionsAndAliases(TestCase):
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(enabled)
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
-        self.assertTrue("UpdatePolicy" not in aliases[0].values()[0])
+        self.assertTrue("UpdatePolicy" not in list(aliases[0].values())[0])
 
     def test_sam_function_cannot_be_with_deployment_preference_without_alias(self):
         with self.assertRaises(InvalidResourceException):
@@ -265,8 +265,8 @@ class TestVersionsAndAliases(TestCase):
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
-        self.assertTrue("UpdatePolicy" in aliases[0].values()[0])
-        self.assertEqual(aliases[0].values()[0]["UpdatePolicy"], self.update_policy().to_dict())
+        self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
+        self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
 
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_deployment_preference_instrinsic_ref_enabled_dict_parameter(self, get_resolved_alias_name_mock):
