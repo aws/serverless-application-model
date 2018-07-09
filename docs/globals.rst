@@ -179,13 +179,11 @@ In the above example the environment variables of ``MyFunction`` will be set to:
 
 Lists are additive
 ~~~~~~~~~~~~~~~~~~~
-*Also called as arrays*
+*Lists are also known as arrays*
 
-List values in the resource will be **appended** with the map value from Global. 
+List entries in the resource will be **appended** to the global entries. 
 
 Example:
-
-SecurityGroupIds of VpcConfig will be set to ``["sg-first", "sg-123", "sg-456"]``
 
 .. code:: yaml
 
@@ -204,3 +202,8 @@ SecurityGroupIds of VpcConfig will be set to ``["sg-first", "sg-123", "sg-456"]`
           SecurityGroupIds:
             - sg-first
  
+In the above example the Security Group Ids of ``MyFunction``'s VPC Config will be set to:
+
+.. code:: json
+
+  [ "sg-123", "sg-456", "sg-first" ]
