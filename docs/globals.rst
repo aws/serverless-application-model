@@ -42,16 +42,15 @@ In the above example, both ``HelloWorldFunction`` and ``ThumbnailFunction`` will
 timeout and index.handler Handler. ``HelloWorldFunction`` adds MESSAGE environment variable in addition to the 
 inherited TABLE_NAME. ``ThumbnailFunction`` inherits all the Globals properties and adds an API Event source.
 
-Supported Resources
--------------------
-Properties of ``AWS::Serverless::Function`` and ``AWS::Serverless::Api`` are only supported in Globals section 
-presently. 
+Supported Resources and Properties
+----------------------------------
+Currently, the following resources and properties are being supported:
 
 .. code:: yaml
 
   Globals:
     Function:
-      # Some properties of AWS::Serverless::Function
+      # Properties of AWS::Serverless::Function
       Handler:
       Runtime:
       CodeUri:
@@ -68,7 +67,7 @@ presently.
       DeploymentPreference:
     
     Api:
-      # Some properties of AWS::Serverless::Api
+      # Properties of AWS::Serverless::Api
       # Also works with Implicit APIs
       Name:
       DefinitionUri:
@@ -81,6 +80,7 @@ presently.
       Cors:
 
     SimpleTable:
+      # Properties of AWS::Serverless::SimpleTable
       SSESpecification
 
 Implicit APIs
