@@ -143,13 +143,11 @@ Runtime of ``MyFunction`` will be set to python3.6
 
 Maps are merged
 ~~~~~~~~~~~~~~~
-*Also called as dictionaries, or key/value pairs*
+*Maps are also known as dictionaries or collections of key/value pairs*
 
-Map value in the resource will be **merged** with the map value from Global. 
+Map entries in the resource will be **merged** with global map entries. In case of duplicates the resource entry will override the global entry.
 
 Example:
-
-Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource-table", "NEW_VAR": "hello" }``
 
 .. code:: yaml
 
@@ -157,6 +155,7 @@ Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource
     Function:
       Environment: 
         Variables:
+          STAGE: Production
           TABLE_NAME: global-table
 
   Resources:
@@ -167,6 +166,16 @@ Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource
           Variables:
             TABLE_NAME: resource-table
             NEW_VAR: hello
+
+In the above example the environment variables of ``MyFunction`` will be set to:
+
+.. code:: json
+
+  {
+    STAGE: Production, 
+    TABLE_NAME: resource-table, 
+    NEW_VAR: hello 
+  }
 
 Lists are additive
 ~~~~~~~~~~~~~~~~~~~
