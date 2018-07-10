@@ -172,9 +172,9 @@ In the above example the environment variables of ``MyFunction`` will be set to:
 .. code:: json
 
   {
-    STAGE: Production, 
-    TABLE_NAME: resource-table, 
-    NEW_VAR: hello 
+    "STAGE": "Production", 
+    "TABLE_NAME": "resource-table", 
+    "NEW_VAR": "hello" 
   }
 
 Lists are additive
