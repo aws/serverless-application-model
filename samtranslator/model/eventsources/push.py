@@ -241,6 +241,11 @@ class S3(PushEventSource):
         """
 
         depends_on = bucket.get("DependsOn", [])
+
+        # DependsOn can be either a list of strings or a scalar string
+        if isinstance(depends_on, string_types):
+            depends_on = [ depends_on ]
+
         depends_on_set = set(depends_on)
         depends_on_set.add(permission.logical_id)
         bucket["DependsOn"] = list(depends_on_set)
