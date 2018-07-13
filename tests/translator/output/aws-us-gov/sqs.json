@@ -5,7 +5,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaSQSExecutionRole"
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",

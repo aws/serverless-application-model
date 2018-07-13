@@ -2,6 +2,7 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemp
 from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.plugins import LifeCycleEvents
+import logging
 
 class Parser:
     def __init__(self):
@@ -25,4 +26,11 @@ class Parser:
             raise InvalidDocumentException(
                 [InvalidTemplateException("'Resources' section is required")])
 
-        SamTemplateValidator.validate(sam_template)
+        validation_errors = SamTemplateValidator.validate(sam_template)
+        has_errors = len(validation_errors)
+
+        if has_errors:
+            # NOTE: eventually we will throw on invalid schema
+            # raise InvalidDocumentException([InvalidTemplateException(validation_errors)])
+            logging.warning(
+                "JSON_VALIDATION_WARNING: {0}".format(validation_errors))

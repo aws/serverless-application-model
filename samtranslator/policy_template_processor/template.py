@@ -46,7 +46,7 @@ class Template(object):
         # Select only necessary parameter_values. this is to prevent malicious or accidental
         # injection of values for parameters not intended in the template. This is important because "Ref" resolution
         # will substitute any references for which a value is provided.
-        necessary_parameter_values = {name: value for name, value in parameter_values.iteritems()
+        necessary_parameter_values = {name: value for name, value in parameter_values.items()
                                       if name in self.parameters}
 
         # Only "Ref" is supported
@@ -71,7 +71,7 @@ class Template(object):
         if not self._is_valid_parameter_values(parameter_values):
             raise InvalidParameterValues("Parameter values are required to process a policy template")
 
-        return list(self.parameters.viewkeys() - parameter_values.viewkeys())
+        return list(set(self.parameters.keys()) - set(parameter_values.keys()))
 
     @staticmethod
     def _is_valid_parameter_values(parameter_values):
