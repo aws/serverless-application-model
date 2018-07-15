@@ -114,7 +114,8 @@
               "dynamodb:Query",
               "dynamodb:UpdateItem",
               "dynamodb:BatchWriteItem",
-              "dynamodb:BatchGetItem"
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
             ],
             "Resource": {
               "Fn::Sub": [
@@ -145,7 +146,8 @@
               "dynamodb:GetItem",
               "dynamodb:Scan",
               "dynamodb:Query",
-              "dynamodb:BatchGetItem"
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
             ],
             "Resource": {
               "Fn::Sub": [
