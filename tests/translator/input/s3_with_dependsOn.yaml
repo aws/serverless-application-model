@@ -1,0 +1,21 @@
+Resources:
+  Topic:
+    Type: AWS::SNS::Topic
+
+  ThumbnailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.generate_thumbails
+      Runtime: nodejs4.3
+      Events:
+        ImageBucket:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*
+
+  Images:
+    Type: AWS::S3::Bucket
+    DependsOn: Topic
