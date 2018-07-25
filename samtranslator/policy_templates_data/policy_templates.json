@@ -1275,7 +1275,7 @@
           {
             "Effect": "Allow",
             "Action": [
-              "logs:FilterLogEvents",
+              "logs:FilterLogEvents"
             ],
             "Resource": "*"
           }
