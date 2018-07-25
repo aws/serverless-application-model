@@ -1264,6 +1264,23 @@
           }
         ]
       }
+    },
+    "FilterLogEventsPolicy": {
+      "Description": "Gives permission to filter Log Events from any Log Group",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:FilterLogEvents"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
     }
   }
 }

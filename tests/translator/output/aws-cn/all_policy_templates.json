@@ -987,6 +987,20 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy39",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "logs:FilterLogEvents"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "AssumeRolePolicyDocument": {
