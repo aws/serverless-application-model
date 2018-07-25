@@ -931,34 +931,34 @@
         ]
       }
     },
-	  "AWSSecretsManagerGetSecretValueAccess": {
-	    "Description": "Grants permissions to GetSecretValue for the specified AWS Secrets Manager secret",
-	    "Parameters": {
-	      "SecretArn": {
-	        "Description": "The ARN of the secret to grant access to"
-	      }
-	    },
-	    "Definition": {
-	      "Statement": [
-	        {
-	          "Effect": "Allow",
-	          "Action": [
-	            "secretsmanager:GetSecretValue"
-	          ],
-	          "Resource": {
-	            "Fn::Sub": [
-	              "${secretArn}",
-	              {
-	                "secretArn": {
-	                  "Ref": "SecretArn"
-	                }
-	              }
-	            ]
-	          }
-	        }
-	      ]
-	    }
-	  },
+    "AWSSecretsManagerGetSecretValueAccess": {
+      "Description": "Grants permissions to GetSecretValue for the specified AWS Secrets Manager secret",
+      "Parameters": {
+        "SecretArn": {
+          "Description": "The ARN of the secret to grant access to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "secretsmanager:GetSecretValue"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "${secretArn}",
+                {
+                  "secretArn": {
+                    "Ref": "SecretArn"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "CodePipelineReadOnlyPolicy": {
       "Description": "Gives read permissions to get details about a CodePipeline pipeline",
       "Parameters": {
