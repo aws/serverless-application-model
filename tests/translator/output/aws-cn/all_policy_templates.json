@@ -996,7 +996,14 @@
                   "Action": [
                     "logs:FilterLogEvents"
                   ],
-                  "Resource": "*",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::Account}:log-group:${logGroupName}*", 
+                      {
+                        "logGroupName": "name"
+                      }
+                    ]
+                  },
                   "Effect": "Allow"
                 }
               ]

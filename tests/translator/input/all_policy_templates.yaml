@@ -119,4 +119,5 @@ Resources:
         - PinpointEndpointAccessPolicy:
             PinpointApplicationId: id
 
-        - FilterLogEventsPolicy: {}
+        - FilterLogEventsPolicy:
+            LogGroupName: name
