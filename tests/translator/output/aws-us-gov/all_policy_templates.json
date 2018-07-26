@@ -988,6 +988,27 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy39",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "logs:FilterLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::Account}:log-group:${logGroupName}",
+                      {
+                        "logGroupName": "name"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "AssumeRolePolicyDocument": {
