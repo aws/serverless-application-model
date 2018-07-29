@@ -1,0 +1,62 @@
+# To deploy with SAM:
+# download and install sam: https://github.com/awslabs/aws-sam-cli
+# sam package --template-file template.yaml --s3-bucket your-s3-bucket --output-template sam-output.yaml
+# sam deploy --template-file sam-output.yaml --stack-name WatchSecurityGroup --capabilities CAPABILITY_IAM
+
+# To test locally: (make sure to modifify the "groupId" with a real security group, add your webhook into vars.json)
+  # sam local invoke -e events/event_iam.json WatchSecurityGroupFunction -n vars.json
+
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda function to watch EC2 Security Group Events to Send to Teams
+
+Parameters:
+
+  WebHook:
+    Description: MS Teams Webhook
+    Type: String
+    Default: https://outlook.office.com/webhook/your/webhook/etc
+
+Resources:
+
+  # Lambda Function
+  WatchSecurityGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: watch-security-group.lambda_handler
+      Timeout: 10
+      Tracing: Active
+      MemorySize: 128
+      Runtime: python3.6
+      CodeUri: .
+      Description: Detects EC2 Security Group Events to Send to Teams
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+        - CloudWatchLogsFullAccess
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                  - ec2:DescribeSecurityGroupReferences
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeStaleSecurityGroups
+              Resource: '*'
+      Events:
+        WatchSecurityGroupRule:
+          Type: CloudWatchEvent
+          Description: Detects EC2 Security Group Events to Send to Teams
+          Properties:
+            Pattern:
+              source:
+                - "aws.ec2"
+              detail-type:
+                - "AWS API Call via CloudTrail"
+              detail:
+                eventSource:
+                  - "ec2.amazonaws.com"
+                eventName:
+                  - "AuthorizeSecurityGroupIngress"
+                  - "RevokeSecurityGroupIngress"
+      Environment:
+        Variables:
+          TEAM_WEBHOOK: !Ref WebHook
+  
