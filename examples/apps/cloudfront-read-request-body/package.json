@@ -1,0 +1,8 @@
+{
+  "name": "hello_world",
+  "version": "1.0.0",
+  "description": "hello world sample for NodeJS",
+  "main": "index.js",
+  "repository": "https://github.com/awslabs/serverless-application-model/tree/master/examples/apps/cloudfront-read-request-body",
+  "author": "AWS"
+}

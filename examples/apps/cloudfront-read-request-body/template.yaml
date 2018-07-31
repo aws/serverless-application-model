@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >-
+  Sample code for accessing request body in origin-request and viewer-request 
+  trigger implemented in NodeJS.
+Resources:
+  CloudfrontReadRequestBody:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: .
+      Description: >-
+        Sample code for accessing request body in origin-request and 
+        viewer-request trigger implemented in NodeJS.
+      MemorySize: 128
+      Timeout: 5
