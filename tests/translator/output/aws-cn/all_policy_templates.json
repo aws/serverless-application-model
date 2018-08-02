@@ -247,7 +247,8 @@
                     "s3:GetObjectVersion", 
                     "s3:PutObject", 
                     "s3:GetLifecycleConfiguration", 
-                    "s3:PutLifecycleConfiguration"
+                    "s3:PutLifecycleConfiguration",
+                    "s3:DeleteObject"
                   ], 
                   "Resource": [
                     {

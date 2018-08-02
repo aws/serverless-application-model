@@ -264,7 +264,7 @@
       }
     },
     "S3CrudPolicy": {
-      "Description": "Gives read permissions to objects in the S3 Bucket",
+      "Description": "Gives CRUD permissions to objects in the S3 Bucket",
       "Parameters": {
         "BucketName": {
           "Description": "Name of the Bucket"
@@ -281,7 +281,8 @@
               "s3:GetObjectVersion",
               "s3:PutObject",
               "s3:GetLifecycleConfiguration",
-              "s3:PutLifecycleConfiguration"
+              "s3:PutLifecycleConfiguration",
+              "s3:DeleteObject"
             ],
             "Resource": [
               {

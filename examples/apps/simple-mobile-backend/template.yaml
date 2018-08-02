@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: A simple mobile backend (read/write to DynamoDB).
+Parameters:
+  TableNameParameter:
+    Type: String
 Resources:
   simplemobilebackend:
     Type: 'AWS::Serverless::Function'
@@ -12,20 +15,5 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'dynamodb:DeleteItem'
-                - 'dynamodb:GetItem'
-                - 'dynamodb:PutItem'
-                - 'dynamodb:Scan'
-                - 'dynamodb:UpdateItem'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:dynamodb:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':table/*'
+      - DynamoDBCrudPolicy:
+          TableName: !Ref TableNameParameter

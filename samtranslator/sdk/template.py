@@ -26,7 +26,7 @@ class SamTemplate(object):
         :yields (string, SamResource): Tuple containing LogicalId and the resource
         """
 
-        for logicalId, resource_dict in self.resources.iteritems():
+        for logicalId, resource_dict in self.resources.items():
 
             resource = SamResource(resource_dict)
             needs_filter = resource.valid()
