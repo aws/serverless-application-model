@@ -1157,6 +1157,34 @@
         ]
       }
     },
+    "AWSSecretsManagerGetSecretValuePolicy": {
+      "Description": "Grants permissions to GetSecretValue for the specified AWS Secrets Manager secret",
+      "Parameters": {
+        "SecretArn": {
+          "Description": "The ARN of the secret to grant access to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "secretsmanager:GetSecretValue"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "${secretArn}",
+                {
+                  "secretArn": {
+                    "Ref": "SecretArn"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "MobileAnalyticsWriteOnlyAccessPolicy": {
       "Description": "Gives write only permissions to put event data for all application resources",
       "Parameters": {
