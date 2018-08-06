@@ -119,6 +119,7 @@ class TestTranslatorEndToEnd(TestCase):
         's3_filter',
         's3_multiple_events_same_bucket',
         's3_multiple_functions',
+        's3_with_dependsOn',
         'sns',
         'sns_existing_other_subscription',
         'sns_topic_outside_template',

@@ -59,7 +59,7 @@ Here are some questions that you should answer in your plan:
 
 - **How do developers work around this problem today?**
 
-    Example: Manually click through every step on the website while refering to
+    Example: Manually click through every step on the website while referring to
     "How To" resources on the internet.
 
 - **Describe your proposed solution?**
