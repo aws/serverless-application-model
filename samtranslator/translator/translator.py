@@ -7,6 +7,7 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidReso
     InvalidEventException
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
 from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
@@ -198,6 +199,7 @@ def prepare_plugins(plugins):
     """
 
     required_plugins = [
+        DefaultDefinitionBodyPlugin(),
         make_implicit_api_plugin(),
         GlobalsPlugin(),
         make_policy_template_for_function_plugin(),

@@ -111,6 +111,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_headers',
         'api_with_cors_and_only_origins',
         'api_with_cors_and_only_maxage',
+        'api_with_cors_no_definitionbody',
         'api_cache',
         's3',
         's3_create_remove',
@@ -679,7 +680,7 @@ class TestPluginsUsage(TestCase):
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
 
         sam_plugins = prepare_plugins([])
-        self.assertEquals(3, len(sam_plugins))
+        self.assertEquals(4, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     def test_prepare_plugins_must_merge_input_plugins(self, make_policy_template_for_function_plugin_mock):
@@ -689,12 +690,12 @@ class TestPluginsUsage(TestCase):
 
         custom_plugin = BasePlugin("someplugin")
         sam_plugins = prepare_plugins([custom_plugin])
-        self.assertEquals(4, len(sam_plugins))
+        self.assertEquals(5, len(sam_plugins))
 
     def test_prepare_plugins_must_handle_empty_input(self):
 
         sam_plugins = prepare_plugins(None)
-        self.assertEquals(3, len(sam_plugins)) # one required plugin
+        self.assertEquals(4, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.PolicyTemplatesProcessor")
     @patch("samtranslator.translator.translator.PolicyTemplatesForFunctionPlugin")

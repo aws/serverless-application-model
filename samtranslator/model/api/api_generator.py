@@ -72,9 +72,6 @@ class ApiGenerator(object):
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
             rest_api.Body = self.definition_body
-        else:
-            raise InvalidResourceException(self.logical_id,
-                                           "Either 'DefinitionUri' or 'DefinitionBody' property is required")
 
         if self.name:
             rest_api.Name = self.name
