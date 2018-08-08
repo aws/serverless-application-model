@@ -47,6 +47,9 @@ class PolicyTemplatesProcessor(object):
     # ./policy_templates.json
     DEFAULT_POLICY_TEMPLATES_FILE = policy_templates_data.POLICY_TEMPLATES_FILE
 
+    # ./managed_policies.json
+    MANAGED_POLICIES_FILE = policy_templates_data.MANAGED_POLICIES_FILE
+
     def __init__(self, policy_templates_dict, schema=None):
         """
         Initialize the class
@@ -119,6 +122,16 @@ class PolicyTemplatesProcessor(object):
             raise ValueError(str(ex))
 
         return True
+
+    @staticmethod
+    def get_managed_policies_json():
+        """
+        Reads and returns the IAM managed policies JSON data from file.
+
+        :return dict: Dictionary containing data read from IAM managed policies JSON file
+        """
+
+        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.MANAGED_POLICIES_FILE)
 
     @staticmethod
     def get_default_policy_templates_json():
