@@ -1,5 +1,5 @@
-from unittest import TestCase
 from mock import Mock, patch
+from unittest import TestCase
 
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
 from samtranslator.public.plugins import BasePlugin

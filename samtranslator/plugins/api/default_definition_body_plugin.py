@@ -22,7 +22,7 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
     def on_before_transform_template(self, template_dict):
         """
         Hook method that gets called before the SAM template is processed.
-        The template has pass the validation and is guaranteed to contain a non-empty "Resources" section.
+        The template has passed the validation and is guaranteed to contain a non-empty "Resources" section.
 
         :param dict template_dict: Dictionary of the SAM template
         :return: Nothing
