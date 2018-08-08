@@ -182,7 +182,7 @@ Lists are additive
 ~~~~~~~~~~~~~~~~~~~
 *Lists are also known as arrays*
 
-List entries in the resource will be **appended** to the global entries. 
+Global entries will be **prepended** to the list in the resource.
 
 Example:
 
