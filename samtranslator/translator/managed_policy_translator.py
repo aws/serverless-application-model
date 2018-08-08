@@ -425,6 +425,6 @@ class ManagedPolicyLoader(object):
 
         # NOTE: Uncomment the line below and set use_local_managed_policies=False to easily
         # get the latest list of managed policies in order to update the local list above.
-        # print(name_to_arn_map)
+        # print(name_to_arn_map, len(name_to_arn_map))
 
         return self._policy_map
