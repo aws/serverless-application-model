@@ -256,10 +256,10 @@ class ApiGenerator(object):
 
         authorizers = {}
 
-        for authorizerName, authorizer in authorizers_config.items():
-            authorizers[authorizerName] = ApiGatewayAuthorizer(
+        for authorizer_name, authorizer in authorizers_config.items():
+            authorizers[authorizer_name] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id,
-                name=authorizer.get('Name'),
+                name=authorizer_name,
                 user_pool_arn=authorizer.get('UserPoolArn'),
                 function_arn=authorizer.get('FunctionArn'),
                 identity=authorizer.get('Identity'),

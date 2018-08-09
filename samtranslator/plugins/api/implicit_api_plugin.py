@@ -232,7 +232,6 @@ class ImplicitApiResource(SamResource):
                 "StageName": "Prod",
 
                 "DefinitionBody": swagger,
-                # "Auth": None,
                 # Internal property that means Event source code can add Events. Used only for implicit APIs, to
                 # prevent back compatibility issues for explicit APIs
                 "__MANAGE_SWAGGER": True

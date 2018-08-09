@@ -1,4 +1,5 @@
 from samtranslator.model import PropertyType, Resource
+from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import is_type, one_of, is_str
 from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.translator import logical_id_generator
@@ -13,7 +14,6 @@ class ApiGatewayRestApi(Resource):
             'CloneFrom': PropertyType(False, is_str()),
             'Description': PropertyType(False, is_str()),
             'FailOnWarnings': PropertyType(False, is_type(bool)),
-            'Name': PropertyType(False, is_str()),
             'Parameters': PropertyType(False, is_type(dict)),
             'EndpointConfiguration': PropertyType(False, is_type(dict)),
             "BinaryMediaTypes": PropertyType(False, is_type(list))
@@ -89,14 +89,21 @@ class ApiGatewayDeployment(Resource):
 
 
 class ApiGatewayAuthorizer(object):
+    _VALID_FUNCTION_PAYLOAD_TYPES = [None, 'TOKEN', 'REQUEST']
+
     def __init__(self, api_logical_id=None, name=None, user_pool_arn=None, function_arn=None, identity=None,
                  function_payload_type=None, function_invoke_role=None):
+        if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
+            raise InvalidResourceException(api_logical_id, name + " Authorizer has invalid "
+                                           "'FunctionPayloadType': " + function_payload_type)
+
+        self.api_logical_id = api_logical_id
         self.name = name
         self.user_pool_arn = user_pool_arn
         self.function_arn = function_arn
         self.identity = identity
         self.function_payload_type = function_payload_type
-        self.function_invoke_role = self._construct_role(function_invoke_role)
+        self.function_invoke_role = function_invoke_role
 
     def generate_swagger(self):
         authorizer_type = self._get_type()
@@ -124,8 +131,7 @@ class ApiGatewayAuthorizer(object):
             reauthorize_every = self._get_reauthorize_every()
             function_invoke_role = self._get_function_invoke_role()
 
-            if reauthorize_every:
-                swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerResultTtlInSeconds'] = reauthorize_every
+            swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerResultTtlInSeconds'] = reauthorize_every
 
             if function_invoke_role:
                 swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerCredentials'] = function_invoke_role
@@ -133,16 +139,15 @@ class ApiGatewayAuthorizer(object):
             if self._get_function_payload_type() == 'REQUEST':
                 swagger[APIGATEWAY_AUTHORIZER_KEY]['identitySource'] = self._get_identity_source()
 
-        if authorizer_type == 'COGNITO_USER_POOLS' or (authorizer_type == 'LAMBDA' and self._get_function_payload_type() == 'TOKEN'):
+        is_lambda_token_authorizer = authorizer_type == 'LAMBDA' and self._get_function_payload_type() == 'TOKEN'
+
+        if authorizer_type == 'COGNITO_USER_POOLS' or is_lambda_token_authorizer:
             identity_validation_expression = self._get_identity_validation_expression()
 
             if identity_validation_expression:
                 swagger[APIGATEWAY_AUTHORIZER_KEY]['identityValidationExpression'] = identity_validation_expression
 
         return swagger
-
-    def _construct_role(self, function_invoke_role):
-        return function_invoke_role if function_invoke_role != 'NONE' else None
 
     def _get_identity_validation_expression(self):
         return self.identity and self.identity.get('ValidationExpression')
@@ -193,7 +198,7 @@ class ApiGatewayAuthorizer(object):
         return self.identity.get('Header')
 
     def _get_reauthorize_every(self):
-        if not self.identity or not self.identity.get('ReauthorizeEvery'):
+        if not self.identity:
             return None
 
         return self.identity.get('ReauthorizeEvery')
