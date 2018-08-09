@@ -477,7 +477,8 @@ class SamApi(SamResourceMacro):
         'EndpointConfiguration': PropertyType(False, is_str()),
         'MethodSettings': PropertyType(False, is_type(list)),
         'BinaryMediaTypes': PropertyType(False, is_type(list)),
-        'Cors': PropertyType(False, one_of(is_str(), is_type(dict)))
+        'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'Auth': PropertyType(False, is_type(dict))
     }
 
     referable_properties = {
@@ -507,7 +508,8 @@ class SamApi(SamResourceMacro):
                                      endpoint_configuration=self.EndpointConfiguration,
                                      method_settings=self.MethodSettings,
                                      binary_media=self.BinaryMediaTypes,
-                                     cors=self.Cors)
+                                     cors=self.Cors,
+                                     auth=self.Auth)
 
         rest_api, deployment, stage = api_generator.to_cloudformation()
 

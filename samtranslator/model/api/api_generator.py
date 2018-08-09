@@ -3,7 +3,7 @@ from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
-                                            ApiGatewayStage)
+                                            ApiGatewayStage, ApiGatewayAuthorizer)
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
@@ -15,9 +15,13 @@ CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", 
 # Default the Cors Properties to '*' wildcard. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None)
 
+AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
+AuthProperties.__new__.__defaults__ = (None, None)
+
+
 class ApiGenerator(object):
 
-    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, cors=None):
+    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, cors=None, auth=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -43,6 +47,7 @@ class ApiGenerator(object):
         self.method_settings = method_settings
         self.binary_media = binary_media
         self.cors = cors
+        self.auth = auth
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -61,12 +66,12 @@ class ApiGenerator(object):
             # to Regional which is the only supported config.
             self._set_endpoint_configuration(rest_api, "REGIONAL")
 
-
         if self.definition_uri and self.definition_body:
             raise InvalidResourceException(self.logical_id,
                                            "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both")
 
         self._add_cors()
+        self._add_auth()
 
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
@@ -207,6 +212,73 @@ class ApiGenerator(object):
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
+
+    def _add_auth(self):
+        """
+        Add Auth configuration to the Swagger file, if necessary
+        """
+
+        if not self.auth:
+            return
+
+        INVALID_ERROR = "Invalid value for 'Auth' property"
+
+        if not isinstance(self.auth, dict):
+            raise InvalidResourceException(self.logical_id,
+                                           "Auth must be a dictionary")
+
+        if self.auth and not self.definition_body:
+            raise InvalidResourceException(self.logical_id,
+                                           "Auth works only with inline Swagger specified in "
+                                           "'DefinitionBody' property")
+
+        # Make sure keys in the dict are recognized
+        if not all(key in AuthProperties._fields for key in self.auth.keys()):
+            raise InvalidResourceException(self.logical_id, INVALID_ERROR)
+
+        if not SwaggerEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(self.logical_id, "Unable to add Auth configuration because "
+                                                            "'DefinitionBody' does not contain a valid Swagger")
+        swagger_editor = SwaggerEditor(self.definition_body)
+        auth_properties = AuthProperties(**self.auth)
+        authorizers = self._get_authorizers(auth_properties.Authorizers)
+
+        if authorizers:
+            swagger_editor.add_authorizers(authorizers)
+            self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer)
+
+        # Assign the Swagger back to template
+        self.definition_body = swagger_editor.swagger
+
+    def _get_authorizers(self, authorizers_config):
+        if not authorizers_config:
+            return None
+
+        authorizers = {}
+
+        for authorizerName, authorizer in authorizers_config.items():
+            authorizers[authorizerName] = ApiGatewayAuthorizer(
+                api_logical_id=self.logical_id,
+                name=authorizer.get('Name'),
+                user_pool_arn=authorizer.get('UserPoolArn'),
+                function_arn=authorizer.get('FunctionArn'),
+                identity=authorizer.get('Identity'),
+                function_payload_type=authorizer.get('FunctionPayloadType'),
+                function_invoke_role=authorizer.get('FunctionInvokeRole')
+            )
+
+        return authorizers
+
+    def _set_default_authorizer(self, swagger_editor, authorizers, default_authorizer):
+        if not default_authorizer:
+            return
+
+        if not authorizers.get(default_authorizer):
+            raise InvalidResourceException(self.logical_id, "Unable to set DefaultAuthorizer because '" +
+                                           default_authorizer + "' was not defined in 'Authorizers'")
+
+        for path in swagger_editor.iter_on_path():
+            swagger_editor.set_path_default_authorizer(path, default_authorizer, authorizers=authorizers)
 
     def _set_endpoint_configuration(self, rest_api, value):
         """

@@ -1,7 +1,8 @@
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, one_of, is_str
-from samtranslator.model.intrinsics import ref
+from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.translator import logical_id_generator
+from samtranslator.translator.arn_generator import ArnGenerator
 
 
 class ApiGatewayRestApi(Resource):
@@ -85,3 +86,142 @@ class ApiGatewayDeployment(Resource):
         hash = generator.get_hash(length=40)  # Get the full hash
         self.Description = "RestApi deployment id: {}".format(hash)
         stage.update_deployment_ref(self.logical_id)
+
+
+class ApiGatewayAuthorizer(object):
+    def __init__(self, api_logical_id=None, name=None, user_pool_arn=None, function_arn=None, identity=None,
+                 function_payload_type=None, function_invoke_role=None):
+        self.name = name
+        self.user_pool_arn = user_pool_arn
+        self.function_arn = function_arn
+        self.identity = identity
+        self.function_payload_type = function_payload_type
+        self.function_invoke_role = self._construct_role(function_invoke_role)
+
+    def generate_swagger(self):
+        authorizer_type = self._get_type()
+        APIGATEWAY_AUTHORIZER_KEY = 'x-amazon-apigateway-authorizer'
+        swagger = {
+            "type": "apiKey",
+            "name": self._get_swagger_header_name(),
+            "in": "header",
+            "x-amazon-apigateway-authtype": self._get_swagger_authtype(),
+            "x-amazon-apigateway-authorizer": {
+                "type": self._get_swagger_authorizer_type()
+            }
+        }
+
+        if authorizer_type == 'COGNITO_USER_POOLS':
+            swagger[APIGATEWAY_AUTHORIZER_KEY]['providerARNs'] = self._get_user_pool_arn_array()
+
+        elif authorizer_type == 'LAMBDA':
+            partition = ArnGenerator.get_partition_name()
+            authorizer_uri = fnSub('arn:{0}:apigateway:${{AWS::Region}}:lambda:path/2015-03-31/functions/'
+                                   '${{__FunctionArn__}}/invocations'.format(partition),
+                                   {'__FunctionArn__': self.function_arn})
+
+            swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerUri'] = authorizer_uri
+            reauthorize_every = self._get_reauthorize_every()
+            function_invoke_role = self._get_function_invoke_role()
+
+            if reauthorize_every:
+                swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerResultTtlInSeconds'] = reauthorize_every
+
+            if function_invoke_role:
+                swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerCredentials'] = function_invoke_role
+
+            if self._get_function_payload_type() == 'REQUEST':
+                swagger[APIGATEWAY_AUTHORIZER_KEY]['identitySource'] = self._get_identity_source()
+
+        if authorizer_type == 'COGNITO_USER_POOLS' or (authorizer_type == 'LAMBDA' and self._get_function_payload_type() == 'TOKEN'):
+            identity_validation_expression = self._get_identity_validation_expression()
+
+            if identity_validation_expression:
+                swagger[APIGATEWAY_AUTHORIZER_KEY]['identityValidationExpression'] = identity_validation_expression
+
+        return swagger
+
+    def _construct_role(self, function_invoke_role):
+        return function_invoke_role if function_invoke_role != 'NONE' else None
+
+    def _get_identity_validation_expression(self):
+        return self.identity and self.identity.get('ValidationExpression')
+
+    def _get_identity_source(self):
+        if not self.identity:
+            return None
+
+        if self.identity.get('Headers'):
+            identity_source_headers = map(lambda h: 'method.request.header.' + h, self.identity.get('Headers'))
+
+        if self.identity.get('QueryStrings'):
+            identity_source_query_strings = map(lambda qs: 'method.request.querystring.' + qs, self.identity.get('QueryStrings'))
+
+        if self.identity.get('StageVariables'):
+            identity_source_stage_variables = map(lambda sv: 'stageVariables.' + sv, self.identity.get('StageVariables'))
+
+        if self.identity.get('Context'):
+            identity_source_context = map(lambda c: 'context.' + c, self.identity.get('Context'))
+
+        identity_source_array = identity_source_headers + identity_source_query_strings + identity_source_stage_variables + identity_source_context
+        identity_source = ', '.join(identity_source_array)
+
+        return identity_source
+
+    def _get_user_pool_arn_array(self):
+        return self.user_pool_arn if isinstance(self.user_pool_arn, list) else [self.user_pool_arn]
+
+    def _get_swagger_header_name(self):
+        authorizer_type = self._get_type()
+        payload_type = self._get_function_payload_type()
+
+        if authorizer_type == 'LAMBDA' and payload_type == 'REQUEST':
+            return 'Unused'
+
+        return self._get_identity_header()
+
+    def _get_type(self):
+        if self.user_pool_arn:
+            return 'COGNITO_USER_POOLS'
+
+        return 'LAMBDA'
+
+    def _get_identity_header(self):
+        if not self.identity or not self.identity.get('Header'):
+            return 'Authorization'
+
+        return self.identity.get('Header')
+
+    def _get_reauthorize_every(self):
+        if not self.identity or not self.identity.get('ReauthorizeEvery'):
+            return None
+
+        return self.identity.get('ReauthorizeEvery')
+
+    def _get_function_invoke_role(self):
+        if not self.function_invoke_role or self.function_invoke_role == 'NONE':
+            return None
+
+        return self.function_invoke_role
+
+    def _get_swagger_authtype(self):
+        authorizer_type = self._get_type()
+
+        return 'cognito_user_pools' if authorizer_type == 'COGNITO_USER_POOLS' else 'custom'
+
+    def _get_function_payload_type(self):
+        return 'TOKEN' if not self.function_payload_type else self.function_payload_type
+
+    def _get_swagger_authorizer_type(self):
+        authorizer_type = self._get_type()
+
+        if authorizer_type == 'COGNITO_USER_POOLS':
+            return 'cognito_user_pools'
+
+        payload_type = self._get_function_payload_type()
+
+        if payload_type == 'REQUEST':
+            return 'request'
+
+        if payload_type == 'TOKEN':
+            return 'token'

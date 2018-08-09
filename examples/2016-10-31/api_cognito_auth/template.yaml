@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway + Cognito User Pools Auth
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: TestStage
+      Auth:
+        DefaultAuthorizer: MyLambdaAuthorizer
+        Authorizers:
+          MyCognitoAuthorizer:
+            UserPoolArn: !GetAtt MyCognitoUserPool.Arn
+
+          MyLambdaAuthorizer:
+            FunctionArn: !GetAtt MyAuthFunction.Arn
+            FunctionInvokeRole: NONE
+            Identity: # Optional
+              Header: Authn # Optional; Default: Authorization
+              ValidationExpression: myexpresso # Optional
+              ReauthorizeEvery: 33
+          
+          MyLambdaRequestAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFunction.Arn
+            FunctionInvokeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/admin
+            Identity:
+              Headers:
+                - Authorization1
+              QueryStrings:
+                - Authorization2
+              StageVariables:
+                - Authorization3
+              Context:
+                - Authorization4
+              ReauthorizeEvery: 100
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        WithNoAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: NONE
+        WithLambdaTokenAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: get
+            Auth:
+              Authorizer: MyLambdaAuthorizer
+        WithCognitoAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: post
+            Auth:
+              Authorizer: MyCognitoAuthorizer
+        WithLambdaRequestAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: delete
+            Auth:
+              Authorizer: MyLambdaRequestAuthorizer
+        WithDefaultAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: put
+  
+  MyAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: index.handler
+      Runtime: nodejs8.10
+  
+  MyCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyUserPool
+      LambdaConfig:
+        PreSignUp: !GetAtt PreSignupLambdaFunction.Arn
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+
+  PreSignupLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          event.response = { autoConfirmUser: true }
+          return event
+        }
+      Handler: index.handler
+      MemorySize: 128
+      Runtime: nodejs8.10
+      Timeout: 3
+      # TODO:
+      # Events:
+      #   CognitoUserPoolPreSignup:
+      #     Type: CognitoUserPool
+      #     Properties:
+      #       UserPool: !Ref MyCognitoUserPool
+
+  LambdaCognitoUserPoolExecutionPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt PreSignupLambdaFunction.Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
+
+Outputs:
+    ApiURL:
+      Description: "API endpoint URL for Prod environment"
+      Value: !Sub 'https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/'

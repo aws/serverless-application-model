@@ -334,7 +334,8 @@ class Api(PushEventSource):
             'Method': PropertyType(True, is_str()),
 
             # Api Event sources must "always" be paired with a Serverless::Api
-            'RestApiId': PropertyType(True, is_str())
+            'RestApiId': PropertyType(True, is_str()),
+            'Auth': PropertyType(False, is_type(dict))
     }
 
     def resources_to_link(self, resources):
@@ -470,6 +471,28 @@ class Api(PushEventSource):
                     method=self.Method, path=self.Path))
 
         editor.add_lambda_integration(self.Path, self.Method, uri)
+
+        if self.Auth:
+            method_authorizer = self.Auth.get('Authorizer')
+
+            if method_authorizer:
+                api_auth = api.get('Auth')
+                api_authorizers = api_auth and api_auth.get('Authorizers')
+
+                if not api_authorizers:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        'Unable to set Authorizer "{authorizer}" on API method "{method}" for path "{path}" because the related API does not define any Authorizers.'.format(
+                            authorizer=method_authorizer, method=self.Method, path=self.Path))
+
+                if method_authorizer != 'NONE' and not api_authorizers.get(method_authorizer):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        'Unable to set Authorizer "{authorizer}" on API method "{method}" for path "{path}" because it was not defined in the API\'s Authorizers.'.format(
+                            authorizer=method_authorizer, method=self.Method, path=self.Path))
+
+            editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+
         api["DefinitionBody"] = editor.swagger
 
 
