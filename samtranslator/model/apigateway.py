@@ -14,6 +14,7 @@ class ApiGatewayRestApi(Resource):
             'CloneFrom': PropertyType(False, is_str()),
             'Description': PropertyType(False, is_str()),
             'FailOnWarnings': PropertyType(False, is_type(bool)),
+            'Name': PropertyType(False, is_str()),
             'Parameters': PropertyType(False, is_type(dict)),
             'EndpointConfiguration': PropertyType(False, is_type(dict)),
             "BinaryMediaTypes": PropertyType(False, is_type(list))

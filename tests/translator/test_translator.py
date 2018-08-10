@@ -272,6 +272,7 @@ class TestTranslatorEndToEnd(TestCase):
 
 @pytest.mark.parametrize('testcase', [
     'error_api_duplicate_methods_same_path',
+    'error_api_invalid_auth',
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
     'error_api_invalid_restapiid',
@@ -306,7 +307,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_invalid_policy_statement'
 ])
 def test_transform_invalid_document(testcase):
-    manifest = yaml.load(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
+    manifest = yaml_parse(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
     expected = json.load(open(os.path.join(output_folder, testcase + '.json'), 'r'))
 
     mock_policy_loader = MagicMock()

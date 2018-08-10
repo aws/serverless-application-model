@@ -1,0 +1,257 @@
+Resources:
+  NoAuthApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  NoAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        GetRoot:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NoAuthApi
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: MyAuth
+
+  NoAuthorizersApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: Foo
+
+  NoAuthorizersFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        GetRoot:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NoAuthorizersApi
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: MyAuth
+
+  MissingAuthorizerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyCognitoAuthorizer:
+            UserPoolArn: 'arn:aws'
+
+  MissingAuthorizerFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        GetRoot:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MissingAuthorizerApi
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: UnspecifiedAuthorizer
+
+  NoDefaultAuthorizerWithNoneApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyCognitoAuthorizer:
+            UserPoolArn: 'arn:aws'
+
+  NoDefaultAuthorizerWithNoneFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        GetRoot:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NoDefaultAuthorizerWithNoneApi
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: NONE
+
+  AuthNotDictApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth: notadict
+
+  AuthorizersNotDictApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers: notadict
+
+  AuthWithDefinitionUriApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://bucket/key
+      Auth:
+        DefaultAuthorizer: Foo
+
+  AuthWithAdditionalPropertyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        MyBad: Foo
+
+  AuthWithInvalidDefinitionBodyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody: { invalid: true }
+      Auth:
+        DefaultAuthorizer: Foo
+
+  AuthWithMissingDefaultAuthorizerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefaultAuthorizer: NotThere
+      Auth:
+        DefaultAuthorizer: Foo
+
+  NoApiAuthorizerFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        GetRoot:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: MyAuth
+
+
+  InvalidFunctionPayloadTypeApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyLambdaAuthorizer:
+            FunctionArn: 'arn:aws'
+            FunctionPayloadType: INVALID
+
+  # InvalidFunctionPayloadTypeFn:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: s3://bucket/key
+  #     Handler: index.handler
+  #     Runtime: nodejs8.10
+  #     Events:
+  #       GetRoot:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref InvalidFunctionPayloadTypeApi
+  #           Path: /
+  #           Method: get
+  #           Auth:
+  #             Authorizer: NONE
+# invalid FunctionPayloadType
+
+      # StageName: TestStage
+      # Auth:
+      #   DefaultAuthorizer: MyLambdaAuthorizer
+      #   Authorizers:
+      #     MyCognitoAuthorizer:
+      #       UserPoolArn: !GetAtt MyCognitoUserPool.Arn
+
+      #     MyLambdaAuthorizer:
+      #       FunctionArn: !GetAtt MyAuthFunction.Arn
+      #       FunctionInvokeRole: NONE
+      #       Identity: # Optional
+      #         Header: Authn # Optional; Default: Authorization
+      #         ValidationExpression: myexpresso # Optional
+      #         ReauthorizeEvery: 33
+          
+      #     MyLambdaRequestAuthorizer:
+      #       FunctionPayloadType: REQUEST
+      #       FunctionArn: !GetAtt MyAuthFunction.Arn
+      #       FunctionInvokeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/admin
+      #       Identity:
+      #         Headers:
+      #           - Authorization1
+      #         QueryStrings:
+      #           - Authorization2
+      #         StageVariables:
+      #           - Authorization3
+      #         Context:
+      #           - Authorization4
+      #         ReauthorizeEvery: 100
+
+  # MyFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: s3://bucket/key
+  #     Handler: index.handler
+  #     Runtime: nodejs8.10
+  #     Events:
+  #       WithNoAuthorizer:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref MyApi
+  #         Path: /
+  #           Method: get
+  #           Auth:
+  #             Authorizer: NONE
+  #       WithLambdaTokenAuthorizer:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref MyApi
+  #         Path: /users
+  #           Method: get
+  #           Auth:
+  #             Authorizer: MyLambdaAuthorizer
+  #       WithCognitoAuthorizer:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref MyApi
+  #         Path: /users
+  #           Method: post
+  #           Auth:
+  #             Authorizer: MyCognitoAuthorizer
+  #       WithLambdaRequestAuthorizer:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref MyApi
+  #         Path: /users
+  #           Method: delete
+  #           Auth:
+  #             Authorizer: MyLambdaRequestAuthorizer
+  #       WithDefaultAuthorizer:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref MyApi
+  #         Path: /users
+  #           Method: put
