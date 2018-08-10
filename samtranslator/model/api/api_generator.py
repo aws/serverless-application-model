@@ -223,10 +223,6 @@ class ApiGenerator(object):
 
         INVALID_ERROR = "Invalid value for 'Auth' property"
 
-        if not isinstance(self.auth, dict):
-            raise InvalidResourceException(self.logical_id,
-                                           "Auth must be a dictionary")
-
         if self.auth and not self.definition_body:
             raise InvalidResourceException(self.logical_id,
                                            "Auth works only with inline Swagger specified in "
@@ -254,6 +250,9 @@ class ApiGenerator(object):
         if not authorizers_config:
             return None
 
+        if not isinstance(authorizers_config, dict):
+            raise InvalidResourceException(self.logical_id,
+                                           "Authorizers must be a dictionary")
         authorizers = {}
 
         for authorizer_name, authorizer in authorizers_config.items():
