@@ -133,9 +133,11 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      DefaultAuthorizer: NotThere
       Auth:
-        DefaultAuthorizer: Foo
+        DefaultAuthorizer: NotThere
+        Authorizers:
+          MyCognitoAuthorizer:
+            UserPoolArn: 'arn:aws'
 
   NoApiAuthorizerFn:
     Type: AWS::Serverless::Function
@@ -162,96 +164,3 @@ Resources:
           MyLambdaAuthorizer:
             FunctionArn: 'arn:aws'
             FunctionPayloadType: INVALID
-
-  # InvalidFunctionPayloadTypeFn:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: s3://bucket/key
-  #     Handler: index.handler
-  #     Runtime: nodejs8.10
-  #     Events:
-  #       GetRoot:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref InvalidFunctionPayloadTypeApi
-  #           Path: /
-  #           Method: get
-  #           Auth:
-  #             Authorizer: NONE
-# invalid FunctionPayloadType
-
-      # StageName: TestStage
-      # Auth:
-      #   DefaultAuthorizer: MyLambdaAuthorizer
-      #   Authorizers:
-      #     MyCognitoAuthorizer:
-      #       UserPoolArn: !GetAtt MyCognitoUserPool.Arn
-
-      #     MyLambdaAuthorizer:
-      #       FunctionArn: !GetAtt MyAuthFunction.Arn
-      #       FunctionInvokeRole: NONE
-      #       Identity: # Optional
-      #         Header: Authn # Optional; Default: Authorization
-      #         ValidationExpression: myexpresso # Optional
-      #         ReauthorizeEvery: 33
-          
-      #     MyLambdaRequestAuthorizer:
-      #       FunctionPayloadType: REQUEST
-      #       FunctionArn: !GetAtt MyAuthFunction.Arn
-      #       FunctionInvokeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/admin
-      #       Identity:
-      #         Headers:
-      #           - Authorization1
-      #         QueryStrings:
-      #           - Authorization2
-      #         StageVariables:
-      #           - Authorization3
-      #         Context:
-      #           - Authorization4
-      #         ReauthorizeEvery: 100
-
-  # MyFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: s3://bucket/key
-  #     Handler: index.handler
-  #     Runtime: nodejs8.10
-  #     Events:
-  #       WithNoAuthorizer:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref MyApi
-  #         Path: /
-  #           Method: get
-  #           Auth:
-  #             Authorizer: NONE
-  #       WithLambdaTokenAuthorizer:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref MyApi
-  #         Path: /users
-  #           Method: get
-  #           Auth:
-  #             Authorizer: MyLambdaAuthorizer
-  #       WithCognitoAuthorizer:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref MyApi
-  #         Path: /users
-  #           Method: post
-  #           Auth:
-  #             Authorizer: MyCognitoAuthorizer
-  #       WithLambdaRequestAuthorizer:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref MyApi
-  #         Path: /users
-  #           Method: delete
-  #           Auth:
-  #             Authorizer: MyLambdaRequestAuthorizer
-  #       WithDefaultAuthorizer:
-  #         Type: Api
-  #         Properties:
-  #           RestApiId: !Ref MyApi
-  #         Path: /users
-  #           Method: put

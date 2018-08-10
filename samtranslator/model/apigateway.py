@@ -157,6 +157,11 @@ class ApiGatewayAuthorizer(object):
         if not self.identity:
             return None
 
+        identity_source_headers = []
+        identity_source_query_strings = []
+        identity_source_stage_variables = []
+        identity_source_context = []
+
         if self.identity.get('Headers'):
             identity_source_headers = map(lambda h: 'method.request.header.' + h, self.identity.get('Headers'))
 
