@@ -834,11 +834,7 @@
               "codepipeline:PutJobSuccessResult",
               "codepipeline:PutJobFailureResult"
             ],
-            "Resource": [
-              {
-                "Fn::Sub": "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*"
-              }
-            ]
+            "Resource": "*"
           }
         ]
       }
