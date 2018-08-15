@@ -511,9 +511,10 @@ class SamApi(SamResourceMacro):
                                      cors=self.Cors,
                                      auth=self.Auth)
 
-        rest_api, deployment, stage = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
 
         resources.extend([rest_api, deployment, stage])
+        resources.extend(permissions)
 
         return resources
 

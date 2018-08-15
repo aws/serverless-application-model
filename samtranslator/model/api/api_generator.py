@@ -8,7 +8,9 @@ from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.model.intrinsics import is_instrinsic
+from samtranslator.model.intrinsics import is_instrinsic, fnSub
+from samtranslator.model.lambda_ import LambdaPermission
+from samtranslator.translator.arn_generator import ArnGenerator
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge"])
@@ -169,8 +171,9 @@ class ApiGenerator(object):
             swagger = rest_api.BodyS3Location
 
         stage = self._construct_stage(deployment, swagger)
+        permissions = self._construct_authorizer_lambda_permission()
 
-        return rest_api, deployment, stage
+        return rest_api, deployment, stage, permissions
 
     def _add_cors(self):
         """
@@ -267,6 +270,47 @@ class ApiGenerator(object):
             )
 
         return authorizers
+
+    def _get_permission(self, authorizer_name, authorizer_lambda_function_arn):
+        """Constructs and returns the Lambda Permission resource allowing the Authorizer to invoke the function.
+
+        :returns: the permission resource
+        :rtype: model.lambda_.LambdaPermission
+        """
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on)
+        api_id = rest_api.get_runtime_attr('rest_api_id')
+
+        partition = ArnGenerator.get_partition_name()
+        resource = '${__ApiId__}/authorizers/*'
+        source_arn = fnSub(ArnGenerator.generate_arn(partition=partition, service='execute-api', resource=resource),
+                           {"__ApiId__": api_id})
+
+        lambda_permission = LambdaPermission(self.logical_id + authorizer_name + 'AuthorizerPermission')
+        lambda_permission.Action = 'lambda:invokeFunction'
+        lambda_permission.FunctionName = authorizer_lambda_function_arn
+        lambda_permission.Principal = 'apigateway.amazonaws.com'
+        lambda_permission.SourceArn = source_arn
+
+        return lambda_permission
+
+    def _construct_authorizer_lambda_permission(self):
+        auth_properties = AuthProperties(**self.auth)
+        authorizers = self._get_authorizers(auth_properties.Authorizers)
+
+        if not authorizers:
+            return []
+
+        permissions = []
+
+        for authorizer_name, authorizer in authorizers.items():
+            # Construct permissions for Lambda Authorizers only
+            if not authorizer.function_arn:
+                continue
+
+            permission = self._get_permission(authorizer_name, authorizer.function_arn)
+            permissions.append(permission)
+
+        return permissions
 
     def _set_default_authorizer(self, swagger_editor, authorizers, default_authorizer):
         if not default_authorizer:

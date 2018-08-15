@@ -124,15 +124,17 @@ class ApiGatewayAuthorizer(object):
 
         elif authorizer_type == 'LAMBDA':
             partition = ArnGenerator.get_partition_name()
-            authorizer_uri = fnSub('arn:{0}:apigateway:${{AWS::Region}}:lambda:path/2015-03-31/functions/'
-                                   '${{__FunctionArn__}}/invocations'.format(partition),
+            resource = 'lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations'
+            authorizer_uri = fnSub(ArnGenerator.generate_arn(partition=partition, service='apigateway',
+                                   resource=resource, include_account_id=False),
                                    {'__FunctionArn__': self.function_arn})
 
             swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerUri'] = authorizer_uri
             reauthorize_every = self._get_reauthorize_every()
             function_invoke_role = self._get_function_invoke_role()
 
-            swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerResultTtlInSeconds'] = reauthorize_every
+            if reauthorize_every is not None:
+                swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerResultTtlInSeconds'] = reauthorize_every
 
             if function_invoke_role:
                 swagger[APIGATEWAY_AUTHORIZER_KEY]['authorizerCredentials'] = function_invoke_role
