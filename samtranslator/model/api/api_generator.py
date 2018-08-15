@@ -294,6 +294,9 @@ class ApiGenerator(object):
         return lambda_permission
 
     def _construct_authorizer_lambda_permission(self):
+        if not self.auth:
+            return []
+
         auth_properties = AuthProperties(**self.auth)
         authorizers = self._get_authorizers(auth_properties.Authorizers)
 

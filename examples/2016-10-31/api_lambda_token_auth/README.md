@@ -15,13 +15,13 @@ aws cloudformation package --template-file template.yaml --output-template-file 
 aws cloudformation deploy --template-file ./template.packaged.yaml --stack-name sam-example-api-lambda-token-auth --capabilities CAPABILITY_IAM
 ```
 
-Invoke the API's root endpoint `/` without an `Authorization` header to see the API respond with a 200. In the SAM template, we explicitly state `Authorizer: NONE` to make this a public/open endpoint (the Authorizer Lambda Function is not invoke).
+Invoke the API's root endpoint `/` without an `Authorization` header to see the API respond with a 200. In the SAM template, we explicitly state `Authorizer: NONE` to make this a public/open endpoint (the Authorizer Lambda Function is not invoked).
 
 ```bash
 curl "$(aws cloudformation describe-stacks --stack-name sam-example-api-lambda-token-auth --query 'Stacks[].Outputs[?OutputKey==`ApiURL`].OutputValue' --output text)"
 ```
 
-Invoke the API's `/users` endpoint without an `Authorization` header to see a `401 {"message":"Unauthorized"}` response. Since we didn't specify an `Authorization` header, API Gateway didn't even attempt to invoke our Authorizer Lambda Function.
+Invoke the API's `/users` endpoint without an `Authorization` header to see a `401 {"message":"Unauthorized"}` response. Since we didn't specify an `Authorization` header, API Gateway didn't even attempt to invoke our Authorizer Lambda Function. If you specify a `ValidationExpression` on the Authorizer, it will also not invoke the Authorizer Lambda Function if the header was provided but does not match the pattern.
 
 ```bash
 curl "$(aws cloudformation describe-stacks --stack-name sam-example-api-lambda-token-auth --query 'Stacks[].Outputs[?OutputKey==`ApiURL`].OutputValue' --output text)users"
