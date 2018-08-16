@@ -1,16 +1,18 @@
 /*
-** Adapted from https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html#api-gateway-lambda-authorizer-token-lambda-function-create
-** A simple TOKEN authorizer example to demonstrate how to use an authorization token
-** to allow or deny a request.In this example, the caller named 'user'is allowed to invoke
-** a request if the client - supplied token value is 'allow'.The caller is not allowed to
-** invoke the request if the token value is 'deny'.If the token value is 'Unauthorized',
-** the function returns the 'Unauthorized' error with an HTTP status code of 401. For any
-** other token value, the authorizer returns 'Error: Invalid token' as a 500 error.
+** Adapted from https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html#api-gateway-lambda-authorizer-request-lambda-function-create
+** A simple REQUEST authorizer example to demonstrate how to use request parameters to allow or deny a request.
+** In this example, a request is authorized if the client-supplied Authorization header specifies 'allow'.
 */
-
 exports.handler = async function (event) {
-  const token = event.authorizationToken.toLowerCase()
+  const token = event.headers.Authorization.toLowerCase()
   const methodArn = event.methodArn
+
+  /*
+  ** queryStringParameters, stageVariables, requestContext and more are available on the `event` object
+  ** event.queryStringParameters: A map/object containing supplied in the URL's query string
+  ** event.stageVariables: A map/object containing variables defined on the API Gateway Stage
+  ** event.requestContext: A map/object containing additional request context
+  */
 
   switch (token) {
     case 'allow':
