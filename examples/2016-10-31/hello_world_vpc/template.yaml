@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A hello world application with VPC Access.
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: src/
+      Policies:
+        - VPCAccessPolicy: {} 
+        # This policy gives permission for Lambdas to create/manage ENIs
+        # SAM Policy templates you can use: https://github.com/awslabs/serverless-application-model/blob/develop/examples/2016-10-31/policy_templates/all_policy_templates.yaml
+      VpcConfig:
+        SecurityGroupIds:
+          - String # add Security Group ID(s) for this Lambda
+        SubnetIds:
+          - String # add VPC Subnet(s) for this Lambda
