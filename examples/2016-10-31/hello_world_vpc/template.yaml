@@ -6,10 +6,10 @@ Description: A hello world application with VPC Access.
 Parameters: 
   SecurityGroupIds: 
     Type: List<AWS::EC2::SecurityGroup::Id>
-    Description: Security Group IDs to be used with Lambda
+    Description: Security Group IDs that Lambda will use
   VpcSubnetIds: 
     Type: List<AWS::EC2::Subnet::Id>
-    Description: VPC Subnet IDs to be used with Lambda
+    Description: VPC Subnet IDs that Lambda will use (min 2 for HA)
 
 
 Resources:
