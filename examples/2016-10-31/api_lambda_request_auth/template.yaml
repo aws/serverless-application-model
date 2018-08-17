@@ -14,14 +14,14 @@ Resources:
             FunctionArn: !GetAtt MyAuthFunction.Arn
             # FunctionInvokeRole: !Ref MyRole
             Identity:
-              Headers:
-                - Authorization
-              # QueryStrings:
-              #   - authorization
+              QueryStrings:
+                - auth
+              # Headers:
+              #   - Authorization
               # StageVariables:
               #   - AUTHORIZATION
               # Context:
-              #   - auth
+              #   - authorization
               # ReauthorizeEvery: 100 # seconds
 
   MyFunction:

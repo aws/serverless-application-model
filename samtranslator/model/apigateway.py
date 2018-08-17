@@ -98,6 +98,14 @@ class ApiGatewayAuthorizer(object):
             raise InvalidResourceException(api_logical_id, name + " Authorizer has invalid "
                                            "'FunctionPayloadType': " + function_payload_type)
 
+        if function_payload_type == 'REQUEST' and self._is_missing_identity_source(identity):
+            raise InvalidResourceException(api_logical_id, name + " Authorizer must specify Identity with at least one "
+                                           "of Headers, QueryStrings, StageVariables, or Context.")
+
+        if function_payload_type == 'REQUEST' and not identity.get('Headers') and not identity.get('QueryStrings') and not identity.get('StageVariables') and not identity.get('Context'):
+            raise InvalidResourceException(api_logical_id, name + " Authorizer must specify Identity with at least one "
+                                           "of Headers, QueryStrings, StageVariables, or Context.")
+
         self.api_logical_id = api_logical_id
         self.name = name
         self.user_pool_arn = user_pool_arn
@@ -105,6 +113,20 @@ class ApiGatewayAuthorizer(object):
         self.identity = identity
         self.function_payload_type = function_payload_type
         self.function_invoke_role = function_invoke_role
+
+    def _is_missing_identity_source(self, identity):
+        if not identity:
+            return True
+
+        headers = identity.get('Headers')
+        query_strings = identity.get('QueryStrings')
+        stage_variables = identity.get('StageVariables')
+        context = identity.get('Context')
+
+        if not headers and not query_strings and not stage_variables and not context:
+            return True
+        
+        return False
 
     def generate_swagger(self):
         authorizer_type = self._get_type()

@@ -17,8 +17,6 @@ exports.handler = async function (event) {
       return generateAuthResponse('user', 'Allow', methodArn)
     case 'deny':
       return generateAuthResponse('user', 'Deny', methodArn)
-    case 'unauthorized':
-      return Promise.reject('Unauthorized.') // Returns 401 Unauthorized
     default:
       return Promise.reject('Error: Invalid token') // Returns 500 Internal Server Error
   }

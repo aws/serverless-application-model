@@ -164,3 +164,25 @@ Resources:
           MyLambdaAuthorizer:
             FunctionArn: 'arn:aws'
             FunctionPayloadType: INVALID
+
+  NoIdentityOnRequestAuthorizer:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyLambdaRequestAuthorizer:
+            FunctionArn: 'arn:aws'
+            FunctionPayloadType: REQUEST
+
+  NoIdentitySourceOnRequestAuthorizer:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyLambdaRequestAuthorizer:
+            FunctionArn: 'arn:aws'
+            FunctionPayloadType: REQUEST
+            Identity:
+              ReauthorizeEvery: 10
