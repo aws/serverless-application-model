@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: A hello world application with VPC Access.
+Description: A hello world function with VPC Access.
 
 
 Parameters: 
@@ -27,3 +27,8 @@ Resources:
         SecurityGroupIds: !Ref SecurityGroupIds
         SubnetIds: !Ref VpcSubnetIds
 
+Outputs:
+
+    HelloWorldFunction:
+      Description: "Hello World Lambda Function ARN"
+      Value: !GetAtt HelloWorldFunction.Arn
