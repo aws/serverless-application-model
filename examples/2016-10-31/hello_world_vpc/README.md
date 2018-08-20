@@ -1,7 +1,7 @@
 
 # Lambda function with VPC Access
 
-This example shows you how to create a Lambda function in VPC with the appropriate permissions using SAM. It primary aims to demonstrate Cloudformation parameters as well as a simplified configuration made possible with SAM Policies, therefore it'll not utilise API Gateway or any other Event source and as a result only the account owner can invoke it.
+This example shows you how to create a Lambda function in a VPC with the appropriate permissions using SAM. It primarily aims to demonstrate Cloudformation parameters as well as a simplified configuration made possible with SAM Policies, therefore it'll not utilise API Gateway or any other Event source and as a result only the account owner can invoke it.
 
 It is important to remember that VPC-enabled functions need NAT in order to access any public IP address (if needed) and therefore should be in a private subnet with VPC NAT Gateway and not VPC Internet Gateway.
 
