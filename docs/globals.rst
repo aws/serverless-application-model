@@ -42,19 +42,19 @@ In the above example, both ``HelloWorldFunction`` and ``ThumbnailFunction`` will
 timeout and index.handler Handler. ``HelloWorldFunction`` adds MESSAGE environment variable in addition to the 
 inherited TABLE_NAME. ``ThumbnailFunction`` inherits all the Globals properties and adds an API Event source.
 
-Supported Resources
--------------------
-Properties of ``AWS::Serverless::Function`` and ``AWS::Serverless::Api`` are only supported in Globals section 
-presently. 
+Supported Resources and Properties
+----------------------------------
+Currently, the following resources and properties are being supported:
 
 .. code:: yaml
 
   Globals:
     Function:
-      # Some properties of AWS::Serverless::Function
+      # Properties of AWS::Serverless::Function
       Handler:
       Runtime:
-      CodeUri:
+      # Specifying CodeUri on Globals is not yet supported by 'CloudFormation package' https://docs.aws.amazon.com/cli/latest/reference/cloudformation/package.html
+      CodeUri: 
       DeadLetterQueue:
       Description:
       MemorySize:
@@ -68,7 +68,7 @@ presently.
       DeploymentPreference:
     
     Api:
-      # Some properties of AWS::Serverless::Api
+      # Properties of AWS::Serverless::Api
       # Also works with Implicit APIs
       Name:
       DefinitionUri:
@@ -81,6 +81,7 @@ presently.
       Cors:
 
     SimpleTable:
+      # Properties of AWS::Serverless::SimpleTable
       SSESpecification
 
 Implicit APIs
@@ -143,13 +144,11 @@ Runtime of ``MyFunction`` will be set to python3.6
 
 Maps are merged
 ~~~~~~~~~~~~~~~
-*Also called as dictionaries, or key/value pairs*
+*Maps are also known as dictionaries or collections of key/value pairs*
 
-Map value in the resource will be **merged** with the map value from Global. 
+Map entries in the resource will be **merged** with global map entries. In case of duplicates the resource entry will override the global entry.
 
 Example:
-
-Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource-table", "NEW_VAR": "hello" }``
 
 .. code:: yaml
 
@@ -157,6 +156,7 @@ Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource
     Function:
       Environment: 
         Variables:
+          STAGE: Production
           TABLE_NAME: global-table
 
   Resources:
@@ -168,15 +168,23 @@ Environment variables of ``MyFunction`` will be set to ``{ TABLE_NAME: "resource
             TABLE_NAME: resource-table
             NEW_VAR: hello
 
+In the above example the environment variables of ``MyFunction`` will be set to:
+
+.. code:: json
+
+  {
+    "STAGE": "Production", 
+    "TABLE_NAME": "resource-table", 
+    "NEW_VAR": "hello" 
+  }
+
 Lists are additive
 ~~~~~~~~~~~~~~~~~~~
-*Also called as arrays*
+*Lists are also known as arrays*
 
-List values in the resource will be **appended** with the map value from Global. 
+Global entries will be **prepended** to the list in the resource.
 
 Example:
-
-SecurityGroupIds of VpcConfig will be set to ``["sg-first", "sg-123", "sg-456"]``
 
 .. code:: yaml
 
@@ -195,3 +203,8 @@ SecurityGroupIds of VpcConfig will be set to ``["sg-first", "sg-123", "sg-456"]`
           SecurityGroupIds:
             - sg-first
  
+In the above example the Security Group Ids of ``MyFunction``'s VPC Config will be set to:
+
+.. code:: json
+
+  [ "sg-123", "sg-456", "sg-first" ]

@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Globals:
+  Api:
+    # If we skip AllowMethods, then SAM will auto generate a list of methods scoped to each path
+    Cors: "origins"
+
+Resources:
+  ImplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ExplicitApi
+            Path: /
+            Method: get
+
+        PostHtml:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ExplicitApi
+            Path: /
+            Method: post
+
+
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
