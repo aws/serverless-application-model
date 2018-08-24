@@ -18,19 +18,20 @@ aws cloudformation deploy --template-file ./template.packaged.yaml --stack-name 
 Invoke the API's root endpoint `/` without an `auth` query string to see the API respond with a 200. In the SAM template, we explicitly state `Authorizer: NONE` to make this a public/open endpoint (the Authorizer Lambda Function is not invoked).
 
 ```bash
-curl "$(aws cloudformation describe-stacks --stack-name sam-example-api-lambda-request-auth --query 'Stacks[].Outputs[?OutputKey==`ApiURL`].OutputValue' --output text)"
+api_url=$(aws cloudformation describe-stacks --stack-name sam-example-api-lambda-request-auth --query 'Stacks[].Outputs[?OutputKey==`ApiURL`].OutputValue' --output text)
+curl $api_url
 ```
 
 Invoke the API's `/users` endpoint without an `auth` query string to see a `401 {"message":"Unauthorized"}` response. Since we didn't specify an `auth` query string, API Gateway didn't even attempt to invoke our Authorizer Lambda Function.
 
 ```bash
-curl "$(aws cloudformation describe-stacks --stack-name sam-example-api-lambda-request-auth --query 'Stacks[].Outputs[?OutputKey==`ApiURL`].OutputValue' --output text)users"
+curl $api_url"users"
 ```
 
 Invoke the API's `/users` endpoint with an `auth=allow` query string to see a `200` response. Try changing the query string value to `"deny"` to see a `403` response and `"gibberish"` to see a `500` response.
 
 ```bash
-curl "$(aws cloudformation describe-stacks --stack-name sam-example-api-lambda-request-auth --query 'Stacks[].Outputs[?OutputKey==`ApiURL`].OutputValue' --output text)users?auth=allow"
+curl $api_url"users?auth=allow"
 ```
 
 ## Additional resources
