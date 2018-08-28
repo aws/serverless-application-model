@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Demonstrates using a built-in Node.js module to make an HTTPS request.
+Metadata:
+  Name: httpsrequest
+Parameters: 
+    IdentityNameParameter: 
+      Type: String
 Resources:
   httpsrequest:
     Type: 'AWS::Serverless::Function'
@@ -12,9 +17,5 @@ Resources:
       MemorySize: 128
       Timeout: 60
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'ses:SendBounce'
-              Resource: '*'
+        - SESSendBouncePolicy:
+            IdentityName: IdentityNameParameter

@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Schedules a recurring Amazon Inspector assessment run
+Parameters:
+  TopicNameParameter:
+    Type:String
 Resources:
   inspectorscheduledrun:
     Type: 'AWS::Serverless::Function'
@@ -12,16 +15,8 @@ Resources:
       MemorySize: 128
       Timeout: 10
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'sns:ListSubscriptionsByTopic'
-                - 'sns:CreateTopic'
-                - 'sns:SetTopicAttributes'
-                - 'sns:Subscribe'
-                - 'sns:Publish'
-              Resource: '*'
+        - SNSCrudPolicy:
+             TopicName: TopicNameParameter
       Environment:
         Variables:
           assessmentTemplateArn: <enter value here>

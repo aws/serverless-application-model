@@ -1,6 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Monitors VPN connection status of an account in all regions.
+Metadata:
+  Name: vpnconnmonitor
 Resources:
   vpnconnmonitor:
     Type: 'AWS::Serverless::Function'
@@ -12,14 +14,5 @@ Resources:
       MemorySize: 128
       Timeout: 120
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'cloudwatch:PutMetricData'
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - 'ec2:DescribeRegions'
-                - 'ec2:DescribeVpnConnections'
-              Resource: '*'
+        - CloudWatchPutMetricPolicy: {}
+        - EC2VPNDescribePolicy: {}

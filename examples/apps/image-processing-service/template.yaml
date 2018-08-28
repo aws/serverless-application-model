@@ -1,8 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
-  Uses ImageMagick to perform simple image processing operations, such as
-  resizing.
+  Uses ImageMagick to perform simple image processing operations, such as resizing.
+Metadata:
+  Name: imageprocessingservice
+Parameters: 
+    IdentityNameParameter: 
+      Type: String
 Resources:
   imageprocessingservice:
     Type: 'AWS::Serverless::Function'
@@ -11,14 +15,9 @@ Resources:
       Runtime: nodejs4.3
       CodeUri: .
       Description: >-
-        Uses ImageMagick to perform simple image processing operations, such as
-        resizing.
+        Uses ImageMagick to perform simple image processing operations, such as resizing.
       MemorySize: 512
       Timeout: 30
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'ses:SendBounce'
-              Resource: '*'
+        - SESSendBouncePolicy:
+            IdentityName: IdentityNameParameter
