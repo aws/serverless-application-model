@@ -9,7 +9,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: Provides the basic framework for a skill adapter for a smart home skill.
       MemorySize: 128

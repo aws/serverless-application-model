@@ -12,7 +12,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: >-
         A simple email filter for protection against spam and viruses as well as DKIM and SPF failures.

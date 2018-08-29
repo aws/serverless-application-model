@@ -9,7 +9,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: Run any algorithm in the Algorithmia marketplace.
       MemorySize: 256

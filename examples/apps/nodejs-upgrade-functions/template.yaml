@@ -28,5 +28,5 @@ Resources:
       Environment:
         Variables:
           EXCEPTIONS: <ENTER_COMMA_SEPARATED_FUNCTION_NAMES>
-          TARGET_RUNTIME: nodejs4.3
+          TARGET_RUNTIME: nodejs6.10
           MODE: List

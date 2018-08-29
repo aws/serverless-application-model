@@ -9,7 +9,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: Sends logs from Cloudwatch logs to Loggly using a Lambda function.
       MemorySize: 128
