@@ -1,8 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: A simple mobile backend (read/write to DynamoDB).
-Parameters:
-  TableNameParameter:
+Metadata:
+  Name: simplemobilebackend
+Parameters: 
+  TableNameParameter: 
     Type: String
 Resources:
   simplemobilebackend:
@@ -15,5 +17,5 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName: !Ref TableNameParameter
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableNameParameter
