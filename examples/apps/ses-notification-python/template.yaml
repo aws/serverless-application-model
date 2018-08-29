@@ -20,4 +20,4 @@ Resources:
       Timeout: 3
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: TableNameParameter
+            TableName: !Ref TableNameParameter

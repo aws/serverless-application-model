@@ -20,7 +20,7 @@ Resources:
       Timeout: 10
       Policies:
         - SESSendBouncePolicy:
-            IdentityName: IdentityNameParameter
+            IdentityName: !Ref IdentityNameParameter
       Environment:
         Variables:
           emailDomain: <enter value here>

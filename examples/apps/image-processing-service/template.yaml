@@ -20,4 +20,4 @@ Resources:
       Timeout: 30
       Policies:
         - SESSendBouncePolicy:
-            IdentityName: IdentityNameParameter
+            IdentityName: !Ref IdentityNameParameter

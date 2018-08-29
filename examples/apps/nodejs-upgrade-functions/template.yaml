@@ -20,11 +20,11 @@ Resources:
       Timeout: 300
       Policies:
         - S3CrudPolicy:
-            BucketName: BucketNameParameter
+            BucketName: !Ref BucketNameParameter
         - RekognitionNoDataAccessPolicy:
-            CollectionId: CollectionIdParameter
+            CollectionId: !Ref CollectionIdParameter
         - RekognitionWriteOnlyAccessPolicy:
-            CollectionId: CollectionIdParameter
+            CollectionId: !Ref CollectionIdParameter
       Environment:
         Variables:
           EXCEPTIONS: <ENTER_COMMA_SEPARATED_FUNCTION_NAMES>

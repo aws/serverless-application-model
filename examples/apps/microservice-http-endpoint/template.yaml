@@ -20,7 +20,7 @@ Resources:
       Timeout: 10
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: TableNameParameter
+            TableName: !Ref TableNameParameter
       Events:
         Api1:
           Type: Api

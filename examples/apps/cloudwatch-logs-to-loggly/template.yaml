@@ -16,7 +16,7 @@ Resources:
       Timeout: 3
       Policies:
         - KMSDecryptPolicy:
-             KeyId: KeyIdParameter
+             KeyId: !Ref KeyIdParameter
       Environment:
         Variables:
           kmsEncryptedCustomerToken: <enter value here>

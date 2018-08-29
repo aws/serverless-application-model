@@ -18,9 +18,9 @@ Resources:
       Timeout: 3
       Policies:
         - LambdaInvokePolicy:
-            FunctionName: FunctionNameParameter
+            FunctionName: !Ref FunctionNameParameter
         - DynamoDBCrudPolicy:
-            TableName: TableNameParameter
+            TableName: !Ref TableNameParameter
       Events:
         Kinesis1:
           Type: Kinesis

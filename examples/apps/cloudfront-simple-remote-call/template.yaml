@@ -21,4 +21,4 @@ Resources:
       Timeout: 3
       Policies:
         - KMSDecryptPolicy:
-             KeyId: KeyIdParameter
+             KeyId: !Ref KeyIdParameter

@@ -16,7 +16,7 @@ Resources:
       Timeout: 10
       Policies:
         - SNSCrudPolicy:
-             TopicName: TopicNameParameter
+             TopicName: !Ref TopicNameParameter
       Environment:
         Variables:
           assessmentTemplateArn: <enter value here>

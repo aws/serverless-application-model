@@ -20,11 +20,10 @@ Resources:
       MemorySize: 128
       Timeout: 10
       Policies:
-      Policies:
         - LambdaInvokePolicy:
-            FunctionName: FunctionNameParameter
+            FunctionName: !Ref FunctionNameParameter
         - DynamoDBCrudPolicy:
-            TableName: TableNameParameter
+            TableName: !Ref TableNameParameter
       Environment:
         Variables:
           site: <enter value here>

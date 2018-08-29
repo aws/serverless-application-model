@@ -16,4 +16,4 @@ Resources:
       Timeout: 7
       Policies:
         - SNSPublishMessagePolicy:
-            TopicName: TopicNameParameter
+            TopicName: !Ref TopicNameParameter

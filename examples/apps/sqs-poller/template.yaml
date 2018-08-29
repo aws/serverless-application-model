@@ -19,7 +19,7 @@ Resources:
       Timeout: 10
       Policies:
         - SQSPollerPolicy:
-            QueueName: QueueNameParameter
+            QueueName: !Ref QueueNameParameter
       Environment:
         Variables:
           queueUrl: <enter value here>

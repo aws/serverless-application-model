@@ -25,6 +25,6 @@ Resources:
       Policies:
       Policies:
         - LambdaInvokePolicy:
-            FunctionName: FunctionNameParameter
+            FunctionName: !Ref FunctionNameParameter
         - DynamoDBCrudPolicy:
-            TableName: TableNameParameter
+            TableName: !Ref TableNameParameter

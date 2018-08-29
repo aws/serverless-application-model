@@ -20,7 +20,7 @@ Resources:
       Timeout: 3
       Policies:
         - S3CrudPolicy:
-            BucketName: BucketNameParameter
+            BucketName: !Ref BucketNameParameter
       Events:
         BucketEvent1:
           Type: S3
