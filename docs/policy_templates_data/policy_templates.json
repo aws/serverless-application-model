@@ -1207,6 +1207,23 @@
         ]
       }
     },
+    "EKSDescribePolicy": {
+      "Description": "Gives permission to describe or list Amazon EKS clusters",
+      "Parameters": {
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "eks:DescribeCluster",
+              "eks:ListClusters"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
     "FirehoseCrudPolicy": {
       "Description": "Gives permission to create, write to, update, and delete a Kinesis Firehose Delivery Stream",
       "Parameters": {
