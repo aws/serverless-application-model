@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   An Amazon Kinesis Firehose stream processor that accesses the Kinesis Streams records in the input and returns them with a processing status.
-Metadata:
-  Name: kinesisfirehoseprocessrecordstreamsassourcepython
 Parameters: 
   FunctionNameParameter: 
     Type: String

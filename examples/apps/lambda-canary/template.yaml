@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: 'Performs a periodic check of the given site, erroring out on test failure.'
-Metadata:
-  Name: lambdacanary
 Parameters: 
   FunctionNameParameter: 
     Type: String

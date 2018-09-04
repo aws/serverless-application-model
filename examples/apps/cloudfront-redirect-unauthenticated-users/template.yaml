@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Blueprint for redirecting unauthenticated users to sign-in page; triggered by CloudFront viewer-request event.
-Metadata:
-  Name: cloudfrontredirectunauthenticatedusers
 Parameters:
   KeyIdParameter:
     Type: String

@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Forward a call to another phone number.
-Metadata:
-  Name: twilioforward
 Resources:
   twilioforward:
     Type: 'AWS::Serverless::Function'

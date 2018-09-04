@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Blueprint to add a header based on the values in a key-value pair in a querynstring.
-Metadata:
-  Name: cloudfrontmodifyquerystring
 Parameters:
   KeyIdParameter:
     Type: String

@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   An Amazon Kinesis Firehose stream processor that extracts individual log events from records sent by Cloudwatch Logs subscription filters.
-Metadata:
-  Name: kinesisfirehosecloudwatchlogsprocessor
 Parameters:
   BucketNameParameter:
     Type: String

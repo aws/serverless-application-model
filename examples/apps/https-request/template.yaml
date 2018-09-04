@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Demonstrates using a built-in Node.js module to make an HTTPS request.
-Metadata:
-  Name: httpsrequest
 Parameters: 
     IdentityNameParameter: 
       Type: String

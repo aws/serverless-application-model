@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Provides a simple framework for conducting various tests of your Lambda functions.
-Metadata:
-  Name: lambdatestharness
 Parameters: 
   FunctionNameParameter: 
     Type: String

@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Allows multiple people to chat together in a conference room.
-Metadata:
-  Name: twilioconference
 Resources:
   twilioconference:
     Type: 'AWS::Serverless::Function'

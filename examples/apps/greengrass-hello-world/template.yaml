@@ -1,7 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Metadata:
-  Name: greengrasshelloworld
 Description: >-
   Deploy this lambda to a Greengrass core where it will send a hello world message to a topic
 Parameters: 

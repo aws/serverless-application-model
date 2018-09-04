@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   A simple email filter for protection against spam and viruses as well as DKIM and SPF failures.
-Metadata:
-  Name: inboundsesspamfilter
 Parameters: 
     IdentityNameParameter: 
       Type: String

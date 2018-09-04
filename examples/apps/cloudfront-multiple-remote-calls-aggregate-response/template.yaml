@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Blueprint for generating aggregated response from multiple remote calls on origin-request trigger implemented in NodeJS.
-Metadata:
-  Name: cloudfrontmultipleremotecallsaggregateresponse
 Parameters:
   KeyIdParameter:
     Type: String

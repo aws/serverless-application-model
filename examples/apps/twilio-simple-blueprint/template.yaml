@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: A simple backend for handling events sent from Twilio.
-Metadata:
-  Name: twiliosimpleblueprint
 Resources:
   twiliosimpleblueprint:
     Type: 'AWS::Serverless::Function'

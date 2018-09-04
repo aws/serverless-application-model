@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Uses ImageMagick to perform simple image processing operations, such as resizing.
-Metadata:
-  Name: imageprocessingservice
 Parameters: 
     IdentityNameParameter: 
       Type: String

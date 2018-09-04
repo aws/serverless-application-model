@@ -3,9 +3,6 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   A simple backend (read/write to DynamoDB) with a RESTful API endpoint using Amazon API Gateway.
 
-Metadata:
-  Name: microservicehttpendpointpython3
-
 Parameters: 
   TableNameParameter: 
     Type: String

@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   An Amazon Kinesis Firehose stream processor that converts input records from RFC3164 Syslog format to CSV.
-Metadata:
-  Name: kinesisfirehosesyslogtocsv
 Parameters: 
   FunctionNameParameter: 
     Type: String
