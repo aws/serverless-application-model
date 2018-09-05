@@ -5,7 +5,7 @@ Description: >-
   group.
 Parameters:
   KeyIdParameter:
-    Type:String
+    Type: String
 Resources:
   cloudwatchlogsprocessdata:
     Type: 'AWS::Serverless::Function'

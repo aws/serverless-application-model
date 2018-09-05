@@ -5,7 +5,7 @@ Description: >-
   understanding
 Parameters:
   KeyIdParameter:
-    Type:String
+    Type: String
 Resources:
   lexmakeappointmentpython:
     Type: 'AWS::Serverless::Function'

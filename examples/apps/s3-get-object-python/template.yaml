@@ -5,7 +5,7 @@ Description: >-
   updated.
 Parameters:
   BucketNameParameter:
-    Type:String
+    Type: String
 Resources:
   s3getobjectpython:
     Type: 'AWS::Serverless::Function'

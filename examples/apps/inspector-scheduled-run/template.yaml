@@ -3,7 +3,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: Schedules a recurring Amazon Inspector assessment run
 Parameters:
   TopicNameParameter:
-    Type:String
+    Type: String
 Resources:
   inspectorscheduledrun:
     Type: 'AWS::Serverless::Function'

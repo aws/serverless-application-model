@@ -3,7 +3,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: Blueprint for modifying CloudFront response header implemented in NodeJS.
 Parameters:
   KeyIdParameter:
-    Type:String
+    Type: String
 Resources:
   cloudfrontmodifyresponseheader:
     Type: 'AWS::Serverless::Function'

@@ -3,7 +3,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: 'Order flowers, using Amazon Lex to perform natural language understanding'
 Parameters:
   KeyIdParameter:
-    Type:String
+    Type: String
 Resources:
   lexorderflowers:
     Type: 'AWS::Serverless::Function'
