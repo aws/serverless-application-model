@@ -5,7 +5,7 @@ Description: >-
   the user.
 Parameters:
   KeyIdParameter:
-    Type:String
+    Type: String
 Resources:
   slackechocommandpython:
     Type: 'AWS::Serverless::Function'

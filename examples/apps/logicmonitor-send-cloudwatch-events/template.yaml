@@ -5,7 +5,7 @@ Description: >-
   correlation between events and performance data.
 Parameters:
   KeyIdParameter:
-    Type:String
+    Type: String
 Resources:
   logicmonitorsendcloudwatchevents:
     Type: 'AWS::Serverless::Function'

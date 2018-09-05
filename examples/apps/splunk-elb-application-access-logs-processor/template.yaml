@@ -3,7 +3,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: Stream Application ELB access logs from S3 to Splunk's HTTP event collector
 Parameters:
   BucketNameParameter:
-    Type:String
+    Type: String
 Resources:
   splunkelbapplicationaccesslogsprocessor:
     Type: 'AWS::Serverless::Function'

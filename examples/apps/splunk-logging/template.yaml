@@ -3,7 +3,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: Demonstrates logging from AWS Lambda code to Splunk's HTTP event collector
 Parameters:
   BucketNameParameter:
-    Type:String
+    Type: String
 Resources:
   splunklogging:
     Type: 'AWS::Serverless::Function'
