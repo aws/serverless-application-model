@@ -1,0 +1,114 @@
+doctype html
+html
+  head
+    title My Serverless Application
+    style.
+      body {
+        width: 650px;
+        margin: auto;
+      }
+      h1 {
+        text-align: center;
+      }
+      .response > code {
+        display: block;
+        background-color: #eff0f1;
+        color: #393318;
+        padding: 5px;
+        font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      form {
+        margin-bottom: 1rem;
+      }
+      .form-group {
+        padding-bottom: 1rem;
+      }
+      label {
+        display: block;
+      }
+  body
+    h1 My Serverless Application
+    p
+      | Public endpoints: GET /, GET /users, GET /users/{userId}
+    p
+      | Authorized endpoints: POST /users, PUT /users/{userId}, DELETE /users/{userId}
+    
+    section.form
+      h2 Invoke API
+      p Experiment with the `users` resource with the form below.
+      form
+        div.form-group
+          label(for='methodField') Method
+          select(name='method' id='methodField')
+            option(value='GET') GET
+            option(value='POST') POST
+            option(value='PUT') PUT
+            option(value='DELETE') DELETE
+        div.form-group
+          label(for='idField') user id
+          input(type='text' name='id' id='idField')
+        div.form-group
+          label(for='nameField') name
+          input(type='text' name='name' id='nameField')
+        input(type='submit')
+
+    section
+      h2 Response
+      p.request
+        span.request__method GET
+        span &nbsp;
+        spand.request__endpoint /users
+      section.response
+        code
+            
+          
+    script.
+      const cognitoIdentityTokenMatch = document.location.hash.match(/id_token=(.*)&access_token=/)
+      const cognitoIdentityToken = cognitoIdentityTokenMatch ? cognitoIdentityTokenMatch[1] : null
+      const form = document.querySelector('form')
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault()
+        const method = document.getElementById('methodField').value
+        const id = document.getElementById('idField').value
+        const name = document.getElementById('nameField').value
+        const endpoint = id ? 'users/' + id : 'users'
+        const body = ['POST', 'PUT'].includes(method) ? JSON.stringify({ name: name }) : undefined
+        const headers = {
+            'content-type': 'application/json',
+            'Authorization': cognitoIdentityToken
+          }
+        
+        document.querySelector('.request__method').innerText = method
+        document.querySelector('.request__endpoint').innerText = `/${endpoint}`
+        
+        return fetch(endpoint, {
+          method,
+          headers,
+          body
+        })
+        .then(setResponseText)
+        .catch(setResponseText)
+      })
+
+      function setResponseText(response) {
+        if (response.headers.get('content-type').contains('application/json')) {
+          return response.json().then(json => {
+            document.querySelector('code').innerText = JSON.stringify(json, null, 4)
+          })
+        }
+
+        return response.text().then(text => {
+          document.querySelector('code').innerText = text
+        })
+      }
+
+      if (!window.fetch) {
+        alert('Your browser does not have fetch support, which this demo uses. Try again in a modern browser (https://caniuse.com/fetch) or modify the example to use an alternate approach (e.g. XMLHttpRequest or your library of choice.)')  
+      }
+
+      fetch('users')
+      .then(setResponseText)
+      .catch(setResponseText)

@@ -315,12 +315,12 @@ class SamFunction(SamResourceMacro):
         return resources
 
     def _construct_code_dict(self):
-        if self.CodeUri:
-            return self._construct_code_dict_code_uri()
-        elif self.InlineCode:
+        if self.InlineCode:
             return {
                 "ZipFile": self.InlineCode
             }
+        elif self.CodeUri:
+            return self._construct_code_dict_code_uri()
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
 
@@ -346,6 +346,7 @@ class SamFunction(SamResourceMacro):
             s3_pointer = parse_s3_uri(self.CodeUri)
 
             if s3_pointer is None:
+                print('s3_pointer here', s3_pointer)
                 raise InvalidResourceException(self.logical_id,
                                                '\'CodeUri\' is not a valid S3 Uri of the form '
                                                '"s3://bucket/key" with optional versionId query parameter.')

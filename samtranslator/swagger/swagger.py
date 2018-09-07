@@ -331,7 +331,8 @@ class SwaggerEditor(object):
 
     def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
                               is_default=False):
-        existing_security = self.paths[path][method_name].get('security', [])  # TEST: [{'sigv4': []}, {'api_key': []}])
+        normalized_method_name = self._normalize_method_name(method_name)
+        existing_security = self.paths[path][normalized_method_name].get('security', [])  # TEST: [{'sigv4': []}, {'api_key': []}])
         authorizer_names = set(authorizers.keys())
         existing_non_authorizer_security = []
         existing_authorizer_security = []
@@ -385,7 +386,7 @@ class SwaggerEditor(object):
         security = existing_non_authorizer_security + authorizer_security
 
         if security:
-            self.paths[path][method_name]['security'] = security
+            self.paths[path][normalized_method_name]['security'] = security
 
     @property
     def swagger(self):

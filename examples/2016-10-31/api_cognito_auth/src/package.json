@@ -1,0 +1,14 @@
+{
+  "name": "api_cognito_auth",
+  "version": "1.0.0",
+  "description": "Example using API Gateway with Cognito Authorizer.",
+  "main": "lambda.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "aws-serverless-express": "^3.3.3",
+    "body-parser": "^1.17.1",
+    "cors": "^2.8.3",
+    "express": "^4.15.2",
+    "pug": "^2.0.0-rc.1"
+  }
+}
