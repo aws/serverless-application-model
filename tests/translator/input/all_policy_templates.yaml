@@ -44,6 +44,8 @@ Resources:
 
         - CloudFormationDescribeStacksPolicy: {}
 
+        - RekognitionDetectOnlyPolicy: {}
+
         - RekognitionNoDataAccessPolicy:
             CollectionId: id
 
@@ -113,7 +115,7 @@ Resources:
 
         - AWSSecretsManagerRotationPolicy:
             FunctionName: function
-        
+
         - MobileAnalyticsWriteOnlyAccessPolicy: {}
 
         - PinpointEndpointAccessPolicy:

@@ -343,6 +343,23 @@
         ]
       }
     },
+    "RekognitionDetectOnlyPolicy": {
+      "Description": "Gives permission to detect faces, labels and text",
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rekognition:DetectFaces",
+              "rekognition:DetectLabels",
+              "rekognition:DetectModerationLabels",
+              "rekognition:DetectText"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
     "RekognitionNoDataAccessPolicy": {
       "Description": "Gives permission to compare and detect faces and labels",
       "Parameters": {
