@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Blueprint for returning HTTP redirect implemented in NodeJS.
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   cloudfronthttpredirect:
     Type: 'AWS::Serverless::Function'
@@ -12,9 +15,5 @@ Resources:
       MemorySize: 128
       Timeout: 1
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+         - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter

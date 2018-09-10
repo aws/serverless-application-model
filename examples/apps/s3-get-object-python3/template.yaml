@@ -3,6 +3,9 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   An Amazon S3 trigger that retrieves metadata for the object that has been
   updated.
+Parameters:
+  BucketNameParameter:
+    Type: String
 Resources:
   s3getobjectpython3:
     Type: 'AWS::Serverless::Function'
@@ -16,12 +19,8 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 's3:GetObject'
-              Resource: 'arn:aws:s3:::*'
+        - S3CrudPolicy:
+            BucketName: !Ref BucketNameParameter
       Events:
         BucketEvent1:
           Type: S3

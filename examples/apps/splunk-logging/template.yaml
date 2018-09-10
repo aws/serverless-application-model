@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Demonstrates logging from AWS Lambda code to Splunk's HTTP event collector
+Parameters:
+  BucketNameParameter:
+    Type: String
 Resources:
   splunklogging:
     Type: 'AWS::Serverless::Function'
@@ -14,12 +17,8 @@ Resources:
       MemorySize: 512
       Timeout: 10
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 's3:GetObject'
-              Resource: 'arn:aws:s3:::*'
+        - S3CrudPolicy:
+            BucketName: !Ref BucketNameParameter
       Environment:
         Variables:
           SPLUNK_HEC_URL: <enter value here>
