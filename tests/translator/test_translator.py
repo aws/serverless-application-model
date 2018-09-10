@@ -125,6 +125,7 @@ class TestTranslatorEndToEnd(TestCase):
         'sns_existing_other_subscription',
         'sns_topic_outside_template',
         'alexa_skill',
+        'alexa_skill_with_skill_id',
         'iot_rule',
         'function_managed_inline_policy',
         'unsupported_resources',
