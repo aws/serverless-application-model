@@ -44,8 +44,6 @@ Resources:
 
         - CloudFormationDescribeStacksPolicy: {}
 
-        - RekognitionDetectOnlyPolicy: {}
-
         - RekognitionNoDataAccessPolicy:
             CollectionId: id
 
@@ -120,3 +118,5 @@ Resources:
 
         - PinpointEndpointAccessPolicy:
             PinpointApplicationId: id
+
+        - RekognitionDetectOnlyPolicy: {}
