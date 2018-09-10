@@ -33,18 +33,18 @@ Resources:
             Method: 'options'
 
 Outputs:
-    ExampleApi:
-      Description: "API Gateway endpoint URL for Prod stage for API Gateway Multi-Origin CORS function"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
-    ExampleRoot:
-      Description: "API Gateway Multi-Origin CORS Lambda Function (Root) ARN"
-      Value: !GetAtt ExampleRoot.Arn
-    ExampleRootIamRole:
-      Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function (Root)"
-      Value: !GetAtt ExampleRootRole.Arn
-    ExampleTest:
-      Description: "API Gateway Multi-Origin CORS Lambda Function (Test) ARN"
-      Value: !GetAtt ExampleTest.Arn
-    ExampleTestIamRole:
-      Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function (Test)"
-      Value: !GetAtt ExampleTestRole.Arn
+  ExampleApi:
+    Description: "API Gateway endpoint URL for Prod stage for API Gateway Multi-Origin CORS function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  ExampleRoot:
+    Description: "API Gateway Multi-Origin CORS Lambda Function (Root) ARN"
+    Value: !GetAtt ExampleRoot.Arn
+  ExampleRootIamRole:
+    Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function (Root)"
+    Value: !GetAtt ExampleRootRole.Arn
+  ExampleTest:
+    Description: "API Gateway Multi-Origin CORS Lambda Function (Test) ARN"
+    Value: !GetAtt ExampleTest.Arn
+  ExampleTestIamRole:
+    Description: "Implicit IAM Role created for API Gateway Multi-Origin CORS function (Test)"
+    Value: !GetAtt ExampleTestRole.Arn

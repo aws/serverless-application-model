@@ -1,8 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
-  An Amazon Kinesis Firehose stream processor that accesses the Kinesis Streams
-  records in the input and returns them with a processing status.
+  An Amazon Kinesis Firehose stream processor that accesses the Kinesis Streams records in the input and returns them with a processing status.
+Parameters: 
+  FunctionNameParameter: 
+    Type: String
+  TableNameParameter: 
+    Type: String
 Resources:
   kinesisfirehoseprocessrecordstreamsassource:
     Type: 'AWS::Serverless::Function'
@@ -11,32 +15,11 @@ Resources:
       Runtime: nodejs6.10
       CodeUri: .
       Description: >-
-        An Amazon Kinesis Firehose stream processor that accesses the Kinesis
-        Streams records in the input and returns them with a processing status.
+        An Amazon Kinesis Firehose stream processor that accesses the Kinesis Streams records in the input and returns them with a processing status.
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'dynamodb:PutItem'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:dynamodb:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':table/*'
-            - Effect: Allow
-              Action:
-                - 'lambda:InvokeFunction'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:lambda:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':function:*'
+        - LambdaInvokePolicy:
+            FunctionName: !Ref FunctionNameParameter
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableNameParameter

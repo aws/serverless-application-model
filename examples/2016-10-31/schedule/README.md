@@ -14,26 +14,4 @@ Lastly, in order for the CloudWatch Events API to invoke our function, it needs 
 
 ### Deployment
 
-The [AWS SAM CLI](https://github.com/awslabs/aws-sam-cli) builds on top of the SAM specification by providing a single tool to manage the packaging and deployment of serverless applications. Once the `sam` tool is installed, the application deployment process occurs in two phases.
-
-First, use `sam` to upload the binary to S3 and reference it in a newly created `packaged.yaml` CloudFormation configuration.
-
-```bash
-$ sam package --s3-bucket test-global-config-us-east-1 \
-              --template-file template.yaml \
-              --output-template-file packaged.yaml
-```
-
-Before using `sam` to deploy using the contents of `packaged.yaml`, run a quick `diff` to see what changed.
-
-```bash
-$ diff template.yaml packaged.yaml
-```
-
-Lastly, use `sam` again to deploy the template through a CloudFormation stack named `Test`.
-
-```bash
-$ sam deploy --template-file packaged.yaml \
-             --stack-name Test \
-             --capabilities CAPABILITY_IAM
-```
+The [AWS SAM CLI](https://github.com/awslabs/aws-sam-cli) lets you locally build, test, and debug serverless applications defined by AWS SAM templates. You can also use SAM CLI to deploy your applications. [Install SAM CLI](https://docs.aws.amazon.com/lambda/latest/dg/sam-cli-requirements.html), and then follow the [Packaging and Deployment instructions](https://docs.aws.amazon.com/lambda/latest/dg/serverless-deploy-wt.html#serverless-deploy) to deploy your application.

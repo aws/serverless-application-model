@@ -3,6 +3,9 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Book details of a visit, using Amazon Lex to perform natural language
   understanding
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   lexbooktrippython:
     Type: 'AWS::Serverless::Function'
@@ -16,9 +19,5 @@ Resources:
       MemorySize: 128
       Timeout: 10
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+        - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter

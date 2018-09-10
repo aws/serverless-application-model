@@ -1,32 +1,21 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
-  Play a greeting, and wait for the caller to press one or more digits on their
-  keypad.
+  Play a greeting, and wait for the caller to press one or more digits on their keypad.
 Resources:
   twiliomenu:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: >-
-        Play a greeting, and wait for the caller to press one or more digits on
-        their keypad.
+        Play a greeting, and wait for the caller to press one or more digits on their keypad.
       MemorySize: 128
       Timeout: 15
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'cloudwatch:PutMetricData'
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - 'ec2:DescribeRegions'
-                - 'ec2:DescribeVpnConnections'
-              Resource: '*'
+        - CloudWatchPutMetricPolicy: {}
+        - EC2VPNDescribePolicy: {}
       Events:
         Api1:
           Type: Api

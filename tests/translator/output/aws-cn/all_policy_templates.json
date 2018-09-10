@@ -247,7 +247,8 @@
                     "s3:GetObjectVersion", 
                     "s3:PutObject", 
                     "s3:GetLifecycleConfiguration", 
-                    "s3:PutLifecycleConfiguration"
+                    "s3:PutLifecycleConfiguration",
+                    "s3:DeleteObject"
                   ], 
                   "Resource": [
                     {
@@ -685,11 +686,7 @@
                     "codepipeline:PutJobSuccessResult", 
                     "codepipeline:PutJobFailureResult"
                   ], 
-                  "Resource": [
-                    {
-                      "Fn::Sub": "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*"
-                    }
-                  ], 
+                  "Resource": "*", 
                   "Effect": "Allow"
                 }
               ]
