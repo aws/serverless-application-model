@@ -36,7 +36,7 @@ class PushEventSource(ResourceMacro):
     """
     principal = None
 
-    def _construct_permission(self, function, source_arn=None, source_account=None, suffix=""):
+    def _construct_permission(self, function, source_arn=None, source_account=None, suffix="", event_source_token=None):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
         source triggers.
 
@@ -56,6 +56,7 @@ class PushEventSource(ResourceMacro):
         lambda_permission.Principal = self.principal
         lambda_permission.SourceArn = source_arn
         lambda_permission.SourceAccount = source_account
+        lambda_permission.EventSourceToken = event_source_token
 
         return lambda_permission
 
@@ -477,7 +478,9 @@ class AlexaSkill(PushEventSource):
     resource_type = 'AlexaSkill'
     principal = 'alexa-appkit.amazon.com'
 
-    property_types = {}
+    property_types = {
+        'SkillId': PropertyType(False, is_str()),
+    }
 
     def to_cloudformation(self, **kwargs):
         function = kwargs.get('function')
@@ -486,7 +489,7 @@ class AlexaSkill(PushEventSource):
             raise TypeError("Missing required keyword argument: function")
 
         resources = []
-        resources.append(self._construct_permission(function))
+        resources.append(self._construct_permission(function, event_source_token=self.SkillId))
 
         return resources
 
