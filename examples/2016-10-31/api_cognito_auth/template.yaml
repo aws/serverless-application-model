@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: API Gateway + Cognito User Pools Auth
 
 Parameters:
-  UserPoolName:
+  CognitoUserPoolName:
     Type: String
     Default: MyUserPool
 
@@ -81,7 +81,7 @@ Resources:
   MyCognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: !Ref UserPoolName
+      UserPoolName: !Ref CognitoUserPoolName
       LambdaConfig:
         PreSignUp: !GetAtt PreSignupLambdaFunction.Arn
       Policies:
@@ -120,6 +120,10 @@ Resources:
       SourceArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
 
 Outputs:
+    ApiId:
+      Description: "API ID"
+      Value: !Ref MyApi
+
     ApiUrl:
       Description: "API endpoint URL for Prod environment"
       Value: !Sub 'https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/'

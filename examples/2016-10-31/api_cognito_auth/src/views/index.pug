@@ -62,9 +62,10 @@ html
         spand.request__endpoint /users
       section.response
         code
-            
           
     script.
+
+      const apiId = "#{apiId}"
       const cognitoIdentityTokenMatch = document.location.hash.match(/id_token=(.*)&access_token=/)
       const cognitoIdentityToken = cognitoIdentityTokenMatch ? cognitoIdentityTokenMatch[1] : null
       const form = document.querySelector('form')
@@ -94,7 +95,8 @@ html
       })
 
       function setResponseText(response) {
-        if (response.headers.get('content-type').contains('application/json')) {
+        const contentType = response.headers.get('content-type')
+        if (contentType.includes('application/json')) {
           return response.json().then(json => {
             document.querySelector('code').innerText = JSON.stringify(json, null, 4)
           })
