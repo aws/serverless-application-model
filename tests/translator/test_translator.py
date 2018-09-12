@@ -23,8 +23,9 @@ from samtranslator.translator.transform import transform
 from mock import Mock, MagicMock, patch
 
 
-input_folder = 'tests/translator/input'
-output_folder = 'tests/translator/output'
+BASE_PATH = os.path.dirname(__file__)
+INPUT_FOLDER = os.path.join(BASE_PATH, 'input')
+OUTPUT_FOLDER = os.path.join(BASE_PATH, 'output')
 
 
 def deep_sort_lists(value):
@@ -168,11 +169,11 @@ class TestTranslatorEndToEnd(TestCase):
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
-        manifest = yaml_parse(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(output_folder,partition_folder, testcase + '.json'), 'r'))
+        expected = json.load(open(os.path.join(OUTPUT_FOLDER,partition_folder, testcase + '.json'), 'r'))
 
         old_region = os.environ.get("AWS_DEFAULT_REGION", "")
         os.environ["AWS_DEFAULT_REGION"] = region
@@ -307,8 +308,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_invalid_policy_statement'
 ])
 def test_transform_invalid_document(testcase):
-    manifest = yaml.load(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
-    expected = json.load(open(os.path.join(output_folder, testcase + '.json'), 'r'))
+    manifest = yaml.load(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+    expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + '.json'), 'r'))
 
     mock_policy_loader = MagicMock()
     parameter_values = get_template_parameter_values()
