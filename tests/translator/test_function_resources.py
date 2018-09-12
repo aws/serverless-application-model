@@ -28,6 +28,7 @@ class TestVersionsAndAliases(TestCase):
         self.lambda_func = self._make_lambda_function(self.sam_func.logical_id)
         self.lambda_version = self._make_lambda_version("VersionLogicalId", self.sam_func)
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_alias(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
@@ -74,6 +75,7 @@ class TestVersionsAndAliases(TestCase):
             self.func_dict["Properties"]["AutoPublishAlias"] = ["a", "b"]
             SamFunction.from_dict(logical_id="foo", resource_dict=self.func_dict)
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_deployment_preference(self, get_resolved_alias_name_mock):
         deploy_preference_dict = {"Type": "LINEAR"}
@@ -140,6 +142,7 @@ class TestVersionsAndAliases(TestCase):
         with self.assertRaises(ValueError):
             sam_func.to_cloudformation(**kwargs)
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_disabled_deployment_preference_does_not_add_update_policy(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
@@ -198,6 +201,7 @@ class TestVersionsAndAliases(TestCase):
             kwargs['deployment_preference_collection'] = self._make_deployment_preference_collection()
             sam_func.to_cloudformation(**kwargs)
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_sam_function_without_alias_allows_disabled_deployment_preference(self):
         enabled = False
         deploy_preference_dict = {"Enabled": enabled}
@@ -229,8 +233,9 @@ class TestVersionsAndAliases(TestCase):
         # Function, IAM Role
         self.assertEquals(len(resources), 2)
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_instrinsic_ref_enabled_boolean_parameter(self, get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_intrinsic_ref_enabled_boolean_parameter(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
         enabled = {"Ref": "MyEnabledFlag"}
         deploy_preference_dict = {"Type": "LINEAR", "Enabled": enabled}
