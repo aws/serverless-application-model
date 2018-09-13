@@ -16,7 +16,8 @@ router.use(awsServerlessExpressMiddleware.eventContext())
 router.get('/', (req, res) => {
   res.render('index', {
     apiId: req.apiGateway ? req.apiGateway.event.requestContext.apiId : null,
-    apiUrl: req.apiGateway ? `https://${req.apiGateway.event.headers.Host}/${req.apiGateway.event.requestContext.stage}` : 'http://localhost:3000'
+    apiUrl: req.apiGateway ? `https://${req.apiGateway.event.headers.Host}/${req.apiGateway.event.requestContext.stage}` : 'http://localhost:3000',
+    cognitoUserPoolClientId: process.env.COGNITO_USER_POOL_CLIENT_ID
   })
 })
 

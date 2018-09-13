@@ -6,6 +6,10 @@ Parameters:
   CognitoUserPoolName:
     Type: String
     Default: MyUserPool
+  
+  CognitoUserPoolClientName:
+    Type: String
+    Default: MyUserPoolClient
 
 Resources:
   MyApi:
@@ -26,6 +30,9 @@ Resources:
       Handler: lambda.handler
       MemorySize: 1024
       Runtime: nodejs8.10
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_CLIENT_ID: !Ref MyCognitoUserPoolClient
       Events:
         Root:
           Type: Api
@@ -87,10 +94,19 @@ Resources:
       Policies:
         PasswordPolicy:
           MinimumLength: 8
+      UsernameAttributes:
+        - email
       Schema:
         - AttributeDataType: String
           Name: email
           Required: false
+  
+  MyCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref MyCognitoUserPool
+      ClientName: !Ref CognitoUserPoolClientName
+      GenerateSecret: false
 
   PreSignupLambdaFunction:
     Type: AWS::Serverless::Function
@@ -104,12 +120,6 @@ Resources:
       MemorySize: 128
       Runtime: nodejs8.10
       Timeout: 3
-      # TODO:
-      # Events:
-      #   CognitoUserPoolPreSignup:
-      #     Type: CognitoUserPool
-      #     Properties:
-      #       UserPool: !Ref MyCognitoUserPool
 
   LambdaCognitoUserPoolExecutionPermission:
     Type: AWS::Lambda::Permission
@@ -118,6 +128,12 @@ Resources:
       FunctionName: !GetAtt PreSignupLambdaFunction.Arn
       Principal: cognito-idp.amazonaws.com
       SourceArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
+      # TODO: Add a CognitoUserPool Event Source to SAM to create this permission for you.
+      # Events:
+      #   CognitoUserPoolPreSignup:
+      #     Type: CognitoUserPool
+      #     Properties:
+      #       UserPool: !Ref MyCognitoUserPool
 
 Outputs:
     ApiId:
@@ -131,3 +147,7 @@ Outputs:
     CognitoUserPoolId:
       Description: "Cognito User Pool Id"
       Value: !Ref MyCognitoUserPool
+
+    CognitoUserPoolClientId:
+      Description: "Cognito User Pool Client Id"
+      Value: !Ref MyCognitoUserPoolClient

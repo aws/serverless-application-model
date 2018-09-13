@@ -65,12 +65,63 @@ html
           
     script.
 
-      const apiId = "#{apiId}"
-      const cognitoIdentityTokenMatch = document.location.hash.match(/id_token=(.*)&access_token=/)
-      const cognitoIdentityToken = cognitoIdentityTokenMatch ? cognitoIdentityTokenMatch[1] : null
+      const apiId = '#{apiId}'
+      const apiUrl = '#{apiUrl}/'
+      const cognitoUserPoolClientId = '#{cognitoUserPoolClientId}'
+      
+      const queryStringParams = new URLSearchParams(window.location.search)
+      const cognitoCode = queryStringParams.get('code')
+      let cognitoIdentityToken = localStorage.getItem('cognitoIdentityToken')
+      
       const form = document.querySelector('form')
+      form.addEventListener('submit', onApiInvokeFormSubmit)
 
-      form.addEventListener('submit', function(event) {
+      fetch('users')
+      .then(setResponseText)
+      .catch(setResponseText)
+
+      if (cognitoCode) {
+        exchangeCodeForAccessToken()
+          .then(response => response.json())
+          .then(json => {
+            if (json.id_token) {
+              cognitoIdentityToken = json.id_token
+              localStorage.setItem('cognitoIdentityToken', cognitoIdentityToken)
+            }
+          })
+      }
+
+      function convertJsonToFormUrlEncoded(json) {
+        const oAuthTokenBodyArray = Object.entries(json).map(([key, value]) => {
+          const encodedKey = encodeURIComponent(key)
+          const encodedValue = encodeURIComponent(value)
+
+          return `${encodedKey}=${encodedValue}`
+        })
+
+        return oAuthTokenBodyArray.join('&')
+      }
+
+      function exchangeCodeForAccessToken() {
+        const oauthTokenBodyJson = {
+          grant_type: 'authorization_code',
+          client_id: cognitoUserPoolClientId,
+          code: cognitoCode,
+          redirect_uri: apiUrl
+        }
+        const oauthTokenBody = convertJsonToFormUrlEncoded(oauthTokenBodyJson)
+        
+        return fetch(`https://${apiId}.auth.us-east-1.amazoncognito.com/oauth2/token`,
+        {
+          method: 'POST',
+          headers: {
+            ['Content-Type']: 'application/x-www-form-urlencoded'
+          },
+          body: oauthTokenBody
+        })
+      }
+
+      function onApiInvokeFormSubmit (event) {
         event.preventDefault()
         const method = document.getElementById('methodField').value
         const id = document.getElementById('idField').value
@@ -92,7 +143,7 @@ html
         })
         .then(setResponseText)
         .catch(setResponseText)
-      })
+      }
 
       function setResponseText(response) {
         const contentType = response.headers.get('content-type')
@@ -106,11 +157,3 @@ html
           document.querySelector('code').innerText = text
         })
       }
-
-      if (!window.fetch) {
-        alert('Your browser does not have fetch support, which this demo uses. Try again in a modern browser (https://caniuse.com/fetch) or modify the example to use an alternate approach (e.g. XMLHttpRequest or your library of choice.)')  
-      }
-
-      fetch('users')
-      .then(setResponseText)
-      .catch(setResponseText)
