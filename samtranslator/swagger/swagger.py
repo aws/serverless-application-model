@@ -311,8 +311,8 @@ class SwaggerEditor(object):
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
-        Adds auth settings for this path/method. Auth settings currently consist solely of Authorization
-        (aka Custom Authorizers) but this method will eventually include setting other auth settings such as API Key,
+        Adds auth settings for this path/method. Auth settings currently consist solely of Authorizers
+        but this method will eventually include setting other auth settings such as API Key,
         Resource Policy, etc.
 
         :param string path: Path name

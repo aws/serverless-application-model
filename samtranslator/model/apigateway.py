@@ -102,10 +102,6 @@ class ApiGatewayAuthorizer(object):
             raise InvalidResourceException(api_logical_id, name + " Authorizer must specify Identity with at least one "
                                            "of Headers, QueryStrings, StageVariables, or Context.")
 
-        if function_payload_type == 'REQUEST' and not identity.get('Headers') and not identity.get('QueryStrings') and not identity.get('StageVariables') and not identity.get('Context'):
-            raise InvalidResourceException(api_logical_id, name + " Authorizer must specify Identity with at least one "
-                                           "of Headers, QueryStrings, StageVariables, or Context.")
-
         self.api_logical_id = api_logical_id
         self.name = name
         self.user_pool_arn = user_pool_arn
@@ -125,7 +121,7 @@ class ApiGatewayAuthorizer(object):
 
         if not headers and not query_strings and not stage_variables and not context:
             return True
-        
+
         return False
 
     def generate_swagger(self):
@@ -164,6 +160,7 @@ class ApiGatewayAuthorizer(object):
             if self._get_function_payload_type() == 'REQUEST':
                 swagger[APIGATEWAY_AUTHORIZER_KEY]['identitySource'] = self._get_identity_source()
 
+        # Authorizer Validation Expression is only allowed on COGNITO_USER_POOLS and LAMBDA_TOKEN
         is_lambda_token_authorizer = authorizer_type == 'LAMBDA' and self._get_function_payload_type() == 'TOKEN'
 
         if authorizer_type == 'COGNITO_USER_POOLS' or is_lambda_token_authorizer:
@@ -178,9 +175,6 @@ class ApiGatewayAuthorizer(object):
         return self.identity and self.identity.get('ValidationExpression')
 
     def _get_identity_source(self):
-        if not self.identity:
-            return None
-
         identity_source_headers = []
         identity_source_query_strings = []
         identity_source_stage_variables = []

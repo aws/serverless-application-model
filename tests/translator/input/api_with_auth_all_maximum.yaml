@@ -1,0 +1,105 @@
+Resources:
+  MyApi:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyCognitoAuth
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: arn:aws:1
+            Identity:
+              Header: MyAuthorizationHeader
+              ValidationExpression: myauthvalidationexpression
+
+          MyCognitoAuthMultipleUserPools:
+            UserPoolArn:
+              - arn:aws:2
+              - arn:aws:3
+            Identity:
+              Header: MyAuthorizationHeader2
+              ValidationExpression: myauthvalidationexpression2
+
+          MyLambdaTokenAuth:
+            FunctionPayloadType: TOKEN
+            FunctionArn: arn:aws
+            FunctionInvokeRole: arn:aws:iam::123456789012:role/S3Access
+            Identity:
+              Header: MyCustomAuthHeader
+              ValidationExpression: mycustomauthexpression
+              ReauthorizeEvery: 20
+
+          MyLambdaTokenAuthNoneFunctionInvokeRole:
+            FunctionArn: arn:aws
+            FunctionInvokeRole: NONE
+            Identity:
+              ReauthorizeEvery: 0
+
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: arn:aws
+            FunctionInvokeRole: arn:aws:iam::123456789012:role/S3Access
+            Identity:
+              Headers:
+                - Authorization1
+              QueryStrings:
+                - Authorization2
+              StageVariables:
+                - Authorization3
+              Context:
+                - Authorization4
+              ReauthorizeEvery: 0
+  
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        WithNoAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: NONE
+        WithCognitoMultipleUserPoolsAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: post
+            Auth:
+              Authorizer: MyCognitoAuthMultipleUserPools
+        WithLambdaTokenAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: get
+            Auth:
+              Authorizer: MyLambdaTokenAuth
+        WithLambdaTokenAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: patch
+            Auth:
+              Authorizer: MyLambdaTokenAuthNoneFunctionInvokeRole
+        WithLambdaRequestAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: delete
+            Auth:
+              Authorizer: MyLambdaRequestAuth
+        WithDefaultAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: put

@@ -346,7 +346,6 @@ class SamFunction(SamResourceMacro):
             s3_pointer = parse_s3_uri(self.CodeUri)
 
             if s3_pointer is None:
-                print('s3_pointer here', s3_pointer)
                 raise InvalidResourceException(self.logical_id,
                                                '\'CodeUri\' is not a valid S3 Uri of the form '
                                                '"s3://bucket/key" with optional versionId query parameter.')
