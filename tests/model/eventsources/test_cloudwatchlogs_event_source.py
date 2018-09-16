@@ -1,4 +1,4 @@
-from mock import Mock
+from mock import Mock, patch
 from unittest import TestCase
 from samtranslator.model.eventsources.cloudwatchlogs import CloudWatchLogs
 
@@ -18,6 +18,7 @@ class CloudWatchLogsEventSource(TestCase):
         self.permission = Mock()
         self.permission.logical_id = 'LogProcessorPermission'
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_get_source_arn(self):
         source_arn = self.cloudwatch_logs_event_source.get_source_arn()
         expected_source_arn = {'Fn::Sub': [
@@ -31,6 +32,7 @@ class CloudWatchLogsEventSource(TestCase):
         self.assertEquals(subscription_filter.FilterPattern, 'Fizbo')
         self.assertEquals(subscription_filter.DestinationArn, 'arn:aws:mock')
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_to_cloudformation_returns_permission_and_subscription_filter_resources(self):
         resources = self.cloudwatch_logs_event_source.to_cloudformation(
             function=self.function)

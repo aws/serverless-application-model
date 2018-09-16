@@ -113,8 +113,10 @@ Resources:
 
         - AWSSecretsManagerRotationPolicy:
             FunctionName: function
-        
+
         - MobileAnalyticsWriteOnlyAccessPolicy: {}
 
         - PinpointEndpointAccessPolicy:
             PinpointApplicationId: id
+
+        - RekognitionDetectOnlyPolicy: {}

@@ -23,8 +23,9 @@ from samtranslator.translator.transform import transform
 from mock import Mock, MagicMock, patch
 
 
-input_folder = 'tests/translator/input'
-output_folder = 'tests/translator/output'
+BASE_PATH = os.path.dirname(__file__)
+INPUT_FOLDER = os.path.join(BASE_PATH, 'input')
+OUTPUT_FOLDER = os.path.join(BASE_PATH, 'output')
 
 
 def deep_sort_lists(value):
@@ -125,6 +126,7 @@ class TestTranslatorEndToEnd(TestCase):
         'sns_existing_other_subscription',
         'sns_topic_outside_template',
         'alexa_skill',
+        'alexa_skill_with_skill_id',
         'iot_rule',
         'function_managed_inline_policy',
         'unsupported_resources',
@@ -167,16 +169,13 @@ class TestTranslatorEndToEnd(TestCase):
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
-        manifest = yaml_parse(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(output_folder,partition_folder, testcase + '.json'), 'r'))
+        expected = json.load(open(os.path.join(OUTPUT_FOLDER,partition_folder, testcase + '.json'), 'r'))
 
-        old_region = os.environ.get("AWS_DEFAULT_REGION", "")
-        os.environ["AWS_DEFAULT_REGION"] = region
-
-        try:
+        with patch('boto3.session.Session.region_name', region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
             mock_policy_loader.load.return_value = {
@@ -188,8 +187,6 @@ class TestTranslatorEndToEnd(TestCase):
 
             output_fragment = transform(
                 manifest, parameter_values, mock_policy_loader)
-        finally:
-            os.environ["AWS_DEFAULT_REGION"] = old_region
 
         print(json.dumps(output_fragment, indent=2))
 
@@ -305,9 +302,10 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_unknown_policy_template',
     'error_function_with_invalid_policy_statement'
 ])
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_transform_invalid_document(testcase):
-    manifest = yaml.load(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
-    expected = json.load(open(os.path.join(output_folder, testcase + '.json'), 'r'))
+    manifest = yaml.load(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+    expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + '.json'), 'r'))
 
     mock_policy_loader = MagicMock()
     parameter_values = get_template_parameter_values()
@@ -319,6 +317,7 @@ def test_transform_invalid_document(testcase):
 
     assert error_message == expected.get('errorMessage')
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_transform_unhandled_failure_empty_managed_policy_map():
     document = {
         'Transform': 'AWS::Serverless-2016-10-31',
@@ -374,6 +373,7 @@ def assert_metric_call(mock, transform, transform_failure=0, invalid_document=0)
     )
 
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_swagger_body_sha_gets_recomputed():
 
     document = {
@@ -415,6 +415,7 @@ def test_swagger_body_sha_gets_recomputed():
     assert get_deployment_key(output_fragment) == deployment_key_changed
 
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_swagger_definitionuri_sha_gets_recomputed():
 
     document = {
@@ -476,6 +477,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
             }
         }
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_logical_id_change_with_parameters(self):
         parameter_values = {
             'CodeKeyParam': 'value1'
@@ -490,6 +492,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         assert first_version_id != second_version_id
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_logical_id_remains_same_without_parameter_change(self):
         parameter_values = {
             'CodeKeyParam': 'value1'
@@ -503,6 +506,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         assert first_version_id == second_version_id
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_logical_id_without_resolving_reference(self):
         # Now value of `CodeKeyParam` is not present in document
 
@@ -725,6 +729,7 @@ class TestPluginsUsage(TestCase):
     @patch.object(Resource, "from_dict")
     @patch("samtranslator.translator.translator.SamPlugins")
     @patch("samtranslator.translator.translator.prepare_plugins")
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_transform_method_must_inject_plugins_when_creating_resources(self,
                                                                           prepare_plugins_mock,
                                                                           sam_plugins_class_mock,
