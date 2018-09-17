@@ -3,6 +3,9 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Deploy this lambda to a Greengrass core where it will send a hello world
   message to a topic
+Parameters: 
+    IdentityNameParameter: 
+      Type: String
 Resources:
   greengrasshelloworldnodejs:
     Type: 'AWS::Serverless::Function'
@@ -16,9 +19,5 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'ses:SendBounce'
-              Resource: '*'
+        - SESSendBouncePolicy:
+            IdentityName: !Ref IdentityNameParameter

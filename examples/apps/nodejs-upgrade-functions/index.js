@@ -36,7 +36,7 @@
  configuration:
   a. Change the MODE environment variable’s value to Upgrade.
   b. Change the TARGET_RUNTIME environment variable’s value to the runtime that you’d like to transition to. Valid
-   values are nodejs4.3 || nodejs6.10.
+   values are nodejs6.10 || nodejs8.10.
   c. Change the EXCEPTIONS environment variable’s value to a list of function names to exclude them from being
    upgraded. The value should be a comma separated list of function names alone, not ARNs.
   d. Run the function from the console.
@@ -53,7 +53,7 @@ const lambda = new AWS.Lambda();
 exports.handler = (event, context, callback) => {
     const memory = { Functions: [], Versions: [] };
     const deprecatedRuntime = 'nodejs';
-    const targetRuntime = process.env.TARGET_RUNTIME || 'nodejs4.3';
+    const targetRuntime = process.env.TARGET_RUNTIME || 'nodejs6.10';
     const mode = (process.env.MODE || 'list').toLowerCase();
     const list = mode === 'list';
     const upgrade = mode === 'upgrade';

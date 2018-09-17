@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Upgrade deprecated Nodejs v0.10 functions to a newer runtime.
+Parameters:
+  BucketNameParameter:
+    Type: String
+  CollectionIdParameter:
+    Type: String
 Resources:
   nodejsupgradefunctions:
     Type: 'AWS::Serverless::Function'
@@ -12,25 +17,14 @@ Resources:
       MemorySize: 128
       Timeout: 300
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 's3:GetObject'
-              Resource: 'arn:aws:s3:::*'
-            - Effect: Allow
-              Action:
-                - 'rekognition:CompareFaces'
-                - 'rekognition:DetectFaces'
-                - 'rekognition:DetectLabels'
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - 'rekognition:CreateCollection'
-                - 'rekognition:IndexFaces'
-              Resource: '*'
+        - S3CrudPolicy:
+            BucketName: !Ref BucketNameParameter
+        - RekognitionNoDataAccessPolicy:
+            CollectionId: !Ref CollectionIdParameter
+        - RekognitionWriteOnlyAccessPolicy:
+            CollectionId: !Ref CollectionIdParameter
       Environment:
         Variables:
           EXCEPTIONS: <ENTER_COMMA_SEPARATED_FUNCTION_NAMES>
-          TARGET_RUNTIME: nodejs4.3
+          TARGET_RUNTIME: nodejs6.10
           MODE: List

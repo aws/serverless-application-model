@@ -119,7 +119,8 @@
                     "dynamodb:Query", 
                     "dynamodb:UpdateItem", 
                     "dynamodb:BatchWriteItem", 
-                    "dynamodb:BatchGetItem"
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:DescribeTable"
                   ], 
                   "Resource": {
                     "Fn::Sub": [
@@ -143,7 +144,8 @@
                     "dynamodb:GetItem", 
                     "dynamodb:Scan", 
                     "dynamodb:Query", 
-                    "dynamodb:BatchGetItem"
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:DescribeTable"
                   ], 
                   "Resource": {
                     "Fn::Sub": [
@@ -686,11 +688,7 @@
                     "codepipeline:PutJobSuccessResult", 
                     "codepipeline:PutJobFailureResult"
                   ], 
-                  "Resource": [
-                    {
-                      "Fn::Sub": "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*"
-                    }
-                  ], 
+                  "Resource": "*", 
                   "Effect": "Allow"
                 }
               ]
@@ -988,8 +986,25 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy39",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "rekognition:DetectFaces",
+                    "rekognition:DetectText",
+                    "rekognition:DetectLabels",
+                    "rekognition:DetectModerationLabels"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
-        ], 
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [

@@ -3,6 +3,9 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Creates LogicMonitor OpsNotes for CloudWatch Events, thereby enabling
   correlation between events and performance data.
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   logicmonitorsendcloudwatchevents:
     Type: 'AWS::Serverless::Function'
@@ -16,12 +19,8 @@ Resources:
       MemorySize: 128
       Timeout: 30
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+       - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter
       Environment:
         Variables:
           ACCOUNT_NAME: <enter value here>

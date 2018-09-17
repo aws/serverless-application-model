@@ -6,20 +6,11 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: Pushes CWL logs to SumoLogic.
       MemorySize: 128
       Timeout: 10
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'cloudwatch:PutMetricData'
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - 'ec2:DescribeRegions'
-                - 'ec2:DescribeVpnConnections'
-              Resource: '*'
+        - CloudWatchPutMetricPolicy: {}
+        - EC2VPNDescribePolicy: {}

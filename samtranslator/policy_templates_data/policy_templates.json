@@ -65,7 +65,7 @@
     "CloudWatchPutMetricPolicy": {
       "Description": "Gives permissions to put metrics to CloudWatch",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -82,7 +82,7 @@
     "EC2DescribePolicy": {
       "Description": "Gives permission to describe EC2 instances",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -116,7 +116,8 @@
               "dynamodb:Query",
               "dynamodb:UpdateItem",
               "dynamodb:BatchWriteItem",
-              "dynamodb:BatchGetItem"
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
             ],
             "Resource": {
               "Fn::Sub": [
@@ -147,7 +148,8 @@
               "dynamodb:GetItem",
               "dynamodb:Scan",
               "dynamodb:Query",
-              "dynamodb:BatchGetItem"
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
             ],
             "Resource": {
               "Fn::Sub": [
@@ -313,7 +315,7 @@
     "AMIDescribePolicy": {
       "Description": "Gives permissions to describe AMIs",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -332,7 +334,7 @@
     "CloudFormationDescribeStacksPolicy": {
       "Description": "Gives permission to describe CloudFormation stacks",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -344,6 +346,26 @@
             "Resource": {
               "Fn::Sub": "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*"
             }
+          }
+        ]
+      }
+    },
+    "RekognitionDetectOnlyPolicy": {
+      "Description": "Gives permission to detect faces, labels and text",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rekognition:DetectFaces",
+              "rekognition:DetectLabels",
+              "rekognition:DetectModerationLabels",
+              "rekognition:DetectText"
+            ],
+            "Resource": "*"
           }
         ]
       }
@@ -498,7 +520,7 @@
     "VPCAccessPolicy": {
       "Description": "Gives access to create, delete, describe and detach ENIs",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -824,7 +846,7 @@
     "CodePipelineLambdaExecutionPolicy": {
       "Description": "Gives permission for a Lambda function invoked by AWS CodePipeline to report back status of the job",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -834,11 +856,7 @@
               "codepipeline:PutJobSuccessResult",
               "codepipeline:PutJobFailureResult"
             ],
-            "Resource": [
-              {
-                "Fn::Sub": "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*"
-              }
-            ]
+            "Resource": "*"
           }
         ]
       }
@@ -846,7 +864,7 @@
     "ServerlessRepoReadWriteAccessPolicy": {
       "Description": "Gives access permissions to create and list applications in the AWS Serverless Application Repository service",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -927,7 +945,7 @@
     "CloudWatchDashboardPolicy": {
       "Description": "Gives permissions to put metrics to operate on CloudWatch Dashboards",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -976,7 +994,7 @@
     "RekognitionLabelsPolicy": {
       "Description": "Gives permission to detect object and moderation labels",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -1091,7 +1109,7 @@
     "ComprehendBasicAccessPolicy": {
       "Description": "Gives access to Amazon Comprehend APIs for detecting entities, key phrases, languages and sentiments",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [

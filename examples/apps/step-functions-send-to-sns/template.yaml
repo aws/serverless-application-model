@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Sends an SNS message from input JSON
+Parameters: 
+  TopicNameParameter: 
+    Type: String
 Resources:
   stepfunctionssendtosns:
     Type: 'AWS::Serverless::Function'
@@ -12,9 +15,5 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'sns:Publish'
-              Resource: 'arn:aws:sns:*:*:*'
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref TopicNameParameter
