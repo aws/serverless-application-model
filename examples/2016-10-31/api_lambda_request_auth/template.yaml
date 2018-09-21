@@ -16,6 +16,7 @@ Resources:
             Identity:
               QueryStrings:
                 - auth
+              # NOTE: Additional options:
               # Headers:
               #   - Authorization
               # StageVariables:
@@ -45,8 +46,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /users
             Method: get
-            # Auth:
-            #   Authorizer: MyOtherAuthorizer
   
   MyAuthFunction:
     Type: AWS::Serverless::Function

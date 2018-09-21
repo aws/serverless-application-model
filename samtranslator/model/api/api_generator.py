@@ -224,8 +224,6 @@ class ApiGenerator(object):
         if not self.auth:
             return
 
-        INVALID_ERROR = "Invalid value for 'Auth' property"
-
         if self.auth and not self.definition_body:
             raise InvalidResourceException(self.logical_id,
                                            "Auth works only with inline Swagger specified in "
@@ -233,7 +231,8 @@ class ApiGenerator(object):
 
         # Make sure keys in the dict are recognized
         if not all(key in AuthProperties._fields for key in self.auth.keys()):
-            raise InvalidResourceException(self.logical_id, INVALID_ERROR)
+            raise InvalidResourceException(
+                self.logical_id, "Invalid value for 'Auth' property")
 
         if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(self.logical_id, "Unable to add Auth configuration because "

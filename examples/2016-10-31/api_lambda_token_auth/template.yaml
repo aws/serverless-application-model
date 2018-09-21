@@ -11,6 +11,7 @@ Resources:
         Authorizers:
           MyLambdaTokenAuthorizer:
             FunctionArn: !GetAtt MyAuthFunction.Arn
+            # NOTE: Additional options:
             # FunctionInvokeRole: !Ref MyRole
             # Identity:
               # Header: Auth
@@ -38,8 +39,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /users
             Method: get
-            # Auth:
-            #   Authorizer: MyOtherAuthorizer
   
   MyAuthFunction:
     Type: AWS::Serverless::Function
