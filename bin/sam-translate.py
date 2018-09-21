@@ -57,7 +57,7 @@ def main():
     except InvalidDocumentException as e:
         errorMessage = reduce(lambda message, error: message + ' ' + error.message, e.causes, e.message)
         print(errorMessage)
-        errors = map(lambda cause: {'errorMessage': cause.message}, e.causes)
+        errors = map(lambda cause: cause.message, e.causes)
         print(errors)
 
 

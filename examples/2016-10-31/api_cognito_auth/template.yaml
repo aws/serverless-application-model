@@ -1,0 +1,153 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API Gateway + Cognito User Pools Auth
+
+Parameters:
+  CognitoUserPoolName:
+    Type: String
+    Default: MyUserPool
+  
+  CognitoUserPoolClientName:
+    Type: String
+    Default: MyUserPoolClient
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors: "'*'"
+      Auth:
+        DefaultAuthorizer: MyCognitoAuthorizer
+        Authorizers:
+          MyCognitoAuthorizer:
+            UserPoolArn: !GetAtt MyCognitoUserPool.Arn
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: lambda.handler
+      MemorySize: 1024
+      Runtime: nodejs8.10
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_CLIENT_ID: !Ref MyCognitoUserPoolClient
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /
+            Method: GET
+            Auth:
+              Authorizer: NONE
+        ProxyAny:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /{proxy+}
+            Method: ANY
+            Auth:
+              Authorizer: NONE
+        GetUsers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: GET
+            Auth:
+              Authorizer: NONE
+        GetUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users/{userId}
+            Method: GET
+            Auth:
+              Authorizer: NONE
+        CreateUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: POST
+        DeleteUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users/{userId}
+            Method: DELETE
+        UpdateUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users/{userId}
+            Method: PUT
+  
+  MyCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Ref CognitoUserPoolName
+      LambdaConfig:
+        PreSignUp: !GetAtt PreSignupLambdaFunction.Arn
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+  
+  MyCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref MyCognitoUserPool
+      ClientName: !Ref CognitoUserPoolClientName
+      GenerateSecret: false
+
+  PreSignupLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          event.response = { autoConfirmUser: true }
+          return event
+        }
+      Handler: index.handler
+      MemorySize: 128
+      Runtime: nodejs8.10
+      Timeout: 3
+
+  LambdaCognitoUserPoolExecutionPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt PreSignupLambdaFunction.Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
+      # TODO: Add a CognitoUserPool Event Source to SAM to create this permission for you.
+      # Events:
+      #   CognitoUserPoolPreSignup:
+      #     Type: CognitoUserPool
+      #     Properties:
+      #       UserPool: !Ref MyCognitoUserPool
+
+Outputs:
+    ApiId:
+      Description: "API ID"
+      Value: !Ref MyApi
+
+    ApiUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value: !Sub 'https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
+
+    CognitoUserPoolId:
+      Description: "Cognito User Pool Id"
+      Value: !Ref MyCognitoUserPool
+
+    CognitoUserPoolClientId:
+      Description: "Cognito User Pool Client Id"
+      Value: !Ref MyCognitoUserPoolClient
