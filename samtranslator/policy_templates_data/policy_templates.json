@@ -1311,6 +1311,25 @@
           }
         ]
       }
+    },
+    "IAMListUserAccessKeyPolicy": {
+      "Description": "Gives permissions to list users and their access keys",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:ListAccessKeys",
+              "iam:GetAccessKeyLastUsed",
+              "iam:ListUsers"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
     }
   }
 }

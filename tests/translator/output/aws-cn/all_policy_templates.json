@@ -1003,7 +1003,23 @@
                 }
               ]
             }
-          }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy40",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "iam:ListAccessKeys",
+                    "iam:GetAccessKeyLastUsed",
+                    "iam:ListUsers"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }		  
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 

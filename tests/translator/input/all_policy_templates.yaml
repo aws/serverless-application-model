@@ -120,3 +120,5 @@ Resources:
             PinpointApplicationId: id
 
         - RekognitionDetectOnlyPolicy: {}
+        
+        - IAMListUserAccessKeyPolicy: {}
