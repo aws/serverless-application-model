@@ -98,6 +98,9 @@ Resources:
 
         - CloudWatchDashboardPolicy: {}
 
+        - RekognitionFacesManagementPolicy:
+            CollectionId: collection
+
         - RekognitionFacesPolicy:
             CollectionId: collection
 
