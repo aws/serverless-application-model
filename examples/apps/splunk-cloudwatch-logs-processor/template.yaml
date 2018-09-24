@@ -4,6 +4,11 @@ Description: Stream events from AWS CloudWatch Logs to Splunk's HTTP event colle
 Parameters:
   BucketNameParameter:
     Type: String
+  SplunkHecUrlParameter:
+    Type: String
+    AllowedPattern: '^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$'
+  SplunkHecTokenParameter:
+    Type: String
 Resources:
   splunkcloudwatchlogsprocessor:
     Type: 'AWS::Serverless::Function'
@@ -19,5 +24,5 @@ Resources:
             BucketName: !Ref BucketNameParameter
       Environment:
         Variables:
-          SPLUNK_HEC_URL: <enter value here>
-          SPLUNK_HEC_TOKEN: <enter value here>
+          SPLUNK_HEC_URL: !Ref SplunkHecUrlParameter
+          SPLUNK_HEC_TOKEN: !Ref SplunkHecTokenParameter
