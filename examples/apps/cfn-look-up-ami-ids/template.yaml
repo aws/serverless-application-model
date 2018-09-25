@@ -6,15 +6,10 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: Looks up the latest AMI ID for a given region and architecture.
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'ec2:DescribeImages'
-              Resource: '*'
+        - AMIDescribePolicy: {}

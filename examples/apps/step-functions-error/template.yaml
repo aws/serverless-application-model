@@ -1,8 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
-  An AWS Lambda function that throws an error. AWS Step Functions state machines
-  can be configured to handle (catch or retry) this error.
+  An AWS Lambda function that throws an error. AWS Step Functions state machines can be configured to handle (catch or retry) this error.
 Resources:
   stepfunctionserror:
     Type: 'AWS::Serverless::Function'
@@ -11,19 +10,9 @@ Resources:
       Runtime: nodejs6.10
       CodeUri: .
       Description: >-
-        An AWS Lambda function that throws an error. AWS Step Functions state
-        machines can be configured to handle (catch or retry) this error.
+        An AWS Lambda function that throws an error. AWS Step Functions state machines can be configured to handle (catch or retry) this error.
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'cloudwatch:PutMetricData'
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - 'ec2:DescribeRegions'
-                - 'ec2:DescribeVpnConnections'
-              Resource: '*'
+        - CloudWatchPutMetricPolicy: {}
+        - EC2VPNDescribePolicy: {}

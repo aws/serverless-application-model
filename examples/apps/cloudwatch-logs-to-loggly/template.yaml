@@ -1,23 +1,22 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Sends logs from Cloudwatch logs to Loggly using a Lambda function.
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   cloudwatchlogstologgly:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: Sends logs from Cloudwatch logs to Loggly using a Lambda function.
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+        - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter
       Environment:
         Variables:
           kmsEncryptedCustomerToken: <enter value here>

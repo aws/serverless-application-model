@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: 'Order flowers, using Amazon Lex to perform natural language understanding'
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   lexorderflowerspython:
     Type: 'AWS::Serverless::Function'
@@ -14,9 +17,5 @@ Resources:
       MemorySize: 128
       Timeout: 10
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+        - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter

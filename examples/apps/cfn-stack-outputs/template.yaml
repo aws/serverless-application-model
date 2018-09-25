@@ -8,7 +8,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: >-
         Takes an AWS CloudFormation stack name and returns the outputs from that
@@ -16,9 +16,4 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'cloudformation:DescribeStacks'
-              Resource: '*'
+        - CloudFormationDescribeStacksPolicy: {}

@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: 'Performs a periodic check of the given site, erroring out on test failure.'
+Parameters: 
+  FunctionNameParameter: 
+    Type: String
 Resources:
   lambdacanarypython3:
     Type: 'AWS::Serverless::Function'
@@ -9,35 +12,12 @@ Resources:
       Runtime: python3.6
       CodeUri: .
       Description: >-
-        Performs a periodic check of the given site, erroring out on test
-        failure.
+        Performs a periodic check of the given site, erroring out on test failure.
       MemorySize: 128
       Timeout: 10
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'dynamodb:PutItem'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:dynamodb:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':table/*'
-            - Effect: Allow
-              Action:
-                - 'lambda:InvokeFunction'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:lambda:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':function:*'
+        - LambdaInvokePolicy:
+            FunctionName: !Ref FunctionNameParameter
       Environment:
         Variables:
           site: 'https://www.amazon.com/'

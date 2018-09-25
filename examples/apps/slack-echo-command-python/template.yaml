@@ -3,6 +3,9 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   A function that handles a Slack slash command and echoes the details back to
   the user.
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   slackechocommandpython:
     Type: 'AWS::Serverless::Function'
@@ -16,12 +19,8 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+       - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter
       Events:
         Api1:
           Type: Api

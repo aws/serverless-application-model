@@ -247,7 +247,8 @@
                     "s3:GetObjectVersion", 
                     "s3:PutObject", 
                     "s3:GetLifecycleConfiguration", 
-                    "s3:PutLifecycleConfiguration"
+                    "s3:PutLifecycleConfiguration",
+                    "s3:DeleteObject"
                   ], 
                   "Resource": [
                     {
@@ -685,11 +686,7 @@
                     "codepipeline:PutJobSuccessResult", 
                     "codepipeline:PutJobFailureResult"
                   ], 
-                  "Resource": [
-                    {
-                      "Fn::Sub": "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*"
-                    }
-                  ], 
+                  "Resource": "*", 
                   "Effect": "Allow"
                 }
               ]
@@ -988,8 +985,25 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy39",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "rekognition:DetectFaces",
+                    "rekognition:DetectText",
+                    "rekognition:DetectLabels",
+                    "rekognition:DetectModerationLabels"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
-        ], 
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [

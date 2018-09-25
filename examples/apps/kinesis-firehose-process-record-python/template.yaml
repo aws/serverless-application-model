@@ -4,6 +4,11 @@ Description: >-
   An Amazon Kinesis Firehose stream processor that accesses the records in the
   input and returns them with a processing status.  Use this processor for any
   custom transformation logic.
+Parameters: 
+  FunctionNameParameter: 
+    Type: String
+  TableNameParameter: 
+    Type: String
 Resources:
   kinesisfirehoseprocessrecordpython:
     Type: 'AWS::Serverless::Function'
@@ -18,27 +23,7 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'dynamodb:PutItem'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:dynamodb:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':table/*'
-            - Effect: Allow
-              Action:
-                - 'lambda:InvokeFunction'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:lambda:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':function:*'
+        - LambdaInvokePolicy:
+            FunctionName: !Ref FunctionNameParameter
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableNameParameter

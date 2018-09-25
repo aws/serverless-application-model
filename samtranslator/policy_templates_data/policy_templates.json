@@ -65,7 +65,7 @@
     "CloudWatchPutMetricPolicy": {
       "Description": "Gives permissions to put metrics to CloudWatch",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -82,7 +82,7 @@
     "EC2DescribePolicy": {
       "Description": "Gives permission to describe EC2 instances",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -264,7 +264,7 @@
       }
     },
     "S3CrudPolicy": {
-      "Description": "Gives read permissions to objects in the S3 Bucket",
+      "Description": "Gives CRUD permissions to objects in the S3 Bucket",
       "Parameters": {
         "BucketName": {
           "Description": "Name of the Bucket"
@@ -281,7 +281,8 @@
               "s3:GetObjectVersion",
               "s3:PutObject",
               "s3:GetLifecycleConfiguration",
-              "s3:PutLifecycleConfiguration"
+              "s3:PutLifecycleConfiguration",
+              "s3:DeleteObject"
             ],
             "Resource": [
               {
@@ -312,7 +313,7 @@
     "AMIDescribePolicy": {
       "Description": "Gives permissions to describe AMIs",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -331,7 +332,7 @@
     "CloudFormationDescribeStacksPolicy": {
       "Description": "Gives permission to describe CloudFormation stacks",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -343,6 +344,26 @@
             "Resource": {
               "Fn::Sub": "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*"
             }
+          }
+        ]
+      }
+    },
+    "RekognitionDetectOnlyPolicy": {
+      "Description": "Gives permission to detect faces, labels and text",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rekognition:DetectFaces",
+              "rekognition:DetectLabels",
+              "rekognition:DetectModerationLabels",
+              "rekognition:DetectText"
+            ],
+            "Resource": "*"
           }
         ]
       }
@@ -497,7 +518,7 @@
     "VPCAccessPolicy": {
       "Description": "Gives access to create, delete, describe and detach ENIs",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -823,7 +844,7 @@
     "CodePipelineLambdaExecutionPolicy": {
       "Description": "Gives permission for a Lambda function invoked by AWS CodePipeline to report back status of the job",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -833,11 +854,7 @@
               "codepipeline:PutJobSuccessResult",
               "codepipeline:PutJobFailureResult"
             ],
-            "Resource": [
-              {
-                "Fn::Sub": "arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*"
-              }
-            ]
+            "Resource": "*"
           }
         ]
       }
@@ -845,7 +862,7 @@
     "ServerlessRepoReadWriteAccessPolicy": {
       "Description": "Gives access permissions to create and list applications in the AWS Serverless Application Repository service",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -926,7 +943,7 @@
     "CloudWatchDashboardPolicy": {
       "Description": "Gives permissions to put metrics to operate on CloudWatch Dashboards",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -975,7 +992,7 @@
     "RekognitionLabelsPolicy": {
       "Description": "Gives permission to detect object and moderation labels",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -1090,7 +1107,7 @@
     "ComprehendBasicAccessPolicy": {
       "Description": "Gives access to Amazon Comprehend APIs for detecting entities, key phrases, languages and sentiments",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [
@@ -1152,6 +1169,34 @@
               "secretsmanager:GetRandomPassword"
             ],
             "Resource": "*"
+          }
+        ]
+      }
+    },
+    "AWSSecretsManagerGetSecretValuePolicy": {
+      "Description": "Grants permissions to GetSecretValue for the specified AWS Secrets Manager secret",
+      "Parameters": {
+        "SecretArn": {
+          "Description": "The ARN of the secret to grant access to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "secretsmanager:GetSecretValue"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "${secretArn}",
+                {
+                  "secretArn": {
+                    "Ref": "SecretArn"
+                  }
+                }
+              ]
+            }
           }
         ]
       }
