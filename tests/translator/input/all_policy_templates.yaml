@@ -120,3 +120,6 @@ Resources:
             PinpointApplicationId: id
 
         - RekognitionDetectOnlyPolicy: {}
+
+        - RekognitionFacesManagementPolicy:
+            CollectionId: collection

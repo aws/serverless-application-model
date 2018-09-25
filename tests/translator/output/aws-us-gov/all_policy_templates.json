@@ -1004,6 +1004,31 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy40", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "rekognition:IndexFaces",
+                    "rekognition:DeleteFaces",
+                    "rekognition:SearchFaces",
+                    "rekognition:SearchFacesByImage",
+                    "rekognition:ListFaces"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}", 
+                      {
+                        "collectionId": "collection"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ],
         "AssumeRolePolicyDocument": {
