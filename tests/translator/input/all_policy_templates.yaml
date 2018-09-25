@@ -98,9 +98,6 @@ Resources:
 
         - CloudWatchDashboardPolicy: {}
 
-        - RekognitionFacesManagementPolicy:
-            CollectionId: collection
-
         - RekognitionFacesPolicy:
             CollectionId: collection
 
@@ -123,3 +120,6 @@ Resources:
             PinpointApplicationId: id
 
         - RekognitionDetectOnlyPolicy: {}
+
+        - RekognitionFacesManagementPolicy:
+            CollectionId: collection
