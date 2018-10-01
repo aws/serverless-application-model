@@ -1028,6 +1028,21 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy41",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "eks:DescribeCluster",
+                    "eks:ListClusters"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ],
         "AssumeRolePolicyDocument": {

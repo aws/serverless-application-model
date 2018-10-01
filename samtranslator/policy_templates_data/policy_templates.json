@@ -1341,6 +1341,23 @@
           }
         ]
       }
+    },
+    "EKSDescribePolicy": {
+      "Description": "Gives permission to describe or list Amazon EKS clusters",
+      "Parameters": {
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "eks:DescribeCluster",
+              "eks:ListClusters"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
     }
   }
 }
