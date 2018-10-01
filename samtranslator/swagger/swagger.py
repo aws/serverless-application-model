@@ -30,6 +30,7 @@ class SwaggerEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
+        self.security_definitions = self._doc.get("securityDefinitions", {})
 
     def has_path(self, path, method=None):
         """
@@ -285,6 +286,108 @@ class SwaggerEditor(object):
         # Allow-Methods is comma separated string
         return ','.join(allow_methods)
 
+    def add_authorizers(self, authorizers):
+        """
+        Add Authorizer definitions to the securityDefinitions part of Swagger.
+
+        :param list authorizers: List of Authorizer configurations which get translated to securityDefinitions.
+        """
+        self.security_definitions = self.security_definitions or {}
+
+        for authorizerName, authorizer in authorizers.items():
+            self.security_definitions[authorizerName] = authorizer.generate_swagger()
+
+    def set_path_default_authorizer(self, path, default_authorizer, authorizers):
+        """
+        Sets the DefaultAuthorizer for each method on this path. The DefaultAuthorizer won't be set if an Authorizer
+        was defined at the Function/Path/Method level
+
+        :param string path: Path name
+        :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the authorizers param.
+        :param list authorizers: List of Authorizer configurations defined on the related Api.
+        """
+        for method_name, method in self.paths[path].items():
+            self.set_method_authorizer(path, method_name, default_authorizer, authorizers, default_authorizer=default_authorizer, is_default=True)
+
+    def add_auth_to_method(self, path, method_name, auth, api):
+        """
+        Adds auth settings for this path/method. Auth settings currently consist solely of Authorizers
+        but this method will eventually include setting other auth settings such as API Key,
+        Resource Policy, etc.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param dict auth: Auth configuration such as Authorizers, ApiKey, ResourcePolicy (only Authorizers supported
+                          currently)
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        """
+        method_authorizer = auth and auth.get('Authorizer')
+        if method_authorizer:
+            api_auth = api.get('Auth')
+            api_authorizers = api_auth and api_auth.get('Authorizers')
+            default_authorizer = api_auth and api_auth.get('DefaultAuthorizer')
+
+            self.set_method_authorizer(path, method_name, method_authorizer, api_authorizers, default_authorizer)
+
+    def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
+                              is_default=False):
+        normalized_method_name = self._normalize_method_name(method_name)
+        existing_security = self.paths[path][normalized_method_name].get('security', [])  # TEST: [{'sigv4': []}, {'api_key': []}])
+        authorizer_names = set(authorizers.keys())
+        existing_non_authorizer_security = []
+        existing_authorizer_security = []
+
+        # Split existing security into Authorizers and everything else
+        # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
+        # We want to ensure only a single Authorizer security entry exists while keeping everything else
+        for security in existing_security:
+            if authorizer_names.isdisjoint(security.keys()):
+                existing_non_authorizer_security.append(security)
+            else:
+                existing_authorizer_security.append(security)
+
+        none_idx = -1
+        authorizer_security = []
+
+        # If this is the Api-level DefaultAuthorizer we need to check for an
+        # existing Authorizer before applying the default. It would be simpler
+        # if instead we applied the DefaultAuthorizer first and then simply
+        # overwrote it if necessary, however, the order in which things get
+        # applied (Function Api Events first; then Api Resource) complicates it.
+        if is_default:
+            # Check if Function/Path/Method specified 'NONE' for Authorizer
+            for idx, security in enumerate(existing_non_authorizer_security):
+                is_none = any(key == 'NONE' for key in security.keys())
+
+                if is_none:
+                    none_idx = idx
+                    break
+
+            # NONE was found; remove it and don't add the DefaultAuthorizer
+            if none_idx > -1:
+                del existing_non_authorizer_security[none_idx]
+
+            # Existing Authorizer found (defined at Function/Path/Method); use that instead of default
+            elif existing_authorizer_security:
+                authorizer_security = existing_authorizer_security
+
+            # No existing Authorizer found; use default
+            else:
+                security_dict = {}
+                security_dict[authorizer_name] = []
+                authorizer_security = [security_dict]
+
+        # This is a Function/Path/Method level Authorizer; simply set it
+        else:
+            security_dict = {}
+            security_dict[authorizer_name] = []
+            authorizer_security = [security_dict]
+
+        security = existing_non_authorizer_security + authorizer_security
+
+        if security:
+            self.paths[path][normalized_method_name]['security'] = security
+
     @property
     def swagger(self):
         """
@@ -295,6 +398,10 @@ class SwaggerEditor(object):
 
         # Make sure any changes to the paths are reflected back in output
         self._doc["paths"] = self.paths
+
+        if self.security_definitions:
+            self._doc["securityDefinitions"] = self.security_definitions
+
         return copy.deepcopy(self._doc)
 
     @staticmethod

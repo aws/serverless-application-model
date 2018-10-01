@@ -75,5 +75,6 @@ class LambdaPermission(Resource):
             'FunctionName': PropertyType(True, is_str()),
             'Principal': PropertyType(True, is_str()),
             'SourceAccount': PropertyType(False, is_str()),
-            'SourceArn': PropertyType(False, is_str())
+            'SourceArn': PropertyType(False, is_str()),
+            'EventSourceToken': PropertyType(False, is_str())
     }

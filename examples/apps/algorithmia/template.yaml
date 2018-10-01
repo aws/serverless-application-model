@@ -1,23 +1,22 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Run any algorithm in the Algorithmia marketplace.
+Parameters: 
+  TopicNameParameter: 
+    Type: String
 Resources:
   algorithmia:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: Run any algorithm in the Algorithmia marketplace.
       MemorySize: 256
       Timeout: 60
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'sns:Publish'
-              Resource: 'arn:aws:sns:*:*:*'
+        - SNSPublishMessagePolicy:
+            TopicName: !Ref TopicNameParameter
       Events:
         BucketEvent1:
           Type: S3

@@ -1,8 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
-  Blueprint to add a header based on the values in a key-value pair in a query
-  string.
+  Blueprint to add a header based on the values in a key-value pair in a querynstring.
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   cloudfrontmodifyquerystring:
     Type: 'AWS::Serverless::Function'
@@ -11,14 +13,9 @@ Resources:
       Runtime: nodejs6.10
       CodeUri: .
       Description: >-
-        Blueprint to add a header based on the values in a key-value pair in a
-        query string.
+        Blueprint to add a header based on the values in a key-value pair in a query string.
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+        - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter

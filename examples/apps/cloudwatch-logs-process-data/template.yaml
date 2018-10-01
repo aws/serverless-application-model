@@ -3,12 +3,15 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   A real-time consumer of log events ingested by an Amazon CloudWatch Logs log
   group.
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   cloudwatchlogsprocessdata:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: >-
         A real-time consumer of log events ingested by an Amazon CloudWatch Logs
@@ -16,9 +19,5 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+        - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter

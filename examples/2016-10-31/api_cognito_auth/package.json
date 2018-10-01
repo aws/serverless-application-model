@@ -1,0 +1,30 @@
+{
+  "name": "api_cognito_auth",
+  "version": "1.0.0",
+  "description": "Example using API Gateway with Cognito Authorizer.",
+  "main": "lambda.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "aws-serverless-express": "^3.3.3",
+    "body-parser": "^1.17.1",
+    "cors": "^2.8.3",
+    "express": "^4.15.2",
+    "pug": "^2.0.0-rc.1"
+  },
+  "scripts": {
+    "package-deploy": "npm run set-config && npm run package && npm run deploy",
+    "set-config": "npm config set STACK_NAME ${STACK_NAME:-sam-example-api-cognito-auth}",
+    "package": "aws cloudformation package --template-file template.yaml --output-template-file template.packaged.yaml --s3-bucket $S3_BUCKET_NAME",
+    "deploy": "aws cloudformation deploy --template-file ./template.packaged.yaml --stack-name $STACK_NAME --capabilities CAPABILITY_IAM",
+    "configure-cognito-user-pool": "npm run set-cognito-user-pool-id && npm run set-cognito-user-pool-client-id && npm run set-api-id && npm run set-api-url && npm run update-user-pool-client && npm run create-user-pool-domain",
+    "set-cognito-user-pool-id": "npm config set COGNITO_USER_POOL_ID $(aws cloudformation describe-stacks --stack-name $(npm config get STACK_NAME) --query 'Stacks[].Outputs[?OutputKey==`CognitoUserPoolId`].OutputValue' --output text)",
+    "set-cognito-user-pool-client-id": "npm config set COGNITO_USER_POOL_CLIENT_ID $(aws cloudformation describe-stacks --stack-name $(npm config get STACK_NAME) --query 'Stacks[].Outputs[?OutputKey==`CognitoUserPoolClientId`].OutputValue' --output text)",
+    "set-api-url": "npm config set API_URL $(aws cloudformation describe-stacks --stack-name sam-example-api-cognito-auth --query 'Stacks[].Outputs[?OutputKey==`ApiUrl`].OutputValue' --output text)",
+    "set-api-id": "npm config set API_ID $(aws cloudformation describe-stacks --stack-name sam-example-api-cognito-auth --query 'Stacks[].Outputs[?OutputKey==`ApiId`].OutputValue' --output text)",
+    "update-user-pool-client": "aws cognito-idp update-user-pool-client --user-pool-id $(npm config get COGNITO_USER_POOL_ID) --client-id $(npm config get COGNITO_USER_POOL_CLIENT_ID) --supported-identity-providers COGNITO --callback-urls \"[\\\"$(npm config get API_URL)\\\"]\" --allowed-o-auth-flows code implicit --allowed-o-auth-scopes openid email --allowed-o-auth-flows-user-pool-client",
+    "create-user-pool-domain": "aws cognito-idp create-user-pool-domain --domain $(npm config get API_ID) --user-pool-id $(npm config get COGNITO_USER_POOL_ID)",
+    "open-signup-page": "open \"https://$(npm config get API_ID).auth.us-east-1.amazoncognito.com/signup?response_type=code&client_id=$(npm config get COGNITO_USER_POOL_CLIENT_ID)&redirect_uri=$(npm config get API_URL)\"",
+    "open-login-page": "open \"https://$(npm config get API_ID).auth.us-east-1.amazoncognito.com/login?response_type=code&client_id=$(npm config get COGNITO_USER_POOL_CLIENT_ID)&redirect_uri=$(npm config get API_URL)\"",
+    "open-api-ui": "open \"$(npm config get API_URL)\""
+  }
+}

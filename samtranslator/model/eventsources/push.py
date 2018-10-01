@@ -36,7 +36,7 @@ class PushEventSource(ResourceMacro):
     """
     principal = None
 
-    def _construct_permission(self, function, source_arn=None, source_account=None, suffix=""):
+    def _construct_permission(self, function, source_arn=None, source_account=None, suffix="", event_source_token=None):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
         source triggers.
 
@@ -56,6 +56,7 @@ class PushEventSource(ResourceMacro):
         lambda_permission.Principal = self.principal
         lambda_permission.SourceArn = source_arn
         lambda_permission.SourceAccount = source_account
+        lambda_permission.EventSourceToken = event_source_token
 
         return lambda_permission
 
@@ -241,6 +242,11 @@ class S3(PushEventSource):
         """
 
         depends_on = bucket.get("DependsOn", [])
+
+        # DependsOn can be either a list of strings or a scalar string
+        if isinstance(depends_on, string_types):
+            depends_on = [ depends_on ]
+
         depends_on_set = set(depends_on)
         depends_on_set.add(permission.logical_id)
         bucket["DependsOn"] = list(depends_on_set)
@@ -329,7 +335,8 @@ class Api(PushEventSource):
             'Method': PropertyType(True, is_str()),
 
             # Api Event sources must "always" be paired with a Serverless::Api
-            'RestApiId': PropertyType(True, is_str())
+            'RestApiId': PropertyType(True, is_str()),
+            'Auth': PropertyType(False, is_type(dict))
     }
 
     def resources_to_link(self, resources):
@@ -465,6 +472,37 @@ class Api(PushEventSource):
                     method=self.Method, path=self.Path))
 
         editor.add_lambda_integration(self.Path, self.Method, uri)
+
+        if self.Auth:
+            method_authorizer = self.Auth.get('Authorizer')
+
+            if method_authorizer:
+                api_auth = api.get('Auth')
+                api_authorizers = api_auth and api_auth.get('Authorizers')
+
+                if not api_authorizers:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] because '
+                        'the related API does not define any Authorizers.'.format(
+                            authorizer=method_authorizer, method=self.Method, path=self.Path))
+
+                if method_authorizer != 'NONE' and not api_authorizers.get(method_authorizer):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] because it '
+                        'wasn\'t defined in the API\'s Authorizers.'.format(
+                            authorizer=method_authorizer, method=self.Method, path=self.Path))
+
+                if method_authorizer == 'NONE' and not api_auth.get('DefaultAuthorizer'):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        'Unable to set Authorizer on API method [{method}] for path [{path}] because \'NONE\' '
+                        'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
+                            method=self.Method, path=self.Path))
+
+            editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+
         api["DefinitionBody"] = editor.swagger
 
 
@@ -472,7 +510,9 @@ class AlexaSkill(PushEventSource):
     resource_type = 'AlexaSkill'
     principal = 'alexa-appkit.amazon.com'
 
-    property_types = {}
+    property_types = {
+        'SkillId': PropertyType(False, is_str()),
+    }
 
     def to_cloudformation(self, **kwargs):
         function = kwargs.get('function')
@@ -481,7 +521,7 @@ class AlexaSkill(PushEventSource):
             raise TypeError("Missing required keyword argument: function")
 
         resources = []
-        resources.append(self._construct_permission(function))
+        resources.append(self._construct_permission(function, event_source_token=self.SkillId))
 
         return resources
 

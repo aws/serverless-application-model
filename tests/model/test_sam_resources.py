@@ -1,5 +1,5 @@
 from unittest import TestCase
-
+from mock import patch
 import pytest
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
@@ -17,6 +17,7 @@ class TestCodeUri(TestCase):
         }
     }
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_with_code_uri(self):
         function = SamFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"
@@ -29,6 +30,7 @@ class TestCodeUri(TestCase):
             "S3Bucket": "foobar",
         })
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_with_zip_file(self):
         function = SamFunction("foo")
         function.InlineCode = "hello world"
