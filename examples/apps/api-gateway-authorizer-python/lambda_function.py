@@ -4,7 +4,8 @@ import re
 
 
 def lambda_handler(event, context):
-    print("Client token: " + event['authorizationToken'])
+    # incoming token value
+    token = event['authorizationToken']
     print("Method ARN: " + event['methodArn'])
 
     '''
