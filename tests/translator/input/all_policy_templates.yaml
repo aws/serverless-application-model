@@ -123,3 +123,5 @@ Resources:
 
         - RekognitionFacesManagementPolicy:
             CollectionId: collection
+
+        - EKSDescribePolicy: {}
