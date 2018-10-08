@@ -125,3 +125,6 @@ Resources:
             CollectionId: collection
 
         - EKSDescribePolicy: {}
+
+        - DynamoDBReconfigurePolicy:
+            TableName: name
