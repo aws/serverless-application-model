@@ -640,6 +640,7 @@
             "Action": [
               "ses:GetIdentityVerificationAttributes",
               "ses:SendEmail",
+              "ses:SendRawEmail",
               "ses:VerifyEmailIdentity"
             ],
             "Resource": {
@@ -1369,6 +1370,37 @@
             "Resource": "*"
           }
         ]
+      }
+    },
+    "CostExplorerReadOnlyPolicy": {
+      "Description": "Gives access to the readonly Cost Explorer APIs for billing history",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "ce:GetCostAndUsage",
+            "ce:GetDimensionValues",
+            "ce:GetReservationCoverage",
+            "ce:GetReservationPurchaseRecommendation",
+            "ce:GetReservationUtilization",
+            "ce:GetTags"
+          ],
+          "Resource": "*"
+        }]
+      }
+    },
+    "OrganizationsListAccountsPolicy": {
+      "Description": "Gives readonly permission to list child account names and ids",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "organizations:ListAccounts"
+          ],
+          "Resource": "*"
+        }]
       }
     }
   }
