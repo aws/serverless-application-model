@@ -87,8 +87,8 @@ class ImplicitApiPlugin(BasePlugin):
         :param SamResource function: Function Resource object
         :return dict: Dictionary of API events along with any other configuration passed to it.
             Example: {
-                FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>}, Cors: {<something>}},
-                BarEvent: {Path: "/bar", Method: "any", MethodSettings: {<something>}, Cors: {<something>}}"
+                FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>}, Cors: {<something>}, Auth: {<something>}},
+                BarEvent: {Path: "/bar", Method: "any", MethodSettings: {<something>}, Cors: {<something>}, Auth: {<something>}}"
             }
         """
 

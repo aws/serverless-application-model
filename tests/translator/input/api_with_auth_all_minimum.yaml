@@ -1,0 +1,59 @@
+Resources:
+  MyApiWithCognitoAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyCognitoAuth
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: !GetAtt MyUserPool.Arn
+
+  MyApiWithLambdaTokenAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyLambdaTokenAuth
+        Authorizers:
+          MyLambdaTokenAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+
+  MyApiWithLambdaRequestAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuth
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            Identity:
+              Headers:
+                - Authorization1
+  MyFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        Cognito:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognito
+        LambdaToken:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaTokenAuth
+            Method: get
+            Path: /lambda-token
+        LambdaRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaRequestAuth
+            Method: get
+            Path: /lambda-request

@@ -104,6 +104,9 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_api',
         'explicit_api',
         'api_endpoint_configuration',
+        'api_with_auth_all_maximum',
+        'api_with_auth_all_minimum',
+        'api_with_auth_no_default',
         'api_with_method_settings',
         'api_with_binary_media_types',
         'api_with_resource_refs',
@@ -269,6 +272,7 @@ class TestTranslatorEndToEnd(TestCase):
 
 @pytest.mark.parametrize('testcase', [
     'error_api_duplicate_methods_same_path',
+    'error_api_invalid_auth',
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
     'error_api_invalid_restapiid',
@@ -304,7 +308,7 @@ class TestTranslatorEndToEnd(TestCase):
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_transform_invalid_document(testcase):
-    manifest = yaml.load(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+    manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
     expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + '.json'), 'r'))
 
     mock_policy_loader = MagicMock()
