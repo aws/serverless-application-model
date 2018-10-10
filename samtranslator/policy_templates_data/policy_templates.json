@@ -177,6 +177,34 @@
         ]
       }
     },
+    "DynamoDBReconfigurePolicy": {
+      "Description": "Gives access reconfigure to a DynamoDB Table",
+      "Parameters": {
+        "TableName": {
+          "Description": "Name of the DynamoDB Table"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:UpdateTable"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                {
+                  "tableName": {
+                    "Ref": "TableName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "SESSendBouncePolicy": {
       "Description": "Gives SendBounce permission to a SES identity",
       "Parameters": {

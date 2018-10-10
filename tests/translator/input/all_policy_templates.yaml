@@ -129,3 +129,6 @@ Resources:
         - CostExplorerReadOnlyPolicy: {}
         
         - OrganizationsListAccountsPolicy: {}
+        
+        - DynamoDBReconfigurePolicy:
+            TableName: name
