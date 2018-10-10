@@ -125,10 +125,17 @@ Resources:
             CollectionId: collection
 
         - EKSDescribePolicy: {}
-        
+
         - CostExplorerReadOnlyPolicy: {}
-        
+
         - OrganizationsListAccountsPolicy: {}
-        
+
         - DynamoDBReconfigurePolicy:
             TableName: name
+
+        - DecodeSSMParameter:
+            ParameterName: name
+
+        - DecodeSSMParameterCustomKey:
+            ParameterName: name
+            KeyId: id
