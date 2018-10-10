@@ -125,6 +125,10 @@ Resources:
             CollectionId: collection
 
         - EKSDescribePolicy: {}
-
+        
+        - CostExplorerReadOnlyPolicy: {}
+        
+        - OrganizationsListAccountsPolicy: {}
+        
         - DynamoDBReconfigurePolicy:
             TableName: name
