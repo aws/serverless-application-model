@@ -1446,7 +1446,7 @@
               "ssm:DescribeParameters"
             ],
             "Resource": "*"
-          }
+          },
           {
             "Effect": "Allow",
             "Action": [
@@ -1495,7 +1495,7 @@
               "ssm:DescribeParameters"
             ],
             "Resource": "*"
-          }
+          },
           {
             "Effect": "Allow",
             "Action": [
