@@ -1431,7 +1431,7 @@
         }]
       }
     },
-    "DecodeSSMParameter": {
+    "DecodeSSMParameterPolicy": {
       "Description": "Gives access to SSM key and parameter to load secrets in this account.",
       "Parameters": {
         "ParameterName": {
@@ -1477,7 +1477,7 @@
         ]
       }
     },
-    "DecodeSSMParameterCustomKey": {
+    "DecodeSSMParameterCustomKeyPolicy": {
       "Description": "Gives access to decoding a SSM Parameters store using non-default key.",
       "Parameters": {
         "ParameterName": {

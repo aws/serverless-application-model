@@ -133,9 +133,9 @@ Resources:
         - DynamoDBReconfigurePolicy:
             TableName: name
 
-        - DecodeSSMParameter:
+        - DecodeSSMParameterPolicy:
             ParameterName: name
 
-        - DecodeSSMParameterCustomKey:
+        - DecodeSSMParameterCustomKeyPolicy:
             ParameterName: name
             KeyId: id

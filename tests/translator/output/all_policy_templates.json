@@ -1113,13 +1113,14 @@
             "PolicyDocument": {
               "Statement": [
                 {
+                  "Effect": "Allow",
                   "Action": [
                     "ssm:DescribeParameters"
                   ],
-                  "Resource": "*",
-                  "Effect": "Allow"
+                  "Resource": "*"
                 },
                 {
+                  "Effect": "Allow",
                   "Action": [
                     "ssm:GetParameters"
                   ],
@@ -1130,10 +1131,10 @@
                         "parameterName": "name"
                       }
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 },
                 {
+                  "Effect": "Allow",
                   "Action": [
                     "kms:Decrypt"
                   ],
@@ -1141,8 +1142,7 @@
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 }
               ]
             }
@@ -1152,13 +1152,14 @@
             "PolicyDocument": {
               "Statement": [
                 {
+                  "Effect": "Allow",
                   "Action": [
                     "ssm:DescribeParameters"
                   ],
-                  "Resource": "*",
-                  "Effect": "Allow"
+                  "Resource": "*"
                 },
                 {
+                  "Effect": "Allow",
                   "Action": [
                     "ssm:GetParameters"
                   ],
@@ -1169,10 +1170,10 @@
                         "parameterName": "name"
                       }
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 },
                 {
+                  "Effect": "Allow",
                   "Action": [
                     "kms:Decrypt"
                   ],
@@ -1183,8 +1184,7 @@
                         "keyId": "id"
                       }
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 }
               ]
             }
