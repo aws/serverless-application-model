@@ -7,7 +7,7 @@ Parameters:
     Description:
   QueueUrlParameter:
     Type: String
-    AllowedPattern: '^https:\/\/sqs\.[a-z\-0-9]+\.amazonaws\.com\/[0-9]{12}\/.{1,80}$'
+    AllowedPattern: '^https:\/\/sqs\.[a-z\-0-9]+\.amazonaws\.com(?:.cn)?\/[0-9]{12}\/.{1,80}$'
 Resources:
   sqspoller:
     Type: 'AWS::Serverless::Function'
