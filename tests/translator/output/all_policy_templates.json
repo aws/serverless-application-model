@@ -1122,7 +1122,8 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "ssm:GetParameters"
+                    "ssm:GetParameters",
+                    "ssm:GetParameter"
                   ],
                   "Resource": {
                     "Fn::Sub": [
@@ -1161,7 +1162,8 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "ssm:GetParameters"
+                    "ssm:GetParameters",
+                    "ssm:GetParameter"
                   ],
                   "Resource": {
                     "Fn::Sub": [
