@@ -14,7 +14,7 @@ The SAM specification and implementation are open sourced under the Apache 2.0 l
 ## Creating a serverless application using SAM
 To create a serverless application using SAM, first, you create a SAM template: a JSON or YAML configuration file that describes your Lambda functions, API endpoints and the other resources in your application. Then, you test, upload, and deploy your application using the [AWS SAM CLI](https://github.com/awslabs/aws-sam-cli). During deployment, SAM automatically translates your application’s specification into CloudFormation syntax, filling in default values for any unspecified properties and determining the appropriate mappings and invocation permissions to setup for any Lambda functions.
 
-[Read the How-To Guide](HOWTO.md) and see [examples](examples/) to learn how to define & deploy serverless applications using SAM.
+Visit the [SAM AWS documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html), read the [How-To Guide](HOWTO.md) and see [examples](examples/) to learn how to define & deploy serverless applications using SAM.
 
 
 ## Contributing new features and enhancements to SAM
