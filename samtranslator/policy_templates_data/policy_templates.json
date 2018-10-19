@@ -219,6 +219,37 @@
         ]
       }
     },
+    "ElasticsearchHttpAdminPolicy": {
+      "Description": "Gives POST/GET/HEAD/DELETE permissions to Elasticsearch",
+      "Parameters": {
+        "DomainName": {
+          "Description": "Name of Domain"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "es:ESHttpHead",
+              "es:ESHttpPost",
+              "es:ESHttpDelete",
+              "es:ESHttpGet",              
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain/${domainName}",
+                {
+                  "domainName": {
+                    "Ref": "DomainName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "S3ReadPolicy": {
       "Description": "Gives read permissions to objects in the S3 Bucket",
       "Parameters": {
