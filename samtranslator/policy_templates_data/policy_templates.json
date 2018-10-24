@@ -116,7 +116,8 @@
               "dynamodb:Query",
               "dynamodb:UpdateItem",
               "dynamodb:BatchWriteItem",
-              "dynamodb:BatchGetItem"
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
             ],
             "Resource": {
               "Fn::Sub": [
@@ -147,7 +148,8 @@
               "dynamodb:GetItem",
               "dynamodb:Scan",
               "dynamodb:Query",
-              "dynamodb:BatchGetItem"
+              "dynamodb:BatchGetItem",
+              "dynamodb:DescribeTable"
             ],
             "Resource": {
               "Fn::Sub": [
@@ -958,6 +960,36 @@
             "Resource": "*"
           }
         ]
+      }
+    },
+    "RekognitionFacesManagementPolicy": {
+      "Description": "Gives permission to add, delete and search faces in a collection",
+      "Parameters": {
+        "CollectionId": {
+          "Description": "ID of the collection"
+        }
+      },
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "rekognition:IndexFaces",
+            "rekognition:DeleteFaces",
+            "rekognition:SearchFaces",
+            "rekognition:SearchFacesByImage",
+            "rekognition:ListFaces"
+          ],
+          "Resource": {
+            "Fn::Sub": [
+              "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
+              {
+                "collectionId": {
+                  "Ref": "CollectionId"
+                }
+              }
+            ]
+          }
+        }]
       }
     },
     "RekognitionFacesPolicy": {

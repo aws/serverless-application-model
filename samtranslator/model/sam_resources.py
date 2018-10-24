@@ -315,12 +315,12 @@ class SamFunction(SamResourceMacro):
         return resources
 
     def _construct_code_dict(self):
-        if self.CodeUri:
-            return self._construct_code_dict_code_uri()
-        elif self.InlineCode:
+        if self.InlineCode:
             return {
                 "ZipFile": self.InlineCode
             }
+        elif self.CodeUri:
+            return self._construct_code_dict_code_uri()
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
 
@@ -477,7 +477,8 @@ class SamApi(SamResourceMacro):
         'EndpointConfiguration': PropertyType(False, is_str()),
         'MethodSettings': PropertyType(False, is_type(list)),
         'BinaryMediaTypes': PropertyType(False, is_type(list)),
-        'Cors': PropertyType(False, one_of(is_str(), is_type(dict)))
+        'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'Auth': PropertyType(False, is_type(dict))
     }
 
     referable_properties = {
@@ -507,11 +508,13 @@ class SamApi(SamResourceMacro):
                                      endpoint_configuration=self.EndpointConfiguration,
                                      method_settings=self.MethodSettings,
                                      binary_media=self.BinaryMediaTypes,
-                                     cors=self.Cors)
+                                     cors=self.Cors,
+                                     auth=self.Auth)
 
-        rest_api, deployment, stage = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
 
         resources.extend([rest_api, deployment, stage])
+        resources.extend(permissions)
 
         return resources
 
