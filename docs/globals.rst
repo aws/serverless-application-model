@@ -79,6 +79,8 @@ Currently, the following resources and properties are being supported:
       MethodSettings:
       BinaryMediaTypes:
       Cors:
+      AccessLogSetting:
+      CanarySetting:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable
