@@ -5,7 +5,7 @@ exports.handler = (event, context, callback) => {
     //console.log('Received event:', JSON.stringify(event, null, 2));
     const message = JSON.parse(event.Records[0].Sns.Message);
     
-    switch(message.notificationType) {
+    switch(message.eventType) {
         case 'Bounce':
             handleBounce(message);
             break;
