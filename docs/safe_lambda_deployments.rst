@@ -105,6 +105,9 @@ resource:
           # Validation Lambda functions that are run before & after traffic shifting
           PreTraffic: !Ref PreTrafficLambdaFunction
           PostTraffic: !Ref PostTrafficLambdaFunction
+        # Provide a custom role for CodeDeploy traffic shifting here, if you don't supply one
+        # SAM will create one for you with default permissions
+        Role: !Ref IAMRoleForCodeDeploy # Parameter example, you can pass an IAM ARN
 
   AliasErrorMetricGreaterThanZeroAlarm:
     Type: "AWS::CloudWatch::Alarm"
@@ -162,6 +165,7 @@ resource:
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: false
+        Role: ""
       Environment:
         Variables:
           CurrentVersion: !Ref MyLambdaFunction.Version
@@ -176,6 +180,7 @@ CloudFormation, the following happens:
 - During traffic shifting, if any of the CloudWatch Alarms go to *Alarm* state, CodeDeploy will immediately flip the Alias back to old version and report a failure to CloudFormation.
 - After traffic shifting completes, CodeDeploy will invoke the **PostTraffic Hook** Lambda function. This is similar to PreTraffic Hook where the function must callback to CodeDeploy to report a Success or a Failure. PostTraffic hook is a great place to run integration tests or other validation actions.
 - If everything went well, the Alias will be pointing to the new Lambda Version.
+- If you supply the "Role" argument to the DeploymentPreference, it will prevent SAM from creating a role and instead use the provided CodeDeploy role for traffic shifting
 
 NOTE: Verify that your AWS SDK version supports PutLifecycleEventHookExecutionStatus. For example, Python requires SDK version 1.4.8 or newer.
 
@@ -294,7 +299,7 @@ Internally, SAM will create the following resources in your CloudFormation stack
    SAM template belongs to its own Deployment Group.
 -  Adds ``UpdatePolicy`` on ``AWS::Lambda::Alias`` resource that is
    connected to the function's Deployment Group resource.
--  One ``AWS::IAM::Role`` called "CodeDeployServiceRole".
+-  One ``AWS::IAM::Role`` called "CodeDeployServiceRole", if no custom role is provided
 
 CodeDeploy assumes that there are no dependencies between Deployment Groups and hence will deploy them in parallel.
 Since every Lambda function is to its own CodeDeploy DeploymentGroup, they will be deployed in parallel.
