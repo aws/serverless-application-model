@@ -28,8 +28,10 @@ class ApiGatewayRestApi(Resource):
 class ApiGatewayStage(Resource):
     resource_type = 'AWS::ApiGateway::Stage'
     property_types = {
+            'AccessLogSetting': PropertyType(False, is_type(dict)),
             'CacheClusterEnabled': PropertyType(False, is_type(bool)),
             'CacheClusterSize': PropertyType(False, is_str()),
+            'CanarySetting': PropertyType(False, is_type(dict)),
             'ClientCertificateId': PropertyType(False, is_str()),
             'DeploymentId': PropertyType(True, is_str()),
             'Description': PropertyType(False, is_str()),

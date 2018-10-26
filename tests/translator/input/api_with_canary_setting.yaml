@@ -1,0 +1,28 @@
+Globals:
+  Api:
+    CanarySetting:
+      PercentTraffic: 100
+      StageVariablesOverrides:
+        sv1: "test"
+        sv2: "test2"
+      UseStageCache: false
+
+Resources:
+  ImplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
