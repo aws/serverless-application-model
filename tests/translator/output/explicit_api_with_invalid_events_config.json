@@ -21,7 +21,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MyFunctionRole"
+      ]
     }, 
     "MyFunctionAddApiPermissionProd": {
       "Type": "AWS::Lambda::Permission", 

@@ -453,7 +453,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "MyFnRole"
+      ]
     }
   }
 }

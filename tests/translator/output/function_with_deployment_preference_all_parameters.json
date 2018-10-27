@@ -21,7 +21,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MinimalFunctionRole"
+      ]
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
@@ -147,7 +150,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MySanityTestFunctionRole"
+      ]
     }, 
     "CodeDeployServiceRole": {
       "Type": "AWS::IAM::Role", 
@@ -209,7 +215,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MyValidationTestFunctionRole"
+      ]
     }, 
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 

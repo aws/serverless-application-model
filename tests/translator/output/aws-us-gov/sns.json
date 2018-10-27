@@ -61,7 +61,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "SaveNotificationFunctionRole"
+      ]
     }, 
     "SaveNotificationFunctionNotificationTopic": {
       "Type": "AWS::SNS::Subscription", 

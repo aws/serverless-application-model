@@ -330,7 +330,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MyAwesomeFunctionRole"
+      ]
     }, 
     "MyAwesomeFunctionCWEvent": {
       "Type": "AWS::Events::Rule", 

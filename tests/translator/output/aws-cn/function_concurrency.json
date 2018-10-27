@@ -48,7 +48,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "ConcurrentFunctionRole"
+      ]
     },
     "AnotherFunctionRole": {
       "Type": "AWS::IAM::Role",
@@ -95,7 +98,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "AnotherFunctionRole"
+      ]
     }
   }
 }

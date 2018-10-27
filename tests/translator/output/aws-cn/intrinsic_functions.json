@@ -169,7 +169,10 @@
           ]
         }, 
         "Runtime": "python2.7"
-      }
+      },
+      "DependsOn": [
+        "MySnsDlqLambdaFunctionRole"
+      ]
     }, 
     "MyExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
@@ -270,7 +273,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "DynamoDBFunctionRole"
+      ]
     }, 
     "MySqsDlqLambdaFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -301,7 +307,10 @@
           ]
         }, 
         "Runtime": "python2.7"
-      }
+      },
+      "DependsOn": [
+        "MySqsDlqLambdaFunctionRole"
+      ]
     }, 
     "MyExplicitApidevStage": {
       "Type": "AWS::ApiGateway::Stage", 
@@ -486,7 +495,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "FunctionWithExplicitS3UriRole"
+      ]
     }, 
     "MyFunctionMyApiPermissiondev": {
       "Type": "AWS::Lambda::Permission", 

@@ -126,7 +126,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "FunctionTwoRole"
+      ]
     },
     "FunctionOne": {
       "Type": "AWS::Lambda::Function",
@@ -149,7 +152,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "FunctionOneRole"
+      ]
     }
   }
 }

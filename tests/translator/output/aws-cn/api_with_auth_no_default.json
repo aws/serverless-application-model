@@ -443,7 +443,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "MyFnRole"
+      ]
     },
     "MyApiWithLambdaTokenAuthDeploymente838608f2f": {
       "Type": "AWS::ApiGateway::Deployment",

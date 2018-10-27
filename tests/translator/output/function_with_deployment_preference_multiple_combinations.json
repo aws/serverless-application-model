@@ -21,7 +21,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarmsRole"
+      ]
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
@@ -68,7 +71,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MinimalFunctionRole"
+      ]
     }, 
     "MinimalFunctionWithMinimalDeploymentPreferenceRole": {
       "Type": "AWS::IAM::Role", 
@@ -252,7 +258,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MinimalFunctionWithMinimalDeploymentPreferenceRole"
+      ]
     }, 
     "MySanityTestFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -275,7 +284,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MySanityTestFunctionRole"
+      ]
     }, 
     "MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarmsVersion640128d35d": {
       "DeletionPolicy": "Retain", 
@@ -450,7 +462,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MyValidationTestFunctionRole"
+      ]
     }
   }
 }

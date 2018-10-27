@@ -72,7 +72,10 @@
         }, 
         "Timeout": 100, 
         "Runtime": "nodejs4.3"
-      }
+      },
+      "DependsOn": [
+        "FunctionWithOverridesRole"
+      ]
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
@@ -155,7 +158,10 @@
         }, 
         "Timeout": 30, 
         "Runtime": "python2.7"
-      }
+      },
+      "DependsOn": [
+        "MinimalFunctionRole"
+      ]
     }, 
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 

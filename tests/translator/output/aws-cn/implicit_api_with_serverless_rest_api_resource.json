@@ -163,7 +163,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "GetHtmlFunctionRole"
+      ]
     }, 
     "GetHtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
@@ -232,7 +235,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "RestApiFunctionRole"
+      ]
     }, 
     "ServerlessRestApiDeploymentb5184bf2cc": {
       "Type": "AWS::ApiGateway::Deployment", 

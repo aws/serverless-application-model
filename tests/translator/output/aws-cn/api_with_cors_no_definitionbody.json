@@ -20,7 +20,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "ImplicitApiFunctionRole"
+      ]
     },
     "ImplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role",

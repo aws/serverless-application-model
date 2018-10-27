@@ -102,7 +102,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MySqsDlqLambdaFunctionRole"
+      ]
     },
     "MySnsDlqLambdaFunction": {
       "Type": "AWS::Lambda::Function",
@@ -128,7 +131,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MySnsDlqLambdaFunctionRole"
+      ]
     }
   }
 }

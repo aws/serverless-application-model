@@ -45,7 +45,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MinimalFunctionRole"
+      ]
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 

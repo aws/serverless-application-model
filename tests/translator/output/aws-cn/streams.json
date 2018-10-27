@@ -19,7 +19,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "DynamoDBFunctionRole"
+      ]
     },
     "KinesisFunction": {
       "Type": "AWS::Lambda::Function",
@@ -40,7 +43,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "KinesisFunctionRole"
+      ]
     },
     "DynamoDBFunctionMyDDBStream": {
       "Type": "AWS::Lambda::EventSourceMapping",

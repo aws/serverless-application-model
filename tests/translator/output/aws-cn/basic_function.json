@@ -49,7 +49,10 @@
         "TracingConfig": {
           "Mode": "Active"
         }
-      }
+      },
+      "DependsOn": [
+        "FunctionWithTracingRole"
+      ]
     },
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
@@ -96,7 +99,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MinimalFunctionRole"
+      ]
     }, 
     "FunctionWithPolicyDocument": {
       "Type": "AWS::Lambda::Function", 
@@ -119,7 +125,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "FunctionWithPolicyDocumentRole"
+      ]
     }, 
     "FunctionWithPolicies": {
       "Type": "AWS::Lambda::Function", 
@@ -142,7 +151,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "FunctionWithPoliciesRole"
+      ]
     }, 
     "FunctionWithCodeUriObjectRole": {
       "Type": "AWS::IAM::Role", 
@@ -271,7 +283,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "FunctionWithCodeUriObjectRole"
+      ]
     }, 
     "FunctionWithPoliciesRole": {
       "Type": "AWS::IAM::Role", 
@@ -409,7 +424,10 @@
           ]
         },
         "Runtime": "python2.7"
-      }
+      },
+      "DependsOn": [
+        "FunctionWithInlineCodeRole"
+      ]
     }
   }
 }

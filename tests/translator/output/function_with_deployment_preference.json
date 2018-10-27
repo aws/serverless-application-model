@@ -79,7 +79,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MinimalFunctionRole"
+      ]
     }, 
     "CodeDeployServiceRole": {
       "Type": "AWS::IAM::Role", 

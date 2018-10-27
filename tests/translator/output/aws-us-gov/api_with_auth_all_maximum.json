@@ -19,7 +19,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "MyFunctionRole"
+      ]
     },
     "MyFunctionWithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",

@@ -115,6 +115,10 @@ class SamFunction(SamResourceMacro):
             execution_role = self._construct_role(managed_policy_map)
             lambda_function.Role = execution_role.get_runtime_attr('arn')
             resources.append(execution_role)
+            try:
+                lambda_function.depends_on.append(execution_role.logical_id)
+            except AttributeError:
+                lambda_function.depends_on = [execution_role.logical_id]
 
         try:
             resources += self._generate_event_resources(lambda_function, execution_role, kwargs['event_resources'],

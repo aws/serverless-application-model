@@ -70,7 +70,10 @@
           ]
         },
         "Runtime": "python2.7"
-      }
+      },
+      "DependsOn": [
+        "FunctionWithKeyArnRole"
+      ]
     },
     "myKey": {
       "Type": "AWS::KMS::Key",
@@ -119,7 +122,10 @@
           ]
         },
         "Runtime": "python2.7"
-      }
+      },
+      "DependsOn": [
+        "FunctionWithReferenceToKeyArnRole"
+      ]
     }
   }
 }

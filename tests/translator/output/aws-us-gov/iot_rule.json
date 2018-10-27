@@ -115,7 +115,10 @@
         }, 
         "Timeout": 3, 
         "Runtime": "nodejs4.3"
-      }
+      },
+      "DependsOn": [
+        "IoTRuleFuncRole"
+      ]
     }, 
     "IoTRuleFuncRole": {
       "Type": "AWS::IAM::Role", 

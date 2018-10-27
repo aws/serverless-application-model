@@ -83,7 +83,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "ThumbnailFunctionRole"
+      ]
     }
   }
 }

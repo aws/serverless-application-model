@@ -26,7 +26,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "OnePolicyTemplateRole"
+      ]
     },
     "MultiplePolicyTemplates": {
       "Type": "AWS::Lambda::Function",
@@ -49,7 +52,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MultiplePolicyTemplatesRole"
+      ]
     },
     "OnePolicyTemplateRole": {
       "Type": "AWS::IAM::Role",
@@ -204,7 +210,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "AllCombinationsRole"
+      ]
     },
     "AllCombinationsRole": {
       "Type": "AWS::IAM::Role",

@@ -35,7 +35,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "MyFunctionRole"
+      ]
     }, 
     "MyApiDeployment359f256a3b": {
       "Type": "AWS::ApiGateway::Deployment", 

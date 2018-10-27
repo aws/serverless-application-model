@@ -24,7 +24,8 @@
       },
       "DependsOn": [
         "MyExplicitApi",
-        "MySamTable"
+        "MySamTable",
+        "MyFunctionRole"
       ]
     },
     "MyExplicitApiDeployment74b681ce04": {

@@ -42,7 +42,10 @@
           "Value": "SAM",
           "Key": "lambda:createdBy"
         }]
-      }
+      },
+      "DependsOn": [
+        "SQSFunctionRole"        
+      ]
     },
     "SQSFunctionMySqsQueue": {
       "Type": "AWS::Lambda::EventSourceMapping",

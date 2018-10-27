@@ -124,7 +124,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "HtmlFunctionRole"
+      ]
     }
   }
 }
