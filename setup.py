@@ -54,6 +54,7 @@ setup(
     version=read_version(),
     description='AWS SAM Translator is a library that transform SAM templates into AWS CloudFormation templates',
     long_description=read('README.md'),
+    long_description_content_type='text/markdown',
     author='Amazon Web Services',
     author_email='aws-sam-developers@amazon.com',
     url='https://github.com/awslabs/serverless-application-model',

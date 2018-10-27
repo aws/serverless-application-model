@@ -70,6 +70,7 @@ Example:
       AutoPublishAlias: live
       DeploymentPreference: 
         Type: Linear10PercentEvery10Minutes
+        Role: "arn"
       ...
 
 
@@ -82,6 +83,8 @@ AWS::CodeDeploy::Application       ServerlessDeploymentApplication (only one per
 AWS::CodeDeploy::DeploymentGroup   MyFunction\ **DeploymentGroup** 
 AWS::IAM::Role                     CodeDeployServiceRole
 ================================== ================================
+
+  NOTE: ``AWS::IAM::Role`` resources are only generated if no Role parameter is supplied for DeploymentPreference
 
 With Events
 ~~~~~~~~~~~
