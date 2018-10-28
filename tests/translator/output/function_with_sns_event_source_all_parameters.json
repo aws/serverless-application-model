@@ -4,6 +4,14 @@
       "Type": "AWS::SNS::Subscription",
       "Properties": {
         "FilterPolicy": {
+          "store": [
+            "example_corp"
+          ],
+          "event": [
+            {
+              "anything-but": "order_cancelled"
+            }
+          ],
           "customer_interests": [
             "rugby",
             "football",
@@ -16,14 +24,6 @@
                 100
               ]
             }
-          ],
-          "event": [
-            {
-              "anything-but": "order_cancelled"
-            }
-          ],
-          "store": [
-            "example_corp"
           ]
         },
         "Endpoint": {
