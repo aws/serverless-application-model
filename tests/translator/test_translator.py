@@ -117,6 +117,8 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_maxage',
         'api_with_cors_no_definitionbody',
         'api_cache',
+        'api_with_access_log_setting',
+        'api_with_canary_setting',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',

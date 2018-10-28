@@ -17,6 +17,8 @@ from samtranslator.model.exceptions import InvalidResourceException
     version.
 :param alarms: A list of Cloudwatch Alarm references that if ever in the alarm state during a deployment (or
     before a deployment starts) cause the deployment to fail and rollback.
+:param role: An IAM role ARN that CodeDeploy will use for traffic shifting, an IAM role will not be created if 
+    this is supplied
 :param enabled: Whether this deployment preference is enabled (true by default)
 """
 DeploymentPreferenceTuple = namedtuple('DeploymentPreferenceTuple',

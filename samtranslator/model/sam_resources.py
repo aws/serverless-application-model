@@ -478,7 +478,9 @@ class SamApi(SamResourceMacro):
         'MethodSettings': PropertyType(False, is_type(list)),
         'BinaryMediaTypes': PropertyType(False, is_type(list)),
         'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'Auth': PropertyType(False, is_type(dict))
+        'Auth': PropertyType(False, is_type(dict)),
+        'AccessLogSetting': PropertyType(False, is_type(dict)),
+        'CanarySetting': PropertyType(False, is_type(dict))
     }
 
     referable_properties = {
@@ -509,7 +511,9 @@ class SamApi(SamResourceMacro):
                                      method_settings=self.MethodSettings,
                                      binary_media=self.BinaryMediaTypes,
                                      cors=self.Cors,
-                                     auth=self.Auth)
+                                     auth=self.Auth,
+                                     access_log_setting=self.AccessLogSetting,
+                                     canary_setting=self.CanarySetting)
 
         rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
 

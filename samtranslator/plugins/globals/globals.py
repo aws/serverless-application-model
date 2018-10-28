@@ -44,7 +44,9 @@ class Globals(object):
             "EndpointConfiguration",
             "MethodSettings",
             "BinaryMediaTypes",
-            "Cors"
+            "Cors",
+            "AccessLogSetting",
+            "CanarySetting"
         ],
 
         SamResourceType.SimpleTable.value: [
