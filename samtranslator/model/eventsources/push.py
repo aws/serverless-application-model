@@ -299,7 +299,8 @@ class SNS(PushEventSource):
     resource_type = 'SNS'
     principal = 'sns.amazonaws.com'
     property_types = {
-            'Topic': PropertyType(True, is_str())
+            'Topic': PropertyType(True, is_str()),
+            'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict)))))
     }
 
     def to_cloudformation(self, **kwargs):
@@ -315,13 +316,16 @@ class SNS(PushEventSource):
             raise TypeError("Missing required keyword argument: function")
 
         return [self._construct_permission(function, source_arn=self.Topic),
-                self._inject_subscription(function, self.Topic)]
+                self._inject_subscription(function, self.Topic, self.FilterPolicy)]
 
-    def _inject_subscription(self, function, topic):
+    def _inject_subscription(self, function, topic, filterPolicy):
         subscription = SNSSubscription(self.logical_id)
         subscription.Protocol = 'lambda'
         subscription.Endpoint = function.get_runtime_attr("arn")
         subscription.TopicArn = topic
+
+        if filterPolicy is not None:
+            subscription.FilterPolicy = filterPolicy
 
         return subscription
 
