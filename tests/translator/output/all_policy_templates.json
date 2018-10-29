@@ -21,7 +21,10 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
+      },
+      "DependsOn": [
+        "KitchenSinkFunctionRole"
+      ]
     },
     "KitchenSinkFunctionRole": {
       "Type": "AWS::IAM::Role",
