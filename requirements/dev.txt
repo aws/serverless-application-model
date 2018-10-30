@@ -10,7 +10,7 @@ pytest>=3.0.7
 py>=1.4.33
 mock>=2.0.0
 parameterized>=0.6.1
-requests>=2.11.1
+requests>=2.20.0
 
 # CLI requirements
 docopt>=0.6.2
