@@ -93,6 +93,7 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        'function_with_condition',
         'basic_function',
         'cloudwatchevent',
         'cloudwatch_logs_with_ref',
