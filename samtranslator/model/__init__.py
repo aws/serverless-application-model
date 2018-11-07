@@ -38,7 +38,7 @@ class Resource(object):
     property_types = None
     _keywords = ['logical_id', 'relative_id', "depends_on", "resource_attributes"]
 
-    _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy"]
+    _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition"]
 
     # Runtime attributes that can be qureied resource. They are CloudFormation attributes like ARN, Name etc that
     # will be resolvable at runtime. This map will be implemented by sub-classes to express list of attributes they
@@ -57,7 +57,7 @@ class Resource(object):
                                 to identify sub-resources.
         :param depends_on Value of DependsOn resource attribute
         :param attributes Dictionary of resource attributes and their values
-        """
+        """      
         self._validate_logical_id(logical_id)
         self.logical_id = logical_id
         self.relative_id = relative_id

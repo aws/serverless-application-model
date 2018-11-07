@@ -154,7 +154,7 @@ class SamFunction(SamResourceMacro):
         :returns: a list containing the Lambda function and execution role resources
         :rtype: list
         """
-        lambda_function = LambdaFunction(self.logical_id, depends_on=self.depends_on)
+        lambda_function = LambdaFunction(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         if self.FunctionName:
             lambda_function.FunctionName = self.FunctionName
