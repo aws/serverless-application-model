@@ -57,7 +57,7 @@ class Resource(object):
                                 to identify sub-resources.
         :param depends_on Value of DependsOn resource attribute
         :param attributes Dictionary of resource attributes and their values
-        """      
+        """
         self._validate_logical_id(logical_id)
         self.logical_id = logical_id
         self.relative_id = relative_id
