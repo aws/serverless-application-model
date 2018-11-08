@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda function with SNS filter policy
+Resources:
+  NotificationLogger:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Handler: index.handler
+      Runtime: nodejs8.10
+      FunctionName: sam-example-lambda-sns-filter-policy-notification-logger
+      Events:
+        NotificationTopic:
+          Type: SNS
+          Properties:
+            Topic: !Ref Notifications
+            FilterPolicy:
+              sport:
+                - football
+
+  Notifications:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: sam-example-lambda-sns-filter-policy
