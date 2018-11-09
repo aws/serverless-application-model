@@ -108,6 +108,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_auth_all_minimum',
         'api_with_auth_no_default',
         'api_with_method_settings',
+        'api_with_access_log_setting',
         'api_with_binary_media_types',
         'api_with_resource_refs',
         'api_with_cors',

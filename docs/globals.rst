@@ -77,6 +77,7 @@ Currently, the following resources and properties are being supported:
       Variables:
       EndpointConfiguration:
       MethodSettings:
+      AccessLogSetting:
       BinaryMediaTypes:
       Cors:
 

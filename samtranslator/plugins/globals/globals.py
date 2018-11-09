@@ -43,6 +43,7 @@ class Globals(object):
             "Variables",
             "EndpointConfiguration",
             "MethodSettings",
+            "AccessLogSetting",
             "BinaryMediaTypes",
             "Cors"
         ],

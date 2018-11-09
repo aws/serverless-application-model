@@ -476,6 +476,7 @@ class SamApi(SamResourceMacro):
         'Variables': PropertyType(False, is_type(dict)),
         'EndpointConfiguration': PropertyType(False, is_str()),
         'MethodSettings': PropertyType(False, is_type(list)),
+        'AccessLogSetting': PropertyType(False, is_type(dict)),
         'BinaryMediaTypes': PropertyType(False, is_type(list)),
         'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
         'Auth': PropertyType(False, is_type(dict))
@@ -507,6 +508,7 @@ class SamApi(SamResourceMacro):
                                      self.StageName,
                                      endpoint_configuration=self.EndpointConfiguration,
                                      method_settings=self.MethodSettings,
+                                     access_log_setting=self.AccessLogSetting,
                                      binary_media=self.BinaryMediaTypes,
                                      cors=self.Cors,
                                      auth=self.Auth)

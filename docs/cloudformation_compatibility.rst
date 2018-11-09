@@ -166,6 +166,7 @@ CacheClusterSize                    All
 Variables                           All
 EndpointConfiguration               All
 MethodSettings                      All
+AccessLogSetting                    All
 BinaryMediaTypes                    All
 Cors                                All
 ================================== ======================== ========================

@@ -36,7 +36,8 @@ class ApiGatewayStage(Resource):
             'RestApiId': PropertyType(True, is_str()),
             'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
             'Variables': PropertyType(False, is_type(dict)),
-            "MethodSettings": PropertyType(False, is_type(list))
+            "MethodSettings": PropertyType(False, is_type(list)),
+            'AccessLogSetting': PropertyType(False, is_type(dict))
     }
 
     runtime_attrs = {

@@ -20,6 +20,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, 'input')
     'explicit_api',
     'api_endpoint_configuration',
     'api_with_method_settings',
+    'api_with_access_log_setting',
     'api_with_binary_media_types',
     'api_with_resource_refs',
     'api_with_cors',
