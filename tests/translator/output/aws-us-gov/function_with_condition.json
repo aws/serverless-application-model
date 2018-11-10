@@ -26,6 +26,7 @@
     },
     "ConditionFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "Condition": "this is a test",      
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
