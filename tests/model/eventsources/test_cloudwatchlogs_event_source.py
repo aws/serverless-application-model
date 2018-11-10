@@ -14,6 +14,7 @@ class CloudWatchLogsEventSource(TestCase):
         self.function = Mock()
         self.function.get_runtime_attr = Mock()
         self.function.get_runtime_attr.return_value = 'arn:aws:mock'
+        self.function.get_passthrough_resource_attributes.return_value = None
 
         self.permission = Mock()
         self.permission.logical_id = 'LogProcessorPermission'

@@ -302,7 +302,18 @@ class Resource(object):
         else:
             raise NotImplementedError(attr_name + " attribute is not implemented for resource " + self.resource_type)
 
+    def get_passthrough_resource_attributes(self):
+        """
+        Returns a dictionary of resource attributes of the ResourceMacro that should be passed through from the main 
+        vanilla CloudFormation resource to its children. Currently only Condition is copied.
 
+        :return: Dictionary of resource attributes.
+        """        
+        attributes = None
+        if 'Condition' in self.resource_attributes:
+            attributes = { 'Condition': self.resource_attributes['Condition'] }
+        return attributes
+        
 class ResourceMacro(Resource):
     """A ResourceMacro object represents a CloudFormation macro. A macro appears in the CloudFormation template in the
     "Resources" mapping, but must be expanded into one or more vanilla CloudFormation resources before a stack can be
