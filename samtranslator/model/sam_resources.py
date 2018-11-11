@@ -547,7 +547,7 @@ class SamSimpleTable(SamResourceMacro):
         return [dynamodb_resources]
 
     def _construct_dynamodb_table(self):
-        dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on)
+        dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         if self.PrimaryKey:
             primary_key = {
