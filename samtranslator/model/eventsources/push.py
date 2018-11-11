@@ -354,6 +354,8 @@ class SNS(PushEventSource):
         subscription.Protocol = 'lambda'
         subscription.Endpoint = function.get_runtime_attr("arn")
         subscription.TopicArn = topic
+        if 'Condition' in function.resource_attributes:
+            subscription = make_conditional(subscription, function.resource_attributes['Condition'])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
@@ -610,5 +612,7 @@ class IoTRule(PushEventSource):
             payload['AwsIotSqlVersion'] = self.AwsIotSqlVersion
 
         rule.TopicRulePayload = payload
+        if 'Condition' in function.resource_attributes:
+            rule = make_conditional(rule, function.resource_attributes['Condition'])
 
         return rule
