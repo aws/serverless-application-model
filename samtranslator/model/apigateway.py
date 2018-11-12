@@ -37,6 +37,7 @@ class ApiGatewayStage(Resource):
             'Description': PropertyType(False, is_str()),
             'RestApiId': PropertyType(True, is_str()),
             'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
+            'TracingEnabled': PropertyType(False, is_type(bool)),
             'Variables': PropertyType(False, is_type(dict)),
             "MethodSettings": PropertyType(False, is_type(list))
     }

@@ -46,7 +46,8 @@ class Globals(object):
             "BinaryMediaTypes",
             "Cors",
             "AccessLogSetting",
-            "CanarySetting"
+            "CanarySetting",
+            "TracingEnabled"
         ],
 
         SamResourceType.SimpleTable.value: [
