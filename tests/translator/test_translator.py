@@ -151,6 +151,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_deployment_and_custom_role',
         'function_with_deployment_no_service_role',
         'function_with_policy_templates',
+        'function_with_sns_event_source_all_parameters',
         'globals_for_function',
         'globals_for_api',
         'globals_for_simpletable',
