@@ -98,7 +98,7 @@
           "Key": "webpage_swagger.json"
         },
         "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL",
+          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     },
