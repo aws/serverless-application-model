@@ -12,14 +12,5 @@ Resources:
       MemorySize: 128
       Timeout: 120
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'cloudwatch:PutMetricData'
-              Resource: '*'
-            - Effect: Allow
-              Action:
-                - 'ec2:DescribeRegions'
-                - 'ec2:DescribeVpnConnections'
-              Resource: '*'
+        - CloudWatchPutMetricPolicy: {}
+        - EC2VPNDescribePolicy: {}

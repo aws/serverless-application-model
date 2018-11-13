@@ -1,37 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Periodically polls an SQS queue and asynchronously consumes each message.
+Parameters: 
+  QueueNameParameter: 
+    Type: String
 Resources:
   sqspoller:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: >-
-        Periodically polls an SQS queue and asynchronously consumes each
-        message.
+        Periodically polls an SQS queue and asynchronously consumes each message.
       MemorySize: 128
       Timeout: 10
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'sqs:DeleteMessage'
-                - 'sqs:ReceiveMessage'
-              Resource: 'arn:aws:sqs:*'
-            - Effect: Allow
-              Action:
-                - 'lambda:Invoke'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:sqs:*'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':function:*'
+        - SQSPollerPolicy:
+            QueueName: !Ref QueueNameParameter
       Environment:
         Variables:
           queueUrl: <enter value here>

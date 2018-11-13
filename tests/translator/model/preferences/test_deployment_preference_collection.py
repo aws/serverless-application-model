@@ -1,3 +1,4 @@
+from mock import patch
 from unittest import TestCase
 
 from samtranslator.model.codedeploy import CodeDeployApplication
@@ -18,16 +19,19 @@ class TestDeploymentPreferenceCollection(TestCase):
         self.pre_traffic_hook_global = 'pre_traffic_function_ref'
         self.function_logical_id = 'FunctionLogicalId'
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_when_no_global_dict_each_local_deployment_preference_requires_parameters(self):
         with self.assertRaises(InvalidResourceException):
             DeploymentPreferenceCollection().add('', dict())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_add_when_logical_id_previously_added_raises_value_error(self):
         with self.assertRaises(ValueError):
             deployment_preference_collection = DeploymentPreferenceCollection()
             deployment_preference_collection.add('1', {'Type': 'Canary'})
             deployment_preference_collection.add('1', {'Type': 'Linear'})
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_codedeploy_application(self):
         expected_codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         expected_codedeploy_application_resource.ComputePlatform = 'Lambda'
@@ -35,6 +39,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         self.assertEqual(DeploymentPreferenceCollection().codedeploy_application.to_dict(),
                          expected_codedeploy_application_resource.to_dict())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_codedeploy_iam_role(self):
         expected_codedeploy_iam_role = IAMRole('CodeDeployServiceRole')
         expected_codedeploy_iam_role.AssumeRolePolicyDocument = {
@@ -50,6 +55,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         self.assertEqual(DeploymentPreferenceCollection().codedeploy_iam_role.to_dict(),
                          expected_codedeploy_iam_role.to_dict())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_deployment_group_with_minimal_parameters(self):
         expected_deployment_group = CodeDeployDeploymentGroup(self.function_logical_id + 'DeploymentGroup')
         expected_deployment_group.ApplicationName = {'Ref': CODEDEPLOY_APPLICATION_LOGICAL_ID}
@@ -77,6 +83,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         self.assertEqual(deployment_group.to_dict(),
                          expected_deployment_group.to_dict())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_deployment_group_with_all_parameters(self):
         expected_deployment_group = CodeDeployDeploymentGroup(self.function_logical_id + 'DeploymentGroup')
         expected_deployment_group.AlarmConfiguration = {'Enabled': True,
@@ -106,6 +113,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         self.assertEqual(deployment_group.to_dict(),
                          expected_deployment_group.to_dict())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_update_policy_with_minimal_parameters(self):
         expected_update_policy = {
             'CodeDeployLambdaAliasUpdate': {
@@ -120,6 +128,7 @@ class TestDeploymentPreferenceCollection(TestCase):
 
         self.assertEqual(expected_update_policy, update_policy.to_dict())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_update_policy_with_all_parameters(self):
         expected_update_polcy = {
             'CodeDeployLambdaAliasUpdate': {
@@ -136,6 +145,7 @@ class TestDeploymentPreferenceCollection(TestCase):
 
         self.assertEqual(expected_update_polcy, update_policy.to_dict())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_any_enabled_true_if_one_of_three_enabled(self):
         deployment_preference_collection = DeploymentPreferenceCollection()
         deployment_preference_collection.add('1', {'Type': 'LINEAR'})
@@ -144,6 +154,7 @@ class TestDeploymentPreferenceCollection(TestCase):
 
         self.assertTrue(deployment_preference_collection.any_enabled())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_any_enabled_true_if_all_of_three_enabled(self):
         deployment_preference_collection = DeploymentPreferenceCollection()
         deployment_preference_collection.add('1', {'Type': 'LINEAR'})
@@ -152,6 +163,7 @@ class TestDeploymentPreferenceCollection(TestCase):
 
         self.assertTrue(deployment_preference_collection.any_enabled())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_any_enabled_false_if_all_of_three_disabled(self):
         deployment_preference_collection = DeploymentPreferenceCollection()
         deployment_preference_collection.add('1', {'Type': 'Linear', 'Enabled': False})
@@ -160,6 +172,7 @@ class TestDeploymentPreferenceCollection(TestCase):
 
         self.assertFalse(deployment_preference_collection.any_enabled())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_enabled_logical_ids_returns_one_if_one_of_three_enabled(self):
         deployment_preference_collection = DeploymentPreferenceCollection()
         enabled_logical_id = '1'

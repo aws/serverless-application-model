@@ -4,7 +4,8 @@ from unittest import TestCase
 from samtranslator.yaml_helper import yaml_parse
 from samtranslator.validator.validator import SamTemplateValidator
 
-input_folder = 'tests/translator/input'
+BASE_PATH = os.path.dirname(__file__)
+INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, 'input')
 
 @pytest.mark.parametrize('testcase', [
     'basic_function',
@@ -57,6 +58,7 @@ input_folder = 'tests/translator/input'
     'function_with_deployment_and_custom_role',
     'function_with_deployment_no_service_role',
     'function_with_policy_templates',
+    'function_with_sns_event_source_all_parameters',
     'globals_for_function',
     'globals_for_api',
     'globals_for_simpletable',
@@ -102,7 +104,7 @@ def test_validate_template_success(testcase):
     ]
     if testcase in excluded:
         return
-    manifest = yaml_parse(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
+    manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
     validation_errors = SamTemplateValidator.validate(manifest)
     has_errors = len(validation_errors)
     if has_errors:

@@ -40,6 +40,8 @@ Resources:
 
         - CloudFormationDescribeStacksPolicy: {}
 
+        - RekognitionDetectOnlyPolicy: {}
+
         - RekognitionNoDataAccessPolicy:
             CollectionId: id
 

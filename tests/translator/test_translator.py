@@ -1,7 +1,9 @@
 import json
 import itertools
 import os.path
-from functools import reduce
+import hashlib
+import sys
+from functools import reduce, cmp_to_key
 
 from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
 from samtranslator.parser.parser import Parser
@@ -21,17 +23,67 @@ from samtranslator.translator.transform import transform
 from mock import Mock, MagicMock, patch
 
 
-input_folder = 'tests/translator/input'
-output_folder = 'tests/translator/output'
+BASE_PATH = os.path.dirname(__file__)
+INPUT_FOLDER = os.path.join(BASE_PATH, 'input')
+OUTPUT_FOLDER = os.path.join(BASE_PATH, 'output')
 
 
-def deep_sorted(value):
+def deep_sort_lists(value):
+    """
+    Custom sorting implemented as a wrapper on top of Python's built-in ``sorted`` method. This is necessary because
+    the previous behavior assumed lists were unordered. As part of migration to Py3, we are trying to
+    retain the same behavior. But in Py3, lists with complex data types like dict cannot be sorted. Hence
+    we provide a custom sort function that tries best sort the lists in a stable order. The actual order
+    does not matter as long as it is stable between runs.
+
+    This implementation assumes that the input was parsed from a JSON data. So it can have one of the
+    following types: a primitive type, list or other dictionaries.
+    We traverse the dictionary like how we would traverse a tree. If a value is a list, we recursively sort the members
+    of the list, and then sort the list itself.
+
+    This assumption that lists are unordered is a problem at the first place. As part of dropping support for Python2,
+    we should remove this assumption. We have to update SAM Translator to output lists in a predictable ordering so we
+    can assume lists are ordered and compare them.
+    """
     if isinstance(value, dict):
-        return {k: deep_sorted(v) for k, v in value.items()}
+        return {k: deep_sort_lists(v) for k, v in value.items()}
     if isinstance(value, list):
-        return sorted(deep_sorted(x) for x in value)
+        if sys.version_info.major < 3:
+            # Py2 can sort lists with complex types like dictionaries
+            return sorted((deep_sort_lists(x) for x in value))
+        else:
+            # Py3 cannot sort lists with complex types. Hence a custom comparator function
+            return sorted((deep_sort_lists(x) for x in value), key=cmp_to_key(custom_list_data_comparator))
     else:
         return value
+
+
+def custom_list_data_comparator(obj1, obj2):
+    """
+    Comparator function used to sort lists with complex data types in them. This is meant to be used only within the
+    context of sorting lists for use with unit tests.
+
+    Given any two objects, this function will return the "difference" between the two objects. This difference obviously
+    does not make sense for complex data types like dictionaries & list. This function implements a custom logic that
+    is partially borrowed from Python2's implementation of such a comparison:
+
+    * Both objects are dict: Convert them JSON strings and compare
+    * Both objects are comparable data types (ie. ones that have > and < operators): Compare them directly
+    * Objects are non-comparable (ie. one is a dict other is a list): Compare the names of the data types.
+      ie. dict < list because of alphabetical order. This is Python2's behavior.
+
+    """
+
+    if isinstance(obj1, dict) and isinstance(obj2, dict):
+        obj1 = json.dumps(obj1, sort_keys=True)
+        obj2 = json.dumps(obj2, sort_keys=True)
+
+    try:
+        return (obj1 > obj2) - (obj1 < obj2)
+    # In Py3 a TypeError will be raised if obj1 and obj2 are different types or uncomparable
+    except TypeError:
+        s1, s2 = type(obj1).__name__, type(obj2).__name__
+        return (s1 > s2) - (s1 < s2)
 
 # implicit_api, explicit_api, explicit_api_ref, api_cache tests currently have deployment IDs hardcoded in output file.
 # These ids are generated using sha1 hash of the swagger body for implicit
@@ -52,6 +104,9 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_api',
         'explicit_api',
         'api_endpoint_configuration',
+        'api_with_auth_all_maximum',
+        'api_with_auth_all_minimum',
+        'api_with_auth_no_default',
         'api_with_method_settings',
         'api_with_binary_media_types',
         'api_with_resource_refs',
@@ -61,7 +116,10 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_origins',
         'api_with_cors_and_only_maxage',
         'api_with_cors_and_only_credentials_false',
+        'api_with_cors_no_definitionbody',
         'api_cache',
+        'api_with_access_log_setting',
+        'api_with_canary_setting',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -69,10 +127,12 @@ class TestTranslatorEndToEnd(TestCase):
         's3_filter',
         's3_multiple_events_same_bucket',
         's3_multiple_functions',
+        's3_with_dependsOn',
         'sns',
         'sns_existing_other_subscription',
         'sns_topic_outside_template',
         'alexa_skill',
+        'alexa_skill_with_skill_id',
         'iot_rule',
         'function_managed_inline_policy',
         'unsupported_resources',
@@ -92,6 +152,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_deployment_and_custom_role',
         'function_with_deployment_no_service_role',
         'function_with_policy_templates',
+        'function_with_sns_event_source_all_parameters',
         'globals_for_function',
         'globals_for_api',
         'globals_for_simpletable',
@@ -115,16 +176,13 @@ class TestTranslatorEndToEnd(TestCase):
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
-        manifest = yaml_parse(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(output_folder,partition_folder, testcase + '.json'), 'r'))
+        expected = json.load(open(os.path.join(OUTPUT_FOLDER,partition_folder, testcase + '.json'), 'r'))
 
-        old_region = os.environ.get("AWS_DEFAULT_REGION", "")
-        os.environ["AWS_DEFAULT_REGION"] = region
-
-        try:
+        with patch('boto3.session.Session.region_name', region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
             mock_policy_loader.load.return_value = {
@@ -136,16 +194,89 @@ class TestTranslatorEndToEnd(TestCase):
 
             output_fragment = transform(
                 manifest, parameter_values, mock_policy_loader)
-        finally:
-            os.environ["AWS_DEFAULT_REGION"] = old_region
 
         print(json.dumps(output_fragment, indent=2))
 
-        assert deep_sorted(output_fragment) == deep_sorted(expected)
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info.major >= 3:
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
+
+        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+
+    def _update_logical_id_hash(self, resources):
+        """
+        Brute force method for updating all APIGW Deployment LogicalIds and references to a consistent hash
+        """
+        output_resources = resources.get("Resources", {})
+        deployment_logical_id_dict = {}
+        rest_api_to_swagger_hash = {}
+        dict_of_things_to_delete = {}
+
+        # Find all RestApis in the template
+        for logical_id, resource_dict in output_resources.items():
+            if "AWS::ApiGateway::RestApi" == resource_dict.get("Type"):
+                resource_properties = resource_dict.get("Properties", {})
+                if "Body" in resource_properties:
+                    self._generate_new_deployment_hash(logical_id, resource_properties.get("Body"), rest_api_to_swagger_hash)
+
+                elif "BodyS3Location" in resource_dict.get("Properties"):
+                    self._generate_new_deployment_hash(logical_id,
+                                                       resource_properties.get("BodyS3Location"),
+                                                       rest_api_to_swagger_hash)
+
+        # Collect all APIGW Deployments LogicalIds and generate the new ones
+        for logical_id, resource_dict in output_resources.items():
+            if "AWS::ApiGateway::Deployment" == resource_dict.get("Type"):
+                resource_properties = resource_dict.get("Properties", {})
+
+                rest_id = resource_properties.get("RestApiId").get("Ref")
+
+                data_hash = rest_api_to_swagger_hash.get(rest_id)
+
+                description = resource_properties.get("Description")[:-len(data_hash)]
+
+                resource_properties["Description"] = description + data_hash
+
+                new_logical_id = logical_id[:-10] + data_hash[:10]
+
+                deployment_logical_id_dict[logical_id] = new_logical_id
+                dict_of_things_to_delete[logical_id] = (new_logical_id, resource_dict)
+
+        # Update References to APIGW Deployments
+        for logical_id, resource_dict in output_resources.items():
+            if "AWS::ApiGateway::Stage" == resource_dict.get("Type"):
+                resource_properties = resource_dict.get("Properties", {})
+
+                rest_id = resource_properties.get("RestApiId", {}).get("Ref", "")
+
+                data_hash = rest_api_to_swagger_hash.get(rest_id)
+
+                deployment_id = resource_properties.get("DeploymentId", {}).get("Ref")
+                new_logical_id = deployment_logical_id_dict.get(deployment_id, "")[:-10]
+                new_logical_id = new_logical_id + data_hash[:10]
+
+                resource_properties.get("DeploymentId", {})["Ref"] = new_logical_id
+
+        # To avoid mutating the template while iterating, delete only after find everything to update
+        for logical_id_to_remove, tuple_to_add in dict_of_things_to_delete.items():
+            output_resources[tuple_to_add[0]] = tuple_to_add[1]
+            del output_resources[logical_id_to_remove]
+
+        # Update any Output References in the template
+        for output_key, output_value in resources.get("Outputs", {}).items():
+            if output_value.get("Ref") in deployment_logical_id_dict:
+                output_value["Ref"] = deployment_logical_id_dict[output_value.get("Ref")]
+
+    def _generate_new_deployment_hash(self, logical_id, dict_to_hash, rest_api_to_swagger_hash):
+        data_bytes = json.dumps(dict_to_hash, separators=(',', ':'), sort_keys=True).encode("utf8")
+        data_hash = hashlib.sha1(data_bytes).hexdigest()
+        rest_api_to_swagger_hash[logical_id] = data_hash
 
 
 @pytest.mark.parametrize('testcase', [
     'error_api_duplicate_methods_same_path',
+    'error_api_invalid_auth',
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
     'error_api_invalid_restapiid',
@@ -181,9 +312,10 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_unknown_policy_template',
     'error_function_with_invalid_policy_statement'
 ])
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_transform_invalid_document(testcase):
-    manifest = yaml.load(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
-    expected = json.load(open(os.path.join(output_folder, testcase + '.json'), 'r'))
+    manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+    expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + '.json'), 'r'))
 
     mock_policy_loader = MagicMock()
     parameter_values = get_template_parameter_values()
@@ -195,6 +327,7 @@ def test_transform_invalid_document(testcase):
 
     assert error_message == expected.get('errorMessage')
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_transform_unhandled_failure_empty_managed_policy_map():
     document = {
         'Transform': 'AWS::Serverless-2016-10-31',
@@ -218,7 +351,7 @@ def test_transform_unhandled_failure_empty_managed_policy_map():
     with pytest.raises(Exception) as e:
         transform(document, parameter_values, mock_policy_loader)
 
-    error_message = e.value.message
+    error_message = str(e.value)
 
     assert error_message == 'Managed policy map is empty, but should not be.'
 
@@ -250,6 +383,7 @@ def assert_metric_call(mock, transform, transform_failure=0, invalid_document=0)
     )
 
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_swagger_body_sha_gets_recomputed():
 
     document = {
@@ -291,6 +425,7 @@ def test_swagger_body_sha_gets_recomputed():
     assert get_deployment_key(output_fragment) == deployment_key_changed
 
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
 def test_swagger_definitionuri_sha_gets_recomputed():
 
     document = {
@@ -352,6 +487,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
             }
         }
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_logical_id_change_with_parameters(self):
         parameter_values = {
             'CodeKeyParam': 'value1'
@@ -366,6 +502,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         assert first_version_id != second_version_id
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_logical_id_remains_same_without_parameter_change(self):
         parameter_values = {
             'CodeKeyParam': 'value1'
@@ -379,6 +516,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         assert first_version_id == second_version_id
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_logical_id_without_resolving_reference(self):
         # Now value of `CodeKeyParam` is not present in document
 
@@ -556,7 +694,7 @@ class TestPluginsUsage(TestCase):
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
 
         sam_plugins = prepare_plugins([])
-        self.assertEquals(3, len(sam_plugins))
+        self.assertEquals(4, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     def test_prepare_plugins_must_merge_input_plugins(self, make_policy_template_for_function_plugin_mock):
@@ -566,12 +704,12 @@ class TestPluginsUsage(TestCase):
 
         custom_plugin = BasePlugin("someplugin")
         sam_plugins = prepare_plugins([custom_plugin])
-        self.assertEquals(4, len(sam_plugins))
+        self.assertEquals(5, len(sam_plugins))
 
     def test_prepare_plugins_must_handle_empty_input(self):
 
         sam_plugins = prepare_plugins(None)
-        self.assertEquals(3, len(sam_plugins)) # one required plugin
+        self.assertEquals(4, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.PolicyTemplatesProcessor")
     @patch("samtranslator.translator.translator.PolicyTemplatesForFunctionPlugin")
@@ -601,6 +739,7 @@ class TestPluginsUsage(TestCase):
     @patch.object(Resource, "from_dict")
     @patch("samtranslator.translator.translator.SamPlugins")
     @patch("samtranslator.translator.translator.prepare_plugins")
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_transform_method_must_inject_plugins_when_creating_resources(self,
                                                                           prepare_plugins_mock,
                                                                           sam_plugins_class_mock,

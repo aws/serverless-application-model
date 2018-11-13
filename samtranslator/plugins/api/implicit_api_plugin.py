@@ -87,8 +87,8 @@ class ImplicitApiPlugin(BasePlugin):
         :param SamResource function: Function Resource object
         :return dict: Dictionary of API events along with any other configuration passed to it.
             Example: {
-                FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>}, Cors: {<something>}},
-                BarEvent: {Path: "/bar", Method: "any", MethodSettings: {<something>}, Cors: {<something>}}"
+                FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>}, Cors: {<something>}, Auth: {<something>}},
+                BarEvent: {Path: "/bar", Method: "any", MethodSettings: {<something>}, Cors: {<something>}, Auth: {<something>}}"
             }
         """
 
@@ -100,7 +100,7 @@ class ImplicitApiPlugin(BasePlugin):
             return {}
 
         api_events = {}
-        for event_id, event in function.properties["Events"].iteritems():
+        for event_id, event in function.properties["Events"].items():
 
             if event and isinstance(event, dict) and event.get("Type") == "Api":
                 api_events[event_id] = event
@@ -117,7 +117,7 @@ class ImplicitApiPlugin(BasePlugin):
         :param SamTemplate template: SAM Template where Serverless::Api resources can be found
         """
 
-        for logicalId, event in api_events.iteritems():
+        for logicalId, event in api_events.items():
 
             event_properties = event.get("Properties", {})
             if not event_properties:

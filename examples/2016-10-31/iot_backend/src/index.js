@@ -17,13 +17,13 @@ exports.handler = function(event, context, callback) {
        
     console.log("Adding a new IoT device...");
     dynamo.put(params, function(err, data) {
-    if (err) {
-        console.error("Unable to add device. Error JSON:", JSON.stringify(err, null, 2));
-        callback(err);
-    } else {
-        console.log("Added device:", JSON.stringify(data, null, 2));
-        callback(null,'DynamoDB updated');
-    }
+        if (err) {
+            console.error("Unable to add device. Error JSON:", JSON.stringify(err, null, 2));
+            callback(err);
+        } else {
+            console.log("Added device:", JSON.stringify(data, null, 2));
+            callback(null,'DynamoDB updated');
+        }
     });
 
     

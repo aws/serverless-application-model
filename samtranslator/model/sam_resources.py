@@ -1,24 +1,25 @@
 """ SAM macro definitions """
 from six import string_types
-from tags.resource_tagging import get_tag_list
+
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.cloudwatchlogs
+from .api.api_generator import ApiGenerator
+from .s3_utils.uri_parser import parse_s3_uri
+from .tags.resource_tagging import get_tag_list
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
+from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import (InvalidEventException,
                                             InvalidResourceException)
+from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion, LambdaAlias
-from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
-from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from api.api_generator import ApiGenerator
-from s3_utils.uri_parser import parse_s3_uri
 
 
 class SamFunction(SamResourceMacro):
@@ -34,7 +35,8 @@ class SamFunction(SamResourceMacro):
         'FunctionName': PropertyType(False, one_of(is_str(), is_type(dict))),
         'Handler': PropertyType(True, is_str()),
         'Runtime': PropertyType(True, is_str()),
-        'CodeUri': PropertyType(True, one_of(is_str(), is_type(dict))),
+        'CodeUri': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'InlineCode': PropertyType(False, one_of(is_str(), is_type(dict))),
         'DeadLetterQueue': PropertyType(False, is_type(dict)),
         'Description': PropertyType(False, is_str()),
         'MemorySize': PropertyType(False, is_type(int)),
@@ -313,6 +315,16 @@ class SamFunction(SamResourceMacro):
         return resources
 
     def _construct_code_dict(self):
+        if self.InlineCode:
+            return {
+                "ZipFile": self.InlineCode
+            }
+        elif self.CodeUri:
+            return self._construct_code_dict_code_uri()
+        else:
+            raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
+
+    def _construct_code_dict_code_uri(self):
         """Constructs the Lambda function's `Code property`_, from the SAM function's CodeUri property.
 
         .. _Code property: \
@@ -465,7 +477,10 @@ class SamApi(SamResourceMacro):
         'EndpointConfiguration': PropertyType(False, is_str()),
         'MethodSettings': PropertyType(False, is_type(list)),
         'BinaryMediaTypes': PropertyType(False, is_type(list)),
-        'Cors': PropertyType(False, one_of(is_str(), is_type(dict)))
+        'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'Auth': PropertyType(False, is_type(dict)),
+        'AccessLogSetting': PropertyType(False, is_type(dict)),
+        'CanarySetting': PropertyType(False, is_type(dict))
     }
 
     referable_properties = {
@@ -495,11 +510,15 @@ class SamApi(SamResourceMacro):
                                      endpoint_configuration=self.EndpointConfiguration,
                                      method_settings=self.MethodSettings,
                                      binary_media=self.BinaryMediaTypes,
-                                     cors=self.Cors)
+                                     cors=self.Cors,
+                                     auth=self.Auth,
+                                     access_log_setting=self.AccessLogSetting,
+                                     canary_setting=self.CanarySetting)
 
-        rest_api, deployment, stage = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
 
         resources.extend([rest_api, deployment, stage])
+        resources.extend(permissions)
 
         return resources
 

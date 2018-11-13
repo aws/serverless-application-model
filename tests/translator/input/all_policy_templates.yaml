@@ -113,8 +113,22 @@ Resources:
 
         - AWSSecretsManagerRotationPolicy:
             FunctionName: function
-        
+
         - MobileAnalyticsWriteOnlyAccessPolicy: {}
 
         - PinpointEndpointAccessPolicy:
             PinpointApplicationId: id
+
+        - RekognitionDetectOnlyPolicy: {}
+
+        - RekognitionFacesManagementPolicy:
+            CollectionId: collection
+
+        - EKSDescribePolicy: {}
+        
+        - CostExplorerReadOnlyPolicy: {}
+        
+        - OrganizationsListAccountsPolicy: {}
+        
+        - DynamoDBReconfigurePolicy:
+            TableName: name

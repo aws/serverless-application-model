@@ -99,4 +99,4 @@ class SQS(PullEventSource):
     resource_type = 'SQS'
 
     def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaSQSExecutionRole')
+        return ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaSQSQueueExecutionRole')

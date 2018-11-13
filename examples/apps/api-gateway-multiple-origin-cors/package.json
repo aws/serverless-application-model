@@ -1,0 +1,19 @@
+{
+  "name": "cors-multiple-origin",
+  "version": "0.0.1",
+  "description": "Example of Multiple-Origin CORS using API Gateway and Lambda",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "devDependencies": {
+    "jest": "^23.1.0"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/routes/test\\.js"
+    ]
+  }
+}

@@ -3,12 +3,15 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   An Amazon Cognito Sync trigger that modifies Cognito datasets based on the
   incoming event.
+Parameters:
+  KeyIdParameter:
+    Type: String
 Resources:
   cognitosynctrigger:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs8.10
       CodeUri: .
       Description: >-
         An Amazon Cognito Sync trigger that modifies Cognito datasets based on
@@ -16,9 +19,5 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'kms:Decrypt'
-              Resource: '*'
+        - KMSDecryptPolicy:
+             KeyId: !Ref KeyIdParameter
