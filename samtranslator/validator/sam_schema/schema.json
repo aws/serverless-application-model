@@ -311,6 +311,11 @@
           "type": "string"
         },
         "Path": {
+          "patternProperties": {
+            "^[a-zA-Z0-9\\-\\_\\.\/\\{\\}\\+]+$": {
+              "type": "string"
+            }
+          },
           "type": "string"
         },
         "RestApiId": {
