@@ -2,6 +2,8 @@
 
 This is a hello world example of the WorkMail lambda feature. For more information see [AWS WorMail lambda documentation](https://docs.aws.amazon.com/workmail/latest/adminguide/lambda.html)
 
+To use this application you can deploy it via Lambda console. Visit [AWS Lambda Console](https://console.aws.amazon.com/lambda/home?region=us-east-1#/create?firstrun=true&tab=serverlessApps)
+
 ### Local development
 
 First, [set up the SAM CLI](https://github.com/awslabs/aws-sam-cli/blob/develop/docs/installation.rst).
