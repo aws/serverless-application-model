@@ -36,6 +36,7 @@ class Globals(object):
         #   StageName: Because StageName cannot be overridden for Implicit APIs because of the current plugin
         #              architecture
         SamResourceType.Api.value: [
+            'Auth',
             "Name",
             "DefinitionUri",
             "CacheClusterEnabled",
