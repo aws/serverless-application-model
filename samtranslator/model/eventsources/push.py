@@ -262,6 +262,12 @@ class S3(PushEventSource):
         """
         Since conditional DependsOn is not supported this undocumented way of 
         implicitely  making dependency through tags is used.
+
+        See https://stackoverflow.com/questions/34607476/cloudformation-apply-condition-on-dependson
+
+        It is done by using Fn:GetAtt wrapped in a conditional Fn:If. Using Fn:GetAtt implies a 
+        dependency, so CloudFormation will automatically wait once it reaches that function, the same 
+        as if you were using a DependsOn.
         """
         properties = bucket.get('Properties', None)
         if properties is None:
@@ -276,7 +282,7 @@ class S3(PushEventSource):
                 'Fn:If': [
                     permission.resource_attributes['Condition'],
                     fnGetAtt(permission.logical_id, 'Arn'),
-                    'no dpendency'
+                    'no dependency'
                 ]
             }
         }
