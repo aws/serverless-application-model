@@ -14,6 +14,9 @@ class SnsEventSource(TestCase):
         self.function = Mock()
         self.function.get_runtime_attr = Mock()
         self.function.get_runtime_attr.return_value = 'arn:aws:lambda:mock'
+        self.function.resource_attributes = {}
+        self.function.get_passthrough_resource_attributes = Mock()
+        self.function.get_passthrough_resource_attributes.return_value = {}
 
     def test_to_cloudformation_returns_permission_and_subscription_resources(self):
         resources = self.sns_event_source.to_cloudformation(
