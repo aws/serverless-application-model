@@ -13,9 +13,9 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator.arn_generator import ArnGenerator
 
 _CORS_WILDCARD = "'*'"
-CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge"])
-# Default the Cors Properties to '*' wildcard. Other properties are actually Optional
-CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None)
+CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge", "AllowCredentials"])
+# Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
+CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
 AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
 AuthProperties.__new__.__defaults__ = (None, None)
@@ -214,10 +214,15 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id, "Unable to add Cors configuration because "
                                                             "'DefinitionBody' does not contain a valid Swagger")
 
+        if properties.AllowCredentials is True and properties.AllowOrigin == _CORS_WILDCARD:
+            raise InvalidResourceException(self.logical_id, "Unable to add Cors configuration because "
+                                                            "'AllowCredentials' can not be true when "
+                                                            "'AllowOrigin' is \"'*'\" or not set")
+
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
             editor.add_cors(path,  properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
-                            max_age=properties.MaxAge)
+                            max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
