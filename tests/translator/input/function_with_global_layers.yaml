@@ -1,0 +1,19 @@
+Globals:
+  Function:
+    Layers:
+        - arn:aws:lambda:us-east-1:123456789101:layer:layer1:1
+        - arn:aws:lambda:us-east-1:123456789101:layer:layer2:1
+
+# Note: there is a limit to the number of layers that a function can reference.
+Resources:
+  ManyLayersFunc:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python3.6
+      Layers:
+        - arn:aws:lambda:us-east-1:123456789101:layer:layer3:1
+        - arn:aws:lambda:us-east-1:123456789101:layer:layer4:1
+        - arn:aws:lambda:us-east-1:123456789101:layer:layer5:1
+

@@ -1,5 +1,6 @@
 from six import string_types
 from six.moves.urllib.parse import urlparse, parse_qs
+from samtranslator.model.exceptions import InvalidResourceException
 
 
 def parse_s3_uri(uri):
@@ -45,3 +46,38 @@ def to_s3_uri(code_dict):
             uri += "?versionId=" + version
 
     return uri
+
+def construct_s3_location_object(location_uri, logical_id, property_name):
+    """Constructs a Lambda `Code` or `Content` property, from the SAM `CodeUri` or `ContentUri` property.
+    This follows the current scheme for Lambda Functions and LayerVersions.
+
+    :param dict or string location_uri: s3 location dict or string
+    :param string logical_id: logical_id of the resource calling this function
+    :param string property_name: name of the property which is used as an input to this function.
+    :returns: a Code dict, containing the S3 Bucket, Key, and Version of the Lambda layer code
+    :rtype: dict
+    """
+    if isinstance(location_uri, dict):
+        if not location_uri.get("Bucket") or not location_uri.get("Key"):
+            # location_uri is a dictionary but does not contain Bucket or Key property
+            raise InvalidResourceException(logical_id,
+                                            "'{}' requires Bucket and Key properties to be specified".format(property_name))
+
+        s3_pointer = location_uri
+
+    else:
+        # location_uri is NOT a dictionary. Parse it as a string
+        s3_pointer = parse_s3_uri(location_uri)
+
+        if s3_pointer is None:
+            raise InvalidResourceException(logical_id,
+                                            '\'{}\' is not a valid S3 Uri of the form '
+                                            '"s3://bucket/key" with optional versionId query parameter.'.format(property_name))
+
+    code = {
+        'S3Bucket': s3_pointer['Bucket'],
+        'S3Key': s3_pointer['Key']
+    }
+    if 'Version' in s3_pointer:
+        code['S3ObjectVersion'] = s3_pointer['Version']
+    return code

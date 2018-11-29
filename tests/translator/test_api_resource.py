@@ -1,10 +1,12 @@
 import json
+import os
 
 from unittest import TestCase
 from mock import MagicMock, patch
 from tests.translator.helpers import get_template_parameter_values
 from samtranslator.translator.transform import transform
 from samtranslator.model.apigateway import ApiGatewayDeployment
+from tests.plugins.application.test_serverless_app_plugin import mock_get_region
 
 mock_policy_loader = MagicMock()
 mock_policy_loader.load.return_value = {
@@ -13,7 +15,7 @@ mock_policy_loader.load.return_value = {
     'AWSLambdaRole': 'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
 }
 
-
+@patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
 def test_redeploy_explicit_api():
     """
     Test to verify that we will redeploy an API when Swagger document changes
@@ -45,6 +47,7 @@ def test_redeploy_explicit_api():
     assert updated_deployment_ids == translate_and_find_deployment_ids(manifest)
 
 
+@patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
 def test_redeploy_implicit_api():
     manifest = {
         'Transform': 'AWS::Serverless-2016-10-31',

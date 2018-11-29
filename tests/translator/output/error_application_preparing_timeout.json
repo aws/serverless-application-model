@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [['preparing-never-ready']] is invalid. Timed out waiting for nested stack templates to reach ACTIVE status."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [['preparing-never-ready']] is invalid. Timed out waiting for nested stack templates to reach ACTIVE status."
+}
