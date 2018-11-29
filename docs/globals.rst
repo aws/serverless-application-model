@@ -81,6 +81,7 @@ Currently, the following resources and properties are being supported:
       Cors:
       AccessLogSetting:
       CanarySetting:
+      TracingEnabled:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable

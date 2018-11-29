@@ -120,6 +120,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_cache',
         'api_with_access_log_setting',
         'api_with_canary_setting',
+        'api_with_xray_tracing',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',

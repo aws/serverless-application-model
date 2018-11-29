@@ -480,7 +480,8 @@ class SamApi(SamResourceMacro):
         'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
         'Auth': PropertyType(False, is_type(dict)),
         'AccessLogSetting': PropertyType(False, is_type(dict)),
-        'CanarySetting': PropertyType(False, is_type(dict))
+        'CanarySetting': PropertyType(False, is_type(dict)),
+        'TracingEnabled': PropertyType(False, is_type(bool))
     }
 
     referable_properties = {
@@ -513,7 +514,8 @@ class SamApi(SamResourceMacro):
                                      cors=self.Cors,
                                      auth=self.Auth,
                                      access_log_setting=self.AccessLogSetting,
-                                     canary_setting=self.CanarySetting)
+                                     canary_setting=self.CanarySetting,
+                                     tracing_enabled=self.TracingEnabled)
 
         rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
 

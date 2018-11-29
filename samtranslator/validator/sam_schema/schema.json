@@ -68,6 +68,9 @@
                 }
               ]
             },
+            "TracingEnabled": {
+              "type": "boolean"
+            },
             "Variables": {
               "additionalProperties": false,
               "patternProperties": {
