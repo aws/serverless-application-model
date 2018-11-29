@@ -394,6 +394,9 @@
         },
         "Stream": {
           "type": "string"
+        },
+        "Enabled": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -512,6 +515,9 @@
         },
         "Stream": {
           "type": "string"
+        },
+        "Enabled": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -534,6 +540,9 @@
               "type": "object"
             }
           ]
+        },
+        "Enabled": {
+          "type": "boolean"
         }
       },
       "required": [
