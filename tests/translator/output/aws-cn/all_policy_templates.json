@@ -157,14 +157,24 @@
                     "dynamodb:BatchGetItem",
                     "dynamodb:DescribeTable"
                   ],
-                  "Resource": {
-                    "Fn::Sub": [
-                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
-                      {
-                        "tableName": "name"
-                      }
-                    ]
-                  },
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                        {
+                          "tableName": "name"
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                          {
+                            "tableName": "name"
+                          }
+                      ]
+                    }
+                  ],
                   "Effect": "Allow"
                 }
               ]
@@ -510,8 +520,8 @@
               "Statement": [
                 {
                   "Action": [
-                    "ses:GetIdentityVerificationAttributes", 
-                    "ses:SendEmail", 
+                    "ses:GetIdentityVerificationAttributes",
+                    "ses:SendEmail",
                     "ses:SendRawEmail",
                     "ses:VerifyEmailIdentity"
                   ],
@@ -1016,7 +1026,7 @@
             }
           },
           {
-            "PolicyName": "KitchenSinkFunctionRolePolicy40", 
+            "PolicyName": "KitchenSinkFunctionRolePolicy40",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1026,15 +1036,15 @@
                     "rekognition:SearchFaces",
                     "rekognition:SearchFacesByImage",
                     "rekognition:ListFaces"
-                  ], 
+                  ],
                   "Resource": {
                     "Fn::Sub": [
-                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}", 
+                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
                       {
                         "collectionId": "collection"
                       }
                     ]
-                  }, 
+                  },
                   "Effect": "Allow"
                 }
               ]
@@ -1056,7 +1066,7 @@
             }
           },
           {
-            "PolicyName": "KitchenSinkFunctionRolePolicy42", 
+            "PolicyName": "KitchenSinkFunctionRolePolicy42",
             "PolicyDocument": {
               "Statement": [{
                 "Effect": "Allow",
@@ -1071,23 +1081,23 @@
                 "Resource": "*"
               }]
             }
-          }, 
+          },
           {
-            "PolicyName": "KitchenSinkFunctionRolePolicy43", 
+            "PolicyName": "KitchenSinkFunctionRolePolicy43",
             "PolicyDocument": {
               "Statement": [
                 {
                   "Action": [
                     "organizations:ListAccounts"
-                  ], 
-                  "Resource": "*", 
+                  ],
+                  "Resource": "*",
                   "Effect": "Allow"
                 }
               ]
             }
           },
           {
-            "PolicyName": "KitchenSinkFunctionRolePolicy44", 
+            "PolicyName": "KitchenSinkFunctionRolePolicy44",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -1096,7 +1106,7 @@
                   ],
                   "Resource": {
                     "Fn::Sub": [
-                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}", 
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
                       {
                         "tableName": "name"
                       }
