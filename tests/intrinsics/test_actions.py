@@ -24,6 +24,9 @@ class TestAction(TestCase):
         with self.assertRaises(NotImplementedError):
             MyAction().resolve_resource_refs({}, {})
 
+        with self.assertRaises(NotImplementedError):
+            MyAction().resolve_resource_id_refs({}, {})
+
     def test_can_handle_input(self):
         class MyAction(Action):
             intrinsic_name = "foo"
@@ -246,6 +249,55 @@ class TestRefCanResolveResourceRefs(TestCase):
         ref = RefAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
         self.assertEquals(expected, ref.resolve_resource_refs(input, self.supported_resource_refs_mock))
+
+
+class TestRefCanResolveResourceIdRefs(TestCase):
+
+    def setUp(self):
+        self.supported_resource_id_refs_mock = Mock()
+        self.ref = RefAction()
+
+    def test_must_replace_refs(self):
+        resolved_value = "NewLogicalId"
+        input = {
+            "Ref": "LogicalId"
+        }
+        expected = {
+            "Ref": resolved_value
+        }
+        self.supported_resource_id_refs_mock.get.return_value = resolved_value
+
+        output = self.ref.resolve_resource_id_refs(input, self.supported_resource_id_refs_mock)
+
+        self.assertEquals(expected, output)
+        self.supported_resource_id_refs_mock.get.assert_called_once_with("LogicalId")
+
+    def test_handle_unsupported_references(self):
+        input = {
+            "Ref": "OtherLogicalId.Property"
+        }
+        expected = {
+            "Ref": "OtherLogicalId.Property"
+        }
+
+        self.supported_resource_id_refs_mock.get.return_value = None
+
+        output = self.ref.resolve_resource_id_refs(input, self.supported_resource_id_refs_mock)
+        self.assertEquals(expected, output)
+        self.supported_resource_id_refs_mock.get.assert_not_called()
+
+    @patch.object(RefAction, "can_handle")
+    def test_return_value_if_cannot_handle(self, can_handle_mock):
+        input = {
+            "Ref": "key"
+        }
+        expected = {
+            "Ref": "key"
+        }
+
+        ref = RefAction()
+        can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
+        self.assertEquals(expected, ref.resolve_resource_id_refs(input, self.supported_resource_id_refs_mock))
 
 class TestSubCanResolveParameterRefs(TestCase):
 
@@ -523,6 +575,95 @@ class TestSubCanResolveResourceRefs(TestCase):
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
         self.assertEquals(expected, sub.resolve_resource_refs(input, parameters))
 
+class TestSubCanResolveResourceIdRefs(TestCase):
+
+    def setUp(self):
+        self.supported_resource_id_refs = {}
+        self.supported_resource_id_refs["id1"] = "newid1"
+        self.supported_resource_id_refs["id2"] = "newid2"
+        self.supported_resource_id_refs["id3"] = "newid3"
+
+        self.input_sub_value = "Hello ${id1} ${id2}${id3} ${id1.arn} ${id2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
+        self.expected_output_sub_value = "Hello ${newid1} ${newid2}${newid3} ${newid1.arn} ${newid2.arn.name.foo} ${!id1.prop1} ${unknown} ${some.arn} World"
+
+    def test_must_resolve_string_value(self):
+
+        input = {
+            "Fn::Sub": self.input_sub_value
+        }
+        expected = {
+            "Fn::Sub": self.expected_output_sub_value
+        }
+
+        sub = SubAction()
+        result = sub.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEqual(expected, result)
+
+    def test_must_resolve_array_value(self):
+        input = {
+            "Fn::Sub": [self.input_sub_value, {"unknown":"a"}]
+        }
+
+        expected = {
+            "Fn::Sub": [self.expected_output_sub_value, {"unknown": "a"}]
+        }
+
+        sub = SubAction()
+        result = sub.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEqual(expected, result)
+
+    def test_sub_all_refs_with_list_input(self):
+        parameters = {
+            "key1": "value1",
+            "key2": "value2"
+        }
+        input = {
+            "Fn::Sub": ["key1", "key2"]
+        }
+        expected = {
+            "Fn::Sub": ["key1", "key2"]
+        }
+
+        sub = SubAction()
+        result = sub.resolve_resource_id_refs(input, parameters)
+
+        self.assertEqual(expected, result)
+
+    def test_sub_all_refs_with_dict_input(self):
+        parameters = {
+            "key1": "value1",
+            "key2": "value2"
+        }
+        input = {
+            "Fn::Sub": {"a": "key1", "b": "key2"}
+        }
+        expected = {
+            "Fn::Sub": {"a": "key1", "b": "key2"}
+        }
+
+        sub = SubAction()
+        result = sub.resolve_resource_id_refs(input, parameters)
+
+        self.assertEqual(expected, result)
+
+    @patch.object(SubAction, "can_handle")
+    def test_return_value_if_cannot_handle(self, can_handle_mock):
+        parameters = {
+            "key": "value"
+        }
+        input = {
+            "Fn::Sub": "${key}"
+        }
+        expected = {
+            "Fn::Sub": "${key}"
+        }
+
+        sub = SubAction()
+        can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
+        self.assertEquals(expected, sub.resolve_resource_id_refs(input, parameters))
+
 
 class TestGetAttCanResolveParameterRefs(TestCase):
 
@@ -683,3 +824,94 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
         self.assertEquals(expected, getatt.resolve_resource_refs(input, self.supported_resource_refs))
+
+
+class TestGetAttCanResolveResourceIdRefs(TestCase):
+
+    def setUp(self):
+        self.supported_resource_id_refs = {}
+        self.supported_resource_id_refs['id1'] = "value1"
+
+    def test_must_resolve_simple_refs(self):
+        input = {
+            "Fn::GetAtt": ["id1", "Arn"]
+        }
+
+        expected = {
+            "Fn::GetAtt": ["value1", "Arn"]
+        }
+
+        getatt = GetAttAction()
+        output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEquals(expected, output)
+
+    def test_must_resolve_refs_with_many_attributes(self):
+        input = {
+            "Fn::GetAtt": ["id1", "Arn1", "Arn2", "Arn3"]
+        }
+
+        expected = {
+            "Fn::GetAtt": ["value1", "Arn1", "Arn2", "Arn3"]
+        }
+
+        getatt = GetAttAction()
+        output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEquals(expected, output)
+
+    def test_must_ignore_invalid_value_array(self):
+        input = {
+            # No actual attributes
+            "Fn::GetAtt": ["id1"]
+        }
+
+        expected = {
+            "Fn::GetAtt": ["id1"]
+        }
+
+        getatt = GetAttAction()
+        output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEquals(expected, output)
+
+    def test_must_ignore_invalid_value_type(self):
+        input = {
+            # No actual attributes
+            "Fn::GetAtt": {"a": "b"}
+        }
+
+        expected = {
+            "Fn::GetAtt": {"a": "b"}
+        }
+
+        getatt = GetAttAction()
+        output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEquals(expected, output)
+
+    def test_must_ignore_missing_properties_with_dot_before(self):
+        input = {
+            "Fn::GetAtt": [".id1", "foo"]
+        }
+        expected = {
+            "Fn::GetAtt": [".id1", "foo"]
+        }
+
+        getatt = GetAttAction()
+        output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEquals(expected, output)
+
+    @patch.object(GetAttAction, "can_handle")
+    def test_return_value_if_cannot_handle(self, can_handle_mock):
+        input = {
+            "Fn::GetAtt": ["id1", "Arn"]
+        }
+        expected = {
+            "Fn::GetAtt": ["id1", "Arn"]
+        }
+
+        getatt = GetAttAction()
+        can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
+        self.assertEquals(expected, getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs))

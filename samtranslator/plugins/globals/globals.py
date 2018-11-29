@@ -28,6 +28,7 @@ class Globals(object):
             "Tracing",
             "KmsKeyArn",
             "AutoPublishAlias",
+            "Layers",
             "DeploymentPreference"
         ],
 

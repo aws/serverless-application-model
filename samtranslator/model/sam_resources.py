@@ -6,17 +6,19 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.cloudwatchlogs
 from .api.api_generator import ApiGenerator
-from .s3_utils.uri_parser import parse_s3_uri
+from .s3_utils.uri_parser import parse_s3_uri, construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
+from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import (InvalidEventException,
                                             InvalidResourceException)
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
-from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion, LambdaAlias
+from samtranslator.model.lambda_ import (LambdaFunction, LambdaVersion, LambdaAlias,
+                                         LambdaLayerVersion)
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -25,10 +27,6 @@ from samtranslator.translator.arn_generator import ArnGenerator
 class SamFunction(SamResourceMacro):
     """SAM function macro.
     """
-
-    # Constants for Tagging
-    _SAM_KEY = "lambda:createdBy"
-    _SAM_VALUE = "SAM"
 
     resource_type = 'AWS::Serverless::Function'
     property_types = {
@@ -51,6 +49,7 @@ class SamFunction(SamResourceMacro):
         'KmsKeyArn': PropertyType(False, one_of(is_type(dict), is_str())),
         'DeploymentPreference': PropertyType(False, is_type(dict)),
         'ReservedConcurrentExecutions': PropertyType(False, any_type()),
+        'Layers': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
 
         # Intrinsic functions in value of Alias property are not supported, yet
         'AutoPublishAlias': PropertyType(False, one_of(is_str()))
@@ -170,7 +169,8 @@ class SamFunction(SamResourceMacro):
         lambda_function.Code = self._construct_code_dict()
         lambda_function.KmsKeyArn = self.KmsKeyArn
         lambda_function.ReservedConcurrentExecutions = self.ReservedConcurrentExecutions
-        lambda_function.Tags = self._contruct_tag_list()
+        lambda_function.Tags = self._construct_tag_list(self.Tags)
+        lambda_function.Layers = self.Layers
 
         if self.Tracing:
             lambda_function.TracingConfig = {"Mode": self.Tracing}
@@ -179,22 +179,6 @@ class SamFunction(SamResourceMacro):
             lambda_function.DeadLetterConfig = {"TargetArn": self.DeadLetterQueue['TargetArn']}
 
         return lambda_function
-
-    def _contruct_tag_list(self):
-        if not bool(self.Tags):
-            self.Tags = {}
-
-        if self._SAM_KEY in self.Tags:
-            raise InvalidResourceException(self.logical_id, self._SAM_KEY + " is a reserved Tag key name and "
-                                                                            "cannot be set on your function. "
-                                                                            "Please change they tag key in the input.")
-        sam_tag = {self._SAM_KEY: self._SAM_VALUE}
-
-        # To maintain backwards compatibility with previous implementation, we *must* append SAM tag to the start of the
-        # tags list. Changing this ordering will trigger a update on Lambda Function resource. Even though this
-        # does not change the actual content of the tags, we don't want to trigger update of a resource without
-        # customer's knowledge.
-        return get_tag_list(sam_tag) + get_tag_list(self.Tags)
 
     def _construct_role(self, managed_policy_map):
         """Constructs a Lambda execution role based on this SAM function's Policies property.
@@ -320,43 +304,9 @@ class SamFunction(SamResourceMacro):
                 "ZipFile": self.InlineCode
             }
         elif self.CodeUri:
-            return self._construct_code_dict_code_uri()
+            return construct_s3_location_object(self.CodeUri, self.logical_id, 'CodeUri')
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
-
-    def _construct_code_dict_code_uri(self):
-        """Constructs the Lambda function's `Code property`_, from the SAM function's CodeUri property.
-
-        .. _Code property: \
-        http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
-
-        :returns: a Code dict, containing the S3 Bucket, Key, and Version of the Lambda function code
-        :rtype: dict
-        """
-        if isinstance(self.CodeUri, dict):
-            if not self.CodeUri.get("Bucket", None) or not self.CodeUri.get("Key", None):
-                # CodeUri is a dictionary but does not contain Bucket or Key property
-                raise InvalidResourceException(self.logical_id,
-                                               "'CodeUri' requires Bucket and Key properties to be specified")
-
-            s3_pointer = self.CodeUri
-
-        else:
-            # CodeUri is NOT a dictionary. Parse it as a string
-            s3_pointer = parse_s3_uri(self.CodeUri)
-
-            if s3_pointer is None:
-                raise InvalidResourceException(self.logical_id,
-                                               '\'CodeUri\' is not a valid S3 Uri of the form '
-                                               '"s3://bucket/key" with optional versionId query parameter.')
-
-        code = {
-            'S3Bucket': s3_pointer['Bucket'],
-            'S3Key': s3_pointer['Key']
-        }
-        if 'Version' in s3_pointer:
-            code['S3ObjectVersion'] = s3_pointer['Version']
-        return code
 
     def _construct_version(self, function, intrinsics_resolver):
         """Constructs a Lambda Version resource that will be auto-published when CodeUri of the function changes.
@@ -581,3 +531,150 @@ class SamSimpleTable(SamResourceMacro):
         if attribute_type in self.attribute_type_conversions:
             return self.attribute_type_conversions[attribute_type]
         raise InvalidResourceException(self.logical_id, 'Invalid \'Type\' "{actual}".'.format(actual=attribute_type))
+
+
+class SamApplication(SamResourceMacro):
+    """SAM application macro.
+    """
+
+    APPLICATION_ID_KEY = 'ApplicationId'
+    SEMANTIC_VERSION_KEY = 'SemanticVersion'
+
+    resource_type = 'AWS::Serverless::Application'
+
+    # The plugin will always insert the TemplateUrl parameter
+    property_types = {
+        'Location': PropertyType(True, one_of(is_str(), is_type(dict))),
+        'TemplateUrl': PropertyType(False, is_str()),
+        'Parameters': PropertyType(False, is_type(dict)),
+        'NotificationArns': PropertyType(False, list_of(is_str())),
+        'Tags': PropertyType(False, is_type(dict)),
+        'TimeoutInMinutes': PropertyType(False, is_type(int))
+    }
+
+    def to_cloudformation(self, **kwargs):
+        """Returns the stack with the proper parameters for this application
+        """
+        nested_stack = self._construct_nested_stack()
+        return [nested_stack]
+
+    def _construct_nested_stack(self):
+        """Constructs a AWS::CloudFormation::Stack resource
+        """
+        nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on)
+        nested_stack.Parameters = self.Parameters
+        nested_stack.NotificationArns = self.NotificationArns
+        application_tags = self._get_application_tags()
+        nested_stack.Tags = self._construct_tag_list(self.Tags, application_tags)
+        nested_stack.TimeoutInMinutes = self.TimeoutInMinutes
+        nested_stack.TemplateURL = self.TemplateUrl if self.TemplateUrl else ""
+
+        return nested_stack
+
+    def _get_application_tags(self):
+        """Adds tags to the stack if this resource is using the serverless app repo
+        """
+        application_tags = {}
+        if isinstance(self.Location, dict):
+            if (self.APPLICATION_ID_KEY in self.Location.keys() 
+                and self.Location[self.APPLICATION_ID_KEY] is not None):
+                application_tags[self._SAR_APP_KEY] = self.Location[self.APPLICATION_ID_KEY]
+            if (self.SEMANTIC_VERSION_KEY in self.Location.keys() 
+                and self.Location[self.SEMANTIC_VERSION_KEY] is not None):
+                application_tags[self._SAR_SEMVER_KEY] = self.Location[self.SEMANTIC_VERSION_KEY]
+        return application_tags
+
+
+class SamLayerVersion(SamResourceMacro):
+    """ SAM Layer macro
+    """
+    resource_type = 'AWS::Serverless::LayerVersion'
+    property_types = {
+        'LayerName': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'Description': PropertyType(False, is_str()),
+        'ContentUri': PropertyType(True, one_of(is_str(), is_type(dict))),
+        'CompatibleRuntimes': PropertyType(False, list_of(is_str())),
+        'LicenseInfo': PropertyType(False, is_str()),
+        'RetentionPolicy': PropertyType(False, is_str())
+    }
+
+    RETAIN = 'Retain'
+    DELETE = 'Delete'
+    retention_policy_options = [ RETAIN.lower(), DELETE.lower() ]
+
+    def to_cloudformation(self, **kwargs):
+        """Returns the Lambda layer to which this SAM Layer corresponds.
+
+        :param dict kwargs: already-converted resources that may need to be modified when converting this \
+        macro to pure CloudFormation
+        :returns: a list of vanilla CloudFormation Resources, to which this Function expands
+        :rtype: list
+        """
+        resources = []
+
+        # Append any CFN resources:
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        resources.append(self._construct_lambda_layer(intrinsics_resolver))
+
+        return resources
+
+    def _construct_lambda_layer(self, intrinsics_resolver):
+        """Constructs and returns the Lambda function.
+
+        :returns: a list containing the Lambda function and execution role resources
+        :rtype: list
+        """
+        retention_policy_value = self._get_retention_policy_value(intrinsics_resolver)
+
+        retention_policy = {
+            'DeletionPolicy': retention_policy_value
+        }
+
+        old_logical_id = self.logical_id
+        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
+        self.logical_id = new_logical_id
+
+        lambda_layer = LambdaLayerVersion(self.logical_id, depends_on=self.depends_on, attributes=retention_policy)
+
+        # Changing the LayerName property: when a layer is published, it is given an Arn
+        # example: arn:aws:lambda:us-west-2:123456789012:layer:MyLayer:1
+        # where MyLayer is the LayerName property if it exists; otherwise, it is the
+        # LogicalId of this resource. Since a LayerVersion is an immutable resource, when
+        # CloudFormation updates this resource, it will ALWAYS create a new version then
+        # delete the old version if the logical ids match. What this does is change the
+        # logical id of every layer (so a `DeletionPolicy: Retain` can work) and set the
+        # LayerName property of the layer so that the Arn will still always be the same
+        # with the exception of an incrementing version number.
+        if not self.LayerName:
+            self.LayerName = old_logical_id
+
+        lambda_layer.LayerName = self.LayerName
+        lambda_layer.Description = self.Description
+        lambda_layer.Content = construct_s3_location_object(self.ContentUri, self.logical_id, 'ContentUri')
+        lambda_layer.CompatibleRuntimes = self.CompatibleRuntimes
+        lambda_layer.LicenseInfo = self.LicenseInfo
+
+        return lambda_layer
+
+    def _get_retention_policy_value(self, intrinsics_resolver):
+        """
+        Sets the deletion policy on this resource. The default is 'Retain'.
+
+        :return: value for the DeletionPolicy attribute.
+        """
+        if isinstance(self.RetentionPolicy, dict):
+            self.RetentionPolicy = intrinsics_resolver.resolve_parameter_refs(self.RetentionPolicy)
+            # If it's still not a string, throw an exception
+            if not isinstance(self.RetentionPolicy, string_types):
+                raise InvalidResourceException(self.logical_id,
+                                               "Could not resolve parameter for '{}' or parameter is not a String."
+                                               .format('RetentionPolicy'))
+
+        if self.RetentionPolicy is None or self.RetentionPolicy.lower() == self.RETAIN.lower():
+            return self.RETAIN
+        elif self.RetentionPolicy.lower() == self.DELETE.lower():
+            return self.DELETE
+        elif self.RetentionPolicy.lower() not in self.retention_policy_options:
+            raise InvalidResourceException(self.logical_id,
+                                           "'{}' must be one of the following options: {}."
+                                           .format('RetentionPolicy', [self.RETAIN, self.DELETE]))

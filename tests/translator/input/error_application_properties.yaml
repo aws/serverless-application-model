@@ -1,0 +1,36 @@
+Resources:
+  NormalApplication:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: 1
+        SemanticVersion: 2.0.0
+
+  MissingApplicationId:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        SemanticVersion: 2.0.0
+
+  MissingSemanticVersion:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: application-id
+
+  MissingLocation:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      TimeoutInMinutes: 10
+
+  UnsupportedProperty:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      TemplateUrl: template-url
+
+  BlankProperties:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId:
+        SemanticVersion:

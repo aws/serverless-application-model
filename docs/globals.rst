@@ -64,6 +64,7 @@ Currently, the following resources and properties are being supported:
       Tags:
       Tracing:
       KmsKeyArn:
+      Layers:
       AutoPublishAlias:
       DeploymentPreference:
     

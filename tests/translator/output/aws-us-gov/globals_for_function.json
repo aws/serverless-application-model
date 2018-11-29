@@ -71,7 +71,11 @@
           ]
         }, 
         "Timeout": 100, 
-        "Runtime": "nodejs4.3"
+        "Runtime": "nodejs4.3",
+        "Layers": [
+          { "Fn::Sub": "arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer:1" },
+          { "Fn::Sub": "arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer2:2" }
+        ]
       }
     }, 
     "MinimalFunctionRole": {
@@ -154,7 +158,10 @@
           ]
         }, 
         "Timeout": 30, 
-        "Runtime": "python2.7"
+        "Runtime": "python2.7",
+        "Layers": [
+          { "Fn::Sub": "arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer:1" }
+        ]
       }
     }, 
     "MinimalFunctionAliaslive": {

@@ -60,6 +60,7 @@ Tracing                            All
 KmsKeyArn                          All
 DeadLetterQueue                    All
 DeploymentPreference               All
+Layers                             All
 AutoPublishAlias             Ref of a CloudFormation Parameter  Alias resources created by SAM uses a LocicalId <FunctionLogicalId+AliasName>. So SAM either needs a string for alias name, or a Ref to template Parameter that SAM can resolve into a string.
 ReservedConcurrentExecutions       All
 ============================ ================================== ========================
@@ -168,6 +169,20 @@ EndpointConfiguration               All
 MethodSettings                      All
 BinaryMediaTypes                    All
 Cors                                All
+================================== ======================== ========================
+
+
+AWS::Serverless::Application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+================================== ======================== ========================
+     Property Name                 Intrinsic(s) Supported          Reasons
+================================== ======================== ========================
+Location                            None                     SAM expects exact values for the Location property
+Parameters                          All
+NotificationArns                    All
+Tags                                All
+TimeoutInMinutes                    All
 ================================== ======================== ========================
 
 

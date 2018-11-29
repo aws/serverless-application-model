@@ -41,7 +41,6 @@ class ArnGenerator(object):
         :return: Partition name
         """
 
-
         if region is None:
             # Use Boto3 to get the region where code is running. This uses Boto's regular region resolution
             # mechanism, starting from AWS_DEFAULT_REGION environment variable.

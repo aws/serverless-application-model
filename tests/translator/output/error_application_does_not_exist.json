@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyApplication] is invalid. Cannot access application: non-existent."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApplication] is invalid. Cannot access application: non-existent."
+}
