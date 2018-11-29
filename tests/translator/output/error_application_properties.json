@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [BlankProperties] is invalid. Property 'ApplicationId' cannot be blank. Resource with id [MissingApplicationId] is invalid. Resource is missing the required [ApplicationId] property. Resource with id [MissingLocation] is invalid. Resource is missing the required [Location] property. Resource with id [MissingSemanticVersion] is invalid. Resource is missing the required [SemanticVersion] property. Resource with id [NormalApplication] is invalid. Type of property 'ApplicationId' is invalid. Resource with id [UnsupportedProperty] is invalid. Resource is missing the required [Location] property."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 6. Resource with id [BlankProperties] is invalid. Property 'ApplicationId' cannot be blank. Resource with id [MissingApplicationId] is invalid. Resource is missing the required [ApplicationId] property. Resource with id [MissingLocation] is invalid. Resource is missing the required [Location] property. Resource with id [MissingSemanticVersion] is invalid. Resource is missing the required [SemanticVersion] property. Resource with id [NormalApplication] is invalid. Type of property 'ApplicationId' is invalid. Resource with id [UnsupportedProperty] is invalid. Resource is missing the required [Location] property."
+}

@@ -3,6 +3,7 @@ import re
 import inspect
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import LifeCycleEvents
+from samtranslator.model.tags.resource_tagging import get_tag_list
 
 
 class PropertyType(object):
@@ -349,6 +350,21 @@ class SamResourceMacro(ResourceMacro):
 
     referable_properties = {}
 
+    # Each resource can optionally override this tag:
+    _SAM_KEY = 'lambda:createdBy'
+    _SAM_VALUE = 'SAM'
+
+    # Tags reserved by the serverless application repo
+    _SAR_APP_KEY = 'serverlessrepo:applicationId'
+    _SAR_SEMVER_KEY = 'serverlessrepo:semanticVersion'
+
+    # Aggregate list of all reserved tags
+    _RESERVED_TAGS = [
+        _SAM_KEY,
+        _SAR_APP_KEY,
+        _SAR_SEMVER_KEY
+    ]
+
     def get_resource_references(self, generated_cfn_resources, supported_resource_refs):
         """
         Constructs the list of supported resource references by going through the list of CFN resources generated
@@ -372,6 +388,30 @@ class SamResourceMacro(ResourceMacro):
                 supported_resource_refs.add(self.logical_id, property, resource_id_by_type[cfn_type])
 
         return supported_resource_refs
+
+    def _construct_tag_list(self, tags, additional_tags=None):
+        if not bool(tags):
+            tags = {}
+
+        if additional_tags == None:
+            additional_tags = {}
+
+        for tag in self._RESERVED_TAGS:
+            self._check_tag(tag, tags)
+
+        sam_tag = {self._SAM_KEY: self._SAM_VALUE}
+
+        # To maintain backwards compatibility with previous implementation, we *must* append SAM tag to the start of the
+        # tags list. Changing this ordering will trigger a update on Lambda Function resource. Even though this
+        # does not change the actual content of the tags, we don't want to trigger update of a resource without
+        # customer's knowledge.
+        return get_tag_list(sam_tag) + get_tag_list(additional_tags) + get_tag_list(tags)
+
+    def _check_tag(self, reserved_tag_name, tags):
+        if reserved_tag_name in tags:
+            raise InvalidResourceException(self.logical_id, reserved_tag_name + " is a reserved Tag key name and "
+                                                                                "cannot be set on your resource. "
+                                                                                "Please change the tag key in the input.")
 
 
 class ResourceTypeResolver(object):
