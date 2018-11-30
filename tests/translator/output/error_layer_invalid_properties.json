@@ -1,0 +1,8 @@
+{
+    "errors": [
+      {
+        "errorMessage": "Resource with id [LayerWithLicenseInfoList] is invalid. Type of property 'LicenseInfo' is invalid. Resource with id [LayerWithNoContentUri] is invalid. Missing required property 'ContentUri'. Resource with id [LayerWithRetentionPolicy] is invalid. 'RetentionPolicy' must be one of the following options: ['Retain', 'Delete']. Resource with id [LayerWithRetentionPolicyListParam] is invalid. Could not resolve parameter for 'RetentionPolicy' or parameter is not a String. Resource with id [LayerWithRetentionPolicyParam] is invalid. 'RetentionPolicy' must be one of the following options: ['Retain', 'Delete']. Resource with id [LayerWithRuntimesString] is invalid. Type of property 'CompatibleRuntimes' is invalid."
+      }
+    ],
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 6. Resource with id [LayerWithLicenseInfoList] is invalid. Type of property 'LicenseInfo' is invalid. Resource with id [LayerWithNoContentUri] is invalid. Missing required property 'ContentUri'. Resource with id [LayerWithRetentionPolicy] is invalid. 'RetentionPolicy' must be one of the following options: ['Retain', 'Delete']. Resource with id [LayerWithRetentionPolicyListParam] is invalid. Could not resolve parameter for 'RetentionPolicy' or parameter is not a String. Resource with id [LayerWithRetentionPolicyParam] is invalid. 'RetentionPolicy' must be one of the following options: ['Retain', 'Delete']. Resource with id [LayerWithRuntimesString] is invalid. Type of property 'CompatibleRuntimes' is invalid."
+  }

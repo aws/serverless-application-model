@@ -1,0 +1,122 @@
+{
+  "Parameters": {
+    "LayerDeleteParam": {
+      "Default": "Delete", 
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Handler": "app.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.6",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "Layers": [
+          {
+            "Ref": "MyLayerd04062b365"
+          }
+        ]
+      }
+    },
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      }
+    },
+    "MyLayerd04062b365": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "LayerName": "MyLayer"
+      }
+    },
+    "MyLayerWithANamefda8c9ec8c": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "LayerName": "DifferentLayerName"
+      }
+    }
+  },
+  "Outputs": {
+    "LayerName": {
+      "Value": {
+        "Ref": "MyLayerd04062b365"
+      }
+    },
+    "FunctionName": {
+      "Value": {
+        "Ref": "MyFunction"
+      }
+    },
+    "LayerAtt": {
+      "Value": {
+        "Fn::GetAtt": [
+          "MyLayerd04062b365",
+          "Arn"
+        ]
+      }
+    },
+    "FunctionAtt": {
+      "Value": {
+        "Fn::GetAtt": [
+          "MyFunction",
+          "Arn"
+        ]
+      }
+    },
+    "LayerSub": {
+      "Value": {
+        "Fn::Sub": "${MyLayerd04062b365}"
+      }
+    },
+    "FunctionSub": {
+      "Value": {
+        "Fn::Sub": "${MyFunction}"
+      }
+    }
+  }
+}

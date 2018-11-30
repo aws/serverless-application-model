@@ -16,6 +16,8 @@ Globals:
       tag1: value1
     Tracing: Active
     AutoPublishAlias: live
+    Layers:
+      - !Sub arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer:1
 
 Resources:
   MinimalFunction:
@@ -39,4 +41,6 @@ Resources:
         newtag1: newvalue1
       Tracing: PassThrough
       AutoPublishAlias: prod
+      Layers:
+        - !Sub arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer2:2
 

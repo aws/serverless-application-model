@@ -1,0 +1,41 @@
+{
+  "Parameters": {
+    "LayerLicenseInfo": {
+      "Type": "String",
+      "Default": "MIT-0 License"
+    },
+    "LayerRuntimeList": {
+      "Type": "CommaDelimitedList"
+    }
+  },
+  "Resources": {
+    "LayerWithLicenseIntrinsic16287c50c8": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithLicenseIntrinsic",
+        "LicenseInfo": {
+          "Ref": "LayerLicenseInfo"
+        }
+      }
+    },
+    "LayerWithRuntimesIntrinsic1a006faa85": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithRuntimesIntrinsic",
+        "CompatibleRuntimes": {
+          "Ref": "LayerRuntimeList"
+        }
+      }
+    }
+  }
+}
