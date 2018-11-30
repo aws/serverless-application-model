@@ -234,7 +234,7 @@
               "es:ESHttpHead",
               "es:ESHttpPost",
               "es:ESHttpDelete",
-              "es:ESHttpGet",              
+              "es:ESHttpGet"
             ],
             "Resource": {
               "Fn::Sub": [
