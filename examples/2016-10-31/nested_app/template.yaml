@@ -23,7 +23,7 @@ Parameters:
     Default: AWS
 
 Resources:
-  TweetLogger:
+  TweetLoggerFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: app.process_tweets
@@ -38,7 +38,7 @@ Resources:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/aws-serverless-twitter-event-source
         SemanticVersion: 1.1.0
       Parameters: # Using default value for PollingFrequencyInMinutes (1)
-        TweetProcessorFunctionName: !Ref TweetLogger
+        TweetProcessorFunctionName: !Ref TweetLoggerFunction
         BatchSize: 20
         DecryptionKeyName: !Ref DecryptionKeyName
         EncryptedAccessToken: !Ref EncryptedAccessToken
@@ -49,8 +49,8 @@ Resources:
       TimeoutInMinutes: 20 
 
 Outputs:
-  TweetProcessorFunctionArn:
-    Value: !GetAtt TweetProcessorFunction.Arn
+  TweetLoggerFunctionArn:
+    Value: !GetAtt TweetLoggerFunction.Arn
   TwitterSearchPollerFunctionArn:
     # Reference an output from the nested stack:
     Value: !GetAtt TwitterEventSourceApp.Outputs.TwitterSearchPollerFunctionArn
