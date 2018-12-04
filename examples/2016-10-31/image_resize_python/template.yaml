@@ -34,6 +34,8 @@ Resources:
     Type: 'AWS::Serverless::LayerVersion'
     Properties:
       ContentUri: ./layer
+      CompatibleRuntimes: # optional
+        - python3.6
 
   SourceBucket:
     Type: AWS::S3::Bucket
