@@ -1,6 +1,6 @@
 # AWS::Serverless::LayerVersion Library Code Example
 
-This example shows you how to download and publish an application that bundles its Function dependencies into an AWS::Serverless::LayerVersion resource.
+This example shows you how to download and publish an application that bundles its Function dependencies into an AWS::Serverless::LayerVersion resource. The function resizes an image that is uploaded to the source bucket and saves the resized image to the destination bucket.
 
 ## Running the example
 
