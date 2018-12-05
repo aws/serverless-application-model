@@ -153,7 +153,7 @@ class SamFunction(SamResourceMacro):
         :returns: a list containing the Lambda function and execution role resources
         :rtype: list
         """
-        lambda_function = LambdaFunction(self.logical_id, depends_on=self.depends_on)
+        lambda_function = LambdaFunction(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         if self.FunctionName:
             lambda_function.FunctionName = self.FunctionName
@@ -186,7 +186,7 @@ class SamFunction(SamResourceMacro):
         :returns: the generated IAM Role
         :rtype: model.iam.IAMRole
         """
-        execution_role = IAMRole(self.logical_id + 'Role')
+        execution_role = IAMRole(self.logical_id + 'Role', attributes=self.get_passthrough_resource_attributes())
         execution_role.AssumeRolePolicyDocument = IAMRolePolicies.lambda_assume_role_policy()
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaBasicExecutionRole')]
@@ -349,11 +349,12 @@ class SamFunction(SamResourceMacro):
         prefix = "{id}Version".format(id=self.logical_id)
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict).gen()
 
-        retain_old_versions = {
-            "DeletionPolicy": "Retain"
-        }
+        attributes = self.get_passthrough_resource_attributes()
+        if attributes is None:
+            attributes = {}
+        attributes["DeletionPolicy"] = "Retain"
 
-        lambda_version = LambdaVersion(logical_id=logical_id, attributes=retain_old_versions)
+        lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr('name')
 
         return lambda_version
@@ -372,7 +373,7 @@ class SamFunction(SamResourceMacro):
             raise ValueError("Alias name is required to create an alias")
 
         logical_id = "{id}Alias{suffix}".format(id=function.logical_id, suffix=name)
-        alias = LambdaAlias(logical_id=logical_id)
+        alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())
         alias.Name = name
         alias.FunctionName = function.get_runtime_attr('name')
         alias.FunctionVersion = version.get_runtime_attr("version")
@@ -498,7 +499,7 @@ class SamSimpleTable(SamResourceMacro):
         return [dynamodb_resources]
 
     def _construct_dynamodb_table(self):
-        dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on)
+        dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         if self.PrimaryKey:
             primary_key = {

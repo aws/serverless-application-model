@@ -2,7 +2,8 @@ import copy
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
-from samtranslator.model.intrinsics import ref, fnSub, make_shorthand
+from samtranslator.model.intrinsics import ref, fnSub, fnGetAtt, make_shorthand, make_conditional
+from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
@@ -43,7 +44,7 @@ class PushEventSource(ResourceMacro):
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        lambda_permission = LambdaPermission(self.logical_id + 'Permission' + suffix)
+        lambda_permission = LambdaPermission(self.logical_id + 'Permission' + suffix, attributes=function.get_passthrough_resource_attributes())
 
         try:
             # Name will not be available for Alias resources
@@ -138,12 +139,13 @@ class CloudWatchEvent(PushEventSource):
         resources = []
 
         events_rule = EventsRule(self.logical_id)
-        resources.append(events_rule)
-
         events_rule.EventPattern = self.Pattern
         events_rule.Targets = [self._construct_target(function)]
-        source_arn = events_rule.get_runtime_attr("arn")
+        if 'Condition' in function.resource_attributes:
+            events_rule = make_conditional(events_rule, function.resource_attributes['Condition'])
+        resources.append(events_rule)
 
+        source_arn = events_rule.get_runtime_attr("arn")
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
@@ -210,7 +212,10 @@ class S3(PushEventSource):
 
         source_account = ref('AWS::AccountId')
         permission = self._construct_permission(function, source_account=source_account)
-        self._depend_on_lambda_permissions(bucket, permission)
+        if 'Condition' in permission.resource_attributes:
+            self._depend_on_lambda_permissions_using_tag(bucket, permission)
+        else:
+            self._depend_on_lambda_permissions(bucket, permission)
         resources.append(permission)
 
         # NOTE: `bucket` here is a dictionary representing the S3 Bucket resource in your SAM template. If there are
@@ -253,6 +258,37 @@ class S3(PushEventSource):
 
         return bucket
 
+    def _depend_on_lambda_permissions_using_tag(self, bucket, permission):
+        """
+        Since conditional DependsOn is not supported this undocumented way of 
+        implicitely  making dependency through tags is used.
+
+        See https://stackoverflow.com/questions/34607476/cloudformation-apply-condition-on-dependson
+
+        It is done by using Fn:GetAtt wrapped in a conditional Fn:If. Using Fn:GetAtt implies a 
+        dependency, so CloudFormation will automatically wait once it reaches that function, the same 
+        as if you were using a DependsOn.
+        """
+        properties = bucket.get('Properties', None)
+        if properties is None:
+            properties = {}
+            bucket['Properties'] = properties
+        tags = properties.get('Tags', None)
+        if tags is None:
+            tags = []
+            properties['Tags'] = tags
+        dep_tag = {
+            'sam:ConditionalDependsOn:' + permission.logical_id: {
+                'Fn:If': [
+                    permission.resource_attributes['Condition'],
+                    fnGetAtt(permission.logical_id, 'Arn'),
+                    'no dependency'
+                ]
+            }
+        }
+        properties['Tags'] = tags + get_tag_list(dep_tag)
+        return bucket
+
     def _inject_notification_configuration(self, function, bucket):
         base_event_mapping = {
             'Function': function.get_runtime_attr("arn")
@@ -270,7 +306,8 @@ class S3(PushEventSource):
 
             lambda_event = copy.deepcopy(base_event_mapping)
             lambda_event['Event'] = event_type
-
+            if 'Condition' in function.resource_attributes:
+                lambda_event = make_conditional(lambda_event, function.resource_attributes['Condition'])
             event_mappings.append(lambda_event)
 
         properties = bucket.get('Properties', None)
@@ -323,6 +360,8 @@ class SNS(PushEventSource):
         subscription.Protocol = 'lambda'
         subscription.Endpoint = function.get_runtime_attr("arn")
         subscription.TopicArn = topic
+        if 'Condition' in function.resource_attributes:
+            subscription = make_conditional(subscription, function.resource_attributes['Condition'])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
@@ -579,5 +618,7 @@ class IoTRule(PushEventSource):
             payload['AwsIotSqlVersion'] = self.AwsIotSqlVersion
 
         rule.TopicRulePayload = payload
+        if 'Condition' in function.resource_attributes:
+            rule = make_conditional(rule, function.resource_attributes['Condition'])
 
         return rule

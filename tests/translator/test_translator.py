@@ -137,6 +137,8 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        's3_with_condition',
+        'function_with_condition',
         'basic_function',
         'basic_application',
         'application_preparing_state',

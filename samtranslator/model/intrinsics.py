@@ -15,6 +15,14 @@ def fnSub(string, variables=None):
         return {'Fn::Sub': [string, variables]}
     return {'Fn::Sub': string}
 
+def make_conditional(condition, data):
+    return {
+        'Fn::If': [
+            condition,
+            data,
+            { 'Ref': 'AWS::NoValue' }
+        ]
+    }
 
 def make_shorthand(intrinsic_dict):
     """
