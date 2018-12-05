@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/awslabs/serverless-application-model.svg?branch=develop)](https://travis-ci.org/awslabs/serverless-application-model)
 [![PyPI version](https://badge.fury.io/py/aws-sam-translator.svg)](https://badge.fury.io/py/aws-sam-translator)
+[![Codecov Test Coverage](https://codecov.io/gh/awslabs/serverless-application-model/branch/master/graphs/badge.svg?style=flat)](https://codecov.io/gh/awslabs/serverless-application-model)
 
 ![Logo](aws_sam_introduction.png)
 
