@@ -568,7 +568,7 @@ class SamApplication(SamResourceMacro):
     def _construct_nested_stack(self):
         """Constructs a AWS::CloudFormation::Stack resource
         """
-        nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on)
+        nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes())
         nested_stack.Parameters = self.Parameters
         nested_stack.NotificationArns = self.NotificationArns
         application_tags = self._get_application_tags()
@@ -633,9 +633,10 @@ class SamLayerVersion(SamResourceMacro):
         """
         retention_policy_value = self._get_retention_policy_value(intrinsics_resolver)
 
-        retention_policy = {
-            'DeletionPolicy': retention_policy_value
-        }
+        retention_policy = self.get_passthrough_resource_attributes()
+        if retention_policy is None:
+            retention_policy = {}
+        retention_policy['DeletionPolicy'] = retention_policy_value
 
         old_logical_id = self.logical_id
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
