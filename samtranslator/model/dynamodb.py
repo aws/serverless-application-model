@@ -10,11 +10,12 @@ class DynamoDBTable(Resource):
             'GlobalSecondaryIndexes': PropertyType(False, list_of(is_type(dict))),
             'KeySchema': PropertyType(False, list_of(is_type(dict))),
             'LocalSecondaryIndexes': PropertyType(False, list_of(is_type(dict))),
-            'ProvisionedThroughput': PropertyType(True, dict_of(is_str(), one_of(is_type(int), is_type(dict)))),
+            'ProvisionedThroughput': PropertyType(False, dict_of(is_str(), one_of(is_type(int), is_type(dict)))),
             'StreamSpecification': PropertyType(False, is_type(dict)),
             'TableName': PropertyType(False, one_of(is_str(), is_type(dict))),
             'Tags': PropertyType(False, list_of(is_type(dict))),
-            'SSESpecification': PropertyType(False, is_type(dict))
+            'SSESpecification': PropertyType(False, is_type(dict)),
+            'BillingMode': PropertyType(False, is_str())
     }
 
     runtime_attrs = {

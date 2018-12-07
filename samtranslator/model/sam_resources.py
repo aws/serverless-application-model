@@ -517,11 +517,9 @@ class SamSimpleTable(SamResourceMacro):
         }]
 
         if self.ProvisionedThroughput:
-            provisioned_throughput = self.ProvisionedThroughput
+            dynamodb_table.ProvisionedThroughput = self.ProvisionedThroughput
         else:
-            provisioned_throughput = {'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
-
-        dynamodb_table.ProvisionedThroughput = provisioned_throughput
+            dynamodb_table.BillingMode = 'PAY_PER_REQUEST'
 
         if self.SSESpecification:
             dynamodb_table.SSESpecification = self.SSESpecification
