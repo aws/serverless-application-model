@@ -566,7 +566,7 @@ class SamApplication(SamResourceMacro):
     def _construct_nested_stack(self):
         """Constructs a AWS::CloudFormation::Stack resource
         """
-        nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on)
+        nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes())
         nested_stack.Parameters = self.Parameters
         nested_stack.NotificationArns = self.NotificationArns
         application_tags = self._get_application_tags()
@@ -631,15 +631,16 @@ class SamLayerVersion(SamResourceMacro):
         """
         retention_policy_value = self._get_retention_policy_value(intrinsics_resolver)
 
-        retention_policy = {
-            'DeletionPolicy': retention_policy_value
-        }
+        attributes = self.get_passthrough_resource_attributes()
+        if attributes is None:
+            attributes = {}
+        attributes['DeletionPolicy'] = retention_policy_value
 
         old_logical_id = self.logical_id
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
         self.logical_id = new_logical_id
 
-        lambda_layer = LambdaLayerVersion(self.logical_id, depends_on=self.depends_on, attributes=retention_policy)
+        lambda_layer = LambdaLayerVersion(self.logical_id, depends_on=self.depends_on, attributes=attributes)
 
         # Changing the LayerName property: when a layer is published, it is given an Arn
         # example: arn:aws:lambda:us-west-2:123456789012:layer:MyLayer:1
