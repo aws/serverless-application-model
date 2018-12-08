@@ -31,6 +31,4 @@ class Parser:
 
         if has_errors:
             # NOTE: eventually we will throw on invalid schema
-            # raise InvalidDocumentException([InvalidTemplateException(validation_errors)])
-            logging.warning(
-                "JSON_VALIDATION_WARNING: {0}".format(validation_errors))
+            raise InvalidDocumentException([InvalidTemplateException(validation_errors)])
