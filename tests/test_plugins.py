@@ -20,7 +20,7 @@ class TestSamPluginsRegistration(TestCase):
 
         self.sam_plugins.register(self.mock_plugin)
 
-        self.assertEquals(self.mock_plugin, self.sam_plugins._get(self.mock_plugin_name))
+        self.assertEqual(self.mock_plugin, self.sam_plugins._get(self.mock_plugin_name))
 
     def test_register_must_raise_on_duplicate_plugin(self):
 
@@ -50,7 +50,7 @@ class TestSamPluginsRegistration(TestCase):
 
         expected = [plugin1, plugin2, plugin3]
 
-        self.assertEquals(expected, self.sam_plugins._plugins)
+        self.assertEqual(expected, self.sam_plugins._plugins)
 
     def test_must_register_plugins_list_on_initialization(self):
 
@@ -62,7 +62,7 @@ class TestSamPluginsRegistration(TestCase):
         new_sam_plugin = SamPlugins(plugins_list)
 
         # Also make sure the plugins are in the same order as in input
-        self.assertEquals(plugins_list, new_sam_plugin._plugins)
+        self.assertEqual(plugins_list, new_sam_plugin._plugins)
 
     def test_must_register_single_plugin_on_initialization(self):
         new_sam_plugin = SamPlugins(self.mock_plugin)
@@ -76,7 +76,7 @@ class TestSamPluginsRegistration(TestCase):
         self.sam_plugins.register(plugin1)
         self.sam_plugins.register(plugin2)
 
-        self.assertEquals(2, len(self.sam_plugins))
+        self.assertEqual(2, len(self.sam_plugins))
 
     def test_is_registered_must_find_registered_plugins(self):
         self.sam_plugins.register(self.mock_plugin)
@@ -101,8 +101,8 @@ class TestSamPluginsRegistration(TestCase):
         self.sam_plugins.register(plugin1)
         self.sam_plugins.register(plugin2)
 
-        self.assertEquals(plugin1, self.sam_plugins._get(plugin1.name))
-        self.assertEquals(plugin2, self.sam_plugins._get(plugin2.name))
+        self.assertEqual(plugin1, self.sam_plugins._get(plugin1.name))
+        self.assertEqual(plugin2, self.sam_plugins._get(plugin2.name))
 
     def test_get_must_handle_no_registered_plugins(self):
 
@@ -282,7 +282,7 @@ class TestBasePlugin(TestCase):
 
         name = "some name"
         plugin = BasePlugin(name)
-        self.assertEquals(name, plugin.name)
+        self.assertEqual(name, plugin.name)
 
     def test_initialization_without_name_must_raise_exception(self):
 
@@ -299,7 +299,7 @@ class TestBasePlugin(TestCase):
         plugin.on_before_transform_resource(data_mock, data_mock, data_mock)
 
         # `method_calls` tracks calls to the mock, its methods, attributes, and *their* methods & attributes
-        self.assertEquals([], data_mock.method_calls)
+        self.assertEqual([], data_mock.method_calls)
 
 
 def _make_mock_plugin(name):
