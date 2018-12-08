@@ -3,6 +3,7 @@ from botocore.exceptions import ClientError, EndpointConnectionError
 import logging
 from time import sleep, time
 
+from samtranslator.intrinsics import resolver
 from samtranslator.model.exceptions import InvalidResourceException, InvalidDocumentException
 from samtranslator.plugins import BasePlugin
 from samtranslator.plugins.exceptions import InvalidPluginException
@@ -101,10 +102,12 @@ class ServerlessAppPlugin(BasePlugin):
 
         :param dict app: the application and its properties
         """
+        location = app.properties.get(self.LOCATION_KEY)
         return (self.LOCATION_KEY in app.properties
-                and isinstance(app.properties[self.LOCATION_KEY], dict)
-                and self.APPLICATION_ID_KEY in app.properties[self.LOCATION_KEY]
-                and self.SEMANTIC_VERSION_KEY in app.properties[self.LOCATION_KEY])
+                and isinstance(location, dict)
+                and list(location.keys())[0] not in resolver.DEFAULT_SUPPORTED_INTRINSICS
+                and self.APPLICATION_ID_KEY in location
+                and self.SEMANTIC_VERSION_KEY in location)
 
 
     def _handle_get_application_request(self, app_id, semver, key, logical_id):
@@ -187,7 +190,8 @@ class ServerlessAppPlugin(BasePlugin):
         self._check_for_dictionary_key(logical_id, resource_properties, [self.LOCATION_KEY])
 
         # If location isn't a dictionary, don't modify the resource.
-        if not isinstance(resource_properties[self.LOCATION_KEY], dict):
+        if (not isinstance(resource_properties[self.LOCATION_KEY], dict)
+                or list(resource_properties[self.LOCATION_KEY].keys())[0] in resolver.DEFAULT_SUPPORTED_INTRINSICS):
             resource_properties[self.TEMPLATE_URL_KEY] = resource_properties[self.LOCATION_KEY]
             return
 

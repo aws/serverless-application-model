@@ -1,5 +1,42 @@
 {
+  "Parameters": {
+    "AppS3Location": {
+      "Default": "s3://sam-bucket/template.yaml",
+      "Type": "String"
+    }
+  },
   "Resources": {
+    "NormalApplication": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "NotificationArns": [
+          "arn:aws:sns:us-east-1:123456789012:sns-arn"
+        ],
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
+        "TimeoutInMinutes": 15,
+        "Parameters": {
+          "IdentityNameParameter": "IdentityName"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          },
+          {
+            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world",
+            "Key": "serverlessrepo:applicationId"
+          },
+          {
+            "Value": "1.0.2",
+            "Key": "serverlessrepo:semanticVersion"
+          },
+          {
+            "Value": "TagValue",
+            "Key": "TagName"
+          }
+        ]
+      }
+    },
     "BasicApplication": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
@@ -20,39 +57,6 @@
         ]
       }
     },
-    "NormalApplication": {
-      "Type": "AWS::CloudFormation::Stack",
-      "Properties": {
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          },
-          {
-            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world",
-            "Key": "serverlessrepo:applicationId"
-          },
-          {
-            "Value": "1.0.2",
-            "Key": "serverlessrepo:semanticVersion"
-          },
-          {
-            "Value": "TagValue",
-            "Key": "TagName"
-          }
-        ],
-        "Parameters":
-        {
-          "IdentityNameParameter": "IdentityName"
-        },
-        "NotificationArns":
-        [
-          "arn:aws:sns:us-east-1:123456789012:sns-arn"
-        ],
-        "TimeoutInMinutes": 15
-      }
-    },
     "ApplicationWithLocationUrl": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
@@ -65,6 +69,20 @@
           {
             "Value": "TagValue2",
             "Key": "TagName2"
+          }
+        ]
+      }
+    },
+    "ApplicationWithLocationParameter": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Ref": "AppS3Location"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
           }
         ]
       }
@@ -92,3 +110,4 @@
     }
   }
 }
+

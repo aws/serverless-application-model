@@ -1,3 +1,8 @@
+Parameters:
+  AppS3Location:
+    Type: String
+    Default: s3://sam-bucket/template.yaml
+
 Resources:
   BasicApplication:
     Type: 'AWS::Serverless::Application'
@@ -33,4 +38,9 @@ Resources:
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
-        SemanticVersion: 1.0.2        
+        SemanticVersion: 1.0.2
+
+  ApplicationWithLocationParameter:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location: !Ref AppS3Location
