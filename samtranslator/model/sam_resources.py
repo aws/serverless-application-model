@@ -635,8 +635,6 @@ class SamLayerVersion(SamResourceMacro):
         self.Description = self._resolve_string_parameter(intrinsics_resolver, self.Description, 'Description')
         self.RetentionPolicy = self._resolve_string_parameter(intrinsics_resolver, self.RetentionPolicy, 'RetentionPolicy')
 
-        # Would it make sense to resolve ContentUri and CompatibleRuntimes as well?
-
         retention_policy_value = self._get_retention_policy_value()
 
         attributes = self.get_passthrough_resource_attributes()
