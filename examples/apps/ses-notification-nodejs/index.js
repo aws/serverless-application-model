@@ -16,7 +16,7 @@ exports.handler = (event, context, callback) => {
             handleDelivery(message);
             break;
         default:
-            callback(`Unknown notification type: ${message.notificationType}`);
+            callback(`Unknown notification type: ${message.eventType}`);
     }
 };
 
