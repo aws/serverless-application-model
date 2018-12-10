@@ -16,6 +16,7 @@ class S3Bucket(Resource):
             'LoggingConfiguration': PropertyType(False, any_type()),
             'MetricsConfigurations': PropertyType(False, any_type()),
             'NotificationConfiguration': PropertyType(False, is_type(dict)),
+            'PublicAccessBlockConfiguration': PropertyType(False, is_type(dict)),
             'ReplicationConfiguration': PropertyType(False, any_type()),
             'Tags': PropertyType(False, is_type(list)),
             'VersioningConfiguration': PropertyType(False, any_type()),

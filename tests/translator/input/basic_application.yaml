@@ -1,0 +1,36 @@
+Resources:
+  BasicApplication:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
+        SemanticVersion: 1.0.2
+
+  NormalApplication:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
+        SemanticVersion: 1.0.2
+      Tags:
+        TagName: TagValue
+      Parameters:
+        IdentityNameParameter: IdentityName
+      NotificationArns:
+        - arn:aws:sns:us-east-1:123456789012:sns-arn
+      TimeoutInMinutes: 15
+
+  ApplicationWithLocationUrl:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location: https://s3-us-east-1.amazonaws.com/demo-bucket/template.yaml
+      Tags:
+        TagName2: TagValue2
+
+  ApplicationWithCondition:
+    Type: 'AWS::Serverless::Application'
+    Condition: "this is a test"    
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
+        SemanticVersion: 1.0.2        

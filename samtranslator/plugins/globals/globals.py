@@ -28,6 +28,7 @@ class Globals(object):
             "Tracing",
             "KmsKeyArn",
             "AutoPublishAlias",
+            "Layers",
             "DeploymentPreference"
         ],
 
@@ -45,7 +46,10 @@ class Globals(object):
             "EndpointConfiguration",
             "MethodSettings",
             "BinaryMediaTypes",
-            "Cors"
+            "Cors",
+            "AccessLogSetting",
+            "CanarySetting",
+            "TracingEnabled"
         ],
 
         SamResourceType.SimpleTable.value: [

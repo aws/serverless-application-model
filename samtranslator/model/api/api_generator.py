@@ -13,9 +13,9 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator.arn_generator import ArnGenerator
 
 _CORS_WILDCARD = "'*'"
-CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge"])
-# Default the Cors Properties to '*' wildcard. Other properties are actually Optional
-CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None)
+CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge", "AllowCredentials"])
+# Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
+CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
 AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
 AuthProperties.__new__.__defaults__ = (None, None)
@@ -23,7 +23,7 @@ AuthProperties.__new__.__defaults__ = (None, None)
 
 class ApiGenerator(object):
 
-    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, cors=None, auth=None):
+    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, cors=None, auth=None, access_log_setting=None, canary_setting=None, tracing_enabled=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -35,6 +35,9 @@ class ApiGenerator(object):
         :param definition_uri: URI to API definition
         :param name: Name of the API Gateway resource
         :param stage_name: Name of the Stage
+        :param access_log_setting: Whether to send access logs and where for Stage
+        :param canary_setting: Canary Setting for Stage
+        :param tracing_enabled: Whether active tracing with X-ray is enabled
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
@@ -50,6 +53,9 @@ class ApiGenerator(object):
         self.binary_media = binary_media
         self.cors = cors
         self.auth = auth
+        self.access_log_setting = access_log_setting
+        self.canary_setting = canary_setting
+        self.tracing_enabled = tracing_enabled
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -148,6 +154,9 @@ class ApiGenerator(object):
         stage.CacheClusterSize = self.cache_cluster_size
         stage.Variables = self.variables
         stage.MethodSettings = self.method_settings
+        stage.AccessLogSetting = self.access_log_setting
+        stage.CanarySetting = self.canary_setting
+        stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
             deployment.make_auto_deployable(stage, swagger)
@@ -208,10 +217,15 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id, "Unable to add Cors configuration because "
                                                             "'DefinitionBody' does not contain a valid Swagger")
 
+        if properties.AllowCredentials is True and properties.AllowOrigin == _CORS_WILDCARD:
+            raise InvalidResourceException(self.logical_id, "Unable to add Cors configuration because "
+                                                            "'AllowCredentials' can not be true when "
+                                                            "'AllowOrigin' is \"'*'\" or not set")
+
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
             editor.add_cors(path,  properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
-                            max_age=properties.MaxAge)
+                            max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger

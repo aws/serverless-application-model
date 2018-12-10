@@ -16,6 +16,7 @@ class SwaggerEditor(object):
     _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
 
+
     def __init__(self, doc):
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
@@ -118,7 +119,8 @@ class SwaggerEditor(object):
         for path, value in self.paths.items():
             yield path
 
-    def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None):
+    def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None,
+                 allow_credentials=None):
         """
         Add CORS configuration to this path. Specifically, we will add a OPTIONS response config to the Swagger that
         will return headers required for CORS. Since SAM uses aws_proxy integration, we cannot inject the headers
@@ -139,6 +141,7 @@ class SwaggerEditor(object):
             Value can also be an intrinsic function dict.
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
+        :param bool/None allow_credentials: Flags whether request is allowed to contain credentials.
         :raises ValueError: When values for one of the allowed_* variables is empty
         """
 
@@ -156,15 +159,19 @@ class SwaggerEditor(object):
             # APIGW expects the value to be a "string expression". Hence wrap in another quote. Ex: "'GET,POST,DELETE'"
             allowed_methods = "'{}'".format(allowed_methods)
 
+        if allow_credentials is not True:
+            allow_credentials = False
+
         # Add the Options method and the CORS response
         self.add_path(path, self._OPTIONS_METHOD)
         self.paths[path][self._OPTIONS_METHOD] = self._options_method_response_for_cors(allowed_origins,
                                                                                         allowed_headers,
                                                                                         allowed_methods,
-                                                                                        max_age)
+                                                                                        max_age,
+                                                                                        allow_credentials)
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
-                                          max_age=None):
+                                          max_age=None, allow_credentials=None):
         """
         Returns a Swagger snippet containing configuration for OPTIONS HTTP Method to configure CORS.
 
@@ -179,6 +186,7 @@ class SwaggerEditor(object):
             Value can also be an intrinsic function dict.
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
+        :param bool allow_credentials: Flags whether request is allowed to contain credentials.
 
         :return dict: Dictionary containing Options method configuration for CORS
         """
@@ -187,6 +195,7 @@ class SwaggerEditor(object):
         ALLOW_HEADERS = "Access-Control-Allow-Headers"
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
+        ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
         HEADER_RESPONSE = lambda x: "method.response.header."+x
 
         response_parameters = {
@@ -217,6 +226,11 @@ class SwaggerEditor(object):
             # MaxAge can be set to 0, which is a valid value. So explicitly check against None
             response_parameters[HEADER_RESPONSE(MAX_AGE)] = max_age
             response_headers[MAX_AGE] = {"type": "integer"}
+        if allow_credentials is True:
+            # Allow-Credentials only has a valid value of true, it should be omitted otherwise.
+            # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+            response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = "'true'"
+            response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
 
         return {
             "summary": "CORS support",

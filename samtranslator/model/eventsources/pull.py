@@ -19,7 +19,8 @@ class PullEventSource(ResourceMacro):
         'Stream': PropertyType(False, is_str()),
         'Queue': PropertyType(False, is_str()),
         'BatchSize': PropertyType(False, is_type(int)),
-        'StartingPosition': PropertyType(False, is_str())
+        'StartingPosition': PropertyType(False, is_str()),
+        'Enabled': PropertyType(False, is_type(bool))
     }
 
     def get_policy_arn(self):
@@ -61,6 +62,7 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition
         lambda_eventsourcemapping.BatchSize = self.BatchSize
+        lambda_eventsourcemapping.Enabled = self.Enabled
 
         if 'role' in kwargs:
             self._link_policy(kwargs['role'])

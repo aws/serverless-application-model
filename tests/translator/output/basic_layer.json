@@ -1,0 +1,56 @@
+{
+  "Resources": {
+    "MinimalLayer0c7f96cce7": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "LayerName": "MinimalLayer",
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        }
+      }
+    },
+    "CompleteLayer5d71a60e81": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "MyAwesomeLayer",
+        "Description": "Starter Lambda Layer",
+        "CompatibleRuntimes": [
+          "python3.6",
+          "python2.7"
+        ],
+        "LicenseInfo": "License information"
+      }
+    },
+    "LayerWithContentUriObjectac002ba767": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "LayerName": "LayerWithContentUriObject",
+        "Content": {
+          "S3Bucket": "somebucket",
+          "S3Key": "somekey",
+          "S3ObjectVersion": 1
+        }
+      }
+    },
+    "LayerWithCondition93cfa80b64": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithCondition"
+      },
+      "Condition": "this is a test"
+    }
+  }
+}

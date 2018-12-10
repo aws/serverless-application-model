@@ -1,0 +1,20 @@
+Parameters:
+  LayerLicenseInfo:
+    Type: String
+    Default: MIT-0 License
+  LayerRuntimeList:
+    Type: CommaDelimitedList
+
+Resources:
+  LayerWithLicenseIntrinsic:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      LicenseInfo: !Ref LayerLicenseInfo
+
+  LayerWithRuntimesIntrinsic:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      CompatibleRuntimes:
+        Ref: LayerRuntimeList

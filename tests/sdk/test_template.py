@@ -1,4 +1,5 @@
 from unittest import TestCase
+from six import assertCountEqual
 
 from samtranslator.sdk.template import SamTemplate
 from samtranslator.sdk.resource import SamResource
@@ -26,6 +27,9 @@ class TestSamTemplate(TestCase):
              "Api": {
                 "Type": "AWS::Serverless::Api"
              },
+             "Layer": {
+                 "Type": "AWS::Serverless::LayerVersion"
+             },
              "NonSam": {
                 "Type": "AWS::Lambda::Function"
              }
@@ -39,10 +43,11 @@ class TestSamTemplate(TestCase):
             ("Function1", {"Type": "AWS::Serverless::Function", "DependsOn": "SomeOtherResource", "Properties": {}}),
             ("Function2", {"Type": "AWS::Serverless::Function", "a": "b", "Properties": {}}),
             ("Api", {"Type": "AWS::Serverless::Api", "Properties": {}}),
+            ("Layer", {"Type": "AWS::Serverless::LayerVersion", "Properties": {}}),
         ]
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate()]
-        self.assertEquals(expected, actual)
+        assertCountEqual(self, expected, actual)
 
     def test_iterate_must_filter_by_resource_type(self):
 
@@ -52,6 +57,17 @@ class TestSamTemplate(TestCase):
         expected = [
             ("Function1", {"Type": "AWS::Serverless::Function", "DependsOn": "SomeOtherResource", "Properties": {}}),
             ("Function2", {"Type": "AWS::Serverless::Function", "a": "b", "Properties": {}}),
+        ]
+
+        actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
+        self.assertEquals(expected, actual)
+
+    def test_iterate_must_filter_by_layers_resource_type(self):
+        template = SamTemplate(self.template_dict)
+
+        type = "AWS::Serverless::LayerVersion"
+        expected = [
+            ("Layer", {"Type": "AWS::Serverless::LayerVersion", "Properties": {}}),
         ]
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]

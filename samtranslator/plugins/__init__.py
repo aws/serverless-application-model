@@ -17,7 +17,7 @@ class SamPlugins(object):
 
     **Template Level**
     - before_transform_template
-    - [Coming Soon] after_transform_template
+    - after_transform_template
 
     When a life cycle event happens in the translator, this class will invoke the corresponding "hook" method on the
     each of the registered plugins to process. Plugins are free to modify internal state of the template or resources
@@ -145,6 +145,7 @@ class LifeCycleEvents(Enum):
     """
     before_transform_template = "before_transform_template"
     before_transform_resource = "before_transform_resource"
+    after_transform_template = "after_transform_template"
 
 
 class BasePlugin(object):
@@ -203,5 +204,22 @@ class BasePlugin(object):
         :param dict template: Entire SAM template as a dictionary.
         :return: nothing
         :raises InvalidDocumentException: If the hook decides that the SAM template is invalid.
+        """
+        pass
+
+    def on_after_transform_template(self, template):
+        """
+        Hook method to execute on "after_transform_template" life cycle event. Plugins may further modify
+        the template. Warning: any changes made in this lifecycle action by a plugin will not be
+        validated and may cause the template to fail deployment with hard-to-understand error messages 
+        for customers.
+
+        This method is called after the template passes all other template transform actions, right before
+        the resources are resolved to their final logical ID names.
+
+        :param dict template: Entire SAM template as a dictionary.
+        :return: nothing
+        :raises InvalidDocumentException: If the hook decides that the SAM template is invalid.
+        :raises InvalidResourceException: If the hook decides that a SAM resource is invalid.
         """
         pass
