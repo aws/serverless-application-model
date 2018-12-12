@@ -1,4 +1,6 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
+from six import string_types
+
 import re
 import inspect
 from samtranslator.model.exceptions import InvalidResourceException
@@ -423,6 +425,16 @@ class SamResourceMacro(ResourceMacro):
             raise InvalidResourceException(self.logical_id, reserved_tag_name + " is a reserved Tag key name and "
                                                                                 "cannot be set on your resource. "
                                                                                 "Please change the tag key in the input.")
+
+    def _resolve_string_parameter(self, intrinsics_resolver, parameter_value, parameter_name):
+        if not parameter_value:
+            return parameter_value
+        value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
+        if not isinstance(value, string_types):
+            raise InvalidResourceException(self.logical_id,
+                                           "Could not resolve parameter for '{}' or parameter is not a String."
+                                           .format(parameter_name))
+        return value
 
 
 class ResourceTypeResolver(object):

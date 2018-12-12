@@ -629,7 +629,13 @@ class SamLayerVersion(SamResourceMacro):
         :returns: a list containing the Lambda function and execution role resources
         :rtype: list
         """
-        retention_policy_value = self._get_retention_policy_value(intrinsics_resolver)
+        # Resolve intrinsics if applicable:
+        self.LayerName = self._resolve_string_parameter(intrinsics_resolver, self.LayerName, 'LayerName')
+        self.LicenseInfo = self._resolve_string_parameter(intrinsics_resolver, self.LicenseInfo, 'LicenseInfo')
+        self.Description = self._resolve_string_parameter(intrinsics_resolver, self.Description, 'Description')
+        self.RetentionPolicy = self._resolve_string_parameter(intrinsics_resolver, self.RetentionPolicy, 'RetentionPolicy')
+
+        retention_policy_value = self._get_retention_policy_value()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
@@ -662,19 +668,12 @@ class SamLayerVersion(SamResourceMacro):
 
         return lambda_layer
 
-    def _get_retention_policy_value(self, intrinsics_resolver):
+    def _get_retention_policy_value(self):
         """
         Sets the deletion policy on this resource. The default is 'Retain'.
 
         :return: value for the DeletionPolicy attribute.
         """
-        if isinstance(self.RetentionPolicy, dict):
-            self.RetentionPolicy = intrinsics_resolver.resolve_parameter_refs(self.RetentionPolicy)
-            # If it's still not a string, throw an exception
-            if not isinstance(self.RetentionPolicy, string_types):
-                raise InvalidResourceException(self.logical_id,
-                                               "Could not resolve parameter for '{}' or parameter is not a String."
-                                               .format('RetentionPolicy'))
 
         if self.RetentionPolicy is None or self.RetentionPolicy.lower() == self.RETAIN.lower():
             return self.RETAIN
@@ -684,3 +683,5 @@ class SamLayerVersion(SamResourceMacro):
             raise InvalidResourceException(self.logical_id,
                                            "'{}' must be one of the following options: {}."
                                            .format('RetentionPolicy', [self.RETAIN, self.DELETE]))
+
+
