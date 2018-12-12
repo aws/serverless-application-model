@@ -9,7 +9,7 @@ class TestResourceTagging(TestCase):
         tag_list = get_tag_list(None)
         expected_tag_list = []
 
-        self.assertEquals(tag_list, expected_tag_list)
+        self.assertEqual(tag_list, expected_tag_list)
 
 
     def test_get_tag_list_with_tag_dictionary_with_key_only(self):
@@ -17,11 +17,11 @@ class TestResourceTagging(TestCase):
         expected_tag_list = [{"Key": "key",
                               "Value": ""}]
 
-        self.assertEquals(tag_list, expected_tag_list)
+        self.assertEqual(tag_list, expected_tag_list)
 
     def test_get_tag_list_with_tag_dictionary(self):
         tag_list = get_tag_list({"AnotherKey": "This time with a value"})
         expected_tag_list = [{"Key": "AnotherKey",
                               "Value": "This time with a value"}]
 
-        self.assertEquals(tag_list, expected_tag_list)
+        self.assertEqual(tag_list, expected_tag_list)

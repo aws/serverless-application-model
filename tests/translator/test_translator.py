@@ -635,7 +635,7 @@ class TestParameterValuesHandling(TestCase):
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(sam_template,
             parameter_values)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_add_default_parameter_values_must_override_user_specified_values(self):
         parameter_values = {
@@ -659,7 +659,7 @@ class TestParameterValuesHandling(TestCase):
         sam_parser = Parser()
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_add_default_parameter_values_must_skip_params_without_defaults(self):
         parameter_values = {
@@ -684,7 +684,7 @@ class TestParameterValuesHandling(TestCase):
         sam_parser = Parser()
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
 
     @parameterized.expand([
@@ -717,7 +717,7 @@ class TestParameterValuesHandling(TestCase):
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(
             sam_template, parameter_values)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
 
 class TestTemplateValidation(TestCase):
@@ -768,7 +768,7 @@ class TestPluginsUsage(TestCase):
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
 
         sam_plugins = prepare_plugins([])
-        self.assertEquals(5, len(sam_plugins))
+        self.assertEqual(5, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
@@ -779,13 +779,13 @@ class TestPluginsUsage(TestCase):
 
         custom_plugin = BasePlugin("someplugin")
         sam_plugins = prepare_plugins([custom_plugin])
-        self.assertEquals(6, len(sam_plugins))
+        self.assertEqual(6, len(sam_plugins))
 
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_prepare_plugins_must_handle_empty_input(self):
 
         sam_plugins = prepare_plugins(None)
-        self.assertEquals(5, len(sam_plugins))
+        self.assertEqual(5, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.PolicyTemplatesProcessor")
     @patch("samtranslator.translator.translator.PolicyTemplatesForFunctionPlugin")
@@ -806,7 +806,7 @@ class TestPluginsUsage(TestCase):
 
         result = make_policy_template_for_function_plugin()
 
-        self.assertEquals(plugin_instance, result)
+        self.assertEqual(plugin_instance, result)
 
         policy_templates_processor_mock.get_default_policy_templates_json.assert_called_once_with()
         policy_templates_processor_mock.assert_called_once_with(default_templates)

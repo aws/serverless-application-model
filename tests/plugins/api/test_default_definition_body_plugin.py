@@ -16,7 +16,7 @@ class TestDefaultDefinitionBodyPlugin_init(TestCase):
         # Name is the class name
         expected_name = "DefaultDefinitionBodyPlugin"
 
-        self.assertEquals(self.plugin.name, expected_name)
+        self.assertEqual(self.plugin.name, expected_name)
 
     def test_plugin_must_be_instance_of_base_plugin_class(self):
         self.assertTrue(isinstance(self.plugin, BasePlugin))

@@ -136,8 +136,8 @@ class TestApiGatewayDeploymentResource(TestCase):
         deployment = ApiGatewayDeployment(logical_id=prefix)
         deployment.make_auto_deployable(stage, swagger=swagger)
 
-        self.assertEquals(deployment.logical_id, id_val)
-        self.assertEquals(deployment.Description, "RestApi deployment id: {}".format(full_hash))
+        self.assertEqual(deployment.logical_id, id_val)
+        self.assertEqual(deployment.Description, "RestApi deployment id: {}".format(full_hash))
 
         LogicalIdGeneratorMock.assert_called_once_with(prefix, str(swagger))
         generator_mock.gen.assert_called_once_with()
@@ -151,8 +151,8 @@ class TestApiGatewayDeploymentResource(TestCase):
         deployment = ApiGatewayDeployment(logical_id=prefix)
         deployment.make_auto_deployable(stage, swagger=None)
 
-        self.assertEquals(deployment.logical_id, prefix)
-        self.assertEquals(deployment.Description, None)
+        self.assertEqual(deployment.logical_id, prefix)
+        self.assertEqual(deployment.Description, None)
 
         LogicalIdGeneratorMock.assert_not_called()
         stage.update_deployment_ref.assert_not_called()
