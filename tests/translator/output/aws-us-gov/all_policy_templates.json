@@ -1119,7 +1119,7 @@
             }
           },
           {
-            "PolicyName": "KitchenSinkFunctionRolePolicy47",
+            "PolicyName": "KitchenSinkFunctionRolePolicy45",
             "PolicyDocument": {
               "Statement": [
                 {
