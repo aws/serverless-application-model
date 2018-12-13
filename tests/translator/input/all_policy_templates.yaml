@@ -70,9 +70,6 @@ Resources:
 
         - SESCrudPolicy:
             IdentityName: name
-        
-        - SESBulkTemplatedCrudPolicy:
-            IdentityName: name
 
         - SNSCrudPolicy:
             TopicName: name
@@ -135,3 +132,6 @@ Resources:
         
         - DynamoDBReconfigurePolicy:
             TableName: name
+
+        - SESBulkTemplatedCrudPolicy:
+            IdentityName: name
