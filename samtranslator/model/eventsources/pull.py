@@ -9,8 +9,9 @@ from samtranslator.model.exceptions import InvalidEventException
 class PullEventSource(ResourceMacro):
     """Base class for pull event sources for SAM Functions.
 
-    The pull events are Kinesis Streams, DynamoDB Streams, and SQS Queues. All of these correspond to an EventSourceMapping in
-    Lambda, and require that the execution role be given to Kinesis Streams, DynamoDB Streams, or SQS Queues, respectively.
+    The pull events are Kinesis Streams, DynamoDB Streams, and SQS Queues. All of these correspond to an
+    EventSourceMapping in Lambda, and require that the execution role be given to Kinesis Streams, DynamoDB
+    Streams, or SQS Queues, respectively.
 
     :cvar str policy_arn: The ARN of the AWS managed role policy corresponding to this pull event source
     """
@@ -53,7 +54,7 @@ class PullEventSource(ResourceMacro):
         if not self.Stream and not self.Queue:
             raise InvalidEventException(
                 self.relative_id, "No Queue (for SQS) or Stream (for Kinesis or DynamoDB) provided.")
-        
+
         if self.Stream and not self.StartingPosition:
             raise InvalidEventException(
                 self.relative_id, "StartingPosition is required for Kinesis and DynamoDB.")

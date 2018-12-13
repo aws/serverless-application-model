@@ -114,6 +114,7 @@ def is_str():
     """
     return is_type(string_types)
 
+
 def any_type():
     def validate(value, should_raise=False):
         return True

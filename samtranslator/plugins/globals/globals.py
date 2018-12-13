@@ -62,7 +62,8 @@ class Globals(object):
 
         :param dict template: SAM template to be parsed
         """
-        self.supported_resource_section_names = [x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties.keys()]
+        self.supported_resource_section_names = ([x.replace(self._RESOURCE_PREFIX, "")
+                                                 for x in self.supported_properties.keys()])
         # Sort the names for stability in list ordering
         self.supported_resource_section_names.sort()
 
@@ -113,17 +114,18 @@ class Globals(object):
         globals = {}
 
         if not isinstance(globals_dict, dict):
-            raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary".format(self._KEYWORD))
+            raise InvalidGlobalsSectionException(self._KEYWORD,
+                                                 "It must be a non-empty dictionary".format(self._KEYWORD))
 
         for section_name, properties in globals_dict.items():
             resource_type = self._make_resource_type(section_name)
 
             if resource_type not in self.supported_properties:
                 raise InvalidGlobalsSectionException(self._KEYWORD,
-                                               "'{section}' is not supported. "
-                                               "Must be one of the following values - {supported}"
-                                               .format(section=section_name,
-                                                       supported=self.supported_resource_section_names))
+                                                     "'{section}' is not supported. "
+                                                     "Must be one of the following values - {supported}"
+                                                     .format(section=section_name,
+                                                             supported=self.supported_resource_section_names))
 
             if not isinstance(properties, dict):
                 raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")
@@ -132,9 +134,9 @@ class Globals(object):
                 supported = self.supported_properties[resource_type]
                 if key not in supported:
                     raise InvalidGlobalsSectionException(self._KEYWORD,
-                                                   "'{key}' is not a supported property of '{section}'. "
-                                                   "Must be one of the following values - {supported}"
-                                                   .format(key=key, section=section_name, supported=supported))
+                                                         "'{key}' is not a supported property of '{section}'. "
+                                                         "Must be one of the following values - {supported}"
+                                                         .format(key=key, section=section_name, supported=supported))
 
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type
             globals[resource_type] = GlobalProperties(properties)
