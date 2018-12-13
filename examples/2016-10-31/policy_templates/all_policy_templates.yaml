@@ -71,9 +71,6 @@ Resources:
         - SESCrudPolicy:
             IdentityName: name
 
-        - SESBulkTemplatedCrudPolicy:
-            IdentityName: name
-
         - SNSCrudPolicy:
             TopicName: name
 
@@ -83,4 +80,5 @@ Resources:
         - KMSDecryptPolicy:
             KeyId: keyId
 
-
+        - SESBulkTemplatedCrudPolicy:
+            IdentityName: name
