@@ -3,6 +3,11 @@ Globals:
     Name: "some api"
     CacheClusterEnabled: True
     CacheClusterSize: "1.6"
+    Auth:
+      DefaultAuthorizer: MyCognitoAuth
+      Authorizers:
+        MyCognitoAuth:
+          UserPoolArn: !GetAtt MyUserPool.Arn      
     Variables:
       SomeVar: Value
 

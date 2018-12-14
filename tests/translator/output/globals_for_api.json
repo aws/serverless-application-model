@@ -113,6 +113,19 @@
         "CacheClusterEnabled": true, 
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment62b96c1a61"
+        },
+        "Auth": {
+          "DefaultAuthorizer": "MyCognitoAuth",
+          "Authorizers": {
+            "MyCognitoAuth": {
+              "UserPoolArn": {
+                "Fn::GetAtt": [
+                  "MyUserPool",
+                  "Arn"
+                ]
+              }
+            }
+          }
         }
       }
     }, 
@@ -179,6 +192,19 @@
         "CacheClusterEnabled": true, 
         "DeploymentId": {
           "Ref": "ExplicitApiDeployment359f256a3b"
+        },
+        "Auth": {
+          "DefaultAuthorizer": "MyCognitoAuth",
+          "Authorizers": {
+            "MyCognitoAuth": {
+              "UserPoolArn": {
+                "Fn::GetAtt": [
+                  "MyUserPool",
+                  "Arn"
+                ]
+              }
+            }
+          }
         }
       }
     }
