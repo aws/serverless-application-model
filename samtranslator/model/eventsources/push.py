@@ -9,11 +9,11 @@ from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
-from samtranslator.model.log import SubscriptionFilter
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.swagger.swagger import SwaggerEditor
+
 
 class PushEventSource(ResourceMacro):
     """Base class for push event sources for SAM Functions.
@@ -44,7 +44,8 @@ class PushEventSource(ResourceMacro):
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        lambda_permission = LambdaPermission(self.logical_id + 'Permission' + suffix, attributes=function.get_passthrough_resource_attributes())
+        lambda_permission = LambdaPermission(self.logical_id + 'Permission' + suffix,
+                                             attributes=function.get_passthrough_resource_attributes())
 
         try:
             # Name will not be available for Alias resources
@@ -105,7 +106,7 @@ class Schedule(PushEventSource):
         """
         target = {
                 'Arn': function.get_runtime_attr("arn"),
-                'Id':  self.logical_id + 'LambdaTarget'
+                'Id': self.logical_id + 'LambdaTarget'
         }
         if self.Input is not None:
             target['Input'] = self.Input
@@ -158,7 +159,7 @@ class CloudWatchEvent(PushEventSource):
         """
         target = {
                 'Arn': function.get_runtime_attr("arn"),
-                'Id':  self.logical_id + 'LambdaTarget'
+                'Id': self.logical_id + 'LambdaTarget'
         }
         if self.Input is not None:
             target['Input'] = self.Input
@@ -166,6 +167,7 @@ class CloudWatchEvent(PushEventSource):
         if self.InputPath is not None:
             target['InputPath'] = self.InputPath
         return target
+
 
 class S3(PushEventSource):
     """S3 bucket event source for SAM Functions."""
@@ -250,7 +252,7 @@ class S3(PushEventSource):
 
         # DependsOn can be either a list of strings or a scalar string
         if isinstance(depends_on, string_types):
-            depends_on = [ depends_on ]
+            depends_on = [depends_on]
 
         depends_on_set = set(depends_on)
         depends_on_set.add(permission.logical_id)
@@ -260,13 +262,13 @@ class S3(PushEventSource):
 
     def _depend_on_lambda_permissions_using_tag(self, bucket, permission):
         """
-        Since conditional DependsOn is not supported this undocumented way of 
+        Since conditional DependsOn is not supported this undocumented way of
         implicitely  making dependency through tags is used.
 
         See https://stackoverflow.com/questions/34607476/cloudformation-apply-condition-on-dependson
 
-        It is done by using Fn:GetAtt wrapped in a conditional Fn:If. Using Fn:GetAtt implies a 
-        dependency, so CloudFormation will automatically wait once it reaches that function, the same 
+        It is done by using Fn:GetAtt wrapped in a conditional Fn:If. Using Fn:GetAtt implies a
+        dependency, so CloudFormation will automatically wait once it reaches that function, the same
         as if you were using a DependsOn.
         """
         properties = bucket.get('Properties', None)
@@ -502,8 +504,8 @@ class Api(PushEventSource):
 
         function_arn = function.get_runtime_attr('arn')
         partition = ArnGenerator.get_partition_name()
-        uri = fnSub('arn:'+partition+':apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/'
-                    + make_shorthand(function_arn) + '/invocations')
+        uri = fnSub('arn:' + partition + ':apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/' +
+                    make_shorthand(function_arn) + '/invocations')
 
         editor = SwaggerEditor(swagger_body)
 
