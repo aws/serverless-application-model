@@ -93,8 +93,27 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
-          "this": "is", 
-          "a": "swagger"
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                },
+                "responses": {}
+              }
+            }
+          },
+          "swagger": "2.0"
         }, 
         "EndpointConfiguration": {
           "Types": [

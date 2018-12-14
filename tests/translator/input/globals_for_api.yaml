@@ -7,7 +7,7 @@ Globals:
       DefaultAuthorizer: MyCognitoAuth
       Authorizers:
         MyCognitoAuth:
-          UserPoolArn: !GetAtt MyUserPool.Arn      
+          UserPoolArn: !GetAtt MyUserPool.Arn
     Variables:
       SomeVar: Value
 
