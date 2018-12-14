@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class SamResource(object):
     """
     Class representing a SAM resource. It is designed to make minimal assumptions about the resource structure.
@@ -49,6 +50,8 @@ class SamResourceType(Enum):
     Api = "AWS::Serverless::Api"
     Function = "AWS::Serverless::Function"
     SimpleTable = "AWS::Serverless::SimpleTable"
+    Application = "AWS::Serverless::Application"
+    LambdaLayerVersion = "AWS::Serverless::LayerVersion"
 
     @classmethod
     def has_value(cls, value):

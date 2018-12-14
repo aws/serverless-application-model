@@ -20,6 +20,7 @@ class LambdaFunction(Resource):
             'Tags': PropertyType(False, list_of(is_type(dict))),
             'TracingConfig': PropertyType(False, is_type(dict)),
             'KmsKeyArn': PropertyType(False, one_of(is_type(dict), is_str())),
+            'Layers': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
             'ReservedConcurrentExecutions': PropertyType(False, any_type())
     }
 
@@ -27,6 +28,7 @@ class LambdaFunction(Resource):
         "name": lambda self: ref(self.logical_id),
         "arn": lambda self: fnGetAtt(self.logical_id, "Arn")
     }
+
 
 class LambdaVersion(Resource):
     resource_type = 'AWS::Lambda::Version'
@@ -41,6 +43,7 @@ class LambdaVersion(Resource):
         "version": lambda self: fnGetAtt(self.logical_id, "Version")
     }
 
+
 class LambdaAlias(Resource):
     resource_type = 'AWS::Lambda::Alias'
     property_types = {
@@ -53,6 +56,7 @@ class LambdaAlias(Resource):
     runtime_attrs = {
         "arn": lambda self: ref(self.logical_id)
     }
+
 
 class LambdaEventSourceMapping(Resource):
     resource_type = 'AWS::Lambda::EventSourceMapping'
@@ -68,6 +72,7 @@ class LambdaEventSourceMapping(Resource):
         "name": lambda self: ref(self.logical_id)
     }
 
+
 class LambdaPermission(Resource):
     resource_type = 'AWS::Lambda::Permission'
     property_types = {
@@ -77,4 +82,23 @@ class LambdaPermission(Resource):
             'SourceAccount': PropertyType(False, is_str()),
             'SourceArn': PropertyType(False, is_str()),
             'EventSourceToken': PropertyType(False, is_str())
+    }
+
+
+class LambdaLayerVersion(Resource):
+    """ Lambda layer version resource
+    """
+
+    resource_type = 'AWS::Lambda::LayerVersion'
+    property_types = {
+            'Content': PropertyType(True, is_type(dict)),
+            'Description': PropertyType(False, is_str()),
+            'LayerName': PropertyType(False, is_str()),
+            'CompatibleRuntimes': PropertyType(False, list_of(is_str())),
+            'LicenseInfo': PropertyType(False, is_str())
+    }
+
+    runtime_attrs = {
+        "name": lambda self: ref(self.logical_id),
+        "arn": lambda self: fnGetAtt(self.logical_id, "Arn")
     }

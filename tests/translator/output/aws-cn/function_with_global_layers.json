@@ -1,0 +1,58 @@
+{
+  "Resources": {
+    "ManyLayersFuncRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ManyLayersFunc": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ManyLayersFuncRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.6",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "Layers": [
+          "arn:aws:lambda:us-east-1:123456789101:layer:layer1:1",
+          "arn:aws:lambda:us-east-1:123456789101:layer:layer2:1",
+          "arn:aws:lambda:us-east-1:123456789101:layer:layer3:1",
+          "arn:aws:lambda:us-east-1:123456789101:layer:layer4:1",
+          "arn:aws:lambda:us-east-1:123456789101:layer:layer5:1"
+        ]
+      }
+    }
+  }
+}

@@ -11,3 +11,4 @@ Resources:
           Properties:
             Queue: arn:aws:sqs:us-west-2:012345678901:my-queue
             BatchSize: 10
+            Enabled: false

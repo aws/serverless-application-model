@@ -1,10 +1,12 @@
 do_not_verify = {
     # type_after_transform: type_before_transform
     'AWS::Lambda::Function': 'AWS::Serverless::Function',
+    'AWS::Lambda::LayerVersion': 'AWS::Serverless::LayerVersion',
     'AWS::ApiGateway::RestApi': 'AWS::Serverless::Api',
     'AWS::S3::Bucket': 'AWS::S3::Bucket',
     'AWS::SNS::Topic': 'AWS::SNS::Topic',
-    'AWS::DynamoDB::Table': 'AWS::Serverless::SimpleTable'
+    'AWS::DynamoDB::Table': 'AWS::Serverless::SimpleTable',
+    'AWS::CloudFormation::Stack': 'AWS::Serverless::Application'
 }
 
 

@@ -12,6 +12,7 @@ Resources:
             Stream: arn:aws:kinesis:us-west-2:012345678901:stream/my-stream
             BatchSize: 100
             StartingPosition: TRIM_HORIZON
+            Enabled: false
   DynamoDBFunction:
     Type: 'AWS::Serverless::Function'
     Properties:

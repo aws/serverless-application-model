@@ -1,0 +1,7 @@
+Resources:
+  MyApplication:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: preparing-never-ready
+        SemanticVersion: 1.0.0

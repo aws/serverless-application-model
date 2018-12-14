@@ -102,7 +102,7 @@ class SwaggerEditor(object):
                 'type': 'aws_proxy',
                 'httpMethod': 'POST',
                 'uri': integration_uri
-            }
+        }
 
         # If 'responses' key is *not* present, add it with an empty dict as value
         self.paths[path][method].setdefault('responses', {})
@@ -118,7 +118,8 @@ class SwaggerEditor(object):
         for path, value in self.paths.items():
             yield path
 
-    def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None):
+    def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None,
+                 allow_credentials=None):
         """
         Add CORS configuration to this path. Specifically, we will add a OPTIONS response config to the Swagger that
         will return headers required for CORS. Since SAM uses aws_proxy integration, we cannot inject the headers
@@ -139,6 +140,7 @@ class SwaggerEditor(object):
             Value can also be an intrinsic function dict.
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
+        :param bool/None allow_credentials: Flags whether request is allowed to contain credentials.
         :raises ValueError: When values for one of the allowed_* variables is empty
         """
 
@@ -156,15 +158,19 @@ class SwaggerEditor(object):
             # APIGW expects the value to be a "string expression". Hence wrap in another quote. Ex: "'GET,POST,DELETE'"
             allowed_methods = "'{}'".format(allowed_methods)
 
+        if allow_credentials is not True:
+            allow_credentials = False
+
         # Add the Options method and the CORS response
         self.add_path(path, self._OPTIONS_METHOD)
         self.paths[path][self._OPTIONS_METHOD] = self._options_method_response_for_cors(allowed_origins,
                                                                                         allowed_headers,
                                                                                         allowed_methods,
-                                                                                        max_age)
+                                                                                        max_age,
+                                                                                        allow_credentials)
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
-                                          max_age=None):
+                                          max_age=None, allow_credentials=None):
         """
         Returns a Swagger snippet containing configuration for OPTIONS HTTP Method to configure CORS.
 
@@ -179,6 +185,7 @@ class SwaggerEditor(object):
             Value can also be an intrinsic function dict.
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
+        :param bool allow_credentials: Flags whether request is allowed to contain credentials.
 
         :return dict: Dictionary containing Options method configuration for CORS
         """
@@ -187,7 +194,8 @@ class SwaggerEditor(object):
         ALLOW_HEADERS = "Access-Control-Allow-Headers"
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
-        HEADER_RESPONSE = lambda x: "method.response.header."+x
+        ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
+        HEADER_RESPONSE = (lambda x: "method.response.header." + x)
 
         response_parameters = {
             # AllowedOrigin is always required
@@ -217,6 +225,11 @@ class SwaggerEditor(object):
             # MaxAge can be set to 0, which is a valid value. So explicitly check against None
             response_parameters[HEADER_RESPONSE(MAX_AGE)] = max_age
             response_headers[MAX_AGE] = {"type": "integer"}
+        if allow_credentials is True:
+            # Allow-Credentials only has a valid value of true, it should be omitted otherwise.
+            # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+            response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = "'true'"
+            response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
 
         return {
             "summary": "CORS support",
@@ -270,7 +283,7 @@ class SwaggerEditor(object):
             allow_methods = all_http_methods
         else:
             allow_methods = methods
-            allow_methods.append("options") # Always add Options to the CORS methods response
+            allow_methods.append("options")  # Always add Options to the CORS methods response
 
         # Clean up the result:
         #
@@ -303,11 +316,13 @@ class SwaggerEditor(object):
         was defined at the Function/Path/Method level
 
         :param string path: Path name
-        :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the authorizers param.
+        :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the
+            authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
         """
         for method_name, method in self.paths[path].items():
-            self.set_method_authorizer(path, method_name, default_authorizer, authorizers, default_authorizer=default_authorizer, is_default=True)
+            self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
+                                       default_authorizer=default_authorizer, is_default=True)
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
@@ -332,7 +347,8 @@ class SwaggerEditor(object):
     def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
                               is_default=False):
         normalized_method_name = self._normalize_method_name(method_name)
-        existing_security = self.paths[path][normalized_method_name].get('security', [])  # TEST: [{'sigv4': []}, {'api_key': []}])
+        existing_security = self.paths[path][normalized_method_name].get('security', [])
+        # TEST: [{'sigv4': []}, {'api_key': []}])
         authorizer_names = set(authorizers.keys())
         existing_non_authorizer_security = []
         existing_authorizer_security = []
@@ -413,9 +429,9 @@ class SwaggerEditor(object):
         :return: True, if data is a Swagger
         """
         return bool(data) and \
-                isinstance(data, dict) and \
-                bool(data.get("swagger")) and \
-                isinstance(data.get('paths'), dict)
+            isinstance(data, dict) and \
+            bool(data.get("swagger")) and \
+            isinstance(data.get('paths'), dict)
 
     @staticmethod
     def gen_skeleton():

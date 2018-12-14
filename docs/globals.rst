@@ -64,6 +64,7 @@ Currently, the following resources and properties are being supported:
       Tags:
       Tracing:
       KmsKeyArn:
+      Layers:
       AutoPublishAlias:
       DeploymentPreference:
     
@@ -81,6 +82,7 @@ Currently, the following resources and properties are being supported:
       Cors:
       AccessLogSetting:
       CanarySetting:
+      TracingEnabled:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable

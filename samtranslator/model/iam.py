@@ -17,6 +17,7 @@ class IAMRole(Resource):
         "arn": lambda self: fnGetAtt(self.logical_id, "Arn")
     }
 
+
 class IAMRolePolicies():
 
     @classmethod

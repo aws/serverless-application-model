@@ -106,7 +106,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment673f662a8e"
+          "Ref": "ExplicitApiDeployment3a5a78688c"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -163,7 +163,8 @@
                       "responseParameters": {
                         "method.response.header.Access-Control-Allow-Origin": "origins", 
                         "method.response.header.Access-Control-Allow-Methods": "methods", 
-                        "method.response.header.Access-Control-Allow-Headers": "headers"
+                        "method.response.header.Access-Control-Allow-Headers": "headers",
+                        "method.response.header.Access-Control-Allow-Credentials": "'true'"
                       }
                     }
                   }
@@ -182,6 +183,9 @@
                         "type": "string"
                       }, 
                       "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Credentials": {
                         "type": "string"
                       }
                     }, 
@@ -209,7 +213,8 @@
                       "responseParameters": {
                         "method.response.header.Access-Control-Allow-Origin": "origins", 
                         "method.response.header.Access-Control-Allow-Methods": "methods", 
-                        "method.response.header.Access-Control-Allow-Headers": "headers"
+                        "method.response.header.Access-Control-Allow-Headers": "headers",
+                        "method.response.header.Access-Control-Allow-Credentials": "'true'"
                       }
                     }
                   }
@@ -228,6 +233,9 @@
                         "type": "string"
                       }, 
                       "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Credentials": {
                         "type": "string"
                       }
                     }, 
@@ -275,13 +283,13 @@
         }
       }
     }, 
-    "ExplicitApiDeployment673f662a8e": {
+    "ExplicitApiDeployment3a5a78688c": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 673f662a8ed9f253ae8dacab409db551a72cd5b2", 
+        "Description": "RestApi deployment id: 3a5a78688c9bc377d53aa4153a11f0c4f6e7364c",
         "StageName": "Stage"
       }
     }, 
