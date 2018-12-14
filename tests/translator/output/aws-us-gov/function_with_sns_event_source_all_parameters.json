@@ -73,6 +73,7 @@
     },
     "MyAwesomeFunction": {
       "Type": "AWS::Lambda::Function",
+      "DependsOn": ["MyAwesomeFunctionRole"],
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

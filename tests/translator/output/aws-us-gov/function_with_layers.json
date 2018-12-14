@@ -26,6 +26,7 @@
     },
     "MinimalLayerFunction": {
       "Type": "AWS::Lambda::Function",
+      "DependsOn": ["MinimalLayerFunctionRole"],
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -76,6 +77,7 @@
     },
     "FunctionNoLayerVersion": {
       "Type": "AWS::Lambda::Function",
+      "DependsOn": ["FunctionNoLayerVersionRole"],
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -126,6 +128,7 @@
     },
     "FunctionLayerWithSubIntrinsic": {
       "Type": "AWS::Lambda::Function",
+      "DependsOn": ["FunctionLayerWithSubIntrinsicRole"],
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -188,6 +191,7 @@
     },
     "FunctionReferencesLayer": {
       "Type": "AWS::Lambda::Function",
+      "DependsOn": ["FunctionReferencesLayerRole"],
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

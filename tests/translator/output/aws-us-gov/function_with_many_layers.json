@@ -26,6 +26,7 @@
     },
     "ManyLayersFunc": {
       "Type": "AWS::Lambda::Function",
+      "DependsOn": ["ManyLayersFuncRole"],
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

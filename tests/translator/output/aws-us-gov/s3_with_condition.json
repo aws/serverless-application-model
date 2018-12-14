@@ -84,6 +84,7 @@
     }, 
     "ThumbnailFunction": {
       "Type": "AWS::Lambda::Function", 
+      "DependsOn": ["ThumbnailFunctionRole"],
       "Condition": "MyCondition",      
       "Properties": {
         "Code": {

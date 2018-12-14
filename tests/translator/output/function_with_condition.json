@@ -2,6 +2,7 @@
   "Resources": {
     "ConditionFunction": {
       "Type": "AWS::Lambda::Function", 
+      "DependsOn": ["ConditionFunctionRole"],
       "Condition": "this is a test",
       "Properties": {
         "Code": {

@@ -8,6 +8,7 @@
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function",
+      "DependsOn": ["MyFunctionRole"],
       "Properties": {
         "Code": {
           "S3Bucket": "bucket",

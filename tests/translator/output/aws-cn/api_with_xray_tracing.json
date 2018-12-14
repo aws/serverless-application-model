@@ -104,6 +104,7 @@
     },
     "HtmlFunction": {
       "Type": "AWS::Lambda::Function",
+      "DependsOn": ["HtmlFunctionRole"],
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
