@@ -15,14 +15,16 @@ def fnSub(string, variables=None):
         return {'Fn::Sub': [string, variables]}
     return {'Fn::Sub': string}
 
+
 def make_conditional(condition, data):
     return {
         'Fn::If': [
             condition,
             data,
-            { 'Ref': 'AWS::NoValue' }
+            {'Ref': 'AWS::NoValue'}
         ]
     }
+
 
 def make_shorthand(intrinsic_dict):
     """
@@ -56,8 +58,8 @@ def is_instrinsic(input):
     """
 
     if input is not None \
-        and isinstance(input, dict) \
-        and len(input) == 1:
+            and isinstance(input, dict) \
+            and len(input) == 1:
 
         key = list(input.keys())[0]
         return key == "Ref" or key == "Condition" or key.startswith("Fn::")

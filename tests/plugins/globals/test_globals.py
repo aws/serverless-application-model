@@ -395,7 +395,7 @@ class TestGlobalPropertiesMerge(TestCase):
         global_properties = GlobalProperties(configuration["global"])
         actual = global_properties.merge(configuration["local"])
 
-        self.assertEquals(actual, configuration["expected_output"])
+        self.assertEqual(actual, configuration["expected_output"])
 
 class TestGlobalsPropertiesEdgeCases(TestCase):
 
@@ -445,9 +445,9 @@ class TestGlobalsObject(TestCase):
         parsed_globals = globals._parse(self.template["Globals"])
 
         self.assertTrue("prefix_type1" in parsed_globals)
-        self.assertEquals(self.template["Globals"]["type1"], parsed_globals["prefix_type1"].global_properties)
+        self.assertEqual(self.template["Globals"]["type1"], parsed_globals["prefix_type1"].global_properties)
         self.assertTrue("prefix_type2" in parsed_globals)
-        self.assertEquals(self.template["Globals"]["type2"], parsed_globals["prefix_type2"].global_properties)
+        self.assertEqual(self.template["Globals"]["type2"], parsed_globals["prefix_type2"].global_properties)
 
 
     def test_parse_should_error_if_globals_is_not_dict(self):
@@ -511,7 +511,7 @@ class TestGlobalsObject(TestCase):
         parsed = globals._parse(template["Globals"])
 
         self.assertTrue("prefix_type1" in parsed)
-        self.assertEquals({}, parsed["prefix_type1"].global_properties)
+        self.assertEqual({}, parsed["prefix_type1"].global_properties)
 
     def test_init_without_globals_section_in_template(self):
 
@@ -520,14 +520,14 @@ class TestGlobalsObject(TestCase):
         }
 
         global_obj = Globals(template)
-        self.assertEquals({}, global_obj.template_globals)
+        self.assertEqual({}, global_obj.template_globals)
 
     def test_del_section_with_globals_section_in_template(self):
         template = self.template
         expected = {}
 
         Globals.del_section(template)
-        self.assertEquals(expected, template)
+        self.assertEqual(expected, template)
 
     def test_del_section_with_no_globals_section_in_template(self):
         template = {
@@ -539,7 +539,7 @@ class TestGlobalsObject(TestCase):
         }
 
         Globals.del_section(template)
-        self.assertEquals(expected, template)
+        self.assertEqual(expected, template)
 
     @patch.object(Globals, "_parse")
     def test_merge_must_actually_do_merge(self, parse_mock):
@@ -559,7 +559,7 @@ class TestGlobalsObject(TestCase):
         globals = Globals(self.template)
         result = globals.merge("type1", local_properties)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
         type1_mock.merge.assert_called_with(local_properties)
         type2_mock.merge.assert_not_called()
 
@@ -579,7 +579,7 @@ class TestGlobalsObject(TestCase):
         # Since type is not available in the globals, nothing should happen
         result = globals.merge("some random type", local_properties)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
         type1_mock.merge.assert_not_called()
 
     @patch.object(Globals, "_parse")
@@ -596,7 +596,7 @@ class TestGlobalsObject(TestCase):
         # Since type is not available in the globals, nothing should happen
         result = globals.merge("some random type", local_properties)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_merge_end_to_end_on_known_type1(self):
 
@@ -617,7 +617,7 @@ class TestGlobalsObject(TestCase):
         globals = Globals(self.template)
         result = globals.merge(type, properties)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_merge_end_to_end_on_known_type2(self):
 
@@ -637,7 +637,7 @@ class TestGlobalsObject(TestCase):
         globals = Globals(self.template)
         result = globals.merge(type, properties)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_merge_end_to_end_unknown_type(self):
 
@@ -656,4 +656,4 @@ class TestGlobalsObject(TestCase):
         globals = Globals(self.template)
         result = globals.merge(type, properties)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)

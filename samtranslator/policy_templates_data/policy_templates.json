@@ -1442,6 +1442,39 @@
           "Resource": "*"
         }]
       }
+    },
+    "SESBulkTemplatedCrudPolicy": {
+      "Description": "Gives permission to send email, templated email, templated bulk emails and verify identity",
+      "Parameters": {
+        "IdentityName": {
+          "Description": "Identity to give permissions to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ses:GetIdentityVerificationAttributes",
+              "ses:SendEmail",
+              "ses:SendRawEmail",
+              "ses:SendTemplatedEmail",
+              "ses:SendBulkTemplatedEmail",
+              "ses:VerifyEmailIdentity"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                {
+                  "identityName": {
+                    "Ref": "IdentityName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }

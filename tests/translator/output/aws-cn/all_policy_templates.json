@@ -1116,6 +1116,32 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy45",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ses:GetIdentityVerificationAttributes",
+                    "ses:SendEmail",
+                    "ses:SendRawEmail",
+                    "ses:SendTemplatedEmail",
+                    "ses:SendBulkTemplatedEmail",
+                    "ses:VerifyEmailIdentity"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                      {
+                        "identityName": "name"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ],
         "AssumeRolePolicyDocument": {

@@ -6,7 +6,7 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.cloudwatchlogs
 from .api.api_generator import ApiGenerator
-from .s3_utils.uri_parser import parse_s3_uri, construct_s3_location_object
+from .s3_utils.uri_parser import construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
@@ -153,7 +153,8 @@ class SamFunction(SamResourceMacro):
         :returns: a list containing the Lambda function and execution role resources
         :rtype: list
         """
-        lambda_function = LambdaFunction(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+        lambda_function = LambdaFunction(self.logical_id, depends_on=self.depends_on,
+                                         attributes=self.resource_attributes)
 
         if self.FunctionName:
             lambda_function.FunctionName = self.FunctionName
@@ -566,7 +567,8 @@ class SamApplication(SamResourceMacro):
     def _construct_nested_stack(self):
         """Constructs a AWS::CloudFormation::Stack resource
         """
-        nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes())
+        nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on,
+                                   attributes=self.get_passthrough_resource_attributes())
         nested_stack.Parameters = self.Parameters
         nested_stack.NotificationArns = self.NotificationArns
         application_tags = self._get_application_tags()
@@ -581,11 +583,11 @@ class SamApplication(SamResourceMacro):
         """
         application_tags = {}
         if isinstance(self.Location, dict):
-            if (self.APPLICATION_ID_KEY in self.Location.keys() 
-                and self.Location[self.APPLICATION_ID_KEY] is not None):
+            if (self.APPLICATION_ID_KEY in self.Location.keys() and
+                    self.Location[self.APPLICATION_ID_KEY] is not None):
                 application_tags[self._SAR_APP_KEY] = self.Location[self.APPLICATION_ID_KEY]
-            if (self.SEMANTIC_VERSION_KEY in self.Location.keys() 
-                and self.Location[self.SEMANTIC_VERSION_KEY] is not None):
+            if (self.SEMANTIC_VERSION_KEY in self.Location.keys() and
+                    self.Location[self.SEMANTIC_VERSION_KEY] is not None):
                 application_tags[self._SAR_SEMVER_KEY] = self.Location[self.SEMANTIC_VERSION_KEY]
         return application_tags
 
@@ -605,7 +607,7 @@ class SamLayerVersion(SamResourceMacro):
 
     RETAIN = 'Retain'
     DELETE = 'Delete'
-    retention_policy_options = [ RETAIN.lower(), DELETE.lower() ]
+    retention_policy_options = [RETAIN.lower(), DELETE.lower()]
 
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda layer to which this SAM Layer corresponds.
@@ -629,7 +631,14 @@ class SamLayerVersion(SamResourceMacro):
         :returns: a list containing the Lambda function and execution role resources
         :rtype: list
         """
-        retention_policy_value = self._get_retention_policy_value(intrinsics_resolver)
+        # Resolve intrinsics if applicable:
+        self.LayerName = self._resolve_string_parameter(intrinsics_resolver, self.LayerName, 'LayerName')
+        self.LicenseInfo = self._resolve_string_parameter(intrinsics_resolver, self.LicenseInfo, 'LicenseInfo')
+        self.Description = self._resolve_string_parameter(intrinsics_resolver, self.Description, 'Description')
+        self.RetentionPolicy = self._resolve_string_parameter(intrinsics_resolver, self.RetentionPolicy,
+                                                              'RetentionPolicy')
+
+        retention_policy_value = self._get_retention_policy_value()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
@@ -662,19 +671,12 @@ class SamLayerVersion(SamResourceMacro):
 
         return lambda_layer
 
-    def _get_retention_policy_value(self, intrinsics_resolver):
+    def _get_retention_policy_value(self):
         """
         Sets the deletion policy on this resource. The default is 'Retain'.
 
         :return: value for the DeletionPolicy attribute.
         """
-        if isinstance(self.RetentionPolicy, dict):
-            self.RetentionPolicy = intrinsics_resolver.resolve_parameter_refs(self.RetentionPolicy)
-            # If it's still not a string, throw an exception
-            if not isinstance(self.RetentionPolicy, string_types):
-                raise InvalidResourceException(self.logical_id,
-                                               "Could not resolve parameter for '{}' or parameter is not a String."
-                                               .format('RetentionPolicy'))
 
         if self.RetentionPolicy is None or self.RetentionPolicy.lower() == self.RETAIN.lower():
             return self.RETAIN

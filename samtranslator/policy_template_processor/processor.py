@@ -6,6 +6,7 @@ from jsonschema.exceptions import ValidationError
 from samtranslator.policy_template_processor.template import Template
 from samtranslator.policy_template_processor.exceptions import TemplateNotFoundException
 
+
 class PolicyTemplatesProcessor(object):
     """
     Policy templates are equivalents of managed policies that can be customized with specific resource name or ARNs.

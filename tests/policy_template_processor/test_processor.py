@@ -59,11 +59,11 @@ class TestPolicyTemplateProcessor(TestCase):
 
         processor = PolicyTemplatesProcessor(policy_templates_dict)
 
-        self.assertEquals(2, len(processor.policy_templates))
-        self.assertEquals(set(["key1", "key2"]), set(processor.policy_templates.keys()))
+        self.assertEqual(2, len(processor.policy_templates))
+        self.assertEqual(set(["key1", "key2"]), set(processor.policy_templates.keys()))
 
         # Template.from_dict must be called only once for each template entry
-        self.assertEquals(2, template_from_dict_mock.call_count)
+        self.assertEqual(2, template_from_dict_mock.call_count)
         template_from_dict_mock.assert_any_call("key1", "value1")
         template_from_dict_mock.assert_any_call("key2", "value2")
 
@@ -110,7 +110,7 @@ class TestPolicyTemplateProcessor(TestCase):
 
         processor = PolicyTemplatesProcessor(policy_templates_dict)
 
-        self.assertEquals(processor.get("key1"), template_obj)
+        self.assertEqual(processor.get("key1"), template_obj)
 
     @patch.object(PolicyTemplatesProcessor, "_is_valid_templates_dict")
     @patch.object(Template, "from_dict")
@@ -126,7 +126,7 @@ class TestPolicyTemplateProcessor(TestCase):
 
         processor = PolicyTemplatesProcessor(policy_templates_dict)
 
-        self.assertEquals(processor.get("key2"), None)
+        self.assertEqual(processor.get("key2"), None)
 
     @patch.object(PolicyTemplatesProcessor, "_is_valid_templates_dict")
     @patch.object(Template, "from_dict")
@@ -149,7 +149,7 @@ class TestPolicyTemplateProcessor(TestCase):
         processor = PolicyTemplatesProcessor(policy_templates_dict)
         result = processor.convert("key1", parameter_values)
 
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
         template_obj_mock.to_statement.assert_called_once_with(parameter_values)
 
     @patch.object(PolicyTemplatesProcessor, "_is_valid_templates_dict")
@@ -241,7 +241,7 @@ class TestPolicyTemplateProcessor(TestCase):
             PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict)
 
         ex = cm.exception
-        self.assertEquals(str(ex), exception_msg)
+        self.assertEqual(str(ex), exception_msg)
 
     @patch.object(jsonschema, "validate")
     @patch.object(PolicyTemplatesProcessor, "_read_schema")
@@ -270,10 +270,10 @@ class TestPolicyTemplateProcessor(TestCase):
         with patch("samtranslator.policy_template_processor.processor.open", open_mock):
 
             result = PolicyTemplatesProcessor._read_json(filepath)
-            self.assertEquals(result, json_return)
+            self.assertEqual(result, json_return)
 
             open_mock.assert_called_once_with(filepath, "r")
-            self.assertEquals(1, json_loads_mock.call_count)
+            self.assertEqual(1, json_loads_mock.call_count)
 
     @patch.object(PolicyTemplatesProcessor, '_read_json')
     def test_read_schema_must_use_default_schema_location(self, _read_file_mock):
@@ -281,7 +281,7 @@ class TestPolicyTemplateProcessor(TestCase):
         _read_file_mock.return_value = expected
 
         result = PolicyTemplatesProcessor._read_schema()
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
         _read_file_mock.assert_called_once_with(PolicyTemplatesProcessor.SCHEMA_LOCATION)
 
     @patch.object(PolicyTemplatesProcessor, '_read_json')
@@ -290,5 +290,5 @@ class TestPolicyTemplateProcessor(TestCase):
         _read_file_mock.return_value = expected
 
         result = PolicyTemplatesProcessor.get_default_policy_templates_json()
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
         _read_file_mock.assert_called_once_with(PolicyTemplatesProcessor.DEFAULT_POLICY_TEMPLATES_FILE)

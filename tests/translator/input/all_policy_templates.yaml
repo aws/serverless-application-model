@@ -132,3 +132,6 @@ Resources:
         
         - DynamoDBReconfigurePolicy:
             TableName: name
+
+        - SESBulkTemplatedCrudPolicy:
+            IdentityName: name

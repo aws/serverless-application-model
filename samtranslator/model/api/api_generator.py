@@ -13,7 +13,8 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator.arn_generator import ArnGenerator
 
 _CORS_WILDCARD = "'*'"
-CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge", "AllowCredentials"])
+CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge",
+                                                "AllowCredentials"])
 # Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
@@ -23,7 +24,10 @@ AuthProperties.__new__.__defaults__ = (None, None)
 
 class ApiGenerator(object):
 
-    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, cors=None, auth=None, access_log_setting=None, canary_setting=None, tracing_enabled=None):
+    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on,
+                 definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
+                 method_settings=None, binary_media=None, cors=None, auth=None, access_log_setting=None,
+                 canary_setting=None, tracing_enabled=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -224,7 +228,7 @@ class ApiGenerator(object):
 
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
-            editor.add_cors(path,  properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
+            editor.add_cors(path, properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
                             max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials)
 
         # Assign the Swagger back to template
