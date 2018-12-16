@@ -16,7 +16,6 @@ class SwaggerEditor(object):
     _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
 
-
     def __init__(self, doc):
         """
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
@@ -103,7 +102,7 @@ class SwaggerEditor(object):
                 'type': 'aws_proxy',
                 'httpMethod': 'POST',
                 'uri': integration_uri
-            }
+        }
 
         # If 'responses' key is *not* present, add it with an empty dict as value
         self.paths[path][method].setdefault('responses', {})
@@ -196,7 +195,7 @@ class SwaggerEditor(object):
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
         ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
-        HEADER_RESPONSE = lambda x: "method.response.header."+x
+        HEADER_RESPONSE = (lambda x: "method.response.header." + x)
 
         response_parameters = {
             # AllowedOrigin is always required
@@ -284,7 +283,7 @@ class SwaggerEditor(object):
             allow_methods = all_http_methods
         else:
             allow_methods = methods
-            allow_methods.append("options") # Always add Options to the CORS methods response
+            allow_methods.append("options")  # Always add Options to the CORS methods response
 
         # Clean up the result:
         #
@@ -317,11 +316,13 @@ class SwaggerEditor(object):
         was defined at the Function/Path/Method level
 
         :param string path: Path name
-        :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the authorizers param.
+        :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the
+            authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
         """
         for method_name, method in self.paths[path].items():
-            self.set_method_authorizer(path, method_name, default_authorizer, authorizers, default_authorizer=default_authorizer, is_default=True)
+            self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
+                                       default_authorizer=default_authorizer, is_default=True)
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
@@ -346,7 +347,8 @@ class SwaggerEditor(object):
     def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
                               is_default=False):
         normalized_method_name = self._normalize_method_name(method_name)
-        existing_security = self.paths[path][normalized_method_name].get('security', [])  # TEST: [{'sigv4': []}, {'api_key': []}])
+        existing_security = self.paths[path][normalized_method_name].get('security', [])
+        # TEST: [{'sigv4': []}, {'api_key': []}])
         authorizer_names = set(authorizers.keys())
         existing_non_authorizer_security = []
         existing_authorizer_security = []
@@ -427,9 +429,9 @@ class SwaggerEditor(object):
         :return: True, if data is a Swagger
         """
         return bool(data) and \
-                isinstance(data, dict) and \
-                bool(data.get("swagger")) and \
-                isinstance(data.get('paths'), dict)
+            isinstance(data, dict) and \
+            bool(data.get("swagger")) and \
+            isinstance(data.get('paths'), dict)
 
     @staticmethod
     def gen_skeleton():

@@ -18,10 +18,10 @@ class TestLogicalIdGenerator(TestCase):
 
         generator = LogicalIdGenerator(self.prefix)
 
-        self.assertEquals(self.prefix, generator.gen())
+        self.assertEqual(self.prefix, generator.gen())
 
         # Calling gen() again should return the same result
-        self.assertEquals(generator.gen(), generator.gen())
+        self.assertEqual(generator.gen(), generator.gen())
 
         stringify_mock.assert_not_called()
 

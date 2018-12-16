@@ -187,15 +187,18 @@ class ApiGatewayAuthorizer(object):
             identity_source_headers = list(map(lambda h: 'method.request.header.' + h, self.identity.get('Headers')))
 
         if self.identity.get('QueryStrings'):
-            identity_source_query_strings = list(map(lambda qs: 'method.request.querystring.' + qs, self.identity.get('QueryStrings')))
+            identity_source_query_strings = list(map(lambda qs: 'method.request.querystring.' + qs,
+                                                     self.identity.get('QueryStrings')))
 
         if self.identity.get('StageVariables'):
-            identity_source_stage_variables = list(map(lambda sv: 'stageVariables.' + sv, self.identity.get('StageVariables')))
+            identity_source_stage_variables = list(map(lambda sv: 'stageVariables.' + sv,
+                                                       self.identity.get('StageVariables')))
 
         if self.identity.get('Context'):
             identity_source_context = list(map(lambda c: 'context.' + c, self.identity.get('Context')))
 
-        identity_source_array = identity_source_headers + identity_source_query_strings + identity_source_stage_variables + identity_source_context
+        identity_source_array = (identity_source_headers + identity_source_query_strings +
+                                 identity_source_stage_variables + identity_source_context)
         identity_source = ', '.join(identity_source_array)
 
         return identity_source
