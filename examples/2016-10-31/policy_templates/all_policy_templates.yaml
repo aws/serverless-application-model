@@ -71,9 +71,6 @@ Resources:
         - SESCrudPolicy:
             IdentityName: name
 
-        - SESBulkTemplatedCrudPolicy:
-            IdentityName: name
-
         - SNSCrudPolicy:
             TopicName: name
 
