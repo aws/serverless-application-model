@@ -135,3 +135,5 @@ Resources:
 
         - SESBulkTemplatedCrudPolicy:
             IdentityName: name
+        
+        - SESCreateTemplatePolicy: {}

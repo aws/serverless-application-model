@@ -1142,6 +1142,20 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy46",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ses:CreateTemplate"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ],
         "AssumeRolePolicyDocument": {

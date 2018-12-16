@@ -1475,6 +1475,21 @@
           }
         ]
       }
+    },
+    "SESCreateTemplatePolicy": {
+      "Description": "Gives permission to create an SES Email Template",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ses:CreateTemplate"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
     }
   }
 }

@@ -1131,14 +1131,21 @@
                     "ses:SendBulkTemplatedEmail",
                     "ses:VerifyEmailIdentity"
                   ],
-                  "Resource": {
-                    "Fn::Sub": [
-                      "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
-                      {
-                        "identityName": "name"
-                      }
-                    ]
-                  },
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy46",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ses:CreateTemplate"
+                  ],
+                  "Resource": "*",
                   "Effect": "Allow"
                 }
               ]
