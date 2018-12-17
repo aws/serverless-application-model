@@ -1143,7 +1143,11 @@
               "Statement": [
                 {
                   "Action": [
-                    "ses:CreateTemplate"
+                    "ses:CreateTemplate",
+                    "ses:GetTemplate",
+                    "ses:ListTemplates",
+                    "ses:UpdateTemplate",
+                    "ses:DeleteTemplate"
                   ],
                   "Resource": "*",
                   "Effect": "Allow"

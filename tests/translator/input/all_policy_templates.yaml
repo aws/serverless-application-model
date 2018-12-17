@@ -136,4 +136,4 @@ Resources:
         - SESBulkTemplatedCrudPolicy:
             IdentityName: name
         
-        - SESCreateTemplatePolicy: {}
+        - SESEmailTemplateCrudPolicy: {}
