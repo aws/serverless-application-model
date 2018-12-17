@@ -1131,7 +1131,14 @@
                     "ses:SendBulkTemplatedEmail",
                     "ses:VerifyEmailIdentity"
                   ],
-                  "Resource": "*",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                      {
+                        "identityName": "name"
+                      }
+                    ]
+                  },
                   "Effect": "Allow"
                 }
               ]
