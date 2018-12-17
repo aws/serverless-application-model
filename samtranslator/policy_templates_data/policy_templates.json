@@ -1478,21 +1478,21 @@
     },
     "SESEmailTemplateCrudPolicy": {
       "Description": "Gives permission to create, get, list, update and delete SES Email Templates",
-      "Parameters": {},
+      "Parameters": {
+        
+      },
       "Definition": {
-        "Statement": [
-          {
-            "Effect": "Allow",
-            "Action": [
-              "ses:CreateTemplate",
-              "ses:GetTemplate",
-              "ses:ListTemplates",
-              "ses:UpdateTemplate",
-              "ses:DeleteTemplate"
-            ],
-            "Resource": "*"
-          }
-        ]
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "ses:CreateTemplate",
+            "ses:GetTemplate",
+            "ses:ListTemplates",
+            "ses:UpdateTemplate",
+            "ses:DeleteTemplate"
+          ],
+          "Resource": "*"
+        }]
       }
     }
   }
