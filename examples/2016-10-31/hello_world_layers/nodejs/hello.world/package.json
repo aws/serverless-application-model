@@ -1,0 +1,46 @@
+{
+  "_from": "hello.world@^1.0.2",
+  "_id": "hello.world@1.0.2",
+  "_inBundle": false,
+  "_integrity": "sha1-HoqldfTDcQ1BXBTYczriACPRlSs=",
+  "_location": "/hello.world",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "hello.world@^1.0.2",
+    "name": "hello.world",
+    "escapedName": "hello.world",
+    "rawSpec": "^1.0.2",
+    "saveSpec": null,
+    "fetchSpec": "^1.0.2"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/hello.world/-/hello.world-1.0.2.tgz",
+  "_shasum": "1e8aa575f4c3710d415c14d8733ae20023d1952b",
+  "_spec": "hello.world@^1.0.2",
+  "_where": "/Users/diegogm/Documents/GitHub/serverless-application-model/examples/2016-10-31/hello_world_layers/hello-world-layer",
+  "author": {
+    "name": "Hello.World"
+  },
+  "bin": {
+    "hello": "./hello.js"
+  },
+  "bugs": {
+    "url": "https://github.com/hellodotworld/hello/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "Do things right",
+  "homepage": "https://hello.world",
+  "license": "MIT",
+  "main": "hello.js",
+  "name": "hello.world",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hellodotworld/hello.git"
+  },
+  "version": "1.0.2"
+}

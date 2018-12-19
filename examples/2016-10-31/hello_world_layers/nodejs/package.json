@@ -1,0 +1,12 @@
+{
+  "name": "hello-world-layer",
+  "version": "1.0.0",
+  "description": "Simple Layer that adds a single depency from NPM",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "hello.world": "^1.0.2"
+  }
+}
