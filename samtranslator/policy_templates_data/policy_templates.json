@@ -1475,6 +1475,34 @@
           }
         ]
       }
+    },
+    "FilterLogEventsPolicy": {
+      "Description": "Gives permission to filter Log Events from a specified Log Group",
+      "Parameters": {
+        "LogGroupName": {
+          "Description": "Name of the Log Group"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:FilterLogEvents"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${logGroupName}:log-stream:*",
+                {
+                  "logGroupName": {
+                    "Ref": "LogGroupName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }

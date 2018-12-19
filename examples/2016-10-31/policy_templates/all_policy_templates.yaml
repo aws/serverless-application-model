@@ -82,3 +82,6 @@ Resources:
 
         - SESBulkTemplatedCrudPolicy:
             IdentityName: name
+
+        - FilterLogEventsPolicy:
+            LogGroupName: name
