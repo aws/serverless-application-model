@@ -106,15 +106,39 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 },
-                "responses": {}
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ]
               }
             }
           },
-          "swagger": "2.0"
-        }, 
+          "swagger": 2.0,
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "x-amazon-apigateway-authorizer": {
+                "type": "cognito_user_pools",
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
@@ -126,13 +150,13 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment5b2cb4ba8f": {
+    "ServerlessRestApiDeployment8d8686036d": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 5b2cb4ba8fce8a9445b1914c6c6fbeef81a9075a", 
+        "Description": "RestApi deployment id: 8d8686036d660a9db5398f6f9d1d3158923cac59", 
         "StageName": "Stage"
       }
     }, 
@@ -149,7 +173,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment359f256a3b"
+          "Ref": "ExplicitApiDeploymentf8ca980dfb"
         }
       }
     }, 
@@ -166,7 +190,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5b2cb4ba8f"
+          "Ref": "ServerlessRestApiDeployment8d8686036d"
         }
       }
     }, 
@@ -190,12 +214,36 @@
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 }, 
-                "responses": {}
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ]
               }
             }
           }, 
-          "swagger": "2.0"
-        }, 
+          "swagger": "2.0",
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "x-amazon-apigateway-authorizer": {
+                "type": "cognito_user_pools",
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
@@ -207,13 +255,13 @@
         }
       }
     }, 
-    "ExplicitApiDeployment359f256a3b": {
+    "ExplicitApiDeploymentf8ca980dfb": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 359f256a3b3ff2e1102e335a4d603f02df9b4988", 
+        "Description": "RestApi deployment id: f8ca980dfb884f427b861089480cf72d9094f39f", 
         "StageName": "Stage"
       }
     }
