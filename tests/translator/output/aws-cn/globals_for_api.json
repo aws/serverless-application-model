@@ -106,15 +106,39 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 },
-                "responses": {}
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ]
               }
             }
           },
-          "swagger": "2.0"
-        }, 
+          "swagger": 2.0,
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "x-amazon-apigateway-authorizer": {
+                "type": "cognito_user_pools",
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
@@ -139,27 +163,27 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentcb4fb12558"
+          "Ref": "ServerlessRestApiDeployment9a5572f369"
         }
       }
     }, 
-    "ServerlessRestApiDeploymentcb4fb12558": {
+    "ServerlessRestApiDeployment9a5572f369": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: cb4fb1255811b7b6a25dd35f23ee7ad133003b89", 
+        "Description": "RestApi deployment id: 9a5572f369351aa29c0c17b8d747fb28430e1b88", 
         "StageName": "Stage"
       }
     }, 
-    "ExplicitApiDeployment359f256a3b": {
+    "ExplicitApiDeploymentf8ca980dfb": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 359f256a3b3ff2e1102e335a4d603f02df9b4988", 
+        "Description": "RestApi deployment id: f8ca980dfb884f427b861089480cf72d9094f39f", 
         "StageName": "Stage"
       }
     }, 
@@ -183,12 +207,36 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 }, 
-                "responses": {}
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ]
               }
             }
           }, 
-          "swagger": "2.0"
-        }, 
+          "swagger": "2.0",
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "x-amazon-apigateway-authorizer": {
+                "type": "cognito_user_pools",
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
@@ -213,7 +261,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment359f256a3b"
+          "Ref": "ExplicitApiDeploymentf8ca980dfb"
         }
       }
     }
