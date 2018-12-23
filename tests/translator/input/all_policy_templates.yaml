@@ -137,3 +137,6 @@ Resources:
             IdentityName: name
         
         - SESEmailTemplateCrudPolicy: {}
+
+        - FilterLogEventsPolicy:
+            LogGroupName: name
