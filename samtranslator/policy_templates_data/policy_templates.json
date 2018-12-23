@@ -1489,7 +1489,8 @@
             "ses:GetTemplate",
             "ses:ListTemplates",
             "ses:UpdateTemplate",
-            "ses:DeleteTemplate"
+            "ses:DeleteTemplate",
+            "ses:TestRenderTemplate"
           ],
           "Resource": "*"
         }]
