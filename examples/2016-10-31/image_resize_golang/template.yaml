@@ -26,7 +26,7 @@ Resources:
           BucketName: !Sub "${BucketNamePrefix}-dest-bucket"
       Environment:
         Variables:
-          DestBucket: "sam-exmaple-dest-bucket"   # BucketNamePrefix-dest-bucket
+          DestBucket: !Sub "${BucketNamePrefix}-source-bucket"
       Events:
         ImageUpload:
           Type: S3

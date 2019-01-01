@@ -1,7 +1,7 @@
 # AWS::Serverless::S3 Event Code Example
 This example shows you how to get events of S3 bucket. When you upload an image in the source bucket it will resize that image and save in the destination bucket.
 ###### Note
-Don't forget to chnage S3 bucket name, source bucket prefix and `DestBucket` name in template file.
+Don't forget to chnage S3 bucket name, source bucket prefix.
 
 ## Package and deploy template
 #### Build
