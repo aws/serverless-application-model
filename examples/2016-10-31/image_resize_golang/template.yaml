@@ -9,7 +9,7 @@ Globals:
 Parameters:
   BucketNamePrefix:
     Type: String
-    Default: sam-exmaple
+    Default: sam-example
 
 Resources:
   ImageProcessorFunction:
