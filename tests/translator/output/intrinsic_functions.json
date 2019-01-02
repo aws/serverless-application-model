@@ -116,7 +116,7 @@
       "Condition": "TrueCondition",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiWithExplicitS3UriDeployment0f0b9c7ec2"
+          "Ref": "ApiWithExplicitS3UriDeploymenta227798f00"
         }, 
         "RestApiId": {
           "Ref": "ApiWithExplicitS3Uri"
@@ -192,14 +192,14 @@
         }
       }
     }, 
-    "ApiWithExplicitS3UriDeployment0f0b9c7ec2": {
+    "ApiWithExplicitS3UriDeploymenta227798f00": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Condition": "TrueCondition",
       "Properties": {
         "RestApiId": {
           "Ref": "ApiWithExplicitS3Uri"
         }, 
-        "Description": "RestApi deployment id: 0f0b9c7ec2272799d7b60aef7fa05a7ea5124d14", 
+        "Description": "RestApi deployment id: a227798f004a50b665fe47a20bb9afbf076bd85d", 
         "StageName": "Stage"
       }
     }, 
