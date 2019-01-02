@@ -27,7 +27,8 @@ class ApiGenerator(object):
     def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on,
                  definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
                  method_settings=None, binary_media=None, cors=None, auth=None, access_log_setting=None,
-                 canary_setting=None, tracing_enabled=None):
+                 canary_setting=None, tracing_enabled=None, resource_attributes=None,
+                 passthrough_resource_attributes=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -60,6 +61,8 @@ class ApiGenerator(object):
         self.access_log_setting = access_log_setting
         self.canary_setting = canary_setting
         self.tracing_enabled = tracing_enabled
+        self.resource_attributes = resource_attributes
+        self.passthrough_resource_attributes = passthrough_resource_attributes
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -67,7 +70,7 @@ class ApiGenerator(object):
         :returns: the RestApi to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayRestApi
         """
-        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on)
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         rest_api.BinaryMediaTypes = self.binary_media
 
         if self.endpoint_configuration:
@@ -132,7 +135,8 @@ class ApiGenerator(object):
         :returns: the Deployment to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayDeployment
         """
-        deployment = ApiGatewayDeployment(self.logical_id + 'Deployment')
+        deployment = ApiGatewayDeployment(self.logical_id + 'Deployment',
+                                          attributes=self.passthrough_resource_attributes)
         deployment.RestApiId = rest_api.get_runtime_attr('rest_api_id')
         deployment.StageName = 'Stage'
 
@@ -150,7 +154,8 @@ class ApiGenerator(object):
         # This will NOT create duplicates because we allow only ONE stage per API resource
         stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
 
-        stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage')
+        stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage',
+                                attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)
         stage.StageName = self.stage_name
@@ -294,7 +299,7 @@ class ApiGenerator(object):
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on)
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         api_id = rest_api.get_runtime_attr('rest_api_id')
 
         partition = ArnGenerator.get_partition_name()
@@ -302,7 +307,8 @@ class ApiGenerator(object):
         source_arn = fnSub(ArnGenerator.generate_arn(partition=partition, service='execute-api', resource=resource),
                            {"__ApiId__": api_id})
 
-        lambda_permission = LambdaPermission(self.logical_id + authorizer_name + 'AuthorizerPermission')
+        lambda_permission = LambdaPermission(self.logical_id + authorizer_name + 'AuthorizerPermission',
+                                             attributes=self.passthrough_resource_attributes)
         lambda_permission.Action = 'lambda:invokeFunction'
         lambda_permission.FunctionName = authorizer_lambda_function_arn
         lambda_permission.Principal = 'apigateway.amazonaws.com'
