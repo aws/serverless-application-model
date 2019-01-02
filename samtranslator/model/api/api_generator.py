@@ -43,6 +43,8 @@ class ApiGenerator(object):
         :param access_log_setting: Whether to send access logs and where for Stage
         :param canary_setting: Canary Setting for Stage
         :param tracing_enabled: Whether active tracing with X-ray is enabled
+        :param resource_attributes: Resource attributes to add to API resources
+        :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
