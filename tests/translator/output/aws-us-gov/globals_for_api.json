@@ -173,7 +173,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentf8ca980dfb"
+          "Ref": "ExplicitApiDeploymentd5fa0145e9"
         }
       }
     }, 
@@ -255,13 +255,13 @@
         }
       }
     }, 
-    "ExplicitApiDeploymentf8ca980dfb": {
+    "ExplicitApiDeploymentd5fa0145e9": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: f8ca980dfb884f427b861089480cf72d9094f39f", 
+        "Description": "RestApi deployment id: d5fa0145e9e6393911d32967e66fd7091d605483", 
         "StageName": "Stage"
       }
     }
