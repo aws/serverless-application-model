@@ -23,5 +23,5 @@ sam deploy --template-file serverless-output.yaml --stack-name image-resizer --c
 It will create necessary resources and link them according to the template using cloudformation.
 
 ## Test
-Uload an image in `JPEG` format to the `SourceBucket` defined in the template and verify the same image with smaller size in `DestBucket`.
+Upload an image in `JPEG` format to the `SourceBucket` defined in the template and verify the same image with smaller size in `DestBucket`.
 
