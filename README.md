@@ -18,4 +18,4 @@ You can build serverless applications faster and further simplify your developme
 
 [Read the Development Guide](DEVELOPMENT_GUIDE.rst) for in-depth information on how to start making changes.
 
-[Join the SAM developers channel (#samdev) on Slack](https://awssamopensource.splashthat.com/) to collaborate with fellow community members and the AWS SAM team.
+[Join the SAM developers channel (#samdev) on Slack](https://join.slack.com/t/awsdevelopers/shared_invite/enQtMzg3NTc5OTM2MzcxLTdjYTdhYWE3OTQyYTU4Njk1ZWY4Y2ZjYjBhMTUxNGYzNDg5MWQ1ZTc5MTRlOGY0OTI4NTdlZTMwNmI5YTgwOGM/) to collaborate with fellow community members and the AWS SAM team.
