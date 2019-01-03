@@ -52,5 +52,5 @@ Outputs:
     Description: "S3 Bucket name that will trigger a Lambda function upon new objects insertion"
     Value: !Ref SourceBucket
   DestBucket:
-    Description: "S3 Bucket name that will trigger a Lambda function upon new objects insertion"
+    Description: "S3 Bucket name that will store the resized versions of the images from the source bucket"
     Value: !Ref DestBucket
