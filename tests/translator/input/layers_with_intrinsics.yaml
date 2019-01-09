@@ -28,3 +28,9 @@ Resources:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LayerName: !Ref LayerNameParam
 
+  LayerWithSubNameIntrinsic:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      LayerName: !Sub layer-${LayerNameParam}
+
