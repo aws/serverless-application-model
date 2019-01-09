@@ -1,22 +1,29 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: A function is triggered off an upload to a bucket. It uploads a resized image to another bucket.
+
+Globals:
+  Function:
+    Timeout: 20
+
 Parameters:
   BucketNamePrefix:
     Type: String
     Default: sam-example
+
 Resources:
   ImageProcessorFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.resize
-      Runtime: python3.6
-      CodeUri: ./src
+      CodeUri: .
+      Handler: main
+      Runtime: go1.x
+      Tracing: Active
       Policies:
-        - S3ReadPolicy:
-            BucketName: !Sub "${BucketNamePrefix}-source-bucket"
-        - S3CrudPolicy:
-            BucketName: !Sub "${BucketNamePrefix}-dest-bucket"
+      - S3ReadPolicy:
+          BucketName: !Sub "${BucketNamePrefix}-source-bucket"
+      - S3CrudPolicy:
+          BucketName: !Sub "${BucketNamePrefix}-dest-bucket"
       Environment:
         Variables:
           DestBucket: !Sub "${BucketNamePrefix}-dest-bucket"
@@ -26,16 +33,6 @@ Resources:
           Properties:
             Bucket: !Ref SourceBucket
             Events: s3:ObjectCreated:*
-      Layers:
-        - !Ref PillowLibrary
-      Tracing: Active
-
-  PillowLibrary:
-    Type: 'AWS::Serverless::LayerVersion'
-    Properties:
-      ContentUri: ./layer
-      CompatibleRuntimes: # optional
-        - python3.6
 
   SourceBucket:
     Type: AWS::S3::Bucket
@@ -52,5 +49,6 @@ Outputs:
     Description: "S3 Bucket name that will trigger a Lambda function upon new objects insertion"
     Value: !Ref SourceBucket
   DestBucket:
-    Description: "S3 Bucket name that will store the resized versions of the images from the source bucket"
+    Description: "S3 Bucket name that will store a resized image"
     Value: !Ref DestBucket
+
