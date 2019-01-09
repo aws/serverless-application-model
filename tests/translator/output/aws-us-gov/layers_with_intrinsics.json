@@ -49,6 +49,19 @@
         "LayerName": "LayerWithLicenseIntrinsic",
         "LicenseInfo": "MIT-0 License"
       }
+    },
+    "LayerWithSubNameIntrinsic6e9b477102": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": {
+          "Fn::Sub": "layer-SomeLayerName"
+        }
+      }
     }
   }
 }

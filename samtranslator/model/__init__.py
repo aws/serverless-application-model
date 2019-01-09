@@ -434,7 +434,8 @@ class SamResourceMacro(ResourceMacro):
         if not parameter_value:
             return parameter_value
         value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
-        if not isinstance(value, string_types):
+
+        if not isinstance(value, string_types) and not isinstance(value, dict):
             raise InvalidResourceException(self.logical_id,
                                            "Could not resolve parameter for '{}' or parameter is not a String."
                                            .format(parameter_name))
