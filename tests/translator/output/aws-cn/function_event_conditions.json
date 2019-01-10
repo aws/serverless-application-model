@@ -368,13 +368,13 @@
           "LambdaConfigurations": [
             {
               "Fn::If": [
+                "MyCondition",
                 {
                   "Function": {
                     "Ref": "MyAwesomeFunctionAliasLive"
                   },
                   "Event": "s3:ObjectCreated:*"
                 },
-                "MyCondition",
                 {
                   "Ref": "AWS::NoValue"
                 }
@@ -395,13 +395,10 @@
           {
             "Key": "sam:ConditionalDependsOn:MyAwesomeFunctionS3TriggerPermission",
             "Value": {
-              "Fn:If": [
+              "Fn::If": [
                 "MyCondition",
                 {
-                  "Fn::GetAtt": [
-                    "MyAwesomeFunctionS3TriggerPermission",
-                    "Arn"
-                  ]
+                  "Ref": "MyAwesomeFunctionS3TriggerPermission"
                 },
                 "no dependency"
               ]
