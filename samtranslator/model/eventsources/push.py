@@ -93,7 +93,8 @@ class Schedule(PushEventSource):
         events_rule.Targets = [self._construct_target(function)]
 
         source_arn = events_rule.get_runtime_attr("arn")
-
+        if 'Condition' in function.resource_attributes:
+            events_rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
@@ -143,7 +144,8 @@ class CloudWatchEvent(PushEventSource):
         events_rule.EventPattern = self.Pattern
         events_rule.Targets = [self._construct_target(function)]
         if 'Condition' in function.resource_attributes:
-            events_rule = make_conditional(events_rule, function.resource_attributes['Condition'])
+            events_rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
+
         resources.append(events_rule)
 
         source_arn = events_rule.get_runtime_attr("arn")
@@ -363,7 +365,7 @@ class SNS(PushEventSource):
         subscription.Endpoint = function.get_runtime_attr("arn")
         subscription.TopicArn = topic
         if 'Condition' in function.resource_attributes:
-            subscription = make_conditional(subscription, function.resource_attributes['Condition'])
+            subscription.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
@@ -621,6 +623,6 @@ class IoTRule(PushEventSource):
 
         rule.TopicRulePayload = payload
         if 'Condition' in function.resource_attributes:
-            rule = make_conditional(rule, function.resource_attributes['Condition'])
+            rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 
         return rule

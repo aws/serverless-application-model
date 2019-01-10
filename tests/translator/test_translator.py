@@ -191,6 +191,7 @@ class TestTranslatorEndToEnd(TestCase):
         'intrinsic_functions',
         'basic_function_with_tags',
         'depends_on',
+        'function_event_conditions',
         'function_with_dlq',
         'function_with_kmskeyarn',
         'function_with_alias',
