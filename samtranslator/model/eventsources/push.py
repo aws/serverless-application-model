@@ -2,7 +2,7 @@ import copy
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
-from samtranslator.model.intrinsics import ref, fnSub, fnGetAtt, make_shorthand, make_conditional
+from samtranslator.model.intrinsics import ref, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.s3 import S3Bucket
