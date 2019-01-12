@@ -47,5 +47,7 @@ class CloudWatchLogs(PushEventSource):
         subscription_filter.LogGroupName = self.LogGroupName
         subscription_filter.FilterPattern = self.FilterPattern
         subscription_filter.DestinationArn = function.get_runtime_attr("arn")
+        if 'Condition' in function.resource_attributes:
+            subscription_filter.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 
         return subscription_filter

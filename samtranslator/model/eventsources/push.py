@@ -2,7 +2,7 @@ import copy
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
-from samtranslator.model.intrinsics import ref, fnSub, fnGetAtt, make_shorthand, make_conditional
+from samtranslator.model.intrinsics import ref, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.s3 import S3Bucket
@@ -93,7 +93,8 @@ class Schedule(PushEventSource):
         events_rule.Targets = [self._construct_target(function)]
 
         source_arn = events_rule.get_runtime_attr("arn")
-
+        if 'Condition' in function.resource_attributes:
+            events_rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
@@ -143,7 +144,8 @@ class CloudWatchEvent(PushEventSource):
         events_rule.EventPattern = self.Pattern
         events_rule.Targets = [self._construct_target(function)]
         if 'Condition' in function.resource_attributes:
-            events_rule = make_conditional(events_rule, function.resource_attributes['Condition'])
+            events_rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
+
         resources.append(events_rule)
 
         source_arn = events_rule.get_runtime_attr("arn")
@@ -267,7 +269,7 @@ class S3(PushEventSource):
 
         See https://stackoverflow.com/questions/34607476/cloudformation-apply-condition-on-dependson
 
-        It is done by using Fn:GetAtt wrapped in a conditional Fn:If. Using Fn:GetAtt implies a
+        It is done by using Ref wrapped in a conditional Fn::If. Using Ref implies a
         dependency, so CloudFormation will automatically wait once it reaches that function, the same
         as if you were using a DependsOn.
         """
@@ -281,9 +283,9 @@ class S3(PushEventSource):
             properties['Tags'] = tags
         dep_tag = {
             'sam:ConditionalDependsOn:' + permission.logical_id: {
-                'Fn:If': [
+                'Fn::If': [
                     permission.resource_attributes['Condition'],
-                    fnGetAtt(permission.logical_id, 'Arn'),
+                    ref(permission.logical_id),
                     'no dependency'
                 ]
             }
@@ -309,7 +311,7 @@ class S3(PushEventSource):
             lambda_event = copy.deepcopy(base_event_mapping)
             lambda_event['Event'] = event_type
             if 'Condition' in function.resource_attributes:
-                lambda_event = make_conditional(lambda_event, function.resource_attributes['Condition'])
+                lambda_event = make_conditional(function.resource_attributes['Condition'], lambda_event)
             event_mappings.append(lambda_event)
 
         properties = bucket.get('Properties', None)
@@ -363,7 +365,7 @@ class SNS(PushEventSource):
         subscription.Endpoint = function.get_runtime_attr("arn")
         subscription.TopicArn = topic
         if 'Condition' in function.resource_attributes:
-            subscription = make_conditional(subscription, function.resource_attributes['Condition'])
+            subscription.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
@@ -621,6 +623,6 @@ class IoTRule(PushEventSource):
 
         rule.TopicRulePayload = payload
         if 'Condition' in function.resource_attributes:
-            rule = make_conditional(rule, function.resource_attributes['Condition'])
+            rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 
         return rule
