@@ -62,18 +62,3 @@ class ApiEventSource(TestCase):
             raise AttributeError("Arn not found")
 
         return arn
-
-# {
-#     'Type': 'AWS::Lambda::Permission',
-#     'Properties': {
-#         'Action': 'lambda:invokeFunction',
-#         'FunctionName': {'Ref': 'func'},
-#         'Principal': 'apigateway.amazonaws.com',
-#         'SourceArn': {
-#             'Fn::Sub': [
-#                 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-#                 {'__ApiId__': 'abc123', '__Stage__': '*'}
-#             ]
-#         }
-#     }
-# }
