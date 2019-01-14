@@ -39,6 +39,7 @@ class ImplicitApiPlugin(BasePlugin):
 
         self.implicit_api_logical_id = GeneratedLogicalId.implicit_api()
         self.existing_implicit_api_resource = None
+        self.conditions = set()
 
     def on_before_transform_template(self, template_dict):
         """
@@ -66,15 +67,19 @@ class ImplicitApiPlugin(BasePlugin):
         for logicalId, function in template.iterate(SamResourceType.Function.value):
 
             api_events = self._get_api_events(function)
+            condition = function.resource_attributes.get('Condition', None)
             if len(api_events) == 0:
                 continue
 
             try:
-                self._process_api_events(function, api_events, template)
+                self._process_api_events(function, api_events, template, condition)
 
             except InvalidEventException as ex:
                 errors.append(InvalidResourceException(logicalId, ex.message))
 
+        # Add condition to API here if necessary
+        if None not in self.conditions:
+            # add SamImplicitApiCondition to ImplicitApi
         self._maybe_remove_implicit_api(template)
 
         if len(errors) > 0:
@@ -109,7 +114,7 @@ class ImplicitApiPlugin(BasePlugin):
 
         return api_events
 
-    def _process_api_events(self, function, api_events, template):
+    def _process_api_events(self, function, api_events, template, condition):
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
         resource from the template
@@ -125,7 +130,9 @@ class ImplicitApiPlugin(BasePlugin):
             if not event_properties:
                 continue
 
-            self._add_implicit_api_id_if_necessary(event_properties)
+            if self._add_implicit_api_id_if_necessary(event_properties):
+                self.conditions.add(condition)
+
             self._add_api_to_swagger(logicalId, event_properties, template)
 
             api_events[logicalId] = event
@@ -143,6 +150,7 @@ class ImplicitApiPlugin(BasePlugin):
         """
         if "RestApiId" not in event_properties:
             event_properties["RestApiId"] = {"Ref": self.implicit_api_logical_id}
+            return True
 
     def _add_api_to_swagger(self, event_id, event_properties, template):
         """
@@ -214,6 +222,10 @@ class ImplicitApiPlugin(BasePlugin):
                 template.set(self.implicit_api_logical_id, self.existing_implicit_api_resource)
             else:
                 template.delete(self.implicit_api_logical_id)
+
+    def on_after_transform_template(self, template):
+        # TODO create condition
+        # TODO add condition to all API resources
 
 
 class ImplicitApiResource(SamResource):

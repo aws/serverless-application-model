@@ -59,7 +59,7 @@ class SwaggerEditor(object):
         :return: True, if an API Gateway integration is already present
         """
         method = self._normalize_method_name(method)
-
+        # TODO: needs to understand conditions
         return self.has_path(path, method) and \
             isinstance(self.paths[path][method], dict) and \
             bool(self.paths[path][method].get(self._X_APIGW_INTEGRATION))  # Key should be present & Value is non-empty
@@ -92,7 +92,7 @@ class SwaggerEditor(object):
         """
 
         method = self._normalize_method_name(method)
-
+        # TODO: needs to understand or use Conditions
         if self.has_integration(path, method):
             raise ValueError("Lambda integration already exists on Path={}, Method={}".format(path, method))
 
@@ -337,6 +337,7 @@ class SwaggerEditor(object):
         :param dict api: Reference to the related Api's properties as defined in the template.
         """
         method_authorizer = auth and auth.get('Authorizer')
+        # TODO: needs to understand or use Conditions
         if method_authorizer:
             api_auth = api.get('Auth')
             api_authorizers = api_auth and api_auth.get('Authorizers')
