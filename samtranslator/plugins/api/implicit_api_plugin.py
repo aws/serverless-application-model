@@ -1,7 +1,7 @@
 import copy
 
 from samtranslator.model.naming import GeneratedLogicalId
-
+from samtranslator.model.intrinsics import make_combined_condition
 from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.swagger import SwaggerEditor
 from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException
@@ -40,6 +40,7 @@ class ImplicitApiPlugin(BasePlugin):
         self.implicit_api_logical_id = GeneratedLogicalId.implicit_api()
         self.existing_implicit_api_resource = None
         self.conditions = set()
+        self.implicit_api_condition = 'SamImplicitApiCondition'
 
     def on_before_transform_template(self, template_dict):
         """
@@ -67,7 +68,7 @@ class ImplicitApiPlugin(BasePlugin):
         for logicalId, function in template.iterate(SamResourceType.Function.value):
 
             api_events = self._get_api_events(function)
-            condition = function.resource_attributes.get('Condition', None)
+            condition = function.condition
             if len(api_events) == 0:
                 continue
 
@@ -77,9 +78,7 @@ class ImplicitApiPlugin(BasePlugin):
             except InvalidEventException as ex:
                 errors.append(InvalidResourceException(logicalId, ex.message))
 
-        # Add condition to API here if necessary
-        if None not in self.conditions:
-            # add SamImplicitApiCondition to ImplicitApi
+        self._maybe_add_condition_to_implicit_api(template_dict)
         self._maybe_remove_implicit_api(template)
 
         if len(errors) > 0:
@@ -147,6 +146,7 @@ class ImplicitApiPlugin(BasePlugin):
         RestApiId property to events that don't have them.
 
         :param dict event_properties: Dictionary of event properties
+        :return: True if implicit API was added to event properties
         """
         if "RestApiId" not in event_properties:
             event_properties["RestApiId"] = {"Ref": self.implicit_api_logical_id}
@@ -203,6 +203,24 @@ class ImplicitApiPlugin(BasePlugin):
         resource.properties["DefinitionBody"] = editor.swagger
         template.set(api_id, resource)
 
+    def _maybe_add_condition_to_implicit_api(self, template_dict):
+        if None not in self.conditions and len(self.conditions) > 0:
+            implicit_api_resource = template_dict.get('Resources').get(self.implicit_api_logical_id)
+            if len(self.conditions) == 1:
+                condition = self.conditions.pop()
+                implicit_api_resource['Condition'] = condition
+            else:
+                implicit_api_resource['Condition'] = self.implicit_api_condition
+                self._add_condition_to_template(template_dict)
+
+    def _add_condition_to_template(self, template_dict):
+        if not template_dict.get('Conditions'):
+            template_dict['Conditions'] = {}
+        template_conditions = template_dict['Conditions']
+        implicit_api_conditions = make_combined_condition(list(self.conditions), self.implicit_api_condition)
+        for key, value in implicit_api_conditions.items():
+            template_conditions[key] = value
+
     def _maybe_remove_implicit_api(self, template):
         """
         Implicit API resource are tentatively added to the template for uniform handling of both Implicit & Explicit
@@ -222,10 +240,6 @@ class ImplicitApiPlugin(BasePlugin):
                 template.set(self.implicit_api_logical_id, self.existing_implicit_api_resource)
             else:
                 template.delete(self.implicit_api_logical_id)
-
-    def on_after_transform_template(self, template):
-        # TODO create condition
-        # TODO add condition to all API resources
 
 
 class ImplicitApiResource(SamResource):
