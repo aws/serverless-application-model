@@ -113,7 +113,7 @@ class ImplicitApiPlugin(BasePlugin):
 
         return api_events
 
-    def _process_api_events(self, function, api_events, template, condition):
+    def _process_api_events(self, function, api_events, template, condition=None):
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
         resource from the template
