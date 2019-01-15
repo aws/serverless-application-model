@@ -17,7 +17,7 @@ def fnSub(string, variables=None):
 
 
 def fnOr(argument_list):
-    return {'Fn::Or': condition_list}
+    return {'Fn::Or': argument_list}
 
 
 def make_conditional(condition, data):
@@ -40,9 +40,7 @@ def make_condition_or_list(conditions_list):
 
 def make_or_condition(conditions_list):
     or_list = make_condition_or_list(conditions_list)
-    condition = {
-        'Fn::Or': or_list
-    }
+    condition = fnOr(or_list)
     return condition
 
 
