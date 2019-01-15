@@ -477,7 +477,7 @@ class Api(PushEventSource):
         return permissions
 
     def _get_permission(self, resources_to_link, stage, suffix):
-        # It turns out that APIGW doesn't like tailing slashes in paths (#665)
+        # It turns out that APIGW doesn't like trailing slashes in paths (#665)
         # and removes as a part of their behaviour, but this isn't documented.
         # The regex removes the tailing slash to ensure the permission works as intended
         path = re.sub(r'([\w:{}\$-/]+)([\/]$)', r'\1', self.Path)
