@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class SamResource(object):
     """
     Class representing a SAM resource. It is designed to make minimal assumptions about the resource structure.

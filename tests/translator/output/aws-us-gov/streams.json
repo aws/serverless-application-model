@@ -80,6 +80,7 @@
       "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
         "BatchSize": 100,
+        "Enabled": false,
         "EventSourceArn": "arn:aws:kinesis:us-west-2:012345678901:stream/my-stream",
         "FunctionName": {
           "Ref": "KinesisFunction"

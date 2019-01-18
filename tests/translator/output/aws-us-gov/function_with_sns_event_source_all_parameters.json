@@ -1,0 +1,98 @@
+{
+  "Resources": {
+    "MyAwesomeFunctionNotificationTopic": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "FilterPolicy": {
+          "store": [
+            "example_corp"
+          ],
+          "event": [
+            {
+              "anything-but": "order_cancelled"
+            }
+          ],
+          "customer_interests": [
+            "rugby",
+            "football",
+            "baseball"
+          ],
+          "price_usd": [
+            {
+              "numeric": [
+                ">=",
+                100
+              ]
+            }
+          ]
+        },
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunction",
+            "Arn"
+          ]
+        },
+        "Protocol": "lambda",
+        "TopicArn": "topicArn"
+      }
+    },
+    "MyAwesomeFunctionNotificationTopicPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "sns.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunction"
+        },
+        "SourceArn": "topicArn"
+      }
+    },
+    "MyAwesomeFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyAwesomeFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

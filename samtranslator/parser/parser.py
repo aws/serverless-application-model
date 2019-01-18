@@ -1,8 +1,7 @@
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException, InvalidEventException, DuplicateLogicalIdException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.validator.validator import SamTemplateValidator
-from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.plugins import LifeCycleEvents
-import logging
+
 
 class Parser:
     def __init__(self):
@@ -22,15 +21,9 @@ class Parser:
         if parameter_values is None:
             raise ValueError("`parameter_values` argument is required")
 
-        if "Resources" not in sam_template or not isinstance(sam_template["Resources"], dict) or not sam_template["Resources"]:
+        if ("Resources" not in sam_template or not isinstance(sam_template["Resources"], dict) or not
+                sam_template["Resources"]):
             raise InvalidDocumentException(
                 [InvalidTemplateException("'Resources' section is required")])
 
-        validation_errors = SamTemplateValidator.validate(sam_template)
-        # has_errors = len(validation_errors)
-
-        # if has_errors:
-            # NOTE: eventually we will throw on invalid schema
-            # raise InvalidDocumentException([InvalidTemplateException(validation_errors)])
-            # logging.warning(
-            #     "JSON_VALIDATION_WARNING: {0}".format(validation_errors))
+        SamTemplateValidator.validate(sam_template)

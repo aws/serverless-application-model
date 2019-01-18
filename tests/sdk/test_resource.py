@@ -35,8 +35,8 @@ class TestSamResource(TestCase):
         }
 
         resource = SamResource(resource_dict)
-        self.assertEquals(resource.type, "foo")
-        self.assertEquals(resource.properties, {"a": "b"})
+        self.assertEqual(resource.type, "foo")
+        self.assertEqual(resource.properties, {"a": "b"})
 
     def test_init_must_default_to_empty_properties_dict(self):
         resource_dict = {
@@ -45,7 +45,7 @@ class TestSamResource(TestCase):
         }
 
         resource = SamResource(resource_dict)
-        self.assertEquals(resource.properties, {})
+        self.assertEqual(resource.properties, {})
 
     def test_valid_must_validate_sam_resources_only(self):
         self.assertTrue(SamResource({"Type": "AWS::Serverless::Api"}).valid())
@@ -69,18 +69,18 @@ class TestSamResource(TestCase):
         resource.type = "AWS::Serverless::Api"
         resource.properties = {"c": "d"}
 
-        self.assertEquals(resource.to_dict(), {"Type": "AWS::Serverless::Api", "Properties": {"c": "d"}})
+        self.assertEqual(resource.to_dict(), {"Type": "AWS::Serverless::Api", "Properties": {"c": "d"}})
 
         # Calling to_dict() has side effect of updating the original dictionary
-        self.assertEquals(resource_dict, {"Type": "AWS::Serverless::Api", "Properties": {"c": "d"}})
+        self.assertEqual(resource_dict, {"Type": "AWS::Serverless::Api", "Properties": {"c": "d"}})
 
 
 class TestSamResourceTypeEnum(TestCase):
 
     def test_contains_sam_resources(self):
-        self.assertEquals(SamResourceType.Function.value, "AWS::Serverless::Function")
-        self.assertEquals(SamResourceType.Api.value, "AWS::Serverless::Api")
-        self.assertEquals(SamResourceType.SimpleTable.value, "AWS::Serverless::SimpleTable")
+        self.assertEqual(SamResourceType.Function.value, "AWS::Serverless::Function")
+        self.assertEqual(SamResourceType.Api.value, "AWS::Serverless::Api")
+        self.assertEqual(SamResourceType.SimpleTable.value, "AWS::Serverless::SimpleTable")
 
     def test_has_value_must_work_for_sam_types(self):
 

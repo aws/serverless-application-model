@@ -1,5 +1,6 @@
 import boto3
 
+
 class ArnGenerator(object):
 
     @classmethod
