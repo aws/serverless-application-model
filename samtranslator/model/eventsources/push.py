@@ -1,4 +1,5 @@
 import copy
+import re
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
@@ -476,11 +477,15 @@ class Api(PushEventSource):
         return permissions
 
     def _get_permission(self, resources_to_link, stage, suffix):
+        # It turns out that APIGW doesn't like trailing slashes in paths (#665)
+        # and removes as a part of their behaviour, but this isn't documented.
+        # The regex removes the tailing slash to ensure the permission works as intended
+        path = re.sub(r'^(.+)/$', r'\1', self.Path)
 
         if not stage or not suffix:
             raise RuntimeError("Could not add permission to lambda function.")
 
-        path = self.Path.replace('{proxy+}', '*')
+        path = path.replace('{proxy+}', '*')
         method = '*' if self.Method.lower() == 'any' else self.Method.upper()
 
         api_id = self.RestApiId
