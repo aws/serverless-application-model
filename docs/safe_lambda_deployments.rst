@@ -309,5 +309,24 @@ The CodeDeploy service will assume the new CodeDeployServiceRole to Invoke any P
 
   NOTE: The CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  ``CodeDeployHook_``. For example,  you should name your Hook functions as such: ``CodeDeployHook_PreTrafficHook``.
 
+Production errors preventing deployments
+~~~~~~~~~
+In some situations, an issue that is happening in production may prevent you from deploying a fix. This may happen when a deployment happens when traffic is too low to register enough errors to trigger a roll back, or where someone is sending malicious traffic through to a lambda and you haven’t accounted for the scenario where they do. 
+
+When this happens, the alarm for errors in the current lambda version is in an error state, which will cause code deploy to roll back any attempted deploys straight away.
+
+To release code in this situation, you need to
+
+- Go into the CodeDeploy console
+- Select the application you want to deploy to
+- Select the corresponding Deployment Group
+- Select “Edit”
+- Select “Advanced - optional”
+- Select "ignore alarm configuration"
+- Save the changes
+
+Run your deployment as usual
+
+Then once deployment has successfully run, return to the CodeDeploy console, and follow the above steps but this time deselect “ignore alarm configuration”.
 
 .. _Globals: globals.rst
