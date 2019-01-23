@@ -23,9 +23,10 @@ Example:
   Resources:
     HelloWorldFunction:
       Type: AWS::Serverless::Function
-      Environment:
-        Variables:
-          MESSAGE: "Hello From SAM"
+      Properties:
+        Environment:
+          Variables:
+            MESSAGE: "Hello From SAM"
 
     ThumbnailFunction:
       Type: AWS::Serverless::Function

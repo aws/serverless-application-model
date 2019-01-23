@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Simple CRUD webservice. State is stored in a SimpleTable (DynamoDB) resource.
 Resources:
@@ -8,7 +8,9 @@ Resources:
       Handler: index.get
       Runtime: nodejs6.10
       CodeUri: src/
-      Policies: AmazonDynamoDBReadOnlyAccess
+      Policies:
+        - DynamoDBReadPolicy:
+          TableName: !Ref Table
       Environment:
         Variables:
           TABLE_NAME: !Ref Table
@@ -25,7 +27,9 @@ Resources:
       Handler: index.put
       Runtime: nodejs6.10
       CodeUri: src/
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+        - DynamoDBCrudPolicy:
+          TableName: !Ref Table
       Environment:
         Variables:
           TABLE_NAME: !Ref Table
@@ -42,7 +46,9 @@ Resources:
       Handler: index.delete
       Runtime: nodejs6.10
       CodeUri: src/
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+        - DynamoDBCrudPolicy:
+          TableName: !Ref Table
       Environment:
         Variables:
           TABLE_NAME: !Ref Table
@@ -57,7 +63,6 @@ Resources:
     Type: AWS::Serverless::SimpleTable
 
 Outputs:
-    ApiURL:
-      Description: "API endpoint URL for Prod environment"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resource/"
-
+  ApiURL:
+    Description: "API endpoint URL for Prod environment"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resource/"

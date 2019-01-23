@@ -93,9 +93,52 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
-          "this": "is", 
-          "a": "swagger"
-        }, 
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ]
+              }
+            }
+          }, 
+          "swagger": 2.0,
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "x-amazon-apigateway-authorizer": {
+                "type": "cognito_user_pools",
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "Name": "some api"
       }
     }, 
@@ -112,27 +155,27 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment62b96c1a61"
+          "Ref": "ServerlessRestApiDeploymentdb4b9da82a"
         }
       }
     }, 
-    "ServerlessRestApiDeployment62b96c1a61": {
+    "ServerlessRestApiDeploymentdb4b9da82a": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 62b96c1a611878eefb13e8ef66dbc71b9ba3dd19", 
+        "Description": "RestApi deployment id: db4b9da82adc6031fcd32bf3a4954485464fc009", 
         "StageName": "Stage"
       }
     }, 
-    "ExplicitApiDeployment359f256a3b": {
+    "ExplicitApiDeploymentd5fa0145e9": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 359f256a3b3ff2e1102e335a4d603f02df9b4988", 
+        "Description": "RestApi deployment id: d5fa0145e9e6393911d32967e66fd7091d605483", 
         "StageName": "Stage"
       }
     }, 
@@ -156,12 +199,36 @@
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 }, 
-                "responses": {}
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ]
               }
             }
           }, 
-          "swagger": "2.0"
-        }, 
+          "swagger": "2.0",
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "x-amazon-apigateway-authorizer": {
+                "type": "cognito_user_pools",
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "Name": "some api"
       }
     }, 
@@ -178,7 +245,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment359f256a3b"
+          "Ref": "ExplicitApiDeploymentd5fa0145e9"
         }
       }
     }
