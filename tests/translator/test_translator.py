@@ -200,6 +200,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_global_layers',
         'function_with_layers',
         'function_with_many_layers',
+        'function_with_permissions_boundary',
         'function_with_policy_templates',
         'globals_for_function',
         'globals_for_api',
