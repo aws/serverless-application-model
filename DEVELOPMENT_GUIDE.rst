@@ -78,26 +78,26 @@ Profiling
 
 Install snakeviz `pip install snakeviz`
 
-```
-python -m cProfile -o sam_profile_results bin/sam-translate.py translate --input-file=tests/translator/input/alexa_skill.yaml --output-file=cfn-template.json
-snakeviz sam_profile_results
-```
+.. code-block:: shell
+
+   python -m cProfile -o sam_profile_results bin/sam-translate.py translate --input-file=tests/translator/input/alexa_skill.yaml --output-file=cfn-template.json
+   snakeviz sam_profile_results
 
 Verifying transforms
 --------------------
 
 If you make changes to the transformer and want to verify the resulting CloudFormation template works as expected, you can transform your SAM template into a CloudFormation template using the following process:
 
-```shell
-# Optional: You only need to run the package command in certain cases; e.g. when your CodeUri specifies a local path
-# Replace MY_TEMPLATE_PATH with the path to your template and MY_S3_BUCKET with an existing S3 bucket
-aws cloudformation package --template-file MY_TEMPLATE_PATH/template.yaml --output-template-file output-template.yaml --s3-bucket MY_S3_BUCKET
+.. code-block:: shell
 
-# Transform your SAM template into a CloudFormation template
-# Replace "output-template.yaml" if you didn't run the package command above or specified a different path for --output-template-file
-bin/sam-translate.py --input-file=output-template.yaml
+   # Optional: You only need to run the package command in certain cases; e.g. when your CodeUri specifies a local path
+   # Replace MY_TEMPLATE_PATH with the path to your template and MY_S3_BUCKET with an existing S3 bucket
+   aws cloudformation package --template-file MY_TEMPLATE_PATH/template.yaml --output-template-file output-template.yaml --s3-bucket MY_S3_BUCKET
 
-# Deploy your transformed CloudFormation template
-# Replace MY_STACK_NAME with a unique name each time you deploy
-aws cloudformation deploy --template-file cfn-template.json --capabilities CAPABILITY_NAMED_IAM --stack-name MY_STACK_NAME
-```
+   # Transform your SAM template into a CloudFormation template
+   # Replace "output-template.yaml" if you didn't run the package command above or specified a different path for --output-template-file
+   bin/sam-translate.py --input-file=output-template.yaml
+
+   # Deploy your transformed CloudFormation template
+   # Replace MY_STACK_NAME with a unique name each time you deploy
+   aws cloudformation deploy --template-file cfn-template.json --capabilities CAPABILITY_NAMED_IAM --stack-name MY_STACK_NAME
