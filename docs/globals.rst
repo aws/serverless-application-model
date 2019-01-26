@@ -79,6 +79,7 @@ Currently, the following resources and properties are being supported:
       EndpointConfiguration:
       MethodSettings:
       BinaryMediaTypes:
+      MinimumCompressionSize:
       Cors:
 
     SimpleTable:

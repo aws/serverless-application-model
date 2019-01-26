@@ -17,7 +17,8 @@ class ApiGatewayRestApi(Resource):
             'Name': PropertyType(False, is_str()),
             'Parameters': PropertyType(False, is_type(dict)),
             'EndpointConfiguration': PropertyType(False, is_type(dict)),
-            "BinaryMediaTypes": PropertyType(False, is_type(list))
+            "BinaryMediaTypes": PropertyType(False, is_type(list)),
+            "MinimumCompressionSize": PropertyType(False, is_type(int))
     }
 
     runtime_attrs = {

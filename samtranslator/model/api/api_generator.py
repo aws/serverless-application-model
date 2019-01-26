@@ -23,7 +23,7 @@ AuthProperties.__new__.__defaults__ = (None, None)
 
 class ApiGenerator(object):
 
-    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, cors=None, auth=None):
+    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, minimum_compression_size=None, cors=None, auth=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -48,6 +48,7 @@ class ApiGenerator(object):
         self.endpoint_configuration = endpoint_configuration
         self.method_settings = method_settings
         self.binary_media = binary_media
+        self.minimum_compression_size = minimum_compression_size
         self.cors = cors
         self.auth = auth
 
@@ -59,6 +60,7 @@ class ApiGenerator(object):
         """
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on)
         rest_api.BinaryMediaTypes = self.binary_media
+        rest_api.MinimumCompressionSize = self.minimum_compression_size
 
         if self.endpoint_configuration:
             self._set_endpoint_configuration(rest_api, self.endpoint_configuration)
