@@ -1477,6 +1477,26 @@
         ]
       }
     },
+    "SESEmailTemplateCrudPolicy": {
+      "Description": "Gives permission to create, get, list, update and delete SES Email Templates",
+      "Parameters": {
+        
+      },
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "ses:CreateTemplate",
+            "ses:GetTemplate",
+            "ses:ListTemplates",
+            "ses:UpdateTemplate",
+            "ses:DeleteTemplate",
+            "ses:TestRenderTemplate"
+          ],
+          "Resource": "*"
+        }]
+      }
+    },
     "FilterLogEventsPolicy": {
       "Description": "Gives permission to filter Log Events from a specified Log Group",
       "Parameters": {

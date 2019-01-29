@@ -1150,6 +1150,25 @@
               "Statement": [
                 {
                   "Action": [
+                    "ses:CreateTemplate",
+                    "ses:GetTemplate",
+                    "ses:ListTemplates",
+                    "ses:UpdateTemplate",
+                    "ses:DeleteTemplate",
+                    "ses:TestRenderTemplate"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy47",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
                     "logs:FilterLogEvents"
                   ],
                   "Resource": {

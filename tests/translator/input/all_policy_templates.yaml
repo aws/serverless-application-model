@@ -135,6 +135,8 @@ Resources:
 
         - SESBulkTemplatedCrudPolicy:
             IdentityName: name
+        
+        - SESEmailTemplateCrudPolicy: {}
 
         - FilterLogEventsPolicy:
             LogGroupName: name
