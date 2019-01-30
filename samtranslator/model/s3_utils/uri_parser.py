@@ -43,7 +43,7 @@ def to_s3_uri(code_dict):
         raise TypeError("Code location should be a dictionary")
 
     if version:
-            uri += "?versionId=" + version
+        uri += "?versionId=" + version
 
     return uri
 
