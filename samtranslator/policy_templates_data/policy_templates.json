@@ -1525,8 +1525,8 @@
         ]
       }
     },
-    "DecodeSSMParameterPolicy": {
-      "Description": "Gives access to SSM key and parameter to load secrets in this account.",
+    "SSMParameterReadPolicy": {
+      "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
       "Parameters": {
         "ParameterName": {
           "Description":"The name of the secret stored in SSM in your account."
@@ -1553,72 +1553,6 @@
                 {
                   "parameterName": {
                     "Ref": "ParameterName"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "Effect": "Allow",
-            "Action": [
-              "kms:Decrypt"
-            ],
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
-              ]
-            }
-          }
-        ]
-      }
-    },
-    "DecodeSSMParameterCustomKeyPolicy": {
-      "Description": "Gives access to decoding a SSM Parameters store using non-default key.",
-      "Parameters": {
-        "ParameterName": {
-          "Description": "The name of the secret stored in SSM in your account."
-        },
-        "KeyId": {
-          "Description": "ID of the KMS Key"
-        }
-      },
-      "Definition": {
-        "Statement": [
-          {
-            "Effect": "Allow",
-            "Action": [
-              "ssm:DescribeParameters"
-            ],
-            "Resource": "*"
-          },
-          {
-            "Effect": "Allow",
-            "Action": [
-              "ssm:GetParameters",
-              "ssm:GetParameter"
-            ],
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
-                {
-                  "parameterName": {
-                    "Ref": "ParameterName"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "Effect": "Allow",
-            "Action": [
-              "kms:Decrypt"
-            ],
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
-                {
-                  "keyId": {
-                    "Ref": "KeyId"
                   }
                 }
               ]

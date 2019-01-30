@@ -141,9 +141,5 @@ Resources:
         - FilterLogEventsPolicy:
             LogGroupName: name
 
-        - DecodeSSMParameterPolicy:
+        - SSMParameterReadPolicy:
             ParameterName: name
-
-        - DecodeSSMParameterCustomKeyPolicy:
-            ParameterName: name
-            KeyId: id
