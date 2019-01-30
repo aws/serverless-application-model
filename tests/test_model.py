@@ -122,8 +122,8 @@ class TestResourceRuntimeAttributes(TestCase):
 
         logical_id = "SomeId"
         resource = NewResource(logical_id)
-        self.assertEquals("value1", resource.get_runtime_attr("attr1"))
-        self.assertEquals("value2", resource.get_runtime_attr("attr2"))
+        self.assertEqual("value1", resource.get_runtime_attr("attr1"))
+        self.assertEqual("value2", resource.get_runtime_attr("attr2"))
 
         with self.assertRaises(NotImplementedError):
             resource.get_runtime_attr("invalid_attribute")
@@ -135,7 +135,7 @@ class TestResourceRuntimeAttributes(TestCase):
             property_types = {}
 
         resource = NewResource("SomeId")
-        self.assertEquals(0, len(resource.runtime_attrs))
+        self.assertEqual(0, len(resource.runtime_attrs))
 
 class TestSamResourceReferableProperties(TestCase):
 
@@ -172,14 +172,14 @@ class TestSamResourceReferableProperties(TestCase):
         self.supported_resource_refs = \
             sam_resource.get_resource_references(cfn_resources, self.supported_resource_refs)
 
-        self.assertEquals("logicalId1", self.supported_resource_refs.get("SamLogicalId", "prop1"))
-        self.assertEquals("logicalId2", self.supported_resource_refs.get("SamLogicalId", "prop2"))
+        self.assertEqual("logicalId1", self.supported_resource_refs.get("SamLogicalId", "prop1"))
+        self.assertEqual("logicalId2", self.supported_resource_refs.get("SamLogicalId", "prop2"))
 
         # there is no cfn resource of for "prop3" in the cfn_resources list
-        self.assertEquals(None, self.supported_resource_refs.get("SamLogicalId", "prop3"))
+        self.assertEqual(None, self.supported_resource_refs.get("SamLogicalId", "prop3"))
 
         # Must add only for the given SAM resource
-        self.assertEquals(1, len(self.supported_resource_refs))
+        self.assertEqual(1, len(self.supported_resource_refs))
 
     def test_must_work_with_two_resources_of_same_type(self):
         class NewSamResource(SamResourceMacro):
@@ -204,12 +204,12 @@ class TestSamResourceReferableProperties(TestCase):
         self.supported_resource_refs = \
             sam_resource2.get_resource_references(cfn_resources, self.supported_resource_refs)
 
-        self.assertEquals("logicalId1", self.supported_resource_refs.get("SamLogicalId1", "prop1"))
-        self.assertEquals("logicalId2", self.supported_resource_refs.get("SamLogicalId1", "prop2"))
-        self.assertEquals("logicalId1", self.supported_resource_refs.get("SamLogicalId2", "prop1"))
-        self.assertEquals("logicalId2", self.supported_resource_refs.get("SamLogicalId2", "prop2"))
+        self.assertEqual("logicalId1", self.supported_resource_refs.get("SamLogicalId1", "prop1"))
+        self.assertEqual("logicalId2", self.supported_resource_refs.get("SamLogicalId1", "prop2"))
+        self.assertEqual("logicalId1", self.supported_resource_refs.get("SamLogicalId2", "prop1"))
+        self.assertEqual("logicalId2", self.supported_resource_refs.get("SamLogicalId2", "prop2"))
 
-        self.assertEquals(2, len(self.supported_resource_refs))
+        self.assertEqual(2, len(self.supported_resource_refs))
 
     def test_must_skip_unknown_resource_types(self):
         class NewSamResource(SamResourceMacro):
@@ -229,7 +229,7 @@ class TestSamResourceReferableProperties(TestCase):
         self.supported_resource_refs = \
             sam_resource.get_resource_references(cfn_resources, self.supported_resource_refs)
 
-        self.assertEquals(0, len(self.supported_resource_refs))
+        self.assertEqual(0, len(self.supported_resource_refs))
 
     def test_must_skip_if_no_supported_properties(self):
         class NewSamResource(SamResourceMacro):
@@ -245,7 +245,7 @@ class TestSamResourceReferableProperties(TestCase):
         self.supported_resource_refs = \
             sam_resource.get_resource_references(cfn_resources, self.supported_resource_refs)
 
-        self.assertEquals(0, len(self.supported_resource_refs))
+        self.assertEqual(0, len(self.supported_resource_refs))
 
     def test_must_skip_if_no_resources(self):
         class NewSamResource(SamResourceMacro):
@@ -260,7 +260,7 @@ class TestSamResourceReferableProperties(TestCase):
         self.supported_resource_refs = \
             sam_resource.get_resource_references(cfn_resources, self.supported_resource_refs)
 
-        self.assertEquals(0, len(self.supported_resource_refs))
+        self.assertEqual(0, len(self.supported_resource_refs))
 
     def test_must_raise_if_input_is_absent(self):
         class NewSamResource(SamResourceMacro):

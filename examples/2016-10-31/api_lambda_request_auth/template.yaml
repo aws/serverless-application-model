@@ -38,8 +38,9 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /
             Method: get
-            Auth:
-              Authorizer: NONE
+            # NOTE: Uncomment the two lines below to make `GET /` publicly accessible
+            # Auth:
+            #   Authorizer: NONE
         GetUsers:
           Type: Api
           Properties:

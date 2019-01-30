@@ -23,9 +23,10 @@ Example:
   Resources:
     HelloWorldFunction:
       Type: AWS::Serverless::Function
-      Environment:
-        Variables:
-          MESSAGE: "Hello From SAM"
+      Properties:
+        Environment:
+          Variables:
+            MESSAGE: "Hello From SAM"
 
     ThumbnailFunction:
       Type: AWS::Serverless::Function
@@ -81,6 +82,9 @@ Currently, the following resources and properties are being supported:
       BinaryMediaTypes:
       MinimumCompressionSize:
       Cors:
+      AccessLogSetting:
+      CanarySetting:
+      TracingEnabled:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable

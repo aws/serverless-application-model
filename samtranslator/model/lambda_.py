@@ -29,6 +29,7 @@ class LambdaFunction(Resource):
         "arn": lambda self: fnGetAtt(self.logical_id, "Arn")
     }
 
+
 class LambdaVersion(Resource):
     resource_type = 'AWS::Lambda::Version'
     property_types = {
@@ -42,6 +43,7 @@ class LambdaVersion(Resource):
         "version": lambda self: fnGetAtt(self.logical_id, "Version")
     }
 
+
 class LambdaAlias(Resource):
     resource_type = 'AWS::Lambda::Alias'
     property_types = {
@@ -54,6 +56,7 @@ class LambdaAlias(Resource):
     runtime_attrs = {
         "arn": lambda self: ref(self.logical_id)
     }
+
 
 class LambdaEventSourceMapping(Resource):
     resource_type = 'AWS::Lambda::EventSourceMapping'
@@ -69,6 +72,7 @@ class LambdaEventSourceMapping(Resource):
         "name": lambda self: ref(self.logical_id)
     }
 
+
 class LambdaPermission(Resource):
     resource_type = 'AWS::Lambda::Permission'
     property_types = {
@@ -79,6 +83,7 @@ class LambdaPermission(Resource):
             'SourceArn': PropertyType(False, is_str()),
             'EventSourceToken': PropertyType(False, is_str())
     }
+
 
 class LambdaLayerVersion(Resource):
     """ Lambda layer version resource
@@ -97,4 +102,3 @@ class LambdaLayerVersion(Resource):
         "name": lambda self: ref(self.logical_id),
         "arn": lambda self: fnGetAtt(self.logical_id, "Arn")
     }
-

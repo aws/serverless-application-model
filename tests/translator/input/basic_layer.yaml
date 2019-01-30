@@ -24,3 +24,9 @@ Resources:
         - python2.7
       LicenseInfo: "License information"
       RetentionPolicy: Retain
+
+  LayerWithCondition:
+    Type: 'AWS::Serverless::LayerVersion'
+    Condition: "this is a test"    
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip  

@@ -2,8 +2,9 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: An Amazon S3 trigger that uses rekognition APIs to detect faces
 Parameters:
-  BucketNameParameter:
+  BucketNamePrefix:
     Type: String
+    Default: sam-example
   CollectionIdParameter:
     Type: String
 Resources:
@@ -18,7 +19,7 @@ Resources:
       Timeout: 3
       Policies:
         - S3CrudPolicy:
-            BucketName: !Ref BucketNameParameter
+            BucketName: !Sub "${BucketNamePrefix}-rekognition"
         - RekognitionNoDataAccessPolicy:
             CollectionId: !Ref CollectionIdParameter
         - RekognitionWriteOnlyAccessPolicy:
@@ -33,3 +34,5 @@ Resources:
               - 's3:ObjectCreated:*'
   Bucket1:
     Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub "${BucketNamePrefix}-rekognition"

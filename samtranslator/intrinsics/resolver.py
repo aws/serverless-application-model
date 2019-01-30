@@ -3,7 +3,8 @@
 from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
 
 # All intrinsics are supported by default
-DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name:action() for action in [RefAction, SubAction, GetAttAction]}
+DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
+
 
 class IntrinsicsResolver(object):
 
@@ -11,8 +12,8 @@ class IntrinsicsResolver(object):
         """
         Instantiate the resolver
         :param dict parameters: Map of parameter names to their values
-        :param dict supported_intrinsics: Dictionary of intrinsic functions this class supports along with the Action class that
-            can process this intrinsic
+        :param dict supported_intrinsics: Dictionary of intrinsic functions this class supports along with the
+            Action class that can process this intrinsic
         :raises TypeError: If parameters or the supported_intrinsics arguments are invalid
         """
 
@@ -25,7 +26,6 @@ class IntrinsicsResolver(object):
 
         self.supported_intrinsics = supported_intrinsics
         self.parameters = parameters
-
 
     def resolve_parameter_refs(self, input):
         """
@@ -218,5 +218,5 @@ class IntrinsicsResolver(object):
         """
         # All intrinsic functions are dictionaries with just one key
         return isinstance(input, dict) \
-               and len(input) == 1 \
-               and list(input.keys())[0] in self.supported_intrinsics
+            and len(input) == 1 \
+            and list(input.keys())[0] in self.supported_intrinsics

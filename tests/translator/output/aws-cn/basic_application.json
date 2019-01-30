@@ -68,6 +68,27 @@
           }
         ]
       }
+    },
+    "ApplicationWithCondition": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          },
+          {
+            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world",
+            "Key": "serverlessrepo:applicationId"
+          },
+          {
+            "Value": "1.0.2",
+            "Key": "serverlessrepo:semanticVersion"
+          }
+        ]
+      },
+      "Condition": "this is a test"
     }
   }
 }

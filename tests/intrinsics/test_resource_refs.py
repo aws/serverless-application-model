@@ -17,7 +17,7 @@ class TestSupportedResourceReferences(TestCase):
             "property3": "value3"
         }
 
-        self.assertEquals(expected, resource_refs.get_all("logicalId"))
+        self.assertEqual(expected, resource_refs.get_all("logicalId"))
 
     def test_add_multiple_logical_ids(self):
         resource_refs = SupportedResourceReferences()
@@ -26,9 +26,9 @@ class TestSupportedResourceReferences(TestCase):
         resource_refs.add("logicalId2", "property2", "value2")
         resource_refs.add("logicalId3", "property3", "value3")
 
-        self.assertEquals({"property1": "value1"}, resource_refs.get_all("logicalId1"))
-        self.assertEquals({"property2": "value2"}, resource_refs.get_all("logicalId2"))
-        self.assertEquals({"property3": "value3"}, resource_refs.get_all("logicalId3"))
+        self.assertEqual({"property1": "value1"}, resource_refs.get_all("logicalId1"))
+        self.assertEqual({"property2": "value2"}, resource_refs.get_all("logicalId2"))
+        self.assertEqual({"property3": "value3"}, resource_refs.get_all("logicalId3"))
 
     def test_add_must_error_on_duplicate_value(self):
 
@@ -64,7 +64,7 @@ class TestSupportedResourceReferences(TestCase):
 
         resource_refs.add("logicalId", "property", "value1")
 
-        self.assertEquals(None, resource_refs.get_all("some logical id"))
+        self.assertEqual(None, resource_refs.get_all("some logical id"))
 
     def test_get_must_return_correct_value(self):
         resource_refs = SupportedResourceReferences()
@@ -73,16 +73,16 @@ class TestSupportedResourceReferences(TestCase):
         resource_refs.add("logicalId1", "property2", "value2")
         resource_refs.add("newLogicalId", "newProperty", "newValue")
 
-        self.assertEquals("value1", resource_refs.get("logicalId1", "property1"))
-        self.assertEquals("value2", resource_refs.get("logicalId1", "property2"))
-        self.assertEquals("newValue", resource_refs.get("newLogicalId", "newProperty"))
+        self.assertEqual("value1", resource_refs.get("logicalId1", "property1"))
+        self.assertEqual("value2", resource_refs.get("logicalId1", "property2"))
+        self.assertEqual("newValue", resource_refs.get("newLogicalId", "newProperty"))
 
     def test_get_on_non_existent_property(self):
         resource_refs = SupportedResourceReferences()
 
         resource_refs.add("logicalId1", "property1", "value1")
-        self.assertEquals(None, resource_refs.get("logicalId1", "SomeProperty"))
-        self.assertEquals(None, resource_refs.get("SomeLogicalId", "property1"))
+        self.assertEqual(None, resource_refs.get("logicalId1", "SomeProperty"))
+        self.assertEqual(None, resource_refs.get("SomeLogicalId", "property1"))
 
 
     def test_len_single_resource(self):
@@ -90,11 +90,11 @@ class TestSupportedResourceReferences(TestCase):
 
         resource_refs.add("logicalId1", "property1", "value1")
         resource_refs.add("logicalId1", "property2", "value2")
-        self.assertEquals(1, len(resource_refs))  # Each unique logicalId adds one to the len
+        self.assertEqual(1, len(resource_refs))  # Each unique logicalId adds one to the len
 
     def test_len_multiple_resources(self):
         resource_refs = SupportedResourceReferences()
 
         resource_refs.add("logicalId1", "property1", "value1")
         resource_refs.add("logicalId2", "property2", "value2")
-        self.assertEquals(2, len(resource_refs))
+        self.assertEqual(2, len(resource_refs))

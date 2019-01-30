@@ -4,8 +4,9 @@ Description: >-
   An Amazon S3 trigger that retrieves metadata for the object that has been
   updated.
 Parameters:
-  BucketNameParameter:
+  BucketNamePrefix:
     Type: String
+    Default: sam-example
 Resources:
   s3getobjectpython3:
     Type: 'AWS::Serverless::Function'
@@ -20,7 +21,7 @@ Resources:
       Timeout: 3
       Policies:
         - S3CrudPolicy:
-            BucketName: !Ref BucketNameParameter
+            BucketName: !Sub "${BucketNamePrefix}-get-object-python3"
       Events:
         BucketEvent1:
           Type: S3
@@ -31,3 +32,5 @@ Resources:
               - 's3:ObjectCreated:*'
   Bucket1:
     Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub "${BucketNamePrefix}-get-object-python3"

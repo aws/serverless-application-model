@@ -3,6 +3,7 @@ from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
+
 class PolicyTemplatesForFunctionPlugin(BasePlugin):
     """
     Use this plugin to allow the usage of Policy Templates in `Policies` section of AWS::Serverless::Function resource.

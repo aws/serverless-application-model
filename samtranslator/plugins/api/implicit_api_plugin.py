@@ -87,8 +87,10 @@ class ImplicitApiPlugin(BasePlugin):
         :param SamResource function: Function Resource object
         :return dict: Dictionary of API events along with any other configuration passed to it.
             Example: {
-                FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>}, Cors: {<something>}, Auth: {<something>}},
-                BarEvent: {Path: "/bar", Method: "any", MethodSettings: {<something>}, Cors: {<something>}, Auth: {<something>}}"
+                FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>},
+                            Cors: {<something>}, Auth: {<something>}},
+                BarEvent: {Path: "/bar", Method: "any", MethodSettings: {<something>}, Cors: {<something>},
+                            Auth: {<something>}}"
             }
         """
 
@@ -167,8 +169,8 @@ class ImplicitApiPlugin(BasePlugin):
         # Make sure Swagger is valid
         resource = template.get(api_id)
         if not (resource and
-                    isinstance(resource.properties, dict) and
-                    SwaggerEditor.is_valid(resource.properties.get("DefinitionBody"))):
+                isinstance(resource.properties, dict) and
+                SwaggerEditor.is_valid(resource.properties.get("DefinitionBody"))):
             # This does not have an inline Swagger. Nothing can be done about it.
             return
 
@@ -212,6 +214,7 @@ class ImplicitApiPlugin(BasePlugin):
                 template.set(self.implicit_api_logical_id, self.existing_implicit_api_resource)
             else:
                 template.delete(self.implicit_api_logical_id)
+
 
 class ImplicitApiResource(SamResource):
     """
