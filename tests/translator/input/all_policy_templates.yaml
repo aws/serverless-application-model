@@ -133,6 +133,14 @@ Resources:
         - DynamoDBReconfigurePolicy:
             TableName: name
 
+        - SESBulkTemplatedCrudPolicy:
+            IdentityName: name
+
+        - SESEmailTemplateCrudPolicy: {}
+
+        - FilterLogEventsPolicy:
+            LogGroupName: name
+
         - DecodeSSMParameterPolicy:
             ParameterName: name
 

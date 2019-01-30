@@ -1,22 +1,24 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: IoT -> Lambda -> DynamoDB
 Resources:
-  IoTFunction: 
+  IoTFunction:
     Type: AWS::Serverless::Function
-    Properties: 
+    Properties:
       Handler: index.handler
       Runtime: nodejs6.10
       CodeUri: src/
-      Policies: AmazonDynamoDBFullAccess
-      Environment: 
-        Variables: 
-          TABLE_NAME: 
+      Policies:
+        - DynamoDBCrudPolicy:
+          TableName: !Ref Table
+      Environment:
+        Variables:
+          TABLE_NAME:
             Ref: Table
-      Events: 
-        IoT: 
+      Events:
+        IoT:
           Type: IoTRule
-          Properties: 
+          Properties:
             AwsIotSqlVersion: 2016-03-23
             Sql: "SELECT * FROM 'iot2ddb'"
   Table:
@@ -25,5 +27,3 @@ Resources:
       PrimaryKey:
         Name: id
         Type: String
-
-

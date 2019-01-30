@@ -15,9 +15,9 @@ class TestTemplateObject(TestCase):
 
         template = Template(template_name, parameters, template_definition)
 
-        self.assertEquals(template.name, template_name)
-        self.assertEquals(template.parameters, parameters)
-        self.assertEquals(template.definition, template_definition)
+        self.assertEqual(template.name, template_name)
+        self.assertEqual(template.parameters, parameters)
+        self.assertEqual(template.definition, template_definition)
         check_parameters_exist_mock.assert_called_once_with(parameters, template_definition)
 
     @patch.object(Template, "check_parameters_exist")
@@ -34,9 +34,9 @@ class TestTemplateObject(TestCase):
         template = Template.from_dict(template_name, template_dict)
 
         self.assertTrue(isinstance(template, Template))
-        self.assertEquals(template.name, template_name)
-        self.assertEquals(template.parameters, parameters)
-        self.assertEquals(template.definition, template_definition)
+        self.assertEqual(template.name, template_name)
+        self.assertEqual(template.parameters, parameters)
+        self.assertEqual(template.definition, template_definition)
 
     @patch.object(Template, "check_parameters_exist")
     def test_from_dict_must_work_when_parameters_is_absent(self, check_parameters_exist_mock):
@@ -49,8 +49,8 @@ class TestTemplateObject(TestCase):
 
         template = Template.from_dict(template_name, template_dict)
 
-        self.assertEquals(template.parameters, {}) # Defaults to {}
-        self.assertEquals(template.definition, template_definition)
+        self.assertEqual(template.parameters, {}) # Defaults to {}
+        self.assertEqual(template.definition, template_definition)
 
     @patch.object(Template, "check_parameters_exist")
     def test_from_dict_must_work_when_template_definition_is_absent(self, check_parameters_exist_mock):
@@ -63,8 +63,8 @@ class TestTemplateObject(TestCase):
 
         template = Template.from_dict(template_name, template_dict)
 
-        self.assertEquals(template.parameters, parameters)
-        self.assertEquals(template.definition, {}) # Defaults to {}
+        self.assertEqual(template.parameters, parameters)
+        self.assertEqual(template.definition, {}) # Defaults to {}
 
     def test_missing_parameter_values_must_work_when_input_has_less_keys(self):
         template_parameters = {
@@ -79,7 +79,7 @@ class TestTemplateObject(TestCase):
         template = Template("name", template_parameters, {})
         result = template.missing_parameter_values(parameter_values)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_missing_parameter_values_must_work_when_input_has_all_keys(self):
         template_parameters = {
@@ -95,7 +95,7 @@ class TestTemplateObject(TestCase):
         template = Template("name", template_parameters, {})
         result = template.missing_parameter_values(parameter_values)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_missing_parameter_values_must_work_when_input_has_more_keys(self):
         template_parameters = {
@@ -112,7 +112,7 @@ class TestTemplateObject(TestCase):
         template = Template("name", template_parameters, {})
         result = template.missing_parameter_values(parameter_values)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_missing_parameter_values_must_raise_on_invalid_input(self):
         template_parameters = {
@@ -155,7 +155,7 @@ class TestTemplateObject(TestCase):
         template = Template("name", template_parameters, template_definition)
         result = template.to_statement(parameter_values)
 
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
         intrinsics_resolver_mock.assert_called_once_with(parameter_values, {"Ref": ANY})
         resolver_instance_mock.resolve_parameter_refs.assert_called_once_with({"Statement": {"key": "value"}})
 

@@ -1,5 +1,6 @@
 import boto3
 
+
 class ArnGenerator(object):
 
     @classmethod
@@ -40,7 +41,6 @@ class ArnGenerator(object):
         :param region: Optional name of the region
         :return: Partition name
         """
-
 
         if region is None:
             # Use Boto3 to get the region where code is running. This uses Boto's regular region resolution

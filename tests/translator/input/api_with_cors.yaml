@@ -66,3 +66,4 @@ Resources:
         AllowMethods: "methods"
         AllowHeaders: "headers"
         AllowOrigin: "origins"
+        AllowCredentials: true

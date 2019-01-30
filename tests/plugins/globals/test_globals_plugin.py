@@ -18,7 +18,7 @@ class TestGlobalsPlugin(TestCase):
         # Name is the class name
         expected_name = "GlobalsPlugin"
 
-        self.assertEquals(self.plugin.name, expected_name)
+        self.assertEqual(self.plugin.name, expected_name)
 
     def test_plugin_must_be_instance_of_base_plugin_class(self):
         self.assertTrue(isinstance(self.plugin, BasePlugin))
@@ -37,7 +37,7 @@ class TestGlobalsPlugin(TestCase):
             self.plugin.on_before_transform_template(template)
 
         ex = context.exception
-        self.assertEquals(1, len(ex.causes))
-        self.assertEquals(ex.causes[0], globals_ex)
+        self.assertEqual(1, len(ex.causes))
+        self.assertEqual(ex.causes[0], globals_ex)
 
     # Skipping test for the happy case because the end-to-end unit tests capture a lot of the Globals Plugin's logic.

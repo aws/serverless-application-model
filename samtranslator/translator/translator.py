@@ -3,15 +3,18 @@ import copy
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, DuplicateLogicalIdException, \
-    InvalidEventException
+from samtranslator.model.exceptions import (InvalidDocumentException, InvalidResourceException,
+                                            DuplicateLogicalIdException, InvalidEventException)
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
+from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
+from samtranslator.plugins import LifeCycleEvents
 from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
+
 
 class Translator:
     """Translates SAM templates into CloudFormation templates
@@ -20,8 +23,8 @@ class Translator:
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
-        :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator, in addition
-            to the default ones.
+        :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator,
+            in addition to the default ones.
         """
         self.managed_policy_map = managed_policy_map
         self.plugins = plugins
@@ -34,10 +37,10 @@ class Translator:
         :param dict sam_template: the SAM manifest, as loaded by json.load() or yaml.load(), or as provided by \
                 CloudFormation transforms.
         :param dict parameter_values: Map of template parameter names to their values. It is a required parameter that
-                should at least be an empty map. By providing an empty map, the caller explicitly opts-into the idea that
-                some functionality that relies on resolving parameter references might not work as expected
-                (ex: auto-creating new Lambda Version when CodeUri contains reference to template parameter). This is why
-                this parameter is required
+                should at least be an empty map. By providing an empty map, the caller explicitly opts-into the idea
+                that some functionality that relies on resolving parameter references might not work as expected
+                (ex: auto-creating new Lambda Version when CodeUri contains reference to template parameter). This is
+                why this parameter is required
 
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
@@ -58,6 +61,7 @@ class Translator:
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
         document_errors = []
+        changed_logical_ids = {}
 
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
@@ -72,6 +76,10 @@ class Translator:
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
+
+                # Some resources mutate their logical ids. Track those to change all references to them:
+                if logical_id != macro.logical_id:
+                    changed_logical_ids[logical_id] = macro.logical_id
 
                 del template['Resources'][logical_id]
                 for resource in translated:
@@ -91,12 +99,19 @@ class Translator:
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 template['Resources'].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
-        
+
+        # Run the after-transform plugin target
+        try:
+            sam_plugins.act(LifeCycleEvents.after_transform_template, template)
+        except (InvalidDocumentException, InvalidResourceException) as e:
+            document_errors.append(e)
+
         # Cleanup
         if 'Transform' in template:
             del template['Transform']
 
         if len(document_errors) is 0:
+            template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
             template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
             return template
         else:
@@ -140,7 +155,8 @@ class Translator:
 
         return functions + apis + others
 
-    # Ideally this should belong to a separate class called "Parameters" or something that knows how to manage parameters. An instance of this class should be passed as input to the Translate class.
+    # Ideally this should belong to a separate class called "Parameters" or something that knows how to manage
+    # parameters. An instance of this class should be passed as input to the Translate class.
     def _add_default_parameter_values(self, sam_template, parameter_values):
         """
         Method to read default values for template parameters and merge with user supplied values.
@@ -189,6 +205,7 @@ class Translator:
 
         return default_values
 
+
 def prepare_plugins(plugins):
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
@@ -206,6 +223,10 @@ def prepare_plugins(plugins):
     ]
 
     plugins = [] if not plugins else plugins
+
+    # If a ServerlessAppPlugin does not yet exist, create one and add to the beginning of the required plugins list.
+    if not any(isinstance(plugin, ServerlessAppPlugin) for plugin in plugins):
+        required_plugins.insert(0, ServerlessAppPlugin())
 
     # Execute customer's plugins first before running SAM plugins. It is very important to retain this order because
     # other plugins will be dependent on this ordering.
