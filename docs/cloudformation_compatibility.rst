@@ -169,6 +169,7 @@ EndpointConfiguration               All
 MethodSettings                      All
 BinaryMediaTypes                    All
 Cors                                All
+TracingEnabled                      All
 ================================== ======================== ========================
 
 

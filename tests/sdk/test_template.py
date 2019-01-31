@@ -60,7 +60,7 @@ class TestSamTemplate(TestCase):
         ]
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_iterate_must_filter_by_layers_resource_type(self):
         template = SamTemplate(self.template_dict)
@@ -71,7 +71,7 @@ class TestSamTemplate(TestCase):
         ]
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_iterate_must_not_return_non_sam_resources_with_filter(self):
         template = SamTemplate(self.template_dict)
@@ -80,7 +80,7 @@ class TestSamTemplate(TestCase):
         expected = []
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_iterate_must_filter_with_resource_not_found(self):
         template = SamTemplate(self.template_dict)
@@ -89,21 +89,21 @@ class TestSamTemplate(TestCase):
         expected = []
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_set_must_add_to_template(self):
         template = SamTemplate(self.template_dict)
         template.set("NewResource", {"Type": "something"})
 
         # Set would modify the original template dictionary
-        self.assertEquals(self.template_dict["Resources"].get("NewResource"), {"Type": "something"})
+        self.assertEqual(self.template_dict["Resources"].get("NewResource"), {"Type": "something"})
 
     def test_set_must_work_with_sam_resource_input(self):
         template = SamTemplate(self.template_dict)
         template.set("NewResource", SamResource({"Type": "something"}))
 
         # Set would modify the original template dictionary
-        self.assertEquals(self.template_dict["Resources"].get("NewResource"), {"Type": "something"})
+        self.assertEqual(self.template_dict["Resources"].get("NewResource"), {"Type": "something"})
 
     def test_get_must_return_resource(self):
         expected = {
@@ -117,7 +117,7 @@ class TestSamTemplate(TestCase):
         actual = template.get("Function1")
         self.assertIsNotNone(actual)
         self.assertTrue(isinstance(actual, SamResource))
-        self.assertEquals(actual.to_dict(), expected)
+        self.assertEqual(actual.to_dict(), expected)
 
     def test_get_must_return_none_for_unknown_resource(self):
         template = SamTemplate(self.template_dict)

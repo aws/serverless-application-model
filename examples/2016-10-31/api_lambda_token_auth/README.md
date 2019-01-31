@@ -6,6 +6,13 @@ The Authorizer Lambda Function in this example simply accepts an `Authorization`
 
 ## Running the example
 
+Optional: Uncomment the following lines in `template.yaml` to enable a publicly accessible endpoint:
+
+```yaml
+# Auth:
+#   Authorizer: NONE
+```
+
 Deploy the example into your account:
 
 ```bash
@@ -15,7 +22,7 @@ aws cloudformation package --template-file template.yaml --output-template-file 
 aws cloudformation deploy --template-file ./template.packaged.yaml --stack-name sam-example-api-lambda-token-auth --capabilities CAPABILITY_IAM
 ```
 
-Invoke the API's root endpoint `/` without an `Authorization` header to see the API respond with a 200. In the SAM template, we explicitly state `Authorizer: NONE` to make this a public/open endpoint (the Authorizer Lambda Function is not invoked).
+Invoke the API's root endpoint `/` without an `Authorization` header to see the API respond with a 200 (assuming you followed the optional step above). In the SAM template, we explicitly state `Authorizer: NONE` to make this a public/open endpoint (the Authorizer Lambda Function is not invoked).
 
 ```bash
 curl "$(aws cloudformation describe-stacks --stack-name sam-example-api-lambda-token-auth --query 'Stacks[].Outputs[?OutputKey==`ApiURL`].OutputValue' --output text)"

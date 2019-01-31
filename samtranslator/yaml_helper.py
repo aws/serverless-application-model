@@ -4,6 +4,8 @@ from six import string_types
 
 # This helper copied almost entirely from
 # https://github.com/aws/aws-cli/blob/develop/awscli/customizations/cloudformation/yamlhelper.py
+
+
 def yaml_parse(yamlstr):
     """Parse a yaml string"""
     yaml.SafeLoader.add_multi_constructor(

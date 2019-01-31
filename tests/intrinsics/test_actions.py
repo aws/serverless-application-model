@@ -81,45 +81,45 @@ class TestAction(TestCase):
         input = "LogicalId.Property"
         expected = ("LogicalId", "Property")
 
-        self.assertEquals(expected, Action._parse_resource_reference(input))
+        self.assertEqual(expected, Action._parse_resource_reference(input))
 
     def test_parse_resource_references_with_multiple_properties(self):
         input = "LogicalId.Property1.Property2.Property3"
         expected = ("LogicalId", "Property1.Property2.Property3")
 
-        self.assertEquals(expected, Action._parse_resource_reference(input))
+        self.assertEqual(expected, Action._parse_resource_reference(input))
 
     def test_parse_resource_references_with_other_special_characters(self):
         input = "some logical id . some value"
         expected = ("some logical id ", " some value")
 
-        self.assertEquals(expected, Action._parse_resource_reference(input))
+        self.assertEqual(expected, Action._parse_resource_reference(input))
 
     def test_parse_resource_references_with_empty_property(self):
         # Just a dot at the end! This is equivalent of no property
         input = "LogicalId."
         expected = (None, None)
 
-        self.assertEquals(expected, Action._parse_resource_reference(input))
+        self.assertEqual(expected, Action._parse_resource_reference(input))
 
     def test_parse_resource_references_with_empty_logical_id(self):
         # Just a dot at the beginning! This is equivalent of no LogicalId
         input = ".Property"
         expected = (None, None)
 
-        self.assertEquals(expected, Action._parse_resource_reference(input))
+        self.assertEqual(expected, Action._parse_resource_reference(input))
 
     def test_parse_resource_references_with_no_property(self):
         input = "LogicalId"
         expected = (None, None)
 
-        self.assertEquals(expected, Action._parse_resource_reference(input))
+        self.assertEqual(expected, Action._parse_resource_reference(input))
 
     def test_parse_resource_references_not_string(self):
         input = {"not a": "string"}
         expected = (None, None)
 
-        self.assertEquals(expected, Action._parse_resource_reference(input))
+        self.assertEqual(expected, Action._parse_resource_reference(input))
 
 class TestRefCanResolveParameterRefs(TestCase):
 
@@ -132,7 +132,7 @@ class TestRefCanResolveParameterRefs(TestCase):
         }
 
         ref = RefAction()
-        self.assertEquals(parameters["key"], ref.resolve_parameter_refs(input, parameters))
+        self.assertEqual(parameters["key"], ref.resolve_parameter_refs(input, parameters))
 
     def test_unknown_ref(self):
         parameters = {
@@ -146,7 +146,7 @@ class TestRefCanResolveParameterRefs(TestCase):
         }
 
         ref = RefAction()
-        self.assertEquals(expected, ref.resolve_parameter_refs(input, parameters))
+        self.assertEqual(expected, ref.resolve_parameter_refs(input, parameters))
 
     def test_must_ignore_invalid_value(self):
         parameters = {
@@ -160,7 +160,7 @@ class TestRefCanResolveParameterRefs(TestCase):
         }
 
         ref = RefAction()
-        self.assertEquals(expected, ref.resolve_parameter_refs(input, parameters))
+        self.assertEqual(expected, ref.resolve_parameter_refs(input, parameters))
 
     @patch.object(RefAction, "can_handle")
     def test_return_value_if_cannot_handle(self, can_handle_mock):
@@ -176,7 +176,7 @@ class TestRefCanResolveParameterRefs(TestCase):
 
         ref = RefAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
-        self.assertEquals(expected, ref.resolve_parameter_refs(input, parameters))
+        self.assertEqual(expected, ref.resolve_parameter_refs(input, parameters))
 
 
 class TestRefCanResolveResourceRefs(TestCase):
@@ -199,7 +199,7 @@ class TestRefCanResolveResourceRefs(TestCase):
 
         output = self.ref.resolve_resource_refs(input, self.supported_resource_refs_mock)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
         self.supported_resource_refs_mock.get.assert_called_once_with("LogicalId", "Property")
         _parse_resource_reference_mock.assert_called_once_with("LogicalId.Property")
 
@@ -216,7 +216,7 @@ class TestRefCanResolveResourceRefs(TestCase):
         self.supported_resource_refs_mock.get.return_value = None
 
         output = self.ref.resolve_resource_refs(input, self.supported_resource_refs_mock)
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
         self.supported_resource_refs_mock.get.assert_called_once_with("LogicalId", "Property")
         _parse_resource_reference_mock.assert_called_once_with("LogicalId.Property")
 
@@ -233,7 +233,7 @@ class TestRefCanResolveResourceRefs(TestCase):
 
         output = self.ref.resolve_resource_refs(input, self.supported_resource_refs_mock)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
         self.supported_resource_refs_mock.get.assert_not_called()
         _parse_resource_reference_mock.assert_called_once_with("some value")
 
@@ -248,7 +248,7 @@ class TestRefCanResolveResourceRefs(TestCase):
 
         ref = RefAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
-        self.assertEquals(expected, ref.resolve_resource_refs(input, self.supported_resource_refs_mock))
+        self.assertEqual(expected, ref.resolve_resource_refs(input, self.supported_resource_refs_mock))
 
 
 class TestRefCanResolveResourceIdRefs(TestCase):
@@ -269,7 +269,7 @@ class TestRefCanResolveResourceIdRefs(TestCase):
 
         output = self.ref.resolve_resource_id_refs(input, self.supported_resource_id_refs_mock)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
         self.supported_resource_id_refs_mock.get.assert_called_once_with("LogicalId")
 
     def test_handle_unsupported_references(self):
@@ -283,7 +283,7 @@ class TestRefCanResolveResourceIdRefs(TestCase):
         self.supported_resource_id_refs_mock.get.return_value = None
 
         output = self.ref.resolve_resource_id_refs(input, self.supported_resource_id_refs_mock)
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
         self.supported_resource_id_refs_mock.get.assert_not_called()
 
     @patch.object(RefAction, "can_handle")
@@ -297,7 +297,7 @@ class TestRefCanResolveResourceIdRefs(TestCase):
 
         ref = RefAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
-        self.assertEquals(expected, ref.resolve_resource_id_refs(input, self.supported_resource_id_refs_mock))
+        self.assertEqual(expected, ref.resolve_resource_id_refs(input, self.supported_resource_id_refs_mock))
 
 class TestSubCanResolveParameterRefs(TestCase):
 
@@ -348,7 +348,7 @@ class TestSubCanResolveParameterRefs(TestCase):
 
         sub = SubAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
-        self.assertEquals(expected, sub.resolve_parameter_refs(input, parameters))
+        self.assertEqual(expected, sub.resolve_parameter_refs(input, parameters))
 
     def test_sub_all_refs_multiple_references(self):
         parameters = {
@@ -573,7 +573,7 @@ class TestSubCanResolveResourceRefs(TestCase):
 
         sub = SubAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
-        self.assertEquals(expected, sub.resolve_resource_refs(input, parameters))
+        self.assertEqual(expected, sub.resolve_resource_refs(input, parameters))
 
 class TestSubCanResolveResourceIdRefs(TestCase):
 
@@ -662,7 +662,7 @@ class TestSubCanResolveResourceIdRefs(TestCase):
 
         sub = SubAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
-        self.assertEquals(expected, sub.resolve_resource_id_refs(input, parameters))
+        self.assertEqual(expected, sub.resolve_resource_id_refs(input, parameters))
 
 
 class TestGetAttCanResolveParameterRefs(TestCase):
@@ -695,7 +695,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_resolve_refs_with_many_attributes(self):
         input = {
@@ -709,7 +709,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_resolve_with_splitted_resource_refs(self):
         input = {
@@ -724,7 +724,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_refs_without_attributes(self):
         input = {
@@ -739,7 +739,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_refs_without_attributes_in_concatenated_form(self):
         input = {
@@ -754,7 +754,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_invalid_value_array(self):
         input = {
@@ -769,7 +769,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_invalid_value_type(self):
         input = {
@@ -784,7 +784,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_missing_properties_with_dot_after(self):
         input = {
@@ -797,7 +797,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_missing_properties_with_dot_before(self):
         input = {
@@ -810,7 +810,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_refs(input, self.supported_resource_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     @patch.object(GetAttAction, "can_handle")
     def test_return_value_if_cannot_handle(self, can_handle_mock):
@@ -823,7 +823,7 @@ class TestGetAttCanResolveResourceRefs(TestCase):
 
         getatt = GetAttAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
-        self.assertEquals(expected, getatt.resolve_resource_refs(input, self.supported_resource_refs))
+        self.assertEqual(expected, getatt.resolve_resource_refs(input, self.supported_resource_refs))
 
 
 class TestGetAttCanResolveResourceIdRefs(TestCase):
@@ -844,7 +844,7 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_resolve_refs_with_many_attributes(self):
         input = {
@@ -858,7 +858,7 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_invalid_value_array(self):
         input = {
@@ -873,7 +873,7 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_invalid_value_type(self):
         input = {
@@ -888,7 +888,7 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     def test_must_ignore_missing_properties_with_dot_before(self):
         input = {
@@ -901,7 +901,7 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
         getatt = GetAttAction()
         output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
 
-        self.assertEquals(expected, output)
+        self.assertEqual(expected, output)
 
     @patch.object(GetAttAction, "can_handle")
     def test_return_value_if_cannot_handle(self, can_handle_mock):
@@ -914,4 +914,4 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
 
         getatt = GetAttAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
-        self.assertEquals(expected, getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs))
+        self.assertEqual(expected, getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs))
