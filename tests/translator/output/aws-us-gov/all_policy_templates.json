@@ -263,13 +263,13 @@
               "Statement": [
                 {
                   "Action": [
-                    "s3:GetObject", 
-                    "s3:ListBucket", 
-                    "s3:GetBucketLocation", 
-                    "s3:GetObjectVersion", 
-                    "s3:PutObject", 
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                    "s3:GetBucketLocation",
+                    "s3:GetObjectVersion",
+                    "s3:PutObject",
                     "s3:PutObjectAcl",
-                    "s3:GetLifecycleConfiguration", 
+                    "s3:GetLifecycleConfiguration",
                     "s3:PutLifecycleConfiguration",
                     "s3:DeleteObject"
                   ],
@@ -1181,6 +1181,35 @@
                     ]
                   },
                   "Effect": "Allow"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy48",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:DescribeParameters"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
+                      {
+                        "parameterName": "name"
+                      }
+                    ]
+                  }
                 }
               ]
             }

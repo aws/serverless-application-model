@@ -1480,7 +1480,7 @@
     "SESEmailTemplateCrudPolicy": {
       "Description": "Gives permission to create, get, list, update and delete SES Email Templates",
       "Parameters": {
-        
+
       },
       "Definition": {
         "Statement": [{
@@ -1517,6 +1517,42 @@
                 {
                   "logGroupName": {
                     "Ref": "LogGroupName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SSMParameterReadPolicy": {
+      "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
+      "Parameters": {
+        "ParameterName": {
+          "Description":"The name of the secret stored in SSM in your account."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:DescribeParameters"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:GetParameters",
+              "ssm:GetParameter"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
+                {
+                  "parameterName": {
+                    "Ref": "ParameterName"
                   }
                 }
               ]
