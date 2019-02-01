@@ -47,6 +47,7 @@ class Globals(object):
             "EndpointConfiguration",
             "MethodSettings",
             "BinaryMediaTypes",
+            "MinimumCompressionSize",
             "Cors",
             "AccessLogSetting",
             "CanarySetting",

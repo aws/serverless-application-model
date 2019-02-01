@@ -168,6 +168,7 @@ Variables                           All
 EndpointConfiguration               All
 MethodSettings                      All
 BinaryMediaTypes                    All
+MinimumCompressionSize              All
 Cors                                All
 TracingEnabled                      All
 ================================== ======================== ========================

@@ -21,6 +21,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, 'input')
     'api_endpoint_configuration',
     'api_with_method_settings',
     'api_with_binary_media_types',
+    'api_with_minimum_compression_size',
     'api_with_resource_refs',
     'api_with_cors',
     'api_with_cors_and_only_methods',
@@ -75,6 +76,7 @@ def test_validate_template_success(testcase):
     excluded = [
         'api_endpoint_configuration',
         'api_with_binary_media_types',
+        'api_with_minimum_compression_size',
         'api_with_cors',
         'cloudwatch_logs_with_ref',
         'sns',
