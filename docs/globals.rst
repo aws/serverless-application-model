@@ -68,7 +68,8 @@ Currently, the following resources and properties are being supported:
       Layers:
       AutoPublishAlias:
       DeploymentPreference:
-    
+      PermissionsBoundary:
+
     Api:
       # Properties of AWS::Serverless::Api
       # Also works with Implicit APIs
