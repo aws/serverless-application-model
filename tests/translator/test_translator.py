@@ -206,6 +206,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_global_layers',
         'function_with_layers',
         'function_with_many_layers',
+        'function_with_permissions_boundary',
         'function_with_policy_templates',
         'function_with_sns_event_source_all_parameters',
         'globals_for_function',

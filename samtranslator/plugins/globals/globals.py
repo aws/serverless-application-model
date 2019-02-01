@@ -29,7 +29,8 @@ class Globals(object):
             "KmsKeyArn",
             "AutoPublishAlias",
             "Layers",
-            "DeploymentPreference"
+            "DeploymentPreference",
+            "PermissionsBoundary"
         ],
 
         # Everything except

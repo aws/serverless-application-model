@@ -42,6 +42,7 @@ class SamFunction(SamResourceMacro):
         'VpcConfig': PropertyType(False, is_type(dict)),
         'Role': PropertyType(False, is_str()),
         'Policies': PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        'PermissionsBoundary': PropertyType(False, is_str()),
         'Environment': PropertyType(False, dict_of(is_str(), is_type(dict))),
         'Events': PropertyType(False, dict_of(is_str(), is_type(dict))),
         'Tags': PropertyType(False, is_type(dict)),
@@ -239,6 +240,7 @@ class SamFunction(SamResourceMacro):
 
         execution_role.ManagedPolicyArns = list(managed_policy_arns)
         execution_role.Policies = policy_documents or None
+        execution_role.PermissionsBoundary = self.PermissionsBoundary
 
         return execution_role
 
