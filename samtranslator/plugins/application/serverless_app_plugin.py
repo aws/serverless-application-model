@@ -48,10 +48,7 @@ class ServerlessAppPlugin(BasePlugin):
         super(ServerlessAppPlugin, self).__init__(ServerlessAppPlugin.__name__)
         self._applications = {}
         self._in_progress_templates = []
-        if sar_client:
-            self._sar_client = sar_client
-        else:
-            self._sar_client = boto3.client('serverlessrepo')
+        self._sar_client = sar_client
         self._wait_for_template_active_status = wait_for_template_active_status
         self._validate_only = validate_only
 
@@ -89,6 +86,9 @@ class ServerlessAppPlugin(BasePlugin):
             key = (app_id, semver)
             if key not in self._applications:
                 try:
+                    # Lazy initialization of the client- create it when it is needed
+                    if not self._sar_client:
+                        self._sar_client = boto3.client('serverlessrepo')
                     service_call(app_id, semver, key, logical_id)
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
