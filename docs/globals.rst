@@ -54,7 +54,6 @@ Currently, the following resources and properties are being supported:
       # Properties of AWS::Serverless::Function
       Handler:
       Runtime:
-      # Specifying CodeUri on Globals is not yet supported by 'CloudFormation package' https://docs.aws.amazon.com/cli/latest/reference/cloudformation/package.html
       CodeUri: 
       DeadLetterQueue:
       Description:
