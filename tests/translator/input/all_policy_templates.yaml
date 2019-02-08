@@ -143,3 +143,5 @@ Resources:
 
         - SSMParameterReadPolicy:
             ParameterName: name
+
+        - ResourceGroupsReadOnlyAccessPolicy: {}

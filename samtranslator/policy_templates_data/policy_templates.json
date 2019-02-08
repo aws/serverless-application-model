@@ -1560,6 +1560,24 @@
           }
         ]
       }
+    },
+    "ResourceGroupsReadOnlyAccessPolicy": {
+      "Description": "Gives readonly permissions to AWS Resource Groups and list group contents",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "resource-groups:Get*",
+            "resource-groups:List*",
+            "resource-groups:Search*",
+            "tag:Get*",
+            "cloudformation:DescribeStacks",
+            "cloudformation:ListStackResources"
+          ],
+          "Resource": "*"
+        }]
+      }
     }
   }
 }
