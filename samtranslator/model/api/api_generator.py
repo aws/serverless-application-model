@@ -27,7 +27,8 @@ class ApiGenerator(object):
     def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on,
                  definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
-                 auth=None, access_log_setting=None, canary_setting=None, tracing_enabled=None):
+                 auth=None, access_log_setting=None, canary_setting=None, tracing_enabled=None,
+                 resource_attributes=None, passthrough_resource_attributes=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
