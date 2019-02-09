@@ -14,6 +14,7 @@ class SwaggerEditor(object):
 
     _OPTIONS_METHOD = "options"
     _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
+    _CONDITIONAL_IF = "Fn::If"
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
 
     def __init__(self, doc):
