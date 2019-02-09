@@ -7,6 +7,7 @@
           "LambdaConfigurations": [
             {
               "Fn::If": [
+                "MyCondition",
                 {
                   "Function": {
                     "Fn::GetAtt": [
@@ -16,7 +17,6 @@
                   },
                   "Event": "s3:ObjectCreated:*"
                 },
-                "MyCondition",
                 {
                   "Ref": "AWS::NoValue"
                 }
@@ -27,13 +27,10 @@
         "Tags": [
           {
             "Value": {
-              "Fn:If": [
+              "Fn::If": [
                 "MyCondition",
                 {
-                  "Fn::GetAtt": [
-                    "ThumbnailFunctionImageBucketPermission",
-                    "Arn"
-                  ]
+                  "Ref": "ThumbnailFunctionImageBucketPermission"
                 },
                 "no dependency"
               ]

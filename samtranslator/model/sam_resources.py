@@ -42,6 +42,7 @@ class SamFunction(SamResourceMacro):
         'VpcConfig': PropertyType(False, is_type(dict)),
         'Role': PropertyType(False, is_str()),
         'Policies': PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        'PermissionsBoundary': PropertyType(False, is_str()),
         'Environment': PropertyType(False, dict_of(is_str(), is_type(dict))),
         'Events': PropertyType(False, dict_of(is_str(), is_type(dict))),
         'Tags': PropertyType(False, is_type(dict)),
@@ -239,6 +240,7 @@ class SamFunction(SamResourceMacro):
 
         execution_role.ManagedPolicyArns = list(managed_policy_arns)
         execution_role.Policies = policy_documents or None
+        execution_role.PermissionsBoundary = self.PermissionsBoundary
 
         return execution_role
 
@@ -429,6 +431,7 @@ class SamApi(SamResourceMacro):
         'EndpointConfiguration': PropertyType(False, is_str()),
         'MethodSettings': PropertyType(False, is_type(list)),
         'BinaryMediaTypes': PropertyType(False, is_type(list)),
+        'MinimumCompressionSize': PropertyType(False, is_type(int)),
         'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
         'Auth': PropertyType(False, is_type(dict)),
         'AccessLogSetting': PropertyType(False, is_type(dict)),
@@ -463,6 +466,7 @@ class SamApi(SamResourceMacro):
                                      endpoint_configuration=self.EndpointConfiguration,
                                      method_settings=self.MethodSettings,
                                      binary_media=self.BinaryMediaTypes,
+                                     minimum_compression_size=self.MinimumCompressionSize,
                                      cors=self.Cors,
                                      auth=self.Auth,
                                      access_log_setting=self.AccessLogSetting,
