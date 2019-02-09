@@ -46,6 +46,37 @@ Globals:
             Context:
               - Authorization4
             ReauthorizeEvery: 0
+
+Conditions:
+  FunctionCondition:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition1:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition2:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition3:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition4:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition5:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition6:
+    Fn::Equals:
+      - true
+      - false
+
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function

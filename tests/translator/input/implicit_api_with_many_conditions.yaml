@@ -10,7 +10,67 @@ Conditions:
     Fn::Equals:
       - true
       - false
-  # Note: not all conditions exist, but SAM does not check for that. It will add all conditions.
+  Cond1:
+    Fn::Equals:
+      - true
+      - false
+  Cond2:
+    Fn::Equals:
+      - true
+      - false
+  Cond3:
+    Fn::Equals:
+      - true
+      - false
+  Cond4:
+    Fn::Equals:
+      - true
+      - false
+  Cond5:
+    Fn::Equals:
+      - true
+      - false
+  Cond6:
+    Fn::Equals:
+      - true
+      - false
+  Cond7:
+    Fn::Equals:
+      - true
+      - false
+  Cond8:
+    Fn::Equals:
+      - true
+      - false
+  Cond9:
+    Fn::Equals:
+      - true
+      - false
+  Cond10:
+    Fn::Equals:
+      - true
+      - false
+  Cond11:
+    Fn::Equals:
+      - true
+      - false
+  Cond12:
+    Fn::Equals:
+      - true
+      - false
+  Cond13:
+    Fn::Equals:
+      - true
+      - false
+  Cond14:
+    Fn::Equals:
+      - true
+      - false
+  Cond15:
+    Fn::Equals:
+      - true
+      - false
+
 Resources:
   hello:
     Type: 'AWS::Serverless::Function'
@@ -26,8 +86,8 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /add
-            Method: post 
+            Path: /sub
+            Method: get
   helloworld:
     Type: 'AWS::Serverless::Function'
     Condition: Cond
@@ -284,4 +344,4 @@ Resources:
           Type: Api
           Properties:
             Path: /sub15
-            Method: post 
+            Method: any 
