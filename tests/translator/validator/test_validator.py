@@ -21,6 +21,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, 'input')
     'api_endpoint_configuration',
     'api_with_method_settings',
     'api_with_binary_media_types',
+    'api_with_minimum_compression_size',
     'api_with_resource_refs',
     'api_with_cors',
     'api_with_cors_and_only_methods',
@@ -57,6 +58,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, 'input')
     'function_with_resource_refs',
     'function_with_deployment_and_custom_role',
     'function_with_deployment_no_service_role',
+    'function_with_permissions_boundary',
     'function_with_policy_templates',
     'function_with_sns_event_source_all_parameters',
     'globals_for_function',
@@ -74,6 +76,7 @@ def test_validate_template_success(testcase):
     excluded = [
         'api_endpoint_configuration',
         'api_with_binary_media_types',
+        'api_with_minimum_compression_size',
         'api_with_cors',
         'cloudwatch_logs_with_ref',
         'sns',

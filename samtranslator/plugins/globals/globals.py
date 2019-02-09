@@ -29,7 +29,8 @@ class Globals(object):
             "KmsKeyArn",
             "AutoPublishAlias",
             "Layers",
-            "DeploymentPreference"
+            "DeploymentPreference",
+            "PermissionsBoundary"
         ],
 
         # Everything except
@@ -46,6 +47,7 @@ class Globals(object):
             "EndpointConfiguration",
             "MethodSettings",
             "BinaryMediaTypes",
+            "MinimumCompressionSize",
             "Cors",
             "AccessLogSetting",
             "CanarySetting",

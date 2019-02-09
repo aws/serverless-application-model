@@ -110,7 +110,7 @@ class Translator:
         if 'Transform' in template:
             del template['Transform']
 
-        if len(document_errors) is 0:
+        if len(document_errors) == 0:
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
             template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
             return template
