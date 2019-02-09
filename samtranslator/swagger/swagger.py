@@ -2,6 +2,7 @@ import copy
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
+from samtranslator.model.intrinsics import make_conditional
 
 
 class SwaggerEditor(object):
@@ -51,6 +52,28 @@ class SwaggerEditor(object):
 
         return result
 
+    def get_integration_from_method(self, method):
+        """
+        Returns the integration for this method.
+
+        :param dict method: method dictionary
+        :return: X_APIGW_INTEGRATION section for this method
+        """
+        return self.get_method_contents(method).get(self._X_APIGW_INTEGRATION)
+
+    def get_method_contents(self, method):
+        """
+        Returns the swagger contents of the given method. This checks to see if a conditional block
+        has been used inside of the method, and, if so, returns the method contents that are
+        inside of the conditional.
+
+        :param dict method: method dictionary
+        :return: swagger components of the method
+        """
+        if self._CONDITIONAL_IF in method:
+            return method[self._CONDITIONAL_IF][1]
+        return method
+
     def has_integration(self, path, method):
         """
         Checks if an API Gateway integration is already present at the given path/method
@@ -60,10 +83,10 @@ class SwaggerEditor(object):
         :return: True, if an API Gateway integration is already present
         """
         method = self._normalize_method_name(method)
-        # TODO: needs to understand conditions
+
         return self.has_path(path, method) and \
             isinstance(self.paths[path][method], dict) and \
-            bool(self.paths[path][method].get(self._X_APIGW_INTEGRATION))  # Key should be present & Value is non-empty
+            bool(self.get_integration_from_method(self.paths[path][method]))  # Integration present and non-empty
 
     def add_path(self, path, method=None):
         """
@@ -83,7 +106,7 @@ class SwaggerEditor(object):
 
         self.paths[path].setdefault(method, {})
 
-    def add_lambda_integration(self, path, method, integration_uri):
+    def add_lambda_integration(self, path, method, integration_uri, condition=None):
         """
         Adds aws_proxy APIGW integration to the given path+method.
 
@@ -93,11 +116,14 @@ class SwaggerEditor(object):
         """
 
         method = self._normalize_method_name(method)
-        # TODO: needs to understand or use Conditions
         if self.has_integration(path, method):
             raise ValueError("Lambda integration already exists on Path={}, Method={}".format(path, method))
 
         self.add_path(path, method)
+
+        # Wrap the integration_uri in a Condition if one exists on that function:
+        if condition:
+            integration_uri = make_conditional(condition, integration_uri)
 
         self.paths[path][method][self._X_APIGW_INTEGRATION] = {
                 'type': 'aws_proxy',
@@ -107,6 +133,10 @@ class SwaggerEditor(object):
 
         # If 'responses' key is *not* present, add it with an empty dict as value
         self.paths[path][method].setdefault('responses', {})
+
+        # If a condition is present, wrap all method contents up into the condition
+        if condition:
+            self.paths[path][method] = make_conditional(condition, self.paths[path][method])
 
     def iter_on_path(self):
         """
@@ -338,7 +368,6 @@ class SwaggerEditor(object):
         :param dict api: Reference to the related Api's properties as defined in the template.
         """
         method_authorizer = auth and auth.get('Authorizer')
-        # TODO: needs to understand or use Conditions
         if method_authorizer:
             api_auth = api.get('Auth')
             api_authorizers = api_auth and api_auth.get('Authorizers')
@@ -349,7 +378,7 @@ class SwaggerEditor(object):
     def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
                               is_default=False):
         normalized_method_name = self._normalize_method_name(method_name)
-        existing_security = self.paths[path][normalized_method_name].get('security', [])
+        existing_security = self.get_method_contents(self.paths[path][normalized_method_name]).get('security', [])
         # TEST: [{'sigv4': []}, {'api_key': []}])
         authorizer_names = set(authorizers.keys())
         existing_non_authorizer_security = []
@@ -404,7 +433,7 @@ class SwaggerEditor(object):
         security = existing_non_authorizer_security + authorizer_security
 
         if security:
-            self.paths[path][normalized_method_name]['security'] = security
+            self.get_method_contents(self.paths[path][normalized_method_name])['security'] = security
 
     @property
     def swagger(self):

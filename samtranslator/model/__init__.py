@@ -397,7 +397,6 @@ class SamResourceMacro(ResourceMacro):
             raise ValueError("`supported_resource_refs` object is required")
 
         # Create a map of {ResourceType: LogicalId} for quick access
-        print(generated_cfn_resources)
         resource_id_by_type = {resource.resource_type: resource.logical_id for resource in generated_cfn_resources}
 
         for property, cfn_type in self.referable_properties.items():
