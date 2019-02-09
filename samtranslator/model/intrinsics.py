@@ -46,6 +46,11 @@ def make_or_condition(conditions_list):
 
 def calculate_number_of_conditions(conditions_length, max_conditions):
     """
+    Every condition can hold up to max_conditions, which (as of writing this) is 10.
+    Every time a condition is created, (max_conditions) are used and 1 new one is added to the conditions list.
+    This means that there is a net decrease of up to (max_conditions-1) with each iteration.
+
+    This formula calculates the number of conditions needed.
     x items in groups of y, where every group adds another number to x
     Math: either math.ceil((x-1)/(y-1))
             or  math.floor((x+(y-1)-2)/(y-1)) == 1 + (x-2)//(y-1)
@@ -55,8 +60,17 @@ def calculate_number_of_conditions(conditions_length, max_conditions):
 
 
 def make_combined_condition(conditions_list, condition_name):
+    """
+    Makes a combined condition using Fn::Or. Since Fn::Or only accepts up to 10 conditions,
+    this method optionally creates multiple conditions. These conditions are named based on
+    the condition_name parameter that is passed into the method.
+
+    :param list conditions_list: list of conditions
+    :param string condition_name: base name desired for new condition
+    :return: dictionary of condition_name: condition_value
+    """
     if len(conditions_list) < 2:
-        # TODO: raise error
+        # Can't make a condition if <2 conditions provided.
         return None
     max_conditions = 10
 
@@ -67,6 +81,7 @@ def make_combined_condition(conditions_list, condition_name):
 
     while len(conditions_list) > 1:
         new_condition_name = condition_name
+        # If more than 1 new condition is needed, add a # to the end of the name
         if num_conditions > 0:
             new_condition_name = '{}{}'.format(condition_name, num_conditions)
             num_conditions -= 1
