@@ -3,6 +3,11 @@ Globals:
     Name: "some api"
     CacheClusterEnabled: True
     CacheClusterSize: "1.6"
+    Auth:
+      DefaultAuthorizer: MyCognitoAuth
+      Authorizers:
+        MyCognitoAuth:
+          UserPoolArn: !GetAtt MyUserPool.Arn
     Variables:
       SomeVar: Value
 
@@ -25,6 +30,16 @@ Resources:
     Properties:
       StageName: SomeStage
       DefinitionBody:
-        "this": "is"
-        "a": "swagger"
+        swagger: 2.0
+        info:
+          version: '1.0'
+          title: !Ref AWS::StackName
+        paths:
+          "/":
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations
+              responses: {}
 

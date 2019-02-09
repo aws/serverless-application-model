@@ -4,6 +4,11 @@ Description: Stream Application ELB access logs from S3 to Splunk's HTTP event c
 Parameters:
   BucketNameParameter:
     Type: String
+  SplunkHecUrlParameter:
+    Type: String
+    AllowedPattern: '^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$'
+  SplunkHecTokenParameter:
+    Type: String
 Resources:
   splunkelbapplicationaccesslogsprocessor:
     Type: 'AWS::Serverless::Function'
@@ -29,7 +34,7 @@ Resources:
               - 's3:ObjectCreated:*'
       Environment:
         Variables:
-          SPLUNK_HEC_URL: <enter value here>
-          SPLUNK_HEC_TOKEN: <enter value here>
+          SPLUNK_HEC_URL: !Ref SplunkHecUrlParameter
+          SPLUNK_HEC_TOKEN: !Ref SplunkHecTokenParameter
   Bucket1:
     Type: 'AWS::S3::Bucket'

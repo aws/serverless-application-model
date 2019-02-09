@@ -334,6 +334,7 @@
               "s3:GetBucketLocation",
               "s3:GetObjectVersion",
               "s3:PutObject",
+              "s3:PutObjectAcl",
               "s3:GetLifecycleConfiguration",
               "s3:PutLifecycleConfiguration",
               "s3:DeleteObject"
@@ -1476,6 +1477,26 @@
         ]
       }
     },
+    "SESEmailTemplateCrudPolicy": {
+      "Description": "Gives permission to create, get, list, update and delete SES Email Templates",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "ses:CreateTemplate",
+            "ses:GetTemplate",
+            "ses:ListTemplates",
+            "ses:UpdateTemplate",
+            "ses:DeleteTemplate",
+            "ses:TestRenderTemplate"
+          ],
+          "Resource": "*"
+        }]
+      }
+    },
     "FilterLogEventsPolicy": {
       "Description": "Gives permission to filter Log Events from a specified Log Group",
       "Parameters": {
@@ -1496,6 +1517,42 @@
                 {
                   "logGroupName": {
                     "Ref": "LogGroupName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SSMParameterReadPolicy": {
+      "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
+      "Parameters": {
+        "ParameterName": {
+          "Description":"The name of the secret stored in SSM in your account."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:DescribeParameters"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:GetParameters",
+              "ssm:GetParameter"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
+                {
+                  "parameterName": {
+                    "Ref": "ParameterName"
                   }
                 }
               ]

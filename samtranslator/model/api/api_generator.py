@@ -58,6 +58,7 @@ class ApiGenerator(object):
         self.endpoint_configuration = endpoint_configuration
         self.method_settings = method_settings
         self.binary_media = binary_media
+        self.minimum_compression_size = minimum_compression_size
         self.cors = cors
         self.auth = auth
         self.access_log_setting = access_log_setting
@@ -74,6 +75,7 @@ class ApiGenerator(object):
         """
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         rest_api.BinaryMediaTypes = self.binary_media
+        rest_api.MinimumCompressionSize = self.minimum_compression_size
 
         if self.endpoint_configuration:
             self._set_endpoint_configuration(rest_api, self.endpoint_configuration)
