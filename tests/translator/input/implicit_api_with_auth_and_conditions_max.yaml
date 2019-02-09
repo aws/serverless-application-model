@@ -52,10 +52,6 @@ Conditions:
     Fn::Equals:
       - true
       - false
-  FunctionCondition1:
-    Fn::Equals:
-      - true
-      - false
   FunctionCondition2:
     Fn::Equals:
       - true
