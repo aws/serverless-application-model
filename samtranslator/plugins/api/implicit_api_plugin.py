@@ -121,6 +121,7 @@ class ImplicitApiPlugin(BasePlugin):
         :param SamResource function: SAM Function containing the API events to be processed
         :param dict api_events: API Events extracted from the function. These events will be processed
         :param SamTemplate template: SAM Template where Serverless::Api resources can be found
+        :param str condition: optional; this is the condition that is on the function with the API event
         """
 
         for logicalId, event in api_events.items():
@@ -204,6 +205,10 @@ class ImplicitApiPlugin(BasePlugin):
         template.set(api_id, resource)
 
     def _maybe_add_condition_to_implicit_api(self, template_dict):
+        """
+        Decides whether to add a condition to the implicit api resource.
+        :param dict template_dict: SAM template dictionary
+        """
         if None not in self.conditions and len(self.conditions) > 0:
             implicit_api_resource = template_dict.get('Resources').get(self.implicit_api_logical_id)
             if len(self.conditions) == 1:
@@ -214,6 +219,10 @@ class ImplicitApiPlugin(BasePlugin):
                 self._add_condition_to_template(template_dict)
 
     def _add_condition_to_template(self, template_dict):
+        """
+        Adds necessary conditions to the template for the implicit api
+        :param dict template_dict: SAM template dictionary
+        """
         if not template_dict.get('Conditions'):
             template_dict['Conditions'] = {}
         template_conditions = template_dict['Conditions']
