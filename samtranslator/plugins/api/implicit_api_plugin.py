@@ -217,7 +217,7 @@ class ImplicitApiPlugin(BasePlugin):
         if not template_dict.get('Conditions'):
             template_dict['Conditions'] = {}
         template_conditions = template_dict['Conditions']
-        implicit_api_conditions = make_combined_condition(list(self.conditions), self.implicit_api_condition)
+        implicit_api_conditions = make_combined_condition(sorted(list(self.conditions)), self.implicit_api_condition)
         for key, value in implicit_api_conditions.items():
             template_conditions[key] = value
 
