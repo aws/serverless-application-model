@@ -54,6 +54,10 @@ def calculate_number_of_conditions(conditions_length, max_conditions):
     x items in groups of y, where every group adds another number to x
     Math: either math.ceil((x-1)/(y-1))
             or  math.floor((x+(y-1)-2)/(y-1)) == 1 + (x-2)//(y-1)
+
+    :param int conditions_length: total # of conditions to handle
+    :param int max_conditions: maximum number of conditions that can be put in an Fn::Or statement
+    :return: the number (int) of necessary additional conditions.
     """
     num_conditions = 1 + (conditions_length - 2) // (max_conditions - 1)
     return num_conditions
@@ -72,6 +76,9 @@ def make_combined_condition(conditions_list, condition_name):
     if len(conditions_list) < 2:
         # Can't make a condition if <2 conditions provided.
         return None
+
+    # Total number of conditions allows in an Fn::Or statement. See docs:
+    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#intrinsic-function-reference-conditions-or
     max_conditions = 10
 
     conditions = {}

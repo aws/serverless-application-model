@@ -121,7 +121,8 @@ class SwaggerEditor(object):
 
         self.add_path(path, method)
 
-        # Wrap the integration_uri in a Condition if one exists on that function:
+        # Wrap the integration_uri in a Condition if one exists on that function
+        # This is necessary so CFN doesn't try to resolve the integration reference.
         if condition:
             integration_uri = make_conditional(condition, integration_uri)
 
