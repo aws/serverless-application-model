@@ -104,6 +104,17 @@ class TestSwaggerEditor_has_integration(TestCase):
                             "a": "b"
                         }
                     },
+                    "post": {
+                        "Fn::If": [
+                            "Condition",
+                            {
+                                _X_INTEGRATION: {
+                                    "a": "b"
+                                }
+                            },
+                            {"Ref": "AWS::NoValue"}
+                        ]
+                    },
                     "somemethod": {
                         "foo": "value",
                     },
@@ -119,6 +130,9 @@ class TestSwaggerEditor_has_integration(TestCase):
 
     def test_must_find_integration(self):
         self.assertTrue(self.editor.has_integration("/foo", "get"))
+
+    def test_must_find_integration_with_condition(self):
+        self.assertTrue(self.editor.has_integration("/foo", "post"))
 
     def test_must_not_find_integration(self):
         self.assertFalse(self.editor.has_integration("/foo", "somemethod"))
