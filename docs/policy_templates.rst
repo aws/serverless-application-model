@@ -28,7 +28,7 @@ DynamoDB tables in **all** regions. This is excessively permissive when all that
 values from the ``MyTable`` created in the stack.
 
 SAM provides a tighter and more secure version of AWS Managed Policies called **Policy Templates**. This are a set of 
-readily availbale policies that can be scoped to a specific resource in the same region where your stack exists. 
+readily available policies that can be scoped to a specific resource in the same region where your stack exists. 
 Let's modify the above example to use a policy template called ``DynamoDBCrudPolicy``:
 
 .. code:: yaml
