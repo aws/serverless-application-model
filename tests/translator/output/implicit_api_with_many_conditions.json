@@ -1,1499 +1,1499 @@
 {
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "A template to test for implicit API condition handling.",
+  "AWSTemplateFormatVersion": "2010-09-09", 
   "Conditions": {
-    "MyCondition": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "Cond": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "Cond1": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "Cond2": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "Cond3": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "Cond4": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
     "Cond5": {
       "Fn::Equals": [
-        true,
+        true, 
         false
       ]
-    },
-    "Cond6": {
+    }, 
+    "Cond4": {
       "Fn::Equals": [
-        true,
+        true, 
         false
       ]
-    },
+    }, 
     "Cond7": {
       "Fn::Equals": [
-        true,
+        true, 
         false
       ]
-    },
-    "Cond8": {
+    }, 
+    "Cond6": {
       "Fn::Equals": [
-        true,
+        true, 
         false
       ]
-    },
+    }, 
+    "Cond1": {
+      "Fn::Equals": [
+        true, 
+        false
+      ]
+    }, 
+    "Cond3": {
+      "Fn::Equals": [
+        true, 
+        false
+      ]
+    }, 
+    "Cond2": {
+      "Fn::Equals": [
+        true, 
+        false
+      ]
+    }, 
     "Cond9": {
       "Fn::Equals": [
-        true,
+        true, 
         false
       ]
-    },
+    }, 
+    "Cond8": {
+      "Fn::Equals": [
+        true, 
+        false
+      ]
+    }, 
+    "Cond": {
+      "Fn::Equals": [
+        true, 
+        false
+      ]
+    }, 
     "SamImplicitApiCondition1": {
       "Fn::Or": [
         {
           "Condition": "Cond"
-        },
+        }, 
         {
           "Condition": "Cond1"
-        },
+        }, 
         {
           "Condition": "Cond2"
-        },
+        }, 
         {
           "Condition": "Cond3"
-        },
+        }, 
         {
           "Condition": "Cond4"
-        },
+        }, 
         {
           "Condition": "Cond5"
-        },
+        }, 
         {
           "Condition": "Cond6"
-        },
+        }, 
         {
           "Condition": "Cond7"
-        },
+        }, 
         {
           "Condition": "Cond8"
-        },
+        }, 
         {
           "Condition": "Cond9"
         }
       ]
-    },
+    }, 
     "SamImplicitApiCondition": {
       "Fn::Or": [
         {
           "Condition": "MyCondition"
-        },
+        }, 
         {
           "Condition": "SamImplicitApiCondition1"
         }
       ]
+    }, 
+    "MyCondition": {
+      "Fn::Equals": [
+        true, 
+        false
+      ]
     }
-  },
+  }, 
   "Resources": {
-    "hello": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "MyCondition",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloRole": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "MyCondition",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "MyCondition",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "hello"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/sub",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
-    "helloApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "MyCondition",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "hello"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/sub",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworldRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworldRole": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloworldApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
-    "helloworldApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld1": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond1",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld1Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld1Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond1",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloworld1ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond1",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld1"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub1",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld1ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond1",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld1"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub1",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld2": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond2",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld2Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld2Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond2",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloworld2ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond2",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld2"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub2",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld2ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond2",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld2"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub2",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld3": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond3",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld3Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld3Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond3",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloworld3ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond3",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld3"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub3",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld3ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond3",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld3"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub3",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld4": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond4",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld4Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld4Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond4",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloworld4ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond4",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld4"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub4",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld4ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond4",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld4"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub4",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld5": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond5",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld5Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld5Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond5",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
     "helloworld5ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond5",
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "helloworld5"
-        },
-        "Principal": "apigateway.amazonaws.com",
+        }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub5",
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub5", 
             {
+              "__Stage__": "*", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld5ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond5",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld5"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub5",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld6": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond6",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld6Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld6Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond6",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
               }
             }
           ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloworld6ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond6",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld6"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub6",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
         }
-      }
-    },
-    "helloworld6ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond6",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld6"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub6",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld7": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond7",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld7Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld7Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond7",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloworld7ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond7",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld7"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub7",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
+      }, 
+      "Condition": "Cond5"
+    }, 
     "helloworld7ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond7",
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "helloworld7"
-        },
-        "Principal": "apigateway.amazonaws.com",
+        }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub7",
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub7", 
             {
+              "__Stage__": "Prod", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld8": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond8",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld8Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld8Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond8",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
               }
             }
           ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
-    "helloworld8ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond8",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld8"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub8",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
         }
-      }
-    },
-    "helloworld8ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond8",
+      }, 
+      "Condition": "Cond7"
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
-        "Action": "lambda:invokeFunction",
-        "FunctionName": {
-          "Ref": "helloworld8"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub8",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
-            }
-          ]
-        }
-      }
-    },
-    "helloworld9": {
-      "Type": "AWS::Lambda::Function",
-      "Condition": "Cond9",
-      "Properties": {
-        "Code": {
-          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "helloworld9Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Timeout": 3,
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "helloworld9Role": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "Cond9",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ]
-      }
-    },
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment20695873e0"
+        }, 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod"
+      }, 
+      "Condition": "SamImplicitApiCondition"
+    }, 
     "helloworld9ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond9",
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "helloworld9"
-        },
-        "Principal": "apigateway.amazonaws.com",
+        }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub9",
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub9", 
             {
+              "__Stage__": "*", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
+              }
             }
           ]
         }
-      }
-    },
+      }, 
+      "Condition": "Cond9"
+    }, 
+    "helloworld1Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond1"
+    }, 
+    "helloworld7": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld7Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond7"
+    }, 
+    "helloworld6": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld6Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond6"
+    }, 
+    "helloworldRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond"
+    }, 
+    "helloworld4": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld4Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond4"
+    }, 
+    "helloworld3": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld3Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond3"
+    }, 
+    "helloworld2": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld2Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond2"
+    }, 
+    "helloworld1": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld1Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond1"
+    }, 
+    "helloApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "hello"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/sub", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "MyCondition"
+    }, 
+    "helloworld9": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld9Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond9"
+    }, 
+    "helloworld3ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld3"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub3", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond3"
+    }, 
+    "helloApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "hello"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/sub", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "MyCondition"
+    }, 
+    "helloworld2ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld2"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub2", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond2"
+    }, 
+    "ServerlessRestApiDeployment20695873e0": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 20695873e064066d66d500fae481652c3b6a0b4c", 
+        "StageName": "Stage"
+      }, 
+      "Condition": "SamImplicitApiCondition"
+    }, 
+    "helloworld3ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld3"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub3", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond3"
+    }, 
+    "helloworld2ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld2"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub2", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond2"
+    }, 
+    "helloworld1ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld1"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub1", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond1"
+    }, 
+    "helloworld8": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld8Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond8"
+    }, 
+    "helloworld6ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld6"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub6", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond6"
+    }, 
+    "helloworld7ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld7"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub7", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond7"
+    }, 
+    "helloworld8ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld8"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub8", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond8"
+    }, 
+    "helloworld4ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld4"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub4", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond4"
+    }, 
+    "helloworld1ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld1"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub1", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond1"
+    }, 
+    "helloworld4Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond4"
+    }, 
+    "helloworld6ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld6"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub6", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond6"
+    }, 
+    "helloworldApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond"
+    }, 
+    "helloworldApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond"
+    }, 
+    "helloworld9Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond9"
+    }, 
+    "helloworld5ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld5"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub5", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond5"
+    }, 
+    "helloworld8ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld8"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub8", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond8"
+    }, 
+    "helloRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "MyCondition"
+    }, 
+    "helloworld8Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond8"
+    }, 
+    "helloworld": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworldRole", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond"
+    }, 
+    "helloworld5Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond5"
+    }, 
+    "hello": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloRole", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "MyCondition"
+    }, 
+    "helloworld5": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 128, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "helloworld5Role", 
+            "Arn"
+          ]
+        }, 
+        "Timeout": 3, 
+        "Runtime": "nodejs8.10"
+      }, 
+      "Condition": "Cond5"
+    }, 
     "helloworld9ApiEventPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "Cond9",
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "helloworld9"
-        },
-        "Principal": "apigateway.amazonaws.com",
+        }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub9",
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub9", 
             {
+              "__Stage__": "Prod", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "Prod"
+              }
             }
           ]
         }
-      }
-    },
+      }, 
+      "Condition": "Cond9"
+    }, 
+    "helloworld6Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond6"
+    }, 
+    "helloworld7Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond7"
+    }, 
+    "helloworld2Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond2"
+    }, 
+    "helloworld3Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond3"
+    }, 
+    "helloworld4ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "helloworld4"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub4", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "Cond4"
+    }, 
     "ServerlessRestApi": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Condition": "SamImplicitApiCondition",
+      "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
-          "swagger": "2.0",
           "info": {
-            "version": "1.0",
+            "version": "1.0", 
             "title": {
               "Ref": "AWS::StackName"
             }
-          },
+          }, 
           "paths": {
             "/sub": {
-              "get": {
-                "Fn::If": [
-                  "MyCondition",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "MyCondition",
-                          {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${hello.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              },
               "post": {
                 "Fn::If": [
-                  "Cond",
+                  "Cond", 
                   {
                     "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
                       "uri": {
                         "Fn::If": [
-                          "Cond",
+                          "Cond", 
                           {
                             "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld.Arn}/invocations"
-                          },
+                          }, 
                           {
                             "Ref": "AWS::NoValue"
                           }
                         ]
                       }
-                    },
+                    }, 
                     "responses": {}
-                  },
+                  }, 
                   {
                     "Ref": "AWS::NoValue"
                   }
                 ]
-              }
-            },
-            "/sub1": {
-              "post": {
+              }, 
+              "get": {
                 "Fn::If": [
-                  "Cond1",
+                  "MyCondition", 
                   {
                     "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
                       "uri": {
                         "Fn::If": [
-                          "Cond1",
+                          "MyCondition", 
                           {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld1.Arn}/invocations"
-                          },
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${hello.Arn}/invocations"
+                          }, 
                           {
                             "Ref": "AWS::NoValue"
                           }
                         ]
                       }
-                    },
+                    }, 
                     "responses": {}
-                  },
+                  }, 
                   {
                     "Ref": "AWS::NoValue"
                   }
                 ]
               }
-            },
-            "/sub2": {
-              "post": {
-                "Fn::If": [
-                  "Cond2",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "Cond2",
-                          {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld2.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              }
-            },
-            "/sub3": {
-              "post": {
-                "Fn::If": [
-                  "Cond3",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "Cond3",
-                          {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld3.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              }
-            },
-            "/sub4": {
-              "post": {
-                "Fn::If": [
-                  "Cond4",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "Cond4",
-                          {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld4.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              }
-            },
-            "/sub5": {
-              "post": {
-                "Fn::If": [
-                  "Cond5",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "Cond5",
-                          {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld5.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              }
-            },
-            "/sub6": {
-              "post": {
-                "Fn::If": [
-                  "Cond6",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "Cond6",
-                          {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld6.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              }
-            },
-            "/sub7": {
-              "post": {
-                "Fn::If": [
-                  "Cond7",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "Cond7",
-                          {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld7.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              }
-            },
+            }, 
             "/sub8": {
               "post": {
                 "Fn::If": [
-                  "Cond8",
+                  "Cond8", 
                   {
                     "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
                       "uri": {
                         "Fn::If": [
-                          "Cond8",
+                          "Cond8", 
                           {
                             "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld8.Arn}/invocations"
-                          },
+                          }, 
                           {
                             "Ref": "AWS::NoValue"
                           }
                         ]
                       }
-                    },
+                    }, 
                     "responses": {}
-                  },
+                  }, 
                   {
                     "Ref": "AWS::NoValue"
                   }
                 ]
               }
-            },
+            }, 
             "/sub9": {
               "post": {
                 "Fn::If": [
-                  "Cond9",
+                  "Cond9", 
                   {
                     "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
                       "uri": {
                         "Fn::If": [
-                          "Cond9",
+                          "Cond9", 
                           {
                             "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld9.Arn}/invocations"
-                          },
+                          }, 
                           {
                             "Ref": "AWS::NoValue"
                           }
                         ]
                       }
-                    },
+                    }, 
                     "responses": {}
-                  },
+                  }, 
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              }
+            }, 
+            "/sub1": {
+              "post": {
+                "Fn::If": [
+                  "Cond1", 
+                  {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
+                      "uri": {
+                        "Fn::If": [
+                          "Cond1", 
+                          {
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld1.Arn}/invocations"
+                          }, 
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }, 
+                    "responses": {}
+                  }, 
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              }
+            }, 
+            "/sub2": {
+              "post": {
+                "Fn::If": [
+                  "Cond2", 
+                  {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
+                      "uri": {
+                        "Fn::If": [
+                          "Cond2", 
+                          {
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld2.Arn}/invocations"
+                          }, 
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }, 
+                    "responses": {}
+                  }, 
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              }
+            }, 
+            "/sub3": {
+              "post": {
+                "Fn::If": [
+                  "Cond3", 
+                  {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
+                      "uri": {
+                        "Fn::If": [
+                          "Cond3", 
+                          {
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld3.Arn}/invocations"
+                          }, 
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }, 
+                    "responses": {}
+                  }, 
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              }
+            }, 
+            "/sub4": {
+              "post": {
+                "Fn::If": [
+                  "Cond4", 
+                  {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
+                      "uri": {
+                        "Fn::If": [
+                          "Cond4", 
+                          {
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld4.Arn}/invocations"
+                          }, 
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }, 
+                    "responses": {}
+                  }, 
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              }
+            }, 
+            "/sub5": {
+              "post": {
+                "Fn::If": [
+                  "Cond5", 
+                  {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
+                      "uri": {
+                        "Fn::If": [
+                          "Cond5", 
+                          {
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld5.Arn}/invocations"
+                          }, 
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }, 
+                    "responses": {}
+                  }, 
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              }
+            }, 
+            "/sub6": {
+              "post": {
+                "Fn::If": [
+                  "Cond6", 
+                  {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
+                      "uri": {
+                        "Fn::If": [
+                          "Cond6", 
+                          {
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld6.Arn}/invocations"
+                          }, 
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }, 
+                    "responses": {}
+                  }, 
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              }
+            }, 
+            "/sub7": {
+              "post": {
+                "Fn::If": [
+                  "Cond7", 
+                  {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST", 
+                      "type": "aws_proxy", 
+                      "uri": {
+                        "Fn::If": [
+                          "Cond7", 
+                          {
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld7.Arn}/invocations"
+                          }, 
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }, 
+                    "responses": {}
+                  }, 
                   {
                     "Ref": "AWS::NoValue"
                   }
                 ]
               }
             }
-          }
+          }, 
+          "swagger": "2.0"
         }
-      }
-    },
-    "ServerlessRestApiDeployment97e704b874": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Condition": "SamImplicitApiCondition",
-      "Properties": {
-        "Description": "RestApi deployment id: 97e704b874d703742a055cd0cd6f3498de47e58f",
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "StageName": "Stage"
-      }
-    },
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Condition": "SamImplicitApiCondition",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment97e704b874"
-        },
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "StageName": "Prod"
-      }
+      }, 
+      "Condition": "SamImplicitApiCondition"
     }
-  }
+  }, 
+  "Description": "A template to test for implicit API condition handling."
 }
