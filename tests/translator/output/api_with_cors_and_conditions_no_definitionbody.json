@@ -9,7 +9,7 @@
     }
   }, 
   "Resources": {
-    "ExplicitApiFunction": {
+    "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
         "Handler": "index.gethtml", 
@@ -19,7 +19,7 @@
         }, 
         "Role": {
           "Fn::GetAtt": [
-            "ExplicitApiFunctionRole", 
+            "ImplicitApiFunctionRole", 
             "Arn"
           ]
         }, 
@@ -33,7 +33,7 @@
       }, 
       "Condition": "MyCondition"
     }, 
-    "ExplicitApiFunctionRole": {
+    "ImplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
@@ -58,13 +58,13 @@
       }, 
       "Condition": "MyCondition"
     }, 
-    "ExplicitApiFunctionGetHtmlPermissionTest": {
+    "ImplicitApiFunctionGetHtmlPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "ExplicitApiFunction"
+          "Ref": "ImplicitApiFunction"
         }, 
         "SourceArn": {
           "Fn::Sub": [
@@ -80,13 +80,13 @@
       }, 
       "Condition": "MyCondition"
     }, 
-    "ExplicitApiFunction2DeleteHtmlPermissionTest": {
+    "ImplicitApiFunction2DeleteHtmlPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "ExplicitApiFunction2"
+          "Ref": "ImplicitApiFunction2"
         }, 
         "SourceArn": {
           "Fn::Sub": [
@@ -101,13 +101,13 @@
         }
       }
     }, 
-    "ExplicitApiFunctionPostHtmlPermissionProd": {
+    "ImplicitApiFunctionPostHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "ExplicitApiFunction"
+          "Ref": "ImplicitApiFunction"
         }, 
         "SourceArn": {
           "Fn::Sub": [
@@ -158,7 +158,7 @@
                         "Fn::If": [
                           "MyCondition", 
                           {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                           }, 
                           {
                             "Ref": "AWS::NoValue"
@@ -184,7 +184,7 @@
                         "Fn::If": [
                           "MyCondition", 
                           {
-                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                           }, 
                           {
                             "Ref": "AWS::NoValue"
@@ -244,7 +244,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction2.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction2.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -255,13 +255,13 @@
         }
       }
     }, 
-    "ExplicitApiFunctionGetHtmlPermissionProd": {
+    "ImplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "ExplicitApiFunction"
+          "Ref": "ImplicitApiFunction"
         }, 
         "SourceArn": {
           "Fn::Sub": [
@@ -287,13 +287,13 @@
         "StageName": "Stage"
       }
     }, 
-    "ExplicitApiFunctionPostHtmlPermissionTest": {
+    "ImplicitApiFunctionPostHtmlPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "ExplicitApiFunction"
+          "Ref": "ImplicitApiFunction"
         }, 
         "SourceArn": {
           "Fn::Sub": [
@@ -309,7 +309,7 @@
       }, 
       "Condition": "MyCondition"
     }, 
-    "ExplicitApiFunction2Role": {
+    "ImplicitApiFunction2Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
@@ -333,13 +333,13 @@
         }
       }
     }, 
-    "ExplicitApiFunction2DeleteHtmlPermissionProd": {
+    "ImplicitApiFunction2DeleteHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "ExplicitApiFunction2"
+          "Ref": "ImplicitApiFunction2"
         }, 
         "SourceArn": {
           "Fn::Sub": [
@@ -354,7 +354,7 @@
         }
       }
     }, 
-    "ExplicitApiFunction2": {
+    "ImplicitApiFunction2": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
         "Handler": "index.gethtml", 
@@ -364,7 +364,7 @@
         }, 
         "Role": {
           "Fn::GetAtt": [
-            "ExplicitApiFunction2Role", 
+            "ImplicitApiFunction2Role", 
             "Arn"
           ]
         }, 
