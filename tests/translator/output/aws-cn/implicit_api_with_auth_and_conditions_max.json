@@ -30,7 +30,7 @@
         false
       ]
     }, 
-    "SamImplicitApiCondition": {
+    "ServerlessRestApiCondition": {
       "Fn::Or": [
         {
           "Condition": "FunctionCondition"
@@ -211,7 +211,7 @@
         }, 
         "StageName": "Prod"
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunction5Role": {
       "Type": "AWS::IAM::Role", 
@@ -376,7 +376,7 @@
           ]
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunctionWithNoAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
@@ -456,7 +456,7 @@
         "Description": "RestApi deployment id: d26d2cbe9f478aaad2fe51f121521610ccbabdbb", 
         "StageName": "Stage"
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -521,7 +521,7 @@
           ]
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunction5WithLambdaRequestAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
@@ -562,7 +562,7 @@
           ]
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunctionWithNoAuthorizerPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
@@ -977,7 +977,7 @@
           "endpointConfigurationTypes": "REGIONAL"
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunction2WithCognitoMultipleUserPoolsAuthorizerPermissionTest": {
       "Type": "AWS::Lambda::Permission", 

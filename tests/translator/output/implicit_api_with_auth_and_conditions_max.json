@@ -30,7 +30,7 @@
         false
       ]
     }, 
-    "SamImplicitApiCondition": {
+    "ServerlessRestApiCondition": {
       "Fn::Or": [
         {
           "Condition": "FunctionCondition"
@@ -211,7 +211,7 @@
         }, 
         "StageName": "Prod"
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunction5Role": {
       "Type": "AWS::IAM::Role", 
@@ -376,7 +376,7 @@
           ]
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunctionWithNoAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
@@ -510,7 +510,7 @@
           ]
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunction5WithLambdaRequestAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
@@ -551,7 +551,7 @@
           ]
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunctionWithNoAuthorizerPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
@@ -675,7 +675,7 @@
         "Description": "RestApi deployment id: d453c269dfc1e5fce66ea9fcaa514e9dcc8904db", 
         "StageName": "Stage"
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi", 
@@ -969,7 +969,7 @@
           }
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "MyFunction2WithCognitoMultipleUserPoolsAuthorizerPermissionTest": {
       "Type": "AWS::Lambda::Permission", 

@@ -61,7 +61,7 @@
         false
       ]
     }, 
-    "SamImplicitApiCondition1": {
+    "ServerlessRestApiCondition1": {
       "Fn::Or": [
         {
           "Condition": "Cond"
@@ -95,13 +95,13 @@
         }
       ]
     }, 
-    "SamImplicitApiCondition": {
+    "ServerlessRestApiCondition": {
       "Fn::Or": [
         {
           "Condition": "MyCondition"
         }, 
         {
-          "Condition": "SamImplicitApiCondition1"
+          "Condition": "ServerlessRestApiCondition1"
         }
       ]
     }, 
@@ -168,7 +168,7 @@
         }, 
         "StageName": "Prod"
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "helloworld9ApiEventPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
@@ -806,7 +806,7 @@
         "Description": "RestApi deployment id: 907bc1304ed556ffcaed31fdc543995f3520ef82", 
         "StageName": "Stage"
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }, 
     "helloworld9Role": {
       "Type": "AWS::IAM::Role", 
@@ -1500,7 +1500,7 @@
           "endpointConfigurationTypes": "REGIONAL"
         }
       }, 
-      "Condition": "SamImplicitApiCondition"
+      "Condition": "ServerlessRestApiCondition"
     }
   }, 
   "Description": "A template to test for implicit API condition handling."

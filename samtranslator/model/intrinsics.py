@@ -84,14 +84,14 @@ def make_combined_condition(conditions_list, condition_name):
     conditions = {}
     conditions_length = len(conditions_list)
     # Get number of conditions needed, then minus one to use them as 0-based indices
-    num_conditions = calculate_number_of_conditions(conditions_length, max_conditions) - 1
+    zero_based_num_conditions = calculate_number_of_conditions(conditions_length, max_conditions) - 1
 
     while len(conditions_list) > 1:
         new_condition_name = condition_name
-        # If more than 1 new condition is needed, add a # to the end of the name
-        if num_conditions > 0:
-            new_condition_name = '{}{}'.format(condition_name, num_conditions)
-            num_conditions -= 1
+        # If more than 1 new condition is needed, add a number to the end of the name
+        if zero_based_num_conditions > 0:
+            new_condition_name = '{}{}'.format(condition_name, zero_based_num_conditions)
+            zero_based_num_conditions -= 1
         new_condition_content = make_or_condition(conditions_list[:max_conditions])
         conditions_list = conditions_list[max_conditions:]
         conditions_list.append(new_condition_name)

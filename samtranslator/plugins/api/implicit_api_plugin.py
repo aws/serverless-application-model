@@ -40,7 +40,7 @@ class ImplicitApiPlugin(BasePlugin):
         self.implicit_api_logical_id = GeneratedLogicalId.implicit_api()
         self.existing_implicit_api_resource = None
         self.conditions = set()
-        self.implicit_api_condition = 'SamImplicitApiCondition'
+        self.implicit_api_condition = 'ServerlessRestApiCondition'
 
     def on_before_transform_template(self, template_dict):
         """
@@ -209,6 +209,8 @@ class ImplicitApiPlugin(BasePlugin):
         Decides whether to add a condition to the implicit api resource.
         :param dict template_dict: SAM template dictionary
         """
+        # If None is in self.conditions, it means that a function without any conditions on it is
+        # referencing the implicit Api, wich means we don't need to add a condition to the Api resource.
         if None not in self.conditions and len(self.conditions) > 0:
             implicit_api_resource = template_dict.get('Resources').get(self.implicit_api_logical_id)
             if len(self.conditions) == 1:
@@ -220,7 +222,11 @@ class ImplicitApiPlugin(BasePlugin):
 
     def _add_condition_to_template(self, template_dict):
         """
-        Adds necessary conditions to the template for the implicit api
+        Adds necessary conditions to the template for the Implicit Ppi.
+        If multiple functions with multiple different conditions reference the Implicit Api, we need to aggregate
+        those conditions in order to conditionally create the Implicit Api. See RFC:
+        https://github.com/awslabs/serverless-application-model/issues/758
+
         :param dict template_dict: SAM template dictionary
         """
         if not template_dict.get('Conditions'):
