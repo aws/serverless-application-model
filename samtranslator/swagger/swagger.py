@@ -64,7 +64,7 @@ class SwaggerEditor(object):
             if self.method_definition_has_integration(method_definition):
                 return True
         return False
-        
+
     def method_definition_has_integration(self, method_definition):
         """
         Checks a method definition to make sure it has an apigw integration
