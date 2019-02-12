@@ -52,14 +52,29 @@ class SwaggerEditor(object):
 
         return result
 
-    def get_integration_from_method(self, method):
+    def method_has_integration(self, method):
         """
-        Returns the integration for this method.
+        Returns true if the given method contains a valid method definition.
+        This uses the get_method_contents function to handle conditionals.
 
         :param dict method: method dictionary
-        :return: X_APIGW_INTEGRATION section for this method
+        :return: true if method has one or multiple integrations
         """
-        return self.get_method_contents(method).get(self._X_APIGW_INTEGRATION)
+        for method_definition in self.get_method_contents(method):
+            if self.method_definition_has_integration(method_definition):
+                return True
+        return False
+        
+    def method_definition_has_integration(self, method_definition):
+        """
+        Checks a method definition to make sure it has an apigw integration
+
+        :param dict method_defintion: method definition dictionary
+        :return: True if an integration exists
+        """
+        if method_definition.get(self._X_APIGW_INTEGRATION):
+            return True
+        return False
 
     def get_method_contents(self, method):
         """
@@ -68,11 +83,11 @@ class SwaggerEditor(object):
         inside of the conditional.
 
         :param dict method: method dictionary
-        :return: swagger components of the method
+        :return: list of swagger component dictionaries for the method
         """
         if self._CONDITIONAL_IF in method:
-            return method[self._CONDITIONAL_IF][1]
-        return method
+            return method[self._CONDITIONAL_IF][1:]
+        return [method]
 
     def has_integration(self, path, method):
         """
@@ -86,7 +101,7 @@ class SwaggerEditor(object):
 
         return self.has_path(path, method) and \
             isinstance(self.paths[path][method], dict) and \
-            bool(self.get_integration_from_method(self.paths[path][method]))  # Integration present and non-empty
+            self.method_has_integration(self.paths[path][method])  # Integration present and non-empty
 
     def add_path(self, path, method=None):
         """
@@ -379,62 +394,69 @@ class SwaggerEditor(object):
     def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
                               is_default=False):
         normalized_method_name = self._normalize_method_name(method_name)
-        existing_security = self.get_method_contents(self.paths[path][normalized_method_name]).get('security', [])
-        # TEST: [{'sigv4': []}, {'api_key': []}])
-        authorizer_names = set(authorizers.keys())
-        existing_non_authorizer_security = []
-        existing_authorizer_security = []
 
-        # Split existing security into Authorizers and everything else
-        # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
-        # We want to ensure only a single Authorizer security entry exists while keeping everything else
-        for security in existing_security:
-            if authorizer_names.isdisjoint(security.keys()):
-                existing_non_authorizer_security.append(security)
-            else:
-                existing_authorizer_security.append(security)
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.paths[path][normalized_method_name]):
 
-        none_idx = -1
-        authorizer_security = []
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+            existing_security = method_definition.get('security', [])
+            # TEST: [{'sigv4': []}, {'api_key': []}])
+            authorizer_names = set(authorizers.keys())
+            existing_non_authorizer_security = []
+            existing_authorizer_security = []
 
-        # If this is the Api-level DefaultAuthorizer we need to check for an
-        # existing Authorizer before applying the default. It would be simpler
-        # if instead we applied the DefaultAuthorizer first and then simply
-        # overwrote it if necessary, however, the order in which things get
-        # applied (Function Api Events first; then Api Resource) complicates it.
-        if is_default:
-            # Check if Function/Path/Method specified 'NONE' for Authorizer
-            for idx, security in enumerate(existing_non_authorizer_security):
-                is_none = any(key == 'NONE' for key in security.keys())
+            # Split existing security into Authorizers and everything else
+            # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
+            # We want to ensure only a single Authorizer security entry exists while keeping everything else
+            for security in existing_security:
+                if authorizer_names.isdisjoint(security.keys()):
+                    existing_non_authorizer_security.append(security)
+                else:
+                    existing_authorizer_security.append(security)
 
-                if is_none:
-                    none_idx = idx
-                    break
+            none_idx = -1
+            authorizer_security = []
 
-            # NONE was found; remove it and don't add the DefaultAuthorizer
-            if none_idx > -1:
-                del existing_non_authorizer_security[none_idx]
+            # If this is the Api-level DefaultAuthorizer we need to check for an
+            # existing Authorizer before applying the default. It would be simpler
+            # if instead we applied the DefaultAuthorizer first and then simply
+            # overwrote it if necessary, however, the order in which things get
+            # applied (Function Api Events first; then Api Resource) complicates it.
+            if is_default:
+                # Check if Function/Path/Method specified 'NONE' for Authorizer
+                for idx, security in enumerate(existing_non_authorizer_security):
+                    is_none = any(key == 'NONE' for key in security.keys())
 
-            # Existing Authorizer found (defined at Function/Path/Method); use that instead of default
-            elif existing_authorizer_security:
-                authorizer_security = existing_authorizer_security
+                    if is_none:
+                        none_idx = idx
+                        break
 
-            # No existing Authorizer found; use default
+                # NONE was found; remove it and don't add the DefaultAuthorizer
+                if none_idx > -1:
+                    del existing_non_authorizer_security[none_idx]
+
+                # Existing Authorizer found (defined at Function/Path/Method); use that instead of default
+                elif existing_authorizer_security:
+                    authorizer_security = existing_authorizer_security
+
+                # No existing Authorizer found; use default
+                else:
+                    security_dict = {}
+                    security_dict[authorizer_name] = []
+                    authorizer_security = [security_dict]
+
+            # This is a Function/Path/Method level Authorizer; simply set it
             else:
                 security_dict = {}
                 security_dict[authorizer_name] = []
                 authorizer_security = [security_dict]
 
-        # This is a Function/Path/Method level Authorizer; simply set it
-        else:
-            security_dict = {}
-            security_dict[authorizer_name] = []
-            authorizer_security = [security_dict]
+            security = existing_non_authorizer_security + authorizer_security
 
-        security = existing_non_authorizer_security + authorizer_security
-
-        if security:
-            self.get_method_contents(self.paths[path][normalized_method_name])['security'] = security
+            if security:
+                method_definition['security'] = security
 
     @property
     def swagger(self):
