@@ -7,6 +7,9 @@ Parameters:
     Default: MIT-0 License
   LayerRuntimeList:
     Type: CommaDelimitedList
+  LayerRuntimeString:
+    Type: String
+    Default: nodejs8.10
 
 Resources:
   LayerWithLicenseIntrinsic:
