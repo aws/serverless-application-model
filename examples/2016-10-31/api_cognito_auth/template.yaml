@@ -131,7 +131,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt PreSignupLambdaFunction.Arn
       Principal: cognito-idp.amazonaws.com
-      SourceArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
+      SourceArn: !Sub 'arn:${AWS::Partition}:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
       # TODO: Add a CognitoUserPool Event Source to SAM to create this permission for you.
       # Events:
       #   CognitoUserPoolPreSignup:
