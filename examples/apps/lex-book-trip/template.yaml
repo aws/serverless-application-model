@@ -3,9 +3,6 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Book details of a visit, using Amazon Lex to perform natural language
   understanding
-Parameters:
-  KeyIdParameter:
-    Type: String
 Resources:
   lexbooktrip:
     Type: 'AWS::Serverless::Function'
@@ -18,6 +15,3 @@ Resources:
         understanding
       MemorySize: 128
       Timeout: 10
-      Policies:
-        - KMSDecryptPolicy:
-             KeyId: !Ref KeyIdParameter
