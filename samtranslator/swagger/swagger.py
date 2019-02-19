@@ -34,6 +34,12 @@ class SwaggerEditor(object):
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", {})
 
+    def get_path(self, path):
+        path_dict = self.paths.get(path)
+        if isinstance(path_dict, dict) and self._CONDITIONAL_IF in path_dict:
+            path_dict = path_dict[self._CONDITIONAL_IF][1]
+        return path_dict
+
     def has_path(self, path, method=None):
         """
         Returns True if this Swagger has the given path and optional method
@@ -44,13 +50,11 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)
 
-        result = path in self.paths
+        path_dict = self.get_path(path)
+        path_dict_exists = path_dict is not None
         if method:
-            result = result and \
-                    isinstance(self.paths[path], dict) and \
-                    method in self.paths[path]
-
-        return result
+            return path_dict_exists and method in path_dict
+        return path_dict_exists
 
     def method_has_integration(self, method):
         """
@@ -99,9 +103,10 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)
 
+        path_dict = self.get_path(path)
         return self.has_path(path, method) and \
-            isinstance(self.paths[path][method], dict) and \
-            self.method_has_integration(self.paths[path][method])  # Integration present and non-empty
+            isinstance(path_dict[method], dict) and \
+            self.method_has_integration(path_dict[method])  # Integration present and non-empty
 
     def add_path(self, path, method=None):
         """
@@ -113,13 +118,16 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)
 
-        self.paths.setdefault(path, {})
+        path_dict = self.paths.setdefault(path, {})
 
-        if not isinstance(self.paths[path], dict):
+        if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
             raise ValueError("Value of '{}' path must be a dictionary according to Swagger spec".format(path))
 
-        self.paths[path].setdefault(method, {})
+        if self._CONDITIONAL_IF in path_dict:
+            path_dict = path_dict[self._CONDITIONAL_IF][1]
+
+        path_dict.setdefault(method, {})
 
     def add_lambda_integration(self, path, method, integration_uri, condition=None):
         """
@@ -141,18 +149,25 @@ class SwaggerEditor(object):
         if condition:
             integration_uri = make_conditional(condition, integration_uri)
 
-        self.paths[path][method][self._X_APIGW_INTEGRATION] = {
+        path_dict = self.get_path(path)
+        path_dict[method][self._X_APIGW_INTEGRATION] = {
                 'type': 'aws_proxy',
                 'httpMethod': 'POST',
                 'uri': integration_uri
         }
 
         # If 'responses' key is *not* present, add it with an empty dict as value
-        self.paths[path][method].setdefault('responses', {})
+        path_dict[method].setdefault('responses', {})
 
         # If a condition is present, wrap all method contents up into the condition
         if condition:
-            self.paths[path][method] = make_conditional(condition, self.paths[path][method])
+            path_dict[method] = make_conditional(condition, path_dict[method])
+
+    def make_path_conditional(self, path, condition):
+        """
+        Wrap entire API path definition in a CloudFormation if condition.
+        """
+        self.paths[path] = make_conditional(condition, self.paths[path])
 
     def iter_on_path(self):
         """
@@ -210,11 +225,11 @@ class SwaggerEditor(object):
 
         # Add the Options method and the CORS response
         self.add_path(path, self._OPTIONS_METHOD)
-        self.paths[path][self._OPTIONS_METHOD] = self._options_method_response_for_cors(allowed_origins,
-                                                                                        allowed_headers,
-                                                                                        allowed_methods,
-                                                                                        max_age,
-                                                                                        allow_credentials)
+        self.get_path(path)[self._OPTIONS_METHOD] = self._options_method_response_for_cors(allowed_origins,
+                                                                                           allowed_headers,
+                                                                                           allowed_methods,
+                                                                                           max_age,
+                                                                                           allow_credentials)
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
                                           max_age=None, allow_credentials=None):
@@ -323,7 +338,7 @@ class SwaggerEditor(object):
             return ""
 
         # At this point, value of Swagger path should be a dictionary with method names being the keys
-        methods = list(self.paths[path].keys())
+        methods = list(self.get_path(path).keys())
 
         if self._X_ANY_METHOD in methods:
             # API Gateway's ANY method is not a real HTTP method but a wildcard representing all HTTP methods
@@ -367,7 +382,7 @@ class SwaggerEditor(object):
             authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
         """
-        for method_name, method in self.paths[path].items():
+        for method_name, method in self.get_path(path).items():
             self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
                                        default_authorizer=default_authorizer, is_default=True)
 
@@ -396,7 +411,7 @@ class SwaggerEditor(object):
         normalized_method_name = self._normalize_method_name(method_name)
 
         # It is possible that the method could have two definitions in a Fn::If block.
-        for method_definition in self.get_method_contents(self.paths[path][normalized_method_name]):
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
             # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
             if not self.method_definition_has_integration(method_definition):

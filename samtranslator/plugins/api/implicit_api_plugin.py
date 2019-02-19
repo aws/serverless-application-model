@@ -39,7 +39,9 @@ class ImplicitApiPlugin(BasePlugin):
 
         self.implicit_api_logical_id = GeneratedLogicalId.implicit_api()
         self.existing_implicit_api_resource = None
-        self.conditions = set()
+        # dict containing condition (or None) for each resource path+method for all APIs. dict format:
+        # {api_id: {path: {method: condition_name_or_None}}}
+        self.api_conditions = {}
         self.implicit_api_condition = 'ServerlessRestApiCondition'
 
     def on_before_transform_template(self, template_dict):
@@ -79,6 +81,7 @@ class ImplicitApiPlugin(BasePlugin):
                 errors.append(InvalidResourceException(logicalId, ex.message))
 
         self._maybe_add_condition_to_implicit_api(template_dict)
+        self._maybe_add_conditions_to_implicit_api_paths(template)
         self._maybe_remove_implicit_api(template)
 
         if len(errors) > 0:
@@ -130,8 +133,14 @@ class ImplicitApiPlugin(BasePlugin):
             if not event_properties:
                 continue
 
-            if self._add_implicit_api_id_if_necessary(event_properties):
-                self.conditions.add(condition)
+            self._add_implicit_api_id_if_necessary(event_properties)
+
+            api_id = self._get_api_id(event_properties)
+            path = event_properties["Path"]
+            method = event_properties["Method"]
+            api_dict = self.api_conditions.setdefault(api_id, {})
+            method_conditions = api_dict.setdefault(path, {})
+            method_conditions[method] = condition
 
             self._add_api_to_swagger(logicalId, event_properties, template)
 
@@ -147,11 +156,9 @@ class ImplicitApiPlugin(BasePlugin):
         RestApiId property to events that don't have them.
 
         :param dict event_properties: Dictionary of event properties
-        :return: True if implicit API was added to event properties
         """
         if "RestApiId" not in event_properties:
             event_properties["RestApiId"] = {"Ref": self.implicit_api_logical_id}
-            return True
 
     def _add_api_to_swagger(self, event_id, event_properties, template):
         """
@@ -163,11 +170,8 @@ class ImplicitApiPlugin(BasePlugin):
         :param SamTemplate template: SAM Template to search for Serverless::Api resources
         """
 
-        # "RestApiId" property of the event contains the logical Id to the AWS::Serverless::Api resource.
-        # Need to grab the resource and update Swagger from it
-        api_id = event_properties.get("RestApiId")
-        if isinstance(api_id, dict) and "Ref" in api_id:
-            api_id = api_id["Ref"]
+        # Need to grab the AWS::Serverless::Api resource for this API event and update its Swagger definition
+        api_id = self._get_api_id(event_properties)
 
         # RestApiId is not pointing to a valid  API resource
         if isinstance(api_id, dict) or not template.get(api_id):
@@ -204,37 +208,103 @@ class ImplicitApiPlugin(BasePlugin):
         resource.properties["DefinitionBody"] = editor.swagger
         template.set(api_id, resource)
 
+    def _get_api_id(self, event_properties):
+        """
+        Get API logical id from API event properties.
+
+        Handles case where API id is not specified or is a reference to a logical id.
+        """
+        api_id = event_properties.get("RestApiId")
+        if isinstance(api_id, dict) and "Ref" in api_id:
+            api_id = api_id["Ref"]
+        return api_id
+
     def _maybe_add_condition_to_implicit_api(self, template_dict):
         """
         Decides whether to add a condition to the implicit api resource.
         :param dict template_dict: SAM template dictionary
         """
-        # If None is in self.conditions, it means that a function without any conditions on it is
-        # referencing the implicit Api, wich means we don't need to add a condition to the Api resource.
-        if None not in self.conditions and len(self.conditions) > 0:
+        # Short-circuit if template doesn't have any functions with implicit API events
+        if not self.api_conditions.get(self.implicit_api_logical_id, {}):
+            return
+
+        # Add a condition to the API resource IFF all of its resource+methods are associated with serverless functions
+        # containing conditions.
+        implicit_api_conditions = self.api_conditions[self.implicit_api_logical_id]
+        all_resource_method_conditions = set([condition
+                                              for path, method_conditions in implicit_api_conditions.items()
+                                              for method, condition in method_conditions.items()])
+        if len(all_resource_method_conditions) > 0 and None not in all_resource_method_conditions:
             implicit_api_resource = template_dict.get('Resources').get(self.implicit_api_logical_id)
-            if len(self.conditions) == 1:
-                condition = self.conditions.pop()
+            if len(all_resource_method_conditions) == 1:
+                condition = all_resource_method_conditions.pop()
                 implicit_api_resource['Condition'] = condition
             else:
+                # If multiple functions with multiple different conditions reference the Implicit Api, we need to
+                # aggregate those conditions in order to conditionally create the Implicit Api. See RFC:
+                # https://github.com/awslabs/serverless-application-model/issues/758
                 implicit_api_resource['Condition'] = self.implicit_api_condition
-                self._add_condition_to_template(template_dict)
+                self._add_combined_condition_to_template(
+                    template_dict, self.implicit_api_condition, all_resource_method_conditions)
 
-    def _add_condition_to_template(self, template_dict):
+    def _add_combined_condition_to_template(self, template_dict, condition_name, conditions_to_combine):
         """
-        Adds necessary conditions to the template for the Implicit Ppi.
-        If multiple functions with multiple different conditions reference the Implicit Api, we need to aggregate
-        those conditions in order to conditionally create the Implicit Api. See RFC:
-        https://github.com/awslabs/serverless-application-model/issues/758
+        Add top-level template condition that combines the given list of conditions.
 
         :param dict template_dict: SAM template dictionary
+        :param string condition_name: Name of top-level template condition
+        :param list conditions_to_combine: List of conditions that should be combined (via OR operator) to form
+                                           top-level condition.
         """
-        if not template_dict.get('Conditions'):
-            template_dict['Conditions'] = {}
-        template_conditions = template_dict['Conditions']
-        implicit_api_conditions = make_combined_condition(sorted(list(self.conditions)), self.implicit_api_condition)
-        for key, value in implicit_api_conditions.items():
-            template_conditions[key] = value
+        template_conditions = template_dict.setdefault('Conditions', {})
+        new_template_conditions = make_combined_condition(sorted(list(conditions_to_combine)), condition_name)
+        for name, definition in new_template_conditions.items():
+            template_conditions[name] = definition
+
+    def _maybe_add_conditions_to_implicit_api_paths(self, template):
+        """
+        Add conditions to implicit API paths if necessary.
+
+        Implicit API resource methods are constructed from API events on individual serverless functions within the SAM
+        template. Since serverless functions can have conditions on them, it's possible to have a case where all methods
+        under a resource path have conditions on them. If all of these conditions evaluate to false, the entire resource
+        path should not be defined either. This method checks all resource paths' methods and if all methods under a
+        given path contain a condition, a composite condition is added to the overall template Conditions section and
+        that composite condition is added to the resource path.
+        """
+
+        for api_id, api in template.iterate(SamResourceType.Api.value):
+            if not api.properties.get('__MANAGE_SWAGGER'):
+                continue
+
+            swagger = api.properties.get("DefinitionBody")
+            editor = SwaggerEditor(swagger)
+
+            for path in editor.iter_on_path():
+                all_method_conditions = set(
+                    [condition for method, condition in self.api_conditions[api_id][path].items()]
+                )
+                if len(all_method_conditions) > 0 and None not in all_method_conditions:
+                    if len(all_method_conditions) == 1:
+                        editor.make_path_conditional(path, all_method_conditions.pop())
+                    else:
+                        path_condition_name = self._path_condition_name(api_id, path)
+                        self._add_combined_condition_to_template(
+                            template.template_dict, path_condition_name, all_method_conditions)
+                        editor.make_path_conditional(path, path_condition_name)
+
+            api.properties["DefinitionBody"] = editor.swagger
+            template.set(api_id, api)
+
+    def _path_condition_name(self, api_id, path):
+        """
+        Generate valid condition logical id from the given API logical id and swagger resource path.
+        """
+        # only valid characters for CloudFormation logical id are [A-Za-z0-9], but swagger paths can contain
+        # slashes and curly braces for templated params, e.g., /foo/{customerId}. So we'll replace
+        # non-alphanumeric characters.
+        path_logical_id = path.replace('/', 'SLASH').replace('{', 'OB').replace('}', 'CB')
+        return 'SamApiPathCondition{}{}'.format(api_id, path_logical_id)
 
     def _maybe_remove_implicit_api(self, template):
         """
