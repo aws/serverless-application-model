@@ -61,16 +61,6 @@
         false
       ]
     },
-    "SamApiPathConditionServerlessRestApiSLASHsub": {
-      "Fn::Or": [
-        {
-          "Condition": "Cond"
-        },
-        {
-          "Condition": "MyCondition"
-        }
-      ]
-    },
     "ServerlessRestApiCondition": {
       "Fn::Or": [
         {
@@ -119,6 +109,16 @@
       "Fn::Equals": [
         true,
         false
+      ]
+    },
+    "ServerlessRestApiSLASHsubPathCondition": {
+      "Fn::Or": [
+        {
+          "Condition": "Cond"
+        },
+        {
+          "Condition": "MyCondition"
+        }
       ]
     }
   },
@@ -171,7 +171,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment0f49b689d6"
+          "Ref": "ServerlessRestApiDeploymentd229cbabc1"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -493,17 +493,6 @@
       },
       "Condition": "MyCondition"
     },
-    "ServerlessRestApiDeployment0f49b689d6": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 0f49b689d65fc66686f0459ec41329f1beffb199",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
     "helloworld2ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -525,6 +514,17 @@
         }
       },
       "Condition": "Cond2"
+    },
+    "ServerlessRestApiDeploymentd229cbabc1": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: d229cbabc195ae9406a1e544dedb556864eb05b0",
+        "StageName": "Stage"
+      },
+      "Condition": "ServerlessRestApiCondition"
     },
     "helloworld3ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
@@ -1194,7 +1194,7 @@
           "paths": {
             "/sub": {
               "Fn::If": [
-                "SamApiPathConditionServerlessRestApiSLASHsub",
+                "ServerlessRestApiSLASHsubPathCondition",
                 {
                   "post": {
                     "Fn::If": [

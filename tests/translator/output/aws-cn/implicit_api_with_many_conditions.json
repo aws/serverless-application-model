@@ -61,16 +61,6 @@
         false
       ]
     },
-    "SamApiPathConditionServerlessRestApiSLASHsub": {
-      "Fn::Or": [
-        {
-          "Condition": "Cond"
-        },
-        {
-          "Condition": "MyCondition"
-        }
-      ]
-    },
     "ServerlessRestApiCondition": {
       "Fn::Or": [
         {
@@ -119,6 +109,16 @@
       "Fn::Equals": [
         true,
         false
+      ]
+    },
+    "ServerlessRestApiSLASHsubPathCondition": {
+      "Fn::Or": [
+        {
+          "Condition": "Cond"
+        },
+        {
+          "Condition": "MyCondition"
+        }
       ]
     }
   },
@@ -171,7 +171,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentc743655398"
+          "Ref": "ServerlessRestApiDeployment5d9ff7b9fd"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -694,6 +694,17 @@
       },
       "Condition": "Cond4"
     },
+    "ServerlessRestApiDeployment5d9ff7b9fd": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 5d9ff7b9fd3c20ed584298527fb932741f6a34fa",
+        "StageName": "Stage"
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
     "helloworld1ApiEventPermissionTest": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -1183,7 +1194,7 @@
           "paths": {
             "/sub": {
               "Fn::If": [
-                "SamApiPathConditionServerlessRestApiSLASHsub",
+                "ServerlessRestApiSLASHsubPathCondition",
                 {
                   "post": {
                     "Fn::If": [
@@ -1578,17 +1589,6 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
-    "ServerlessRestApiDeploymentc743655398": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: c7436553987150ec14a5bbcf74c07a3181d2fda9",
-        "StageName": "Stage"
       },
       "Condition": "ServerlessRestApiCondition"
     }

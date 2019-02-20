@@ -52,7 +52,7 @@
         false
       ]
     },
-    "SamApiPathConditionServerlessRestApiSLASHusers": {
+    "ServerlessRestApiSLASHusersPathCondition": {
       "Fn::Or": [
         {
           "Condition": "FunctionCondition2"
@@ -223,7 +223,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5a1cb25cdc"
+          "Ref": "ServerlessRestApiDeployment13185ed4f8"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -466,17 +466,6 @@
       },
       "Condition": "FunctionCondition3"
     },
-    "ServerlessRestApiDeployment5a1cb25cdc": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 5a1cb25cdc6abef78e144b5aad2d58d7c5adf3f7",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
     "MyFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -604,6 +593,17 @@
         }
       },
       "Condition": "FunctionCondition"
+    },
+    "ServerlessRestApiDeployment13185ed4f8": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 13185ed4f830a9731f30c8561a781a0f560748c1",
+        "StageName": "Stage"
+      },
+      "Condition": "ServerlessRestApiCondition"
     },
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role",
@@ -750,7 +750,7 @@
             },
             "/users": {
               "Fn::If": [
-                "SamApiPathConditionServerlessRestApiSLASHusers",
+                "ServerlessRestApiSLASHusersPathCondition",
                 {
                   "put": {
                     "Fn::If": [

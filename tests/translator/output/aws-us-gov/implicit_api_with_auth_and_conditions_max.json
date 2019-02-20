@@ -52,7 +52,7 @@
         false
       ]
     },
-    "SamApiPathConditionServerlessRestApiSLASHusers": {
+    "ServerlessRestApiSLASHusersPathCondition": {
       "Fn::Or": [
         {
           "Condition": "FunctionCondition2"
@@ -149,6 +149,17 @@
       },
       "Condition": "FunctionCondition6"
     },
+    "ServerlessRestApiDeploymentc06acce7cc": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: c06acce7cc8764dcad4cb4a7c74b2d0b43310c00",
+        "StageName": "Stage"
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
     "MyFunction2WithCognitoMultipleUserPoolsAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -223,7 +234,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment3480fcc11e"
+          "Ref": "ServerlessRestApiDeploymentc06acce7cc"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -490,17 +501,6 @@
       },
       "Condition": "FunctionCondition"
     },
-    "ServerlessRestApiDeployment3480fcc11e": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 3480fcc11e4e040757b6cfa113fb716b51e6435e",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
     "MyFunction4WithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -750,7 +750,7 @@
             },
             "/users": {
               "Fn::If": [
-                "SamApiPathConditionServerlessRestApiSLASHusers",
+                "ServerlessRestApiSLASHusersPathCondition",
                 {
                   "put": {
                     "Fn::If": [

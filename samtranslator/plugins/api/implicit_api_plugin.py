@@ -234,7 +234,9 @@ class ImplicitApiPlugin(BasePlugin):
         all_resource_method_conditions = set([condition
                                               for path, method_conditions in implicit_api_conditions.items()
                                               for method, condition in method_conditions.items()])
-        if len(all_resource_method_conditions) > 0 and None not in all_resource_method_conditions:
+        at_least_one_resource_method = len(all_resource_method_conditions) > 0
+        all_resource_methods_contain_conditions = None not in all_resource_method_conditions
+        if at_least_one_resource_method and all_resource_methods_contain_conditions:
             implicit_api_resource = template_dict.get('Resources').get(self.implicit_api_logical_id)
             if len(all_resource_method_conditions) == 1:
                 condition = all_resource_method_conditions.pop()
@@ -256,6 +258,10 @@ class ImplicitApiPlugin(BasePlugin):
         :param list conditions_to_combine: List of conditions that should be combined (via OR operator) to form
                                            top-level condition.
         """
+        # defensive precondition check
+        if not conditions_to_combine or len(conditions_to_combine) < 2:
+            raise ValueError('conditions_to_combine must have at least 2 conditions')
+
         template_conditions = template_dict.setdefault('Conditions', {})
         new_template_conditions = make_combined_condition(sorted(list(conditions_to_combine)), condition_name)
         for name, definition in new_template_conditions.items():
@@ -284,7 +290,9 @@ class ImplicitApiPlugin(BasePlugin):
                 all_method_conditions = set(
                     [condition for method, condition in self.api_conditions[api_id][path].items()]
                 )
-                if len(all_method_conditions) > 0 and None not in all_method_conditions:
+                at_least_one_method = len(all_method_conditions) > 0
+                all_methods_contain_conditions = None not in all_method_conditions
+                if at_least_one_method and all_methods_contain_conditions:
                     if len(all_method_conditions) == 1:
                         editor.make_path_conditional(path, all_method_conditions.pop())
                     else:
@@ -304,7 +312,7 @@ class ImplicitApiPlugin(BasePlugin):
         # slashes and curly braces for templated params, e.g., /foo/{customerId}. So we'll replace
         # non-alphanumeric characters.
         path_logical_id = path.replace('/', 'SLASH').replace('{', 'OB').replace('}', 'CB')
-        return 'SamApiPathCondition{}{}'.format(api_id, path_logical_id)
+        return '{}{}PathCondition'.format(api_id, path_logical_id)
 
     def _maybe_remove_implicit_api(self, template):
         """

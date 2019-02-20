@@ -52,7 +52,7 @@
         false
       ]
     },
-    "SamApiPathConditionServerlessRestApiSLASHusers": {
+    "ServerlessRestApiSLASHusersPathCondition": {
       "Fn::Or": [
         {
           "Condition": "FunctionCondition2"
@@ -223,7 +223,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentc835f5e03f"
+          "Ref": "ServerlessRestApiDeploymente09cc405ab"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -619,17 +619,6 @@
       },
       "Condition": "FunctionCondition"
     },
-    "ServerlessRestApiDeploymentc835f5e03f": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: c835f5e03f1ae93932802a4ce58bb221163a24ec",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
     "MyFunction5WithLambdaRequestAuthorizerPermissionTest": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -696,6 +685,17 @@
       },
       "Condition": "FunctionCondition6"
     },
+    "ServerlessRestApiDeploymente09cc405ab": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: e09cc405abe09a0afb9e5f0cb2e94cfba98767d5",
+        "StageName": "Stage"
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
@@ -750,7 +750,7 @@
             },
             "/users": {
               "Fn::If": [
-                "SamApiPathConditionServerlessRestApiSLASHusers",
+                "ServerlessRestApiSLASHusersPathCondition",
                 {
                   "put": {
                     "Fn::If": [
