@@ -604,9 +604,7 @@ class SamLayerVersion(SamResourceMacro):
         'LayerName': PropertyType(False, one_of(is_str(), is_type(dict))),
         'Description': PropertyType(False, is_str()),
         'ContentUri': PropertyType(True, one_of(is_str(), is_type(dict))),
-#        'CompatibleRuntimes': PropertyType(False, list_of(is_str())),
-        'CompatibleRuntimes': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-##        'CompatibleRuntimes': PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        'CompatibleRuntimes': PropertyType(False, list_of( one_of( is_str(), is_type(dict) ) )),
         'LicenseInfo': PropertyType(False, is_str()),
         'RetentionPolicy': PropertyType(False, is_str())
     }

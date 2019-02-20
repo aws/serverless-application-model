@@ -34,11 +34,11 @@
         }, 
         "LayerName": "LayerWithRuntimesStringIntrinsic", 
         "CompatibleRuntimes": {
-          "Ref": "LayerRuntimeString"
+          "Ref": "LayerRuntimeString1"
         }
       }
     }, 
-    "LayerWithRuntimesIntrinsic1ec42e9de6": {
+    "LayerWithLicenseIntrinsic16287c50c8": {
       "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::LayerVersion", 
       "Properties": {
@@ -46,9 +46,9 @@
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "layer.zip"
         }, 
-        "LayerName": "LayerWithRuntimesIntrinsic", 
-        "CompatibleRuntimes": {
-          "Fn::Ref:": "LayerRuntimeList"
+        "LayerName": "LayerWithLicenseIntrinsic", 
+        "LicenseInfo": {
+          "Ref": "LayerLicenseInfo"
         }
       }
     },

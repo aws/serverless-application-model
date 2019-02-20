@@ -7,7 +7,10 @@ Parameters:
     Default: MIT-0 License
   LayerRuntimeList:
     Type: CommaDelimitedList
-  LayerRuntimeString:
+  LayerRuntimeString1:
+    Type: String
+    Default: nodejs6.10
+  LayerRuntimeString2:
     Type: String
     Default: nodejs8.10
 
