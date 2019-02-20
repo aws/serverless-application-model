@@ -224,6 +224,7 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_api_with_serverless_rest_api_resource',
         'implicit_api_with_auth_and_conditions_max',
         'implicit_api_with_many_conditions',
+        'implicit_and_explicit_api_with_conditions',
         'api_with_cors_and_conditions_no_definitionbody',
         'api_with_auth_and_conditions_all_max'
       ],
