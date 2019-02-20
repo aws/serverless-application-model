@@ -15,6 +15,8 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.swagger.swagger import SwaggerEditor
 
+CONDITION = 'Condition'
+
 
 class PushEventSource(ResourceMacro):
     """Base class for push event sources for SAM Functions.
@@ -94,8 +96,8 @@ class Schedule(PushEventSource):
         events_rule.Targets = [self._construct_target(function)]
 
         source_arn = events_rule.get_runtime_attr("arn")
-        if 'Condition' in function.resource_attributes:
-            events_rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
+        if CONDITION in function.resource_attributes:
+            events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
@@ -144,8 +146,8 @@ class CloudWatchEvent(PushEventSource):
         events_rule = EventsRule(self.logical_id)
         events_rule.EventPattern = self.Pattern
         events_rule.Targets = [self._construct_target(function)]
-        if 'Condition' in function.resource_attributes:
-            events_rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
+        if CONDITION in function.resource_attributes:
+            events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         resources.append(events_rule)
 
@@ -217,7 +219,7 @@ class S3(PushEventSource):
 
         source_account = ref('AWS::AccountId')
         permission = self._construct_permission(function, source_account=source_account)
-        if 'Condition' in permission.resource_attributes:
+        if CONDITION in permission.resource_attributes:
             self._depend_on_lambda_permissions_using_tag(bucket, permission)
         else:
             self._depend_on_lambda_permissions(bucket, permission)
@@ -285,7 +287,7 @@ class S3(PushEventSource):
         dep_tag = {
             'sam:ConditionalDependsOn:' + permission.logical_id: {
                 'Fn::If': [
-                    permission.resource_attributes['Condition'],
+                    permission.resource_attributes[CONDITION],
                     ref(permission.logical_id),
                     'no dependency'
                 ]
@@ -311,8 +313,8 @@ class S3(PushEventSource):
 
             lambda_event = copy.deepcopy(base_event_mapping)
             lambda_event['Event'] = event_type
-            if 'Condition' in function.resource_attributes:
-                lambda_event = make_conditional(function.resource_attributes['Condition'], lambda_event)
+            if CONDITION in function.resource_attributes:
+                lambda_event = make_conditional(function.resource_attributes[CONDITION], lambda_event)
             event_mappings.append(lambda_event)
 
         properties = bucket.get('Properties', None)
@@ -365,8 +367,8 @@ class SNS(PushEventSource):
         subscription.Protocol = 'lambda'
         subscription.Endpoint = function.get_runtime_attr("arn")
         subscription.TopicArn = topic
-        if 'Condition' in function.resource_attributes:
-            subscription.set_resource_attribute('Condition', function.resource_attributes['Condition'])
+        if CONDITION in function.resource_attributes:
+            subscription.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
@@ -523,7 +525,11 @@ class Api(PushEventSource):
                 'API method "{method}" defined multiple times for path "{path}".'.format(
                     method=self.Method, path=self.Path))
 
-        editor.add_lambda_integration(self.Path, self.Method, uri)
+        condition = None
+        if CONDITION in function.resource_attributes:
+            condition = function.resource_attributes[CONDITION]
+
+        editor.add_lambda_integration(self.Path, self.Method, uri, condition=condition)
 
         if self.Auth:
             method_authorizer = self.Auth.get('Authorizer')
@@ -627,7 +633,7 @@ class IoTRule(PushEventSource):
             payload['AwsIotSqlVersion'] = self.AwsIotSqlVersion
 
         rule.TopicRulePayload = payload
-        if 'Condition' in function.resource_attributes:
-            rule.set_resource_attribute('Condition', function.resource_attributes['Condition'])
+        if CONDITION in function.resource_attributes:
+            rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         return rule

@@ -1,0 +1,657 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "ServerlessRestApiCondition": {
+      "Fn::Or": [
+        {
+          "Condition": "implicithello1condition"
+        },
+        {
+          "Condition": "implicithello2condition"
+        }
+      ]
+    },
+    "explicithello2condition": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
+    "implicithello1condition": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
+    "implicithello2condition": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
+    "explicithello1condition": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    }
+  },
+  "Resources": {
+    "explicithello2": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "MemorySize": 128,
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "explicithello2Role",
+            "Arn"
+          ]
+        },
+        "Timeout": 3,
+        "Runtime": "nodejs8.10"
+      },
+      "Condition": "explicithello2condition"
+    },
+    "implicithello2Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "implicithello2condition"
+    },
+    "implicithello2ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "implicithello2"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello2",
+            {
+              "__Stage__": "*",
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "implicithello2condition"
+    },
+    "explicithello1": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "MemorySize": 128,
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "explicithello1Role",
+            "Arn"
+          ]
+        },
+        "Timeout": 3,
+        "Runtime": "nodejs8.10"
+      },
+      "Condition": "explicithello1condition"
+    },
+    "explicitapiProdStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "explicitapiDeploymentc8f1a3b6da"
+        },
+        "RestApiId": {
+          "Ref": "explicitapi"
+        },
+        "StageName": "Prod"
+      }
+    },
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment0270cbc16b"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
+    "explicithello2ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "explicithello2"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello2",
+            {
+              "__Stage__": "*",
+              "__ApiId__": {
+                "Ref": "explicitapi"
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "explicithello2condition"
+    },
+    "explicithello2Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "explicithello2condition"
+    },
+    "explicithello1ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "explicithello1"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello1",
+            {
+              "__Stage__": "Prod",
+              "__ApiId__": {
+                "Ref": "explicitapi"
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "explicithello1condition"
+    },
+    "implicithello2": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "MemorySize": 128,
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "implicithello2Role",
+            "Arn"
+          ]
+        },
+        "Timeout": 3,
+        "Runtime": "nodejs8.10"
+      },
+      "Condition": "implicithello2condition"
+    },
+    "implicithello1ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "implicithello1"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello1",
+            {
+              "__Stage__": "Prod",
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "implicithello1condition"
+    },
+    "ServerlessRestApiDeployment0270cbc16b": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 0270cbc16b8a9cded2c076b6ab6e50254430918b",
+        "StageName": "Stage"
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
+    "implicithello1": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "MemorySize": 128,
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "implicithello1Role",
+            "Arn"
+          ]
+        },
+        "Timeout": 3,
+        "Runtime": "nodejs8.10"
+      },
+      "Condition": "implicithello1condition"
+    },
+    "explicithello2ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "explicithello2"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello2",
+            {
+              "__Stage__": "Prod",
+              "__ApiId__": {
+                "Ref": "explicitapi"
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "explicithello2condition"
+    },
+    "explicitapiDeploymentc8f1a3b6da": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "explicitapi"
+        },
+        "Description": "RestApi deployment id: c8f1a3b6da24370ce143b6ab046e51dded1bfc36",
+        "StageName": "Stage"
+      }
+    },
+    "explicitapi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {
+            "/explicit/hello2": {
+              "Fn::If": [
+                "explicithello2condition",
+                {
+                  "get": {
+                    "Fn::If": [
+                      "explicithello2condition",
+                      {
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST",
+                          "type": "aws_proxy",
+                          "uri": {
+                            "Fn::If": [
+                              "explicithello2condition",
+                              {
+                                "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello2.Arn}/invocations"
+                              },
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        },
+                        "responses": {}
+                      },
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            },
+            "/explicit/hello1": {
+              "Fn::If": [
+                "explicithello1condition",
+                {
+                  "get": {
+                    "Fn::If": [
+                      "explicithello1condition",
+                      {
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST",
+                          "type": "aws_proxy",
+                          "uri": {
+                            "Fn::If": [
+                              "explicithello1condition",
+                              {
+                                "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello1.Arn}/invocations"
+                              },
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        },
+                        "responses": {}
+                      },
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    },
+    "implicithello2ApiEventPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "implicithello2"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello2",
+            {
+              "__Stage__": "Prod",
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "implicithello2condition"
+    },
+    "explicithello1ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "explicithello1"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello1",
+            {
+              "__Stage__": "*",
+              "__ApiId__": {
+                "Ref": "explicitapi"
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "explicithello1condition"
+    },
+    "explicithello1Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "explicithello1condition"
+    },
+    "implicithello1ApiEventPermissionTest": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "implicithello1"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello1",
+            {
+              "__Stage__": "*",
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "implicithello1condition"
+    },
+    "ServerlessRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {
+            "/implicit/hello1": {
+              "Fn::If": [
+                "implicithello1condition",
+                {
+                  "get": {
+                    "Fn::If": [
+                      "implicithello1condition",
+                      {
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST",
+                          "type": "aws_proxy",
+                          "uri": {
+                            "Fn::If": [
+                              "implicithello1condition",
+                              {
+                                "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${implicithello1.Arn}/invocations"
+                              },
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        },
+                        "responses": {}
+                      },
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            },
+            "/implicit/hello2": {
+              "Fn::If": [
+                "implicithello2condition",
+                {
+                  "get": {
+                    "Fn::If": [
+                      "implicithello2condition",
+                      {
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST",
+                          "type": "aws_proxy",
+                          "uri": {
+                            "Fn::If": [
+                              "implicithello2condition",
+                              {
+                                "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${implicithello2.Arn}/invocations"
+                              },
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        },
+                        "responses": {}
+                      },
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
+    "implicithello1Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Condition": "implicithello1condition"
+    }
+  },
+  "Description": "A template to test for API condition handling with a mix of explicit and implicit api events."
+}

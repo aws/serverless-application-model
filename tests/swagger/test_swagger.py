@@ -104,6 +104,28 @@ class TestSwaggerEditor_has_integration(TestCase):
                             "a": "b"
                         }
                     },
+                    "post": {
+                        "Fn::If": [
+                            "Condition",
+                            {
+                                _X_INTEGRATION: {
+                                    "a": "b"
+                                }
+                            },
+                            {"Ref": "AWS::NoValue"}
+                        ]
+                    },
+                    "delete": {
+                        "Fn::If": [
+                            "Condition",
+                            {"Ref": "AWS::NoValue"},
+                            {
+                                _X_INTEGRATION: {
+                                    "a": "b"
+                                }
+                            }
+                        ]
+                    },
                     "somemethod": {
                         "foo": "value",
                     },
@@ -119,6 +141,12 @@ class TestSwaggerEditor_has_integration(TestCase):
 
     def test_must_find_integration(self):
         self.assertTrue(self.editor.has_integration("/foo", "get"))
+
+    def test_must_find_integration_with_condition(self):
+        self.assertTrue(self.editor.has_integration("/foo", "post"))
+
+    def test_must_find_integration_with_condition2(self):
+        self.assertTrue(self.editor.has_integration("/foo", "delete"))
 
     def test_must_not_find_integration(self):
         self.assertFalse(self.editor.has_integration("/foo", "somemethod"))
@@ -224,6 +252,42 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         }
 
         self.editor.add_lambda_integration(path, method, integration_uri)
+
+        self.assertTrue(self.editor.has_path(path, method))
+        actual = self.editor.swagger["paths"][path][method]
+        self.assertEqual(expected, actual)
+
+    def test_must_add_new_integration_with_conditions_to_new_path(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        condition = "condition"
+        expected = {
+            "Fn::If": [
+                "condition",
+                {
+                    "responses": {},
+                    _X_INTEGRATION: {
+                        "type": "aws_proxy",
+                        "httpMethod": "POST",
+                        "uri": {
+                            "Fn::If": [
+                                "condition",
+                                integration_uri,
+                                {
+                                    "Ref": "AWS::NoValue"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Ref": "AWS::NoValue"
+                }
+            ]
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, condition=condition)
 
         self.assertTrue(self.editor.has_path(path, method))
         actual = self.editor.swagger["paths"][path][method]
