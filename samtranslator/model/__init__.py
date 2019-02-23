@@ -94,7 +94,7 @@ class Resource(object):
             translator
         :returns: a Resource object populated from the provided parameters
         :rtype: Resource
-        :raises TypeError: if the provided parmeters are invalid
+        :raises TypeError: if the provided parameters are invalid
         """
 
         resource = cls(logical_id, relative_id=relative_id)
