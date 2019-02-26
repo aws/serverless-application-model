@@ -72,6 +72,7 @@
     "MyLayerWithANamefda8c9ec8c": {
       "Type": "AWS::Lambda::LayerVersion",
       "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "Content": {
           "S3Bucket": "bucket",

@@ -3,6 +3,7 @@
     "MinimalLayer0c7f96cce7": {
       "Type": "AWS::Lambda::LayerVersion",
       "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "LayerName": "MinimalLayer",
         "Content": {
@@ -14,6 +15,7 @@
     "CompleteLayer5d71a60e81": {
       "Type": "AWS::Lambda::LayerVersion",
       "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",
@@ -42,6 +44,7 @@
     },
     "LayerWithCondition93cfa80b64": {
       "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
         "Content": {
