@@ -86,6 +86,9 @@
                 }, 
                 "produces": [
                   "application/json"
+                ],
+                "security": [
+                    {"NONE": []}
                 ]
               }
             }, 
@@ -132,6 +135,9 @@
                 }, 
                 "produces": [
                   "application/json"
+                ],
+                "security": [
+                    {"NONE": []}
                 ]
               }, 
               "x-amazon-apigateway-any-method": {
