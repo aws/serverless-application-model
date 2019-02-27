@@ -109,6 +109,7 @@ class ApiGatewayAuthorizer(object):
         self.identity = identity
         self.function_payload_type = function_payload_type
         self.function_invoke_role = function_invoke_role
+        self.is_aws_iam_authorizer = True if name == 'sigv4' else False
 
     def _is_missing_identity_source(self, identity):
         if not identity:
@@ -131,16 +132,19 @@ class ApiGatewayAuthorizer(object):
             "type": "apiKey",
             "name": self._get_swagger_header_name(),
             "in": "header",
-            "x-amazon-apigateway-authtype": self._get_swagger_authtype(),
-            "x-amazon-apigateway-authorizer": {
-                "type": self._get_swagger_authorizer_type()
-            }
+            "x-amazon-apigateway-authtype": self._get_swagger_authtype()
         }
 
         if authorizer_type == 'COGNITO_USER_POOLS':
-            swagger[APIGATEWAY_AUTHORIZER_KEY]['providerARNs'] = self._get_user_pool_arn_array()
+            swagger[APIGATEWAY_AUTHORIZER_KEY] = {
+                'type': self._get_swagger_authorizer_type(),
+                'providerARNs': self._get_user_pool_arn_array()
+            }
 
         elif authorizer_type == 'LAMBDA':
+            swagger[APIGATEWAY_AUTHORIZER_KEY] = {
+                'type': self._get_swagger_authorizer_type()
+            }
             partition = ArnGenerator.get_partition_name()
             resource = 'lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations'
             authorizer_uri = fnSub(ArnGenerator.generate_arn(partition=partition, service='apigateway',
@@ -210,6 +214,9 @@ class ApiGatewayAuthorizer(object):
         return self._get_identity_header()
 
     def _get_type(self):
+        if self.is_aws_iam_authorizer:
+            return 'AWS_IAM'
+
         if self.user_pool_arn:
             return 'COGNITO_USER_POOLS'
 
@@ -235,8 +242,13 @@ class ApiGatewayAuthorizer(object):
 
     def _get_swagger_authtype(self):
         authorizer_type = self._get_type()
+        if authorizer_type == 'AWS_IAM':
+            return 'awsSigv4'
 
-        return 'cognito_user_pools' if authorizer_type == 'COGNITO_USER_POOLS' else 'custom'
+        if authorizer_type == 'COGNITO_USER_POOLS':
+            return 'cognito_user_pools'
+
+        return 'custom'
 
     def _get_function_payload_type(self):
         return 'TOKEN' if not self.function_payload_type else self.function_payload_type

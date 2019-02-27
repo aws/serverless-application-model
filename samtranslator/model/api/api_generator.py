@@ -17,8 +17,8 @@ CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", 
 # Default the Cors Properties to '*' wildcard. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None)
 
-AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
-AuthProperties.__new__.__defaults__ = (None, None)
+AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer", "InvokeRole"])
+AuthProperties.__new__.__defaults__ = (None, None, None)
 
 
 class ApiGenerator(object):
@@ -239,7 +239,7 @@ class ApiGenerator(object):
                                                             "'DefinitionBody' does not contain a valid Swagger")
         swagger_editor = SwaggerEditor(self.definition_body)
         auth_properties = AuthProperties(**self.auth)
-        authorizers = self._get_authorizers(auth_properties.Authorizers)
+        authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)
 
         if authorizers:
             swagger_editor.add_authorizers(authorizers)
@@ -248,14 +248,20 @@ class ApiGenerator(object):
         # Assign the Swagger back to template
         self.definition_body = swagger_editor.swagger
 
-    def _get_authorizers(self, authorizers_config):
+    def _get_authorizers(self, authorizers_config, authorizers_default=None):
+        authorizers = {}
+        if authorizers_default == 'AWS_IAM':
+            authorizers['sigv4'] = ApiGatewayAuthorizer(
+                api_logical_id=self.logical_id,
+                name='sigv4'
+            )
+
         if not authorizers_config:
             return None
 
         if not isinstance(authorizers_config, dict):
             raise InvalidResourceException(self.logical_id,
                                            "Authorizers must be a dictionary")
-        authorizers = {}
 
         for authorizer_name, authorizer in authorizers_config.items():
             authorizers[authorizer_name] = ApiGatewayAuthorizer(
@@ -267,7 +273,7 @@ class ApiGenerator(object):
                 function_payload_type=authorizer.get('FunctionPayloadType'),
                 function_invoke_role=authorizer.get('FunctionInvokeRole')
             )
-
+        print(authorizers)
         return authorizers
 
     def _get_permission(self, authorizer_name, authorizer_lambda_function_arn):
@@ -318,7 +324,7 @@ class ApiGenerator(object):
         if not default_authorizer:
             return
 
-        if not authorizers.get(default_authorizer):
+        if not authorizers.get(default_authorizer) and default_authorizer != 'AWS_IAM':
             raise InvalidResourceException(self.logical_id, "Unable to set DefaultAuthorizer because '" +
                                            default_authorizer + "' was not defined in 'Authorizers'")
 
