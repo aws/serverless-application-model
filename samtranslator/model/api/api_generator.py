@@ -248,12 +248,13 @@ class ApiGenerator(object):
         # Assign the Swagger back to template
         self.definition_body = swagger_editor.swagger
 
-    def _get_authorizers(self, authorizers_config, authorizers_default=None):
+    def _get_authorizers(self, authorizers_config, default_authorizer=None):
         authorizers = {}
-        if authorizers_default == 'AWS_IAM':
-            authorizers['sigv4'] = ApiGatewayAuthorizer(
+        if default_authorizer == 'AWS_IAM':
+            authorizers[default_authorizer] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id,
-                name='sigv4'
+                name=default_authorizer,
+                default_authorizer=default_authorizer
             )
 
         if not authorizers_config:
@@ -273,7 +274,6 @@ class ApiGenerator(object):
                 function_payload_type=authorizer.get('FunctionPayloadType'),
                 function_invoke_role=authorizer.get('FunctionInvokeRole')
             )
-        print(authorizers)
         return authorizers
 
     def _get_permission(self, authorizer_name, authorizer_lambda_function_arn):
