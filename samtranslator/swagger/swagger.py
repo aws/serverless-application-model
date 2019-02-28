@@ -104,29 +104,24 @@ class SwaggerEditor(object):
                 'uri': integration_uri
             }
 
-        if api_auth_config is not None:
-            if method_auth_config is not None and method_auth_config.get('Authorizer') == 'AWS_IAM':
-                self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = self._generate_integration_credentials(
-                    method_invoke_role=method_auth_config.get('InvokeRole'),
-                    api_invoke_role=api_auth_config.get('InvokeRole')
-                )
-
-            if method_auth_config is None and api_auth_config.get('DefaultAuthorizer') == 'AWS_IAM':
-                self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = self._generate_integration_credentials(
-                    api_invoke_role=api_auth_config.get('InvokeRole')
-                )
+        method_auth_config = method_auth_config or {}
+        api_auth_config = api_auth_config or {}
+        if method_auth_config.get('InvokeRole') != 'NONE' and (method_auth_config.get('Authorizer') == 'AWS_IAM'
+           or api_auth_config.get('DefaultAuthorizer') == 'AWS_IAM' and not method_auth_config):
+            self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = self._generate_integration_credentials(
+                method_invoke_role=method_auth_config.get('InvokeRole'),
+                api_invoke_role=api_auth_config.get('InvokeRole')
+            )
 
         # If 'responses' key is *not* present, add it with an empty dict as value
         self.paths[path][method].setdefault('responses', {})
 
     def _generate_integration_credentials(self, method_invoke_role=None, api_invoke_role=None):
-        if method_invoke_role is not None and method_invoke_role != 'CALLER_CREDENTIALS':
-            return method_invoke_role
+        return self._get_invoke_role(method_invoke_role or api_invoke_role)
 
-        if api_invoke_role is not None and api_invoke_role != 'CALLER_CREDENTIALS':
-            return api_invoke_role
-
-        return 'arn:aws:iam::*:user/*'
+    def _get_invoke_role(self, invoke_role):
+        CALLER_CREDENTIALS_ARN = 'arn:aws:iam::*:user/*'
+        return invoke_role if invoke_role and invoke_role != 'CALLER_CREDENTIALS' else CALLER_CREDENTIALS_ARN
 
     def iter_on_path(self):
         """

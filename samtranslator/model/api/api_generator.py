@@ -254,7 +254,7 @@ class ApiGenerator(object):
             authorizers[default_authorizer] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id,
                 name=default_authorizer,
-                default_authorizer=default_authorizer
+                is_aws_iam_authorizer=True
             )
 
         if not authorizers_config:
