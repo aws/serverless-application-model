@@ -1,0 +1,54 @@
+Resources:
+  MyApiWithAwsIamAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: arn:aws:cognito-idp:xxxxxxxxx
+        InvokeRole: arn:aws:iam::123:role/AUTH_AWS_IAM
+  MyFunction1:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /1
+            Auth:
+              Authorizer: MyCognitoAuth
+  MyFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API2:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /2
+  MyFunction3:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API3:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /3
+            Auth:
+              Authorizer: NONE
