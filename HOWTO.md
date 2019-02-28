@@ -14,9 +14,15 @@ resources for you.
 The remainder of this document explains how to write SAM templates and 
 deploy them via AWS CloudFormation. 
 
-## Writing SAM Template
+## Getting started with SAM Template
 Check out the [latest specification](versions/2016-10-31.md) for details on how to write a SAM template
 
+
+You could also use the [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-publishing-applications.html) to get started 
+
+```shell
+$ sam init --runtime python3.7
+```
 ## Packing Artifacts
 Before you can deploy a SAM template, you should first upload your Lambda 
 function code zip and API's OpenAPI File to S3. Set the `CodeUri` and 
@@ -45,6 +51,15 @@ Run the following command to upload your artifacts to S3 and output a
 packaged template that can be readily deployed to CloudFormation.
 ```bash
 $ aws cloudformation package \
+    --template-file /path_to_template/template.yaml \
+    --s3-bucket bucket-name \
+    --output-template-file packaged-template.yaml
+```
+
+Using `aws-sam-cli`
+
+```bash
+$ sam package \
     --template-file /path_to_template/template.yaml \
     --s3-bucket bucket-name \
     --output-template-file packaged-template.yaml
@@ -80,7 +95,16 @@ $ aws cloudformation deploy \
     --capabilities CAPABILITY_IAM
 ```
 
-Refer to the [documentation](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html) for more details.
+Or using `aws-sam-cli` 
+
+```bash
+$ sam publish \
+    --template-file /path_to_template/packaged-template.yaml \
+    --region AWS_REGION
+    --capabilities CAPABILITY_IAM
+```
+
+Refer to the [cloudformation documentation](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html) and [samcli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-command-reference.html) for more details.
 
 ## Using Intrinsic Functions
 CloudFormation provides handy functions that you can use to generate values at runtime. These are called [Intrinsic Functions](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html). Since SAM is deployed using CloudFormation, you can use these intrinsic functions within SAM as well. Here are some examples:
