@@ -82,7 +82,7 @@ class SwaggerEditor(object):
 
         self.paths[path].setdefault(method, {})
 
-    def add_lambda_integration(self, path, method, integration_uri):
+    def add_lambda_integration(self, path, method, integration_uri, method_auth_config=None, api_auth_config=None):
         """
         Adds aws_proxy APIGW integration to the given path+method.
 
@@ -104,8 +104,29 @@ class SwaggerEditor(object):
                 'uri': integration_uri
             }
 
+        if api_auth_config is not None:
+            if method_auth_config is not None and method_auth_config.get('Authorizer') == 'AWS_IAM':
+                self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = self._generate_integration_credentials(
+                    method_invoke_role=method_auth_config.get('InvokeRole'),
+                    api_invoke_role=api_auth_config.get('InvokeRole')
+                )
+
+            if method_auth_config is None and api_auth_config.get('DefaultAuthorizer') == 'AWS_IAM':
+                self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = self._generate_integration_credentials(
+                    api_invoke_role=api_auth_config.get('InvokeRole')
+                )
+
         # If 'responses' key is *not* present, add it with an empty dict as value
         self.paths[path][method].setdefault('responses', {})
+
+    def _generate_integration_credentials(self, method_invoke_role=None, api_invoke_role=None):
+        if method_invoke_role is not None and method_invoke_role != 'CALLER_CREDENTIALS':
+            return method_invoke_role
+
+        if api_invoke_role is not None and api_invoke_role != 'CALLER_CREDENTIALS':
+            return api_invoke_role
+
+        return 'arn:aws:iam::*:user/*'
 
     def iter_on_path(self):
         """
