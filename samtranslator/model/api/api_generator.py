@@ -258,6 +258,8 @@ class ApiGenerator(object):
             )
 
         if not authorizers_config:
+            if 'AWS_IAM' in authorizers:
+                return authorizers
             return None
 
         if not isinstance(authorizers_config, dict):
