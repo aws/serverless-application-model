@@ -106,8 +106,8 @@ class SwaggerEditor(object):
 
         method_auth_config = method_auth_config or {}
         api_auth_config = api_auth_config or {}
-        if method_auth_config.get('InvokeRole') != 'NONE' and (method_auth_config.get('Authorizer') == 'AWS_IAM'
-           or api_auth_config.get('DefaultAuthorizer') == 'AWS_IAM' and not method_auth_config):
+        if method_auth_config.get('Authorizer') == 'AWS_IAM' \
+           or api_auth_config.get('DefaultAuthorizer') == 'AWS_IAM' and not method_auth_config:
             self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = self._generate_integration_credentials(
                 method_invoke_role=method_auth_config.get('InvokeRole'),
                 api_invoke_role=api_auth_config.get('InvokeRole')
