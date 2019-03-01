@@ -167,6 +167,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_maxage',
         'api_with_cors_and_only_credentials_false',
         'api_with_cors_no_definitionbody',
+        'api_with_cors_and_auth_no_preflight_auth',
         'api_cache',
         'api_with_access_log_setting',
         'api_with_canary_setting',
