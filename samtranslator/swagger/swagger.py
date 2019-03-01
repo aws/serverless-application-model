@@ -255,10 +255,7 @@ class SwaggerEditor(object):
                     "description": "Default response for CORS method",
                     "headers": response_headers
                 }
-            },
-            "security": [
-                {"NONE": []}
-            ]
+            }
         }
 
     def _make_cors_allowed_methods_for_path(self, path):
