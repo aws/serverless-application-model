@@ -349,7 +349,10 @@ class SwaggerEditor(object):
                               is_default=False):
         normalized_method_name = self._normalize_method_name(method_name)
         existing_security = self.paths[path][normalized_method_name].get('security', [])  # TEST: [{'sigv4': []}, {'api_key': []}])
-        authorizer_names = set(authorizers.keys())
+        authorizer_list = ['AWS_IAM']
+        if authorizers:
+            authorizer_list.extend(authorizers.keys())
+        authorizer_names = set(authorizer_list)
         existing_non_authorizer_security = []
         existing_authorizer_security = []
 
@@ -403,6 +406,20 @@ class SwaggerEditor(object):
 
         if security:
             self.paths[path][normalized_method_name]['security'] = security
+
+        if 'AWS_IAM' in self.paths[path][normalized_method_name]['security'][0]:
+            aws_iam_security_definition = {
+                'AWS_IAM': {
+                    'x-amazon-apigateway-authtype': 'awsSigv4',
+                    'type': 'apiKey',
+                    'name': 'Authorization',
+                    'in': 'header'
+                }
+            }
+            if not self.security_definitions:
+                self.security_definitions = aws_iam_security_definition
+            elif not 'AWS_IAM' in self.security_definitions:
+                self.security_definitions.update(aws_iam_security_definition)
 
     @property
     def swagger(self):
