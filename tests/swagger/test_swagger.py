@@ -479,10 +479,7 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
                         }
                     }
                 }
-            },
-            "security": [
-                {"NONE": []}
-            ]
+            }
         }
 
         actual = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(origins, headers,

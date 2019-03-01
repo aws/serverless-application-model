@@ -188,9 +188,6 @@
                 },
                 "produces": [
                   "application/json"
-                ],
-                "security": [
-                    {"NONE": []}
                 ]
               },
               "get": {
