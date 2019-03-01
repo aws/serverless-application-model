@@ -1,27 +1,6 @@
 {
   "Resources": {
-    "MyFunction1API1PermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunction1"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/1",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
-      }
-    },
-    "MyFunction1": {
+    "MyFunctionCustomInvokeRole": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Handler": "index.handler",
@@ -31,7 +10,7 @@
         },
         "Role": {
           "Fn::GetAtt": [
-            "MyFunction1Role",
+            "MyFunctionCustomInvokeRoleRole",
             "Arn"
           ]
         },
@@ -44,7 +23,7 @@
         ]
       }
     },
-    "MyFunction3": {
+    "MyFunctionNoneAuth": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Handler": "index.handler",
@@ -54,7 +33,7 @@
         },
         "Role": {
           "Fn::GetAtt": [
-            "MyFunction3Role",
+            "MyFunctionNoneAuthRole",
             "Arn"
           ]
         },
@@ -65,67 +44,13 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    },
-    "MyFunction2": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "index.handler",
-        "Code": {
-          "S3Bucket": "bucket",
-          "S3Key": "key"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "MyFunction2Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs8.10",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    },
-    "MyApiWithAwsIamAuthDeployment805a045ca5": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuth"
-        },
-        "Description": "RestApi deployment id: 805a045ca542f006926e9c2365699a1881d4d740",
-        "StageName": "Stage"
-      }
-    },
-    "MyFunction3API3PermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunction3"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/3",
-            {
-              "__Stage__": "Prod",
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
       }
     },
     "MyApiWithAwsIamAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthDeployment805a045ca5"
+          "Ref": "MyApiWithAwsIamAuthDeploymented0a631915"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
@@ -133,7 +58,7 @@
         "StageName": "Prod"
       }
     },
-    "MyFunction2Role": {
+    "MyFunctionWithoutAuthRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
@@ -157,17 +82,17 @@
         }
       }
     },
-    "MyFunction2API2PermissionProd": {
+    "MyFunctionCustomInvokeRoleAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:invokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
-          "Ref": "MyFunction2"
+          "Ref": "MyFunctionCustomInvokeRole"
         },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/2",
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionCustomInvokeRole",
             {
               "__Stage__": "Prod",
               "__ApiId__": {
@@ -178,7 +103,103 @@
         }
       }
     },
-    "MyFunction1Role": {
+    "MyFunctionWithoutAuthAPI2PermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyFunctionWithoutAuth"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionWithoutAuth",
+            {
+              "__Stage__": "Prod",
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyFunctionMyCognitoAuthAPI1PermissionTest": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyFunctionMyCognitoAuth"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionMyCognitoAuth",
+            {
+              "__Stage__": "*",
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyApiWithAwsIamAuthDeploymented0a631915": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuth"
+        },
+        "Description": "RestApi deployment id: ed0a631915dc4df4436f471e81cd69beb6f89603",
+        "StageName": "Stage"
+      }
+    },
+    "MyFunctionMyCognitoAuth": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionMyCognitoAuthRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs8.10",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "MyFunctionDefaultInvokeRoleAPI3PermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyFunctionDefaultInvokeRole"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionDefaultInvokeRole",
+            {
+              "__Stage__": "Prod",
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyFunctionNoneAuthRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
@@ -202,17 +223,41 @@
         }
       }
     },
-    "MyFunction3API3PermissionTest": {
+    "MyFunctionCustomInvokeRoleRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyFunctionDefaultInvokeRoleAPI3PermissionTest": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:invokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
-          "Ref": "MyFunction3"
+          "Ref": "MyFunctionDefaultInvokeRole"
         },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/3",
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionDefaultInvokeRole",
             {
               "__Stage__": "*",
               "__ApiId__": {
@@ -223,17 +268,17 @@
         }
       }
     },
-    "MyFunction2API2PermissionTest": {
+    "MyFunctionWithoutAuthAPI2PermissionTest": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:invokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
-          "Ref": "MyFunction2"
+          "Ref": "MyFunctionWithoutAuth"
         },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/2",
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionWithoutAuth",
             {
               "__Stage__": "*",
               "__ApiId__": {
@@ -244,19 +289,155 @@
         }
       }
     },
-    "MyFunction1API1PermissionProd": {
+    "MyFunctionWithoutAuth": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionWithoutAuthRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs8.10",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "MyFunctionMyCognitoAuthAPI1PermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:invokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
-          "Ref": "MyFunction1"
+          "Ref": "MyFunctionMyCognitoAuth"
         },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/1",
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionMyCognitoAuth",
             {
               "__Stage__": "Prod",
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyFunctionDefaultInvokeRoleRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyFunctionMyCognitoAuthRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyFunctionCustomInvokeRoleAPI3PermissionTest": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyFunctionCustomInvokeRole"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionCustomInvokeRole",
+            {
+              "__Stage__": "*",
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyFunctionDefaultInvokeRole": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionDefaultInvokeRoleRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs8.10",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "MyFunctionNoneAuthAPI3PermissionTest": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyFunctionNoneAuth"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNoneAuth",
+            {
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
               }
@@ -276,30 +457,31 @@
             }
           },
           "paths": {
-            "/3": {
+            "/MyFunctionDefaultInvokeRole": {
               "get": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction3.Arn}/invocations"
-                  }
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionDefaultInvokeRole.Arn}/invocations"
+                  },
+                  "credentials": "arn:aws:iam::*:user/*"
                 },
                 "security": [
                   {
-                    "NONE": []
+                    "AWS_IAM": []
                   }
                 ],
                 "responses": {}
               }
             },
-            "/2": {
+            "/MyFunctionWithoutAuth": {
               "get": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction2.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithoutAuth.Arn}/invocations"
                   },
                   "credentials": "arn:aws:iam::123:role/AUTH_AWS_IAM"
                 },
@@ -311,18 +493,53 @@
                 "responses": {}
               }
             },
-            "/1": {
+            "/MyFunctionNoneAuth": {
               "get": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction1.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionNoneAuth.Arn}/invocations"
+                  }
+                },
+                "security": [
+                  {
+                    "NONE": []
+                  }
+                ],
+                "responses": {}
+              }
+            },
+            "/MyFunctionMyCognitoAuth": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionMyCognitoAuth.Arn}/invocations"
                   }
                 },
                 "security": [
                   {
                     "MyCognitoAuth": []
+                  }
+                ],
+                "responses": {}
+              }
+            },
+            "/MyFunctionCustomInvokeRole": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionCustomInvokeRole.Arn}/invocations"
+                  },
+                  "credentials": "arn:aws:iam::456::role/something-else"
+                },
+                "security": [
+                  {
+                    "AWS_IAM": []
                   }
                 ],
                 "responses": {}
@@ -361,24 +578,21 @@
         }
       }
     },
-    "MyFunction3Role": {
-      "Type": "AWS::IAM::Role",
+    "MyFunctionNoneAuthAPI3PermissionProd": {
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
+        "Action": "lambda:invokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyFunctionNoneAuth"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNoneAuth",
             {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+              "__Stage__": "Prod",
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
               }
             }
           ]
