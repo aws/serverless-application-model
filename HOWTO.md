@@ -14,11 +14,11 @@ resources for you.
 The remainder of this document explains how to write SAM templates and 
 deploy them via AWS CloudFormation. 
 
-## Getting started with SAM Template
+## Getting started with the SAM Template
 Check out the [latest specification](versions/2016-10-31.md) for details on how to write a SAM template
 
 
-You could also use the [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-publishing-applications.html) to get started 
+You could also use the [aws-sam-cli](https://github.com/awslabs/aws-sam-cli) to get started 
 
 ```shell
 $ sam init --runtime python3.7
@@ -53,17 +53,21 @@ packaged template that can be readily deployed to CloudFormation.
 $ aws cloudformation package \
     --template-file /path_to_template/template.yaml \
     --s3-bucket bucket-name \
+    --s3-prefix appname/branchname/version
     --output-template-file packaged-template.yaml
 ```
 
-Using `aws-sam-cli`
+Or using the aws-sam-cli
 
 ```bash
 $ sam package \
     --template-file /path_to_template/template.yaml \
     --s3-bucket bucket-name \
+    --s3-prefix appname/branchname/version
     --output-template-file packaged-template.yaml
 ```
+
+
 
 The packaged template will look something like this:
 ```YAML
@@ -95,16 +99,16 @@ $ aws cloudformation deploy \
     --capabilities CAPABILITY_IAM
 ```
 
-Or using `aws-sam-cli` 
+Or using aws-sam-cli 
 
 ```bash
-$ sam publish \
+$ sam deploy \
     --template-file /path_to_template/packaged-template.yaml \
-    --region AWS_REGION
+    --stack-name my-new-stack
     --capabilities CAPABILITY_IAM
 ```
 
-Refer to the [cloudformation documentation](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html) and [samcli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-command-reference.html) for more details.
+Refer to the [cloudformation documentation](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html) and [samcli](https://github.com/awslabs/aws-sam-cli) for more details.
 
 ## Using Intrinsic Functions
 CloudFormation provides handy functions that you can use to generate values at runtime. These are called [Intrinsic Functions](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html). Since SAM is deployed using CloudFormation, you can use these intrinsic functions within SAM as well. Here are some examples:
