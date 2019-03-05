@@ -33,6 +33,7 @@ class SwaggerEditor(object):
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", {})
+        self.gateway_responses = self._doc.get('x-amazon-apigateway-gateway-responses', {})
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -473,6 +474,17 @@ class SwaggerEditor(object):
             if security:
                 method_definition['security'] = security
 
+    def add_gateway_responses(self, gateway_responses):
+        """
+        Add Gateway Response definitions to Swagger.
+
+        :param dict gateway_responses: Dictionary of GatewayResponse configuration which gets translated.
+        """
+        self.gateway_responses = self.gateway_responses or {}
+
+        for response_type, response in gateway_responses.items():
+            self.gateway_responses[response_type] = response.generate_swagger()
+
     @property
     def swagger(self):
         """
@@ -486,6 +498,8 @@ class SwaggerEditor(object):
 
         if self.security_definitions:
             self._doc["securityDefinitions"] = self.security_definitions
+        if self.gateway_responses:
+            self._doc['x-amazon-apigateway-gateway-responses'] = self.gateway_responses
 
         return copy.deepcopy(self._doc)
 

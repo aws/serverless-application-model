@@ -1,4 +1,4 @@
-from samtranslator.public.sdk.resource import SamResourceType
+﻿from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
 
 
@@ -49,6 +49,7 @@ class Globals(object):
             "BinaryMediaTypes",
             "MinimumCompressionSize",
             "Cors",
+            "GatewayResponses",
             "AccessLogSetting",
             "CanarySetting",
             "TracingEnabled"

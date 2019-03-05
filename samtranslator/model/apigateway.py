@@ -93,6 +93,35 @@ class ApiGatewayDeployment(Resource):
         stage.update_deployment_ref(self.logical_id)
 
 
+class ApiGatewayResponse(object):
+    def __init__(self, api_logical_id=None, response_parameters=None, response_templates=None, status_code=None):
+        self.api_logical_id = api_logical_id
+        self.response_parameters = response_parameters or {}
+        self.response_templates = response_templates or {}
+        self.status_code = status_code or 0
+
+    def generate_swagger(self):
+        swagger = {
+            "responseParameters": self._add_prefixes(self.response_parameters),
+            "responseTemplates": self.response_templates,
+            "statusCode": self.status_code
+        }
+
+        return swagger
+
+    def _add_prefixes(self, response_parameters):
+        GATEWAY_RESPONSE_PREFIX = 'gatewayresponse.'
+        prefixed_parameters = {}
+        for key, value in response_parameters.get('Headers', {}).items():
+            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + 'header.' + key] = value
+        for key, value in response_parameters.get('Paths', {}).items():
+            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + 'path.' + key] = value
+        for key, value in response_parameters.get('QueryStrings', {}).items():
+            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + 'querystring.' + key] = value
+
+        return prefixed_parameters
+
+
 class ApiGatewayAuthorizer(object):
     _VALID_FUNCTION_PAYLOAD_TYPES = [None, 'TOKEN', 'REQUEST']
 
