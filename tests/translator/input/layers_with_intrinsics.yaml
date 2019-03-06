@@ -1,4 +1,7 @@
 Parameters:
+  LayerNameParam:
+    Type: String
+    Default: SomeLayerName
   LayerLicenseInfo:
     Type: String
     Default: MIT-0 License
@@ -18,3 +21,16 @@ Resources:
       ContentUri: s3://sam-demo-bucket/layer.zip
       CompatibleRuntimes:
         Ref: LayerRuntimeList
+
+  LayerWithNameIntrinsic:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      LayerName: !Ref LayerNameParam
+
+  LayerWithSubNameIntrinsic:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      LayerName: !Sub layer-${LayerNameParam}
+

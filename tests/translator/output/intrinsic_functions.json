@@ -16,7 +16,15 @@
       "Default": "PassThrough", 
       "Type": "String"
     }
-  }, 
+  },
+  "Conditions": {
+    "TrueCondition": {
+      "Fn::Equals": [
+        true,
+        true
+      ]
+    }
+  },
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -104,7 +112,8 @@
       }
     }, 
     "ApiWithExplicitS3UridevStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+      "Type": "AWS::ApiGateway::Stage",
+      "Condition": "TrueCondition",
       "Properties": {
         "DeploymentId": {
           "Ref": "ApiWithExplicitS3UriDeploymenta227798f00"
@@ -185,6 +194,7 @@
     }, 
     "ApiWithExplicitS3UriDeploymenta227798f00": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "Condition": "TrueCondition",
       "Properties": {
         "RestApiId": {
           "Ref": "ApiWithExplicitS3Uri"
@@ -351,7 +361,8 @@
       }
     }, 
     "ApiWithExplicitS3Uri": {
-      "Type": "AWS::ApiGateway::RestApi", 
+      "Type": "AWS::ApiGateway::RestApi",
+      "Condition": "TrueCondition",
       "Properties": {
         "BodyS3Location": {
           "Version": "myversion", 

@@ -17,7 +17,8 @@ class ApiGatewayRestApi(Resource):
             'Name': PropertyType(False, is_str()),
             'Parameters': PropertyType(False, is_type(dict)),
             'EndpointConfiguration': PropertyType(False, is_type(dict)),
-            "BinaryMediaTypes": PropertyType(False, is_type(list))
+            "BinaryMediaTypes": PropertyType(False, is_type(list)),
+            "MinimumCompressionSize": PropertyType(False, is_type(int))
     }
 
     runtime_attrs = {
@@ -28,13 +29,16 @@ class ApiGatewayRestApi(Resource):
 class ApiGatewayStage(Resource):
     resource_type = 'AWS::ApiGateway::Stage'
     property_types = {
+            'AccessLogSetting': PropertyType(False, is_type(dict)),
             'CacheClusterEnabled': PropertyType(False, is_type(bool)),
             'CacheClusterSize': PropertyType(False, is_str()),
+            'CanarySetting': PropertyType(False, is_type(dict)),
             'ClientCertificateId': PropertyType(False, is_str()),
             'DeploymentId': PropertyType(True, is_str()),
             'Description': PropertyType(False, is_str()),
             'RestApiId': PropertyType(True, is_str()),
             'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
+            'TracingEnabled': PropertyType(False, is_type(bool)),
             'Variables': PropertyType(False, is_type(dict)),
             "MethodSettings": PropertyType(False, is_type(list))
     }
@@ -184,15 +188,18 @@ class ApiGatewayAuthorizer(object):
             identity_source_headers = list(map(lambda h: 'method.request.header.' + h, self.identity.get('Headers')))
 
         if self.identity.get('QueryStrings'):
-            identity_source_query_strings = list(map(lambda qs: 'method.request.querystring.' + qs, self.identity.get('QueryStrings')))
+            identity_source_query_strings = list(map(lambda qs: 'method.request.querystring.' + qs,
+                                                     self.identity.get('QueryStrings')))
 
         if self.identity.get('StageVariables'):
-            identity_source_stage_variables = list(map(lambda sv: 'stageVariables.' + sv, self.identity.get('StageVariables')))
+            identity_source_stage_variables = list(map(lambda sv: 'stageVariables.' + sv,
+                                                       self.identity.get('StageVariables')))
 
         if self.identity.get('Context'):
             identity_source_context = list(map(lambda c: 'context.' + c, self.identity.get('Context')))
 
-        identity_source_array = identity_source_headers + identity_source_query_strings + identity_source_stage_variables + identity_source_context
+        identity_source_array = (identity_source_headers + identity_source_query_strings +
+                                 identity_source_stage_variables + identity_source_context)
         identity_source = ', '.join(identity_source_array)
 
         return identity_source

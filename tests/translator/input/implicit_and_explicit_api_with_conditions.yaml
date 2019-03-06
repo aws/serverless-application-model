@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: A template to test for API condition handling with a mix of explicit and implicit api events.
+Conditions:
+  implicithello1condition:
+    Fn::Equals:
+      - true
+      - false
+  implicithello2condition:
+    Fn::Equals:
+      - true
+      - false
+  explicithello1condition:
+    Fn::Equals:
+      - true
+      - false
+  explicithello2condition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  implicithello1:
+    Type: 'AWS::Serverless::Function'
+    Condition: implicithello1condition
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 128
+      Timeout: 3
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /implicit/hello1
+            Method: get
+  implicithello2:
+    Type: 'AWS::Serverless::Function'
+    Condition: implicithello2condition
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 128
+      Timeout: 3
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /implicit/hello2
+            Method: get
+
+  explicitapi:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: Prod
+  explicithello1:
+    Type: 'AWS::Serverless::Function'
+    Condition: explicithello1condition
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 128
+      Timeout: 3
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref explicitapi
+            Path: /explicit/hello1
+            Method: get
+  explicithello2:
+    Type: 'AWS::Serverless::Function'
+    Condition: explicithello2condition
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      MemorySize: 128
+      Timeout: 3
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref explicitapi
+            Path: /explicit/hello2
+            Method: get

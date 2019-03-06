@@ -3,8 +3,8 @@ import copy
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException, DuplicateLogicalIdException, \
-    InvalidEventException
+from samtranslator.model.exceptions import (InvalidDocumentException, InvalidResourceException,
+                                            DuplicateLogicalIdException, InvalidEventException)
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
@@ -15,6 +15,7 @@ from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 
+
 class Translator:
     """Translates SAM templates into CloudFormation templates
     """
@@ -22,8 +23,8 @@ class Translator:
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
-        :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator, in addition
-            to the default ones.
+        :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to be installed in the translator,
+            in addition to the default ones.
         """
         self.managed_policy_map = managed_policy_map
         self.plugins = plugins
@@ -36,10 +37,10 @@ class Translator:
         :param dict sam_template: the SAM manifest, as loaded by json.load() or yaml.load(), or as provided by \
                 CloudFormation transforms.
         :param dict parameter_values: Map of template parameter names to their values. It is a required parameter that
-                should at least be an empty map. By providing an empty map, the caller explicitly opts-into the idea that
-                some functionality that relies on resolving parameter references might not work as expected
-                (ex: auto-creating new Lambda Version when CodeUri contains reference to template parameter). This is why
-                this parameter is required
+                should at least be an empty map. By providing an empty map, the caller explicitly opts-into the idea
+                that some functionality that relies on resolving parameter references might not work as expected
+                (ex: auto-creating new Lambda Version when CodeUri contains reference to template parameter). This is
+                why this parameter is required
 
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
@@ -109,7 +110,7 @@ class Translator:
         if 'Transform' in template:
             del template['Transform']
 
-        if len(document_errors) is 0:
+        if len(document_errors) == 0:
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
             template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
             return template
@@ -154,7 +155,8 @@ class Translator:
 
         return functions + apis + others
 
-    # Ideally this should belong to a separate class called "Parameters" or something that knows how to manage parameters. An instance of this class should be passed as input to the Translate class.
+    # Ideally this should belong to a separate class called "Parameters" or something that knows how to manage
+    # parameters. An instance of this class should be passed as input to the Translate class.
     def _add_default_parameter_values(self, sam_template, parameter_values):
         """
         Method to read default values for template parameters and merge with user supplied values.
@@ -202,6 +204,7 @@ class Translator:
         default_values.update(parameter_values)
 
         return default_values
+
 
 def prepare_plugins(plugins):
     """

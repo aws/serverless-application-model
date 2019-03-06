@@ -119,16 +119,28 @@
               "dynamodb:BatchGetItem",
               "dynamodb:DescribeTable"
             ],
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
-                {
-                  "tableName": {
-                    "Ref": "TableName"
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                  {
+                    "tableName": {
+                      "Ref": "TableName"
+                    }
                   }
-                }
-              ]
-            }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                  {
+                    "tableName": {
+                      "Ref": "TableName"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
@@ -150,6 +162,46 @@
               "dynamodb:Query",
               "dynamodb:BatchGetItem",
               "dynamodb:DescribeTable"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                  {
+                    "tableName": {
+                      "Ref": "TableName"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                  {
+                    "tableName": {
+                      "Ref": "TableName"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "DynamoDBReconfigurePolicy": {
+      "Description": "Gives access reconfigure to a DynamoDB Table",
+      "Parameters": {
+        "TableName": {
+          "Description": "Name of the DynamoDB Table"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:UpdateTable"
             ],
             "Resource": {
               "Fn::Sub": [
@@ -282,6 +334,7 @@
               "s3:GetBucketLocation",
               "s3:GetObjectVersion",
               "s3:PutObject",
+              "s3:PutObjectAcl",
               "s3:GetLifecycleConfiguration",
               "s3:PutLifecycleConfiguration",
               "s3:DeleteObject"
@@ -628,6 +681,7 @@
             "Action": [
               "ses:GetIdentityVerificationAttributes",
               "ses:SendEmail",
+              "ses:SendRawEmail",
               "ses:VerifyEmailIdentity"
             ],
             "Resource": {
@@ -1334,6 +1388,171 @@
                 {
                   "deliveryStreamName": {
                     "Ref": "DeliveryStreamName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "EKSDescribePolicy": {
+      "Description": "Gives permission to describe or list Amazon EKS clusters",
+      "Parameters": {
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "eks:DescribeCluster",
+              "eks:ListClusters"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    "CostExplorerReadOnlyPolicy": {
+      "Description": "Gives access to the readonly Cost Explorer APIs for billing history",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "ce:GetCostAndUsage",
+            "ce:GetDimensionValues",
+            "ce:GetReservationCoverage",
+            "ce:GetReservationPurchaseRecommendation",
+            "ce:GetReservationUtilization",
+            "ce:GetTags"
+          ],
+          "Resource": "*"
+        }]
+      }
+    },
+    "OrganizationsListAccountsPolicy": {
+      "Description": "Gives readonly permission to list child account names and ids",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "organizations:ListAccounts"
+          ],
+          "Resource": "*"
+        }]
+      }
+    },
+    "SESBulkTemplatedCrudPolicy": {
+      "Description": "Gives permission to send email, templated email, templated bulk emails and verify identity",
+      "Parameters": {
+        "IdentityName": {
+          "Description": "Identity to give permissions to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ses:GetIdentityVerificationAttributes",
+              "ses:SendEmail",
+              "ses:SendRawEmail",
+              "ses:SendTemplatedEmail",
+              "ses:SendBulkTemplatedEmail",
+              "ses:VerifyEmailIdentity"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}",
+                {
+                  "identityName": {
+                    "Ref": "IdentityName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SESEmailTemplateCrudPolicy": {
+      "Description": "Gives permission to create, get, list, update and delete SES Email Templates",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [{
+          "Effect": "Allow",
+          "Action": [
+            "ses:CreateTemplate",
+            "ses:GetTemplate",
+            "ses:ListTemplates",
+            "ses:UpdateTemplate",
+            "ses:DeleteTemplate",
+            "ses:TestRenderTemplate"
+          ],
+          "Resource": "*"
+        }]
+      }
+    },
+    "FilterLogEventsPolicy": {
+      "Description": "Gives permission to filter Log Events from a specified Log Group",
+      "Parameters": {
+        "LogGroupName": {
+          "Description": "Name of the Log Group"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:FilterLogEvents"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${logGroupName}:log-stream:*",
+                {
+                  "logGroupName": {
+                    "Ref": "LogGroupName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SSMParameterReadPolicy": {
+      "Description": "Gives access to a parameter to load secrets in this account. If not using default key, KMSDecryptPolicy will also be needed.",
+      "Parameters": {
+        "ParameterName": {
+          "Description":"The name of the secret stored in SSM in your account."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:DescribeParameters"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:GetParameters",
+              "ssm:GetParameter"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
+                {
+                  "parameterName": {
+                    "Ref": "ParameterName"
                   }
                 }
               ]

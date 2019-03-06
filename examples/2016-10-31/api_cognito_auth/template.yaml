@@ -40,6 +40,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /
             Method: GET
+            # NOTE: This endpoint is publicly accessible
             Auth:
               Authorizer: NONE
         ProxyAny:
@@ -48,6 +49,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /{proxy+}
             Method: ANY
+            # NOTE: This endpoint is publicly accessible
             Auth:
               Authorizer: NONE
         GetUsers:
@@ -56,6 +58,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /users
             Method: GET
+            # NOTE: This endpoint is publicly accessible
             Auth:
               Authorizer: NONE
         GetUser:
@@ -64,6 +67,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /users/{userId}
             Method: GET
+            # NOTE: This endpoint is publicly accessible
             Auth:
               Authorizer: NONE
         CreateUser:

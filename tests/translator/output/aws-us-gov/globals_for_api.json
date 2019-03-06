@@ -93,9 +93,52 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
-          "this": "is", 
-          "a": "swagger"
-        }, 
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                },
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ]
+              }
+            }
+          },
+          "swagger": 2.0,
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "x-amazon-apigateway-authorizer": {
+                "type": "cognito_user_pools",
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
@@ -107,13 +150,13 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment5b2cb4ba8f": {
+    "ServerlessRestApiDeploymentc969c99f9d": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 5b2cb4ba8fce8a9445b1914c6c6fbeef81a9075a", 
+        "Description": "RestApi deployment id: c969c99f9d6b6921dff605a206e8989bdb7d1bc7", 
         "StageName": "Stage"
       }
     }, 
@@ -130,7 +173,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment359f256a3b"
+          "Ref": "ExplicitApiDeploymentd5fa0145e9"
         }
       }
     }, 
@@ -147,7 +190,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5b2cb4ba8f"
+          "Ref": "ServerlessRestApiDeploymentc969c99f9d"
         }
       }
     }, 
@@ -171,12 +214,36 @@
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 }, 
-                "responses": {}
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ]
               }
             }
           }, 
-          "swagger": "2.0"
-        }, 
+          "swagger": "2.0",
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "x-amazon-apigateway-authorizer": {
+                "type": "cognito_user_pools",
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
@@ -188,13 +255,13 @@
         }
       }
     }, 
-    "ExplicitApiDeployment359f256a3b": {
+    "ExplicitApiDeploymentd5fa0145e9": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 359f256a3b3ff2e1102e335a4d603f02df9b4988", 
+        "Description": "RestApi deployment id: d5fa0145e9e6393911d32967e66fd7091d605483", 
         "StageName": "Stage"
       }
     }

@@ -23,9 +23,10 @@ Example:
   Resources:
     HelloWorldFunction:
       Type: AWS::Serverless::Function
-      Environment:
-        Variables:
-          MESSAGE: "Hello From SAM"
+      Properties:
+        Environment:
+          Variables:
+            MESSAGE: "Hello From SAM"
 
     ThumbnailFunction:
       Type: AWS::Serverless::Function
@@ -53,7 +54,6 @@ Currently, the following resources and properties are being supported:
       # Properties of AWS::Serverless::Function
       Handler:
       Runtime:
-      # Specifying CodeUri on Globals is not yet supported by 'CloudFormation package' https://docs.aws.amazon.com/cli/latest/reference/cloudformation/package.html
       CodeUri: 
       DeadLetterQueue:
       Description:
@@ -67,7 +67,8 @@ Currently, the following resources and properties are being supported:
       Layers:
       AutoPublishAlias:
       DeploymentPreference:
-    
+      PermissionsBoundary:
+
     Api:
       # Properties of AWS::Serverless::Api
       # Also works with Implicit APIs
@@ -79,7 +80,11 @@ Currently, the following resources and properties are being supported:
       EndpointConfiguration:
       MethodSettings:
       BinaryMediaTypes:
+      MinimumCompressionSize:
       Cors:
+      AccessLogSetting:
+      CanarySetting:
+      TracingEnabled:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable

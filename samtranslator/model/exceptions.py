@@ -57,7 +57,7 @@ class InvalidResourceException(Exception):
     Attributes:
         message -- explanation of the error
     """
-    def __init__(self, logical_id,  message):
+    def __init__(self, logical_id, message):
         self._logical_id = logical_id
         self._message = message
 

@@ -53,7 +53,7 @@ class TestImplicitApiPlugin_init(TestCase):
         # Name is the class name
         expected_name = "ImplicitApiPlugin"
 
-        self.assertEquals(self.plugin.name, expected_name)
+        self.assertEqual(self.plugin.name, expected_name)
 
     def test_plugin_must_be_instance_of_base_plugin_class(self):
         self.assertTrue(isinstance(self.plugin, BasePlugin))
@@ -73,7 +73,10 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
     def test_must_process_functions(self, SamTemplateMock):
 
         template_dict = {"a": "b"}
-        function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
+        function1 = SamResource({"Type": "AWS::Serverless::Function"})
+        function2 = SamResource({"Type": "AWS::Serverless::Function"})
+        function3 = SamResource({"Type": "AWS::Serverless::Function"})
+        function_resources = [("id1", function1), ("id2", function2), ("id3", function3)]
         api_events = ["event1", "event2"]
 
         sam_template = Mock()
@@ -89,13 +92,14 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
         sam_template.set.assert_called_with(IMPLICIT_API_LOGICAL_ID, ImplicitApiResource().to_dict())
 
         # Make sure this is called only for Functions
-        sam_template.iterate.assert_called_with("AWS::Serverless::Function")
+        sam_template.iterate.assert_any_call("AWS::Serverless::Function")
+        sam_template.iterate.assert_any_call("AWS::Serverless::Api")
 
-        self.plugin._get_api_events.assert_has_calls([call("function1"), call("function2"), call("function3")])
+        self.plugin._get_api_events.assert_has_calls([call(function1), call(function2), call(function3)])
         self.plugin._process_api_events.assert_has_calls([
-            call("function1", ["event1", "event2"], sam_template),
-            call("function2", ["event1", "event2"], sam_template),
-            call("function3", ["event1", "event2"], sam_template),
+            call(function1, ["event1", "event2"], sam_template, None),
+            call(function2, ["event1", "event2"], sam_template, None),
+            call(function3, ["event1", "event2"], sam_template, None),
         ])
 
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
@@ -105,7 +109,10 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
     def test_must_skip_functions_without_events(self, SamTemplateMock):
 
         template_dict = {"a": "b"}
-        function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
+        function1 = SamResource({"Type": "AWS::Serverless::Function"})
+        function2 = SamResource({"Type": "AWS::Serverless::Function"})
+        function3 = SamResource({"Type": "AWS::Serverless::Function"})
+        function_resources = [("id1", function1), ("id2", function2), ("id3", function3)]
         # NO EVENTS for any function
         api_events = []
 
@@ -118,7 +125,7 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
 
         self.plugin.on_before_transform_template(template_dict)
 
-        self.plugin._get_api_events.assert_has_calls([call("function1"), call("function2"), call("function3")])
+        self.plugin._get_api_events.assert_has_calls([call(function1), call(function2), call(function3)])
         self.plugin._process_api_events.assert_not_called()
 
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
@@ -148,8 +155,12 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
     def test_must_collect_errors_and_raise_on_invalid_events(self, SamTemplateMock):
 
         template_dict = {"a": "b"}
-        function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
-        api_event_errors = [InvalidEventException("eventid1", "msg"), InvalidEventException("eventid3", "msg"), InvalidEventException("eventid3", "msg")]
+        function_resources = [("id1", SamResource({"Type": "AWS::Serverless::Function"})),
+                              ("id2", SamResource({"Type": "AWS::Serverless::Function"})),
+                              ("id3", SamResource({"Type": "AWS::Serverless::Function"}))]
+        api_event_errors = [InvalidEventException("eventid1", "msg"),
+                            InvalidEventException("eventid3", "msg"),
+                            InvalidEventException("eventid3", "msg")]
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
@@ -165,15 +176,15 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
         # Verify the content of exception. There are two exceptions embedded one inside another
         #   InvalidDocumentException -> InvalidResourceException -> contains the msg from InvalidEventException
         causes = context.exception.causes
-        self.assertEquals(3, len(causes))
+        self.assertEqual(3, len(causes))
         for index, cause in enumerate(causes):
             self.assertTrue(isinstance(cause, InvalidResourceException))
 
             # Resource's logicalID must be correctly passed
-            self.assertEquals(function_resources[index][0], cause._logical_id)
+            self.assertEqual(function_resources[index][0], cause._logical_id)
 
             # Message must directly come from InvalidEventException
-            self.assertEquals(api_event_errors[index].message, cause._message)
+            self.assertEqual(api_event_errors[index].message, cause._message)
 
         # Must cleanup even if there an exception
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
@@ -226,7 +237,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
             }
         }
         result = self.plugin._get_api_events(function)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_must_work_with_no_api_events(self):
 
@@ -258,7 +269,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
 
         expected = {}
         result = self.plugin._get_api_events(function)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_must_skip_with_bad_events_structure(self):
 
@@ -271,7 +282,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
 
         expected = {}
         result = self.plugin._get_api_events(function)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_must_skip_if_no_events_property(self):
 
@@ -284,7 +295,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
 
         expected = {}
         result = self.plugin._get_api_events(function)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_must_skip_if_no_property_dictionary(self):
 
@@ -295,7 +306,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
 
         expected = {}
         result = self.plugin._get_api_events(function)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_must_return_reference_to_event_dict(self):
         function = SamResource({
@@ -335,7 +346,7 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
 
         expected = {}
         result = self.plugin._get_api_events(function)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
 
 class TestImplicitApiPlugin_process_api_events(TestCase):
@@ -349,11 +360,17 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         api_events = {
             "Api1": {
                 "Type": "Api",
-                "Properties": {"a": "b"}
+                "Properties": {
+                    "Path": "/",
+                    "Method": "GET"
+                }
             },
             "Api2": {
                 "Type": "Api",
-                "Properties": {"c": "d"}
+                "Properties": {
+                    "Path": "/foo",
+                    "Method": "POST"
+                }
             }
         }
 
@@ -370,13 +387,13 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         self.plugin._process_api_events(function, api_events, template)
 
         self.plugin._add_implicit_api_id_if_necessary.assert_has_calls([
-            call({"a": "b"}),
-            call({"c": "d"}),
+            call({"Path": "/", "Method": "GET"}),
+            call({"Path": "/foo", "Method": "POST"}),
         ])
 
         self.plugin._add_api_to_swagger.assert_has_calls([
-            call("Api1", {"a": "b"}, template),
-            call("Api2", {"c": "d"}, template),
+            call("Api1", {"Path": "/", "Method": "GET"}, template),
+            call("Api2", {"Path": "/foo", "Method": "POST"}, template),
         ])
 
         function_events_mock.update.assert_called_with(api_events)
@@ -389,7 +406,10 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
             },
             "Api2": {
                 "Type": "Api",
-                "Properties": {"c": "d"}
+                "Properties": {
+                    "Path": "/",
+                    "Method": "GET"
+                }
             }
         }
 
@@ -404,11 +424,11 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         self.plugin._process_api_events(function, api_events, template)
 
         self.plugin._add_implicit_api_id_if_necessary.assert_has_calls([
-            call({"c": "d"}),
+            call({"Path": "/", "Method": "GET"}),
         ])
 
         self.plugin._add_api_to_swagger.assert_has_calls([
-            call("Api2", {"c": "d"}, template),
+            call("Api2", {"Path": "/", "Method": "GET"}, template),
         ])
 
     def test_must_retain_side_effect_of_modifying_events(self):
@@ -419,11 +439,17 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         api_events = {
             "Api1": {
                 "Type": "Api",
-                "Properties": {"a": "b"}
+                "Properties": {
+                    "Path": "/",
+                    "Method": "get"
+                }
             },
             "Api2": {
                 "Type": "Api",
-                "Properties": {"c": "d"}
+                "Properties": {
+                    "Path": "/foo",
+                    "Method": "post"
+                }
             }
         }
 
@@ -449,22 +475,22 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         self.plugin._process_api_events(function, api_events, template)
 
         # Side effect must be visible after call returns on the input object
-        self.assertEquals(api_events["Api1"]["Properties"], {"a": "b", "Key": "Value"})
-        self.assertEquals(api_events["Api2"]["Properties"], {"c": "d", "Key": "Value"})
+        self.assertEqual(api_events["Api1"]["Properties"], {"Path": "/", "Method": "get", "Key": "Value"})
+        self.assertEqual(api_events["Api2"]["Properties"], {"Path": "/foo", "Method": "post", "Key": "Value"})
 
         # Every Event object inside the SamResource class must be entirely replaced by input api_events with side effect
-        self.assertEquals(function.properties["Events"]["Api1"]["Properties"], {"a": "b", "Key": "Value"})
-        self.assertEquals(function.properties["Events"]["Api2"]["Properties"], {"c": "d", "Key": "Value"})
+        self.assertEqual(function.properties["Events"]["Api1"]["Properties"], {"Path": "/", "Method": "get", "Key": "Value"})
+        self.assertEqual(function.properties["Events"]["Api2"]["Properties"], {"Path": "/foo", "Method": "post", "Key": "Value"})
 
         # Subsequent calls must be made with the side effect. This is important.
         self.plugin._add_api_to_swagger.assert_has_calls([
             call("Api1",
                  # Side effects should be visible here
-                 {"a": "b", "Key": "Value"},
+                 {"Path": "/", "Method": "get", "Key": "Value"},
                  template),
             call("Api2",
                  # Side effects should be visible here
-                 {"c": "d", "Key": "Value"},
+                 {"Path": "/foo", "Method": "post", "Key": "Value"},
                  template),
         ])
 
@@ -486,7 +512,7 @@ class TestImplicitApiPlugin_add_implicit_api_id_if_necessary(TestCase):
         }
 
         self.plugin._add_implicit_api_id_if_necessary(input)
-        self.assertEquals(input, expected)
+        self.assertEqual(input, expected)
 
 
     def test_must_skip_if_present(self):
@@ -502,7 +528,7 @@ class TestImplicitApiPlugin_add_implicit_api_id_if_necessary(TestCase):
         }
 
         self.plugin._add_implicit_api_id_if_necessary(input)
-        self.assertEquals(input, expected)
+        self.assertEqual(input, expected)
 
 
 class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
@@ -546,7 +572,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         template_mock.get.assert_called_with('restid')
         editor_mock.add_path("/hello", "GET")
         template_mock.set.assert_called_with("restid", mock_api)
-        self.assertEquals(mock_api.properties["DefinitionBody"], updated_swagger)
+        self.assertEqual(mock_api.properties["DefinitionBody"], updated_swagger)
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
     def test_must_work_with_rest_api_id_as_string(self, SwaggerEditorMock):
@@ -585,7 +611,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         template_mock.get.assert_called_with('restid')
         editor_mock.add_path("/hello", "GET")
         template_mock.set.assert_called_with("restid", mock_api)
-        self.assertEquals(mock_api.properties["DefinitionBody"], updated_swagger)
+        self.assertEqual(mock_api.properties["DefinitionBody"], updated_swagger)
 
     def test_must_raise_when_api_is_not_found(self):
         event_id = "id"
@@ -602,7 +628,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         with self.assertRaises(InvalidEventException) as context:
             self.plugin._add_api_to_swagger(event_id, properties, template_mock)
 
-        self.assertEquals(event_id, context.exception._event_id)
+        self.assertEqual(event_id, context.exception._event_id)
 
     def test_must_raise_when_api_id_is_intrinsic(self):
         event_id = "id"
@@ -619,7 +645,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         with self.assertRaises(InvalidEventException) as context:
             self.plugin._add_api_to_swagger(event_id, properties, template_mock)
 
-        self.assertEquals(event_id, context.exception._event_id)
+        self.assertEqual(event_id, context.exception._event_id)
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
     def test_must_skip_invalid_swagger(self, SwaggerEditorMock):

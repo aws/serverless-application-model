@@ -43,9 +43,10 @@ def to_s3_uri(code_dict):
         raise TypeError("Code location should be a dictionary")
 
     if version:
-            uri += "?versionId=" + version
+        uri += "?versionId=" + version
 
     return uri
+
 
 def construct_s3_location_object(location_uri, logical_id, property_name):
     """Constructs a Lambda `Code` or `Content` property, from the SAM `CodeUri` or `ContentUri` property.
@@ -61,7 +62,8 @@ def construct_s3_location_object(location_uri, logical_id, property_name):
         if not location_uri.get("Bucket") or not location_uri.get("Key"):
             # location_uri is a dictionary but does not contain Bucket or Key property
             raise InvalidResourceException(logical_id,
-                                            "'{}' requires Bucket and Key properties to be specified".format(property_name))
+                                           "'{}' requires Bucket and Key properties to be "
+                                           "specified".format(property_name))
 
         s3_pointer = location_uri
 
@@ -71,8 +73,9 @@ def construct_s3_location_object(location_uri, logical_id, property_name):
 
         if s3_pointer is None:
             raise InvalidResourceException(logical_id,
-                                            '\'{}\' is not a valid S3 Uri of the form '
-                                            '"s3://bucket/key" with optional versionId query parameter.'.format(property_name))
+                                           '\'{}\' is not a valid S3 Uri of the form '
+                                           '"s3://bucket/key" with optional versionId query '
+                                           'parameter.'.format(property_name))
 
     code = {
         'S3Bucket': s3_pointer['Bucket'],

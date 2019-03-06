@@ -55,15 +55,15 @@ class TestVersionsAndAliases(TestCase):
         resources = sam_func.to_cloudformation(**kwargs)
 
         # Function, Version, Alias, IAM Role
-        self.assertEquals(len(resources), 4)
+        self.assertEqual(len(resources), 4)
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
         versions = [r.to_dict() for r in resources if r.resource_type == LambdaVersion.resource_type]
-        self.assertEquals(len(aliases), 1)
-        self.assertEquals(len(versions), 1)
+        self.assertEqual(len(aliases), 1)
+        self.assertEqual(len(versions), 1)
 
         alias = list(aliases[0].values())[0]["Properties"]
-        self.assertEquals(alias["Name"], alias_name)
+        self.assertEqual(alias["Name"], alias_name)
         # We don't need to do any deeper validation here because there is a separate SAM template -> CFN template conversion test
         # that will care of validating all properties & connections
 
@@ -232,7 +232,7 @@ class TestVersionsAndAliases(TestCase):
 
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(enabled)
         # Function, IAM Role
-        self.assertEquals(len(resources), 2)
+        self.assertEqual(len(resources), 2)
 
     @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch.object(SamFunction, "_get_resolved_alias_name")
@@ -481,7 +481,7 @@ class TestVersionsAndAliases(TestCase):
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = alias_name
 
         result = self.sam_func._get_resolved_alias_name(property_name, alias_value, self.intrinsics_resolver_mock)
-        self.assertEquals(alias_name, result)
+        self.assertEqual(alias_name, result)
 
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved(self):
 
@@ -497,7 +497,7 @@ class TestVersionsAndAliases(TestCase):
             self.sam_func._get_resolved_alias_name(property_name, alias_value, self.intrinsics_resolver_mock)
 
         ex = raises_assert.exception
-        self.assertEquals(expected_exception_msg, ex.message)
+        self.assertEqual(expected_exception_msg, ex.message)
 
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved_with_list(self):
 
@@ -513,7 +513,7 @@ class TestVersionsAndAliases(TestCase):
             self.sam_func._get_resolved_alias_name(property_name, alias_value, self.intrinsics_resolver_mock)
 
         ex = raises_assert.exception
-        self.assertEquals(expected_exception_msg, ex.message)
+        self.assertEqual(expected_exception_msg, ex.message)
 
 
     def _make_lambda_function(self, logical_id):
@@ -545,6 +545,6 @@ class TestSupportedResourceReferences(TestCase):
     def test_must_not_break_support(self):
 
         func = SamFunction("LogicalId")
-        self.assertEquals(2, len(func.referable_properties))
-        self.assertEquals(func.referable_properties["Alias"], "AWS::Lambda::Alias")
-        self.assertEquals(func.referable_properties["Version"], "AWS::Lambda::Version")
+        self.assertEqual(2, len(func.referable_properties))
+        self.assertEqual(func.referable_properties["Alias"], "AWS::Lambda::Alias")
+        self.assertEqual(func.referable_properties["Version"], "AWS::Lambda::Version")

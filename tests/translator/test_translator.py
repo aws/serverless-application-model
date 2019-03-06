@@ -137,6 +137,8 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        's3_with_condition',
+        'function_with_condition',
         'basic_function',
         'basic_application',
         'application_preparing_state',
@@ -156,14 +158,19 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_auth_no_default',
         'api_with_method_settings',
         'api_with_binary_media_types',
+        'api_with_minimum_compression_size',
         'api_with_resource_refs',
         'api_with_cors',
         'api_with_cors_and_only_methods',
         'api_with_cors_and_only_headers',
         'api_with_cors_and_only_origins',
         'api_with_cors_and_only_maxage',
+        'api_with_cors_and_only_credentials_false',
         'api_with_cors_no_definitionbody',
         'api_cache',
+        'api_with_access_log_setting',
+        'api_with_canary_setting',
+        'api_with_xray_tracing',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -185,6 +192,7 @@ class TestTranslatorEndToEnd(TestCase):
         'intrinsic_functions',
         'basic_function_with_tags',
         'depends_on',
+        'function_event_conditions',
         'function_with_dlq',
         'function_with_kmskeyarn',
         'function_with_alias',
@@ -200,7 +208,9 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_global_layers',
         'function_with_layers',
         'function_with_many_layers',
+        'function_with_permissions_boundary',
         'function_with_policy_templates',
+        'function_with_sns_event_source_all_parameters',
         'globals_for_function',
         'globals_for_api',
         'globals_for_simpletable',
@@ -211,7 +221,12 @@ class TestTranslatorEndToEnd(TestCase):
         'simple_table_with_extra_tags',
         'explicit_api_with_invalid_events_config',
         'no_implicit_api_with_serverless_rest_api_resource',
-        'implicit_api_with_serverless_rest_api_resource'
+        'implicit_api_with_serverless_rest_api_resource',
+        'implicit_api_with_auth_and_conditions_max',
+        'implicit_api_with_many_conditions',
+        'implicit_and_explicit_api_with_conditions',
+        'api_with_cors_and_conditions_no_definitionbody',
+        'api_with_auth_and_conditions_all_max'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -335,6 +350,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_application_preparing_timeout',
     'error_cors_on_external_swagger',
     'error_invalid_cors_dict',
+    'error_cors_credentials_true_with_wildcard_origin',
+    'error_cors_credentials_true_without_explicit_origin',
     'error_function_invalid_codeuri',
     'error_function_invalid_layer',
     'error_function_no_codeuri',
@@ -626,7 +643,7 @@ class TestParameterValuesHandling(TestCase):
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(sam_template,
             parameter_values)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_add_default_parameter_values_must_override_user_specified_values(self):
         parameter_values = {
@@ -650,7 +667,7 @@ class TestParameterValuesHandling(TestCase):
         sam_parser = Parser()
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
     def test_add_default_parameter_values_must_skip_params_without_defaults(self):
         parameter_values = {
@@ -675,7 +692,7 @@ class TestParameterValuesHandling(TestCase):
         sam_parser = Parser()
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
 
     @parameterized.expand([
@@ -708,7 +725,7 @@ class TestParameterValuesHandling(TestCase):
         translator = Translator({}, sam_parser)
         result = translator._add_default_parameter_values(
             sam_template, parameter_values)
-        self.assertEquals(expected, result)
+        self.assertEqual(expected, result)
 
 
 class TestTemplateValidation(TestCase):
@@ -759,7 +776,7 @@ class TestPluginsUsage(TestCase):
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
 
         sam_plugins = prepare_plugins([])
-        self.assertEquals(5, len(sam_plugins))
+        self.assertEqual(5, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
@@ -770,13 +787,13 @@ class TestPluginsUsage(TestCase):
 
         custom_plugin = BasePlugin("someplugin")
         sam_plugins = prepare_plugins([custom_plugin])
-        self.assertEquals(6, len(sam_plugins))
+        self.assertEqual(6, len(sam_plugins))
 
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_prepare_plugins_must_handle_empty_input(self):
 
         sam_plugins = prepare_plugins(None)
-        self.assertEquals(5, len(sam_plugins))
+        self.assertEqual(5, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.PolicyTemplatesProcessor")
     @patch("samtranslator.translator.translator.PolicyTemplatesForFunctionPlugin")
@@ -797,7 +814,7 @@ class TestPluginsUsage(TestCase):
 
         result = make_policy_template_for_function_plugin()
 
-        self.assertEquals(plugin_instance, result)
+        self.assertEqual(plugin_instance, result)
 
         policy_templates_processor_mock.get_default_policy_templates_json.assert_called_once_with()
         policy_templates_processor_mock.assert_called_once_with(default_templates)

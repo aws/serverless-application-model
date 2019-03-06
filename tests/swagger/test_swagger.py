@@ -8,6 +8,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
+_ALLOW_CREDENTALS_TRUE = "'true'"
 
 class TestSwaggerEditor_init(TestCase):
 
@@ -29,7 +30,7 @@ class TestSwaggerEditor_init(TestCase):
         editor = SwaggerEditor(valid_swagger)
         self.assertIsNotNone(editor)
 
-        self.assertEquals(editor.paths, {"/foo": {}, "/bar": {}})
+        self.assertEqual(editor.paths, {"/foo": {}, "/bar": {}})
 
 
 class TestSwaggerEditor_has_path(TestCase):
@@ -103,6 +104,28 @@ class TestSwaggerEditor_has_integration(TestCase):
                             "a": "b"
                         }
                     },
+                    "post": {
+                        "Fn::If": [
+                            "Condition",
+                            {
+                                _X_INTEGRATION: {
+                                    "a": "b"
+                                }
+                            },
+                            {"Ref": "AWS::NoValue"}
+                        ]
+                    },
+                    "delete": {
+                        "Fn::If": [
+                            "Condition",
+                            {"Ref": "AWS::NoValue"},
+                            {
+                                _X_INTEGRATION: {
+                                    "a": "b"
+                                }
+                            }
+                        ]
+                    },
                     "somemethod": {
                         "foo": "value",
                     },
@@ -118,6 +141,12 @@ class TestSwaggerEditor_has_integration(TestCase):
 
     def test_must_find_integration(self):
         self.assertTrue(self.editor.has_integration("/foo", "get"))
+
+    def test_must_find_integration_with_condition(self):
+        self.assertTrue(self.editor.has_integration("/foo", "post"))
+
+    def test_must_find_integration_with_condition2(self):
+        self.assertTrue(self.editor.has_integration("/foo", "delete"))
 
     def test_must_not_find_integration(self):
         self.assertFalse(self.editor.has_integration("/foo", "somemethod"))
@@ -157,7 +186,7 @@ class TestSwaggerEditor_add_path(TestCase):
         self.editor.add_path(path, method)
 
         self.assertTrue(self.editor.has_path(path, method), "must add for "+case)
-        self.assertEquals(self.editor.swagger["paths"][path][method], {})
+        self.assertEqual(self.editor.swagger["paths"][path][method], {})
 
     def test_must_raise_non_dict_path_values(self):
 
@@ -179,7 +208,7 @@ class TestSwaggerEditor_add_path(TestCase):
 
         self.editor.add_path(path, method)
         modified_swagger = self.editor.swagger
-        self.assertEquals(original_value, modified_swagger["paths"][path][method])
+        self.assertEqual(original_value, modified_swagger["paths"][path][method])
 
 
 class TestSwaggerEditor_add_lambda_integration(TestCase):
@@ -226,7 +255,43 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
 
         self.assertTrue(self.editor.has_path(path, method))
         actual = self.editor.swagger["paths"][path][method]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
+
+    def test_must_add_new_integration_with_conditions_to_new_path(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        condition = "condition"
+        expected = {
+            "Fn::If": [
+                "condition",
+                {
+                    "responses": {},
+                    _X_INTEGRATION: {
+                        "type": "aws_proxy",
+                        "httpMethod": "POST",
+                        "uri": {
+                            "Fn::If": [
+                                "condition",
+                                integration_uri,
+                                {
+                                    "Ref": "AWS::NoValue"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Ref": "AWS::NoValue"
+                }
+            ]
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, condition=condition)
+
+        self.assertTrue(self.editor.has_path(path, method))
+        actual = self.editor.swagger["paths"][path][method]
+        self.assertEqual(expected, actual)
 
     def test_must_add_new_integration_to_existing_path(self):
         path = "/foo"
@@ -255,7 +320,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         self.editor.add_lambda_integration(path, method, integration_uri)
 
         actual = self.editor.swagger["paths"][path][method]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_must_raise_on_existing_integration(self):
 
@@ -283,7 +348,7 @@ class TestSwaggerEditor_iter_on_path(TestCase):
         expected = {"/foo", "/bar", "/baz"}
         actual = set([path for path in self.editor.iter_on_path()])
 
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
 
 class TestSwaggerEditor_add_cors(TestCase):
@@ -308,25 +373,28 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_headers = ["headers", "2"]
         allowed_methods = {"key": "methods"}
         max_age = 60
+        allow_credentials = True
+        options_method_response_allow_credentials = True
         path = "/foo"
         expected = {"some cors": "return value"}
 
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
 
-        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age)
-        self.assertEquals(expected, self.editor.swagger["paths"][path]["options"])
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials)
+        self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
         self.editor._options_method_response_for_cors.assert_called_with(allowed_origins,
                                                                          allowed_headers,
                                                                          allowed_methods,
-                                                                         max_age)
+                                                                         max_age,
+                                                                         options_method_response_allow_credentials)
 
     def test_must_skip_existing_path(self):
         path = "/withoptions"
         expected = copy.deepcopy(self.original_swagger["paths"][path]["options"])
 
         self.editor.add_cors(path, "origins", "headers", "methods")
-        self.assertEquals(expected, self.editor.swagger["paths"][path]["options"])
+        self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
 
     def test_must_fail_with_bad_values_for_path(self):
         path = "/bad"
@@ -346,6 +414,8 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_headers = None # No Value
         allowed_methods = "methods"
         max_age = 60
+        allow_credentials = True
+        options_method_response_allow_credentials = True
 
         expected = {"some cors": "return value"}
         path = "/foo"
@@ -353,14 +423,15 @@ class TestSwaggerEditor_add_cors(TestCase):
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
 
-        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age)
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials)
 
-        self.assertEquals(expected, self.editor.swagger["paths"][path]["options"])
+        self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
 
         self.editor._options_method_response_for_cors.assert_called_with(allowed_origins,
                                                                          allowed_headers,
                                                                          allowed_methods,
-                                                                         max_age)
+                                                                         max_age,
+                                                                         options_method_response_allow_credentials)
 
     def test_must_make_default_value_with_optional_allowed_methods(self):
 
@@ -368,6 +439,8 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_headers = "headers"
         allowed_methods = None  # No Value
         max_age = 60
+        allow_credentials = True
+        options_method_response_allow_credentials = True
 
         default_allow_methods_value = "some default value"
         default_allow_methods_value_with_quotes = "'{}'".format(default_allow_methods_value)
@@ -380,16 +453,38 @@ class TestSwaggerEditor_add_cors(TestCase):
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
 
-        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age)
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials)
 
-        self.assertEquals(expected, self.editor.swagger["paths"][path]["options"])
+        self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
 
         self.editor._options_method_response_for_cors.assert_called_with(allowed_origins,
                                                                          allowed_headers,
                                                                          # Must be called with default value.
                                                                          # And value must be quoted
                                                                          default_allow_methods_value_with_quotes,
-                                                                         max_age)
+                                                                         max_age,
+                                                                         options_method_response_allow_credentials)
+
+    def test_must_accept_none_allow_credentials(self):
+        allowed_origins = "origins"
+        allowed_headers = ["headers", "2"]
+        allowed_methods = {"key": "methods"}
+        max_age = 60
+        allow_credentials = None
+        options_method_response_allow_credentials = False
+        path = "/foo"
+        expected = {"some cors": "return value"}
+
+        self.editor._options_method_response_for_cors = Mock()
+        self.editor._options_method_response_for_cors.return_value = expected
+
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials)
+        self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
+        self.editor._options_method_response_for_cors.assert_called_with(allowed_origins,
+                                                                         allowed_headers,
+                                                                         allowed_methods,
+                                                                         max_age,
+                                                                         options_method_response_allow_credentials)
 
 
 class TestSwaggerEditor_options_method_response_for_cors(TestCase):
@@ -400,6 +495,7 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         methods = {"a": "b"}
         origins = [1,2,3]
         max_age = 60
+        allow_credentials = True
 
         expected = {
             "summary": "CORS support",
@@ -414,10 +510,11 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
                     "default": {
                         "statusCode": "200",
                         "responseParameters": {
+                            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
                             "method.response.header.Access-Control-Allow-Headers": headers,
                             "method.response.header.Access-Control-Allow-Methods": methods,
                             "method.response.header.Access-Control-Allow-Origin": origins,
-                            "method.response.header.Access-Control-Max-Age": max_age
+                            "method.response.header.Access-Control-Max-Age": max_age,
                         },
                         "responseTemplates": {
                             "application/json": "{}\n"
@@ -429,6 +526,9 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
                 "200": {
                     "description": "Default response for CORS method",
                     "headers": {
+                        "Access-Control-Allow-Credentials": {
+                            "type": "string"
+                        },
                         "Access-Control-Allow-Headers": {
                             "type": "string"
                         },
@@ -446,20 +546,27 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
             }
         }
 
-        actual = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(origins, headers, methods, max_age)
-        self.assertEquals(expected, actual)
+        actual = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(origins, headers,
+                                                                                               methods, max_age,
+                                                                                               allow_credentials)
+        self.assertEqual(expected, actual)
 
     def test_allow_headers_is_skipped_with_no_value(self):
         headers = None # No value
         methods = "methods"
         origins = "origins"
+        allow_credentials = True
 
         expected = {
+            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
             "method.response.header.Access-Control-Allow-Methods": methods,
-            "method.response.header.Access-Control-Allow-Origin": origins
+            "method.response.header.Access-Control-Allow-Origin": origins,
         }
 
         expected_headers = {
+            "Access-Control-Allow-Credentials": {
+                "type": "string"
+            },
             "Access-Control-Allow-Methods": {
                 "type": "string"
             },
@@ -469,32 +576,35 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         }
 
         options_config = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(
-            origins, headers, methods)
+            origins, headers, methods, allow_credentials=allow_credentials)
 
         actual = options_config[_X_INTEGRATION]["responses"]["default"]["responseParameters"]
-        self.assertEquals(expected, actual)
-        self.assertEquals(expected_headers, options_config["responses"]["200"]["headers"])
+        self.assertEqual(expected, actual)
+        self.assertEqual(expected_headers, options_config["responses"]["200"]["headers"])
 
     def test_allow_methods_is_skipped_with_no_value(self):
         headers = "headers"
         methods = None # No value
         origins = "origins"
+        allow_credentials = True
 
         expected = {
+            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
             "method.response.header.Access-Control-Allow-Headers": headers,
-            "method.response.header.Access-Control-Allow-Origin": origins
+            "method.response.header.Access-Control-Allow-Origin": origins,
         }
 
         options_config = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(
-            origins, headers, methods)
+            origins, headers, methods, allow_credentials=allow_credentials)
 
         actual = options_config[_X_INTEGRATION]["responses"]["default"]["responseParameters"]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_allow_origins_is_not_skipped_with_no_value(self):
         headers = None
         methods = None
         origins = None
+        allow_credentials = False
 
         expected = {
             # We will ALWAYS set AllowOrigin. This is a minimum requirement for CORS
@@ -502,29 +612,48 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         }
 
         options_config = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(
-            origins, headers, methods)
+            origins, headers, methods, allow_credentials=allow_credentials)
 
         actual = options_config[_X_INTEGRATION]["responses"]["default"]["responseParameters"]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_max_age_can_be_set_to_zero(self):
         headers = None
         methods = "methods"
         origins = "origins"
         max_age = 0
+        allow_credentials = True
 
         expected = {
+            "method.response.header.Access-Control-Allow-Credentials": _ALLOW_CREDENTALS_TRUE,
             "method.response.header.Access-Control-Allow-Methods": methods,
             "method.response.header.Access-Control-Allow-Origin": origins,
-            "method.response.header.Access-Control-Max-Age": max_age
+            "method.response.header.Access-Control-Max-Age": max_age,
         }
 
         options_config = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(
-            origins, headers, methods, max_age)
+            origins, headers, methods, max_age, allow_credentials)
 
         actual = options_config[_X_INTEGRATION]["responses"]["default"]["responseParameters"]
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
+    def test_allow_credentials_is_skipped_with_false_value(self):
+        headers = "headers"
+        methods = "methods"
+        origins = "origins"
+        allow_credentials = False
+
+        expected = {
+            "method.response.header.Access-Control-Allow-Headers": headers,
+            "method.response.header.Access-Control-Allow-Methods": methods,
+            "method.response.header.Access-Control-Allow-Origin": origins,
+        }
+
+        options_config = SwaggerEditor(SwaggerEditor.gen_skeleton())._options_method_response_for_cors(
+            origins, headers, methods, allow_credentials=allow_credentials)
+
+        actual = options_config[_X_INTEGRATION]["responses"]["default"]["responseParameters"]
+        self.assertEqual(expected, actual)
 
 class TestSwaggerEditor_make_cors_allowed_methods_for_path(TestCase):
 
@@ -551,28 +680,28 @@ class TestSwaggerEditor_make_cors_allowed_methods_for_path(TestCase):
         expected = "DELETE,GET,OPTIONS,POST" # Result should be sorted alphabetically
 
         actual = self.editor._make_cors_allowed_methods_for_path(path)
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_must_work_for_any_method(self):
         path = "/withany"
         expected = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT" # Result should be sorted alphabetically
 
         actual = self.editor._make_cors_allowed_methods_for_path(path)
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_must_work_with_no_methods(self):
         path = "/nothing"
         expected = "OPTIONS"
 
         actual = self.editor._make_cors_allowed_methods_for_path(path)
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_must_skip_non_existent_path(self):
         path = "/no-path"
         expected = ""
 
         actual = self.editor._make_cors_allowed_methods_for_path(path)
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
 
 class TestSwaggerEditor_normalize_method_name(TestCase):
@@ -586,7 +715,7 @@ class TestSwaggerEditor_normalize_method_name(TestCase):
         param([1, 2], [1, 2], "must skip non-string values"),
     ])
     def test_must_normalize(self, input, expected, msg):
-        self.assertEquals(expected, SwaggerEditor._normalize_method_name(input), msg)
+        self.assertEqual(expected, SwaggerEditor._normalize_method_name(input), msg)
 
 
 class TestSwaggerEditor_swagger_property(TestCase):
@@ -599,13 +728,13 @@ class TestSwaggerEditor_swagger_property(TestCase):
         }
 
         editor = SwaggerEditor(input)
-        self.assertEquals(input, editor.swagger) # They are equal in content
+        self.assertEqual(input, editor.swagger) # They are equal in content
         input["swagger"] = "3"
-        self.assertEquals("2.0", editor.swagger["swagger"]) # Editor works on a diff copy of input
+        self.assertEqual("2.0", editor.swagger["swagger"]) # Editor works on a diff copy of input
 
         editor.add_path("/foo", "get")
-        self.assertEquals({"/foo": {"get": {}}}, editor.swagger["paths"])
-        self.assertEquals({}, input["paths"]) # Editor works on a diff copy of input
+        self.assertEqual({"/foo": {"get": {}}}, editor.swagger["paths"])
+        self.assertEqual({}, input["paths"]) # Editor works on a diff copy of input
 
 
 class TestSwaggerEditor_is_valid(TestCase):

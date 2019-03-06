@@ -2,6 +2,7 @@ import copy
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
+from samtranslator.model.intrinsics import make_conditional
 
 
 class SwaggerEditor(object):
@@ -14,6 +15,7 @@ class SwaggerEditor(object):
 
     _OPTIONS_METHOD = "options"
     _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
+    _CONDITIONAL_IF = "Fn::If"
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
 
     def __init__(self, doc):
@@ -32,6 +34,12 @@ class SwaggerEditor(object):
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", {})
 
+    def get_path(self, path):
+        path_dict = self.paths.get(path)
+        if isinstance(path_dict, dict) and self._CONDITIONAL_IF in path_dict:
+            path_dict = path_dict[self._CONDITIONAL_IF][1]
+        return path_dict
+
     def has_path(self, path, method=None):
         """
         Returns True if this Swagger has the given path and optional method
@@ -42,13 +50,48 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)
 
-        result = path in self.paths
+        path_dict = self.get_path(path)
+        path_dict_exists = path_dict is not None
         if method:
-            result = result and \
-                    isinstance(self.paths[path], dict) and \
-                    method in self.paths[path]
+            return path_dict_exists and method in path_dict
+        return path_dict_exists
 
-        return result
+    def method_has_integration(self, method):
+        """
+        Returns true if the given method contains a valid method definition.
+        This uses the get_method_contents function to handle conditionals.
+
+        :param dict method: method dictionary
+        :return: true if method has one or multiple integrations
+        """
+        for method_definition in self.get_method_contents(method):
+            if self.method_definition_has_integration(method_definition):
+                return True
+        return False
+
+    def method_definition_has_integration(self, method_definition):
+        """
+        Checks a method definition to make sure it has an apigw integration
+
+        :param dict method_defintion: method definition dictionary
+        :return: True if an integration exists
+        """
+        if method_definition.get(self._X_APIGW_INTEGRATION):
+            return True
+        return False
+
+    def get_method_contents(self, method):
+        """
+        Returns the swagger contents of the given method. This checks to see if a conditional block
+        has been used inside of the method, and, if so, returns the method contents that are
+        inside of the conditional.
+
+        :param dict method: method dictionary
+        :return: list of swagger component dictionaries for the method
+        """
+        if self._CONDITIONAL_IF in method:
+            return method[self._CONDITIONAL_IF][1:]
+        return [method]
 
     def has_integration(self, path, method):
         """
@@ -60,9 +103,10 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)
 
+        path_dict = self.get_path(path)
         return self.has_path(path, method) and \
-            isinstance(self.paths[path][method], dict) and \
-            bool(self.paths[path][method].get(self._X_APIGW_INTEGRATION))  # Key should be present & Value is non-empty
+            isinstance(path_dict[method], dict) and \
+            self.method_has_integration(path_dict[method])  # Integration present and non-empty
 
     def add_path(self, path, method=None):
         """
@@ -74,15 +118,18 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)
 
-        self.paths.setdefault(path, {})
+        path_dict = self.paths.setdefault(path, {})
 
-        if not isinstance(self.paths[path], dict):
+        if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
             raise ValueError("Value of '{}' path must be a dictionary according to Swagger spec".format(path))
 
-        self.paths[path].setdefault(method, {})
+        if self._CONDITIONAL_IF in path_dict:
+            path_dict = path_dict[self._CONDITIONAL_IF][1]
 
-    def add_lambda_integration(self, path, method, integration_uri):
+        path_dict.setdefault(method, {})
+
+    def add_lambda_integration(self, path, method, integration_uri, condition=None):
         """
         Adds aws_proxy APIGW integration to the given path+method.
 
@@ -92,20 +139,35 @@ class SwaggerEditor(object):
         """
 
         method = self._normalize_method_name(method)
-
         if self.has_integration(path, method):
             raise ValueError("Lambda integration already exists on Path={}, Method={}".format(path, method))
 
         self.add_path(path, method)
 
-        self.paths[path][method][self._X_APIGW_INTEGRATION] = {
+        # Wrap the integration_uri in a Condition if one exists on that function
+        # This is necessary so CFN doesn't try to resolve the integration reference.
+        if condition:
+            integration_uri = make_conditional(condition, integration_uri)
+
+        path_dict = self.get_path(path)
+        path_dict[method][self._X_APIGW_INTEGRATION] = {
                 'type': 'aws_proxy',
                 'httpMethod': 'POST',
                 'uri': integration_uri
-            }
+        }
 
         # If 'responses' key is *not* present, add it with an empty dict as value
-        self.paths[path][method].setdefault('responses', {})
+        path_dict[method].setdefault('responses', {})
+
+        # If a condition is present, wrap all method contents up into the condition
+        if condition:
+            path_dict[method] = make_conditional(condition, path_dict[method])
+
+    def make_path_conditional(self, path, condition):
+        """
+        Wrap entire API path definition in a CloudFormation if condition.
+        """
+        self.paths[path] = make_conditional(condition, self.paths[path])
 
     def iter_on_path(self):
         """
@@ -118,7 +180,8 @@ class SwaggerEditor(object):
         for path, value in self.paths.items():
             yield path
 
-    def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None):
+    def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None,
+                 allow_credentials=None):
         """
         Add CORS configuration to this path. Specifically, we will add a OPTIONS response config to the Swagger that
         will return headers required for CORS. Since SAM uses aws_proxy integration, we cannot inject the headers
@@ -139,6 +202,7 @@ class SwaggerEditor(object):
             Value can also be an intrinsic function dict.
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
+        :param bool/None allow_credentials: Flags whether request is allowed to contain credentials.
         :raises ValueError: When values for one of the allowed_* variables is empty
         """
 
@@ -156,15 +220,19 @@ class SwaggerEditor(object):
             # APIGW expects the value to be a "string expression". Hence wrap in another quote. Ex: "'GET,POST,DELETE'"
             allowed_methods = "'{}'".format(allowed_methods)
 
+        if allow_credentials is not True:
+            allow_credentials = False
+
         # Add the Options method and the CORS response
         self.add_path(path, self._OPTIONS_METHOD)
-        self.paths[path][self._OPTIONS_METHOD] = self._options_method_response_for_cors(allowed_origins,
-                                                                                        allowed_headers,
-                                                                                        allowed_methods,
-                                                                                        max_age)
+        self.get_path(path)[self._OPTIONS_METHOD] = self._options_method_response_for_cors(allowed_origins,
+                                                                                           allowed_headers,
+                                                                                           allowed_methods,
+                                                                                           max_age,
+                                                                                           allow_credentials)
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
-                                          max_age=None):
+                                          max_age=None, allow_credentials=None):
         """
         Returns a Swagger snippet containing configuration for OPTIONS HTTP Method to configure CORS.
 
@@ -179,6 +247,7 @@ class SwaggerEditor(object):
             Value can also be an intrinsic function dict.
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
+        :param bool allow_credentials: Flags whether request is allowed to contain credentials.
 
         :return dict: Dictionary containing Options method configuration for CORS
         """
@@ -187,7 +256,8 @@ class SwaggerEditor(object):
         ALLOW_HEADERS = "Access-Control-Allow-Headers"
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
-        HEADER_RESPONSE = lambda x: "method.response.header."+x
+        ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
+        HEADER_RESPONSE = (lambda x: "method.response.header." + x)
 
         response_parameters = {
             # AllowedOrigin is always required
@@ -217,6 +287,11 @@ class SwaggerEditor(object):
             # MaxAge can be set to 0, which is a valid value. So explicitly check against None
             response_parameters[HEADER_RESPONSE(MAX_AGE)] = max_age
             response_headers[MAX_AGE] = {"type": "integer"}
+        if allow_credentials is True:
+            # Allow-Credentials only has a valid value of true, it should be omitted otherwise.
+            # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+            response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = "'true'"
+            response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
 
         return {
             "summary": "CORS support",
@@ -263,14 +338,14 @@ class SwaggerEditor(object):
             return ""
 
         # At this point, value of Swagger path should be a dictionary with method names being the keys
-        methods = list(self.paths[path].keys())
+        methods = list(self.get_path(path).keys())
 
         if self._X_ANY_METHOD in methods:
             # API Gateway's ANY method is not a real HTTP method but a wildcard representing all HTTP methods
             allow_methods = all_http_methods
         else:
             allow_methods = methods
-            allow_methods.append("options") # Always add Options to the CORS methods response
+            allow_methods.append("options")  # Always add Options to the CORS methods response
 
         # Clean up the result:
         #
@@ -303,11 +378,13 @@ class SwaggerEditor(object):
         was defined at the Function/Path/Method level
 
         :param string path: Path name
-        :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the authorizers param.
+        :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the
+            authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
         """
-        for method_name, method in self.paths[path].items():
-            self.set_method_authorizer(path, method_name, default_authorizer, authorizers, default_authorizer=default_authorizer, is_default=True)
+        for method_name, method in self.get_path(path).items():
+            self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
+                                       default_authorizer=default_authorizer, is_default=True)
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
@@ -332,61 +409,69 @@ class SwaggerEditor(object):
     def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
                               is_default=False):
         normalized_method_name = self._normalize_method_name(method_name)
-        existing_security = self.paths[path][normalized_method_name].get('security', [])  # TEST: [{'sigv4': []}, {'api_key': []}])
-        authorizer_names = set(authorizers.keys())
-        existing_non_authorizer_security = []
-        existing_authorizer_security = []
 
-        # Split existing security into Authorizers and everything else
-        # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
-        # We want to ensure only a single Authorizer security entry exists while keeping everything else
-        for security in existing_security:
-            if authorizer_names.isdisjoint(security.keys()):
-                existing_non_authorizer_security.append(security)
-            else:
-                existing_authorizer_security.append(security)
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
-        none_idx = -1
-        authorizer_security = []
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+            existing_security = method_definition.get('security', [])
+            # TEST: [{'sigv4': []}, {'api_key': []}])
+            authorizer_names = set(authorizers.keys())
+            existing_non_authorizer_security = []
+            existing_authorizer_security = []
 
-        # If this is the Api-level DefaultAuthorizer we need to check for an
-        # existing Authorizer before applying the default. It would be simpler
-        # if instead we applied the DefaultAuthorizer first and then simply
-        # overwrote it if necessary, however, the order in which things get
-        # applied (Function Api Events first; then Api Resource) complicates it.
-        if is_default:
-            # Check if Function/Path/Method specified 'NONE' for Authorizer
-            for idx, security in enumerate(existing_non_authorizer_security):
-                is_none = any(key == 'NONE' for key in security.keys())
+            # Split existing security into Authorizers and everything else
+            # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
+            # We want to ensure only a single Authorizer security entry exists while keeping everything else
+            for security in existing_security:
+                if authorizer_names.isdisjoint(security.keys()):
+                    existing_non_authorizer_security.append(security)
+                else:
+                    existing_authorizer_security.append(security)
 
-                if is_none:
-                    none_idx = idx
-                    break
+            none_idx = -1
+            authorizer_security = []
 
-            # NONE was found; remove it and don't add the DefaultAuthorizer
-            if none_idx > -1:
-                del existing_non_authorizer_security[none_idx]
+            # If this is the Api-level DefaultAuthorizer we need to check for an
+            # existing Authorizer before applying the default. It would be simpler
+            # if instead we applied the DefaultAuthorizer first and then simply
+            # overwrote it if necessary, however, the order in which things get
+            # applied (Function Api Events first; then Api Resource) complicates it.
+            if is_default:
+                # Check if Function/Path/Method specified 'NONE' for Authorizer
+                for idx, security in enumerate(existing_non_authorizer_security):
+                    is_none = any(key == 'NONE' for key in security.keys())
 
-            # Existing Authorizer found (defined at Function/Path/Method); use that instead of default
-            elif existing_authorizer_security:
-                authorizer_security = existing_authorizer_security
+                    if is_none:
+                        none_idx = idx
+                        break
 
-            # No existing Authorizer found; use default
+                # NONE was found; remove it and don't add the DefaultAuthorizer
+                if none_idx > -1:
+                    del existing_non_authorizer_security[none_idx]
+
+                # Existing Authorizer found (defined at Function/Path/Method); use that instead of default
+                elif existing_authorizer_security:
+                    authorizer_security = existing_authorizer_security
+
+                # No existing Authorizer found; use default
+                else:
+                    security_dict = {}
+                    security_dict[authorizer_name] = []
+                    authorizer_security = [security_dict]
+
+            # This is a Function/Path/Method level Authorizer; simply set it
             else:
                 security_dict = {}
                 security_dict[authorizer_name] = []
                 authorizer_security = [security_dict]
 
-        # This is a Function/Path/Method level Authorizer; simply set it
-        else:
-            security_dict = {}
-            security_dict[authorizer_name] = []
-            authorizer_security = [security_dict]
+            security = existing_non_authorizer_security + authorizer_security
 
-        security = existing_non_authorizer_security + authorizer_security
-
-        if security:
-            self.paths[path][normalized_method_name]['security'] = security
+            if security:
+                method_definition['security'] = security
 
     @property
     def swagger(self):
@@ -413,9 +498,9 @@ class SwaggerEditor(object):
         :return: True, if data is a Swagger
         """
         return bool(data) and \
-                isinstance(data, dict) and \
-                bool(data.get("swagger")) and \
-                isinstance(data.get('paths'), dict)
+            isinstance(data, dict) and \
+            bool(data.get("swagger")) and \
+            isinstance(data.get('paths'), dict)
 
     @staticmethod
     def gen_skeleton():

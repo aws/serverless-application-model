@@ -4,6 +4,7 @@ from samtranslator.sdk.resource import SamResource
 Classes representing SAM template and resources.
 """
 
+
 class SamTemplate(object):
     """
     Class representing the SAM template

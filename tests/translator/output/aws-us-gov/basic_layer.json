@@ -39,6 +39,18 @@
           "S3ObjectVersion": 1
         }
       }
+    },
+    "LayerWithCondition93cfa80b64": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithCondition"
+      },
+      "Condition": "this is a test"
     }
   }
 }

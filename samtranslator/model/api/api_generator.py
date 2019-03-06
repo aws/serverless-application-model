@@ -13,9 +13,10 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator.arn_generator import ArnGenerator
 
 _CORS_WILDCARD = "'*'"
-CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge"])
-# Default the Cors Properties to '*' wildcard. Other properties are actually Optional
-CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None)
+CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge",
+                                                "AllowCredentials"])
+# Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
+CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
 AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
 AuthProperties.__new__.__defaults__ = (None, None)
@@ -23,7 +24,11 @@ AuthProperties.__new__.__defaults__ = (None, None)
 
 class ApiGenerator(object):
 
-    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on, definition_body, definition_uri, name, stage_name, endpoint_configuration=None, method_settings=None, binary_media=None, cors=None, auth=None):
+    def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on,
+                 definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
+                 method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
+                 auth=None, access_log_setting=None, canary_setting=None, tracing_enabled=None,
+                 resource_attributes=None, passthrough_resource_attributes=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -35,6 +40,11 @@ class ApiGenerator(object):
         :param definition_uri: URI to API definition
         :param name: Name of the API Gateway resource
         :param stage_name: Name of the Stage
+        :param access_log_setting: Whether to send access logs and where for Stage
+        :param canary_setting: Canary Setting for Stage
+        :param tracing_enabled: Whether active tracing with X-ray is enabled
+        :param resource_attributes: Resource attributes to add to API resources
+        :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
@@ -48,8 +58,14 @@ class ApiGenerator(object):
         self.endpoint_configuration = endpoint_configuration
         self.method_settings = method_settings
         self.binary_media = binary_media
+        self.minimum_compression_size = minimum_compression_size
         self.cors = cors
         self.auth = auth
+        self.access_log_setting = access_log_setting
+        self.canary_setting = canary_setting
+        self.tracing_enabled = tracing_enabled
+        self.resource_attributes = resource_attributes
+        self.passthrough_resource_attributes = passthrough_resource_attributes
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -57,8 +73,9 @@ class ApiGenerator(object):
         :returns: the RestApi to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayRestApi
         """
-        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on)
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         rest_api.BinaryMediaTypes = self.binary_media
+        rest_api.MinimumCompressionSize = self.minimum_compression_size
 
         if self.endpoint_configuration:
             self._set_endpoint_configuration(rest_api, self.endpoint_configuration)
@@ -122,7 +139,8 @@ class ApiGenerator(object):
         :returns: the Deployment to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayDeployment
         """
-        deployment = ApiGatewayDeployment(self.logical_id + 'Deployment')
+        deployment = ApiGatewayDeployment(self.logical_id + 'Deployment',
+                                          attributes=self.passthrough_resource_attributes)
         deployment.RestApiId = rest_api.get_runtime_attr('rest_api_id')
         deployment.StageName = 'Stage'
 
@@ -140,7 +158,8 @@ class ApiGenerator(object):
         # This will NOT create duplicates because we allow only ONE stage per API resource
         stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
 
-        stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage')
+        stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage',
+                                attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)
         stage.StageName = self.stage_name
@@ -148,6 +167,9 @@ class ApiGenerator(object):
         stage.CacheClusterSize = self.cache_cluster_size
         stage.Variables = self.variables
         stage.MethodSettings = self.method_settings
+        stage.AccessLogSetting = self.access_log_setting
+        stage.CanarySetting = self.canary_setting
+        stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
             deployment.make_auto_deployable(stage, swagger)
@@ -208,10 +230,15 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id, "Unable to add Cors configuration because "
                                                             "'DefinitionBody' does not contain a valid Swagger")
 
+        if properties.AllowCredentials is True and properties.AllowOrigin == _CORS_WILDCARD:
+            raise InvalidResourceException(self.logical_id, "Unable to add Cors configuration because "
+                                                            "'AllowCredentials' can not be true when "
+                                                            "'AllowOrigin' is \"'*'\" or not set")
+
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
-            editor.add_cors(path,  properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
-                            max_age=properties.MaxAge)
+            editor.add_cors(path, properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
+                            max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
@@ -276,7 +303,7 @@ class ApiGenerator(object):
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on)
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         api_id = rest_api.get_runtime_attr('rest_api_id')
 
         partition = ArnGenerator.get_partition_name()
@@ -284,7 +311,8 @@ class ApiGenerator(object):
         source_arn = fnSub(ArnGenerator.generate_arn(partition=partition, service='execute-api', resource=resource),
                            {"__ApiId__": api_id})
 
-        lambda_permission = LambdaPermission(self.logical_id + authorizer_name + 'AuthorizerPermission')
+        lambda_permission = LambdaPermission(self.logical_id + authorizer_name + 'AuthorizerPermission',
+                                             attributes=self.passthrough_resource_attributes)
         lambda_permission.Action = 'lambda:invokeFunction'
         lambda_permission.FunctionName = authorizer_lambda_function_arn
         lambda_permission.Principal = 'apigateway.amazonaws.com'

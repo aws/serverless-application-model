@@ -1,6 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Stream events from AWS IoT to Splunk's HTTP event collector
+Parameters:
+  SplunkHecUrlParameter:
+    Type: String
+    AllowedPattern: '^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$'
+  SplunkHecTokenParameter:
+    Type: String
 Resources:
   splunkiotprocessor:
     Type: 'AWS::Serverless::Function'
@@ -14,5 +20,5 @@ Resources:
       Policies: []
       Environment:
         Variables:
-          SPLUNK_HEC_URL: <enter value here>
-          SPLUNK_HEC_TOKEN: <enter value here>
+          SPLUNK_HEC_URL: !Ref SplunkHecUrlParameter
+          SPLUNK_HEC_TOKEN: !Ref SplunkHecTokenParameter

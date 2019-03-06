@@ -18,7 +18,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         # Name is the class name
         expected_name = "PolicyTemplatesForFunctionPlugin"
 
-        self.assertEquals(self.plugin.name, expected_name)
+        self.assertEqual(self.plugin.name, expected_name)
 
     def test_plugin_must_be_instance_of_base_plugin_class(self):
         self.assertTrue(isinstance(self.plugin, BasePlugin))
@@ -74,7 +74,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # This will overwrite the resource_properties input array
-        self.assertEquals(expected, resource_properties["Policies"])
+        self.assertEqual(expected, resource_properties["Policies"])
         function_policies_obj_mock.get.assert_called_once_with()
         self._policy_template_processor_mock.convert.assert_has_calls([
             call("MyTemplate1", {"Param1": "value1"}),
@@ -126,7 +126,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # This will overwrite the resource_properties input array
-        self.assertEquals(expected, resource_properties["Policies"])
+        self.assertEqual(expected, resource_properties["Policies"])
         function_policies_obj_mock.get.assert_called_once_with()
         self._policy_template_processor_mock.convert.assert_has_calls([
             call("MyTemplate1", {"Param1": "value1"}),
@@ -167,7 +167,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
+        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_must_raise_on_invalid_parameter_values(self, function_policies_class_mock):
@@ -201,7 +201,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
+        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_must_bubble_exception(self, function_policies_class_mock):
@@ -235,7 +235,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEquals(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
+        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
 
     def test_on_before_transform_resource_must_skip_unsupported_resources(self):
 
@@ -248,7 +248,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         self.plugin.on_before_transform_resource(data_mock, data_mock, data_mock)
 
         # Make sure none of the data elements were accessed, because the method returned immediately
-        self.assertEquals([], data_mock.method_calls)
+        self.assertEqual([], data_mock.method_calls)
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_resource_must_skip_function_with_no_policies(self, function_policies_class_mock):
