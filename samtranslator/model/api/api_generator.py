@@ -313,10 +313,6 @@ class ApiGenerator(object):
                 raise InvalidResourceException(
                     self.logical_id, "Invalid key '{}' for 'GatewayResponses' property".format(responses_key))
 
-            if 'StatusCode' not in responses_value.keys():
-                raise InvalidResourceException(
-                    self.logical_id, "Property 'StatusCode' is required on gateway response")
-
             for response_key, response_value in responses_value.items():
                 if response_key not in GatewayResponseProperties._fields:
                     raise InvalidResourceException(

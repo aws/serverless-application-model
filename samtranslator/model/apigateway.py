@@ -98,14 +98,17 @@ class ApiGatewayResponse(object):
         self.api_logical_id = api_logical_id
         self.response_parameters = response_parameters or {}
         self.response_templates = response_templates or {}
-        self.status_code = status_code or 0
+        self.status_code = status_code
 
     def generate_swagger(self):
         swagger = {
             "responseParameters": self._add_prefixes(self.response_parameters),
-            "responseTemplates": self.response_templates,
-            "statusCode": self.status_code
+            "responseTemplates": self.response_templates
         }
+
+        # Prevent "null" being written.
+        if self.status_code:
+            swagger["statusCode"] = self.status_code
 
         return swagger
 

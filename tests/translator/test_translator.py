@@ -169,6 +169,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_no_definitionbody',
         'api_with_gateway_responses',
         'api_with_gateway_responses_all',
+        'api_with_gateway_responses_minimal',
         'api_with_gateway_responses_implicit',
         'api_cache',
         'api_with_access_log_setting',
@@ -343,7 +344,6 @@ class TestTranslatorEndToEnd(TestCase):
 
 @pytest.mark.parametrize('testcase', [
     'error_api_duplicate_methods_same_path',
-    'error_api_gateway_responses_missing_status_code',
     'error_api_gateway_responses_nonnumeric_status_code',
     'error_api_gateway_responses_unknown_responseparameter',
     'error_api_gateway_responses_unknown_responseparameter_property',
