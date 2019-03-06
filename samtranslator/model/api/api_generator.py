@@ -1,4 +1,4 @@
-﻿from collections import namedtuple
+from collections import namedtuple
 from six import string_types, integer_types
 
 from samtranslator.model.intrinsics import ref
@@ -22,21 +22,9 @@ CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
 AuthProperties.__new__.__defaults__ = (None, None)
 
-GatewayResponsesProperties = namedtuple("_GatewayResponsesProperties", [
-    "ACCESS_DENIED", "API_CONFIGURATION_ERROR", "AUTHORIZER_FAILURE", "AUTHORIZER_CONFIGURATION_ERROR",
-    "BAD_REQUEST_PARAMETERS", "BAD_REQUEST_BODY", "DEFAULT_4XX", "DEFAULT_5XX", "EXPIRED_TOKEN",
-    "INVALID_SIGNATURE", "INTEGRATION_FAILURE", "INTEGRATION_TIMEOUT", "INVALID_API_KEY",
-    "MISSING_AUTHENTICATION_TOKEN", "QUOTA_EXCEEDED", "REQUEST_TOO_LARGE", "RESOURCE_NOT_FOUND",
-    "THROTTLED", "UNAUTHORIZED", "UNSUPPORTED_MEDIA_TYPE"])
-GatewayResponsesProperties.__new__.__default__ = (None, None, None, None, None, None, None, None, None, None,
-                                                  None, None, None, None, None, None, None, None, None, None)
+GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
-GatewayResponseProperties = namedtuple("_GatewayResponseProperties",
-                                       ["ResponseParameters", "ResponseTemplates", "StatusCode"])
-GatewayResponseProperties.__new__.__default__ = (None, None, None)
-
-ResponseParameterProperties = namedtuple("_ResponseParameterProperties", ["Headers", "Paths", "QueryStrings"])
-ResponseParameterProperties.__new__.__default__ = (None, None, None)
+ResponseParameterProperties = ["Headers", "Paths", "QueryStrings"]
 
 
 class ApiGenerator(object):
@@ -309,19 +297,15 @@ class ApiGenerator(object):
 
         # Make sure keys in the dict are recognized
         for responses_key, responses_value in self.gateway_responses.items():
-            if responses_key not in GatewayResponsesProperties._fields:
-                raise InvalidResourceException(
-                    self.logical_id, "Invalid key '{}' for 'GatewayResponses' property".format(responses_key))
-
             for response_key, response_value in responses_value.items():
-                if response_key not in GatewayResponseProperties._fields:
+                if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(
                         self.logical_id,
                         "Invalid property '{}' in 'GatewayResponses' property '{}'".format(response_key, responses_key))
 
                 if response_key == 'ResponseParameters':
                     for response_parameter_key in response_value.keys():
-                        if response_parameter_key not in ResponseParameterProperties._fields:
+                        if response_parameter_key not in ResponseParameterProperties:
                             raise InvalidResourceException(
                                 self.logical_id,
                                 "Invalid gateway response parameter '{}'".format(response_parameter_key))
