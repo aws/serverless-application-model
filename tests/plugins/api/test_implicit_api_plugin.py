@@ -73,7 +73,10 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
     def test_must_process_functions(self, SamTemplateMock):
 
         template_dict = {"a": "b"}
-        function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
+        function1 = SamResource({"Type": "AWS::Serverless::Function"})
+        function2 = SamResource({"Type": "AWS::Serverless::Function"})
+        function3 = SamResource({"Type": "AWS::Serverless::Function"})
+        function_resources = [("id1", function1), ("id2", function2), ("id3", function3)]
         api_events = ["event1", "event2"]
 
         sam_template = Mock()
@@ -89,13 +92,14 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
         sam_template.set.assert_called_with(IMPLICIT_API_LOGICAL_ID, ImplicitApiResource().to_dict())
 
         # Make sure this is called only for Functions
-        sam_template.iterate.assert_called_with("AWS::Serverless::Function")
+        sam_template.iterate.assert_any_call("AWS::Serverless::Function")
+        sam_template.iterate.assert_any_call("AWS::Serverless::Api")
 
-        self.plugin._get_api_events.assert_has_calls([call("function1"), call("function2"), call("function3")])
+        self.plugin._get_api_events.assert_has_calls([call(function1), call(function2), call(function3)])
         self.plugin._process_api_events.assert_has_calls([
-            call("function1", ["event1", "event2"], sam_template),
-            call("function2", ["event1", "event2"], sam_template),
-            call("function3", ["event1", "event2"], sam_template),
+            call(function1, ["event1", "event2"], sam_template, None),
+            call(function2, ["event1", "event2"], sam_template, None),
+            call(function3, ["event1", "event2"], sam_template, None),
         ])
 
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
@@ -105,7 +109,10 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
     def test_must_skip_functions_without_events(self, SamTemplateMock):
 
         template_dict = {"a": "b"}
-        function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
+        function1 = SamResource({"Type": "AWS::Serverless::Function"})
+        function2 = SamResource({"Type": "AWS::Serverless::Function"})
+        function3 = SamResource({"Type": "AWS::Serverless::Function"})
+        function_resources = [("id1", function1), ("id2", function2), ("id3", function3)]
         # NO EVENTS for any function
         api_events = []
 
@@ -118,7 +125,7 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
 
         self.plugin.on_before_transform_template(template_dict)
 
-        self.plugin._get_api_events.assert_has_calls([call("function1"), call("function2"), call("function3")])
+        self.plugin._get_api_events.assert_has_calls([call(function1), call(function2), call(function3)])
         self.plugin._process_api_events.assert_not_called()
 
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
@@ -148,8 +155,12 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
     def test_must_collect_errors_and_raise_on_invalid_events(self, SamTemplateMock):
 
         template_dict = {"a": "b"}
-        function_resources = [("id1", "function1"), ("id2", "function2"), ("id3", "function3")]
-        api_event_errors = [InvalidEventException("eventid1", "msg"), InvalidEventException("eventid3", "msg"), InvalidEventException("eventid3", "msg")]
+        function_resources = [("id1", SamResource({"Type": "AWS::Serverless::Function"})),
+                              ("id2", SamResource({"Type": "AWS::Serverless::Function"})),
+                              ("id3", SamResource({"Type": "AWS::Serverless::Function"}))]
+        api_event_errors = [InvalidEventException("eventid1", "msg"),
+                            InvalidEventException("eventid3", "msg"),
+                            InvalidEventException("eventid3", "msg")]
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
@@ -349,11 +360,17 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         api_events = {
             "Api1": {
                 "Type": "Api",
-                "Properties": {"a": "b"}
+                "Properties": {
+                    "Path": "/",
+                    "Method": "GET"
+                }
             },
             "Api2": {
                 "Type": "Api",
-                "Properties": {"c": "d"}
+                "Properties": {
+                    "Path": "/foo",
+                    "Method": "POST"
+                }
             }
         }
 
@@ -370,13 +387,13 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         self.plugin._process_api_events(function, api_events, template)
 
         self.plugin._add_implicit_api_id_if_necessary.assert_has_calls([
-            call({"a": "b"}),
-            call({"c": "d"}),
+            call({"Path": "/", "Method": "GET"}),
+            call({"Path": "/foo", "Method": "POST"}),
         ])
 
         self.plugin._add_api_to_swagger.assert_has_calls([
-            call("Api1", {"a": "b"}, template),
-            call("Api2", {"c": "d"}, template),
+            call("Api1", {"Path": "/", "Method": "GET"}, template),
+            call("Api2", {"Path": "/foo", "Method": "POST"}, template),
         ])
 
         function_events_mock.update.assert_called_with(api_events)
@@ -389,7 +406,10 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
             },
             "Api2": {
                 "Type": "Api",
-                "Properties": {"c": "d"}
+                "Properties": {
+                    "Path": "/",
+                    "Method": "GET"
+                }
             }
         }
 
@@ -404,11 +424,11 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         self.plugin._process_api_events(function, api_events, template)
 
         self.plugin._add_implicit_api_id_if_necessary.assert_has_calls([
-            call({"c": "d"}),
+            call({"Path": "/", "Method": "GET"}),
         ])
 
         self.plugin._add_api_to_swagger.assert_has_calls([
-            call("Api2", {"c": "d"}, template),
+            call("Api2", {"Path": "/", "Method": "GET"}, template),
         ])
 
     def test_must_retain_side_effect_of_modifying_events(self):
@@ -419,11 +439,17 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         api_events = {
             "Api1": {
                 "Type": "Api",
-                "Properties": {"a": "b"}
+                "Properties": {
+                    "Path": "/",
+                    "Method": "get"
+                }
             },
             "Api2": {
                 "Type": "Api",
-                "Properties": {"c": "d"}
+                "Properties": {
+                    "Path": "/foo",
+                    "Method": "post"
+                }
             }
         }
 
@@ -449,22 +475,22 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         self.plugin._process_api_events(function, api_events, template)
 
         # Side effect must be visible after call returns on the input object
-        self.assertEqual(api_events["Api1"]["Properties"], {"a": "b", "Key": "Value"})
-        self.assertEqual(api_events["Api2"]["Properties"], {"c": "d", "Key": "Value"})
+        self.assertEqual(api_events["Api1"]["Properties"], {"Path": "/", "Method": "get", "Key": "Value"})
+        self.assertEqual(api_events["Api2"]["Properties"], {"Path": "/foo", "Method": "post", "Key": "Value"})
 
         # Every Event object inside the SamResource class must be entirely replaced by input api_events with side effect
-        self.assertEqual(function.properties["Events"]["Api1"]["Properties"], {"a": "b", "Key": "Value"})
-        self.assertEqual(function.properties["Events"]["Api2"]["Properties"], {"c": "d", "Key": "Value"})
+        self.assertEqual(function.properties["Events"]["Api1"]["Properties"], {"Path": "/", "Method": "get", "Key": "Value"})
+        self.assertEqual(function.properties["Events"]["Api2"]["Properties"], {"Path": "/foo", "Method": "post", "Key": "Value"})
 
         # Subsequent calls must be made with the side effect. This is important.
         self.plugin._add_api_to_swagger.assert_has_calls([
             call("Api1",
                  # Side effects should be visible here
-                 {"a": "b", "Key": "Value"},
+                 {"Path": "/", "Method": "get", "Key": "Value"},
                  template),
             call("Api2",
                  # Side effects should be visible here
-                 {"c": "d", "Key": "Value"},
+                 {"Path": "/foo", "Method": "post", "Key": "Value"},
                  template),
         ])
 

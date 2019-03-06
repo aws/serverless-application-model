@@ -28,7 +28,7 @@ DynamoDB tables in **all** regions. This is excessively permissive when all that
 values from the ``MyTable`` created in the stack.
 
 SAM provides a tighter and more secure version of AWS Managed Policies called **Policy Templates**. This are a set of 
-readily availbale policies that can be scoped to a specific resource in the same region where your stack exists. 
+readily available policies that can be scoped to a specific resource in the same region where your stack exists. 
 Let's modify the above example to use a policy template called ``DynamoDBCrudPolicy``:
 
 .. code:: yaml
@@ -54,7 +54,7 @@ How to Use
 
 Policy Templates are specified in ``Policies`` property of AWS::Serverless::Function resource. You can mix policy 
 templates with AWS Managed Policies, custom managed policies or inline policy statements. Behind the scenes
-SAM will expand the policy template to a inline policy statement based on the definition listed in 
+SAM will expand the policy template to an inline policy statement based on the definition listed in 
 `policy_templates.json`_ file.
 
 Every policy template requires zero or more parameters, which are the resource that this policy is scoped to. 
