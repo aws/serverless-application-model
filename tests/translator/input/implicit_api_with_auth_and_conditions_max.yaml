@@ -1,0 +1,164 @@
+Globals:
+  Api:
+    Auth:
+      DefaultAuthorizer: MyCognitoAuth
+      Authorizers:
+        MyCognitoAuth:
+          UserPoolArn: arn:aws:1
+          Identity:
+            Header: MyAuthorizationHeader
+            ValidationExpression: myauthvalidationexpression
+
+        MyCognitoAuthMultipleUserPools:
+          UserPoolArn:
+            - arn:aws:2
+            - arn:aws:3
+          Identity:
+            Header: MyAuthorizationHeader2
+            ValidationExpression: myauthvalidationexpression2
+
+        MyLambdaTokenAuth:
+          FunctionPayloadType: TOKEN
+          FunctionArn: arn:aws
+          FunctionInvokeRole: arn:aws:iam::123456789012:role/S3Access
+          Identity:
+            Header: MyCustomAuthHeader
+            ValidationExpression: mycustomauthexpression
+            ReauthorizeEvery: 20
+
+        MyLambdaTokenAuthNoneFunctionInvokeRole:
+          FunctionArn: arn:aws
+          FunctionInvokeRole: NONE
+          Identity:
+            ReauthorizeEvery: 0
+
+        MyLambdaRequestAuth:
+          FunctionPayloadType: REQUEST
+          FunctionArn: arn:aws
+          FunctionInvokeRole: arn:aws:iam::123456789012:role/S3Access
+          Identity:
+            Headers:
+              - Authorization1
+            QueryStrings:
+              - Authorization2
+            StageVariables:
+              - Authorization3
+            Context:
+              - Authorization4
+            ReauthorizeEvery: 0
+
+Conditions:
+  FunctionCondition:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition2:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition3:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition4:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition5:
+    Fn::Equals:
+      - true
+      - false
+  FunctionCondition6:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Condition: FunctionCondition
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        WithNoAuthorizer:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: NONE
+  MyFunction2:
+    Type: AWS::Serverless::Function
+    Condition: FunctionCondition2
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        WithCognitoMultipleUserPoolsAuthorizer:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+            Auth:
+              Authorizer: MyCognitoAuthMultipleUserPools
+  MyFunction3:
+    Type: AWS::Serverless::Function
+    Condition: FunctionCondition3
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        WithLambdaTokenAuthorizer:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: get
+            Auth:
+              Authorizer: MyLambdaTokenAuth
+  MyFunction4:
+    Type: AWS::Serverless::Function
+    Condition: FunctionCondition4
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        WithLambdaTokenAuthorizer:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: patch
+            Auth:
+              Authorizer: MyLambdaTokenAuthNoneFunctionInvokeRole
+  MyFunction5:
+    Type: AWS::Serverless::Function
+    Condition: FunctionCondition5
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        WithLambdaRequestAuthorizer:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: delete
+            Auth:
+              Authorizer: MyLambdaRequestAuth
+  MyFunction6:
+    Type: AWS::Serverless::Function
+    Condition: FunctionCondition6
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        WithDefaultAuthorizer:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: put
