@@ -264,8 +264,11 @@ class SamFunction(SamResourceMacro):
         event_resources = {}
         if self.Events:
             for logical_id, event_dict in self.Events.items():
-                event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
-                    self.logical_id + logical_id, event_dict, logical_id)
+                try:
+                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        self.logical_id + logical_id, event_dict, logical_id)
+                except TypeError as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 
@@ -286,8 +289,11 @@ class SamFunction(SamResourceMacro):
         resources = []
         if self.Events:
             for logical_id, event_dict in self.Events.items():
-                eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
-                    lambda_function.logical_id + logical_id, event_dict, logical_id)
+                try:
+                    eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        lambda_function.logical_id + logical_id, event_dict, logical_id)
+                except TypeError as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
 
                 kwargs = {
                     # When Alias is provided, connect all event sources to the alias and *not* the function
