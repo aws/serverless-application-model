@@ -136,8 +136,11 @@ class ImplicitApiPlugin(BasePlugin):
             self._add_implicit_api_id_if_necessary(event_properties)
 
             api_id = self._get_api_id(event_properties)
-            path = event_properties["Path"]
-            method = event_properties["Method"]
+            try:
+                path = event_properties["Path"]
+                method = event_properties["Method"]
+            except KeyError as e:
+                raise InvalidEventException(logicalId, "Event is missing key {}.".format(e))
             api_dict = self.api_conditions.setdefault(api_id, {})
             method_conditions = api_dict.setdefault(path, {})
             method_conditions[method] = condition
