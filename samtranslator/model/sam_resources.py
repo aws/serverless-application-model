@@ -53,7 +53,8 @@ class SamFunction(SamResourceMacro):
         'Layers': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
 
         # Intrinsic functions in value of Alias property are not supported, yet
-        'AutoPublishAlias': PropertyType(False, one_of(is_str()))
+        'AutoPublishAlias': PropertyType(False, one_of(is_str())),
+        'VersionDescription': PropertyType(False, is_str())
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.eventsources, samtranslator.model.eventsources.pull,
                                           samtranslator.model.eventsources.push,
@@ -365,6 +366,7 @@ class SamFunction(SamResourceMacro):
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr('name')
+        lambda_version.Description = self.VersionDescription
 
         return lambda_version
 
