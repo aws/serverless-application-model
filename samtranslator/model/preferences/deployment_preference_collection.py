@@ -8,6 +8,16 @@ from samtranslator.translator.arn_generator import ArnGenerator
 
 CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = 'CodeDeployServiceRole'
 CODEDEPLOY_APPLICATION_LOGICAL_ID = 'ServerlessDeploymentApplication'
+CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST = ["Canary10Percent5Minutes",
+                                             "Canary10Percent10Minutes",
+                                             "Canary10Percent15Minutes",
+                                             "Canary10Percent30Minutes",
+                                             "Linear10PercentEvery1Minute",
+                                             "Linear10PercentEvery2Minutes",
+                                             "Linear10PercentEvery3Minutes",
+                                             "Linear10PercentEvery10Minutes",
+                                             "AllAtOnce"
+                                             ]
 
 
 class DeploymentPreferenceCollection(object):
@@ -95,6 +105,7 @@ class DeploymentPreferenceCollection(object):
         :param function_logical_id: logical_id of the function this deployment group belongs to
         :return: CodeDeployDeploymentGroup resource
         """
+
         deployment_preference = self.get(function_logical_id)
 
         deployment_group = CodeDeployDeploymentGroup(self.deployment_group_logical_id(function_logical_id))
@@ -109,8 +120,13 @@ class DeploymentPreferenceCollection(object):
                                                       'Events': ['DEPLOYMENT_FAILURE',
                                                                  'DEPLOYMENT_STOP_ON_ALARM',
                                                                  'DEPLOYMENT_STOP_ON_REQUEST']}
-        deployment_group.DeploymentConfigName = fnSub("CodeDeployDefault.Lambda${ConfigName}",
-                                                      {"ConfigName": deployment_preference.deployment_type})
+
+        if deployment_preference.deployment_type in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
+            deployment_group.DeploymentConfigName = fnSub("CodeDeployDefault.Lambda${ConfigName}",
+                                                          {"ConfigName": deployment_preference.deployment_type})
+        else:
+            deployment_group.DeploymentConfigName = deployment_preference.deployment_type
+
         deployment_group.DeploymentStyle = {'DeploymentType': 'BLUE_GREEN',
                                             'DeploymentOption': 'WITH_TRAFFIC_CONTROL'}
 
