@@ -542,15 +542,15 @@ class Api(PushEventSource):
                     if not api_authorizers:
                         raise InvalidEventException(
                             self.relative_id,
-                            'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] because '
-                            'the related API does not define any Authorizers.'.format(
+                            'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
+                            'because the related API does not define any Authorizers.'.format(
                                 authorizer=method_authorizer, method=self.Method, path=self.Path))
 
                     if method_authorizer != 'NONE' and not api_authorizers.get(method_authorizer):
                         raise InvalidEventException(
                             self.relative_id,
-                            'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] because it '
-                            'wasn\'t defined in the API\'s Authorizers.'.format(
+                            'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
+                            'because it wasn\'t defined in the API\'s Authorizers.'.format(
                                 authorizer=method_authorizer, method=self.Method, path=self.Path))
 
                     if method_authorizer == 'NONE' and not api_auth.get('DefaultAuthorizer'):

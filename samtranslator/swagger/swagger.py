@@ -129,7 +129,8 @@ class SwaggerEditor(object):
 
         path_dict.setdefault(method, {})
 
-    def add_lambda_integration(self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None):
+    def add_lambda_integration(self, path, method, integration_uri,
+            method_auth_config=None, api_auth_config=None, condition=None):
         """
         Adds aws_proxy APIGW integration to the given path+method.
 
@@ -502,7 +503,7 @@ class SwaggerEditor(object):
                     }
                     if not self.security_definitions:
                         self.security_definitions = aws_iam_security_definition
-                    elif not 'AWS_IAM' in self.security_definitions:
+                    elif 'AWS_IAM' not in self.security_definitions:
                         self.security_definitions.update(aws_iam_security_definition)
 
     @property
