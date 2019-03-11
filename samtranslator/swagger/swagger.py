@@ -130,7 +130,7 @@ class SwaggerEditor(object):
         path_dict.setdefault(method, {})
 
     def add_lambda_integration(self, path, method, integration_uri,
-            method_auth_config=None, api_auth_config=None, condition=None):
+                               method_auth_config=None, api_auth_config=None, condition=None):
         """
         Adds aws_proxy APIGW integration to the given path+method.
 
