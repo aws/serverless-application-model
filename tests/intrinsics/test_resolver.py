@@ -36,7 +36,7 @@ class TestParameterReferenceResolution(TestCase):
         }
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_must_resolve_nested_refs(self):
         input = {
@@ -64,21 +64,21 @@ class TestParameterReferenceResolution(TestCase):
         }
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_must_resolve_direct_refs(self):
         input = {"Ref": "param1"}
         expected = self.parameter_values["param1"]
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_must_resolve_array_refs(self):
         input = ["foo", 1, 2, {"Ref": "param1"}]
         expected = ["foo", 1, 2, self.parameter_values["param1"]]
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_must_skip_unknown_refs(self):
         input = {
@@ -98,7 +98,7 @@ class TestParameterReferenceResolution(TestCase):
         }
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_must_resolve_inside_sub_strings(self):
         input = {
@@ -110,7 +110,7 @@ class TestParameterReferenceResolution(TestCase):
         }
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_must_skip_over_sub_literals(self):
         input = {
@@ -122,7 +122,7 @@ class TestParameterReferenceResolution(TestCase):
         }
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_must_resolve_refs_inside_other_intrinsics(self):
         input = {
@@ -138,7 +138,7 @@ class TestParameterReferenceResolution(TestCase):
         }
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_skip_invalid_values_for_ref(self):
         input = {
@@ -149,7 +149,7 @@ class TestParameterReferenceResolution(TestCase):
             "Ref": ["ref cannot have list value"]
         }
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_skip_invalid_values_for_sub(self):
         input = {
@@ -162,7 +162,7 @@ class TestParameterReferenceResolution(TestCase):
         }
 
         output = self.resolver.resolve_parameter_refs(input)
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_throw_on_empty_parameters(self):
         with self.assertRaises(TypeError):
@@ -178,7 +178,7 @@ class TestParameterReferenceResolution(TestCase):
         input = {"Ref": "foo"}
         expected = {"Ref": "foo"}
 
-        self.assertEquals(resolver.resolve_parameter_refs(input), expected)
+        self.assertEqual(resolver.resolve_parameter_refs(input), expected)
         resolver._try_resolve_parameter_refs.assert_not_called()
 
 class TestResourceReferenceResolution(TestCase):
@@ -216,7 +216,7 @@ class TestResourceReferenceResolution(TestCase):
         supported_refs = Mock()
 
         result = self.resolver._try_resolve_sam_resource_refs(input, supported_refs)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
         action_mock.resolve_sam_resource_refs.assert_not_called()
 
     def test_short_circuit_on_empty_parameters(self):
@@ -225,7 +225,7 @@ class TestResourceReferenceResolution(TestCase):
         input = {"Ref": "foo"}
         expected = {"Ref": "foo"}
 
-        self.assertEquals(resolver.resolve_sam_resource_refs(input, {}), expected)
+        self.assertEqual(resolver.resolve_sam_resource_refs(input, {}), expected)
         resolver._try_resolve_sam_resource_refs.assert_not_called()
 
 class TestSupportedIntrinsics(TestCase):
@@ -234,7 +234,7 @@ class TestSupportedIntrinsics(TestCase):
         resolver = IntrinsicsResolver({})
 
         # This needs to be updated when new intrinsics are added
-        self.assertEquals(3, len(resolver.supported_intrinsics))
+        self.assertEqual(3, len(resolver.supported_intrinsics))
         self.assertTrue("Ref" in resolver.supported_intrinsics)
         self.assertTrue("Fn::Sub" in resolver.supported_intrinsics)
         self.assertTrue("Fn::GetAtt" in resolver.supported_intrinsics)
@@ -249,7 +249,7 @@ class TestSupportedIntrinsics(TestCase):
         }
         resolver = IntrinsicsResolver({}, supported_intrinsics)
 
-        self.assertEquals(resolver.supported_intrinsics, {
+        self.assertEqual(resolver.supported_intrinsics, {
             "ThisCanBeAnyIntrinsicName": action
         })
 

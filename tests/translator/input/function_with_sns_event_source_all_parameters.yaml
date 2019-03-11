@@ -1,0 +1,28 @@
+Resources:
+  MyAwesomeFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+
+      Events:
+        NotificationTopic:
+          Type: SNS
+          Properties:
+            Topic: topicArn
+            FilterPolicy:
+              store:
+              - example_corp
+              event:
+              - anything-but: order_cancelled
+              customer_interests:
+              - rugby
+              - football
+              - baseball
+              price_usd:
+              - numeric:
+                - ">="
+                - 100
+
+

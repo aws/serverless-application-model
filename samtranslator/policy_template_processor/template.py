@@ -4,6 +4,7 @@ from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import RefAction
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
+
 class Template(object):
     """
     Class representing a single policy template. It includes the name, parameters and template dictionary.
@@ -33,7 +34,8 @@ class Template(object):
 
         :param dict parameter_values: Dict containing values for each parameter defined in the template
         :return dict: Dictionary containing policy statement
-        :raises InvalidParameterValues: If parameter values is not a valid dictionary or does not contain values for all parameters
+        :raises InvalidParameterValues: If parameter values is not a valid dictionary or does not contain values
+            for all parameters
         :raises InsufficientParameterValues: If the parameter values don't have values for all required parameters
         """
 

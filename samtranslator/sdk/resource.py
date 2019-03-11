@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class SamResource(object):
     """
     Class representing a SAM resource. It is designed to make minimal assumptions about the resource structure.
@@ -18,6 +19,7 @@ class SamResource(object):
 
         self.resource_dict = resource_dict
         self.type = resource_dict.get("Type")
+        self.condition = resource_dict.get("Condition", None)
 
         # Properties is *not* required. Ex: SimpleTable resource has no required properties
         self.properties = resource_dict.get("Properties", {})

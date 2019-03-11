@@ -3,10 +3,7 @@
       "TableWithSSE": {
         "Type": "AWS::DynamoDB::Table", 
         "Properties": {
-          "ProvisionedThroughput": {
-            "WriteCapacityUnits": 5, 
-            "ReadCapacityUnits": 5
-          }, 
+          "BillingMode": "PAY_PER_REQUEST",
           "SSESpecification": {
             "SSEEnabled": true
           },

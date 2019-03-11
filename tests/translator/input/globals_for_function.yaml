@@ -16,6 +16,7 @@ Globals:
       tag1: value1
     Tracing: Active
     AutoPublishAlias: live
+    PermissionsBoundary: arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary
     Layers:
       - !Sub arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer:1
 
@@ -41,6 +42,7 @@ Resources:
         newtag1: newvalue1
       Tracing: PassThrough
       AutoPublishAlias: prod
+      PermissionsBoundary: arn:aws:1234:iam:boundary/OverridePermissionsBoundary
       Layers:
         - !Sub arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer2:2
 

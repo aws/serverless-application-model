@@ -14,6 +14,12 @@ Parameters:
     Type: String
     Default: SomeName
 
+Conditions:
+  TrueCondition:
+    Fn::Equals:
+      - true
+      - true
+
 Resources:
   MyFunction:
     Type: 'AWS::Serverless::Function'
@@ -74,6 +80,7 @@ Resources:
 
   ApiWithExplicitS3Uri:
     Type: AWS::Serverless::Api
+    Condition: TrueCondition
     Properties:
       StageName: dev
       DefinitionUri:

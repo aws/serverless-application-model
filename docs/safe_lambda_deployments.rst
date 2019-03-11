@@ -156,7 +156,7 @@ resource:
             Action:
               - "codedeploy:PutLifecycleEventHookExecutionStatus"
             Resource:
-              !Sub 'arn:aws:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*'
+              !Sub 'arn:${AWS::Partition}:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*'
         - Version: "2012-10-17"
           Statement:
           - Effect: "Allow"

@@ -123,3 +123,23 @@ Resources:
 
         - RekognitionFacesManagementPolicy:
             CollectionId: collection
+
+        - EKSDescribePolicy: {}
+
+        - CostExplorerReadOnlyPolicy: {}
+
+        - OrganizationsListAccountsPolicy: {}
+
+        - DynamoDBReconfigurePolicy:
+            TableName: name
+
+        - SESBulkTemplatedCrudPolicy:
+            IdentityName: name
+
+        - SESEmailTemplateCrudPolicy: {}
+
+        - FilterLogEventsPolicy:
+            LogGroupName: name
+
+        - SSMParameterReadPolicy:
+            ParameterName: name

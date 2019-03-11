@@ -65,27 +65,27 @@ class TestServerlessAppPlugin_init(TestCase):
     def test_plugin_must_setup_correct_name(self):
         # Name is the class name
         expected_name = "ServerlessAppPlugin"
-        self.assertEquals(self.plugin.name, expected_name)
+        self.assertEqual(self.plugin.name, expected_name)
 
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_plugin_default_values(self):
-        self.assertEquals(self.plugin._wait_for_template_active_status, False)
-        self.assertEquals(self.plugin._validate_only, False)
+        self.assertEqual(self.plugin._wait_for_template_active_status, False)
+        self.assertEqual(self.plugin._validate_only, False)
         self.assertTrue(self.plugin._sar_client is not None)
         # For some reason, `isinstance` or comparing classes did not work here
-        self.assertEquals(str(self.plugin._sar_client.__class__), str(boto3.client('serverlessrepo').__class__))
+        self.assertEqual(str(self.plugin._sar_client.__class__), str(boto3.client('serverlessrepo').__class__))
 
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_plugin_accepts_different_sar_client(self):
         client = boto3.client('serverlessrepo', endpoint_url = 'https://example.com')
         self.plugin = ServerlessAppPlugin(sar_client=client)
-        self.assertEquals(self.plugin._sar_client, client)
-        self.assertEquals(self.plugin._sar_client._endpoint, client._endpoint)
+        self.assertEqual(self.plugin._sar_client, client)
+        self.assertEqual(self.plugin._sar_client._endpoint, client._endpoint)
 
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_plugin_accepts_flags(self):
         self.plugin = ServerlessAppPlugin(wait_for_template_active_status=True)
-        self.assertEquals(self.plugin._wait_for_template_active_status, True)
+        self.assertEqual(self.plugin._wait_for_template_active_status, True)
 
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_plugin_invalid_configuration_raises_exception(self):
@@ -192,7 +192,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
         app_id = 'app_id'
         semver = '1.0.0'
         response = self.plugin._sar_service_call(service_call_lambda, logical_id, app_id, semver)
-        self.assertEquals(app_id, response['ApplicationId'])
+        self.assertEqual(app_id, response['ApplicationId'])
 
 
 class ApplicationResource(object):

@@ -25,7 +25,6 @@ class LogicalIdGenerator(object):
         self._prefix = prefix
         self.data_str = data_str
 
-
     def gen(self):
         """
         Generate stable LogicalIds based on the prefix and given data. This method ensures that the logicalId is

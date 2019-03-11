@@ -40,6 +40,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /
             Method: GET
+            # NOTE: This endpoint is publicly accessible
             Auth:
               Authorizer: NONE
         ProxyAny:
@@ -48,6 +49,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /{proxy+}
             Method: ANY
+            # NOTE: This endpoint is publicly accessible
             Auth:
               Authorizer: NONE
         GetUsers:
@@ -56,6 +58,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /users
             Method: GET
+            # NOTE: This endpoint is publicly accessible
             Auth:
               Authorizer: NONE
         GetUser:
@@ -64,6 +67,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /users/{userId}
             Method: GET
+            # NOTE: This endpoint is publicly accessible
             Auth:
               Authorizer: NONE
         CreateUser:
@@ -127,7 +131,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt PreSignupLambdaFunction.Arn
       Principal: cognito-idp.amazonaws.com
-      SourceArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
+      SourceArn: !Sub 'arn:${AWS::Partition}:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
       # TODO: Add a CognitoUserPool Event Source to SAM to create this permission for you.
       # Events:
       #   CognitoUserPoolPreSignup:
