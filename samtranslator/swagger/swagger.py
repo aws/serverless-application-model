@@ -492,6 +492,8 @@ class SwaggerEditor(object):
             if security:
                 method_definition['security'] = security
 
+                # The first element of the method_definition['security'] should be AWS_IAM
+                # because authorizer_list = ['AWS_IAM'] is hardcoded above
                 if 'AWS_IAM' in method_definition['security'][0]:
                     aws_iam_security_definition = {
                         'AWS_IAM': {
