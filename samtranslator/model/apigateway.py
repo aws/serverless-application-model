@@ -1,3 +1,5 @@
+from re import match
+
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import is_type, one_of, is_str
@@ -94,7 +96,20 @@ class ApiGatewayDeployment(Resource):
 
 
 class ApiGatewayResponse(object):
+    ResponseParameterProperties = ["Headers", "Paths", "QueryStrings"]
+
     def __init__(self, api_logical_id=None, response_parameters=None, response_templates=None, status_code=None):
+        if response_parameters:
+            for response_parameter_key in response_parameters.keys():
+                if response_parameter_key not in ApiGatewayResponse.ResponseParameterProperties:
+                    raise InvalidResourceException(
+                        api_logical_id,
+                        "Invalid gateway response parameter '{}'".format(response_parameter_key))
+
+        # status_code must look like a status code, if present. Let's not be judgmental; just check 0-999.
+        if status_code and not match(r'^[0-9]{1,3}$', str(status_code)):
+            raise InvalidResourceException(api_logical_id, "Property 'StatusCode' must be numeric")
+
         self.api_logical_id = api_logical_id
         self.response_parameters = response_parameters or {}
         self.response_templates = response_templates or {}

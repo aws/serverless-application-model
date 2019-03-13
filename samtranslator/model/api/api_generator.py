@@ -1,5 +1,5 @@
 from collections import namedtuple
-from six import string_types, integer_types
+from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
@@ -23,8 +23,6 @@ AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorize
 AuthProperties.__new__.__defaults__ = (None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
-
-ResponseParameterProperties = ["Headers", "Paths", "QueryStrings"]
 
 
 class ApiGenerator(object):
@@ -297,23 +295,11 @@ class ApiGenerator(object):
 
         # Make sure keys in the dict are recognized
         for responses_key, responses_value in self.gateway_responses.items():
-            for response_key, response_value in responses_value.items():
+            for response_key in responses_value.keys():
                 if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(
                         self.logical_id,
                         "Invalid property '{}' in 'GatewayResponses' property '{}'".format(response_key, responses_key))
-
-                if response_key == 'ResponseParameters':
-                    for response_parameter_key in response_value.keys():
-                        if response_parameter_key not in ResponseParameterProperties:
-                            raise InvalidResourceException(
-                                self.logical_id,
-                                "Invalid gateway response parameter '{}'".format(response_parameter_key))
-
-                if response_key == 'StatusCode':
-                    if not isinstance(response_value, integer_types):
-                        raise InvalidResourceException(
-                            self.logical_id, "Property 'StatusCode' must be numeric")
 
         if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
@@ -328,7 +314,7 @@ class ApiGenerator(object):
                 api_logical_id=self.logical_id,
                 response_parameters=response.get('ResponseParameters', {}),
                 response_templates=response.get('ResponseTemplates', {}),
-                status_code=response.get('StatusCode')
+                status_code=response.get('StatusCode', None)
             )
 
         if gateway_responses:

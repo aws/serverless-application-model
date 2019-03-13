@@ -1,4 +1,4 @@
-import copy
+﻿import copy
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
@@ -16,6 +16,7 @@ class SwaggerEditor(object):
     _OPTIONS_METHOD = "options"
     _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
     _CONDITIONAL_IF = "Fn::If"
+    _X_APIGW_GATEWAY_RESPONSES = 'x-amazon-apigateway-gateway-responses'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
 
     def __init__(self, doc):
@@ -33,7 +34,7 @@ class SwaggerEditor(object):
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", {})
-        self.gateway_responses = self._doc.get('x-amazon-apigateway-gateway-responses', {})
+        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -370,8 +371,8 @@ class SwaggerEditor(object):
         """
         self.security_definitions = self.security_definitions or {}
 
-        for authorizerName, authorizer in authorizers.items():
-            self.security_definitions[authorizerName] = authorizer.generate_swagger()
+        for authorizer_name, authorizer in authorizers.items():
+            self.security_definitions[authorizer_name] = authorizer.generate_swagger()
 
     def set_path_default_authorizer(self, path, default_authorizer, authorizers):
         """
@@ -499,7 +500,7 @@ class SwaggerEditor(object):
         if self.security_definitions:
             self._doc["securityDefinitions"] = self.security_definitions
         if self.gateway_responses:
-            self._doc['x-amazon-apigateway-gateway-responses'] = self.gateway_responses
+            self._doc[self._X_APIGW_GATEWAY_RESPONSES] = self.gateway_responses
 
         return copy.deepcopy(self._doc)
 
