@@ -1,4 +1,5 @@
 import re
+import boto3
 
 from six import string_types
 
@@ -74,6 +75,13 @@ class Action(object):
 
         return splits[0], splits[1]
 
+    @classmethod
+    def _resolve_pseudo_parameters(cls, param_name, input_dict):
+        if param_name == 'AWS::Region':
+            return boto3.session.Session().region_name
+        else:
+            return input_dict
+
 
 class RefAction(Action):
     intrinsic_name = "Ref"
@@ -100,7 +108,7 @@ class RefAction(Action):
         if param_name in parameters:
             return parameters[param_name]
         else:
-            return input_dict
+            return self._resolve_pseudo_parameters(param_name, input_dict)
 
     def resolve_resource_refs(self, input_dict, supported_resource_refs):
         """
