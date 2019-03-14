@@ -503,3 +503,50 @@ class GetAttAction(Action):
             input_dict[key] = [resolved_value] + remaining
 
         return input_dict
+
+
+class FindInMapAction(Action):
+    """
+    This action can't be used along with other actions.
+    """
+    intrinsic_name = "Fn::FindInMap"
+
+    def resolve_parameter_refs(self, input_dict, parameters):
+        """
+        Recursively resolves "Fn::FindInMap"references that are present in the mappings and returns the value.
+        If it is not in mappings, this method simply returns the input unchanged.
+
+        :param input_dict: Dictionary representing the FindInMap function. Must contain only one key and it
+                           should be "Fn::FindInMap".
+
+        :param parameters: Dictionary of mappings from the SAM template
+        """
+        if not self.can_handle(input_dict):
+            return input_dict
+
+        value = input_dict[self.intrinsic_name]
+
+        if not isinstance(value, list) or len(value) != 3:
+            return input_dict
+
+        map_name = self.resolve_parameter_refs(value[0], parameters)
+        top_level_key = self.resolve_parameter_refs(value[1], parameters)
+        second_level_key = self.resolve_parameter_refs(value[2], parameters)
+
+        if not isinstance(map_name, basestring) or \
+                not isinstance(top_level_key, basestring) or \
+                not isinstance(second_level_key, basestring):
+            return input_dict
+
+        if map_name not in parameters or \
+                top_level_key not in parameters[map_name] or \
+                second_level_key not in parameters[map_name][top_level_key]:
+            return input_dict
+
+        return parameters[map_name][top_level_key][second_level_key]
+
+    def resolve_resource_refs(self, input_dict, supported_resource_refs):
+        return input_dict
+
+    def resolve_resource_id_refs(self, input_dict, supported_resource_id_refs):
+        return input_dict

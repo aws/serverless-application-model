@@ -174,12 +174,13 @@ class TestParameterReferenceResolution(TestCase):
 
     def test_short_circuit_on_empty_parameters(self):
         resolver = IntrinsicsResolver({})
-        resolver._try_resolve_parameter_refs = Mock()  # Mock other methods to detect any actual calls
+        resolver._try_resolve_sam_resource_refs = Mock()  # Mock other methods to detect any actual calls
         input = {"Ref": "foo"}
         expected = {"Ref": "foo"}
 
-        self.assertEqual(resolver.resolve_parameter_refs(input), expected)
-        resolver._try_resolve_parameter_refs.assert_not_called()
+        self.assertEqual(resolver.resolve_sam_resource_refs(input, {}), expected)
+        resolver._try_resolve_sam_resource_refs.assert_not_called()
+        
 
 class TestResourceReferenceResolution(TestCase):
 
@@ -227,6 +228,7 @@ class TestResourceReferenceResolution(TestCase):
 
         self.assertEqual(resolver.resolve_sam_resource_refs(input, {}), expected)
         resolver._try_resolve_sam_resource_refs.assert_not_called()
+
 
 class TestSupportedIntrinsics(TestCase):
     def test_by_default_all_intrinsics_must_be_supported(self):

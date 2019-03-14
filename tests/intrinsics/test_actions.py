@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mock import patch, Mock
-from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction
+from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction, FindInMapAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 
 class TestAction(TestCase):
@@ -932,3 +932,203 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
         getatt = GetAttAction()
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
         self.assertEqual(expected, getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs))
+
+
+class TestFindInMapCanResolveParameterRefs(TestCase):
+
+    def setUp(self):
+        self.ref = FindInMapAction()
+
+    @patch.object(FindInMapAction, "can_handle")
+    def test_cannot_handle(self, can_handle_mock):
+        input = {
+            "Fn::FindInMap": ["a", "b", "c"]
+        }
+        can_handle_mock.return_value = False
+        output = self.ref.resolve_parameter_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_value_not_list(self):
+        input = {
+            "Fn::FindInMap": "a string"
+        }
+        output = self.ref.resolve_parameter_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_value_not_list_of_length_three(self):
+        input = {
+            "Fn::FindInMap": ["a string"]
+        }
+        output = self.ref.resolve_parameter_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_mapping_not_string(self):
+        mappings = {
+            "MapA":{
+                "TopKey1": {
+                   "SecondKey2": "value3"
+               },
+                "TopKey2": {
+                    "SecondKey1": "value4"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": [["MapA"], "TopKey2", "SecondKey1"]
+        }
+        output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(input, output)
+
+    def test_top_level_key_not_string(self):
+        mappings = {
+            "MapA":{
+                "TopKey1": {
+                   "SecondKey2": "value3"
+               },
+                "TopKey2": {
+                    "SecondKey1": "value4"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapA", ["TopKey2"], "SecondKey1"]
+        }
+        output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(input, output)
+
+    def test_second_level_key_not_string(self):
+        mappings = {
+            "MapA":{
+                "TopKey1": {
+                   "SecondKey2": "value3"
+               },
+                "TopKey2": {
+                    "SecondKey1": "value4"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapA", "TopKey1", ["SecondKey2"]]
+        }
+        output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(input, output)
+
+    def test_mapping_not_found(self):
+        mappings = {
+            "MapA":{
+                "TopKey1": {
+                   "SecondKey2": "value3"
+               },
+                "TopKey2": {
+                    "SecondKey1": "value4"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapB", "TopKey2", "SecondKey1"]
+        }
+        output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(input, output)
+
+    def test_top_level_key_not_found(self):
+        mappings = {
+            "MapA":{
+                "TopKey1": {
+                   "SecondKey2": "value3"
+               },
+                "TopKey2": {
+                    "SecondKey1": "value4"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapA", "TopKey3", "SecondKey1"]
+        }
+        output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(input, output)
+
+    def test_second_level_key_not_found(self):
+        mappings = {
+            "MapA":{
+                "TopKey1": {
+                   "SecondKey2": "value3"
+               },
+                "TopKey2": {
+                    "SecondKey1": "value4"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapA", "TopKey1", "SecondKey1"]
+        }
+        output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(input, output)
+
+    def test_one_level_find_in_mappings(self):
+        mappings = {
+            "MapA":{
+                "TopKey1": {
+                   "SecondKey2": "value3"
+               },
+                "TopKey2": {
+                    "SecondKey1": "value4"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapA", "TopKey2", "SecondKey1"]
+        }
+        expected = "value4"
+        output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(expected, output)
+
+    def test_nested_find_in_mappings(self):
+        mappings = {
+            "MapA":{
+                "TopKey1": {
+                   "SecondKey2": "value3"
+               },
+                "TopKey2": {
+                    "SecondKey1": "TopKey1"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapA", {"Fn::FindInMap": ["MapA", "TopKey2", "SecondKey1"]}, "SecondKey2"]
+        }
+        expected = "value3"
+        output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(expected, output)
+
+
+class TestFindInMapCanResolveResourceRefs(TestCase):
+
+    def test_must_do_nothing(self):
+        input = "foo"
+        expected = "foo"
+        supported_resource_refs = Mock()
+        self.assertEqual(expected, FindInMapAction().resolve_resource_refs(input, supported_resource_refs))
+
+        supported_resource_refs.assert_not_called()
+
+
+class TestFindInMapCanResolveResourceIdRefs(TestCase):
+
+    def test_must_do_nothing(self):
+        input = "foo"
+        expected = "foo"
+        supported_resource_refs = Mock()
+        self.assertEqual(expected, FindInMapAction().resolve_resource_id_refs(input, supported_resource_refs))
+
+        supported_resource_refs.assert_not_called()
