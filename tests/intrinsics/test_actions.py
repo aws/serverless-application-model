@@ -419,6 +419,23 @@ class TestSubCanResolveParameterRefs(TestCase):
 
         self.assertEqual(expected, result)
 
+    def test_sub_all_refs_with_pseudo_parameters(self):
+        parameters = {
+            "key1": "value1",
+            "AWS::Region": "ap-southeast-1"
+        }
+        input = {
+            "Fn::Sub": "hello ${AWS::Region} ${key1}"
+        }
+        expected = {
+            "Fn::Sub": "hello ap-southeast-1 value1"
+        }
+
+        sub = SubAction()
+        result = sub.resolve_parameter_refs(input, parameters)
+
+        self.assertEqual(expected, result)
+
 class TestSubInternalMethods(TestCase):
 
     @patch.object(SubAction, "_sub_all_refs")

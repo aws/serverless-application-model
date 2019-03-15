@@ -34,3 +34,15 @@ Resources:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LayerName: !Sub layer-${LayerNameParam}
 
+  LayerWithRefNameIntrinsicRegion:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      LayerName: !Ref 'AWS::Region'
+
+  LayerWithSubNameIntrinsicRegion:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      LayerName: !Sub 'layer-${AWS::Region}'
+

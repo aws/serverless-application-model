@@ -731,6 +731,39 @@ class TestParameterValuesHandling(TestCase):
             sam_template, parameter_values)
         self.assertEqual(expected, result)
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    def test_add_pseudo_parameter_values_aws_region(self):
+        parameter_values = {
+            "Param1": "value1"
+        }
+
+        expected = {
+            "Param1": "value1",
+            "AWS::Region": "ap-southeast-1"
+        }
+
+
+        sam_parser = Parser()
+        translator = Translator({}, sam_parser)
+        result = translator._add_pseudo_parameter_values(parameter_values)
+        self.assertEqual(expected, result)
+
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    def test_add_pseudo_parameter_values_aws_region_not_override(self):
+        parameter_values = {
+            "AWS::Region": "value1"
+        }
+
+        expected = {
+            "AWS::Region": "value1"
+        }
+
+
+        sam_parser = Parser()
+        translator = Translator({}, sam_parser)
+        result = translator._add_pseudo_parameter_values(parameter_values)
+        self.assertEqual(expected, result)
+
 
 class TestTemplateValidation(TestCase):
 
