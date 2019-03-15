@@ -178,18 +178,6 @@ class TestRefCanResolveParameterRefs(TestCase):
         can_handle_mock.return_value = False # Simulate failure to handle the input. Result should be same as input
         self.assertEqual(expected, ref.resolve_parameter_refs(input, parameters))
 
-    @patch('boto3.session.Session.region_name', 'us-west-2')
-    def test_resolve_aws_region(self):
-        parameters = {
-            "key": "value"
-        }
-        input = {
-            "Ref": "AWS::Region"
-        }
-
-        ref = RefAction()
-        self.assertEqual('us-west-2', ref.resolve_parameter_refs(input, parameters))
-
 
 class TestRefCanResolveResourceRefs(TestCase):
 
@@ -424,6 +412,23 @@ class TestSubCanResolveParameterRefs(TestCase):
         }
         expected = {
             "Fn::Sub": {"a": "key1", "b": "key2"}
+        }
+
+        sub = SubAction()
+        result = sub.resolve_parameter_refs(input, parameters)
+
+        self.assertEqual(expected, result)
+
+    def test_sub_all_refs_with_pseudo_parameters(self):
+        parameters = {
+            "key1": "value1",
+            "AWS::Region": "ap-southeast-1"
+        }
+        input = {
+            "Fn::Sub": "hello ${AWS::Region} ${key1}"
+        }
+        expected = {
+            "Fn::Sub": "hello ap-southeast-1 value1"
         }
 
         sub = SubAction()

@@ -1,4 +1,5 @@
 import copy
+import boto3
 
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
@@ -48,6 +49,7 @@ class Translator:
         # Create & Install plugins
         sam_plugins = prepare_plugins(self.plugins)
         parameter_values = self._add_default_parameter_values(sam_template, parameter_values)
+        parameter_values = self._add_pseudo_parameter_values(parameter_values)
 
         self.sam_parser.parse(
             sam_template=sam_template,
@@ -204,6 +206,12 @@ class Translator:
         default_values.update(parameter_values)
 
         return default_values
+
+    def _add_pseudo_parameter_values(self, parameter_values):
+        updated_parameter_values = copy.deepcopy(parameter_values)
+        if 'AWS::Region' not in updated_parameter_values:
+            updated_parameter_values['AWS::Region'] = boto3.session.Session().region_name
+        return updated_parameter_values
 
 
 def prepare_plugins(plugins):

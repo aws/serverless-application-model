@@ -1,5 +1,4 @@
 import re
-import boto3
 
 from six import string_types
 
@@ -75,13 +74,6 @@ class Action(object):
 
         return splits[0], splits[1]
 
-    @classmethod
-    def _resolve_pseudo_parameters(cls, param_name, input_dict):
-        if param_name == 'AWS::Region':
-            return boto3.session.Session().region_name
-        else:
-            return input_dict
-
 
 class RefAction(Action):
     intrinsic_name = "Ref"
@@ -108,7 +100,7 @@ class RefAction(Action):
         if param_name in parameters:
             return parameters[param_name]
         else:
-            return self._resolve_pseudo_parameters(param_name, input_dict)
+            return input_dict
 
     def resolve_resource_refs(self, input_dict, supported_resource_refs):
         """
@@ -379,7 +371,7 @@ class SubAction(Action):
         """
 
         # RegExp to find pattern "${logicalId.property}" and return the word inside bracket
-        logical_id_regex = '[A-Za-z0-9\.]+'
+        logical_id_regex = '[A-Za-z0-9\.]+|AWS::[A-Z][A-Za-z]*'
         ref_pattern = re.compile(r'\$\{(' + logical_id_regex + ')\}')
 
         # Find all the pattern, and call the handler to decide how to substitute them.
