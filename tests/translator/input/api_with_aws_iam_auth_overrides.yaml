@@ -1,0 +1,86 @@
+Resources:
+  MyApiWithAwsIamAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: arn:aws:cognito-idp:xxxxxxxxx
+        InvokeRole: arn:aws:iam::123:role/AUTH_AWS_IAM
+  MyFunctionMyCognitoAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API1:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /MyFunctionMyCognitoAuth
+            Auth:
+              Authorizer: MyCognitoAuth
+  MyFunctionWithoutAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API2:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /MyFunctionWithoutAuth
+  MyFunctionNoneAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API3:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /MyFunctionNoneAuth
+            Auth:
+              Authorizer: NONE
+  MyFunctionDefaultInvokeRole:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API3:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /MyFunctionDefaultInvokeRole
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: CALLER_CREDENTIALS
+  MyFunctionCustomInvokeRole:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API3:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /MyFunctionCustomInvokeRole
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: arn:aws:iam::456::role/something-else

@@ -119,12 +119,12 @@ def mock_sar_service_call(self, service_call_function, logical_id, *args):
     elif application_id == "expired":
         status = "EXPIRED"
     message = {
-        'ApplicationId': args[0], 
-        'CreationTime': 'x', 
-        'ExpirationTime': 'x', 
-        'SemanticVersion': '1.1.1', 
-        'Status': status, 
-        'TemplateId': 'id-xx-xx', 
+        'ApplicationId': args[0],
+        'CreationTime': 'x',
+        'ExpirationTime': 'x',
+        'SemanticVersion': '1.1.1',
+        'Status': status,
+        'TemplateId': 'id-xx-xx',
         'TemplateUrl': 'https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url'
     }
     return message
@@ -156,6 +156,9 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_auth_all_maximum',
         'api_with_auth_all_minimum',
         'api_with_auth_no_default',
+        'api_with_default_aws_iam_auth',
+        'api_with_method_aws_iam_auth',
+        'api_with_aws_iam_auth_overrides',
         'api_with_method_settings',
         'api_with_binary_media_types',
         'api_with_minimum_compression_size',
@@ -877,4 +880,3 @@ def get_resource_by_type(template, type):
 
 def get_exception_error_message(e):
     return reduce(lambda message, error: message + ' ' + error.message, e.value.causes, e.value.message)
-

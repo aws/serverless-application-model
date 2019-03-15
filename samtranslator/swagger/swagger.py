@@ -129,7 +129,8 @@ class SwaggerEditor(object):
 
         path_dict.setdefault(method, {})
 
-    def add_lambda_integration(self, path, method, integration_uri, condition=None):
+    def add_lambda_integration(self, path, method, integration_uri,
+                               method_auth_config=None, api_auth_config=None, condition=None):
         """
         Adds aws_proxy APIGW integration to the given path+method.
 
@@ -156,6 +157,15 @@ class SwaggerEditor(object):
                 'uri': integration_uri
         }
 
+        method_auth_config = method_auth_config or {}
+        api_auth_config = api_auth_config or {}
+        if method_auth_config.get('Authorizer') == 'AWS_IAM' \
+           or api_auth_config.get('DefaultAuthorizer') == 'AWS_IAM' and not method_auth_config:
+            self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = self._generate_integration_credentials(
+                method_invoke_role=method_auth_config.get('InvokeRole'),
+                api_invoke_role=api_auth_config.get('InvokeRole')
+            )
+
         # If 'responses' key is *not* present, add it with an empty dict as value
         path_dict[method].setdefault('responses', {})
 
@@ -168,6 +178,13 @@ class SwaggerEditor(object):
         Wrap entire API path definition in a CloudFormation if condition.
         """
         self.paths[path] = make_conditional(condition, self.paths[path])
+
+    def _generate_integration_credentials(self, method_invoke_role=None, api_invoke_role=None):
+        return self._get_invoke_role(method_invoke_role or api_invoke_role)
+
+    def _get_invoke_role(self, invoke_role):
+        CALLER_CREDENTIALS_ARN = 'arn:aws:iam::*:user/*'
+        return invoke_role if invoke_role and invoke_role != 'CALLER_CREDENTIALS' else CALLER_CREDENTIALS_ARN
 
     def iter_on_path(self):
         """
@@ -409,7 +426,6 @@ class SwaggerEditor(object):
     def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
                               is_default=False):
         normalized_method_name = self._normalize_method_name(method_name)
-
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
@@ -418,7 +434,10 @@ class SwaggerEditor(object):
                 continue
             existing_security = method_definition.get('security', [])
             # TEST: [{'sigv4': []}, {'api_key': []}])
-            authorizer_names = set(authorizers.keys())
+            authorizer_list = ['AWS_IAM']
+            if authorizers:
+                authorizer_list.extend(authorizers.keys())
+            authorizer_names = set(authorizer_list)
             existing_non_authorizer_security = []
             existing_authorizer_security = []
 
@@ -472,6 +491,22 @@ class SwaggerEditor(object):
 
             if security:
                 method_definition['security'] = security
+
+                # The first element of the method_definition['security'] should be AWS_IAM
+                # because authorizer_list = ['AWS_IAM'] is hardcoded above
+                if 'AWS_IAM' in method_definition['security'][0]:
+                    aws_iam_security_definition = {
+                        'AWS_IAM': {
+                            'x-amazon-apigateway-authtype': 'awsSigv4',
+                            'type': 'apiKey',
+                            'name': 'Authorization',
+                            'in': 'header'
+                        }
+                    }
+                    if not self.security_definitions:
+                        self.security_definitions = aws_iam_security_definition
+                    elif 'AWS_IAM' not in self.security_definitions:
+                        self.security_definitions.update(aws_iam_security_definition)
 
     @property
     def swagger(self):
