@@ -78,7 +78,7 @@
                 "gatewayresponse.header.Retry-After": "'31536000'"
               },
               "responseTemplates": {},
-              "statusCode": 429
+              "statusCode": "429"
             },
             "UNAUTHORIZED": {
               "responseParameters": {
@@ -89,17 +89,27 @@
                 "gatewayresponse.querystring.QueryStringKey": "'query-string-value'"
               },
               "responseTemplates": {},
-              "statusCode": 401
+              "statusCode": "401"
             }
           }
         }
+      }
+    },
+    "ExplicitApiDeploymentedbd8aa001": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "Description": "RestApi deployment id: edbd8aa001b34e2c5fa4458827ad9f4075fb812d",
+        "StageName": "Stage"
       }
     },
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentf3653fc729"
+          "Ref": "ExplicitApiDeploymentedbd8aa001"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -126,16 +136,6 @@
             }
           ]
         }
-      }
-    },
-    "ExplicitApiDeploymentf3653fc729": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "Description": "RestApi deployment id: f3653fc729e3f0c9626ca1ff6ecb8a8c774783b5",
-        "StageName": "Stage"
       }
     },
     "FunctionGetHtmlPermissionTest": {

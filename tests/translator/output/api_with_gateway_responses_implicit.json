@@ -23,6 +23,16 @@
         ]
       }
     },
+    "ServerlessRestApiDeploymentf63e40e7e8": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: f63e40e7e8923689c5fa5f296abf1fc5d4773cc3",
+        "StageName": "Stage"
+      }
+    },
     "FunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -51,22 +61,12 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5121e3a1e9"
+          "Ref": "ServerlessRestApiDeploymentf63e40e7e8"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Prod"
-      }
-    },
-    "ServerlessRestApiDeployment5121e3a1e9": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 5121e3a1e976685590c6c56c8d9f1808c8ca329b",
-        "StageName": "Stage"
       }
     },
     "FunctionGetHtmlPermissionProd": {
@@ -123,7 +123,7 @@
                 "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
               },
               "responseTemplates": {},
-              "statusCode": 401
+              "statusCode": "401"
             }
           }
         },

@@ -106,14 +106,15 @@ class ApiGatewayResponse(object):
                         api_logical_id,
                         "Invalid gateway response parameter '{}'".format(response_parameter_key))
 
+        status_code_str = self._status_code_string(status_code)
         # status_code must look like a status code, if present. Let's not be judgmental; just check 0-999.
-        if status_code and not match(r'^[0-9]{1,3}$', str(status_code)):
+        if status_code and not match(r'^[0-9]{1,3}$', status_code_str):
             raise InvalidResourceException(api_logical_id, "Property 'StatusCode' must be numeric")
 
         self.api_logical_id = api_logical_id
         self.response_parameters = response_parameters or {}
         self.response_templates = response_templates or {}
-        self.status_code = status_code
+        self.status_code = status_code_str
 
     def generate_swagger(self):
         swagger = {
@@ -138,6 +139,9 @@ class ApiGatewayResponse(object):
             prefixed_parameters[GATEWAY_RESPONSE_PREFIX + 'querystring.' + key] = value
 
         return prefixed_parameters
+
+    def _status_code_string(self, status_code):
+        return None if status_code is None else str(status_code)
 
 
 class ApiGatewayAuthorizer(object):

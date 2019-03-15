@@ -23,16 +23,6 @@
         ]
       }
     },
-    "ExplicitApiDeploymentda491fdb62": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "Description": "RestApi deployment id: da491fdb62db4eb2c96f7cb5986ead342cfe816f",
-        "StageName": "Stage"
-      }
-    },
     "FunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -55,6 +45,16 @@
             }
           ]
         }
+      }
+    },
+    "ExplicitApiDeploymenta27cf1b1d7": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "Description": "RestApi deployment id: a27cf1b1d762583a4e0873d7a1eb25bea7966067",
+        "StageName": "Stage"
       }
     },
     "ExplicitApi": {
@@ -88,7 +88,7 @@
                 "gatewayresponse.header.Retry-After": "'31536000'"
               },
               "responseTemplates": {},
-              "statusCode": 429
+              "statusCode": "429"
             },
             "UNAUTHORIZED": {
               "responseParameters": {
@@ -99,7 +99,7 @@
                 "gatewayresponse.querystring.QueryStringKey": "'query-string-value'"
               },
               "responseTemplates": {},
-              "statusCode": 401
+              "statusCode": "401"
             }
           }
         },
@@ -117,7 +117,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentda491fdb62"
+          "Ref": "ExplicitApiDeploymenta27cf1b1d7"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"

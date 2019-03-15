@@ -23,13 +23,13 @@
         ]
       }
     },
-    "ExplicitApiDeploymentbc23d3333b": {
+    "ExplicitApiDeployment42329c77b0": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         },
-        "Description": "RestApi deployment id: bc23d3333bb707454769bcf9355d0c9ab7893f15",
+        "Description": "RestApi deployment id: 42329c77b0faabe3a86487f92af32b9afe0a0fa1",
         "StageName": "Stage"
       }
     },
@@ -88,7 +88,7 @@
                 "gatewayresponse.header.Retry-After": "'31536000'"
               },
               "responseTemplates": {},
-              "statusCode": 429
+              "statusCode": "429"
             },
             "UNAUTHORIZED": {
               "responseParameters": {
@@ -99,7 +99,7 @@
                 "gatewayresponse.querystring.QueryStringKey": "'query-string-value'"
               },
               "responseTemplates": {},
-              "statusCode": 401
+              "statusCode": "401"
             }
           }
         },
@@ -117,7 +117,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentbc23d3333b"
+          "Ref": "ExplicitApiDeployment42329c77b0"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
