@@ -526,6 +526,7 @@ class FindInMapAction(Action):
 
         value = input_dict[self.intrinsic_name]
 
+        # FindInMap expects an array with 3 values
         if not isinstance(value, list) or len(value) != 3:
             return input_dict
 
@@ -544,9 +545,3 @@ class FindInMapAction(Action):
             return input_dict
 
         return parameters[map_name][top_level_key][second_level_key]
-
-    def resolve_resource_refs(self, input_dict, supported_resource_refs):
-        return input_dict
-
-    def resolve_resource_id_refs(self, input_dict, supported_resource_id_refs):
-        return input_dict

@@ -1111,24 +1111,23 @@ class TestFindInMapCanResolveParameterRefs(TestCase):
 
         self.assertEqual(expected, output)
 
+    def test_nested_find_in_multiple_mappings(self):
+        mappings = {
+            "MapA":{
+                "ATopKey1": {
+                   "ASecondKey2": "value3"
+               }
+            },
+            "MapB": {
+                "BTopKey1": {
+                    "BSecondKey2": "ATopKey1"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapA", {"Fn::FindInMap": ["MapB", "BTopKey1", "BSecondKey2"]}, "ASecondKey2"]
+        }
+        expected = "value3"
+        output = self.ref.resolve_parameter_refs(input, mappings)
 
-class TestFindInMapCanResolveResourceRefs(TestCase):
-
-    def test_must_do_nothing(self):
-        input = "foo"
-        expected = "foo"
-        supported_resource_refs = Mock()
-        self.assertEqual(expected, FindInMapAction().resolve_resource_refs(input, supported_resource_refs))
-
-        supported_resource_refs.assert_not_called()
-
-
-class TestFindInMapCanResolveResourceIdRefs(TestCase):
-
-    def test_must_do_nothing(self):
-        input = "foo"
-        expected = "foo"
-        supported_resource_refs = Mock()
-        self.assertEqual(expected, FindInMapAction().resolve_resource_id_refs(input, supported_resource_refs))
-
-        supported_resource_refs.assert_not_called()
+        self.assertEqual(expected, output)

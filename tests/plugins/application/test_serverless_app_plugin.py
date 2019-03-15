@@ -198,7 +198,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
         app_id = 'app_id'
         semver = '1.0.0'
         response = self.plugin._sar_service_call(service_call_lambda, logical_id, app_id, semver)
-        self.assertEqual(app_id, response['ApplicationId'])    \
+        self.assertEqual(app_id, response['ApplicationId'])
 
     def test_resolve_intrinsics(self):
         self.plugin = ServerlessAppPlugin(parameters={"AWS::Region": "us-east-1"})
