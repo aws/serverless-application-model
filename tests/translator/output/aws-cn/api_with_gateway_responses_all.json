@@ -23,6 +23,16 @@
         ]
       }
     },
+    "ExplicitApiDeploymentda491fdb62": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "Description": "RestApi deployment id: da491fdb62db4eb2c96f7cb5986ead342cfe816f",
+        "StageName": "Stage"
+      }
+    },
     "FunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -73,6 +83,13 @@
           },
           "swagger": "2.0",
           "x-amazon-apigateway-gateway-responses": {
+            "QUOTA_EXCEEDED": {
+              "responseParameters": {
+                "gatewayresponse.header.Retry-After": "'31536000'"
+              },
+              "responseTemplates": {},
+              "statusCode": 429
+            },
             "UNAUTHORIZED": {
               "responseParameters": {
                 "gatewayresponse.header.WWW-Authenticate": "'Bearer realm=\"admin\"'",
@@ -96,21 +113,11 @@
         }
       }
     },
-    "ExplicitApiDeploymented745328e1": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "Description": "RestApi deployment id: ed745328e14ba5a6c98b32a73e14cc6447946382",
-        "StageName": "Stage"
-      }
-    },
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymented745328e1"
+          "Ref": "ExplicitApiDeploymentda491fdb62"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"

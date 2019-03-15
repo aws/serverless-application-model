@@ -19,19 +19,10 @@ Resources:
       StageName: Prod
       GatewayResponses:
         UNAUTHORIZED:
-          StatusCode: 401
+          StatusCode: '401'
           ResponseParameters:
             Headers:
               Access-Control-Expose-Headers: "'WWW-Authenticate'"
               Access-Control-Allow-Origin: "'*'"
               WWW-Authenticate: >-
                 'Bearer realm="admin"'
-            Paths:
-              PathKey: "'path-value'"
-            QueryStrings:
-              QueryStringKey: "'query-string-value'"
-        QUOTA_EXCEEDED:
-          StatusCode: 429
-          ResponseParameters:
-            Headers:
-              Retry-After: "'31536000'"

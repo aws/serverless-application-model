@@ -27,7 +27,7 @@
       "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -64,7 +64,7 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations"
                   }
                 },
                 "responses": {}
@@ -73,33 +73,42 @@
           },
           "swagger": "2.0",
           "x-amazon-apigateway-gateway-responses": {
-            "QUOTA_EXCEEDED": {
-              "responseParameters": {
-                "gatewayresponse.header.Retry-After": "'31536000'"
-              },
-              "responseTemplates": {},
-              "statusCode": 429
-            },
             "UNAUTHORIZED": {
               "responseParameters": {
                 "gatewayresponse.header.WWW-Authenticate": "'Bearer realm=\"admin\"'",
                 "gatewayresponse.header.Access-Control-Expose-Headers": "'WWW-Authenticate'",
-                "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
-                "gatewayresponse.path.PathKey": "'path-value'",
-                "gatewayresponse.querystring.QueryStringKey": "'query-string-value'"
+                "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
               },
               "responseTemplates": {},
-              "statusCode": 401
+              "statusCode": "401"
             }
           }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    },
+    "ExplicitApiDeploymenteb3ade17f4": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "Description": "RestApi deployment id: eb3ade17f4483e3bf17630ef2f7580d325cf074b",
+        "StageName": "Stage"
       }
     },
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentf3653fc729"
+          "Ref": "ExplicitApiDeploymenteb3ade17f4"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -117,7 +126,7 @@
         },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
               "__Stage__": "Prod",
               "__ApiId__": {
@@ -126,16 +135,6 @@
             }
           ]
         }
-      }
-    },
-    "ExplicitApiDeploymentf3653fc729": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "Description": "RestApi deployment id: f3653fc729e3f0c9626ca1ff6ecb8a8c774783b5",
-        "StageName": "Stage"
       }
     },
     "FunctionGetHtmlPermissionTest": {
@@ -148,7 +147,7 @@
         },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
               "__Stage__": "*",
               "__ApiId__": {
