@@ -533,9 +533,9 @@ class FindInMapAction(Action):
         top_level_key = self.resolve_parameter_refs(value[1], parameters)
         second_level_key = self.resolve_parameter_refs(value[2], parameters)
 
-        if not isinstance(map_name, basestring) or \
-                not isinstance(top_level_key, basestring) or \
-                not isinstance(second_level_key, basestring):
+        if not isinstance(map_name, string_types) or \
+                not isinstance(top_level_key, string_types) or \
+                not isinstance(second_level_key, string_types):
             return input_dict
 
         if map_name not in parameters or \
