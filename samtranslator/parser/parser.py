@@ -23,8 +23,8 @@ class Parser:
 
         if ("Resources" not in sam_template or not isinstance(sam_template["Resources"], dict) or not
                 sam_template["Resources"]):
-                raise InvalidDocumentException(
-                    [InvalidTemplateException("'Resources' section is required")])
+            raise InvalidDocumentException(
+                [InvalidTemplateException("'Resources' section is required")])
 
         if (not all(isinstance(value, dict) for value in sam_template["Resources"].values())):
             raise InvalidDocumentException(
