@@ -1,6 +1,7 @@
 import re
 
 from six import string_types
+from samtranslator.model.exceptions import InvalidTemplateException
 
 
 class Action(object):
@@ -528,7 +529,8 @@ class FindInMapAction(Action):
 
         # FindInMap expects an array with 3 values
         if not isinstance(value, list) or len(value) != 3:
-            return input_dict
+            raise InvalidTemplateException('Invalid FindInMap value {}. FindInMap expects an array with 3 values.'
+                                           .format(value))
 
         map_name = self.resolve_parameter_refs(value[0], parameters)
         top_level_key = self.resolve_parameter_refs(value[1], parameters)

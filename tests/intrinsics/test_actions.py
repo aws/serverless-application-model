@@ -2,6 +2,7 @@ from unittest import TestCase
 from mock import patch, Mock
 from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction, FindInMapAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
+from samtranslator.model.exceptions import InvalidTemplateException
 
 class TestAction(TestCase):
 
@@ -953,17 +954,16 @@ class TestFindInMapCanResolveParameterRefs(TestCase):
         input = {
             "Fn::FindInMap": "a string"
         }
-        output = self.ref.resolve_parameter_refs(input, {})
-
-        self.assertEqual(input, output)
+        with self.assertRaises(InvalidTemplateException):
+            self.ref.resolve_parameter_refs(input, {})
 
     def test_value_not_list_of_length_three(self):
         input = {
             "Fn::FindInMap": ["a string"]
         }
-        output = self.ref.resolve_parameter_refs(input, {})
 
-        self.assertEqual(input, output)
+        with self.assertRaises(InvalidTemplateException):
+            self.ref.resolve_parameter_refs(input, {})
 
     def test_mapping_not_string(self):
         mappings = {
