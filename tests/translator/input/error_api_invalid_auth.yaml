@@ -186,3 +186,11 @@ Resources:
             FunctionPayloadType: REQUEST
             Identity:
               ReauthorizeEvery: 10
+
+  AuthorizerNotDict:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyCognitoAuthorizer:
