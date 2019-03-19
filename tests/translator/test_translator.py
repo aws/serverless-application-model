@@ -142,6 +142,7 @@ class TestTranslatorEndToEnd(TestCase):
         'basic_function',
         'basic_application',
         'application_preparing_state',
+        'application_with_intrinsics',
         'basic_layer',
         'cloudwatchevent',
         'cloudwatch_logs_with_ref',
@@ -896,7 +897,7 @@ class TestPluginsUsage(TestCase):
         resource_from_dict_mock.assert_called_with("MyTable",
                                                         manifest["Resources"]["MyTable"],
                                                         sam_plugins=sam_plugins_object_mock)
-        prepare_plugins_mock.assert_called_once_with(initial_plugins)
+        prepare_plugins_mock.assert_called_once_with(initial_plugins, {"AWS::Region": "ap-southeast-1"})
 
 def get_policy_mock():
     mock_policy_loader = MagicMock()

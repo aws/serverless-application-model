@@ -2,12 +2,15 @@ import boto3
 from botocore.exceptions import ClientError, EndpointConnectionError
 import logging
 from time import sleep, time
+import copy
 
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import BasePlugin
 from samtranslator.plugins.exceptions import InvalidPluginException
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from samtranslator.intrinsics.actions import FindInMapAction
 
 
 class ServerlessAppPlugin(BasePlugin):
@@ -35,7 +38,7 @@ class ServerlessAppPlugin(BasePlugin):
     LOCATION_KEY = 'Location'
     TEMPLATE_URL_KEY = 'TemplateUrl'
 
-    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False):
+    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False, parameters={}):
         """
         Initialize the plugin.
 
@@ -50,6 +53,7 @@ class ServerlessAppPlugin(BasePlugin):
         self._sar_client = sar_client
         self._wait_for_template_active_status = wait_for_template_active_status
         self._validate_only = validate_only
+        self._parameters = parameters
 
         # make sure the flag combination makes sense
         if self._validate_only is True and self._wait_for_template_active_status is True:
@@ -68,6 +72,7 @@ class ServerlessAppPlugin(BasePlugin):
         :return: Nothing
         """
         template = SamTemplate(template_dict)
+        intrinsic_resolvers = self._get_intrinsic_resolvers(template_dict.get('Mappings', {}))
 
         service_call = None
         if self._validate_only:
@@ -79,8 +84,11 @@ class ServerlessAppPlugin(BasePlugin):
                 # Handle these cases in the on_before_transform_resource event
                 continue
 
-            app_id = app.properties[self.LOCATION_KEY].get(self.APPLICATION_ID_KEY)
-            semver = app.properties[self.LOCATION_KEY].get(self.SEMANTIC_VERSION_KEY)
+            app_id = self._replace_value(app.properties[self.LOCATION_KEY],
+                                         self.APPLICATION_ID_KEY, intrinsic_resolvers)
+            semver = self._replace_value(app.properties[self.LOCATION_KEY],
+                                         self.SEMANTIC_VERSION_KEY, intrinsic_resolvers)
+
             key = (app_id, semver)
             if key not in self._applications:
                 try:
@@ -91,6 +99,21 @@ class ServerlessAppPlugin(BasePlugin):
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
                     self._applications[key] = e
+
+    def _replace_value(self, input_dict, key, intrinsic_resolvers):
+        value = self._resolve_location_value(input_dict.get(key), intrinsic_resolvers)
+        input_dict[key] = value
+        return value
+
+    def _get_intrinsic_resolvers(self, mappings):
+        return [IntrinsicsResolver(self._parameters),
+                IntrinsicsResolver(mappings, {FindInMapAction.intrinsic_name: FindInMapAction()})]
+
+    def _resolve_location_value(self, value, intrinsic_resolvers):
+        resolved_value = copy.deepcopy(value)
+        for intrinsic_resolver in intrinsic_resolvers:
+            resolved_value = intrinsic_resolver.resolve_parameter_refs(resolved_value)
+        return resolved_value
 
     def _can_process_application(self, app):
         """

@@ -46,10 +46,10 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
-        # Create & Install plugins
-        sam_plugins = prepare_plugins(self.plugins)
         parameter_values = self._add_default_parameter_values(sam_template, parameter_values)
         parameter_values = self._add_pseudo_parameter_values(parameter_values)
+        # Create & Install plugins
+        sam_plugins = prepare_plugins(self.plugins, parameter_values)
 
         self.sam_parser.parse(
             sam_template=sam_template,
@@ -214,12 +214,13 @@ class Translator:
         return updated_parameter_values
 
 
-def prepare_plugins(plugins):
+def prepare_plugins(plugins, parameters={}):
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
 
-    :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to install
+    :param plugins: list of samtranslator.plugins.BasePlugin plugins: List of plugins to install
+    :param parameters: Dictionary of parameter values
     :return samtranslator.plugins.SamPlugins: Instance of `SamPlugins`
     """
 
@@ -234,7 +235,7 @@ def prepare_plugins(plugins):
 
     # If a ServerlessAppPlugin does not yet exist, create one and add to the beginning of the required plugins list.
     if not any(isinstance(plugin, ServerlessAppPlugin) for plugin in plugins):
-        required_plugins.insert(0, ServerlessAppPlugin())
+        required_plugins.insert(0, ServerlessAppPlugin(parameters=parameters))
 
     # Execute customer's plugins first before running SAM plugins. It is very important to retain this order because
     # other plugins will be dependent on this ordering.
