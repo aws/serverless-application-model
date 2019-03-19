@@ -342,6 +342,10 @@ class ApiGenerator(object):
                                            "Authorizers must be a dictionary")
 
         for authorizer_name, authorizer in authorizers_config.items():
+            if not isinstance(authorizer, dict):
+                raise InvalidResourceException(self.logical_id,
+                                               "Authorizer %s must be a dictionary." % (authorizer_name))
+
             authorizers[authorizer_name] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id,
                 name=authorizer_name,

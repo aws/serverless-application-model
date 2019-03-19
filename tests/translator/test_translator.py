@@ -365,6 +365,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_cors_credentials_true_with_wildcard_origin',
     'error_cors_credentials_true_without_explicit_origin',
     'error_function_invalid_codeuri',
+    'error_function_invalid_api_event',
     'error_function_invalid_event_type',
     'error_function_invalid_layer',
     'error_function_no_codeuri',
@@ -386,6 +387,7 @@ class TestTranslatorEndToEnd(TestCase):
     'existing_permission_logical_id',
     'existing_role_logical_id',
     'error_invalid_template',
+    'error_resource_not_dict',
     'error_globals_is_not_dict',
     'error_globals_unsupported_type',
     'error_globals_unsupported_property',
@@ -803,6 +805,21 @@ class TestTemplateValidation(TestCase):
     def test_throws_when_resource_is_not_dict(self):
         template = {
             "Resources": [1,2,3]
+        }
+
+        with self.assertRaises(InvalidDocumentException):
+            sam_parser = Parser()
+            translator = Translator({}, sam_parser)
+            translator.translate(template, {})
+
+
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    def test_throws_when_resources_not_all_dicts(self):
+        template = {
+            "Resources": {
+                "notadict": None,
+                "MyResource": {}
+            }
         }
 
         with self.assertRaises(InvalidDocumentException):

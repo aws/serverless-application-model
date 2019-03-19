@@ -1,4 +1,5 @@
 import copy
+import six
 
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.model.intrinsics import make_combined_condition
@@ -141,6 +142,14 @@ class ImplicitApiPlugin(BasePlugin):
                 method = event_properties["Method"]
             except KeyError as e:
                 raise InvalidEventException(logicalId, "Event is missing key {}.".format(e))
+
+            if (not isinstance(path, six.string_types)):
+                raise InvalidEventException(logicalId,
+                                            "Api Event must have a String specified for 'Path'.")
+            if (not isinstance(method, six.string_types)):
+                raise InvalidEventException(logicalId,
+                                            "Api Event must have a String specified for 'Method'.")
+
             api_dict = self.api_conditions.setdefault(api_id, {})
             method_conditions = api_dict.setdefault(path, {})
             method_conditions[method] = condition
