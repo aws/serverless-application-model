@@ -4,6 +4,7 @@
       "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
       "Properties": {
+        "Description": "sam-testing",
         "FunctionName": {
           "Ref": "MinimalFunction"
         }

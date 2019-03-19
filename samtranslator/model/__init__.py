@@ -474,8 +474,8 @@ class ResourceTypeResolver(object):
         :rtype: class
         """
         if not self.can_resolve(resource_dict):
-            raise TypeError("Resource dict has missing or invalid value for key Type. Resource Dict is: " +
-                            str(resource_dict))
+            raise TypeError("Resource dict has missing or invalid value for key Type. Event Type is: {}.".format(
+                    resource_dict.get('Type')))
         if resource_dict['Type'] not in self.resource_types:
             raise TypeError("Invalid resource type {resource_type}".format(resource_type=resource_dict['Type']))
         return self.resource_types[resource_dict['Type']]

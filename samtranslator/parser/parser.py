@@ -26,4 +26,11 @@ class Parser:
             raise InvalidDocumentException(
                 [InvalidTemplateException("'Resources' section is required")])
 
+        if (not all(isinstance(value, dict) for value in sam_template["Resources"].values())):
+            raise InvalidDocumentException(
+                [InvalidTemplateException(
+                    "All 'Resources' must be Objects. If you're using YAML, this may be an "
+                    "indentation issue."
+                )])
+
         SamTemplateValidator.validate(sam_template)

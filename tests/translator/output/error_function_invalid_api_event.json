@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [FunctionApiNoMethod] is invalid. Event with id [ApiEvent] is invalid. Event is missing key 'Path'."
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 4. Resource with id [FunctionApiMethodArray] is invalid. Event with id [ApiEvent] is invalid. Api Event must have a String specified for 'Method'. Resource with id [FunctionApiNoMethod] is invalid. Event with id [ApiEvent] is invalid. Event is missing key 'Method'. Resource with id [FunctionApiNoPath] is invalid. Event with id [ApiEvent] is invalid. Event is missing key 'Path'. Resource with id [FunctionApiPathArray] is invalid. Event with id [ApiEvent] is invalid. Api Event must have a String specified for 'Path'."
+}

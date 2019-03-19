@@ -82,6 +82,7 @@ Currently, the following resources and properties are being supported:
       BinaryMediaTypes:
       MinimumCompressionSize:
       Cors:
+      GatewayResponses:
       AccessLogSetting:
       CanarySetting:
       TracingEnabled:

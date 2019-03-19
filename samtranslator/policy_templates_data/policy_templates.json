@@ -261,7 +261,7 @@
             ],
             "Resource": {
               "Fn::Sub": [
-                "arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain/${domainName}",
+                "arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain/${domainName}/*",
                 {
                   "domainName": {
                     "Ref": "DomainName"
@@ -927,9 +927,11 @@
             "Action": [
               "serverlessrepo:CreateApplication",
               "serverlessrepo:CreateApplicationVersion",
+              "serverlessrepo:UpdateApplication",
               "serverlessrepo:GetApplication",
               "serverlessrepo:ListApplications",
-              "serverlessrepo:ListApplicationVersions"
+              "serverlessrepo:ListApplicationVersions",
+              "serverlessrepo:ListApplicationDependencies"
             ],
             "Resource": [
               {

@@ -1,0 +1,70 @@
+{
+  "Resources": {
+    "ApplicationRefParameter": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          },
+          {
+            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world",
+            "Key": "serverlessrepo:applicationId"
+          },
+          {
+            "Value": "1.0.0",
+            "Key": "serverlessrepo:semanticVersion"
+          }
+        ]
+      }
+    },
+    "ApplicationFindInMap": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          },
+          {
+            "Value": "arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world",
+            "Key": "serverlessrepo:applicationId"
+          },
+          {
+            "Value": "1.0.2",
+            "Key": "serverlessrepo:semanticVersion"
+          }
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "ApplicationIdParam": {
+      "Type": "String",
+      "Default": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world"
+    },
+    "VersionParam": {
+      "Type": "String",
+      "Default": "1.0.0"
+    }
+  },
+  "Mappings": {
+    "ApplicationLocations": {
+      "ap-southeast-1": {
+        "ApplicationId": "arn:aws:serverlessrepo:ap-southeast-1:123456789012:applications/hello-world",
+        "Version": "1.0.1"
+      },
+      "cn-north-1": {
+        "ApplicationId": "arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world",
+        "Version": "1.0.2"
+      },
+      "us-gov-west-1": {
+        "ApplicationId": "arn:aws-gov:serverlessrepo:us-gov-west-1:123456789012:applications/hello-world",
+        "Version": "1.0.3"
+      }
+    }
+  }
+}

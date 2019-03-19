@@ -1,0 +1,52 @@
+Resources:
+  FunctionApiNoMethod:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            method: get # NOTE: lowercase 'm'
+            Path: /
+  
+  FunctionApiNoPath:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: get
+            path: / # NOTE: lowercase 'm'
+  
+  FunctionApiPathArray:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: [/, /users]
+  
+  FunctionApiMethodArray:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: [get, post]
+            Path: /
