@@ -1,0 +1,27 @@
+Globals:
+  Api:
+    Name: "some api"
+    GatewayResponses:
+      UNAUTHORIZED:
+        StatusCode: 401
+        ResponseParameters:
+          Headers:
+            Access-Control-Expose-Headers: "'WWW-Authenticate'"
+            Access-Control-Allow-Origin: "'*'"
+            WWW-Authenticate: >-
+              'Bearer realm="admin"'
+
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get

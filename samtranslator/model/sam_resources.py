@@ -1,4 +1,4 @@
-""" SAM macro definitions """
+﻿""" SAM macro definitions """
 from six import string_types
 
 import samtranslator.model.eventsources
@@ -442,6 +442,7 @@ class SamApi(SamResourceMacro):
         'MinimumCompressionSize': PropertyType(False, is_type(int)),
         'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
         'Auth': PropertyType(False, is_type(dict)),
+        'GatewayResponses': PropertyType(False, is_type(dict)),
         'AccessLogSetting': PropertyType(False, is_type(dict)),
         'CanarySetting': PropertyType(False, is_type(dict)),
         'TracingEnabled': PropertyType(False, is_type(bool))
@@ -477,6 +478,7 @@ class SamApi(SamResourceMacro):
                                      minimum_compression_size=self.MinimumCompressionSize,
                                      cors=self.Cors,
                                      auth=self.Auth,
+                                     gateway_responses=self.GatewayResponses,
                                      access_log_setting=self.AccessLogSetting,
                                      canary_setting=self.CanarySetting,
                                      tracing_enabled=self.TracingEnabled,

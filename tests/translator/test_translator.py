@@ -170,6 +170,11 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_maxage',
         'api_with_cors_and_only_credentials_false',
         'api_with_cors_no_definitionbody',
+        'api_with_gateway_responses',
+        'api_with_gateway_responses_all',
+        'api_with_gateway_responses_minimal',
+        'api_with_gateway_responses_implicit',
+        'api_with_gateway_responses_string_status_code',
         'api_cache',
         'api_with_access_log_setting',
         'api_with_canary_setting',
@@ -248,7 +253,7 @@ class TestTranslatorEndToEnd(TestCase):
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(OUTPUT_FOLDER,partition_folder, testcase + '.json'), 'r'))
+        expected = json.load(open(os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json'), 'r'))
 
         with patch('boto3.session.Session.region_name', region):
             parameter_values = get_template_parameter_values()
@@ -343,6 +348,9 @@ class TestTranslatorEndToEnd(TestCase):
 
 @pytest.mark.parametrize('testcase', [
     'error_api_duplicate_methods_same_path',
+    'error_api_gateway_responses_nonnumeric_status_code',
+    'error_api_gateway_responses_unknown_responseparameter',
+    'error_api_gateway_responses_unknown_responseparameter_property',
     'error_api_invalid_auth',
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',

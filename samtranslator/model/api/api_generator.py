@@ -3,7 +3,8 @@ from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
-                                            ApiGatewayStage, ApiGatewayAuthorizer)
+                                            ApiGatewayStage, ApiGatewayAuthorizer,
+                                            ApiGatewayResponse)
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
@@ -21,14 +22,16 @@ CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer", "InvokeRole"])
 AuthProperties.__new__.__defaults__ = (None, None, None)
 
+GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
+
 
 class ApiGenerator(object):
 
     def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on,
                  definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
-                 auth=None, access_log_setting=None, canary_setting=None, tracing_enabled=None,
-                 resource_attributes=None, passthrough_resource_attributes=None):
+                 auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
+                 tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -61,6 +64,7 @@ class ApiGenerator(object):
         self.minimum_compression_size = minimum_compression_size
         self.cors = cors
         self.auth = auth
+        self.gateway_responses = gateway_responses
         self.access_log_setting = access_log_setting
         self.canary_setting = canary_setting
         self.tracing_enabled = tracing_enabled
@@ -91,6 +95,7 @@ class ApiGenerator(object):
 
         self._add_cors()
         self._add_auth()
+        self._add_gateway_responses()
 
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
@@ -271,6 +276,49 @@ class ApiGenerator(object):
         if authorizers:
             swagger_editor.add_authorizers(authorizers)
             self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer)
+
+        # Assign the Swagger back to template
+        self.definition_body = swagger_editor.swagger
+
+    def _add_gateway_responses(self):
+        """
+        Add Gateway Response configuration to the Swagger file, if necessary
+        """
+
+        if not self.gateway_responses:
+            return
+
+        if self.gateway_responses and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "GatewayResponses works only with inline Swagger specified in "
+                                 "'DefinitionBody' property")
+
+        # Make sure keys in the dict are recognized
+        for responses_key, responses_value in self.gateway_responses.items():
+            for response_key in responses_value.keys():
+                if response_key not in GatewayResponseProperties:
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        "Invalid property '{}' in 'GatewayResponses' property '{}'".format(response_key, responses_key))
+
+        if not SwaggerEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
+                self.logical_id, "Unable to add Auth configuration because "
+                                 "'DefinitionBody' does not contain a valid Swagger")
+
+        swagger_editor = SwaggerEditor(self.definition_body)
+
+        gateway_responses = {}
+        for response_type, response in self.gateway_responses.items():
+            gateway_responses[response_type] = ApiGatewayResponse(
+                api_logical_id=self.logical_id,
+                response_parameters=response.get('ResponseParameters', {}),
+                response_templates=response.get('ResponseTemplates', {}),
+                status_code=response.get('StatusCode', None)
+            )
+
+        if gateway_responses:
+            swagger_editor.add_gateway_responses(gateway_responses)
 
         # Assign the Swagger back to template
         self.definition_body = swagger_editor.swagger
