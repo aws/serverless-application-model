@@ -57,6 +57,7 @@
           }
         ], 
         "MemorySize": 512, 
+        "ReservedConcurrentExecutions": 100, 
         "Environment": {
           "Variables": {
             "Var1": "value1", 
@@ -146,6 +147,7 @@
           }
         ], 
         "MemorySize": 1024, 
+        "ReservedConcurrentExecutions": 50, 
         "Environment": {
           "Variables": {
             "Var1": "value1", 

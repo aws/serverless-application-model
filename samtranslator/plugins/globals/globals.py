@@ -30,7 +30,8 @@ class Globals(object):
             "AutoPublishAlias",
             "Layers",
             "DeploymentPreference",
-            "PermissionsBoundary"
+            "PermissionsBoundary",
+            "ReservedConcurrentExecutions"
         ],
 
         # Everything except

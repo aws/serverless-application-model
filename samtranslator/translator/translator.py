@@ -1,5 +1,4 @@
 import copy
-import boto3
 
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
@@ -15,6 +14,7 @@ from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
+from samtranslator.sdk.parameter import SamParameterValues
 
 
 class Translator:
@@ -46,8 +46,10 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
-        parameter_values = self._add_default_parameter_values(sam_template, parameter_values)
-        parameter_values = self._add_pseudo_parameter_values(parameter_values)
+        sam_parameter_values = SamParameterValues(parameter_values)
+        sam_parameter_values.add_default_parameter_values(sam_template)
+        sam_parameter_values.add_pseudo_parameter_values()
+        parameter_values = sam_parameter_values.parameter_values
         # Create & Install plugins
         sam_plugins = prepare_plugins(self.plugins, parameter_values)
 
@@ -156,62 +158,6 @@ class Translator:
                 others.append(data)
 
         return functions + apis + others
-
-    # Ideally this should belong to a separate class called "Parameters" or something that knows how to manage
-    # parameters. An instance of this class should be passed as input to the Translate class.
-    def _add_default_parameter_values(self, sam_template, parameter_values):
-        """
-        Method to read default values for template parameters and merge with user supplied values.
-
-        Example:
-        If the template contains the following parameters defined
-
-        Parameters:
-            Param1:
-                Type: String
-                Default: default_value
-            Param2:
-                Type: String
-                Default: default_value
-
-        And, the user explicitly provided the following parameter values:
-
-        {
-            Param2: "new value"
-        }
-
-        then, this method will grab default value for Param1 and return the following result:
-
-        {
-            Param1: "default_value",
-            Param2: "new value"
-        }
-
-
-        :param dict sam_template: SAM template
-        :param dict parameter_values: Dictionary of parameter values provided by the user
-        :return dict: Merged parameter values
-        """
-
-        parameter_definition = sam_template.get("Parameters", None)
-        if not parameter_definition or not isinstance(parameter_definition, dict):
-            return parameter_values
-
-        default_values = {}
-        for param_name, value in parameter_definition.items():
-            if isinstance(value, dict) and "Default" in value:
-                default_values[param_name] = value["Default"]
-
-        # Any explicitly provided value must override the default
-        default_values.update(parameter_values)
-
-        return default_values
-
-    def _add_pseudo_parameter_values(self, parameter_values):
-        updated_parameter_values = copy.deepcopy(parameter_values)
-        if 'AWS::Region' not in updated_parameter_values:
-            updated_parameter_values['AWS::Region'] = boto3.session.Session().region_name
-        return updated_parameter_values
 
 
 def prepare_plugins(plugins, parameters={}):
