@@ -152,7 +152,7 @@ class DeploymentPreferenceCollection(object):
         if element in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
             return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": element})
         elif isinstance(element, dict):
-            if element.keys()[0] == "Fn::If":
+            if list(element)[0] == "Fn::If":
                 return self.__handle_intrinsic_function_in_deployment_type(element)
             return element
         else:
