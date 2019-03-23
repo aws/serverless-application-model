@@ -19,6 +19,7 @@ Globals:
     PermissionsBoundary: arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary
     Layers:
       - !Sub arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer:1
+    ReservedConcurrentExecutions: 50
 
 Resources:
   MinimalFunction:
@@ -45,4 +46,5 @@ Resources:
       PermissionsBoundary: arn:aws:1234:iam:boundary/OverridePermissionsBoundary
       Layers:
         - !Sub arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer2:2
+      ReservedConcurrentExecutions: 100
 

@@ -1,3 +1,5 @@
+from re import match
+
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import is_type, one_of, is_str
@@ -93,11 +95,60 @@ class ApiGatewayDeployment(Resource):
         stage.update_deployment_ref(self.logical_id)
 
 
+class ApiGatewayResponse(object):
+    ResponseParameterProperties = ["Headers", "Paths", "QueryStrings"]
+
+    def __init__(self, api_logical_id=None, response_parameters=None, response_templates=None, status_code=None):
+        if response_parameters:
+            for response_parameter_key in response_parameters.keys():
+                if response_parameter_key not in ApiGatewayResponse.ResponseParameterProperties:
+                    raise InvalidResourceException(
+                        api_logical_id,
+                        "Invalid gateway response parameter '{}'".format(response_parameter_key))
+
+        status_code_str = self._status_code_string(status_code)
+        # status_code must look like a status code, if present. Let's not be judgmental; just check 0-999.
+        if status_code and not match(r'^[0-9]{1,3}$', status_code_str):
+            raise InvalidResourceException(api_logical_id, "Property 'StatusCode' must be numeric")
+
+        self.api_logical_id = api_logical_id
+        self.response_parameters = response_parameters or {}
+        self.response_templates = response_templates or {}
+        self.status_code = status_code_str
+
+    def generate_swagger(self):
+        swagger = {
+            "responseParameters": self._add_prefixes(self.response_parameters),
+            "responseTemplates": self.response_templates
+        }
+
+        # Prevent "null" being written.
+        if self.status_code:
+            swagger["statusCode"] = self.status_code
+
+        return swagger
+
+    def _add_prefixes(self, response_parameters):
+        GATEWAY_RESPONSE_PREFIX = 'gatewayresponse.'
+        prefixed_parameters = {}
+        for key, value in response_parameters.get('Headers', {}).items():
+            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + 'header.' + key] = value
+        for key, value in response_parameters.get('Paths', {}).items():
+            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + 'path.' + key] = value
+        for key, value in response_parameters.get('QueryStrings', {}).items():
+            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + 'querystring.' + key] = value
+
+        return prefixed_parameters
+
+    def _status_code_string(self, status_code):
+        return None if status_code is None else str(status_code)
+
+
 class ApiGatewayAuthorizer(object):
     _VALID_FUNCTION_PAYLOAD_TYPES = [None, 'TOKEN', 'REQUEST']
 
     def __init__(self, api_logical_id=None, name=None, user_pool_arn=None, function_arn=None, identity=None,
-                 function_payload_type=None, function_invoke_role=None):
+                 function_payload_type=None, function_invoke_role=None, is_aws_iam_authorizer=False):
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(api_logical_id, name + " Authorizer has invalid "
                                            "'FunctionPayloadType': " + function_payload_type)
@@ -113,6 +164,7 @@ class ApiGatewayAuthorizer(object):
         self.identity = identity
         self.function_payload_type = function_payload_type
         self.function_invoke_role = function_invoke_role
+        self.is_aws_iam_authorizer = is_aws_iam_authorizer
 
     def _is_missing_identity_source(self, identity):
         if not identity:
@@ -135,16 +187,19 @@ class ApiGatewayAuthorizer(object):
             "type": "apiKey",
             "name": self._get_swagger_header_name(),
             "in": "header",
-            "x-amazon-apigateway-authtype": self._get_swagger_authtype(),
-            "x-amazon-apigateway-authorizer": {
-                "type": self._get_swagger_authorizer_type()
-            }
+            "x-amazon-apigateway-authtype": self._get_swagger_authtype()
         }
 
         if authorizer_type == 'COGNITO_USER_POOLS':
-            swagger[APIGATEWAY_AUTHORIZER_KEY]['providerARNs'] = self._get_user_pool_arn_array()
+            swagger[APIGATEWAY_AUTHORIZER_KEY] = {
+                'type': self._get_swagger_authorizer_type(),
+                'providerARNs': self._get_user_pool_arn_array()
+            }
 
         elif authorizer_type == 'LAMBDA':
+            swagger[APIGATEWAY_AUTHORIZER_KEY] = {
+                'type': self._get_swagger_authorizer_type()
+            }
             partition = ArnGenerator.get_partition_name()
             resource = 'lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations'
             authorizer_uri = fnSub(ArnGenerator.generate_arn(partition=partition, service='apigateway',
@@ -217,6 +272,9 @@ class ApiGatewayAuthorizer(object):
         return self._get_identity_header()
 
     def _get_type(self):
+        if self.is_aws_iam_authorizer:
+            return 'AWS_IAM'
+
         if self.user_pool_arn:
             return 'COGNITO_USER_POOLS'
 
@@ -242,8 +300,13 @@ class ApiGatewayAuthorizer(object):
 
     def _get_swagger_authtype(self):
         authorizer_type = self._get_type()
+        if authorizer_type == 'AWS_IAM':
+            return 'awsSigv4'
 
-        return 'cognito_user_pools' if authorizer_type == 'COGNITO_USER_POOLS' else 'custom'
+        if authorizer_type == 'COGNITO_USER_POOLS':
+            return 'cognito_user_pools'
+
+        return 'custom'
 
     def _get_function_payload_type(self):
         return 'TOKEN' if not self.function_payload_type else self.function_payload_type

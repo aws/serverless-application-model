@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Simple webservice deomnstrating gateway responses.
+
+Resources:
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Auth:
+        Authorizers:
+          Authorizer:
+            FunctionArn: !GetAtt AuthorizerFunction.Arn
+            Identity:
+              ValidationExpression: "^Bearer +[-0-9a-zA-Z\\._]*$"
+              ReauthorizeEvery: 300
+      GatewayResponses:
+        UNAUTHORIZED:
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'WWW-Authenticate'"
+              Access-Control-Allow-Origin: "'*'"
+              WWW-Authenticate: >-
+                'Bearer realm="admin"'
+  GetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.get
+      Runtime: nodejs6.10
+      CodeUri: src/
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            Path: /resource/{resourceId}
+            Method: get
+            Auth:
+              Authorizer: Authorizer
+            RestApiId: !Ref ExplicitApi
+  AuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.auth
+      Runtime: nodejs6.10
+      CodeUri: src/
+Outputs:
+  ApiURL:
+    Description: "API endpoint URL for Prod environment"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resource/"

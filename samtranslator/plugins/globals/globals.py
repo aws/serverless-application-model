@@ -1,4 +1,4 @@
-from samtranslator.public.sdk.resource import SamResourceType
+﻿from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
 
 
@@ -30,7 +30,8 @@ class Globals(object):
             "AutoPublishAlias",
             "Layers",
             "DeploymentPreference",
-            "PermissionsBoundary"
+            "PermissionsBoundary",
+            "ReservedConcurrentExecutions"
         ],
 
         # Everything except
@@ -49,6 +50,7 @@ class Globals(object):
             "BinaryMediaTypes",
             "MinimumCompressionSize",
             "Cors",
+            "GatewayResponses",
             "AccessLogSetting",
             "CanarySetting",
             "TracingEnabled"

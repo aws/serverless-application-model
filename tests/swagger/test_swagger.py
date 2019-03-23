@@ -327,6 +327,37 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         with self.assertRaises(ValueError):
             self.editor.add_lambda_integration("/bar", "get", "integrationUri")
 
+    def test_must_add_credentials_to_the_integration(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        expected = 'arn:aws:iam::*:user/*'
+        api_auth_config = {
+          "DefaultAuthorizer": "AWS_IAM",
+          "InvokeRole": "CALLER_CREDENTIALS"
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, None, api_auth_config)
+        actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]['credentials']
+        self.assertEquals(expected, actual)
+
+    def test_must_add_credentials_to_the_integration_overrides(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        expected = 'arn:aws:iam::*:role/xxxxxx'
+        api_auth_config = {
+          "DefaultAuthorizer": "MyAuth",
+        }
+        method_auth_config = {
+          "Authorizer": "AWS_IAM",
+          "InvokeRole": "arn:aws:iam::*:role/xxxxxx"
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, method_auth_config, api_auth_config)
+        actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]['credentials']
+        self.assertEquals(expected, actual)
+
 
 class TestSwaggerEditor_iter_on_path(TestCase):
 

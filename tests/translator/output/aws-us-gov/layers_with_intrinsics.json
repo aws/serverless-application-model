@@ -24,6 +24,30 @@
         "LayerName": "SomeLayerName"
       }
     },
+    "LayerWithRefNameIntrinsicRegionad31c93c8b": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "us-gov-west-1"
+      }
+    },
+    "LayerWithSubNameIntrinsicRegion5b2c74d55e": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": {
+          "Fn::Sub": "layer-us-gov-west-1"
+        }
+      }
+    },
     "LayerWithRuntimesIntrinsic1a006faa85": {
       "DeletionPolicy": "Retain",
       "Type": "AWS::Lambda::LayerVersion",

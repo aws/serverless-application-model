@@ -68,6 +68,7 @@ Currently, the following resources and properties are being supported:
       AutoPublishAlias:
       DeploymentPreference:
       PermissionsBoundary:
+      ReservedConcurrentExecutions:
 
     Api:
       # Properties of AWS::Serverless::Api
@@ -82,6 +83,7 @@ Currently, the following resources and properties are being supported:
       BinaryMediaTypes:
       MinimumCompressionSize:
       Cors:
+      GatewayResponses:
       AccessLogSetting:
       CanarySetting:
       TracingEnabled:

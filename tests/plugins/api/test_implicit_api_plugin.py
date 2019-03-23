@@ -423,6 +423,54 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         with self.assertRaises(InvalidEventException) as context:
             self.plugin._process_api_events(function, api_events, template)
 
+    def test_must_verify_method_is_string(self):
+        api_events = {
+            "Api1": {
+                "Type": "Api",
+                "Properties": {
+                    "Path": "/",
+                    "Method": ["POST"]
+                }
+            }
+        }
+
+        template = Mock()
+        function_events_mock = Mock()
+        function = SamResource({
+            "Type": SamResourceType.Function.value,
+            "Properties": {
+                "Events": function_events_mock
+            }
+        })
+        function_events_mock.update = Mock()
+
+        with self.assertRaises(InvalidEventException) as context:
+            self.plugin._process_api_events(function, api_events, template)
+
+    def test_must_verify_path_is_string(self):
+        api_events = {
+            "Api1": {
+                "Type": "Api",
+                "Properties": {
+                    "Path": ["/"],
+                    "Method": "POST"
+                }
+            }
+        }
+
+        template = Mock()
+        function_events_mock = Mock()
+        function = SamResource({
+            "Type": SamResourceType.Function.value,
+            "Properties": {
+                "Events": function_events_mock
+            }
+        })
+        function_events_mock.update = Mock()
+
+        with self.assertRaises(InvalidEventException) as context:
+            self.plugin._process_api_events(function, api_events, template)
+
     def test_must_skip_events_without_properties(self):
 
         api_events = {
