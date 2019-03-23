@@ -120,12 +120,19 @@ class DeploymentPreferenceCollection(object):
                                                       'Events': ['DEPLOYMENT_FAILURE',
                                                                  'DEPLOYMENT_STOP_ON_ALARM',
                                                                  'DEPLOYMENT_STOP_ON_REQUEST']}
+        if isinstance(deployment_preference.deployment_type, dict):
+            modified_deployment_type = self.__handle_intrinsic_function_in_deployment_type(
+                deployment_preference.deployment_type)
 
-        if deployment_preference.deployment_type in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
-            deployment_group.DeploymentConfigName = fnSub("CodeDeployDefault.Lambda${ConfigName}",
-                                                          {"ConfigName": deployment_preference.deployment_type})
-        else:
+            # Using replace method to modify the namedtuple
+            deployment_preference._replace(deployment_type=modified_deployment_type)
             deployment_group.DeploymentConfigName = deployment_preference.deployment_type
+        else:
+            if deployment_preference.deployment_type in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
+                deployment_group.DeploymentConfigName = fnSub("CodeDeployDefault.Lambda${ConfigName}",
+                                                              {"ConfigName": deployment_preference.deployment_type})
+            else:
+                deployment_group.DeploymentConfigName = deployment_preference.deployment_type
 
         deployment_group.DeploymentStyle = {'DeploymentType': 'BLUE_GREEN',
                                             'DeploymentOption': 'WITH_TRAFFIC_CONTROL'}
@@ -135,6 +142,21 @@ class DeploymentPreferenceCollection(object):
             deployment_group.ServiceRoleArn = deployment_preference.role
 
         return deployment_group
+
+    def __handle_intrinsic_function_in_deployment_type(self, deployment_type):
+        for key, value in deployment_type.items():
+            deployment_type[key] = [self.__process_element(element) for element in value]
+        return deployment_type
+
+    def __process_element(self, element):
+        if element in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
+            return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": element})
+        elif isinstance(element, dict):
+            if element.keys()[0] == "Fn::If":
+                return self.__handle_intrinsic_function_in_deployment_type(element)
+            return element
+        else:
+            return element
 
     def update_policy(self, function_logical_id):
         deployment_preference = self.get(function_logical_id)
