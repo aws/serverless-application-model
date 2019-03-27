@@ -1,4 +1,5 @@
 import boto3
+import json
 from botocore.exceptions import ClientError, EndpointConnectionError
 import logging
 from time import sleep, time
@@ -86,10 +87,17 @@ class ServerlessAppPlugin(BasePlugin):
 
             app_id = self._replace_value(app.properties[self.LOCATION_KEY],
                                          self.APPLICATION_ID_KEY, intrinsic_resolvers)
+
             semver = self._replace_value(app.properties[self.LOCATION_KEY],
                                          self.SEMANTIC_VERSION_KEY, intrinsic_resolvers)
 
+            if isinstance(app_id, dict) or isinstance(semver, dict):
+                key = (json.dumps(app_id), json.dumps(semver))
+                self._applications[key] = False
+                continue
+
             key = (app_id, semver)
+
             if key not in self._applications:
                 try:
                     # Lazy initialization of the client- create it when it is needed
@@ -211,11 +219,23 @@ class ServerlessAppPlugin(BasePlugin):
                                        [self.APPLICATION_ID_KEY, self.SEMANTIC_VERSION_KEY])
 
         app_id = resource_properties[self.LOCATION_KEY].get(self.APPLICATION_ID_KEY)
+
         if not app_id:
             raise InvalidResourceException(logical_id, "Property 'ApplicationId' cannot be blank.")
+
+        if isinstance(app_id, dict):
+            raise InvalidResourceException(logical_id, "Property 'ApplicationId' cannot be resolved. Only FindInMap "
+                                                       "and Ref intrinsic functions are supported.")
+
         semver = resource_properties[self.LOCATION_KEY].get(self.SEMANTIC_VERSION_KEY)
+
         if not semver:
-            raise InvalidResourceException(logical_id, "Property 'SemanticVersion cannot be blank.")
+            raise InvalidResourceException(logical_id, "Property 'SemanticVersion' cannot be blank.")
+
+        if isinstance(semver, dict):
+            raise InvalidResourceException(logical_id, "Property 'SemanticVersion' cannot be resolved. Only FindInMap "
+                                                       "and Ref intrinsic functions are supported.")
+
         key = (app_id, semver)
 
         # Throw any resource exceptions saved from the before_transform_template event
