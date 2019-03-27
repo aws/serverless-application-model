@@ -388,6 +388,7 @@ class TestTranslatorEndToEnd(TestCase):
     'existing_role_logical_id',
     'error_invalid_template',
     'error_resource_not_dict',
+    'error_resource_properties_not_dict',
     'error_globals_is_not_dict',
     'error_globals_unsupported_type',
     'error_globals_unsupported_property',
