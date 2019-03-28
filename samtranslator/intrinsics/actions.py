@@ -1,7 +1,7 @@
 import re
 
 from six import string_types
-from samtranslator.model.exceptions import InvalidTemplateException
+from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
 
 class Action(object):
@@ -427,6 +427,11 @@ class GetAttAction(Action):
         if not isinstance(value, list) or len(value) < 2:
             return input_dict
 
+        if (not all(isinstance(entry, string_types) for entry in value)):
+            raise InvalidDocumentException(
+                [InvalidTemplateException('Invalid GetAtt value {}. GetAtt expects an array with 2 strings.'
+                                          .format(value))])
+
         # Value of GetAtt is an array. It can contain any number of elements, with first being the LogicalId of
         # resource and rest being the attributes. In a SAM template, a reference to a resource can be used in the
         # first parameter. However tools like AWS CLI might break them down as well. So let's just concatenate
@@ -529,8 +534,9 @@ class FindInMapAction(Action):
 
         # FindInMap expects an array with 3 values
         if not isinstance(value, list) or len(value) != 3:
-            raise InvalidTemplateException('Invalid FindInMap value {}. FindInMap expects an array with 3 values.'
-                                           .format(value))
+            raise InvalidDocumentException(
+                [InvalidTemplateException('Invalid FindInMap value {}. FindInMap expects an array with 3 values.'
+                                          .format(value))])
 
         map_name = self.resolve_parameter_refs(value[0], parameters)
         top_level_key = self.resolve_parameter_refs(value[1], parameters)
