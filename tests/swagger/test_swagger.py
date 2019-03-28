@@ -339,7 +339,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
 
         self.editor.add_lambda_integration(path, method, integration_uri, None, api_auth_config)
         actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]['credentials']
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_must_add_credentials_to_the_integration_overrides(self):
         path = "/newpath"
@@ -356,7 +356,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
 
         self.editor.add_lambda_integration(path, method, integration_uri, method_auth_config, api_auth_config)
         actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]['credentials']
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
 
 class TestSwaggerEditor_iter_on_path(TestCase):
