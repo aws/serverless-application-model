@@ -353,7 +353,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_gateway_responses_unknown_responseparameter',
     'error_api_gateway_responses_unknown_responseparameter_property',
     'error_api_invalid_auth',
-    'error_api_invalid_',
+    'error_api_invalid_path',
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
     'error_api_invalid_stagename',
