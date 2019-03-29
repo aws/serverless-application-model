@@ -5,6 +5,7 @@ from mock import Mock
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.model.exceptions import InvalidDocumentException
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
@@ -193,7 +194,7 @@ class TestSwaggerEditor_add_path(TestCase):
         path = "/badpath"
         method = "get"
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_path(path, method)
 
     def test_must_skip_existing_path(self):
@@ -430,7 +431,7 @@ class TestSwaggerEditor_add_cors(TestCase):
     def test_must_fail_with_bad_values_for_path(self):
         path = "/bad"
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_cors(path, "origins", "headers", "methods")
 
     def test_must_fail_for_invalid_allowed_origin(self):

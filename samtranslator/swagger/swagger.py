@@ -3,6 +3,7 @@ from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
 class SwaggerEditor(object):
@@ -124,7 +125,9 @@ class SwaggerEditor(object):
 
         if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
-            raise ValueError("Value of '{}' path must be a dictionary according to Swagger spec".format(path))
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Value of '{}' path must be a dictionary according to Swagger spec."
+                                          .format(path))])
 
         if self._CONDITIONAL_IF in path_dict:
             path_dict = path_dict[self._CONDITIONAL_IF][1]
