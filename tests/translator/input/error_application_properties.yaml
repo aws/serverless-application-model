@@ -42,4 +42,4 @@ Resources:
         ApplicationId:
           Sub: foobar
         SemanticVersion:
-          Sub: foobar
+          Fn::Sub: foobar
