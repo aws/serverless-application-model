@@ -370,6 +370,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_cors_credentials_true_without_explicit_origin',
     'error_function_invalid_codeuri',
     'error_function_invalid_api_event',
+    'error_function_invalid_autopublishalias',
     'error_function_invalid_event_type',
     'error_function_invalid_layer',
     'error_function_no_codeuri',
