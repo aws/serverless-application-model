@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [Function] is invalid. All 'Resources' must be Objects and have a 'Properties' Object. If you're using YAML, this may be an indentation issue."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function] is invalid. All 'Resources' must be Objects and have a 'Properties' Object. If you're using YAML, this may be an indentation issue."
+}

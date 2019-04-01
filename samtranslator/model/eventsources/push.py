@@ -12,7 +12,7 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 
 CONDITION = 'Condition'
@@ -419,6 +419,8 @@ class Api(PushEventSource):
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
                 if isinstance(permitted_stage, string_types):
+                    if not permitted_stage:
+                        raise InvalidResourceException(rest_api_id, 'StageName cannot be empty.')
                     stage_suffix = permitted_stage
                 else:
                     stage_suffix = "Stage"
