@@ -28,6 +28,9 @@ import sys
 import boto3
 from docopt import docopt
 
+my_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, my_path + '/..')
+
 from samtranslator.public.translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
