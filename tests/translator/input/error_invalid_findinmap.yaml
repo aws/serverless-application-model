@@ -1,0 +1,39 @@
+Parameters:
+  ApplicationIdParam:
+    Type: String
+    Default: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
+  VersionParam:
+    Type: String
+    Default: 1.0.0
+
+Mappings:
+  ApplicationLocations:
+    ap-southeast-1:
+      ApplicationId: arn:aws:serverlessrepo:ap-southeast-1:123456789012:applications/hello-world
+      Version: 1.0.1
+    cn-north-1:
+      ApplicationId: arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world
+      Version: 1.0.2
+    us-gov-west-1:
+      ApplicationId: arn:aws-gov:serverlessrepo:us-gov-west-1:123456789012:applications/hello-world
+      Version: 1.0.3
+
+Resources:
+  ApplicationRefParameter:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: !Ref ApplicationIdParam
+        SemanticVersion: !Ref VersionParam
+
+  ApplicationFindInMap:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: !FindInMap
+         - ApplicationLocations
+         - !Ref 'AWS::Region'
+        SemanticVersion: !FindInMap
+        - ApplicationLocations
+        - !Ref 'AWS::Region'
+        - Version
