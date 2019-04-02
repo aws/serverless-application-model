@@ -24,7 +24,7 @@ paths:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
 
         passthroughBehavior: when_no_match
-        httpMethod: POST
+        httpMethod: POST  # Keep "POST" when the API definition method is not POST. This "httpMethod" is used to call Lambda.
         type: aws_proxy
   /{proxy+}:
     x-amazon-apigateway-any-method:
@@ -41,7 +41,7 @@ paths:
       x-amazon-apigateway-integration:
         uri: 
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
-        httpMethod: POST
+        httpMethod: POST  # Keep "POST" when the API definition method is not POST. This "httpMethod" is used to call Lambda.
         type: aws_proxy
 definitions:
   Empty:
