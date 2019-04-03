@@ -2,9 +2,10 @@ from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.intrinsics import fnSub, is_instrinsic
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
+import  copy
 
 CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = 'CodeDeployServiceRole'
 CODEDEPLOY_APPLICATION_LOGICAL_ID = 'ServerlessDeploymentApplication'
@@ -120,19 +121,9 @@ class DeploymentPreferenceCollection(object):
                                                       'Events': ['DEPLOYMENT_FAILURE',
                                                                  'DEPLOYMENT_STOP_ON_ALARM',
                                                                  'DEPLOYMENT_STOP_ON_REQUEST']}
-        if isinstance(deployment_preference.deployment_type, dict):
-            modified_deployment_type = self.__handle_intrinsic_function_in_deployment_type(
-                deployment_preference.deployment_type)
-
-            # Using replace method to modify the namedtuple
-            deployment_preference._replace(deployment_type=modified_deployment_type)
-            deployment_group.DeploymentConfigName = deployment_preference.deployment_type
-        else:
-            if deployment_preference.deployment_type in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
-                deployment_group.DeploymentConfigName = fnSub("CodeDeployDefault.Lambda${ConfigName}",
-                                                              {"ConfigName": deployment_preference.deployment_type})
-            else:
-                deployment_group.DeploymentConfigName = deployment_preference.deployment_type
+        
+        deployment_group.DeploymentConfigName = self._replace_deployment_types(copy.deepcopy(
+            deployment_preference.deployment_type))
 
         deployment_group.DeploymentStyle = {'DeploymentType': 'BLUE_GREEN',
                                             'DeploymentOption': 'WITH_TRAFFIC_CONTROL'}
@@ -143,20 +134,20 @@ class DeploymentPreferenceCollection(object):
 
         return deployment_group
 
-    def __handle_intrinsic_function_in_deployment_type(self, deployment_type):
-        for key, value in deployment_type.items():
-            deployment_type[key] = [self.__process_element(element) for element in value]
-        return deployment_type
-
-    def __process_element(self, element):
-        if element in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
-            return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": element})
-        elif isinstance(element, dict):
-            if list(element)[0] == "Fn::If":
-                return self.__handle_intrinsic_function_in_deployment_type(element)
-            return element
+    def _replace_deployment_types(self, value):
+        if isinstance(value, list):
+            for i in range(len(value)):
+                value[i] = self._replace_deployment_types(value[i])
+            return value
+        elif is_instrinsic(value):
+            for (k, v) in value.items():
+                value[k] = self._replace_deployment_types(v)
+            return value
         else:
-            return element
+            if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
+                return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
+            return value
+
 
     def update_policy(self, function_logical_id):
         deployment_preference = self.get(function_logical_id)
