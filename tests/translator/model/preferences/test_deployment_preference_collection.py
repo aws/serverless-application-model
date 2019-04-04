@@ -122,7 +122,7 @@ class TestDeploymentPreferenceCollection(TestCase):
                                                                 {
                                                                    'ConfigName': 'AllAtOnce'
                                                                 }
-                                                                ]
+                                                            ]
                                                          },
                                                             'TestDeploymentConfiguration']},
                                             {'Fn::Sub': [
