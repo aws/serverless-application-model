@@ -41,7 +41,7 @@ class Resource(object):
     property_types = None
     _keywords = ['logical_id', 'relative_id', "depends_on", "resource_attributes"]
 
-    _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition", "UpdateReplacePolicy"]
+    _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition"]
 
     # Runtime attributes that can be qureied resource. They are CloudFormation attributes like ARN, Name etc that
     # will be resolvable at runtime. This map will be implemented by sub-classes to express list of attributes they

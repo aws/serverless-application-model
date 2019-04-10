@@ -660,8 +660,6 @@ class SamLayerVersion(SamResourceMacro):
         if attributes is None:
             attributes = {}
         attributes['DeletionPolicy'] = retention_policy_value
-        if retention_policy_value == self.RETAIN:
-            attributes['UpdateReplacePolicy'] = self.RETAIN
 
         old_logical_id = self.logical_id
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()

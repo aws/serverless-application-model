@@ -57,7 +57,6 @@
     "MyLayera5167acaba": {
       "Type": "AWS::Lambda::LayerVersion",
       "DeletionPolicy": "Retain",
-      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "LayerName": "MyLayer",
         "Content": {
