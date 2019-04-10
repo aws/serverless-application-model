@@ -381,7 +381,7 @@ class SamFunction(SamResourceMacro):
         """
 
         if not name:
-            raise ValueError("Alias name is required to create an alias")
+            raise InvalidResourceException(self.logical_id, "Alias name is required to create an alias")
 
         logical_id = "{id}Alias{suffix}".format(id=function.logical_id, suffix=name)
         alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())

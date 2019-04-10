@@ -34,3 +34,12 @@ Resources:
       Location:
         ApplicationId:
         SemanticVersion:
+
+  IntrinsicProperties:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId:
+          Sub: foobar
+        SemanticVersion:
+          Fn::Sub: foobar

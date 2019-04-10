@@ -353,8 +353,10 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_gateway_responses_unknown_responseparameter',
     'error_api_gateway_responses_unknown_responseparameter_property',
     'error_api_invalid_auth',
+    'error_api_invalid_path',
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
+    'error_api_invalid_stagename',
     'error_api_invalid_restapiid',
     'error_application_properties',
     'error_application_does_not_exist',
@@ -362,10 +364,13 @@ class TestTranslatorEndToEnd(TestCase):
     'error_application_preparing_timeout',
     'error_cors_on_external_swagger',
     'error_invalid_cors_dict',
+    'error_invalid_findinmap',
+    'error_invalid_getatt',
     'error_cors_credentials_true_with_wildcard_origin',
     'error_cors_credentials_true_without_explicit_origin',
     'error_function_invalid_codeuri',
     'error_function_invalid_api_event',
+    'error_function_invalid_autopublishalias',
     'error_function_invalid_event_type',
     'error_function_invalid_layer',
     'error_function_no_codeuri',
@@ -388,6 +393,7 @@ class TestTranslatorEndToEnd(TestCase):
     'existing_role_logical_id',
     'error_invalid_template',
     'error_resource_not_dict',
+    'error_resource_properties_not_dict',
     'error_globals_is_not_dict',
     'error_globals_unsupported_type',
     'error_globals_unsupported_property',
@@ -628,152 +634,6 @@ class TestFunctionVersionWithParameterReferences(TestCase):
         print(json.dumps(output_fragment, indent=2))
 
         return output_fragment
-
-
-class TestParameterValuesHandling(TestCase):
-    """
-    Test how user-supplied parameters & default template parameter values from template get merged
-    """
-
-    def test_add_default_parameter_values_must_merge(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param2": {
-                    "Type": "String",
-                    "Default": "template default"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1",
-            "Param2": "template default"
-        }
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template,
-            parameter_values)
-        self.assertEqual(expected, result)
-
-    def test_add_default_parameter_values_must_override_user_specified_values(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param1": {
-                    "Type": "String",
-                    "Default": "template default"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEqual(expected, result)
-
-    def test_add_default_parameter_values_must_skip_params_without_defaults(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param1": {
-                    "Type": "String"
-                },
-                "Param2": {
-                    "Type": "String"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEqual(expected, result)
-
-
-    @parameterized.expand([
-        # Array
-        param(["1", "2"]),
-
-        # String
-        param("something"),
-
-        # Some other non-parameter looking dictionary
-        param({"Param1": {"Foo": "Bar"}}),
-
-        param(None)
-    ])
-    def test_add_default_parameter_values_must_ignore_invalid_template_parameters(self, template_parameters):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": template_parameters
-        }
-
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(
-            sam_template, parameter_values)
-        self.assertEqual(expected, result)
-
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
-    def test_add_pseudo_parameter_values_aws_region(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        expected = {
-            "Param1": "value1",
-            "AWS::Region": "ap-southeast-1"
-        }
-
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_pseudo_parameter_values(parameter_values)
-        self.assertEqual(expected, result)
-
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
-    def test_add_pseudo_parameter_values_aws_region_not_override(self):
-        parameter_values = {
-            "AWS::Region": "value1"
-        }
-
-        expected = {
-            "AWS::Region": "value1"
-        }
-
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_pseudo_parameter_values(parameter_values)
-        self.assertEqual(expected, result)
 
 
 class TestTemplateValidation(TestCase):
