@@ -1,25 +1,29 @@
 {
   "Resources": {
-    "Images": {
-      "Type": "AWS::S3::Bucket",
-      "DependsOn": ["ThumbnailFunctionImageBucketPermission"],
+    "GetHtmlFunction": {
+      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "NotificationConfiguration": {
-          "LambdaConfigurations": [
-            {
-              "Function": {
-                "Fn::GetAtt": [
-                  "ThumbnailFunction", 
-                  "Arn"
-                ]
-              }, 
-              "Event": "s3:ObjectCreated:*"
-            }
+        "Handler": "hello.handler", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "GetHtmlFunctionRole", 
+            "Arn"
           ]
-        }
+        }, 
+        "Runtime": "python3.6", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
-    },
-    "ThumbnailFunctionRole": {
+    }, 
+    "GetHtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
@@ -56,14 +60,106 @@
         "Principal": "s3.amazonaws.com"
       }
     }, 
+    "RestApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "RestApiFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "hello.handler", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "RestApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python3.6", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ThumbnailFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "Images": {
+      "Type": "AWS::S3::Bucket", 
+      "Properties": {
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Function": {
+                "Fn::GetAtt": [
+                  "ThumbnailFunction", 
+                  "Arn"
+                ]
+              }, 
+              "Event": "s3:ObjectCreated:*"
+            }
+          ]
+        }
+      }, 
+      "DependsOn": [
+        "ThumbnailFunctionImageBucketPermission"
+      ]
+    }, 
     "ThumbnailFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "index.generate_thumbails", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket",
+          "S3Bucket": "sam-demo-bucket", 
           "S3Key": "thumbnails.zip"
         }, 
-        "Handler": "index.generate_thumbails", 
         "Role": {
           "Fn::GetAtt": [
             "ThumbnailFunctionRole", 

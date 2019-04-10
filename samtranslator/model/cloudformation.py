@@ -9,7 +9,7 @@ class NestedStack(Resource):
     property_types = {
         'TemplateURL': PropertyType(True, is_str()),
         'Parameters': PropertyType(False, is_type(dict)),
-        'NotificationArns': PropertyType(False, list_of(is_str())),
+        'NotificationARNs': PropertyType(False, list_of(is_str())),
         'Tags': PropertyType(False, list_of(is_type(dict))),
         'TimeoutInMinutes': PropertyType(False, is_type(int))
     }

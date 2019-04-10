@@ -3,13 +3,16 @@
     "FunctionWithRole": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
-          "Ref": "DeploymentRole"
+          "Fn::GetAtt": [
+            "DeploymentRole", 
+            "Arn"
+          ]
         }, 
         "Runtime": "python2.7", 
         "Tags": [
@@ -23,11 +26,11 @@
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
           "Fn::GetAtt": [
             "MinimalFunctionRole", 

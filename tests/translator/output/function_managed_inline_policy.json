@@ -1,13 +1,19 @@
 {
+  "Parameters": {
+    "SomeManagedPolicyArn": {
+      "Default": "arn:aws:iam::aws:policy/OtherPolicy", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "Function": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket",
+          "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
           "Fn::GetAtt": [
             "FunctionRole", 
@@ -27,11 +33,13 @@
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaRole", 
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
           "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess", 
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          {"Ref": "SomeManagedPolicyArn"},
-          "arn:aws:1234:iam:policy/CustomerCreatedManagedPolicy"
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaRole", 
+          {
+            "Ref": "SomeManagedPolicyArn"
+          }, 
+          "arn:aws:iam::123456789012:policy/CustomerCreatedManagedPolicy"
         ], 
         "Policies": [
           {

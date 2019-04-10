@@ -27,19 +27,26 @@ Resources:
         Fn::GetAtt: ["MinimalFunction.Alias", "Name"]
 
 Outputs:
-  AliasArn: !Ref MinimalFunction.Alias
+  AliasArn:
+    Value: !Ref MinimalFunction.Alias
 
-  AliasName: !GetAtt MinimalFunction.Alias.Name
+  AliasName:
+    Value: !GetAtt MinimalFunction.Alias.Name
 
   # Alias doesn't exist for this function. This reference must not resolve
-  MustNotResolve: !GetAtt FunctionWithoutAlias.Alias.Name
+  MustNotResolve:
+    Value: !GetAtt FunctionWithoutAlias.Alias.Name
 
   AliasInSub:
-    Fn::Sub: ["Hello ${MinimalFunction.Alias} ${MinimalFunction.Alias.Name} ${SomeValue}", {"SomeValue": "World"}]
+    Value:
+      Fn::Sub: ["Hello ${MinimalFunction.Alias} ${MinimalFunction.Alias.Name} ${SomeValue}", {"SomeValue": "World"}]
 
-  VersionArn: !Ref MinimalFunction.Version
+  VersionArn:
+    Value: !Ref MinimalFunction.Version
   VersionNumber:
-    Fn::GetAtt: ["MinimalFunction.Version", "Version"]
+    Value:
+      Fn::GetAtt: ["MinimalFunction.Version", "Version"]
 
   UnResolvedVersion:
-    Ref: FunctionWithoutAlias.Version
+    Value:
+      Ref: FunctionWithoutAlias.Version
