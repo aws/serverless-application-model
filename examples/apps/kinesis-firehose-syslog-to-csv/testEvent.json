@@ -1,0 +1,16 @@
+{
+  "invocationId": "fir",
+  "region": "us-east-1",
+  "records": [
+    {
+      "recordId": "49546986683135544286507457936321625675700192471156785154",
+      "approximateArrivalTimestamp": 1495072949453,
+      "data": "SmFuIDEyIDA2OjMwOjAwIDEuMi4zLjQgYXBhY2hlX3NlcnZlcjogMS4yLjMuNCAtIC0gWzEyL0phbi8yMDExOjA2OjI5OjU5ICswMTAwXSAiR0VUIC9mb28vYmFyLmh0bWwgSFRUUC8xLjEiIDMwMSA5NiAiLSIgIk1vemlsbGEvNS4wIChXaW5kb3dzOyBVOyBXaW5kb3dzIE5UIDUuMTsgZnI7IHJ2OjEuOS4yLjEyKSBHZWNrby8yMDEwMTAyNiBGaXJlZm94LzMuNi4xMiAoIC5ORVQgQ0xSIDMuNS4zMDcyOSkiIFBJRCAxODkwNCBUaW1lIFRha2VuIDA="
+    },
+    {
+      "recordId": "49546986683135544286507457936321625675700192471156785154",
+      "approximateArrivalTimestamp": "2012-04-23T18:25:43.511Z",
+      "data": "SGVsbG8sIHRoaXMgaXMgYSB0ZXN0IDEyMy4="
+    }
+  ]
+}
