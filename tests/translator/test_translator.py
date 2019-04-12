@@ -288,9 +288,18 @@ class TestTranslatorEndToEnd(TestCase):
         print(json.dumps(output_fragment, indent=2))
 
         # Run cfn-lint on translator test output files.
-
         rules = cfnlint.core.get_rules([], LINT_IGNORE_WARNINGS, [])
-        output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info.major >= 3:
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
+            output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        else: # deprecation warning catching in py2
+            import warnings
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore",category=DeprecationWarning)
+                output_template = cfnlint.decode.cfn_json.load(expected_filepath)
         runner = cfnlint.Runner(rules, expected_filepath, output_template, [region])
         matches = []
 
@@ -298,11 +307,6 @@ class TestTranslatorEndToEnd(TestCase):
         if testcase not in LINT_IGNORE_TESTS and partition != 'aws-cn':
             matches = runner.run()
         print('cfn-lint ({}): {}'.format(expected_filepath, matches))
-
-        # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
 
         assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
         assert len(matches) == 0
