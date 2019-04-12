@@ -372,8 +372,8 @@ class TestTranslatorEndToEnd(TestCase):
 
         # Update any Output References in the template
         for output_key, output_value in resources.get("Outputs", {}).items():
-            if output_value.get("Ref") in deployment_logical_id_dict:
-                output_value["Ref"] = deployment_logical_id_dict[output_value.get("Ref")]
+            if output_value.get("Value").get("Ref") in deployment_logical_id_dict:
+                output_value["Value"]["Ref"] = deployment_logical_id_dict[output_value.get("Value").get("Ref")]
 
     def _generate_new_deployment_hash(self, logical_id, dict_to_hash, rest_api_to_swagger_hash):
         data_bytes = json.dumps(dict_to_hash, separators=(',', ':'), sort_keys=True).encode("utf8")
