@@ -182,7 +182,7 @@ AWS::Serverless::Application
 ================================== ======================== ========================
 Location                            None                     SAM expects exact values for the Location property
 Parameters                          All
-NotificationArns                    All
+NotificationARNs                    All
 Tags                                All
 TimeoutInMinutes                    All
 ================================== ======================== ========================
