@@ -1,7 +1,10 @@
 # Testing Alias Invoke with ALL event sources supported by Lambda
 # We are looking to check if the event sources and their associated Lambda::Permission resources are
 # connect to the Alias and *not* the function
-
+Parameters:
+  MyStageName:
+    Type: String
+    Default: beta
 Resources:
   MyAwesomeFunction:
     Type: 'AWS::Serverless::Function'
@@ -96,4 +99,4 @@ Resources:
         Key: webpage_swagger.json
       Variables:
         LambdaFunction:
-          Fn::GetAtt: ["MyAwesomeFunction.Alias", "Arn"]
+          Ref: "MyAwesomeFunction"

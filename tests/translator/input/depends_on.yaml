@@ -41,8 +41,8 @@ Resources:
         - { "AttributeName" : "id", "KeyType" : "HASH"}
 
       ProvisionedThroughput:
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
       StreamSpecification:
         StreamViewType: "NEW_IMAGE"

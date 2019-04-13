@@ -30,8 +30,6 @@ Outputs:
     Value: !Ref MyLayer
   FunctionName:
     Value: !Ref MyFunction
-  LayerAtt: # For testing purposes only
-    Value: !GetAtt MyLayer.Arn
   FunctionAtt:
     Value: !GetAtt MyFunction.Arn
   LayerSub:

@@ -1,4 +1,4 @@
-Properties:
+Parameters:
   EndpointConfig:
     Type: String
 

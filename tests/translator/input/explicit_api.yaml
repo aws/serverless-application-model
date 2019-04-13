@@ -2,6 +2,9 @@ Parameters:
   MyStageName:
     Type: String
     Default: Production
+  something:
+    Type: String
+    Default: something
 
 Resources:
   GetHtmlFunction:

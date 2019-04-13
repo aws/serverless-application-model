@@ -1,3 +1,13 @@
+Parameters:
+  ReadCapacity:
+    Type: Number
+    Default: 15
+  WriteCapacity:
+    Type: Number
+    Default: 15
+  EnableSSE:
+    Type: String # Boolean parameter types not allowed
+    Default: True
 Resources:
   MinimalTableRefParamLongForm:
     Type: 'AWS::Serverless::SimpleTable'

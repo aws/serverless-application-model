@@ -569,7 +569,7 @@ class SamApplication(SamResourceMacro):
         'Location': PropertyType(True, one_of(is_str(), is_type(dict))),
         'TemplateUrl': PropertyType(False, is_str()),
         'Parameters': PropertyType(False, is_type(dict)),
-        'NotificationArns': PropertyType(False, list_of(is_str())),
+        'NotificationARNs': PropertyType(False, list_of(is_str())),
         'Tags': PropertyType(False, is_type(dict)),
         'TimeoutInMinutes': PropertyType(False, is_type(int))
     }
@@ -586,7 +586,7 @@ class SamApplication(SamResourceMacro):
         nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on,
                                    attributes=self.get_passthrough_resource_attributes())
         nested_stack.Parameters = self.Parameters
-        nested_stack.NotificationArns = self.NotificationArns
+        nested_stack.NotificationARNs = self.NotificationARNs
         application_tags = self._get_application_tags()
         nested_stack.Tags = self._construct_tag_list(self.Tags, application_tags)
         nested_stack.TimeoutInMinutes = self.TimeoutInMinutes

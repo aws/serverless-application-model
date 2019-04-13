@@ -1,3 +1,9 @@
+Conditions:
+  TestCondition:
+    Fn::Equals:
+      - beta
+      - beta
+
 Resources:
   MinimalLayer:
     Type: 'AWS::Serverless::LayerVersion'
@@ -10,7 +16,7 @@ Resources:
       ContentUri:
         Bucket: somebucket
         Key: somekey
-        Version: 1
+        Version: "v1"
       RetentionPolicy: Delete
 
   CompleteLayer:
@@ -27,6 +33,6 @@ Resources:
 
   LayerWithCondition:
     Type: 'AWS::Serverless::LayerVersion'
-    Condition: "this is a test"    
+    Condition: TestCondition    
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip  
