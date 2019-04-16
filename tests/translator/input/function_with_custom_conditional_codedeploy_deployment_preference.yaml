@@ -3,6 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Parameters:
   EnvType:
     Default: dev
+    Type: String
 Conditions:
   IsDevEnv: !Equals [!Ref EnvType, dev]
   IsDevEnv2: !Equals [!Ref EnvType, prod]
@@ -12,6 +13,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs8.10
+      CodeUri: s3://bucket/key
       AutoPublishAlias: live
       DeploymentPreference:
         Type: !If [IsDevEnv, !If [IsDevEnv2, AllAtOnce, TestCustomDeploymentConfig], Canary10Percent15Minutes]
