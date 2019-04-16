@@ -148,7 +148,7 @@
           "Fn::Sub": [
             "CodeDeployDefault.Lambda${ConfigName}", 
             {
-              "ConfigName": "Linear10PercentEvery2Minute"
+              "ConfigName": "Linear10PercentEvery2Minutes"
             }
           ]
         }, 

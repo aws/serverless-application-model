@@ -63,12 +63,11 @@ class TestDeploymentPreferenceCollection(TestCase):
                                                                'Events': ['DEPLOYMENT_FAILURE',
                                                                           'DEPLOYMENT_STOP_ON_ALARM',
                                                                           'DEPLOYMENT_STOP_ON_REQUEST']}
-        deployment_type = 'deployment_type'
         expected_deployment_group.DeploymentConfigName = {
             'Fn::Sub': [
                 'CodeDeployDefault.Lambda${ConfigName}',
                 {
-                    'ConfigName': deployment_type
+                    'ConfigName': self.deployment_type_global
                 }
             ]
         }
@@ -77,11 +76,69 @@ class TestDeploymentPreferenceCollection(TestCase):
         expected_deployment_group.ServiceRoleArn = {'Fn::GetAtt': [CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID, 'Arn']}
 
         deployment_preference_collection = DeploymentPreferenceCollection()
-        deployment_preference_collection.add(self.function_logical_id, {'Type': deployment_type})
+        deployment_preference_collection.add(self.function_logical_id, {'Type': self.deployment_type_global})
         deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
 
         self.assertEqual(deployment_group.to_dict(),
                          expected_deployment_group.to_dict())
+
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    def test_deployment_preference_with_codedeploy_custom_configuration(self):
+        deployment_type = "TestDeploymentConfiguration"
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, {'Type': deployment_type})
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertEqual(deployment_type, deployment_group.DeploymentConfigName)
+
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    def test_deployment_preference_with_codedeploy_predifined_configuration(self):
+        deployment_type = "Canary10Percent5Minutes"
+        expected_deployment_config_name = {
+            'Fn::Sub': [
+                'CodeDeployDefault.Lambda${ConfigName}',
+                {
+                    'ConfigName': deployment_type
+                }
+            ]
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, {'Type': deployment_type})
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        print(deployment_group.DeploymentConfigName)
+        self.assertEqual(expected_deployment_config_name, deployment_group.DeploymentConfigName)
+
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    def test_deployment_preference_with_conditional_custom_configuration(self):
+        deployment_type = {'Fn::If': ['IsDevEnv', {'Fn::If':
+                                                   ['IsDevEnv1', 'AllAtOnce', 'TestDeploymentConfiguration']},
+                                      'Canary10Percent15Minutes']}
+
+        expected_deployment_config_name = {'Fn::If':
+                                           ['IsDevEnv', {'Fn::If':
+                                                         ['IsDevEnv1', {'Fn::Sub': [
+                                                                'CodeDeployDefault.Lambda${ConfigName}',
+                                                                {
+                                                                   'ConfigName': 'AllAtOnce'
+                                                                }
+                                                            ]
+                                                         },
+                                                            'TestDeploymentConfiguration']},
+                                            {'Fn::Sub': [
+                                               'CodeDeployDefault.Lambda${ConfigName}',
+                                               {
+                                                   'ConfigName': 'Canary10Percent15Minutes'
+                                               }
+                                                ]
+                                             }
+                                            ]
+                                           }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, {'Type': deployment_type})
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+        print(deployment_group.DeploymentConfigName)
+        self.assertEqual(expected_deployment_config_name, deployment_group.DeploymentConfigName)
 
     @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_deployment_group_with_all_parameters(self):

@@ -2,12 +2,23 @@ from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.intrinsics import fnSub
+from samtranslator.model.intrinsics import fnSub, is_instrinsic
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
+import copy
 
 CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = 'CodeDeployServiceRole'
 CODEDEPLOY_APPLICATION_LOGICAL_ID = 'ServerlessDeploymentApplication'
+CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST = ["Canary10Percent5Minutes",
+                                             "Canary10Percent10Minutes",
+                                             "Canary10Percent15Minutes",
+                                             "Canary10Percent30Minutes",
+                                             "Linear10PercentEvery1Minute",
+                                             "Linear10PercentEvery2Minutes",
+                                             "Linear10PercentEvery3Minutes",
+                                             "Linear10PercentEvery10Minutes",
+                                             "AllAtOnce"
+                                             ]
 
 
 class DeploymentPreferenceCollection(object):
@@ -95,6 +106,7 @@ class DeploymentPreferenceCollection(object):
         :param function_logical_id: logical_id of the function this deployment group belongs to
         :return: CodeDeployDeploymentGroup resource
         """
+
         deployment_preference = self.get(function_logical_id)
 
         deployment_group = CodeDeployDeploymentGroup(self.deployment_group_logical_id(function_logical_id))
@@ -109,8 +121,10 @@ class DeploymentPreferenceCollection(object):
                                                       'Events': ['DEPLOYMENT_FAILURE',
                                                                  'DEPLOYMENT_STOP_ON_ALARM',
                                                                  'DEPLOYMENT_STOP_ON_REQUEST']}
-        deployment_group.DeploymentConfigName = fnSub("CodeDeployDefault.Lambda${ConfigName}",
-                                                      {"ConfigName": deployment_preference.deployment_type})
+
+        deployment_group.DeploymentConfigName = self._replace_deployment_types(copy.deepcopy(
+            deployment_preference.deployment_type))
+
         deployment_group.DeploymentStyle = {'DeploymentType': 'BLUE_GREEN',
                                             'DeploymentOption': 'WITH_TRAFFIC_CONTROL'}
 
@@ -119,6 +133,20 @@ class DeploymentPreferenceCollection(object):
             deployment_group.ServiceRoleArn = deployment_preference.role
 
         return deployment_group
+
+    def _replace_deployment_types(self, value):
+        if isinstance(value, list):
+            for i in range(len(value)):
+                value[i] = self._replace_deployment_types(value[i])
+            return value
+        elif is_instrinsic(value):
+            for (k, v) in value.items():
+                value[k] = self._replace_deployment_types(v)
+            return value
+        else:
+            if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
+                return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
+            return value
 
     def update_policy(self, function_logical_id):
         deployment_preference = self.get(function_logical_id)

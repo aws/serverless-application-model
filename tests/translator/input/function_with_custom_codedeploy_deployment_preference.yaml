@@ -7,4 +7,4 @@ Resources:
       Runtime: python2.7
       AutoPublishAlias: live
       DeploymentPreference:
-        Type: Linear10PercentEvery3Minutes
+        Type: TestDeploymentConfiguration
