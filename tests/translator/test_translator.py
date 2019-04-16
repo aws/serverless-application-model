@@ -221,6 +221,8 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_kmskeyarn',
         'function_with_alias',
         'function_with_alias_intrinsics',
+        'function_with_custom_codedeploy_deployment_preference',
+        'function_with_custom_conditional_codedeploy_deployment_preference',
         'function_with_disabled_deployment_preference',
         'function_with_deployment_preference',
         'function_with_deployment_preference_all_parameters',
