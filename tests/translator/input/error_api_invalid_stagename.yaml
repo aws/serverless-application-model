@@ -1,0 +1,20 @@
+Resources:
+  ApiWithEmptyStageName:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody: {}
+      StageName: ''
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda.handler
+      CodeUri: s3://bucket/api
+      Runtime: nodejs8.10
+      Events:
+        ProxyApiRoot:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ApiWithEmptyStageName
+            Path: "/"
+            Method: ANY

@@ -92,6 +92,12 @@ class TestServerlessAppPlugin_init(TestCase):
         with self.assertRaises(InvalidPluginException):
             plugin = ServerlessAppPlugin(wait_for_template_active_status=True, validate_only=True)
 
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    def test_plugin_accepts_parameters(self):
+        parameters = {"a":"b"}
+        self.plugin = ServerlessAppPlugin(parameters=parameters)
+        self.assertEqual(self.plugin._parameters, parameters)
+
 
 class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
 
@@ -193,6 +199,23 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
         semver = '1.0.0'
         response = self.plugin._sar_service_call(service_call_lambda, logical_id, app_id, semver)
         self.assertEqual(app_id, response['ApplicationId'])
+
+    def test_resolve_intrinsics(self):
+        self.plugin = ServerlessAppPlugin(parameters={"AWS::Region": "us-east-1"})
+        mappings = {
+            "MapA":{
+                "us-east-1": {
+                    "SecondLevelKey1": "value1"
+                }
+            }
+        }
+        input = {
+            "Fn::FindInMap": ["MapA", {"Ref": "AWS::Region"}, "SecondLevelKey1"]
+        }
+        intrinsic_resolvers = self.plugin._get_intrinsic_resolvers(mappings)
+        output = self.plugin._resolve_location_value(input, intrinsic_resolvers)
+
+        self.assertEqual("value1", output)
 
 
 class ApplicationResource(object):

@@ -24,6 +24,30 @@
         "LayerName": "SomeLayerName"
       }
     },
+    "LayerWithRefNameIntrinsicRegion32bf7198a5": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "ap-southeast-1"
+      }
+    },
+    "LayerWithSubNameIntrinsicRegiond71326de24": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": {
+          "Fn::Sub": "layer-ap-southeast-1"
+        }
+      }
+    },
     "LayerWithRuntimesIntrinsic1a006faa85": {
       "DeletionPolicy": "Retain",
       "Type": "AWS::Lambda::LayerVersion",

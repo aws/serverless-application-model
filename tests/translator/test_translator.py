@@ -119,12 +119,12 @@ def mock_sar_service_call(self, service_call_function, logical_id, *args):
     elif application_id == "expired":
         status = "EXPIRED"
     message = {
-        'ApplicationId': args[0], 
-        'CreationTime': 'x', 
-        'ExpirationTime': 'x', 
-        'SemanticVersion': '1.1.1', 
-        'Status': status, 
-        'TemplateId': 'id-xx-xx', 
+        'ApplicationId': args[0],
+        'CreationTime': 'x',
+        'ExpirationTime': 'x',
+        'SemanticVersion': '1.1.1',
+        'Status': status,
+        'TemplateId': 'id-xx-xx',
         'TemplateUrl': 'https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url'
     }
     return message
@@ -142,6 +142,7 @@ class TestTranslatorEndToEnd(TestCase):
         'basic_function',
         'basic_application',
         'application_preparing_state',
+        'application_with_intrinsics',
         'basic_layer',
         'cloudwatchevent',
         'cloudwatch_logs_with_ref',
@@ -156,6 +157,9 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_auth_all_maximum',
         'api_with_auth_all_minimum',
         'api_with_auth_no_default',
+        'api_with_default_aws_iam_auth',
+        'api_with_method_aws_iam_auth',
+        'api_with_aws_iam_auth_overrides',
         'api_with_method_settings',
         'api_with_binary_media_types',
         'api_with_minimum_compression_size',
@@ -167,6 +171,11 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_maxage',
         'api_with_cors_and_only_credentials_false',
         'api_with_cors_no_definitionbody',
+        'api_with_gateway_responses',
+        'api_with_gateway_responses_all',
+        'api_with_gateway_responses_minimal',
+        'api_with_gateway_responses_implicit',
+        'api_with_gateway_responses_string_status_code',
         'api_cache',
         'api_with_access_log_setting',
         'api_with_canary_setting',
@@ -245,7 +254,7 @@ class TestTranslatorEndToEnd(TestCase):
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(OUTPUT_FOLDER,partition_folder, testcase + '.json'), 'r'))
+        expected = json.load(open(os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json'), 'r'))
 
         with patch('boto3.session.Session.region_name', region):
             parameter_values = get_template_parameter_values()
@@ -340,9 +349,14 @@ class TestTranslatorEndToEnd(TestCase):
 
 @pytest.mark.parametrize('testcase', [
     'error_api_duplicate_methods_same_path',
+    'error_api_gateway_responses_nonnumeric_status_code',
+    'error_api_gateway_responses_unknown_responseparameter',
+    'error_api_gateway_responses_unknown_responseparameter_property',
     'error_api_invalid_auth',
+    'error_api_invalid_path',
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
+    'error_api_invalid_stagename',
     'error_api_invalid_restapiid',
     'error_application_properties',
     'error_application_does_not_exist',
@@ -350,9 +364,14 @@ class TestTranslatorEndToEnd(TestCase):
     'error_application_preparing_timeout',
     'error_cors_on_external_swagger',
     'error_invalid_cors_dict',
+    'error_invalid_findinmap',
+    'error_invalid_getatt',
     'error_cors_credentials_true_with_wildcard_origin',
     'error_cors_credentials_true_without_explicit_origin',
     'error_function_invalid_codeuri',
+    'error_function_invalid_api_event',
+    'error_function_invalid_autopublishalias',
+    'error_function_invalid_event_type',
     'error_function_invalid_layer',
     'error_function_no_codeuri',
     'error_function_no_handler',
@@ -373,6 +392,8 @@ class TestTranslatorEndToEnd(TestCase):
     'existing_permission_logical_id',
     'existing_role_logical_id',
     'error_invalid_template',
+    'error_resource_not_dict',
+    'error_resource_properties_not_dict',
     'error_globals_is_not_dict',
     'error_globals_unsupported_type',
     'error_globals_unsupported_property',
@@ -615,119 +636,6 @@ class TestFunctionVersionWithParameterReferences(TestCase):
         return output_fragment
 
 
-class TestParameterValuesHandling(TestCase):
-    """
-    Test how user-supplied parameters & default template parameter values from template get merged
-    """
-
-    def test_add_default_parameter_values_must_merge(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param2": {
-                    "Type": "String",
-                    "Default": "template default"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1",
-            "Param2": "template default"
-        }
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template,
-            parameter_values)
-        self.assertEqual(expected, result)
-
-    def test_add_default_parameter_values_must_override_user_specified_values(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param1": {
-                    "Type": "String",
-                    "Default": "template default"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEqual(expected, result)
-
-    def test_add_default_parameter_values_must_skip_params_without_defaults(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param1": {
-                    "Type": "String"
-                },
-                "Param2": {
-                    "Type": "String"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEqual(expected, result)
-
-
-    @parameterized.expand([
-        # Array
-        param(["1", "2"]),
-
-        # String
-        param("something"),
-
-        # Some other non-parameter looking dictionary
-        param({"Param1": {"Foo": "Bar"}}),
-
-        param(None)
-    ])
-    def test_add_default_parameter_values_must_ignore_invalid_template_parameters(self, template_parameters):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": template_parameters
-        }
-
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(
-            sam_template, parameter_values)
-        self.assertEqual(expected, result)
-
-
 class TestTemplateValidation(TestCase):
 
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
@@ -757,6 +665,21 @@ class TestTemplateValidation(TestCase):
     def test_throws_when_resource_is_not_dict(self):
         template = {
             "Resources": [1,2,3]
+        }
+
+        with self.assertRaises(InvalidDocumentException):
+            sam_parser = Parser()
+            translator = Translator({}, sam_parser)
+            translator.translate(template, {})
+
+
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    def test_throws_when_resources_not_all_dicts(self):
+        template = {
+            "Resources": {
+                "notadict": None,
+                "MyResource": {}
+            }
         }
 
         with self.assertRaises(InvalidDocumentException):
@@ -851,7 +774,7 @@ class TestPluginsUsage(TestCase):
         resource_from_dict_mock.assert_called_with("MyTable",
                                                         manifest["Resources"]["MyTable"],
                                                         sam_plugins=sam_plugins_object_mock)
-        prepare_plugins_mock.assert_called_once_with(initial_plugins)
+        prepare_plugins_mock.assert_called_once_with(initial_plugins, {"AWS::Region": "ap-southeast-1"})
 
 def get_policy_mock():
     mock_policy_loader = MagicMock()
@@ -876,4 +799,3 @@ def get_resource_by_type(template, type):
 
 def get_exception_error_message(e):
     return reduce(lambda message, error: message + ' ' + error.message, e.value.causes, e.value.message)
-

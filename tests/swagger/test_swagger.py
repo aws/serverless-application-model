@@ -5,6 +5,7 @@ from mock import Mock
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.model.exceptions import InvalidDocumentException
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
@@ -193,7 +194,7 @@ class TestSwaggerEditor_add_path(TestCase):
         path = "/badpath"
         method = "get"
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_path(path, method)
 
     def test_must_skip_existing_path(self):
@@ -327,6 +328,37 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         with self.assertRaises(ValueError):
             self.editor.add_lambda_integration("/bar", "get", "integrationUri")
 
+    def test_must_add_credentials_to_the_integration(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        expected = 'arn:aws:iam::*:user/*'
+        api_auth_config = {
+          "DefaultAuthorizer": "AWS_IAM",
+          "InvokeRole": "CALLER_CREDENTIALS"
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, None, api_auth_config)
+        actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]['credentials']
+        self.assertEqual(expected, actual)
+
+    def test_must_add_credentials_to_the_integration_overrides(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        expected = 'arn:aws:iam::*:role/xxxxxx'
+        api_auth_config = {
+          "DefaultAuthorizer": "MyAuth",
+        }
+        method_auth_config = {
+          "Authorizer": "AWS_IAM",
+          "InvokeRole": "arn:aws:iam::*:role/xxxxxx"
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, method_auth_config, api_auth_config)
+        actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]['credentials']
+        self.assertEqual(expected, actual)
+
 
 class TestSwaggerEditor_iter_on_path(TestCase):
 
@@ -399,7 +431,7 @@ class TestSwaggerEditor_add_cors(TestCase):
     def test_must_fail_with_bad_values_for_path(self):
         path = "/bad"
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_cors(path, "origins", "headers", "methods")
 
     def test_must_fail_for_invalid_allowed_origin(self):

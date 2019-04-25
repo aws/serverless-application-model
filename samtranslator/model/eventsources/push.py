@@ -12,7 +12,7 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.exceptions import InvalidEventException
+from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 
 CONDITION = 'Condition'
@@ -419,6 +419,8 @@ class Api(PushEventSource):
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
                 if isinstance(permitted_stage, string_types):
+                    if not permitted_stage:
+                        raise InvalidResourceException(rest_api_id, 'StageName cannot be empty.')
                     stage_suffix = permitted_stage
                 else:
                     stage_suffix = "Stage"
@@ -529,7 +531,7 @@ class Api(PushEventSource):
         if CONDITION in function.resource_attributes:
             condition = function.resource_attributes[CONDITION]
 
-        editor.add_lambda_integration(self.Path, self.Method, uri, condition=condition)
+        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get('Auth'), condition=condition)
 
         if self.Auth:
             method_authorizer = self.Auth.get('Authorizer')
@@ -538,28 +540,29 @@ class Api(PushEventSource):
                 api_auth = api.get('Auth')
                 api_authorizers = api_auth and api_auth.get('Authorizers')
 
-                if not api_authorizers:
-                    raise InvalidEventException(
-                        self.relative_id,
-                        'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] because '
-                        'the related API does not define any Authorizers.'.format(
-                            authorizer=method_authorizer, method=self.Method, path=self.Path))
+                if method_authorizer != 'AWS_IAM':
+                    if not api_authorizers:
+                        raise InvalidEventException(
+                            self.relative_id,
+                            'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
+                            'because the related API does not define any Authorizers.'.format(
+                                authorizer=method_authorizer, method=self.Method, path=self.Path))
 
-                if method_authorizer != 'NONE' and not api_authorizers.get(method_authorizer):
-                    raise InvalidEventException(
-                        self.relative_id,
-                        'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] because it '
-                        'wasn\'t defined in the API\'s Authorizers.'.format(
-                            authorizer=method_authorizer, method=self.Method, path=self.Path))
+                    if method_authorizer != 'NONE' and not api_authorizers.get(method_authorizer):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
+                            'because it wasn\'t defined in the API\'s Authorizers.'.format(
+                                authorizer=method_authorizer, method=self.Method, path=self.Path))
 
-                if method_authorizer == 'NONE' and not api_auth.get('DefaultAuthorizer'):
-                    raise InvalidEventException(
-                        self.relative_id,
-                        'Unable to set Authorizer on API method [{method}] for path [{path}] because \'NONE\' '
-                        'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
-                            method=self.Method, path=self.Path))
+                    if method_authorizer == 'NONE' and not api_auth.get('DefaultAuthorizer'):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            'Unable to set Authorizer on API method [{method}] for path [{path}] because \'NONE\' '
+                            'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
+                                method=self.Method, path=self.Path))
 
-            editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+                editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
 
         api["DefinitionBody"] = editor.swagger
 

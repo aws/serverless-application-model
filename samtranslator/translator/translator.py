@@ -14,6 +14,7 @@ from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
+from samtranslator.sdk.parameter import SamParameterValues
 
 
 class Translator:
@@ -45,9 +46,12 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
+        sam_parameter_values = SamParameterValues(parameter_values)
+        sam_parameter_values.add_default_parameter_values(sam_template)
+        sam_parameter_values.add_pseudo_parameter_values()
+        parameter_values = sam_parameter_values.parameter_values
         # Create & Install plugins
-        sam_plugins = prepare_plugins(self.plugins)
-        parameter_values = self._add_default_parameter_values(sam_template, parameter_values)
+        sam_plugins = prepare_plugins(self.plugins, parameter_values)
 
         self.sam_parser.parse(
             sam_template=sam_template,
@@ -155,63 +159,14 @@ class Translator:
 
         return functions + apis + others
 
-    # Ideally this should belong to a separate class called "Parameters" or something that knows how to manage
-    # parameters. An instance of this class should be passed as input to the Translate class.
-    def _add_default_parameter_values(self, sam_template, parameter_values):
-        """
-        Method to read default values for template parameters and merge with user supplied values.
 
-        Example:
-        If the template contains the following parameters defined
-
-        Parameters:
-            Param1:
-                Type: String
-                Default: default_value
-            Param2:
-                Type: String
-                Default: default_value
-
-        And, the user explicitly provided the following parameter values:
-
-        {
-            Param2: "new value"
-        }
-
-        then, this method will grab default value for Param1 and return the following result:
-
-        {
-            Param1: "default_value",
-            Param2: "new value"
-        }
-
-
-        :param dict sam_template: SAM template
-        :param dict parameter_values: Dictionary of parameter values provided by the user
-        :return dict: Merged parameter values
-        """
-
-        parameter_definition = sam_template.get("Parameters", None)
-        if not parameter_definition or not isinstance(parameter_definition, dict):
-            return parameter_values
-
-        default_values = {}
-        for param_name, value in parameter_definition.items():
-            if isinstance(value, dict) and "Default" in value:
-                default_values[param_name] = value["Default"]
-
-        # Any explicitly provided value must override the default
-        default_values.update(parameter_values)
-
-        return default_values
-
-
-def prepare_plugins(plugins):
+def prepare_plugins(plugins, parameters={}):
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
 
-    :param list of samtranslator.plugins.BasePlugin plugins: List of plugins to install
+    :param plugins: list of samtranslator.plugins.BasePlugin plugins: List of plugins to install
+    :param parameters: Dictionary of parameter values
     :return samtranslator.plugins.SamPlugins: Instance of `SamPlugins`
     """
 
@@ -226,7 +181,7 @@ def prepare_plugins(plugins):
 
     # If a ServerlessAppPlugin does not yet exist, create one and add to the beginning of the required plugins list.
     if not any(isinstance(plugin, ServerlessAppPlugin) for plugin in plugins):
-        required_plugins.insert(0, ServerlessAppPlugin())
+        required_plugins.insert(0, ServerlessAppPlugin(parameters=parameters))
 
     # Execute customer's plugins first before running SAM plugins. It is very important to retain this order because
     # other plugins will be dependent on this ordering.
