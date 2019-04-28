@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "An error occurred (ValidationError) when calling the CreateChangeSet operation: Template format error: Every Condition member must be a string"
+    }
+  ],
+  "errorMessage": "An error occurred (ValidationError) when calling the CreateChangeSet operation: Template format error: Every Condition member must be a string"
+}
