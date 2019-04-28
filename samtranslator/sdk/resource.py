@@ -1,5 +1,5 @@
 from enum import Enum
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.model.types import is_type
 
 
@@ -35,7 +35,10 @@ class SamResource(object):
         # As long as the type is valid and type string.
         validate_type = is_type(str)
         if self.type and not validate_type(self.type, should_raise=False):
-            raise InvalidDocumentException([InvalidTemplateException("An error occurred (ValidationError) when calling the CreateChangeSet operation: Template format error: Every Condition member must be a string")])
+            raise InvalidDocumentException([
+                InvalidTemplateException("An error occurred (ValidationError) when calling the CreateChangeSet "
+                                         "operation: Template format error: Every Condition member must be a"
+                                         " string")])
         else:
             return SamResourceType.has_value(self.type)
 
