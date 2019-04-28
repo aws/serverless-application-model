@@ -252,7 +252,8 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_api_with_many_conditions',
         'implicit_and_explicit_api_with_conditions',
         'api_with_cors_and_conditions_no_definitionbody',
-        'api_with_auth_and_conditions_all_max'
+        'api_with_auth_and_conditions_all_max',
+        'error_function_with_invalid_condition_name',
       ],
       [
        ("aws", "ap-southeast-1"),
