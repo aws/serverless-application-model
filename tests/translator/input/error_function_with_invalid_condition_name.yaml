@@ -2,7 +2,7 @@ Resources:
   ConditionFunction:
     Type: 'AWS::Serverless::Function'
     Condition:
-      ref: "MyCondition"
+      ref: 1221
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
