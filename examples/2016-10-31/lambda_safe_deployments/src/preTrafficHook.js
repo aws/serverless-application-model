@@ -8,7 +8,7 @@ exports.handler = async (event, context, callback) => {
 
     console.log("Entering PreTraffic Hook!");
     console.log(JSON.stringify(event));
-	
+
     //Read the DeploymentId from the event payload.
     let deploymentId = event.DeploymentId;
     console.log("deploymentId=" + deploymentId);
@@ -20,7 +20,7 @@ exports.handler = async (event, context, callback) => {
     /*
       [Perform validation or prewarming steps here]
     */
-	
+
     // Prepare the validation test results with the deploymentId and
     // the lifecycleEventHookExecutionId for AWS CodeDeploy.
     let params = {
@@ -28,7 +28,7 @@ exports.handler = async (event, context, callback) => {
         lifecycleEventHookExecutionId: lifecycleEventHookExecutionId,
         status: 'Succeeded' // status can be 'Succeeded' or 'Failed'
     };
-	
+
     try {
       await codedeploy.putLifecycleEventHookExecutionStatus(params).promise();
       console.log("putLifecycleEventHookExecutionStatus done. executionStatus=[" + params.status + "]");
@@ -36,7 +36,7 @@ exports.handler = async (event, context, callback) => {
     }
     catch (err) {
       console.log("putLifecycleEventHookExecutionStatus ERROR: " + err);
-      return 'Validation test failed'
+      throw new Error('Validation test failed')
     }
 
 }
