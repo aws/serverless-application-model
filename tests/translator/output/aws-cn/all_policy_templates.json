@@ -1226,9 +1226,9 @@
                   ],
                   "Resource": {
                     "Fn::Sub": [
-                      "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${parameterName}",
+                      "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
                       {
-                        "parameterName": "name"
+                        "stateMachineName": "name"
                       }
                     ]
                   }
