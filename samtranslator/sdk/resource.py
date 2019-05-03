@@ -1,6 +1,6 @@
 from enum import Enum
-from six import string_types
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.types import is_str
 
 
 class SamResource(object):
@@ -35,9 +35,11 @@ class SamResource(object):
         # As long as the type is valid and type string.
         # validate the condition should be string
 
+        validate_type_str = is_str()
+
         if self.condition:
 
-            if not isinstance(self.condition, string_types):
+            if not validate_type_str(self.condition, should_raise=False):
                 raise InvalidDocumentException([
                     InvalidTemplateException("Every Condition member must be a string.")])
 
