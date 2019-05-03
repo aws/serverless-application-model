@@ -39,14 +39,11 @@ class SamResource(object):
 
         if self.condition:
 
-            if sys.version_info.major == 2:
+            if sys.version_info.major == 2 and isinstance(self.condition, unicode):
                 # In Py2, only unicode needs to be encoded.
-                if isinstance(self.condition, unicode):
-                    encoded_condition_name = self.condition.encode('utf-8')
-                else:
-                    encoded_condition_name = self.condition
-            else:
                 encoded_condition_name = self.condition.encode('utf-8')
+            else:
+                encoded_condition_name = self.condition
 
             if not validate_type_str(encoded_condition_name, should_raise=False):
                 raise InvalidDocumentException([
