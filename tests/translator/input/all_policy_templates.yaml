@@ -143,3 +143,6 @@ Resources:
 
         - SSMParameterReadPolicy:
             ParameterName: name
+
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: name
