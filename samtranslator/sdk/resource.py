@@ -36,19 +36,23 @@ class SamResource(object):
         # As long as the type is valid and type string.
         # validate the condition should be string
         validate_type_str = is_type(str)
-        encoded_condition_name = self.condition
-        if sys.version_info.major == 2:
-            # In Py2, only unicode needs to be encoded.
-            if isinstance(self.condition, unicode):
-                encoded_condition_name = self.condition.encode('utf-8')
-        else:
-            encoded_condition_name = self.condition.encode('utf-8')
 
-        if encoded_condition_name and not validate_type_str(encoded_condition_name, should_raise=False):
-            raise InvalidDocumentException([
-                InvalidTemplateException("An error occurred (ValidationError) when calling the CreateChangeSet "
-                                         "operation: Template format error: Every Condition member must be a"
-                                         " string")])
+        if self.condition:
+
+            if sys.version_info.major == 2:
+                # In Py2, only unicode needs to be encoded.
+                if isinstance(self.condition, unicode):
+                    encoded_condition_name = self.condition.encode('utf-8')
+                else:
+                    encoded_condition_name = self.condition
+            else:
+                encoded_condition_name = self.condition.encode('utf-8')
+
+            if not validate_type_str(encoded_condition_name, should_raise=False):
+                raise InvalidDocumentException([
+                    InvalidTemplateException("An error occurred (ValidationError) when calling the CreateChangeSet "
+                                             "operation: Template format error: Every Condition member must be a"
+                                             " string")])
 
         return SamResourceType.has_value(self.type)
 
