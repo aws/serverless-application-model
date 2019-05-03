@@ -34,8 +34,10 @@ class SamResource(object):
         """
         # As long as the type is valid and type string.
         # validate the condition should be string
-        validate_type = is_type(str)
-        if self.condition and not validate_type(self.condition, should_raise=False):
+        validate_type_str = is_type(str)
+        validate_type_unicode = is_type(unicode)
+        if self.condition and (not validate_type_str(self.condition, should_raise=False) and
+                               not validate_type_unicode(self.condition, should_raise=False)):
             raise InvalidDocumentException([
                 InvalidTemplateException("An error occurred (ValidationError) when calling the CreateChangeSet "
                                          "operation: Template format error: Every Condition member must be a"
