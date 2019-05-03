@@ -33,14 +33,15 @@ class SamResource(object):
         :return: True, if the resource is valid
         """
         # As long as the type is valid and type string.
+        # validate the condition should be string
         validate_type = is_type(str)
-        if self.type and not validate_type(self.type, should_raise=False):
+        if self.condition and not validate_type(self.condition, should_raise=False):
             raise InvalidDocumentException([
                 InvalidTemplateException("An error occurred (ValidationError) when calling the CreateChangeSet "
                                          "operation: Template format error: Every Condition member must be a"
                                          " string")])
-        else:
-            return SamResourceType.has_value(self.type)
+
+        return SamResourceType.has_value(self.type)
 
     def to_dict(self):
 
