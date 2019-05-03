@@ -1,7 +1,6 @@
-import sys
 from enum import Enum
+from six import string_types
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
-from samtranslator.model.types import is_type
 
 
 class SamResource(object):
@@ -35,21 +34,12 @@ class SamResource(object):
         """
         # As long as the type is valid and type string.
         # validate the condition should be string
-        validate_type_str = is_type(str)
 
         if self.condition:
 
-            if sys.version_info.major == 2 and isinstance(self.condition, unicode):
-                # In Py2, only unicode needs to be encoded.
-                encoded_condition_name = self.condition.encode('utf-8')
-            else:
-                encoded_condition_name = self.condition
-
-            if not validate_type_str(encoded_condition_name, should_raise=False):
+            if not isinstance(self.condition, string_types):
                 raise InvalidDocumentException([
-                    InvalidTemplateException("An error occurred (ValidationError) when calling the CreateChangeSet "
-                                             "operation: Template format error: Every Condition member must be a"
-                                             " string")])
+                    InvalidTemplateException("Every Condition member must be a string.")])
 
         return SamResourceType.has_value(self.type)
 
