@@ -711,7 +711,7 @@ class SamLayerVersion(SamResourceMacro):
 class SamGraphApi(SamResourceMacro):
     """ SAM AppSync Macro
     """
-    resource_type = 'AWS::Serverless::LayerVersion'
+    resource_type = 'AWS::Serverless::GraphQLApi'
     property_types = {
         'Name': PropertyType(True, is_str()),
         'AuthenticationType': PropertyType(True, is_str()),
@@ -734,14 +734,14 @@ class SamGraphApi(SamResourceMacro):
 
         resources = []
 
-        api_resources = _construct_api()
+        api_resources = self._construct_api()
 
         resources.extend(api_resources)
 
 
         return resources
 
-    def _construct_api():
+    def _construct_api(self):
         resources = []
 
         api = AppSyncApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
@@ -751,15 +751,33 @@ class SamGraphApi(SamResourceMacro):
             api.AuthenticationType = self.AuthenticationType
         else:
             api.AuthenticationType = 'API_KEY'
-     
-        if self.LogConfig and 'Enabled' in self.LogConfig.keys() and self.LogConfig['Enabled'] is True:
+        
+        if self.SchemaDefinition:
+            api.Definition = self.SchemaDefinition
+            
+        if self.SchemaDefinitionUri:
+            api.DefinitionS3Location = self.SchemaDefinitionUri
 
+        if self.ApiKeys:
+            for index, values in enumerate(self.ApiKeys):
+                api_key = AppSyncApiKey(self.logical_id + 'Key' + str(index), depends_on=self.depends_on, attributes=self.resource_attributes)
+                api_key.ApiId = fnGetAtt(api.logical_id, 'ApiId')
+                print(index, values)
+                if 'Description' in values:
+                    api_key.Description = values['Description']
+
+                if 'Expires' in values.keys():
+                    api_key.Expires = float(values['Expires'])
+
+                resources.append(api_key)
+
+        if self.LogConfig and 'Enabled' in self.LogConfig.keys() and self.LogConfig['Enabled'] is True:
+            api.LogConfig = {}
             log_role = IAMRole(self.logical_id + 'Role', depends_on=self.depends_on, attributes=self.resource_attributes)
             log_role.AssumeRolePolicyDocument = IAMRolePolicies.appsync_assume_role_policy()
             policy_documents = []
             policy_documents.append(IAMRolePolicies.cloudwatch_log_policy())
             log_role.Policies = policy_documents
-
             api.LogConfig['CloudWatchLogsRoleArn'] = fnGetAtt(log_role.logical_id, 'Arn')
 
             if 'FieldLogLevel' in self.LogConfig.keys():
@@ -774,3 +792,5 @@ class SamGraphApi(SamResourceMacro):
 
 
             resources.append(log_role)
+        resources.append(api)
+        return resources

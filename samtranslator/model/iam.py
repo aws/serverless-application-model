@@ -52,7 +52,7 @@ class IAMRolePolicies():
             'Statement': [{
                 'Action': ['sts:AssumeRole'],
                 'Effect': 'Allow',
-                'Principal': {'Service': ['lambda.amazonaws.com']}
+                'Principal': {'Service': ['appsync.amazonaws.com']}
             }]
         }
         return document
@@ -87,7 +87,7 @@ class IAMRolePolicies():
                             "logs:CreateLogGroup",
                             "logs:PutRetentionPolicy",
                         ],
-                        "Resource": 'arn:aws:logs:*:*:log-group:/aws/rds/*',
+                        "Resource": 'arn:aws:logs:*:*:log-group:/aws/appsync/apis/*',
                         "Effect": "Allow"
                     },
                     {
@@ -97,7 +97,7 @@ class IAMRolePolicies():
                             "logs:DescribeLogStreams",
                             "logs:GetLogEvents"
                         ],
-                        "Resource": 'arn:aws:logs:*:*:log-group:/aws/rds/*:log-stream:*',
+                        "Resource": 'arn:aws:logs:*:*:log-group:/aws/appsync/apis/*:log-stream:*',
                         "Effect": "Allow"
                     },
 
