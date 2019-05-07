@@ -35,11 +35,9 @@ class SamResource(object):
         # As long as the type is valid and type string.
         # validate the condition should be string
 
-        validate_type_str = is_str()
-
         if self.condition:
 
-            if not validate_type_str(self.condition, should_raise=False):
+            if not is_str()(self.condition, should_raise=False):
                 raise InvalidDocumentException([
                     InvalidTemplateException("Every Condition member must be a string.")])
 
