@@ -762,7 +762,6 @@ class SamGraphApi(SamResourceMacro):
             for index, values in enumerate(self.ApiKeys):
                 api_key = AppSyncApiKey(self.logical_id + 'Key' + str(index), depends_on=self.depends_on, attributes=self.resource_attributes)
                 api_key.ApiId = fnGetAtt(api.logical_id, 'ApiId')
-                print(index, values)
                 if 'Description' in values:
                     api_key.Description = values['Description']
 
