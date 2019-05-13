@@ -783,10 +783,10 @@ class SamGraphApi(SamResourceMacro):
             if 'FieldLogLevel' in self.LogConfig.keys():
                 api.LogConfig['FieldLogLevel'] = self.LogConfig['FieldLogLevel']
 
-            if 'Retention' in self.LogConfig.keys():
+            if 'RetentionInDays' in self.LogConfig.keys():
                 log_group = CloudWatchLogGroup(api.logical_id + 'LogGroup', depends_on=self.depends_on, attributes=self.resource_attributes)
                 log_group.LogGroupName = fnSub('/aws/appsync/apis/${ApiId}', {'ApiId': fnGetAtt(api.logical_id, 'ApiId')})
-                log_group.RetentionInDays = self.LogConfig['Retention']
+                log_group.RetentionInDays = self.LogConfig['RetentionInDays']
                 resources.append(log_group)
 
 
