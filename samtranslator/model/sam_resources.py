@@ -268,7 +268,7 @@ class SamFunction(SamResourceMacro):
                 try:
                     event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         self.logical_id + logical_id, event_dict, logical_id)
-                except TypeError as e:
+                except (TypeError, AttributeError) as e:
                     raise InvalidEventException(logical_id, "{}".format(e))
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
