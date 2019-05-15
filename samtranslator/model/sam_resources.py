@@ -707,7 +707,7 @@ class SamLayerVersion(SamResourceMacro):
                                            "'{}' must be one of the following options: {}."
                                            .format('RetentionPolicy', [self.RETAIN, self.DELETE]))
 
-    
+
 class SamGraphApi(SamResourceMacro):
     """ SAM AppSync Macro
     """
@@ -738,7 +738,6 @@ class SamGraphApi(SamResourceMacro):
 
         resources.extend(api_resources)
 
-
         return resources
 
     def _construct_api(self):
@@ -747,7 +746,12 @@ class SamGraphApi(SamResourceMacro):
         api = AppSyncApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         api.Name = self.Name
 
-        api_schema = AppSyncApiSchema(api.logical_id + 'Schema', depends_on=self.depends_on, attributes=self.resource_attributes)
+        api_schema = AppSyncApiSchema(
+            api.logical_id + 'Schema',
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes
+        )
+
         api_schema.ApiId = fnGetAtt(api.logical_id, 'ApiId')
 
         if self.SchemaDefinition:
@@ -762,7 +766,11 @@ class SamGraphApi(SamResourceMacro):
 
         if self.ApiKeys:
             for index, values in enumerate(self.ApiKeys):
-                api_key = AppSyncApiKey(self.logical_id + 'Key' + str(index), depends_on=self.depends_on, attributes=self.resource_attributes)
+                api_key = AppSyncApiKey(
+                    self.logical_id + 'Key' + str(index),
+                    depends_on=self.depends_on,
+                    attributes=self.resource_attributes
+                )
                 api_key.ApiId = fnGetAtt(api.logical_id, 'ApiId')
 
                 if isinstance(values, dict) and 'Description' in values:
@@ -775,7 +783,11 @@ class SamGraphApi(SamResourceMacro):
 
         if self.LogConfig and 'Enabled' in self.LogConfig.keys() and self.LogConfig['Enabled'] is True:
             api.LogConfig = {}
-            log_role = IAMRole(self.logical_id + 'Role', depends_on=self.depends_on, attributes=self.resource_attributes)
+            log_role = IAMRole(
+                self.logical_id + 'Role',
+                depends_on=self.depends_on,
+                attributes=self.resource_attributes
+            )
             log_role.AssumeRolePolicyDocument = IAMRolePolicies.appsync_assume_role_policy()
             policy_documents = []
             policy_documents.append(IAMRolePolicies.cloudwatch_log_policy())
@@ -786,12 +798,16 @@ class SamGraphApi(SamResourceMacro):
                 api.LogConfig['FieldLogLevel'] = self.LogConfig['FieldLogLevel']
 
             if 'RetentionInDays' in self.LogConfig.keys():
-                log_group = CloudWatchLogGroup(api.logical_id + 'LogGroup', depends_on=self.depends_on, attributes=self.resource_attributes)
-                log_group.LogGroupName = fnSub('/aws/appsync/apis/${ApiId}', {'ApiId': fnGetAtt(api.logical_id, 'ApiId')})
+                log_group = CloudWatchLogGroup(
+                    api.logical_id + 'LogGroup',
+                    depends_on=self.depends_on,
+                    attributes=self.resource_attributes
+                )
+                log_group.LogGroupName = fnSub(
+                    '/aws/appsync/apis/${ApiId}', {'ApiId': fnGetAtt(api.logical_id, 'ApiId')})
+
                 log_group.RetentionInDays = self.LogConfig['RetentionInDays']
                 resources.append(log_group)
-
-
 
             resources.append(log_role)
         resources.extend([api, api_schema])

@@ -1,6 +1,7 @@
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.intrinsics import ref
-from samtranslator.model.types import is_type, one_of, is_str
+from samtranslator.model.types import is_type, is_str
+
 
 class CloudWatchLogGroup(Resource):
     resource_type = 'AWS::Logs::LogGroup'

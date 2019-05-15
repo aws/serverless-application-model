@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.intrinsics import ref
-from samtranslator.model.types import is_type, one_of, is_str
+from samtranslator.model.types import is_type, is_str
 
 
 class AppSyncApi(Resource):
@@ -17,6 +17,7 @@ class AppSyncApi(Resource):
         "name": lambda self: ref(self.logical_id),
     }
 
+
 class AppSyncApiSchema(Resource):
     resource_type = 'AWS::AppSync::GraphQLSchema'
     property_types = {
@@ -28,6 +29,7 @@ class AppSyncApiSchema(Resource):
     runtime_attrs = {
         "name": lambda self: ref(self.logical_id),
     }
+
 
 class AppSyncApiKey(Resource):
     resource_type = 'AWS::AppSync::ApiKey'
