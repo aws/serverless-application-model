@@ -719,7 +719,7 @@ class SamGraphApi(SamResourceMacro):
         'OpenIDConnectConfig': PropertyType(False, is_type(dict)),
         'UserPoolConfig': PropertyType(False, is_type(dict)),
         'SchemaDefinition': PropertyType(False, is_str()),
-        'SchemaDefinitionUri': PropertyType(False, is_type(dict)),
+        'SchemaDefinitionUri': PropertyType(False, is_str()),
         'ApiKeys': PropertyType(False, is_type(list))
     }
 
@@ -747,16 +747,18 @@ class SamGraphApi(SamResourceMacro):
         api = AppSyncApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         api.Name = self.Name
 
+        api_schema = AppSyncApiSchema(api.logical_id + 'Schema', depends_on=self.depends_on, attributes=self.resource_attributes)
+        api_schema.ApiId = fnGetAtt(api.logical_id, 'ApiId')
+
+        if self.SchemaDefinition:
+            api_schema.Definition = self.SchemaDefinition
+        elif self.SchemaDefinitionUri:
+            api_schema.DefinitionS3Location = self.SchemaDefinitionUri
+
         if self.AuthenticationType:
             api.AuthenticationType = self.AuthenticationType
         else:
             api.AuthenticationType = 'API_KEY'
-        
-        if self.SchemaDefinition:
-            api.Definition = self.SchemaDefinition
-            
-        if self.SchemaDefinitionUri:
-            api.DefinitionS3Location = self.SchemaDefinitionUri
 
         if self.ApiKeys:
             for index, values in enumerate(self.ApiKeys):
@@ -792,5 +794,5 @@ class SamGraphApi(SamResourceMacro):
 
 
             resources.append(log_role)
-        resources.append(api)
+        resources.extend([api, api_schema])
         return resources
