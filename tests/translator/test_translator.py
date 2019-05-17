@@ -237,6 +237,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_permissions_boundary',
         'function_with_policy_templates',
         'function_with_sns_event_source_all_parameters',
+        'global_handle_path_level_parameter',
         'globals_for_function',
         'globals_for_api',
         'globals_for_simpletable',
