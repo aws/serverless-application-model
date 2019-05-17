@@ -4,5 +4,5 @@
       "errorMessage": "Resource with id [FunctionApiTypeError] is invalid. Event with id [ApiEvent] is invalid. Resource dict has missing or invalid value for key Type. Event Type is: API. Resource with id [FunctionNoEventType] is invalid. Event with id [MissingType] is invalid. Resource dict has missing or invalid value for key Type. Event Type is: None."
     }
   ], 
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [FunctionApiTypeError] is invalid. Event with id [ApiEvent] is invalid. Resource dict has missing or invalid value for key Type. Event Type is: API. Resource with id [FunctionNoEventType] is invalid. Event with id [MissingType] is invalid. Resource dict has missing or invalid value for key Type. Event Type is: None."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 3. Resource with id [FunctionApiTypeError] is invalid. Event with id [ApiEvent] is invalid. Resource dict has missing or invalid value for key Type. Event Type is: API. Resource with id [FunctionNoEventType] is invalid. Event with id [MissingType] is invalid. Resource dict has missing or invalid value for key Type. Event Type is: None. Resource with id [TestFunction] is invalid. Event with id [FileUploaded] is invalid. 'NoneType' object has no attribute 'get'"
 }
