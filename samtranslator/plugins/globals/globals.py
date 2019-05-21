@@ -53,7 +53,8 @@ class Globals(object):
             "GatewayResponses",
             "AccessLogSetting",
             "CanarySetting",
-            "TracingEnabled"
+            "TracingEnabled",
+            "OpenApiVersion"
         ],
 
         SamResourceType.SimpleTable.value: [

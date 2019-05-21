@@ -31,7 +31,8 @@ class ApiGenerator(object):
                  definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
                  auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
-                 tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None):
+                 tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
+                 open_api_version=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -70,6 +71,7 @@ class ApiGenerator(object):
         self.tracing_enabled = tracing_enabled
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
+        self.open_api_version = open_api_version
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -80,6 +82,7 @@ class ApiGenerator(object):
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         rest_api.BinaryMediaTypes = self.binary_media
         rest_api.MinimumCompressionSize = self.minimum_compression_size
+        rest_api.OpenApiVersion = self.open_api_version
 
         if self.endpoint_configuration:
             self._set_endpoint_configuration(rest_api, self.endpoint_configuration)
