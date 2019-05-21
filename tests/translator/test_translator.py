@@ -438,7 +438,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_policy_template_invalid_value',
     'error_function_with_unknown_policy_template',
     'error_function_with_invalid_policy_statement',
-    'error_function_with_invalid_condition_name'
+    'error_function_with_invalid_condition_name',
+    'error_invalid_document_empty_semantic_version'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
