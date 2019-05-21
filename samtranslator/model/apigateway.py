@@ -20,7 +20,8 @@ class ApiGatewayRestApi(Resource):
             'Parameters': PropertyType(False, is_type(dict)),
             'EndpointConfiguration': PropertyType(False, is_type(dict)),
             "BinaryMediaTypes": PropertyType(False, is_type(list)),
-            "MinimumCompressionSize": PropertyType(False, is_type(int))
+            "MinimumCompressionSize": PropertyType(False, is_type(int)),
+            'OpenApiVersion': PropertyType(False, is_str())
     }
 
     runtime_attrs = {
