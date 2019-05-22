@@ -16,6 +16,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge",
                                                 "AllowCredentials"])
+
 # Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
@@ -23,6 +24,7 @@ AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorize
 AuthProperties.__new__.__defaults__ = (None, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
+OpenApiVersionsSupported = ["2.0", "3.0"]
 
 
 class ApiGenerator(object):
@@ -95,6 +97,10 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id,
                                            "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both")
 
+        if self.open_api_version and self.open_api_version not in OpenApiVersionsSupported:
+            raise InvalidResourceException(self.logical_id,
+                                           "The OpenApiVersion value must be one of [2.0, 3.0]")
+
         self._add_cors()
         self._add_auth()
         self._add_gateway_responses()
@@ -139,7 +145,7 @@ class ApiGenerator(object):
             body_s3['Version'] = s3_pointer['Version']
         return body_s3
 
-    def _construct_deployment(self, rest_api):
+    def _construct_deployment(self, rest_api, open_api_version):
         """Constructs and returns the ApiGateway Deployment.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi for this Deployment
@@ -149,7 +155,8 @@ class ApiGenerator(object):
         deployment = ApiGatewayDeployment(self.logical_id + 'Deployment',
                                           attributes=self.passthrough_resource_attributes)
         deployment.RestApiId = rest_api.get_runtime_attr('rest_api_id')
-        deployment.StageName = 'Stage'
+        if not self.open_api_version:
+            deployment.StageName = 'Stage'
 
         return deployment
 
@@ -191,7 +198,7 @@ class ApiGenerator(object):
         """
 
         rest_api = self._construct_rest_api()
-        deployment = self._construct_deployment(rest_api)
+        deployment = self._construct_deployment(rest_api, self.open_api_version)
 
         swagger = None
         if rest_api.Body is not None:

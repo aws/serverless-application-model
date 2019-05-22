@@ -394,6 +394,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
     'error_api_invalid_stagename',
+    'error_api_with_invalid_open_api_version',
     'error_api_invalid_restapiid',
     'error_application_properties',
     'error_application_does_not_exist',

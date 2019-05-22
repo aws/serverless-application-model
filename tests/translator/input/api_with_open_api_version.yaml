@@ -15,10 +15,3 @@ Resources:
           Properties:
             Path: /
             Method: get
-
-  ExplicitApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Prod
-      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
-      OpenApiVersion: '3.0'

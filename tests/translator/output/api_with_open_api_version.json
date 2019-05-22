@@ -47,16 +47,6 @@
           }
         }
       }, 
-      "ExplicitApiDeploymentf117c932f7": {
-        "Type": "AWS::ApiGateway::Deployment", 
-        "Properties": {
-          "RestApiId": {
-            "Ref": "ExplicitApi"
-          }, 
-          "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
-          "StageName": "Stage"
-        }
-      }, 
       "ImplicitApiFunctionGetHtmlPermissionTest": {
         "Type": "AWS::Lambda::Permission", 
         "Properties": {
@@ -99,25 +89,13 @@
           }
         }
       }, 
-      "ExplicitApi": {
-        "Type": "AWS::ApiGateway::RestApi", 
+      "ServerlessRestApiDeployment62b96c1a61": {
+        "Type": "AWS::ApiGateway::Deployment", 
         "Properties": {
-          "BodyS3Location": {
-            "Bucket": "sam-demo-bucket", 
-            "Key": "webpage_swagger.json"
-          }
-        }
-      }, 
-      "ExplicitApiProdStage": {
-        "Type": "AWS::ApiGateway::Stage", 
-        "Properties": {
-          "DeploymentId": {
-            "Ref": "ExplicitApiDeploymentf117c932f7"
-          }, 
           "RestApiId": {
-            "Ref": "ExplicitApi"
+            "Ref": "ServerlessRestApi"
           }, 
-          "StageName": "Prod"
+          "Description": "RestApi deployment id: 62b96c1a611878eefb13e8ef66dbc71b9ba3dd19"
         }
       }, 
       "ServerlessRestApiProdStage": {
@@ -130,16 +108,6 @@
             "Ref": "ServerlessRestApi"
           }, 
           "StageName": "Prod"
-        }
-      }, 
-      "ServerlessRestApiDeployment62b96c1a61": {
-        "Type": "AWS::ApiGateway::Deployment", 
-        "Properties": {
-          "RestApiId": {
-            "Ref": "ServerlessRestApi"
-          }, 
-          "Description": "RestApi deployment id: 62b96c1a611878eefb13e8ef66dbc71b9ba3dd19", 
-          "StageName": "Stage"
         }
       }, 
       "ServerlessRestApi": {
