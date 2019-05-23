@@ -42,6 +42,8 @@ LINT_IGNORE_WARNINGS = [
     'E3001', # Check for resource availability in a region.
     'W7001', # Check if mappings are used. Serverless::Application uses mappings, the output CFN doesn't use them anymore.
     'W1020', # Sub isn't needed if it doesn't have a variable defined. SAM leaves `!Sub` in even if it tries to resolve variables.
+    'E2531', # we don't care if a runtime has been deprecated in our tests.
+    'E3038', # Serverless resources- test for invalid resources.
 ]
 
 LINT_IGNORE_TESTS = [
