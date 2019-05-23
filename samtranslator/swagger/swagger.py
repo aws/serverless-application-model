@@ -556,7 +556,7 @@ class SwaggerEditor(object):
         """
         return bool(data) and \
             isinstance(data, dict) and \
-            bool(data.get("swagger")) and \
+            (bool(data.get("swagger")) or bool(data.get("openapi"))) and \
             isinstance(data.get('paths'), dict)
 
     @staticmethod

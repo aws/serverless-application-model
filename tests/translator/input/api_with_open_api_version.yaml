@@ -16,4 +16,7 @@ Resources:
           Properties:
             Path: /
             Method: get
- 
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod

@@ -117,10 +117,10 @@ class Globals(object):
         resources = template["Resources"]
 
         for _, resource in resources.items():
-            if resource["Type"] == "AWS::Serverless::Api":
+            if ("Type" in resource) and (resource["Type"] == "AWS::Serverless::Api"):
                 properties = resource["Properties"]
-                if cls._OPENAPIVERSION in properties:
-                    if properties[cls._OPENAPIVERSION] == "3.0":
+                if (cls._OPENAPIVERSION in properties) and (properties[cls._OPENAPIVERSION] == "3.0"):
+                    if "DefinitionBody" in properties:
                         definition_body = properties['DefinitionBody']
                         definition_body['openapi'] = "3.0"
                         if definition_body.get('swagger'):

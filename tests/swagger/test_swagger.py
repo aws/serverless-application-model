@@ -33,6 +33,34 @@ class TestSwaggerEditor_init(TestCase):
 
         self.assertEqual(editor.paths, {"/foo": {}, "/bar": {}})
 
+    def test_must_succeed_on_valid_openapi(self):
+        valid_swagger = {
+            "openapi": "2.0",
+            "paths": {
+                "/foo": {},
+                "/bar": {}
+            }
+        }
+
+        editor = SwaggerEditor(valid_swagger)
+        self.assertIsNotNone(editor)
+
+        self.assertEqual(editor.paths, {"/foo": {}, "/bar": {}})
+
+    def test_must_succeed_on_valid_openapi3(self):
+        valid_swagger = {
+            "openapi": "3.0",
+            "paths": {
+                "/foo": {},
+                "/bar": {}
+            }
+        }
+
+        editor = SwaggerEditor(valid_swagger)
+        self.assertIsNotNone(editor)
+
+        self.assertEqual(editor.paths, {"/foo": {}, "/bar": {}})
+
 
 class TestSwaggerEditor_has_path(TestCase):
 
