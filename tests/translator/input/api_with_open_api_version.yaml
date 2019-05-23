@@ -1,6 +1,7 @@
 Globals:
   Api:
     OpenApiVersion: '3.0'
+    Cors: '*'
 
 Resources:
   ImplicitApiFunction:
@@ -15,3 +16,4 @@ Resources:
           Properties:
             Path: /
             Method: get
+ 

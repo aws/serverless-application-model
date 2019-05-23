@@ -11,6 +11,8 @@ class Globals(object):
     # Key of the dictionary containing Globals section in SAM template
     _KEYWORD = "Globals"
     _RESOURCE_PREFIX = "AWS::Serverless::"
+    _OPENAPIVERSION = "OpenApiVersion"
+    _API_TYPE = "AWS::Serverless::Api"
 
     supported_properties = {
         # Everything on Serverless::Function except Role, Policies, FunctionName, Events
@@ -107,6 +109,22 @@ class Globals(object):
 
         if cls._KEYWORD in template:
             del template[cls._KEYWORD]
+
+    @classmethod
+    def fix_openapi_definitions(cls, template):
+        """
+        """
+        resources = template["Resources"]
+
+        for _, resource in resources.items():
+            if resource["Type"] == "AWS::Serverless::Api":
+                properties = resource["Properties"]
+                if cls._OPENAPIVERSION in properties:
+                    if properties[cls._OPENAPIVERSION] == "3.0":
+                        definition_body = properties['DefinitionBody']
+                        definition_body['openapi'] = "3.0"
+                        if definition_body.get('swagger'):
+                            del definition_body['swagger']
 
     def _parse(self, globals_dict):
         """

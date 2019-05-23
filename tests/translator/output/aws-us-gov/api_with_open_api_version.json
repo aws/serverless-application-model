@@ -47,6 +47,15 @@
         }
       }
     }, 
+    "ServerlessRestApiDeployment9bdc4ed430": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 9bdc4ed430c09a5c332bdd62654d27d54fd60001"
+      }
+    }, 
     "ImplicitApiFunctionGetHtmlPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -93,21 +102,12 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5b2cb4ba8f"
+          "Ref": "ServerlessRestApiDeployment9bdc4ed430"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiDeployment5b2cb4ba8f": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: 5b2cb4ba8fce8a9445b1914c6c6fbeef81a9075a"
       }
     }, 
     "ServerlessRestApi": {
@@ -122,6 +122,46 @@
           }, 
           "paths": {
             "/": {
+              "options": {
+                "x-amazon-apigateway-integration": {
+                  "type": "mock", 
+                  "requestTemplates": {
+                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
+                  }, 
+                  "responses": {
+                    "default": {
+                      "statusCode": "200", 
+                      "responseTemplates": {
+                        "application/json": "{}\n"
+                      }, 
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "*", 
+                        "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'"
+                      }
+                    }
+                  }
+                }, 
+                "consumes": [
+                  "application/json"
+                ], 
+                "summary": "CORS support", 
+                "responses": {
+                  "200": {
+                    "headers": {
+                      "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      }, 
+                      "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      }
+                    }, 
+                    "description": "Default response for CORS method"
+                  }
+                }, 
+                "produces": [
+                  "application/json"
+                ]
+              }, 
               "get": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST", 
@@ -134,7 +174,7 @@
               }
             }
           }, 
-          "swagger": "2.0"
+          "openapi": "3.0"
         }, 
         "EndpointConfiguration": {
           "Types": [
