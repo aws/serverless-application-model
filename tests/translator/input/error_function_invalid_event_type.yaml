@@ -24,3 +24,13 @@ Resources:
             Method: get
             Path: /
 
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: code/
+      Handler: lambda_handler.handler
+
+      Runtime: python3.6
+      Events:
+        FileUploaded:
+

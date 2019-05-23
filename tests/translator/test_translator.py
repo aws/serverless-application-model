@@ -237,6 +237,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_permissions_boundary',
         'function_with_policy_templates',
         'function_with_sns_event_source_all_parameters',
+        'global_handle_path_level_parameter',
         'globals_for_function',
         'globals_for_api',
         'globals_for_simpletable',
@@ -252,7 +253,7 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_api_with_many_conditions',
         'implicit_and_explicit_api_with_conditions',
         'api_with_cors_and_conditions_no_definitionbody',
-        'api_with_auth_and_conditions_all_max'
+        'api_with_auth_and_conditions_all_max',
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -436,7 +437,9 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_policy_template_with_missing_parameter',
     'error_function_policy_template_invalid_value',
     'error_function_with_unknown_policy_template',
-    'error_function_with_invalid_policy_statement'
+    'error_function_with_invalid_policy_statement',
+    'error_function_with_invalid_condition_name',
+    'error_invalid_document_empty_semantic_version'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
