@@ -554,10 +554,13 @@ class SwaggerEditor(object):
         :param dict data: Data to be validated
         :return: True, if data is a Swagger
         """
-        return bool(data) and \
-            isinstance(data, dict) and \
-            (bool(data.get("swagger")) or bool(data.get("openapi"))) and \
-            isinstance(data.get('paths'), dict)
+        if bool(data) and isinstance(data, dict) and isinstance(data.get('paths'), dict):
+            if bool(data.get("swagger")):
+                return True
+            elif bool(data.get("openapi")):
+                return "3.0" in data["openapi"]
+            return False
+        return False
 
     @staticmethod
     def gen_skeleton():

@@ -113,6 +113,11 @@ class Globals(object):
     @classmethod
     def fix_openapi_definitions(cls, template):
         """
+        Helper method to postprocess the resources to make sure the swagger doc version matches
+        the one specified on the resource with flag OpenApiVersion
+
+        :param dict template: SAM template
+        :return: Modified SAM template with corrected swagger doc matching the OpenApiVersion.
         """
         resources = template["Resources"]
 

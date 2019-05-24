@@ -16,7 +16,6 @@ from samtranslator.translator.arn_generator import ArnGenerator
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge",
                                                 "AllowCredentials"])
-
 # Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
