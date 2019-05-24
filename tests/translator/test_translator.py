@@ -168,6 +168,7 @@ class TestTranslatorEndToEnd(TestCase):
         'simpletable_with_sse',
         'implicit_api',
         'explicit_api',
+        'explicit_api_openapi_3',
         'api_endpoint_configuration',
         'api_with_auth_all_maximum',
         'api_with_auth_all_minimum',
