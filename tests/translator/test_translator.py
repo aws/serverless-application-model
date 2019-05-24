@@ -260,6 +260,8 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_and_explicit_api_with_conditions',
         'api_with_cors_and_conditions_no_definitionbody',
         'api_with_auth_and_conditions_all_max',
+        'api_with_apikey_default_override',
+        'api_with_apikey_required',
       ],
       [
        ("aws", "ap-southeast-1"),

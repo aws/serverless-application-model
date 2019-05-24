@@ -23,16 +23,6 @@
         ]
       }
     },
-    "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentd0103947f7": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
-        },
-        "Description": "RestApi deployment id: d0103947f7e2e1d52ca7afac92f5afc8339a051b",
-        "StageName": "Stage"
-      }
-    },
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionTest": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -52,6 +42,16 @@
             }
           ]
         }
+      }
+    },
+    "MyApiWithAwsIamAuthDeploymente6d5fb9b50": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuth"
+        },
+        "Description": "RestApi deployment id: e6d5fb9b50efbcef7ba82212572d741a89330edf",
+        "StageName": "Stage"
       }
     },
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionProd": {
@@ -75,11 +75,21 @@
         }
       }
     },
+    "MyApiWithAwsIamAuthAndCustomInvokeRoleDeploymentb406a33161": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRole"
+        },
+        "Description": "RestApi deployment id: b406a33161a8a9cb2842e4374c3f0167931eb064",
+        "StageName": "Stage"
+      }
+    },
     "MyApiWithAwsIamAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthDeploymentc8adfb74cf"
+          "Ref": "MyApiWithAwsIamAuthDeploymente6d5fb9b50"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
@@ -91,7 +101,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentd0103947f7"
+          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeployment76f532c4be"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
@@ -141,16 +151,6 @@
         }
       }
     },
-    "MyApiWithAwsIamAuthDeploymentc8adfb74cf": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuth"
-        },
-        "Description": "RestApi deployment id: c8adfb74cfae8b8052802a21a258ecbd5178d144",
-        "StageName": "Stage"
-      }
-    },
     "MyApiWithAwsIamAuthAndCustomInvokeRole": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
@@ -184,10 +184,10 @@
           "swagger": "2.0",
           "securityDefinitions": {
             "AWS_IAM": {
-              "in": "header",
+              "x-amazon-apigateway-authtype": "awsSigv4",
               "type": "apiKey",
               "name": "Authorization",
-              "x-amazon-apigateway-authtype": "awsSigv4"
+              "in": "header"
             }
           }
         },
@@ -205,7 +205,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRoleDeployment2a6ecd9264"
+          "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRoleDeploymentb406a33161"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRole"
@@ -246,10 +246,10 @@
           "swagger": "2.0",
           "securityDefinitions": {
             "AWS_IAM": {
-              "in": "header",
+              "x-amazon-apigateway-authtype": "awsSigv4",
               "type": "apiKey",
               "name": "Authorization",
-              "x-amazon-apigateway-authtype": "awsSigv4"
+              "in": "header"
             }
           }
         },
@@ -261,16 +261,6 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
-      }
-    },
-    "MyApiWithAwsIamAuthAndCustomInvokeRoleDeployment2a6ecd9264": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRole"
-        },
-        "Description": "RestApi deployment id: 2a6ecd9264d4f59054caa89a94960604594cd94f",
-        "StageName": "Stage"
       }
     },
     "MyApiWithAwsIamAuth": {
@@ -306,10 +296,10 @@
           "swagger": "2.0",
           "securityDefinitions": {
             "AWS_IAM": {
-              "in": "header",
+              "x-amazon-apigateway-authtype": "awsSigv4",
               "type": "apiKey",
               "name": "Authorization",
-              "x-amazon-apigateway-authtype": "awsSigv4"
+              "in": "header"
             }
           }
         },
@@ -321,6 +311,16 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    },
+    "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeployment76f532c4be": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
+        },
+        "Description": "RestApi deployment id: 76f532c4bee79a53b122020ad84d7e9671824afe",
+        "StageName": "Stage"
       }
     },
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthAndCustomInvokeRolePermissionProd": {

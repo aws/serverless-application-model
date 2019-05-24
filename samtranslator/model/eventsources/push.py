@@ -71,8 +71,8 @@ class Schedule(PushEventSource):
     resource_type = 'Schedule'
     principal = 'events.amazonaws.com'
     property_types = {
-            'Schedule': PropertyType(True, is_str()),
-            'Input': PropertyType(False, is_str())
+        'Schedule': PropertyType(True, is_str()),
+        'Input': PropertyType(False, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
@@ -109,8 +109,8 @@ class Schedule(PushEventSource):
         :rtype: dict
         """
         target = {
-                'Arn': function.get_runtime_attr("arn"),
-                'Id': self.logical_id + 'LambdaTarget'
+            'Arn': function.get_runtime_attr("arn"),
+            'Id': self.logical_id + 'LambdaTarget'
         }
         if self.Input is not None:
             target['Input'] = self.Input
@@ -123,9 +123,9 @@ class CloudWatchEvent(PushEventSource):
     resource_type = 'CloudWatchEvent'
     principal = 'events.amazonaws.com'
     property_types = {
-            'Pattern': PropertyType(False, is_type(dict)),
-            'Input': PropertyType(False, is_str()),
-            'InputPath': PropertyType(False, is_str())
+        'Pattern': PropertyType(False, is_type(dict)),
+        'Input': PropertyType(False, is_str()),
+        'InputPath': PropertyType(False, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
@@ -163,8 +163,8 @@ class CloudWatchEvent(PushEventSource):
         :rtype: dict
         """
         target = {
-                'Arn': function.get_runtime_attr("arn"),
-                'Id': self.logical_id + 'LambdaTarget'
+            'Arn': function.get_runtime_attr("arn"),
+            'Id': self.logical_id + 'LambdaTarget'
         }
         if self.Input is not None:
             target['Input'] = self.Input
@@ -179,9 +179,9 @@ class S3(PushEventSource):
     resource_type = 'S3'
     principal = 's3.amazonaws.com'
     property_types = {
-            'Bucket': PropertyType(True, is_str()),
-            'Events': PropertyType(True, one_of(is_str(), list_of(is_str()))),
-            'Filter': PropertyType(False, dict_of(is_str(), is_str()))
+        'Bucket': PropertyType(True, is_str()),
+        'Events': PropertyType(True, one_of(is_str(), list_of(is_str()))),
+        'Filter': PropertyType(False, dict_of(is_str(), is_str()))
     }
 
     def resources_to_link(self, resources):
@@ -343,8 +343,8 @@ class SNS(PushEventSource):
     resource_type = 'SNS'
     principal = 'sns.amazonaws.com'
     property_types = {
-            'Topic': PropertyType(True, is_str()),
-            'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict)))))
+        'Topic': PropertyType(True, is_str()),
+        'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict)))))
     }
 
     def to_cloudformation(self, **kwargs):
@@ -381,13 +381,13 @@ class Api(PushEventSource):
     resource_type = 'Api'
     principal = 'apigateway.amazonaws.com'
     property_types = {
-            'Path': PropertyType(True, is_str()),
-            'Method': PropertyType(True, is_str()),
+        'Path': PropertyType(True, is_str()),
+        'Method': PropertyType(True, is_str()),
 
-            # Api Event sources must "always" be paired with a Serverless::Api
-            'RestApiId': PropertyType(True, is_str()),
-            'Auth': PropertyType(False, is_type(dict)),
-            'RequestModel': PropertyType(False, is_type(dict))
+        # Api Event sources must "always" be paired with a Serverless::Api
+        'RestApiId': PropertyType(True, is_str()),
+        'Auth': PropertyType(False, is_type(dict)),
+        'RequestModel': PropertyType(False, is_type(dict))
     }
 
     def resources_to_link(self, resources):
@@ -536,9 +536,9 @@ class Api(PushEventSource):
 
         if self.Auth:
             method_authorizer = self.Auth.get('Authorizer')
+            api_auth = api.get('Auth')
 
             if method_authorizer:
-                api_auth = api.get('Auth')
                 api_authorizers = api_auth and api_auth.get('Authorizers')
 
                 if method_authorizer != 'AWS_IAM':
@@ -563,6 +563,16 @@ class Api(PushEventSource):
                             'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
                                 method=self.Method, path=self.Path))
 
+            apikey_required_setting = self.Auth.get('ApiKeyRequired')
+            apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
+            if apikey_required_setting_is_false and not api_auth.get('ApiKeyRequired'):
+                raise InvalidEventException(
+                    self.relative_id,
+                    'Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] '
+                    'because the related API does not specify any ApiKeyRequired.'.format(
+                        method=self.Method, path=self.Path))
+
+            if method_authorizer or apikey_required_setting is not None:
                 editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
 
         if self.RequestModel:
