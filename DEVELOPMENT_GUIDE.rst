@@ -10,12 +10,20 @@ and send a Pull Request.
 Environment Setup
 -----------------
 
-.. note:: You need to have `pyenv`_ installed, please see the `installation instructions`_ for more information.
+You need to have `pyenv`_ installed, please see the `installation instructions`_ for more information. 
+You can use the``make install`` command to setup `pyenv` locally. After installation, make sure the following lines are present in your ``~/.bashrc (or ~/.bash_profile , ~/.zshenv)`` file per operating system:
+
+``
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+``
+Note: You can easily echo those commands to the file llike: ``$ echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bashrc
 
 ``make setup`` will perform the following steps for you. You can either run ``make setup`` command or perform the
 steps manually.
 
-1. Install Python Versions
+1. Install Python Versions (Manually)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 Python 2.7 is our officially supported Python version. We have a future goal to support to Python3.6 but the code base
 currently does not work with Python3. To make future migration easier, any new code we write must be compatible with
