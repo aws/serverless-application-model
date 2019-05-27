@@ -160,6 +160,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_default_aws_iam_auth',
         'api_with_method_aws_iam_auth',
         'api_with_aws_iam_auth_overrides',
+        'api_with_default_authorizer_no_custom_authorizers',
         'api_with_method_settings',
         'api_with_binary_media_types',
         'api_with_minimum_compression_size',

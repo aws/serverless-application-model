@@ -541,7 +541,13 @@ class Api(PushEventSource):
                 api_authorizers = api_auth and api_auth.get('Authorizers')
 
                 if method_authorizer != 'AWS_IAM':
-                    if not api_authorizers:
+                    '''
+                    #Valid to have a method authorizer be NONE without any Authorizers definition. We check for default authorizers below
+                    Type: "AWS::Serverless::Api"
+                        Auth:
+                            DefaultAuthorizer: AWS_IAM 
+                    '''
+                    if method_authorizer != 'NONE' and not api_authorizers: 
                         raise InvalidEventException(
                             self.relative_id,
                             'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
