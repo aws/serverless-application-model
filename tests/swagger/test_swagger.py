@@ -35,7 +35,19 @@ class TestSwaggerEditor_init(TestCase):
 
     def test_must_fail_on_invalid_openapi_version(self):
         invalid_swagger = {
-            "openapi": "2.0",
+            "openapi": "2.3.0",
+            "paths": {
+                "/foo": {},
+                "/bar": {}
+            }
+        }
+
+        with self.assertRaises(ValueError):
+            SwaggerEditor(invalid_swagger)
+
+    def test_must_fail_on_invalid_openapi_version_2(self):
+        invalid_swagger = {
+            "openapi": "3.1.1.1",
             "paths": {
                 "/foo": {},
                 "/bar": {}

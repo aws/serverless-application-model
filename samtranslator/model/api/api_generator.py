@@ -1,5 +1,6 @@
 from collections import namedtuple
 from six import string_types
+import re
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
@@ -23,7 +24,7 @@ AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorize
 AuthProperties.__new__.__defaults__ = (None, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
-OpenApiVersionsSupported = ["2.0", "3.0"]
+OpenApiVersionsSupportedRegex = r"\A[2-3](\.\d)(\.\d)?$"
 
 
 class ApiGenerator(object):
@@ -96,9 +97,10 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id,
                                            "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both")
 
-        if self.open_api_version and self.open_api_version not in OpenApiVersionsSupported:
-            raise InvalidResourceException(self.logical_id,
-                                           "The OpenApiVersion value must be one of [2.0, 3.0]")
+        if self.open_api_version:
+            if re.match(OpenApiVersionsSupportedRegex, self.open_api_version) is None:
+                raise InvalidResourceException(
+                    self.logical_id, "The OpenApiVersion value must be of the format 2.x.x or 3.x.x")
 
         self._add_cors()
         self._add_auth()

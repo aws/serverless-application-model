@@ -675,6 +675,7 @@ class TestGlobalsOpenApi(TestCase):
                     "MyApi": {
                         "Type": "AWS::Serverless::Api",
                         "Properties": {
+                            "__MANAGE_SWAGGER": True,
                             "OpenApiVersion": "3.0",
                             "DefinitionBody": {
                                 "swagger": "2.0"
@@ -688,6 +689,7 @@ class TestGlobalsOpenApi(TestCase):
                     "MyApi": {
                         "Type": "AWS::Serverless::Api",
                         "Properties": {
+                            "__MANAGE_SWAGGER": True,
                             "OpenApiVersion": "3.0",
                             "DefinitionBody": {
                                 "openapi": "3.0"
@@ -731,6 +733,7 @@ class TestGlobalsOpenApi(TestCase):
                     "MyApi": {
                         "Type": "AWS::Serverless::Api",
                         "Properties": {
+                            "__MANAGE_SWAGGER": True,
                             "OpenApiVersion": "2.0",
                             "DefinitionBody": {
                                 "swagger": "2.0"
@@ -744,6 +747,7 @@ class TestGlobalsOpenApi(TestCase):
                     "MyApi": {
                         "Type": "AWS::Serverless::Api",
                         "Properties": {
+                            "__MANAGE_SWAGGER": True,
                             "OpenApiVersion": "2.0",
                             "DefinitionBody": {
                                 "swagger": "2.0"
@@ -760,6 +764,7 @@ class TestGlobalsOpenApi(TestCase):
                     "MyApi": {
                         "Type": "AWS::Serverless::Api",
                         "Properties": {
+                            "__MANAGE_SWAGGER": True,
                             "OpenApiVersion": "3.0"
                         }
                     }
@@ -770,12 +775,43 @@ class TestGlobalsOpenApi(TestCase):
                     "MyApi": {
                         "Type": "AWS::Serverless::Api",
                         "Properties": {
+                            "__MANAGE_SWAGGER": True,
                             "OpenApiVersion": "3.0"
                         }
                     }
                 }
             }
-        }
+        },
+        {
+            "name": "ignore customer defined swagger",
+            "input": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "OpenApiVersion": "3.0",
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            },
+            "expected": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "OpenApiVersion": "3.0",
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
     ]
 
     def test_openapi_postprocess(self):

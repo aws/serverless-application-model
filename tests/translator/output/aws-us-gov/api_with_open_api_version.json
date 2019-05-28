@@ -47,15 +47,6 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment9bdc4ed430": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: 9bdc4ed430c09a5c332bdd62654d27d54fd60001"
-      }
-    }, 
     "ImplicitApiFunctionGetHtmlPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -109,7 +100,7 @@
             }
           }, 
           "paths": {}, 
-          "openapi": "3.0"
+          "openapi": "3.0.1"
         }, 
         "EndpointConfiguration": {
           "Types": [
@@ -125,7 +116,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment783c7f37fe"
+          "Ref": "ExplicitApiDeployment01dd43a75f"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -137,7 +128,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment9bdc4ed430"
+          "Ref": "ServerlessRestApiDeployment3f1d889857"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -145,13 +136,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ExplicitApiDeployment783c7f37fe": {
+    "ServerlessRestApiDeployment3f1d889857": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
-          "Ref": "ExplicitApi"
+          "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 783c7f37fe04219a0cd2252fd5e83d4d48836e50"
+        "Description": "RestApi deployment id: 3f1d889857c22227451ab7a02be7ea74b2e9d5b4"
       }
     }, 
     "ServerlessRestApi": {
@@ -218,7 +209,7 @@
               }
             }
           }, 
-          "openapi": "3.0"
+          "openapi": "3.0.1"
         }, 
         "EndpointConfiguration": {
           "Types": [
@@ -228,6 +219,15 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    }, 
+    "ExplicitApiDeployment01dd43a75f": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 01dd43a75fc0e125c678d20749bacde95d723928"
       }
     }
   }

@@ -103,20 +103,11 @@
         }
       }
     }, 
-    "ExplicitApiDeploymentf5768abea2": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: f5768abea2db17f06ce98bcd1771216e8c6e5c0a"
-      }
-    }, 
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentf5768abea2"
+          "Ref": "ExplicitApiDeployment4c4177079d"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -143,6 +134,15 @@
             }
           ]
         }
+      }
+    }, 
+    "ExplicitApiDeployment4c4177079d": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 4c4177079dd342a2b71978bd25721b7b774295ad"
       }
     }, 
     "FunctionGetHtmlPermissionTest": {

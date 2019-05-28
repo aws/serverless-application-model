@@ -1,4 +1,5 @@
 ﻿import copy
+import re
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
@@ -554,11 +555,13 @@ class SwaggerEditor(object):
         :param dict data: Data to be validated
         :return: True, if data is a Swagger
         """
+        openapi_version_supported_regex = r"\A3(\.\d)(\.\d)?$"
+
         if bool(data) and isinstance(data, dict) and isinstance(data.get('paths'), dict):
             if bool(data.get("swagger")):
                 return True
             elif bool(data.get("openapi")):
-                return "3.0" in data["openapi"]
+                return re.search(openapi_version_supported_regex, data["openapi"]) is not None
             return False
         return False
 

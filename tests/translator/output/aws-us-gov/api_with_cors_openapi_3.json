@@ -221,7 +221,7 @@
               }
             }
           }, 
-          "openapi": "3.0"
+          "swagger": "2.0"
         }, 
         "EndpointConfiguration": {
           "Types": [
@@ -261,7 +261,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment75043f18da"
+          "Ref": "ServerlessRestApiDeployment2cd28b2066"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -273,21 +273,12 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment724a726704"
+          "Ref": "ExplicitApiDeployment3a5a78688c"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiDeployment75043f18da": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: 75043f18dafc631dfaf58fcfc876783f9210c4b0"
       }
     }, 
     "RestApiFunctionRole": {
@@ -335,6 +326,24 @@
         }
       }
     }, 
+    "ServerlessRestApiDeployment2cd28b2066": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 2cd28b2066d69ecfb44eb7e024734cab2f3f9dac"
+      }
+    }, 
+    "ExplicitApiDeployment3a5a78688c": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 3a5a78688c9bc377d53aa4153a11f0c4f6e7364c"
+      }
+    }, 
     "RestApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -356,15 +365,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "ExplicitApiDeployment724a726704": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: 724a7267040d90d6d894a7617c0b0823b83f4169"
       }
     }, 
     "ServerlessRestApi": {

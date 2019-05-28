@@ -27,7 +27,7 @@
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -57,7 +57,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -66,15 +66,6 @@
             }
           ]
         }
-      }
-    }, 
-    "ExplicitApiDeployment01dd43a75f": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: 01dd43a75fc0e125c678d20749bacde95d723928"
       }
     }, 
     "ImplicitApiFunctionGetHtmlPermissionProd": {
@@ -87,7 +78,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
               "__Stage__": "Prod", 
               "__ApiId__": {
@@ -109,7 +100,15 @@
             }
           }, 
           "paths": {}, 
-          "openapi": "3.0.1"
+          "swagger": "2.0"
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     }, 
@@ -117,7 +116,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment82c7b2e316"
+          "Ref": "ServerlessRestApiDeploymentc444e5d902"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -129,12 +128,21 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment01dd43a75f"
+          "Ref": "ExplicitApiDeployment5332c373d4"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "ServerlessRestApiDeploymentc444e5d902": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: c444e5d902971761ced658a7ce701149743eb376"
       }
     }, 
     "ServerlessRestApi": {
@@ -194,24 +202,32 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
               }
             }
           }, 
-          "openapi": "3.0.1"
+          "swagger": "2.0"
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     }, 
-    "ServerlessRestApiDeployment82c7b2e316": {
+    "ExplicitApiDeployment5332c373d4": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
-          "Ref": "ServerlessRestApi"
+          "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 82c7b2e3162ebd01c9b3ccaa1fafa5cc1df94a68"
+        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7"
       }
     }
   }

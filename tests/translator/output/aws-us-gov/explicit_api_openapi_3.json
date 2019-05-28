@@ -37,7 +37,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiWithInlineSwaggerDeploymentf98588d7ff"
+          "Ref": "ApiWithInlineSwaggerDeployment09cda3d97b"
         }, 
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"
@@ -65,26 +65,6 @@
               }
             }
           ]
-        }
-      }
-    }, 
-    "GetHtmlApiStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "GetHtmlApiDeploymentf117c932f7"
-        }, 
-        "RestApiId": {
-          "Ref": "GetHtmlApi"
-        }, 
-        "Variables": {
-          "EndpointUri": {
-            "Ref": "something"
-          }, 
-          "EndpointUri2": "http://example.com"
-        }, 
-        "StageName": {
-          "Ref": "MyStageName"
         }
       }
     }, 
@@ -128,8 +108,7 @@
       "Properties": {
         "Body": {
           "this": "is", 
-          "a": "inline swagger", 
-          "openapi": "3.0"
+          "a": "inline swagger"
         }, 
         "EndpointConfiguration": {
           "Types": [
@@ -172,23 +151,43 @@
             "REGIONAL"
           ]
         }, 
-        "Name": "MyGetApi", 
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        }, 
         "BodyS3Location": {
           "Bucket": "sam-demo-bucket", 
           "Key": "webpage_swagger.json"
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }, 
+        "Name": "MyGetApi"
+      }
+    }, 
+    "GetHtmlApiStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "GetHtmlApiDeploymentf117c932f7"
+        }, 
+        "RestApiId": {
+          "Ref": "GetHtmlApi"
+        }, 
+        "Variables": {
+          "EndpointUri": {
+            "Ref": "something"
+          }, 
+          "EndpointUri2": "http://example.com"
+        }, 
+        "StageName": {
+          "Ref": "MyStageName"
         }
       }
     }, 
-    "ApiWithInlineSwaggerDeploymentf98588d7ff": {
+    "ApiWithInlineSwaggerDeployment09cda3d97b": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"
         }, 
-        "Description": "RestApi deployment id: f98588d7ff10d9add9be1344fbe7daff2e100b78"
+        "Description": "RestApi deployment id: 09cda3d97b008bed7bd4ebb1b5304ed622492941"
       }
     }
   }

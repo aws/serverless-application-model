@@ -197,6 +197,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_gateway_responses_implicit',
         'api_with_gateway_responses_string_status_code',
         'api_with_open_api_version',
+        'api_with_open_api_version_2',
         'api_cache',
         'api_with_access_log_setting',
         'api_with_canary_setting',
