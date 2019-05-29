@@ -287,7 +287,15 @@ class ApiGenerator(object):
             self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer)
 
         # Assign the Swagger back to template
-        self.definition_body = swagger_editor.swagger
+        self.definition_body = self._openapi_auth_postprocess(swagger_editor.swagger)
+
+    def _openapi_auth_postprocess(self, definition_body):
+        if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
+            if definition_body.get('securityDefinitions'):
+                definition_body['components'] = {}
+                definition_body['components']['securitySchemes'] = definition_body['securityDefinitions']
+                del definition_body['securityDefinitions']
+        return definition_body
 
     def _add_gateway_responses(self):
         """
