@@ -555,13 +555,12 @@ class SwaggerEditor(object):
         :param dict data: Data to be validated
         :return: True, if data is a Swagger
         """
-        openapi_version_supported_regex = r"\A3(\.\d)(\.\d)?$"
 
         if bool(data) and isinstance(data, dict) and isinstance(data.get('paths'), dict):
             if bool(data.get("swagger")):
                 return True
             elif bool(data.get("openapi")):
-                return re.search(openapi_version_supported_regex, data["openapi"]) is not None
+                return re.search(SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]) is not None
             return False
         return False
 
@@ -601,3 +600,13 @@ class SwaggerEditor(object):
             return SwaggerEditor._X_ANY_METHOD
         else:
             return method
+
+    @staticmethod
+    def get_openapi_versions_supported_regex():
+        openapi_version_supported_regex = r"\A[2-3](\.\d)(\.\d)?$"
+        return openapi_version_supported_regex
+
+    @staticmethod
+    def get_openapi_version_3_regex():
+        openapi_version_3_regex = r"\A3(\.\d)(\.\d)?$"
+        return openapi_version_3_regex

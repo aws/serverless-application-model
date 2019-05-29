@@ -1,5 +1,6 @@
 ﻿from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
+from samtranslator.swagger.swagger import SwaggerEditor
 import re
 
 
@@ -15,7 +16,6 @@ class Globals(object):
     _OPENAPIVERSION = "OpenApiVersion"
     _API_TYPE = "AWS::Serverless::Api"
     _MANAGE_SWAGGER = "__MANAGE_SWAGGER"
-    _OPENAPIVERSION_REGEX = r"\A3(\.\d)(\.\d)?$"
 
     supported_properties = {
         # Everything on Serverless::Function except Role, Policies, FunctionName, Events
@@ -135,7 +135,8 @@ class Globals(object):
             if ("Type" in resource) and (resource["Type"] == cls._API_TYPE):
                 properties = resource["Properties"]
                 if (cls._OPENAPIVERSION in properties) and (cls._MANAGE_SWAGGER in properties) and \
-                        (re.match(cls._OPENAPIVERSION_REGEX, properties[cls._OPENAPIVERSION]) is not None):
+                    (re.match(SwaggerEditor.get_openapi_version_3_regex(),
+                              properties[cls._OPENAPIVERSION]) is not None):
                     if "DefinitionBody" in properties:
                         definition_body = properties['DefinitionBody']
                         definition_body['openapi'] = properties[cls._OPENAPIVERSION]

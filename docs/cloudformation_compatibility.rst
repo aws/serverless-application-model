@@ -171,7 +171,7 @@ BinaryMediaTypes                    All
 MinimumCompressionSize              All
 Cors                                All
 TracingEnabled                      All
-OpenApiVersion                      All
+OpenApiVersion                      None
 ================================== ======================== ========================
 
 

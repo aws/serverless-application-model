@@ -24,7 +24,6 @@ AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorize
 AuthProperties.__new__.__defaults__ = (None, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
-OpenApiVersionsSupportedRegex = r"\A[2-3](\.\d)(\.\d)?$"
 
 
 class ApiGenerator(object):
@@ -98,9 +97,9 @@ class ApiGenerator(object):
                                            "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both")
 
         if self.open_api_version:
-            if re.match(OpenApiVersionsSupportedRegex, self.open_api_version) is None:
+            if re.match(SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version) is None:
                 raise InvalidResourceException(
-                    self.logical_id, "The OpenApiVersion value must be of the format 2.x.x or 3.x.x")
+                    self.logical_id, "The OpenApiVersion value must be 3.0.0")
 
         self._add_cors()
         self._add_auth()
