@@ -5,13 +5,17 @@ import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.cloudwatchlogs
+from samtranslator.model.intrinsics import fnGetAtt, fnSub
+
 from .api.api_generator import ApiGenerator
 from .s3_utils.uri_parser import construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
+from samtranslator.model.appsync import AppSyncApi, AppSyncApiKey, AppSyncApiSchema
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
 from samtranslator.model.cloudformation import NestedStack
+from samtranslator.model.cloudwatch import CloudWatchLogGroup
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import (InvalidEventException,
                                             InvalidResourceException)
@@ -702,3 +706,109 @@ class SamLayerVersion(SamResourceMacro):
             raise InvalidResourceException(self.logical_id,
                                            "'{}' must be one of the following options: {}."
                                            .format('RetentionPolicy', [self.RETAIN, self.DELETE]))
+
+
+class SamGraphApi(SamResourceMacro):
+    """ SAM AppSync Macro
+    """
+    resource_type = 'AWS::Serverless::GraphQLApi'
+    property_types = {
+        'Name': PropertyType(True, is_str()),
+        'AuthenticationType': PropertyType(True, is_str()),
+        'LogConfig': PropertyType(False, is_type(dict)),
+        'OpenIDConnectConfig': PropertyType(False, is_type(dict)),
+        'UserPoolConfig': PropertyType(False, is_type(dict)),
+        'SchemaDefinition': PropertyType(False, is_str()),
+        'SchemaDefinitionUri': PropertyType(False, is_str()),
+        'ApiKeys': PropertyType(False, is_type(list))
+    }
+
+    def to_cloudformation(self, **kwargs):
+        """Returns the GraphQL Api, function, role, and event resources to which this SAM GraphQL Api corresponds
+
+        :param dict kwargs: already-converted resources that may need to be modified when converting this \
+        macro to pure CloudFormation
+        :returns: a list of vanilla CloudFormation Resources, to which this Function expands
+        :rtype: list
+        """
+
+        resources = []
+
+        api_resources = self._construct_api()
+
+        resources.extend(api_resources)
+
+        return resources
+
+    def _construct_api(self):
+        resources = []
+
+        api = AppSyncApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+        api.Name = self.Name
+
+        api_schema = AppSyncApiSchema(
+            api.logical_id + 'Schema',
+            depends_on=self.depends_on,
+            attributes=self.resource_attributes
+        )
+
+        api_schema.ApiId = fnGetAtt(api.logical_id, 'ApiId')
+
+        if self.SchemaDefinition:
+            api_schema.Definition = self.SchemaDefinition
+        elif self.SchemaDefinitionUri:
+            api_schema.DefinitionS3Location = self.SchemaDefinitionUri
+
+        if self.AuthenticationType:
+            api.AuthenticationType = self.AuthenticationType
+        else:
+            api.AuthenticationType = 'API_KEY'
+
+        if self.ApiKeys:
+            for index, values in enumerate(self.ApiKeys):
+                api_key = AppSyncApiKey(
+                    self.logical_id + 'Key' + str(index),
+                    depends_on=self.depends_on,
+                    attributes=self.resource_attributes
+                )
+                api_key.ApiId = fnGetAtt(api.logical_id, 'ApiId')
+
+                if isinstance(values, dict) and 'Description' in values:
+                    api_key.Description = values['Description']
+
+                if isinstance(values, dict) and 'Expires' in values.keys():
+                    api_key.Expires = float(values['Expires'])
+
+                resources.append(api_key)
+
+        if self.LogConfig and 'Enabled' in self.LogConfig.keys() and self.LogConfig['Enabled'] is True:
+            api.LogConfig = {}
+            log_role = IAMRole(
+                self.logical_id + 'Role',
+                depends_on=self.depends_on,
+                attributes=self.resource_attributes
+            )
+            log_role.AssumeRolePolicyDocument = IAMRolePolicies.appsync_assume_role_policy()
+            policy_documents = []
+            policy_documents.append(IAMRolePolicies.cloudwatch_log_policy())
+            log_role.Policies = policy_documents
+            api.LogConfig['CloudWatchLogsRoleArn'] = fnGetAtt(log_role.logical_id, 'Arn')
+
+            if 'FieldLogLevel' in self.LogConfig.keys():
+                api.LogConfig['FieldLogLevel'] = self.LogConfig['FieldLogLevel']
+
+            if 'RetentionInDays' in self.LogConfig.keys():
+                log_group = CloudWatchLogGroup(
+                    api.logical_id + 'LogGroup',
+                    depends_on=self.depends_on,
+                    attributes=self.resource_attributes
+                )
+                log_group.LogGroupName = fnSub(
+                    '/aws/appsync/apis/${ApiId}', {'ApiId': fnGetAtt(api.logical_id, 'ApiId')})
+
+                log_group.RetentionInDays = self.LogConfig['RetentionInDays']
+                resources.append(log_group)
+
+            resources.append(log_role)
+        resources.extend([api, api_schema])
+        return resources

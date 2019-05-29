@@ -5,7 +5,8 @@ import pytest
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion
-from samtranslator.model.sam_resources import SamFunction
+from samtranslator.model.appsync import AppSyncApi, AppSyncApiSchema
+from samtranslator.model.sam_resources import SamFunction, SamGraphApi
 
 
 class TestCodeUri(TestCase):
@@ -70,3 +71,31 @@ class TestVersionDescription(TestCase):
         cfnResources = function.to_cloudformation(**self.kwargs)
         generateFunctionVersion = [x for x in cfnResources if isinstance(x, LambdaVersion)]
         self.assertEqual(generateFunctionVersion[0].Description, test_description)
+
+class TestGraphAPISchemaUri(TestCase):
+    kwargs = {
+        'intrinsics_resolver': IntrinsicsResolver({}),
+        'event_resources': [],
+        'managed_policy_map': {
+            "foo": "bar"
+        }
+    }
+
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    def test_with_schema_uri(self):
+        api = SamGraphApi("foo")
+        test_schema = "s3://foobar/foo.gql"
+
+        api.Name = "FooApi"
+        api.AuthenticationType = "API_KEY"
+        api.LogConfig = {
+            'Enabled': True
+        }
+        api.SchemaDefinitionUri = test_schema
+        api.ApiKeys = [None, None]
+
+        cfnResources = api.to_cloudformation(**self.kwargs)
+        generatedApiList = [x for x in cfnResources if isinstance(x, AppSyncApi)]
+        generatedApiSchema = [x for x in cfnResources if isinstance(x, AppSyncApiSchema)]
+        self.assertEqual(generatedApiList.__len__(), 1)
+        self.assertEqual(generatedApiSchema[0].DefinitionS3Location, test_schema)
