@@ -99,7 +99,7 @@ class ApiGenerator(object):
         if self.open_api_version:
             if re.match(SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version) is None:
                 raise InvalidResourceException(
-                    self.logical_id, "The OpenApiVersion value must be 3.0.0")
+                    self.logical_id, "The OpenApiVersion value must be of the format 3.0.0")
 
         self._add_cors()
         self._add_auth()
