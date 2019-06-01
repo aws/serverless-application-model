@@ -31,7 +31,8 @@ class ApiGenerator(object):
                  definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
                  auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
-                 tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None):
+                 tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
+                 models=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -48,6 +49,7 @@ class ApiGenerator(object):
         :param tracing_enabled: Whether active tracing with X-ray is enabled
         :param resource_attributes: Resource attributes to add to API resources
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
+        :param models: Model definitions to be used by API methods
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
@@ -70,6 +72,7 @@ class ApiGenerator(object):
         self.tracing_enabled = tracing_enabled
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
+        self.models = models
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -96,6 +99,7 @@ class ApiGenerator(object):
         self._add_cors()
         self._add_auth()
         self._add_gateway_responses()
+        self._add_models()
 
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
@@ -321,6 +325,30 @@ class ApiGenerator(object):
             swagger_editor.add_gateway_responses(gateway_responses)
 
         # Assign the Swagger back to template
+        self.definition_body = swagger_editor.swagger
+
+    # TODO: tests
+    def _add_models(self):
+        """
+        Add Model definitions to the Swagger file, if necessary
+        :return:
+        """
+
+        if not self.models:
+            return
+
+        if self.models and not self.definition_body:
+            raise InvalidResourceException(self.logical_id,
+                                           "Models works only with inline Swagger specified in "
+                                           "'DefinitionBody' property")
+
+        if not SwaggerEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(self.logical_id, "Unable to add Models definitions because "
+                                                            "'DefinitionBody' does not contain a valid Swagger")
+
+        swagger_editor = SwaggerEditor(self.definition_body)
+        swagger_editor.add_models(self.models)
+
         self.definition_body = swagger_editor.swagger
 
     def _get_authorizers(self, authorizers_config, default_authorizer=None):

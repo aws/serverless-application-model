@@ -36,6 +36,7 @@ class SwaggerEditor(object):
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", {})
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
+        self.definitions = self._doc.get('definitions', {})
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -513,6 +514,41 @@ class SwaggerEditor(object):
                     elif 'AWS_IAM' not in self.security_definitions:
                         self.security_definitions.update(aws_iam_security_definition)
 
+    # TODO: tests
+    def add_request_model_to_method(self, path, method_name, request_model, api):
+        """
+        Adds request model body parameter for this path/method.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param dict request_model: Model name
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        """
+        model_name = request_model and request_model.get('Model').lower()
+        model_required = request_model and request_model.get('Required')
+
+        normalized_method_name = self._normalize_method_name(method_name)
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+
+            existing_parameters = method_definition.get('parameters', [])
+
+            existing_parameters.append({
+                'in': 'body',
+                'name': model_name,
+                'required': model_required,
+                'schema': {
+                    '$ref': '#/definitions/{}'.format(model_name)
+                }
+            })
+
+            method_definition['parameters'] = existing_parameters
+
+
     def add_gateway_responses(self, gateway_responses):
         """
         Add Gateway Response definitions to Swagger.
@@ -523,6 +559,30 @@ class SwaggerEditor(object):
 
         for response_type, response in gateway_responses.items():
             self.gateway_responses[response_type] = response.generate_swagger()
+
+    # TODO: tests
+    def add_models(self, models):
+        """
+        Add Model definitions to Swagger.
+
+        :param dict models: Dictionary of Model schemas which gets translated
+        :return:
+        """
+
+        self.definitions = self.definitions or {}
+
+        for model_name, schema in models.items():
+
+            model_type = schema.get('type')
+            model_properties = schema.get('properties')
+
+            if not model_type:
+                raise ValueError("Invalid input. Value for type is required")
+
+            if not model_properties:
+                raise ValueError("Invalid input. Value for properties is required")
+
+            self.definitions[model_name.lower()] = schema
 
     @property
     def swagger(self):
@@ -539,6 +599,8 @@ class SwaggerEditor(object):
             self._doc["securityDefinitions"] = self.security_definitions
         if self.gateway_responses:
             self._doc[self._X_APIGW_GATEWAY_RESPONSES] = self.gateway_responses
+        if self.definitions:
+            self._doc['definitions'] = self.definitions
 
         return copy.deepcopy(self._doc)
 
