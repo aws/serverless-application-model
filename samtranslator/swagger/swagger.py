@@ -518,15 +518,13 @@ class SwaggerEditor(object):
                     elif 'AWS_IAM' not in self.security_definitions:
                         self.security_definitions.update(aws_iam_security_definition)
 
-    # TODO: tests
-    def add_request_model_to_method(self, path, method_name, request_model, api):
+    def add_request_model_to_method(self, path, method_name, request_model):
         """
         Adds request model body parameter for this path/method.
 
         :param string path: Path name
         :param string method_name: Method name
         :param dict request_model: Model name
-        :param dict api: Reference to the related Api's properties as defined in the template.
         """
         model_name = request_model and request_model.get('Model').lower()
         model_required = request_model and request_model.get('Required')
@@ -541,14 +539,18 @@ class SwaggerEditor(object):
 
             existing_parameters = method_definition.get('parameters', [])
 
-            existing_parameters.append({
+            parameter = {
                 'in': 'body',
                 'name': model_name,
-                'required': model_required,
                 'schema': {
                     '$ref': '#/definitions/{}'.format(model_name)
                 }
-            })
+            }
+
+            if model_required is not None:
+                parameter['required'] = model_required
+
+            existing_parameters.append(parameter)
 
             method_definition['parameters'] = existing_parameters
 
@@ -564,7 +566,6 @@ class SwaggerEditor(object):
         for response_type, response in gateway_responses.items():
             self.gateway_responses[response_type] = response.generate_swagger()
 
-    # TODO: tests
     def add_models(self, models):
         """
         Add Model definitions to Swagger.
