@@ -585,7 +585,7 @@ class Api(PushEventSource):
                         'because it wasn\'t defined in the API\'s Models.'.format(
                             model=method_model, method=self.Method, path=self.Path))
 
-                editor.add_request_model_to_method(api=api, path=self.Path, method_name=self.Method,
+                editor.add_request_model_to_method(path=self.Path, method_name=self.Method,
                                                    request_model=self.RequestModel)
 
         api["DefinitionBody"] = editor.swagger
