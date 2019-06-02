@@ -180,6 +180,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_access_log_setting',
         'api_with_canary_setting',
         'api_with_xray_tracing',
+        'api_request_model',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -275,6 +276,16 @@ class TestTranslatorEndToEnd(TestCase):
         if sys.version_info.major >= 3:
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
+
+        try:
+            output_sort = deep_sort_lists(output_fragment)
+        except Exception as error:
+            raise
+
+        try:
+            expected_sort = deep_sort_lists(expected)
+        except Exception as error:
+            raise
 
         assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
 
