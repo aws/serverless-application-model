@@ -1,0 +1,81 @@
+Resources:
+
+  NoModelsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  NoModelFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NoModelsApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+
+  MissingModelApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string
+
+  MissingModelFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MissingModelApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model: UnspecifiedModel
+
+  ModelsNotDictApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        User: notadict
+
+  ModelsWithDefinitionUrlApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://bucket/key
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string
+
+  ModelsWithInvalidDefinitionBodyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody: { invalid: true }
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string
