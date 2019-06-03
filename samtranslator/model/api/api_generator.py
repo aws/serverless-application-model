@@ -307,7 +307,7 @@ class ApiGenerator(object):
         if definition_body.get('openapi') is not None:
             if self.open_api_version is None:
                 raise InvalidResourceException(
-                    self.logical_id, "OpenApiVersion must be specified")
+                    self.logical_id, "'OpenApiVersion: {}' must be specified".format(definition_body.get('openapi')))
 
         if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
             if definition_body.get('securityDefinitions'):
