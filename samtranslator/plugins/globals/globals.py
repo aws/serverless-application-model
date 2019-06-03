@@ -1,5 +1,7 @@
 ﻿from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
+from samtranslator.swagger.swagger import SwaggerEditor
+import re
 
 
 class Globals(object):
@@ -11,6 +13,9 @@ class Globals(object):
     # Key of the dictionary containing Globals section in SAM template
     _KEYWORD = "Globals"
     _RESOURCE_PREFIX = "AWS::Serverless::"
+    _OPENAPIVERSION = "OpenApiVersion"
+    _API_TYPE = "AWS::Serverless::Api"
+    _MANAGE_SWAGGER = "__MANAGE_SWAGGER"
 
     supported_properties = {
         # Everything on Serverless::Function except Role, Policies, FunctionName, Events
@@ -53,7 +58,8 @@ class Globals(object):
             "GatewayResponses",
             "AccessLogSetting",
             "CanarySetting",
-            "TracingEnabled"
+            "TracingEnabled",
+            "OpenApiVersion"
         ],
 
         SamResourceType.SimpleTable.value: [
@@ -68,7 +74,7 @@ class Globals(object):
         :param dict template: SAM template to be parsed
         """
         self.supported_resource_section_names = ([x.replace(self._RESOURCE_PREFIX, "")
-                                                 for x in self.supported_properties.keys()])
+                                                  for x in self.supported_properties.keys()])
         # Sort the names for stability in list ordering
         self.supported_resource_section_names.sort()
 
@@ -106,6 +112,36 @@ class Globals(object):
 
         if cls._KEYWORD in template:
             del template[cls._KEYWORD]
+
+    @classmethod
+    def fix_openapi_definitions(cls, template):
+        """
+        Helper method to postprocess the resources to make sure the swagger doc version matches
+        the one specified on the resource with flag OpenApiVersion.
+
+        This is done postprocess in globals because, the implicit api plugin runs before globals, \
+        and at that point the global flags aren't applied on each resource, so we do not know \
+        whether OpenApiVersion flag is specified. Running the globals plugin before implicit api \
+        was a risky change, so we decided to postprocess the openapi version here.
+
+        To make sure we don't modify customer defined swagger, we also check for __MANAGE_SWAGGER flag.
+
+        :param dict template: SAM template
+        :return: Modified SAM template with corrected swagger doc matching the OpenApiVersion.
+        """
+        resources = template["Resources"]
+
+        for _, resource in resources.items():
+            if ("Type" in resource) and (resource["Type"] == cls._API_TYPE):
+                properties = resource["Properties"]
+                if (cls._OPENAPIVERSION in properties) and (cls._MANAGE_SWAGGER in properties) and \
+                    (re.match(SwaggerEditor.get_openapi_version_3_regex(),
+                              properties[cls._OPENAPIVERSION]) is not None):
+                    if "DefinitionBody" in properties:
+                        definition_body = properties['DefinitionBody']
+                        definition_body['openapi'] = properties[cls._OPENAPIVERSION]
+                        if definition_body.get('swagger'):
+                            del definition_body['swagger']
 
     def _parse(self, globals_dict):
         """
@@ -398,6 +434,7 @@ class InvalidGlobalsSectionException(Exception):
     Attributes:
         message -- explanation of the error
     """
+
     def __init__(self, logical_id, message):
         self._logical_id = logical_id
         self._message = message

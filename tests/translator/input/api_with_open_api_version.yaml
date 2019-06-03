@@ -1,0 +1,22 @@
+Globals:
+  Api:
+    OpenApiVersion: '3.0.1'
+    Cors: '*'
+
+Resources:
+  ImplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs8.10
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod

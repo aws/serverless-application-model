@@ -5,6 +5,8 @@ from samtranslator.public.exceptions import InvalidDocumentException
 
 from samtranslator.plugins.globals.globals import Globals, InvalidGlobalsSectionException
 
+_API_RESOURCE = "AWS::Serverless::Api"
+
 
 class GlobalsPlugin(BasePlugin):
     """
@@ -38,3 +40,7 @@ class GlobalsPlugin(BasePlugin):
 
         # Remove the Globals section from template if necessary
         Globals.del_section(template_dict)
+
+        # If there was a global openApiVersion flag, check and convert swagger
+        # to the right version
+        Globals.fix_openapi_definitions(template_dict)
