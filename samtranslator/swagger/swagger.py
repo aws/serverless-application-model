@@ -554,7 +554,6 @@ class SwaggerEditor(object):
 
             method_definition['parameters'] = existing_parameters
 
-
     def add_gateway_responses(self, gateway_responses):
         """
         Add Gateway Response definitions to Swagger.
