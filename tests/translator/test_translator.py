@@ -407,6 +407,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_invalid_definitionbody',
     'error_api_invalid_stagename',
     'error_api_invalid_restapiid',
+    'error_api_invalid_request_model',
     'error_application_properties',
     'error_application_does_not_exist',
     'error_application_no_access',

@@ -576,7 +576,7 @@ class Api(PushEventSource):
                         self.relative_id,
                         'Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] '
                         'because the related API does not define any Models.'.format(
-                            model=self.RequestModel, method=self.Method, path=self.Path))
+                            model=method_model, method=self.Method, path=self.Path))
 
                 if not api_models.get(method_model):
                     raise InvalidEventException(
