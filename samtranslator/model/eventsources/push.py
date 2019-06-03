@@ -565,7 +565,6 @@ class Api(PushEventSource):
 
                 editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
 
-        # TODO: tests
         if self.RequestModel:
             method_model = self.RequestModel.get('Model')
 
