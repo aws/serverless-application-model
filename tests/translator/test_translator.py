@@ -324,6 +324,16 @@ class TestTranslatorEndToEnd(TestCase):
         except Exception as error:
             raise
 
+        try:
+            output_sort = deep_sort_lists(output_fragment)
+        except Exception as error:
+            raise
+
+        try:
+            expected_sort = deep_sort_lists(expected)
+        except Exception as error:
+            raise
+
         assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
         assert len(matches) == 0
 
