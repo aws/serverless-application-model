@@ -325,6 +325,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_open_api_version',
         'api_with_open_api_version_2',
         'api_with_auth_all_minimum_openapi',
+        'api_with_swagger_and_openapi_with_auth'
       ],
       [
        ("aws", "ap-southeast-1"),
