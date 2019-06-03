@@ -325,7 +325,6 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_open_api_version',
         'api_with_open_api_version_2',
         'api_with_auth_all_minimum_openapi',
-        'api_with_auth_no_openapi_flag'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -466,6 +465,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_invalid_definitionbody',
     'error_api_invalid_stagename',
     'error_api_with_invalid_open_api_version',
+    'error_api_with_openapi_definition_body_no_flag',
     'error_api_invalid_restapiid',
     'error_application_properties',
     'error_application_does_not_exist',
