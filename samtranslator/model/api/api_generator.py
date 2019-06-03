@@ -287,9 +287,28 @@ class ApiGenerator(object):
             self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer)
 
         # Assign the Swagger back to template
+
         self.definition_body = self._openapi_auth_postprocess(swagger_editor.swagger)
 
     def _openapi_auth_postprocess(self, definition_body):
+        """
+        Convert auth components to openapi 3 in definition body if OpenApiVersion flag is specified.
+
+        To maintain backward compatibility with existing swagger documents that contain both swagger
+        and openapi defined in the definition body, we return if there is "swagger" defined in the
+        definition body.
+
+        If the definition body contains "openapi" and not "swagger", we enforce that the OpenApiVersion
+        flag is specified for cases with auth.
+        """
+        if definition_body.get('swagger') is not None:
+            return definition_body
+
+        if definition_body.get('openapi') is not None:
+            if self.open_api_version is None:
+                raise InvalidResourceException(
+                    self.logical_id, "OpenApiVersion must be specified")
+
         if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
             if definition_body.get('securityDefinitions'):
                 definition_body['components'] = {}
