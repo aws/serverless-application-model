@@ -66,7 +66,7 @@ class ApiGatewayDeployment(Resource):
             'Description': PropertyType(False, is_str()),
             'RestApiId': PropertyType(True, is_str()),
             'StageDescription': PropertyType(False, is_type(dict)),
-            'StageName': PropertyType(True, is_str())
+            'StageName': PropertyType(False, is_str())
     }
 
     runtime_attrs = {
