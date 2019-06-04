@@ -1,8 +1,0 @@
-{
-  "errors": [
-    {
-      "errorMessage": "'OpenApiVersion: 3.1.1' must be specified"
-    }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ExplicitApi] is invalid. 'OpenApiVersion: 3.1.1' must be specified"
-}
