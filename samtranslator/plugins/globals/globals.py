@@ -129,7 +129,7 @@ class Globals(object):
         :param dict template: SAM template
         :return: Modified SAM template with corrected swagger doc matching the OpenApiVersion.
         """
-        resources = template["Resources"]
+        resources = template.get("Resources", {})
 
         for _, resource in resources.items():
             if ("Type" in resource) and (resource["Type"] == cls._API_TYPE):
