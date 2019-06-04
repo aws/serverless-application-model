@@ -294,12 +294,8 @@ class ApiGenerator(object):
         """
         Convert auth components to openapi 3 in definition body if OpenApiVersion flag is specified.
 
-        To maintain backward compatibility with existing swagger documents that contain both swagger
-        and openapi defined in the definition body, we return if there is "swagger" defined in the
-        definition body.
-
-        If the definition body contains "openapi" and not "swagger", we enforce that the OpenApiVersion
-        flag is specified for cases with auth.
+        If there is swagger defined in the definition body, we treat it as a swagger spec and do not
+        make any openapi 3 changes to it.
         """
         if definition_body.get('swagger') is not None:
             return definition_body
