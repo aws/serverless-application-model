@@ -586,7 +586,8 @@ class Api(PushEventSource):
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property")
 
-                    if not all(key in RequestParameterProperties for key in parameter_value.keys()):
+                    if not isinstance(parameter_value, dict) or not all(key in RequestParameterProperties
+                                                                        for key in parameter_value.keys()):
                         raise InvalidEventException(
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property")
@@ -602,6 +603,11 @@ class Api(PushEventSource):
                         "Invalid value for 'RequestParameters' property")
 
                 else:
+                    if not re.match('method\.request\.(query|path|header)', parameter):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Invalid value for 'RequestParameters' property")
+
                     parameters[parameter] = default_value.copy()
 
             editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
