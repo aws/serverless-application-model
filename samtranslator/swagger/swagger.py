@@ -528,6 +528,49 @@ class SwaggerEditor(object):
         for response_type, response in gateway_responses.items():
             self.gateway_responses[response_type] = response.generate_swagger()
 
+    def add_request_parameters_to_method(self, path, method_name, request_parameters):
+        """
+        Add Parameters to Swagger.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param dict request_parameters: Dictionary of Parameters
+        :return:
+        """
+
+        normalized_method_name = self._normalize_method_name(method_name)
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+
+            existing_parameters = method_definition.get('parameters', [])
+
+            for parameter_name, parameter_settings in request_parameters.items():
+
+                location_name = parameter_name.replace('method.request.', '')
+                location, name = location_name.split('.')
+
+                parameter = {
+                    'in': location,
+                    'name': name,
+                    'required': parameter_settings.Required,
+                    'type': 'string'
+                }
+
+                existing_parameters.append(parameter)
+
+                if parameter_settings.Caching:
+
+                    integration = method_definition[self._X_APIGW_INTEGRATION]
+                    cache_parameters = integration.get('cacheKeyParameters', [])
+                    cache_parameters.append(parameter_name)
+                    integration['cacheKeyParameters'] = cache_parameters
+
+            method_definition['parameters'] = existing_parameters
+
     @property
     def swagger(self):
         """

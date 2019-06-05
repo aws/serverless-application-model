@@ -1,5 +1,6 @@
 import copy
 import re
+from collections import namedtuple
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
@@ -16,6 +17,9 @@ from samtranslator.model.exceptions import InvalidEventException, InvalidResourc
 from samtranslator.swagger.swagger import SwaggerEditor
 
 CONDITION = 'Condition'
+
+RequestParameterProperties = namedtuple("_RequestParameterProperties", ["Required", "Caching"])
+RequestParameterProperties.__new__.__defaults__ = (False, False)
 
 
 class PushEventSource(ResourceMacro):
@@ -386,7 +390,8 @@ class Api(PushEventSource):
 
             # Api Event sources must "always" be paired with a Serverless::Api
             'RestApiId': PropertyType(True, is_str()),
-            'Auth': PropertyType(False, is_type(dict))
+            'Auth': PropertyType(False, is_type(dict)),
+            'RequestParameters': PropertyType(False, is_type(list))
     }
 
     def resources_to_link(self, resources):
@@ -563,6 +568,38 @@ class Api(PushEventSource):
                                 method=self.Method, path=self.Path))
 
                 editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+
+        if self.RequestParameters:
+
+            parameters = {}
+            for parameter in self.RequestParameters:
+
+                if isinstance(parameter, dict):
+
+                    parameter_name, parameter_value = parameter.items()[0]
+
+                    if not re.match('method\.request\.(query|path|header)', parameter_name):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Invalid value for 'RequestParameters' property")
+
+                    if not all(key in RequestParameterProperties._fields for key in parameter_value.keys()):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Invalid value for 'RequestParameters' property")
+
+                    parameters[parameter_name] = RequestParameterProperties(**parameter_value)
+
+                elif not isinstance(parameter, string_types):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Invalid value for 'RequestParameters' property")
+
+                else:
+                    parameters[parameter] = RequestParameterProperties()
+
+            editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
+                                                    request_parameters=parameters)
 
         api["DefinitionBody"] = editor.swagger
 
