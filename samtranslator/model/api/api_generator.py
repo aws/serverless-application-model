@@ -81,6 +81,8 @@ class ApiGenerator(object):
         :rtype: model.apigateway.ApiGatewayRestApi
         """
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+        # NOTE: For backwards compatibility we need to retain BinaryMediaTypes on the CloudFormation Property
+        # Removing this and only setting x-amazon-apigateway-binary-media-types results in other issues.
         rest_api.BinaryMediaTypes = self.binary_media
         rest_api.MinimumCompressionSize = self.minimum_compression_size
 
@@ -104,6 +106,7 @@ class ApiGenerator(object):
         self._add_cors()
         self._add_auth()
         self._add_gateway_responses()
+        self._add_binary_media_types()
 
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
@@ -253,6 +256,24 @@ class ApiGenerator(object):
         for path in editor.iter_on_path():
             editor.add_cors(path, properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
                             max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials)
+
+        # Assign the Swagger back to template
+        self.definition_body = editor.swagger
+
+    def _add_binary_media_types(self):
+        """
+        Add binary media types to Swagger
+        """
+
+        if not self.binary_media:
+            return
+
+        # We don't raise an error here like we do for similar cases because that would be backwards incompatible
+        if self.binary_media and not self.definition_body:
+            return
+
+        editor = SwaggerEditor(self.definition_body)
+        editor.add_binary_media_types(self.binary_media)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger

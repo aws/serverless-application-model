@@ -43,7 +43,7 @@
           ]
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ]
       }
     },
@@ -57,7 +57,7 @@
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
@@ -78,7 +78,7 @@
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
@@ -92,9 +92,28 @@
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "BodyS3Location": {
-          "Bucket": "sam-demo-bucket",
-          "Key": "webpage_swagger.json"
+        "Body": {
+          "swagger": "2.0",
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {},
+          "x-amazon-apigateway-binary-media-types": [
+            "image/jpg",
+            {
+              "Fn::Join": [
+                "/",
+                [
+                  "image",
+                  "png"
+                ]
+              ]
+            },
+            "image/gif"
+          ]
         },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
@@ -119,10 +138,10 @@
         ]
       }
     },
-    "ExplicitApiDeployment52f00354a1": {
+    "ExplicitApiDeploymentf4ab7ba289": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 52f00354a16a18fd32d019aff64a63e417294cfb",
+        "Description": "RestApi deployment id: f4ab7ba28970eac19c70a9b256d940b7458e7e26",
         "RestApiId": {
           "Ref": "ExplicitApi"
         },
@@ -133,7 +152,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment52f00354a1"
+          "Ref": "ExplicitApiDeploymentf4ab7ba289"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -159,7 +178,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 },
                 "responses": {}
@@ -201,10 +220,10 @@
         ]
       }
     },
-    "ServerlessRestApiDeployment40390bbcc7": {
+    "ServerlessRestApiDeployment1016fdb05c": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 40390bbcc732b6fb06bf2b92731e4f58227fc97f",
+        "Description": "RestApi deployment id: 1016fdb05c38cef5641ccbb716b512e8f8dcc827",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
@@ -215,7 +234,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment40390bbcc7"
+          "Ref": "ServerlessRestApiDeployment1016fdb05c"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"

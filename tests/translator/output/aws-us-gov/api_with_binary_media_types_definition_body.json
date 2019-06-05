@@ -92,9 +92,28 @@
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "BodyS3Location": {
-          "Bucket": "sam-demo-bucket",
-          "Key": "webpage_swagger.json"
+        "Body": {
+          "swagger": "2.0",
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {},
+          "x-amazon-apigateway-binary-media-types": [
+            "image/jpg",
+            {
+              "Fn::Join": [
+                "/",
+                [
+                  "image",
+                  "png"
+                ]
+              ]
+            },
+            "image/gif"
+          ]
         },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
@@ -119,10 +138,10 @@
         ]
       }
     },
-    "ExplicitApiDeployment52f00354a1": {
+    "ExplicitApiDeploymentf4ab7ba289": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 52f00354a16a18fd32d019aff64a63e417294cfb",
+        "Description": "RestApi deployment id: f4ab7ba28970eac19c70a9b256d940b7458e7e26",
         "RestApiId": {
           "Ref": "ExplicitApi"
         },
@@ -133,7 +152,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment52f00354a1"
+          "Ref": "ExplicitApiDeploymentf4ab7ba289"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
