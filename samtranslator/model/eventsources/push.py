@@ -18,8 +18,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 
 CONDITION = 'Condition'
 
-RequestParameterProperties = namedtuple("_RequestParameterProperties", ["Required", "Caching"])
-RequestParameterProperties.__new__.__defaults__ = (False, False)
+RequestParameterProperties = ["Required", "Caching"]
 
 
 class PushEventSource(ResourceMacro):
@@ -571,6 +570,11 @@ class Api(PushEventSource):
 
         if self.RequestParameters:
 
+            default_value = {
+                'Required': False,
+                'Caching': False
+            }
+
             parameters = {}
             for parameter in self.RequestParameters:
 
@@ -583,12 +587,15 @@ class Api(PushEventSource):
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property")
 
-                    if not all(key in RequestParameterProperties._fields for key in parameter_value.keys()):
+                    if not all(key in RequestParameterProperties for key in parameter_value.keys()):
                         raise InvalidEventException(
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property")
 
-                    parameters[parameter_name] = RequestParameterProperties(**parameter_value)
+                    settings = default_value.copy()
+                    settings.update(parameter_value)
+
+                    parameters[parameter_name] = settings
 
                 elif not isinstance(parameter, string_types):
                     raise InvalidEventException(
@@ -596,7 +603,7 @@ class Api(PushEventSource):
                         "Invalid value for 'RequestParameters' property")
 
                 else:
-                    parameters[parameter] = RequestParameterProperties()
+                    parameters[parameter] = default_value.copy()
 
             editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
                                                     request_parameters=parameters)

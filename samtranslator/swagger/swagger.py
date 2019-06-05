@@ -556,13 +556,13 @@ class SwaggerEditor(object):
                 parameter = {
                     'in': location,
                     'name': name,
-                    'required': parameter_settings.Required,
+                    'required': parameter_settings['Required'],
                     'type': 'string'
                 }
 
                 existing_parameters.append(parameter)
 
-                if parameter_settings.Caching:
+                if parameter_settings['Caching']:
 
                     integration = method_definition[self._X_APIGW_INTEGRATION]
                     cache_parameters = integration.get('cacheKeyParameters', [])
