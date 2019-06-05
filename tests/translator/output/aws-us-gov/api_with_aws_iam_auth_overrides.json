@@ -46,11 +46,21 @@
         ]
       }
     },
+    "MyApiWithAwsIamAuthDeploymentd6dd2d1504": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuth"
+        },
+        "Description": "RestApi deployment id: d6dd2d1504ea960bdb50055b256d9292aa565e4b",
+        "StageName": "Stage"
+      }
+    },
     "MyApiWithAwsIamAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthDeploymentc527246f7f"
+          "Ref": "MyApiWithAwsIamAuthDeploymentd6dd2d1504"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
@@ -101,16 +111,6 @@
             }
           ]
         }
-      }
-    },
-    "MyApiWithAwsIamAuthDeploymentc527246f7f": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuth"
-        },
-        "Description": "RestApi deployment id: c527246f7ffc9d300cb5934f0a2feaf19ce90c8b",
-        "StageName": "Stage"
       }
     },
     "MyFunctionWithoutAuthAPI2PermissionProd": {
@@ -561,10 +561,10 @@
               "x-amazon-apigateway-authtype": "cognito_user_pools"
             },
             "AWS_IAM": {
-              "x-amazon-apigateway-authtype": "awsSigv4",
+              "in": "header",
               "type": "apiKey",
               "name": "Authorization",
-              "in": "header"
+              "x-amazon-apigateway-authtype": "awsSigv4"
             }
           }
         },
