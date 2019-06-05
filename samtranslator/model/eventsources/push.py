@@ -1,6 +1,5 @@
 import copy
 import re
-from collections import namedtuple
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
