@@ -394,7 +394,7 @@ class SwaggerEditor(object):
         for authorizer_name, authorizer in authorizers.items():
             self.security_definitions[authorizer_name] = authorizer.generate_swagger()
 
-    def set_path_default_authorizer(self, path, default_authorizer, authorizers):
+    def set_path_default_authorizer(self, path, default_authorizer, authorizers, add_default_authorizer_to_cors_preflight=True):
         """
         Sets the DefaultAuthorizer for each method on this path. The DefaultAuthorizer won't be set if an Authorizer
         was defined at the Function/Path/Method level
@@ -403,10 +403,13 @@ class SwaggerEditor(object):
         :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the
             authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
+        :param bool add_default_authorizer_to_cors_preflight: Bool of whether to add the default authorizer to OPTIONS preflight requests.
         """
         for method_name, method in self.get_path(path).items():
-            self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
-                                       default_authorizer=default_authorizer, is_default=True)
+            normalized_method_name = self._normalize_method_name(method_name)
+            if not (add_default_authorizer_to_cors_preflight is False and normalized_method_name == "options"):
+                self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
+                                           default_authorizer=default_authorizer, is_default=True)
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
