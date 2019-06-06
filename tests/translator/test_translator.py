@@ -165,6 +165,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_minimum_compression_size',
         'api_with_resource_refs',
         'api_with_cors',
+        'api_with_cors_and_auth_no_preflight_auth',
         'api_with_cors_and_only_methods',
         'api_with_cors_and_only_headers',
         'api_with_cors_and_only_origins',
@@ -244,39 +245,40 @@ class TestTranslatorEndToEnd(TestCase):
       ] # Run all the above tests against each of the list of partitions to test against
       )
     )
-    @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
-    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    # @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
+    # @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_transform_success(self, testcase, partition_with_region):
-        partition = partition_with_region[0]
-        region = partition_with_region[1]
+        with patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call), patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region):
+            partition = partition_with_region[0]
+            region = partition_with_region[1]
 
-        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
-        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
-        manifest = json.loads(json.dumps(manifest))
-        partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json'), 'r'))
+            manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+            # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
+            manifest = json.loads(json.dumps(manifest))
+            partition_folder = partition if partition != "aws" else ""
+            expected = json.load(open(os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json'), 'r'))
 
-        with patch('boto3.session.Session.region_name', region):
-            parameter_values = get_template_parameter_values()
-            mock_policy_loader = MagicMock()
-            mock_policy_loader.load.return_value = {
-                'AWSLambdaBasicExecutionRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'.format(partition),
-                'AmazonDynamoDBFullAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess'.format(partition),
-                'AmazonDynamoDBReadOnlyAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess'.format(partition),
-                'AWSLambdaRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaRole'.format(partition),
-            }
+            with patch('boto3.session.Session.region_name', region):
+                parameter_values = get_template_parameter_values()
+                mock_policy_loader = MagicMock()
+                mock_policy_loader.load.return_value = {
+                    'AWSLambdaBasicExecutionRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'.format(partition),
+                    'AmazonDynamoDBFullAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess'.format(partition),
+                    'AmazonDynamoDBReadOnlyAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess'.format(partition),
+                    'AWSLambdaRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaRole'.format(partition),
+                }
 
-            output_fragment = transform(
-                manifest, parameter_values, mock_policy_loader)
+                output_fragment = transform(
+                    manifest, parameter_values, mock_policy_loader)
 
-        print(json.dumps(output_fragment, indent=2))
+            print(json.dumps(output_fragment, indent=2))
 
-        # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
+            # Only update the deployment Logical Id hash in Py3.
+            if sys.version_info.major >= 3:
+                self._update_logical_id_hash(expected)
+                self._update_logical_id_hash(output_fragment)
 
-        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+            assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
 
     def _update_logical_id_hash(self, resources):
         """

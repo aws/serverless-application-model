@@ -402,7 +402,7 @@ class ApiGenerator(object):
 
         return permissions
 
-    def _set_default_authorizer(self, swagger_editor, authorizers, default_authorizer, add_default_authorizer_to_cors_preflight):
+    def _set_default_authorizer(self, swagger_editor, authorizers, default_authorizer, add_default_authorizer_to_cors_preflight=True):
         if not default_authorizer:
             return
 
@@ -411,7 +411,7 @@ class ApiGenerator(object):
                                            default_authorizer + "' was not defined in 'Authorizers'")
 
         for path in swagger_editor.iter_on_path():
-            swagger_editor.set_path_default_authorizer(path, default_authorizer, authorizers=authorizers, addDefaultAuthorizerToCorsPreflight=add_default_authorizer_to_cors_preflight)
+            swagger_editor.set_path_default_authorizer(path, default_authorizer, authorizers=authorizers, add_default_authorizer_to_cors_preflight=add_default_authorizer_to_cors_preflight)
 
     def _set_endpoint_configuration(self, rest_api, value):
         """
