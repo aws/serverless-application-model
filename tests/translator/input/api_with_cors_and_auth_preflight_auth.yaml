@@ -30,7 +30,6 @@ Resources:
     Properties:
       StageName: Prod
       Auth:
-        AddDefaultAuthorizerToCorsPreflight: False
         DefaultAuthorizer: MyLambdaRequestAuth
         Authorizers:
           MyLambdaRequestAuth:
