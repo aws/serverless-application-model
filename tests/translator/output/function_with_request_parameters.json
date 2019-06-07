@@ -47,6 +47,16 @@
         }
       }
     },
+    "ServerlessRestApiDeployment498b4bac69": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 498b4bac6915ecf6514efc3763418babae239612",
+        "StageName": "Stage"
+      }
+    },
     "ApiParameterFunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -117,32 +127,12 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentd87b63187d"
+          "Ref": "ServerlessRestApiDeployment498b4bac69"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Prod"
-      }
-    },
-    "ApiDeploymentb45131471b": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "Api"
-        },
-        "Description": "RestApi deployment id: b45131471b437edb4cca88487357f3bfbcf59866",
-        "StageName": "Stage"
-      }
-    },
-    "ServerlessRestApiDeploymentd87b63187d": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: d87b63187df8e37b3658e755490457f1fb5426cb",
-        "StageName": "Stage"
       }
     },
     "Api": {
@@ -222,6 +212,16 @@
         }
       }
     },
+    "ApiDeploymentb45131471b": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "Description": "RestApi deployment id: b45131471b437edb4cca88487357f3bfbcf59866",
+        "StageName": "Stage"
+      }
+    },
     "ApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
@@ -259,14 +259,14 @@
                   {
                     "required": false,
                     "type": "string",
-                    "name": "id",
-                    "in": "path"
+                    "name": "type",
+                    "in": "query"
                   },
                   {
                     "required": false,
                     "type": "string",
-                    "name": "type",
-                    "in": "query"
+                    "name": "id",
+                    "in": "path"
                   }
                 ]
               }

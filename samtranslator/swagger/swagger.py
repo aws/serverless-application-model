@@ -535,7 +535,7 @@ class SwaggerEditor(object):
 
         :param string path: Path name
         :param string method_name: Method name
-        :param dict request_parameters: Dictionary of Parameters
+        :param list request_parameters: Dictionary of Parameters
         :return:
         """
 
@@ -549,21 +549,22 @@ class SwaggerEditor(object):
 
             existing_parameters = method_definition.get('parameters', [])
 
-            for parameter_name, parameter_settings in request_parameters.items():
+            for request_parameter in request_parameters:
 
+                parameter_name = request_parameter['Name']
                 location_name = parameter_name.replace('method.request.', '')
                 location, name = location_name.split('.')
 
                 parameter = {
                     'in': location,
                     'name': name,
-                    'required': parameter_settings['Required'],
+                    'required': request_parameter['Required'],
                     'type': 'string'
                 }
 
                 existing_parameters.append(parameter)
 
-                if parameter_settings['Caching']:
+                if request_parameter['Caching']:
 
                     integration = method_definition[self._X_APIGW_INTEGRATION]
                     cache_parameters = integration.get('cacheKeyParameters', [])

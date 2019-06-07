@@ -574,7 +574,7 @@ class Api(PushEventSource):
                 'Caching': False
             }
 
-            parameters = {}
+            parameters = []
             for parameter in self.RequestParameters:
 
                 if isinstance(parameter, dict):
@@ -594,8 +594,9 @@ class Api(PushEventSource):
 
                     settings = default_value.copy()
                     settings.update(parameter_value)
+                    settings.update({'Name': parameter_name})
 
-                    parameters[parameter_name] = settings
+                    parameters.append(settings)
 
                 elif not isinstance(parameter, string_types):
                     raise InvalidEventException(
@@ -608,7 +609,10 @@ class Api(PushEventSource):
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property")
 
-                    parameters[parameter] = default_value.copy()
+                    settings = default_value.copy()
+                    settings.update({'Name': parameter})
+
+                    parameters.append(settings)
 
             editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
                                                     request_parameters=parameters)

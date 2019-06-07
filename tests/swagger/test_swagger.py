@@ -849,12 +849,11 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
 
     def test_must_add_parameter_to_method_with_required_and_caching_true(self):
 
-        parameters = {
-            'method.request.header.Authorization': {
-                'Required': True,
-                'Caching': True
-            }
-        }
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': True,
+            'Caching': True
+        }]
 
         self.editor.add_request_parameters_to_method('/foo', 'get', parameters)
 
@@ -874,12 +873,11 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
 
     def test_must_add_parameter_to_method_with_required_and_caching_false(self):
 
-        parameters = {
-            'method.request.header.Authorization': {
-                'Required': False,
-                'Caching': False
-            }
-        }
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': False,
+            'Caching': False
+        }]
 
         self.editor.add_request_parameters_to_method('/foo', 'get', parameters)
 
@@ -915,12 +913,11 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
 
         editor = SwaggerEditor(original_swagger)
 
-        parameters = {
-            'method.request.header.Authorization': {
-                'Required': False,
-                'Caching': False
-            }
-        }
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': False,
+            'Caching': False
+        }]
 
         editor.add_request_parameters_to_method('/foo', 'get', parameters)
 
@@ -953,12 +950,11 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
 
         editor = SwaggerEditor(original_swagger)
 
-        parameters = {
-            'method.request.header.Authorization': {
-                'Required': True,
-                'Caching': True
-            }
-        }
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': True,
+            'Caching': True
+        }]
 
         editor.add_request_parameters_to_method('/foo', 'get', parameters)
 
