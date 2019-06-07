@@ -579,7 +579,7 @@ class Api(PushEventSource):
 
                 if isinstance(parameter, dict):
 
-                    parameter_name, parameter_value = parameter.items()[0]
+                    parameter_name, parameter_value = next(iter(parameter.items()))
 
                     if not re.match('method\.request\.(query|path|header)', parameter_name):
                         raise InvalidEventException(
