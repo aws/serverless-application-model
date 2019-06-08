@@ -5,22 +5,20 @@ Globals:
       - {"Fn::Join": ["/", ["image", "png"]]}
 
 Resources:
-  ImplicitApiFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: s3://sam-demo-bucket/member_portal.zip
-      Handler: index.gethtml
-      Runtime: nodejs4.3
-      Events:
-        GetHtml:
-          Type: Api
-          Properties:
-            Path: /
-            Method: get
-
-  ExplicitApi:
+  ExplicitApiManagedSwagger:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       BinaryMediaTypes:
         - image/gif
+
+  ExplicitApiDefinitionBody:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      BinaryMediaTypes:
+        - application/json
+      DefinitionBody: {
+          "paths": {}, 
+          "swagger": "2.0", 
+      }
