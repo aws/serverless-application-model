@@ -811,7 +811,17 @@ class TestGlobalsOpenApi(TestCase):
                 }
             }
         },
-
+        {
+            "name": "No Resources",
+            "input": {
+                "some": "other",
+                "swagger": "donottouch"
+                },
+            "expected": {
+                "some": "other",
+                "swagger": "donottouch"
+            }
+        }
     ]
 
     def test_openapi_postprocess(self):
