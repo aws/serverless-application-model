@@ -1,0 +1,124 @@
+{
+  "Resources": {
+    "ExplicitApiManagedSwaggerDeployment51ba79c0e7": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApiManagedSwagger"
+        }, 
+        "Description": "RestApi deployment id: 51ba79c0e7185c019037fb7f9f9f2235547af57b", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiManagedSwaggerProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiManagedSwaggerDeployment51ba79c0e7"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApiManagedSwagger"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApiDefinitionBodyDeploymentcb68c305fb": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApiDefinitionBody"
+        }, 
+        "Description": "RestApi deployment id: cb68c305fb80d8e723c6c5d51a7b62462a25f5ba", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiDefinitionBody": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "paths": {}, 
+          "swagger": "2.0", 
+          "x-amazon-apigateway-binary-media-types": [
+            "image/jpg", 
+            {
+              "Fn::Join": [
+                "/", 
+                [
+                  "image", 
+                  "png"
+                ]
+              ]
+            }, 
+            "application/json"
+          ]
+        }, 
+        "BinaryMediaTypes": [
+          "image/jpg", 
+          {
+            "Fn::Join": [
+              "/", 
+              [
+                "image", 
+                "png"
+              ]
+            ]
+          }, 
+          "application/json"
+        ]
+      }
+    }, 
+    "ExplicitApiDefinitionBodyProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDefinitionBodyDeploymentcb68c305fb"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApiDefinitionBody"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApiManagedSwagger": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {}, 
+          "swagger": "2.0", 
+          "x-amazon-apigateway-binary-media-types": [
+            "image/jpg", 
+            {
+              "Fn::Join": [
+                "/", 
+                [
+                  "image", 
+                  "png"
+                ]
+              ]
+            }, 
+            "image/gif"
+          ]
+        }, 
+        "BinaryMediaTypes": [
+          "image/jpg", 
+          {
+            "Fn::Join": [
+              "/", 
+              [
+                "image", 
+                "png"
+              ]
+            ]
+          }, 
+          "image/gif"
+        ]
+      }
+    }
+  }
+}
