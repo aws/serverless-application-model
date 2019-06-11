@@ -10,7 +10,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
               "__Stage__": "Prod", 
               "__ApiId__": {
@@ -31,7 +31,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -82,7 +82,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -93,22 +93,6 @@
                 "responses": {}
               }, 
               "options": {
-                "responses": {
-                  "200": {
-                    "headers": {
-                      "Access-Control-Allow-Origin": {
-                        "type": "string"
-                      }, 
-                      "Access-Control-Allow-Methods": {
-                        "type": "string"
-                      }
-                    }, 
-                    "description": "Default response for CORS method"
-                  }
-                }, 
-                "produces": [
-                  "application/json"
-                ], 
                 "x-amazon-apigateway-integration": {
                   "type": "mock", 
                   "requestTemplates": {
@@ -127,13 +111,24 @@
                     }
                   }
                 }, 
-                "summary": "CORS support", 
-                "security": [
-                  {
-                    "MyLambdaRequestAuth": []
-                  }
-                ], 
                 "consumes": [
+                  "application/json"
+                ], 
+                "summary": "CORS support", 
+                "responses": {
+                  "200": {
+                    "headers": {
+                      "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      }, 
+                      "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      }
+                    }, 
+                    "description": "Default response for CORS method"
+                  }
+                }, 
+                "produces": [
                   "application/json"
                 ]
               }, 
@@ -142,7 +137,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -165,7 +160,7 @@
                 "identitySource": "method.request.header.Authorization1", 
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
                     {
                       "__FunctionArn__": {
                         "Fn::GetAtt": [
@@ -180,6 +175,14 @@
               "x-amazon-apigateway-authtype": "custom"
             }
           }
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     }, 
@@ -196,7 +199,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
             {
               "__ApiId__": {
                 "Ref": "ServerlessApi"
@@ -210,7 +213,7 @@
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -230,13 +233,13 @@
         }
       }
     }, 
-    "ServerlessApiDeployment5355b9449d": {
+    "ServerlessApiDeployment6050a96a0f": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessApi"
         }, 
-        "Description": "RestApi deployment id: 5355b9449d512736d24b6b328925b4b0635fee89", 
+        "Description": "RestApi deployment id: 6050a96a0f36baa9bc42da60f16427b8e3f34291", 
         "StageName": "Stage"
       }
     }, 
@@ -250,7 +253,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -271,7 +274,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
             {
               "__Stage__": "Prod", 
               "__ApiId__": {
@@ -286,7 +289,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessApiDeployment5355b9449d"
+          "Ref": "ServerlessApiDeployment6050a96a0f"
         }, 
         "RestApiId": {
           "Ref": "ServerlessApi"
@@ -296,3 +299,5 @@
     }
   }
 }
+
+
