@@ -145,7 +145,6 @@ class DeploymentPreferenceCollection(object):
             return value
         else:
             if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
-                print(key)
                 if key == "Fn::Sub":  # Don't nest a "Sub" in a "Sub"
                     return ["CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value}]
                 return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
