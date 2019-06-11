@@ -1,10 +1,11 @@
 Mappings:
-  prod:
-    DeploymentPreference:
-      AllAtOnce
-  beta:
-    DeploymentPreference:
-      CustomDeployment
+  DeploymentPreferenceMap:
+    prod:
+      DeploymentPreference:
+        AllAtOnce
+    beta:
+      DeploymentPreference:
+        CustomDeployment
 
 Parameters:
   Stage:
@@ -34,7 +35,7 @@ Resources:
       DeploymentPreference:
         Type: TestDeploymentConfiguration
 
-  CustomWithFindInMap:
+  CustomWithFindInMap: # Doesn't work
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -42,9 +43,9 @@ Resources:
       Runtime: python2.7
       AutoPublishAlias: live
       DeploymentPreference:
-        Type: !FindInMap [!Ref Stage, DeploymentPreference]
+        Type: !FindInMap [DeploymentPreferenceMap, !Ref Stage, DeploymentPreference]
 
-  CustomWithCondition:
+  CustomWithCondition: # Works
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -62,7 +63,7 @@ Resources:
       Runtime: python2.7
       AutoPublishAlias: live
       DeploymentPreference:
-        Type: !If [MyCondition, !Sub ${Deployment}, !Ref Custom]
+        Type: !If [MyCondition, !Sub "${Deployment}", !Ref Custom]
 
   NormalWithSub:
     Type: 'AWS::Serverless::Function'
@@ -83,3 +84,13 @@ Resources:
       AutoPublishAlias: live
       DeploymentPreference:
         Type: !Sub ${Custom}
+
+  NormalWithRef:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !Ref Deployment

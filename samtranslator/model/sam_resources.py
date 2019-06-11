@@ -87,6 +87,7 @@ class SamFunction(SamResourceMacro):
         """
         resources = []
         intrinsics_resolver = kwargs["intrinsics_resolver"]
+        mappings_resolver = kwargs.get("mappings_resolver", None)
 
         if self.DeadLetterQueue:
             self._validate_dlq()
@@ -105,7 +106,8 @@ class SamFunction(SamResourceMacro):
         if self.DeploymentPreference:
             self._validate_deployment_preference_and_add_update_policy(kwargs.get('deployment_preference_collection',
                                                                                   None),
-                                                                       lambda_alias, intrinsics_resolver)
+                                                                       lambda_alias, intrinsics_resolver,
+                                                                       mappings_resolver)
 
         managed_policy_map = kwargs.get('managed_policy_map', {})
         if not managed_policy_map:
@@ -392,12 +394,19 @@ class SamFunction(SamResourceMacro):
         return alias
 
     def _validate_deployment_preference_and_add_update_policy(self, deployment_preference_collection, lambda_alias,
-                                                              intrinsics_resolver):
+                                                              intrinsics_resolver, mappings_resolver):
         if 'Enabled' in self.DeploymentPreference:
             self.DeploymentPreference['Enabled'] = intrinsics_resolver.resolve_parameter_refs(
                 self.DeploymentPreference['Enabled'])
             if isinstance(self.DeploymentPreference['Enabled'], dict):
                 raise InvalidResourceException(self.logical_id, "'Enabled' must be a boolean value")
+
+        if 'Type' in self.DeploymentPreference:
+            # resolve intrinsics and mappings for Type
+            preference_type = self.DeploymentPreference['Type']
+            preference_type = intrinsics_resolver.resolve_parameter_refs(preference_type)
+            preference_type = mappings_resolver.resolve_parameter_refs(preference_type)
+            self.DeploymentPreference['Type'] = preference_type
 
         if deployment_preference_collection is None:
             raise ValueError('deployment_preference_collection required for parsing the deployment preference')
