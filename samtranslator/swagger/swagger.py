@@ -538,22 +538,41 @@ class SwaggerEditor(object):
             if not self.method_definition_has_integration(method_definition):
                 continue
 
-            existing_parameters = method_definition.get('parameters', [])
+            if self._doc.get('swagger') is not None:
 
-            parameter = {
-                'in': 'body',
-                'name': model_name,
-                'schema': {
-                    '$ref': '#/definitions/{}'.format(model_name)
+                existing_parameters = method_definition.get('parameters', [])
+
+                parameter = {
+                    'in': 'body',
+                    'name': model_name,
+                    'schema': {
+                        '$ref': '#/definitions/{}'.format(model_name)
+                    }
                 }
-            }
 
-            if model_required is not None:
-                parameter['required'] = model_required
+                if model_required is not None:
+                    parameter['required'] = model_required
 
-            existing_parameters.append(parameter)
+                existing_parameters.append(parameter)
 
-            method_definition['parameters'] = existing_parameters
+                method_definition['parameters'] = existing_parameters
+
+            elif self._doc.get("openapi") and \
+                    re.search(SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]) is not None:
+
+                method_definition['requestBody'] = {
+                    'content': {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/{}".format(model_name)
+                            }
+                        }
+
+                    }
+                }
+
+                if model_required is not None:
+                    method_definition['requestBody']['required'] = model_required
 
     def add_gateway_responses(self, gateway_responses):
         """

@@ -314,26 +314,6 @@ class TestTranslatorEndToEnd(TestCase):
             matches = runner.run()
         print('cfn-lint ({}): {}'.format(expected_filepath, matches))
 
-        try:
-            output_sort = deep_sort_lists(output_fragment)
-        except Exception as error:
-            raise
-
-        try:
-            expected_sort = deep_sort_lists(expected)
-        except Exception as error:
-            raise
-
-        try:
-            output_sort = deep_sort_lists(output_fragment)
-        except Exception as error:
-            raise
-
-        try:
-            expected_sort = deep_sort_lists(expected)
-        except Exception as error:
-            raise
-
         assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
         assert len(matches) == 0
 
@@ -347,7 +327,8 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_open_api_version_2',
         'api_with_auth_all_minimum_openapi',
         'api_with_swagger_and_openapi_with_auth',
-        'api_with_openapi_definition_body_no_flag'
+        'api_with_openapi_definition_body_no_flag',
+        'api_request_model_openapi_3'
       ],
       [
        ("aws", "ap-southeast-1"),

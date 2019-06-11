@@ -1041,3 +1041,75 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
             ]
 
         self.assertEqual(expected, self.editor.swagger['paths']['/foo']['get']['parameters'])
+
+    def test_must_add_body_parameter_to_method_openapi_without_required(self):
+
+        original_openapi = {
+            "openapi": "3.0.1",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        }
+                    }
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_openapi)
+
+        model = {
+            'Model': 'User',
+            'Required': True
+        }
+
+        editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = {
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/user'
+                    }
+                }
+            },
+            'required': True
+        }
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get']['requestBody'])
+
+    def test_must_add_body_parameter_to_method_openapi_required_true(self):
+
+        original_openapi = {
+            "openapi": "3.0.1",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        }
+                    }
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_openapi)
+
+        model = {
+            'Model': 'User'
+        }
+
+        editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = {
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/user'
+                    }
+                }
+            }
+        }
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get']['requestBody'])
