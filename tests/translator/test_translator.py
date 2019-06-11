@@ -179,6 +179,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_aws_iam_auth_overrides',
         'api_with_method_settings',
         'api_with_binary_media_types',
+        'api_with_binary_media_types_definition_body',
         'api_with_minimum_compression_size',
         'api_with_resource_refs',
         'api_with_cors',

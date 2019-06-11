@@ -1,9 +1,13 @@
 # Enable container based builds
 sudo: false
+dist: xenial   # required for Python >= 3.7
 language: python
 
 matrix:
   include:
+    - python: 3.7
+      env:
+        - TOXENV=py37
     - python: 3.6
       env:
         - TOXENV=py36

@@ -3,11 +3,11 @@
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "index.gethtml", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "member_portal.zip"
         }, 
-        "Handler": "index.gethtml", 
         "Role": {
           "Fn::GetAtt": [
             "ImplicitApiFunctionRole", 
@@ -137,7 +137,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment62b96c1a61"
+          "Ref": "ServerlessRestApiDeployment706c6ba929"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -145,13 +145,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeployment62b96c1a61": {
+    "ServerlessRestApiDeployment706c6ba929": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 62b96c1a611878eefb13e8ef66dbc71b9ba3dd19", 
+        "Description": "RestApi deployment id: 706c6ba9298c730536b2f4c51409cf33e5d616d4", 
         "StageName": "Stage"
       }
     }, 
@@ -179,7 +179,19 @@
               }
             }
           }, 
-          "swagger": "2.0"
+          "swagger": "2.0", 
+          "x-amazon-apigateway-binary-media-types": [
+            "image/jpg", 
+            {
+              "Fn::Join": [
+                "/", 
+                [
+                  "image", 
+                  "png"
+                ]
+              ]
+            }
+          ]
         }, 
         "BinaryMediaTypes": [
           "image/jpg", 

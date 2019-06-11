@@ -3,11 +3,11 @@
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "index.gethtml", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "member_portal.zip"
         }, 
-        "Handler": "index.gethtml", 
         "Role": {
           "Fn::GetAtt": [
             "ImplicitApiFunctionRole", 
@@ -45,6 +45,16 @@
             }
           ]
         }
+      }
+    }, 
+    "ExplicitApiDeploymentf117c932f7": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
+        "StageName": "Stage"
       }
     }, 
     "ImplicitApiFunctionGetHtmlPermissionTest": {
@@ -135,7 +145,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentcb4fb12558"
+          "Ref": "ServerlessRestApiDeploymentd244838cf7"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -143,23 +153,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeploymentcb4fb12558": {
+    "ServerlessRestApiDeploymentd244838cf7": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: cb4fb1255811b7b6a25dd35f23ee7ad133003b89", 
-        "StageName": "Stage"
-      }
-    }, 
-    "ExplicitApiDeploymentf117c932f7": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
+        "Description": "RestApi deployment id: d244838cf7da9d22daa2df81b63056f8b578f711", 
         "StageName": "Stage"
       }
     }, 
@@ -187,7 +187,19 @@
               }
             }
           }, 
-          "swagger": "2.0"
+          "swagger": "2.0", 
+          "x-amazon-apigateway-binary-media-types": [
+            "image/jpg", 
+            {
+              "Fn::Join": [
+                "/", 
+                [
+                  "image", 
+                  "png"
+                ]
+              ]
+            }
+          ]
         }, 
         "BinaryMediaTypes": [
           "image/jpg", 
