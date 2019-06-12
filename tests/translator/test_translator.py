@@ -267,8 +267,6 @@ class TestTranslatorEndToEnd(TestCase):
       ] # Run all the above tests against each of the list of partitions to test against
       )
     )
-    # @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
-    # @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_transform_success(self, testcase, partition_with_region):
         with (patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call),
               patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)):
