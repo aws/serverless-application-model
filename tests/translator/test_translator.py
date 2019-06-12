@@ -361,10 +361,10 @@ class TestTranslatorEndToEnd(TestCase):
                     'AWSLambdaRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaRole'.format(partition),
                 }
 
-                    output_fragment = transform(
-                        manifest, parameter_values, mock_policy_loader)
+                output_fragment = transform(
+                    manifest, parameter_values, mock_policy_loader)
 
-                print(json.dumps(output_fragment, indent=2))
+            print(json.dumps(output_fragment, indent=2))
 
             # Run cfn-lint on translator test output files.
             rules = cfnlint.core.get_rules([], LINT_IGNORE_WARNINGS, [])
