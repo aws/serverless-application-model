@@ -1,4 +1,5 @@
 ﻿import copy
+import re
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
@@ -16,6 +17,7 @@ class SwaggerEditor(object):
 
     _OPTIONS_METHOD = "options"
     _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
+    _X_APIGW_BINARY_MEDIA_TYPES = 'x-amazon-apigateway-binary-media-types'
     _CONDITIONAL_IF = "Fn::If"
     _X_APIGW_GATEWAY_RESPONSES = 'x-amazon-apigateway-gateway-responses'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
@@ -253,6 +255,9 @@ class SwaggerEditor(object):
                                                                                            max_age,
                                                                                            allow_credentials)
 
+    def add_binary_media_types(self, binary_media_types):
+        self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = binary_media_types
+
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
                                           max_age=None, allow_credentials=None):
         """
@@ -407,8 +412,12 @@ class SwaggerEditor(object):
         :param bool add_default_auth_to_preflight: Bool of whether to add the default
             authorizer to OPTIONS preflight requests.
         """
+
         for method_name, method in self.get_path(path).items():
             normalized_method_name = self._normalize_method_name(method_name)
+            # Excluding paramters section
+            if normalized_method_name == "parameters":
+                continue
             if not (add_default_auth_to_preflight is False and normalized_method_name == "options"):
                 self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
                                            default_authorizer=default_authorizer, is_default=True)
@@ -555,10 +564,14 @@ class SwaggerEditor(object):
         :param dict data: Data to be validated
         :return: True, if data is a Swagger
         """
-        return bool(data) and \
-            isinstance(data, dict) and \
-            bool(data.get("swagger")) and \
-            isinstance(data.get('paths'), dict)
+
+        if bool(data) and isinstance(data, dict) and isinstance(data.get('paths'), dict):
+            if bool(data.get("swagger")):
+                return True
+            elif bool(data.get("openapi")):
+                return re.search(SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]) is not None
+            return False
+        return False
 
     @staticmethod
     def gen_skeleton():
@@ -596,3 +609,13 @@ class SwaggerEditor(object):
             return SwaggerEditor._X_ANY_METHOD
         else:
             return method
+
+    @staticmethod
+    def get_openapi_versions_supported_regex():
+        openapi_version_supported_regex = r"\A[2-3](\.\d)(\.\d)?$"
+        return openapi_version_supported_regex
+
+    @staticmethod
+    def get_openapi_version_3_regex():
+        openapi_version_3_regex = r"\A3(\.\d)(\.\d)?$"
+        return openapi_version_3_regex

@@ -1,5 +1,6 @@
 from collections import namedtuple
 from six import string_types
+import re
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
@@ -32,7 +33,8 @@ class ApiGenerator(object):
                  definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
                  auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
-                 tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None):
+                 tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
+                 open_api_version=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -71,6 +73,7 @@ class ApiGenerator(object):
         self.tracing_enabled = tracing_enabled
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
+        self.open_api_version = open_api_version
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -79,6 +82,8 @@ class ApiGenerator(object):
         :rtype: model.apigateway.ApiGatewayRestApi
         """
         rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+        # NOTE: For backwards compatibility we need to retain BinaryMediaTypes on the CloudFormation Property
+        # Removing this and only setting x-amazon-apigateway-binary-media-types results in other issues.
         rest_api.BinaryMediaTypes = self.binary_media
         rest_api.MinimumCompressionSize = self.minimum_compression_size
 
@@ -94,9 +99,15 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id,
                                            "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both")
 
+        if self.open_api_version:
+            if re.match(SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version) is None:
+                raise InvalidResourceException(
+                    self.logical_id, "The OpenApiVersion value must be of the format 3.0.0")
+
         self._add_cors()
         self._add_auth()
         self._add_gateway_responses()
+        self._add_binary_media_types()
 
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
@@ -138,7 +149,7 @@ class ApiGenerator(object):
             body_s3['Version'] = s3_pointer['Version']
         return body_s3
 
-    def _construct_deployment(self, rest_api):
+    def _construct_deployment(self, rest_api, open_api_version):
         """Constructs and returns the ApiGateway Deployment.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi for this Deployment
@@ -148,7 +159,8 @@ class ApiGenerator(object):
         deployment = ApiGatewayDeployment(self.logical_id + 'Deployment',
                                           attributes=self.passthrough_resource_attributes)
         deployment.RestApiId = rest_api.get_runtime_attr('rest_api_id')
-        deployment.StageName = 'Stage'
+        if not self.open_api_version:
+            deployment.StageName = 'Stage'
 
         return deployment
 
@@ -190,7 +202,7 @@ class ApiGenerator(object):
         """
 
         rest_api = self._construct_rest_api()
-        deployment = self._construct_deployment(rest_api)
+        deployment = self._construct_deployment(rest_api, self.open_api_version)
 
         swagger = None
         if rest_api.Body is not None:
@@ -249,6 +261,24 @@ class ApiGenerator(object):
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
 
+    def _add_binary_media_types(self):
+        """
+        Add binary media types to Swagger
+        """
+
+        if not self.binary_media:
+            return
+
+        # We don't raise an error here like we do for similar cases because that would be backwards incompatible
+        if self.binary_media and not self.definition_body:
+            return
+
+        editor = SwaggerEditor(self.definition_body)
+        editor.add_binary_media_types(self.binary_media)
+
+        # Assign the Swagger back to template
+        self.definition_body = editor.swagger
+
     def _add_auth(self):
         """
         Add Auth configuration to the Swagger file, if necessary
@@ -280,7 +310,29 @@ class ApiGenerator(object):
                                          auth_properties.AddDefaultAuthorizerToCorsPreflight)
 
         # Assign the Swagger back to template
-        self.definition_body = swagger_editor.swagger
+
+        self.definition_body = self._openapi_auth_postprocess(swagger_editor.swagger)
+
+    def _openapi_auth_postprocess(self, definition_body):
+        """
+        Convert auth components to openapi 3 in definition body if OpenApiVersion flag is specified.
+
+        If there is swagger defined in the definition body, we treat it as a swagger spec and do not
+        make any openapi 3 changes to it.
+        """
+        if definition_body.get('swagger') is not None:
+            return definition_body
+
+        if definition_body.get('openapi') is not None:
+            if self.open_api_version is None:
+                self.open_api_version = definition_body.get('openapi')
+
+        if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
+            if definition_body.get('securityDefinitions'):
+                definition_body['components'] = {}
+                definition_body['components']['securitySchemes'] = definition_body['securityDefinitions']
+                del definition_body['securityDefinitions']
+        return definition_body
 
     def _add_gateway_responses(self):
         """

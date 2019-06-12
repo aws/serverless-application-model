@@ -268,7 +268,7 @@ class SamFunction(SamResourceMacro):
                 try:
                     event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         self.logical_id + logical_id, event_dict, logical_id)
-                except TypeError as e:
+                except (TypeError, AttributeError) as e:
                     raise InvalidEventException(logical_id, "{}".format(e))
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
@@ -445,7 +445,8 @@ class SamApi(SamResourceMacro):
         'GatewayResponses': PropertyType(False, is_type(dict)),
         'AccessLogSetting': PropertyType(False, is_type(dict)),
         'CanarySetting': PropertyType(False, is_type(dict)),
-        'TracingEnabled': PropertyType(False, is_type(bool))
+        'TracingEnabled': PropertyType(False, is_type(bool)),
+        'OpenApiVersion': PropertyType(False, is_str())
     }
 
     referable_properties = {
@@ -483,7 +484,8 @@ class SamApi(SamResourceMacro):
                                      canary_setting=self.CanarySetting,
                                      tracing_enabled=self.TracingEnabled,
                                      resource_attributes=self.resource_attributes,
-                                     passthrough_resource_attributes=self.get_passthrough_resource_attributes())
+                                     passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+                                     open_api_version=self.OpenApiVersion)
 
         rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
 
@@ -569,7 +571,7 @@ class SamApplication(SamResourceMacro):
         'Location': PropertyType(True, one_of(is_str(), is_type(dict))),
         'TemplateUrl': PropertyType(False, is_str()),
         'Parameters': PropertyType(False, is_type(dict)),
-        'NotificationArns': PropertyType(False, list_of(is_str())),
+        'NotificationARNs': PropertyType(False, list_of(is_str())),
         'Tags': PropertyType(False, is_type(dict)),
         'TimeoutInMinutes': PropertyType(False, is_type(int))
     }
@@ -586,7 +588,7 @@ class SamApplication(SamResourceMacro):
         nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on,
                                    attributes=self.get_passthrough_resource_attributes())
         nested_stack.Parameters = self.Parameters
-        nested_stack.NotificationArns = self.NotificationArns
+        nested_stack.NotificationARNs = self.NotificationARNs
         application_tags = self._get_application_tags()
         nested_stack.Tags = self._construct_tag_list(self.Tags, application_tags)
         nested_stack.TimeoutInMinutes = self.TimeoutInMinutes

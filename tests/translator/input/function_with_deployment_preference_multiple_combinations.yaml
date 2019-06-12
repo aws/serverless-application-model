@@ -25,7 +25,7 @@ Resources:
       Runtime: python2.7
       AutoPublishAlias: livewithdeploymentwithhooksandalarms
       DeploymentPreference:
-        Type: Linear10PercentEvery2Minute
+        Type: Linear10PercentEvery2Minutes
         Hooks:
           PreTraffic: !Ref MySanityTestFunction
           PostTraffic: !Ref MyValidationTestFunction

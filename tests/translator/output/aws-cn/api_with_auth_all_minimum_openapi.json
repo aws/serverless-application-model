@@ -1,0 +1,551 @@
+{
+  "Resources": {
+    "MyApiWithCognitoAuth": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/cognito": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                  }
+                }, 
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ], 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.0.1", 
+          "components": {
+            "securitySchemes": {
+              "MyCognitoAuth": {
+                "in": "header", 
+                "type": "apiKey", 
+                "name": "Authorization", 
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    {
+                      "Fn::GetAtt": [
+                        "MyUserPool", 
+                        "Arn"
+                      ]
+                    }
+                  ], 
+                  "type": "cognito_user_pools"
+                }, 
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
+              }
+            }
+          }
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }, 
+    "MyApiWithLambdaRequestAuthProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithLambdaRequestAuthDeploymentf8f280f2eb"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaRequestAuth"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "MyApiWithLambdaTokenAuthMyLambdaTokenAuthAuthorizerPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyAuthFn", 
+            "Arn"
+          ]
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+            {
+              "__ApiId__": {
+                "Ref": "MyApiWithLambdaTokenAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApiWithLambdaRequestAuthDeploymentf8f280f2eb": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaRequestAuth"
+        }, 
+        "Description": "RestApi deployment id: f8f280f2eb973eb694b872901c9395c3d3e05252"
+      }
+    }, 
+    "MyFnLambdaRequestPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-request", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithLambdaRequestAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyFnLambdaTokenPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-token", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithLambdaTokenAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyFnCognitoPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognito", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithCognitoAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyAuthFn": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "bucketname", 
+          "S3Key": "thumbnails.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyAuthFnRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyFnRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApiWithCognitoAuthProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithCognitoAuthDeploymente116f8541f"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "MyFnCognitoPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognito", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "MyApiWithCognitoAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApiWithLambdaRequestAuthMyLambdaRequestAuthAuthorizerPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyAuthFn", 
+            "Arn"
+          ]
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+            {
+              "__ApiId__": {
+                "Ref": "MyApiWithLambdaRequestAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyFnLambdaTokenPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-token", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "MyApiWithLambdaTokenAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyFnLambdaRequestPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-request", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "MyApiWithLambdaRequestAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApiWithLambdaTokenAuth": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/lambda-token": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                  }
+                }, 
+                "security": [
+                  {
+                    "MyLambdaTokenAuth": []
+                  }
+                ], 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.0.1", 
+          "components": {
+            "securitySchemes": {
+              "MyLambdaTokenAuth": {
+                "in": "header", 
+                "type": "apiKey", 
+                "name": "Authorization", 
+                "x-amazon-apigateway-authorizer": {
+                  "type": "token", 
+                  "authorizerUri": {
+                    "Fn::Sub": [
+                      "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                      {
+                        "__FunctionArn__": {
+                          "Fn::GetAtt": [
+                            "MyAuthFn", 
+                            "Arn"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }, 
+                "x-amazon-apigateway-authtype": "custom"
+              }
+            }
+          }
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }, 
+    "MyApiWithLambdaTokenAuthDeploymentae2752e462": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaTokenAuth"
+        }, 
+        "Description": "RestApi deployment id: ae2752e46261b6dac7c962a6a65154ea5189f594"
+      }
+    }, 
+    "MyUserPool": {
+      "Type": "AWS::Cognito::UserPool", 
+      "Properties": {
+        "UsernameAttributes": [
+          "email"
+        ], 
+        "UserPoolName": "UserPoolName", 
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 8
+          }
+        }, 
+        "Schema": [
+          {
+            "AttributeDataType": "String", 
+            "Required": false, 
+            "Name": "email"
+          }
+        ]
+      }
+    }, 
+    "MyFn": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "bucketname", 
+          "S3Key": "thumbnails.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFnRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyAuthFnRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApiWithLambdaTokenAuthProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithLambdaTokenAuthDeploymentae2752e462"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaTokenAuth"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "MyApiWithLambdaRequestAuth": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/lambda-request": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                  }
+                }, 
+                "security": [
+                  {
+                    "MyLambdaRequestAuth": []
+                  }
+                ], 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.0.1", 
+          "components": {
+            "securitySchemes": {
+              "MyLambdaRequestAuth": {
+                "in": "header", 
+                "type": "apiKey", 
+                "name": "Unused", 
+                "x-amazon-apigateway-authorizer": {
+                  "type": "request", 
+                  "identitySource": "method.request.header.Authorization1", 
+                  "authorizerUri": {
+                    "Fn::Sub": [
+                      "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                      {
+                        "__FunctionArn__": {
+                          "Fn::GetAtt": [
+                            "MyAuthFn", 
+                            "Arn"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }, 
+                "x-amazon-apigateway-authtype": "custom"
+              }
+            }
+          }
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }, 
+    "MyApiWithCognitoAuthDeploymente116f8541f": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        }, 
+        "Description": "RestApi deployment id: e116f8541f950bade71c8656c6a8493fd823d35c"
+      }
+    }
+  }
+}

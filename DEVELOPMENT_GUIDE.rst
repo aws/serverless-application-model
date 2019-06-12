@@ -17,10 +17,8 @@ steps manually.
 
 1. Install Python Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Python 2.7 is our officially supported Python version. We have a future goal to support to Python3.6 but the code base
-currently does not work with Python3. To make future migration easier, any new code we write must be compatible with
-Python3. Follow the idioms from this `excellent cheatsheet`_ to make sure your code is compatible with both Python
-versions.
+Our officially supported Python versions are 2.7, 3.6, and 3.7. Follow the idioms from this `excellent cheatsheet`_ to
+make sure your code is compatible with both Python 2.7 and 3 versions.
 
 Setup Python locally using `pyenv`_
 
@@ -80,7 +78,7 @@ Install snakeviz `pip install snakeviz`
 
 .. code-block:: shell
 
-   python -m cProfile -o sam_profile_results bin/sam-translate.py translate --input-file=tests/translator/input/alexa_skill.yaml --output-file=cfn-template.json
+   python -m cProfile -o sam_profile_results bin/sam-translate.py translate --template-file=tests/translator/input/alexa_skill.yaml --output-template=cfn-template.json
    snakeviz sam_profile_results
 
 Verifying transforms
@@ -96,7 +94,7 @@ If you make changes to the transformer and want to verify the resulting CloudFor
 
    # Transform your SAM template into a CloudFormation template
    # Replace "output-template.yaml" if you didn't run the package command above or specified a different path for --output-template-file
-   bin/sam-translate.py --input-file=output-template.yaml
+   bin/sam-translate.py --template-file=output-template.yaml
 
    # Deploy your transformed CloudFormation template
    # Replace MY_STACK_NAME with a unique name each time you deploy

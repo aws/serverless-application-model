@@ -155,11 +155,11 @@
     "GetHtmlFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "index.gethtml", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "todo_list.zip"
         }, 
-        "Handler": "index.gethtml", 
         "Role": {
           "Fn::GetAtt": [
             "GetHtmlFunctionRole", 
@@ -224,11 +224,11 @@
     "RestApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "index.restapi", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "todo_list.zip"
         }, 
-        "Handler": "index.restapi", 
         "Role": {
           "Fn::GetAtt": [
             "RestApiFunctionRole", 

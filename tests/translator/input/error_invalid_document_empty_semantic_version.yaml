@@ -1,0 +1,7 @@
+Resources:
+    helloworld:
+      Type: AWS::Serverless::Application
+      Properties:
+        Location:
+          ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world
+          SemanticVersion:

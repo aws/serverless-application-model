@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "MySimpleTableParameter": {
+      "Default": "TableName", 
+      "Type": "String"
+    }
+  },
   "Resources": {
     "MinimalTableWithTableName": {
       "Type": "AWS::DynamoDB::Table",

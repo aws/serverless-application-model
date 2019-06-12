@@ -69,7 +69,7 @@
             "Key": "TagKey3"
           },
           {
-            "Value": 123,
+            "Value": "123",
             "Key": "TagKey4"
           }
         ], 

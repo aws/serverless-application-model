@@ -1,8 +1,7 @@
 {
   "Resources": {
     "Images": {
-      "Type": "AWS::S3::Bucket",
-      "DependsOn": ["ThumbnailFunctionImageBucketPermission"],
+      "Type": "AWS::S3::Bucket", 
       "Properties": {
         "NotificationConfiguration": {
           "LambdaConfigurations": [
@@ -18,11 +17,15 @@
           ], 
           "TopicConfigurations": [
             {
-              "Topic": "my-super-awesome-topic"
+              "Topic": "my-super-awesome-topic", 
+              "Event": "s3:ObjectRemoved:*"
             }
           ]
         }
-      }
+      }, 
+      "DependsOn": [
+        "ThumbnailFunctionImageBucketPermission"
+      ]
     }, 
     "ThumbnailFunctionRole": {
       "Type": "AWS::IAM::Role", 
@@ -64,11 +67,11 @@
     "ThumbnailFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "index.generate_thumbails", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket",
+          "S3Bucket": "sam-demo-bucket", 
           "S3Key": "thumbnails.zip"
         }, 
-        "Handler": "index.generate_thumbails", 
         "Role": {
           "Fn::GetAtt": [
             "ThumbnailFunctionRole", 
