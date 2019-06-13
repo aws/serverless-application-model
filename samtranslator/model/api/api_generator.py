@@ -33,7 +33,7 @@ class ApiGenerator(object):
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
                  auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
                  tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
-                 open_api_version=None):
+                 open_api_version=None, models=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -50,6 +50,7 @@ class ApiGenerator(object):
         :param tracing_enabled: Whether active tracing with X-ray is enabled
         :param resource_attributes: Resource attributes to add to API resources
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
+        :param models: Model definitions to be used by API methods
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
@@ -73,6 +74,7 @@ class ApiGenerator(object):
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.open_api_version = open_api_version
+        self.models = models
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -107,6 +109,7 @@ class ApiGenerator(object):
         self._add_auth()
         self._add_gateway_responses()
         self._add_binary_media_types()
+        self._add_models()
 
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
@@ -327,8 +330,9 @@ class ApiGenerator(object):
 
         if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
             if definition_body.get('securityDefinitions'):
-                definition_body['components'] = {}
-                definition_body['components']['securitySchemes'] = definition_body['securityDefinitions']
+                components = definition_body.get('components', {})
+                components['securitySchemes'] = definition_body['securityDefinitions']
+                definition_body['components'] = components
                 del definition_body['securityDefinitions']
         return definition_body
 
@@ -374,6 +378,56 @@ class ApiGenerator(object):
 
         # Assign the Swagger back to template
         self.definition_body = swagger_editor.swagger
+
+    def _add_models(self):
+        """
+        Add Model definitions to the Swagger file, if necessary
+        :return:
+        """
+
+        if not self.models:
+            return
+
+        if self.models and not self.definition_body:
+            raise InvalidResourceException(self.logical_id,
+                                           "Models works only with inline Swagger specified in "
+                                           "'DefinitionBody' property")
+
+        if not SwaggerEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(self.logical_id, "Unable to add Models definitions because "
+                                                            "'DefinitionBody' does not contain a valid Swagger")
+
+        if not all(isinstance(model, dict) for model in self.models.values()):
+            raise InvalidResourceException(self.logical_id, "Invalid value for 'Models' property")
+
+        swagger_editor = SwaggerEditor(self.definition_body)
+        swagger_editor.add_models(self.models)
+
+        # Assign the Swagger back to template
+
+        self.definition_body = self._openapi_models_postprocess(swagger_editor.swagger)
+
+    def _openapi_models_postprocess(self, definition_body):
+        """
+        Convert definitions to openapi 3 in definition body if OpenApiVersion flag is specified.
+
+        If the is swagger defined in the definition body, we treat it as a swagger spec and dod not
+        make any openapi 3 changes to it
+        """
+        if definition_body.get('swagger') is not None:
+            return definition_body
+
+        if definition_body.get('openapi') is not None:
+            if self.open_api_version is None:
+                self.open_api_version = definition_body.get('openapi')
+
+        if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
+            if definition_body.get('definitions'):
+                components = definition_body.get('components', {})
+                components['schemas'] = definition_body['definitions']
+                definition_body['components'] = components
+                del definition_body['definitions']
+        return definition_body
 
     def _get_authorizers(self, authorizers_config, default_authorizer=None):
         authorizers = {}

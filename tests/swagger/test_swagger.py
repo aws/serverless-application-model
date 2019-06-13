@@ -827,3 +827,289 @@ class TestSwaggerEditor_is_valid(TestCase):
     ])
     def test_must_fail_for_invalid_values(self, data, case):
         self.assertFalse(SwaggerEditor.is_valid(data), "Swagger dictionary with {} must not be valid".format(case))
+
+class TestSwaggerEditor_add_models(TestCase):
+
+    def setUp(self):
+
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {}
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+
+    def test_must_add_definitions(self):
+
+        models = {
+            'User': {
+                'type': 'object',
+                'properties': {
+                    'username': {
+                        'type': 'string'
+                    }
+                }
+            }
+        }
+
+        self.editor.add_models(models)
+
+        expected = {
+            'user': {
+                'type': 'object',
+                'properties': {
+                    'username': {
+                        'type': 'string'
+                    }
+                }
+            }
+        }
+
+        self.assertEqual(expected, self.editor.swagger['definitions'])
+
+    def test_must_fail_without_type_in_model(self):
+
+        models = {
+            'User': {
+                'properties': {
+                    'username': {
+                        'type': 'string'
+                    }
+                }
+            }
+        }
+
+        with self.assertRaises(ValueError):
+            self.editor.add_models(models)
+
+    def test_must_fail_without_properties_in_model(self):
+        models = {
+            'User': {
+                'type': 'object'
+            }
+        }
+
+        with self.assertRaises(ValueError):
+            self.editor.add_models(models)
+
+class TestSwaggerEditor_add_request_model_to_method(TestCase):
+
+    def setUp(self):
+
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        }
+                    }
+                }
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+
+    def test_must_add_body_parameter_to_method_with_required_true(self):
+
+        model = {
+            'Model': 'User',
+            'Required': True
+        }
+
+        self.editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = [
+                {
+                    'in': 'body',
+                    'required': True,
+                    'name': 'user',
+                    'schema': {
+                        '$ref': '#/definitions/user'
+                    }
+                }
+            ]
+
+        self.assertEqual(expected, self.editor.swagger['paths']['/foo']['get']['parameters'])
+
+    def test_must_add_body_parameter_to_method_with_required_false(self):
+
+        model = {
+            'Model': 'User',
+            'Required': False
+        }
+
+        self.editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = [
+                {
+                    'in': 'body',
+                    'required': False,
+                    'name': 'user',
+                    'schema': {
+                        '$ref': '#/definitions/user'
+                    }
+                }
+            ]
+
+        self.assertEqual(expected, self.editor.swagger['paths']['/foo']['get']['parameters'])
+
+    def test_must_add_body_parameter_to_existing_method_parameters(self):
+
+        original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        },
+                        'parameters': [{'test': 'existing parameter'}]
+                    }
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_swagger)
+
+        model = {
+            'Model': 'User',
+            'Required': True
+        }
+
+        editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = [
+            {
+                'test': 'existing parameter'
+            },
+            {
+                'in': 'body',
+                'required': True,
+                'name': 'user',
+                'schema': {
+                    '$ref': '#/definitions/user'
+                }
+            }
+        ]
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get']['parameters'])
+
+    def test_must_not_add_body_parameter_to_method_without_integration(self):
+
+        original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {}
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_swagger)
+
+        model = {
+            'Model': 'User',
+            'Required': True
+        }
+
+        editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = {}
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get'])
+
+    def test_must_add_body_parameter_to_method_without_required(self):
+
+        model = {
+            'Model': 'User'
+        }
+
+        self.editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = [
+                {
+                    'in': 'body',
+                    'name': 'user',
+                    'schema': {
+                        '$ref': '#/definitions/user'
+                    }
+                }
+            ]
+
+        self.assertEqual(expected, self.editor.swagger['paths']['/foo']['get']['parameters'])
+
+    def test_must_add_body_parameter_to_method_openapi_without_required(self):
+
+        original_openapi = {
+            "openapi": "3.0.1",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        }
+                    }
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_openapi)
+
+        model = {
+            'Model': 'User',
+            'Required': True
+        }
+
+        editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = {
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/user'
+                    }
+                }
+            },
+            'required': True
+        }
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get']['requestBody'])
+
+    def test_must_add_body_parameter_to_method_openapi_required_true(self):
+
+        original_openapi = {
+            "openapi": "3.0.1",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        }
+                    }
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_openapi)
+
+        model = {
+            'Model': 'User'
+        }
+
+        editor.add_request_model_to_method('/foo', 'get', model)
+
+        expected = {
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/user'
+                    }
+                }
+            }
+        }
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get']['requestBody'])

@@ -446,7 +446,8 @@ class SamApi(SamResourceMacro):
         'AccessLogSetting': PropertyType(False, is_type(dict)),
         'CanarySetting': PropertyType(False, is_type(dict)),
         'TracingEnabled': PropertyType(False, is_type(bool)),
-        'OpenApiVersion': PropertyType(False, is_str())
+        'OpenApiVersion': PropertyType(False, is_str()),
+        'Models': PropertyType(False, is_type(dict))
     }
 
     referable_properties = {
@@ -485,7 +486,8 @@ class SamApi(SamResourceMacro):
                                      tracing_enabled=self.TracingEnabled,
                                      resource_attributes=self.resource_attributes,
                                      passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
-                                     open_api_version=self.OpenApiVersion)
+                                     open_api_version=self.OpenApiVersion,
+                                     models=self.Models)
 
         rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
 

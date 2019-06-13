@@ -386,7 +386,8 @@ class Api(PushEventSource):
 
             # Api Event sources must "always" be paired with a Serverless::Api
             'RestApiId': PropertyType(True, is_str()),
-            'Auth': PropertyType(False, is_type(dict))
+            'Auth': PropertyType(False, is_type(dict)),
+            'RequestModel': PropertyType(False, is_type(dict))
     }
 
     def resources_to_link(self, resources):
@@ -563,6 +564,28 @@ class Api(PushEventSource):
                                 method=self.Method, path=self.Path))
 
                 editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+
+        if self.RequestModel:
+            method_model = self.RequestModel.get('Model')
+
+            if method_model:
+                api_models = api.get('Models')
+                if not api_models:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        'Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] '
+                        'because the related API does not define any Models.'.format(
+                            model=method_model, method=self.Method, path=self.Path))
+
+                if not api_models.get(method_model):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        'Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] '
+                        'because it wasn\'t defined in the API\'s Models.'.format(
+                            model=method_model, method=self.Method, path=self.Path))
+
+                editor.add_request_model_to_method(path=self.Path, method_name=self.Method,
+                                                   request_model=self.RequestModel)
 
         api["DefinitionBody"] = editor.swagger
 

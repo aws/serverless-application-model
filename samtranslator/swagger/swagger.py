@@ -38,6 +38,7 @@ class SwaggerEditor(object):
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", {})
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
+        self.definitions = self._doc.get('definitions', {})
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -522,6 +523,61 @@ class SwaggerEditor(object):
                     elif 'AWS_IAM' not in self.security_definitions:
                         self.security_definitions.update(aws_iam_security_definition)
 
+    def add_request_model_to_method(self, path, method_name, request_model):
+        """
+        Adds request model body parameter for this path/method.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param dict request_model: Model name
+        """
+        model_name = request_model and request_model.get('Model').lower()
+        model_required = request_model and request_model.get('Required')
+
+        normalized_method_name = self._normalize_method_name(method_name)
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+
+            if self._doc.get('swagger') is not None:
+
+                existing_parameters = method_definition.get('parameters', [])
+
+                parameter = {
+                    'in': 'body',
+                    'name': model_name,
+                    'schema': {
+                        '$ref': '#/definitions/{}'.format(model_name)
+                    }
+                }
+
+                if model_required is not None:
+                    parameter['required'] = model_required
+
+                existing_parameters.append(parameter)
+
+                method_definition['parameters'] = existing_parameters
+
+            elif self._doc.get("openapi") and \
+                    re.search(SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]) is not None:
+
+                method_definition['requestBody'] = {
+                    'content': {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/{}".format(model_name)
+                            }
+                        }
+
+                    }
+                }
+
+                if model_required is not None:
+                    method_definition['requestBody']['required'] = model_required
+
     def add_gateway_responses(self, gateway_responses):
         """
         Add Gateway Response definitions to Swagger.
@@ -532,6 +588,29 @@ class SwaggerEditor(object):
 
         for response_type, response in gateway_responses.items():
             self.gateway_responses[response_type] = response.generate_swagger()
+
+    def add_models(self, models):
+        """
+        Add Model definitions to Swagger.
+
+        :param dict models: Dictionary of Model schemas which gets translated
+        :return:
+        """
+
+        self.definitions = self.definitions or {}
+
+        for model_name, schema in models.items():
+
+            model_type = schema.get('type')
+            model_properties = schema.get('properties')
+
+            if not model_type:
+                raise ValueError("Invalid input. Value for type is required")
+
+            if not model_properties:
+                raise ValueError("Invalid input. Value for properties is required")
+
+            self.definitions[model_name.lower()] = schema
 
     @property
     def swagger(self):
@@ -548,6 +627,8 @@ class SwaggerEditor(object):
             self._doc["securityDefinitions"] = self.security_definitions
         if self.gateway_responses:
             self._doc[self._X_APIGW_GATEWAY_RESPONSES] = self.gateway_responses
+        if self.definitions:
+            self._doc['definitions'] = self.definitions
 
         return copy.deepcopy(self._doc)
 
