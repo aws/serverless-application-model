@@ -1,0 +1,61 @@
+{
+  "Conditions": {
+    "TestCondition": {
+      "Fn::Equals": [
+        "test", 
+        "test"
+      ]
+    }
+  }, 
+  "Resources": {
+    "ConditionFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "hello.handler", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ConditionFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }, 
+      "Condition": "TestCondition"
+    }, 
+    "ConditionFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "TestCondition"
+    }
+  }
+}

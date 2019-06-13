@@ -1,0 +1,47 @@
+Resources:
+  MyApiWithAwsIamAuthAndDefaultInvokeRole:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+        InvokeRole: CALLER_CREDENTIALS
+  MyApiWithAwsIamAuthAndCustomInvokeRole:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+        InvokeRole: rn:aws:iam::123:role/AUTH_AWS_IAM
+  MyApiWithAwsIamAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+
+  MyFunctionWithAwsIamAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        MyApiWithAwsIamAuth:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Path: /
+            Method: get
+        MyApiWithAwsIamAuthAndCustomInvokeRole:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuthAndCustomInvokeRole
+            Path: /
+            Method: post
+        MyApiWithAwsIamAuthAndDefaultInvokeRole:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuthAndDefaultInvokeRole
+            Path: /
+            Method: put

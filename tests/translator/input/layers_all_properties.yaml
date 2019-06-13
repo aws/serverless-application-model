@@ -1,0 +1,38 @@
+Parameters:
+  LayerDeleteParam:
+    Type: String
+    Default: Delete
+
+Resources:
+  MyLayer:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://bucket/key
+      RetentionPolicy: !Ref LayerDeleteParam
+
+  MyLayerWithAName:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://bucket/key
+      LayerName: DifferentLayerName
+
+  MyFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: app.handler
+      Runtime: python3.6
+      Layers:
+        - !Ref MyLayer
+
+Outputs:
+  LayerName:
+    Value: !Ref MyLayer
+  FunctionName:
+    Value: !Ref MyFunction
+  FunctionAtt:
+    Value: !GetAtt MyFunction.Arn
+  LayerSub:
+    Value: !Sub ${MyLayer}
+  FunctionSub:
+    Value: !Sub ${MyFunction}

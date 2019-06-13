@@ -1,0 +1,193 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09", 
+  "Parameters": {
+    "EnvType": {
+      "Default": "dev", 
+      "Type": "String"
+    }
+  }, 
+  "Conditions": {
+    "IsDevEnv2": {
+      "Fn::Equals": [
+        {
+          "Ref": "EnvType"
+        }, 
+        "prod"
+      ]
+    }, 
+    "IsDevEnv": {
+      "Fn::Equals": [
+        {
+          "Ref": "EnvType"
+        }, 
+        "dev"
+      ]
+    }
+  }, 
+  "Resources": {
+    "ServerlessDeploymentApplication": {
+      "Type": "AWS::CodeDeploy::Application", 
+      "Properties": {
+        "ComputePlatform": "Lambda"
+      }
+    }, 
+    "HelloWorldFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "CodeDeployServiceRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "codedeploy.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "HelloWorldFunctionDeploymentGroup": {
+      "Type": "AWS::CodeDeploy::DeploymentGroup", 
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "ServerlessDeploymentApplication"
+        }, 
+        "AutoRollbackConfiguration": {
+          "Enabled": true, 
+          "Events": [
+            "DEPLOYMENT_FAILURE", 
+            "DEPLOYMENT_STOP_ON_ALARM", 
+            "DEPLOYMENT_STOP_ON_REQUEST"
+          ]
+        }, 
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "CodeDeployServiceRole", 
+            "Arn"
+          ]
+        }, 
+        "DeploymentConfigName": {
+          "Fn::If": [
+            "IsDevEnv", 
+            {
+              "Fn::If": [
+                "IsDevEnv2", 
+                {
+                  "Fn::Sub": [
+                    "CodeDeployDefault.Lambda${ConfigName}", 
+                    {
+                      "ConfigName": "AllAtOnce"
+                    }
+                  ]
+                }, 
+                "TestCustomDeploymentConfig"
+              ]
+            }, 
+            {
+              "Fn::Sub": [
+                "CodeDeployDefault.Lambda${ConfigName}", 
+                {
+                  "ConfigName": "Canary10Percent15Minutes"
+                }
+              ]
+            }
+          ]
+        }, 
+        "DeploymentStyle": {
+          "DeploymentType": "BLUE_GREEN", 
+          "DeploymentOption": "WITH_TRAFFIC_CONTROL"
+        }
+      }
+    }, 
+    "HelloWorldFunctionVersionfb53d5c2e6": {
+      "DeletionPolicy": "Retain", 
+      "Type": "AWS::Lambda::Version", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "HelloWorldFunction"
+        }
+      }
+    }, 
+    "HelloWorldFunctionAliaslive": {
+      "Type": "AWS::Lambda::Alias", 
+      "UpdatePolicy": {
+        "CodeDeployLambdaAliasUpdate": {
+          "ApplicationName": {
+            "Ref": "ServerlessDeploymentApplication"
+          }, 
+          "DeploymentGroupName": {
+            "Ref": "HelloWorldFunctionDeploymentGroup"
+          }
+        }
+      }, 
+      "Properties": {
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "HelloWorldFunctionVersionfb53d5c2e6", 
+            "Version"
+          ]
+        }, 
+        "FunctionName": {
+          "Ref": "HelloWorldFunction"
+        }, 
+        "Name": "live"
+      }
+    }, 
+    "HelloWorldFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "HelloWorldFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

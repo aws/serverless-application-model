@@ -1,0 +1,42 @@
+Resources:
+  MinimalLayerFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Layers:
+        - arn:aws:lambda:us-east-1:123456789101:layer:CorpXLayer:1
+
+  FunctionNoLayerVersion:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Layers:
+        - arn:aws:lambda:us-east-1:123456789101:layer:CorpXLayer:1
+
+  FunctionLayerWithSubIntrinsic:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Layers:
+        - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:CorpXLayer:1
+        - Fn::Sub: arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:CorpYLayer:1
+
+  FunctionReferencesLayer:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Layers:
+        - !Ref MyLayer
+
+  MyLayer:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip

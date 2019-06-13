@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [InvalidAutoPublishAliasFunction] is invalid. Alias name is required to create an alias"
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [InvalidAutoPublishAliasFunction] is invalid. Alias name is required to create an alias"
+}

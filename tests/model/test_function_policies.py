@@ -23,7 +23,7 @@ class TestFunctionPolicies(TestCase):
         function_policies = FunctionPolicies(resource_properties, self.policy_template_processor_mock)
 
         get_policies_mock.assert_called_once_with(resource_properties)
-        self.assertEquals(expected_length, len(function_policies))
+        self.assertEqual(expected_length, len(function_policies))
 
 
     @patch.object(FunctionPolicies, "_get_policies")
@@ -37,7 +37,7 @@ class TestFunctionPolicies(TestCase):
         function_policies = FunctionPolicies(resource_properties, self.policy_template_processor_mock)
 
         # `list()` will implicitly call the `get()` repeatedly because it is a generator
-        self.assertEquals(list(function_policies.get()), expected_results)
+        self.assertEqual(list(function_policies.get()), expected_results)
 
 
     @patch.object(FunctionPolicies, "_get_policies")
@@ -51,7 +51,7 @@ class TestFunctionPolicies(TestCase):
         function_policies = FunctionPolicies(resource_properties, self.policy_template_processor_mock)
 
         # `list()` will implicitly call the `get()` repeatedly because it is a generator
-        self.assertEquals(list(function_policies.get()), expected_result)
+        self.assertEqual(list(function_policies.get()), expected_result)
 
     def test_contains_policies_must_work_for_valid_input(self):
         resource_properties = {
@@ -90,7 +90,7 @@ class TestFunctionPolicies(TestCase):
         expected = PolicyTypes.MANAGED_POLICY
 
         result = self.function_policies._get_type(policy)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     @patch("samtranslator.model.function_policies.is_instrinsic")
     def test_get_type_must_work_for_managed_policy_with_intrinsics(self, is_intrinsic_mock):
@@ -101,7 +101,7 @@ class TestFunctionPolicies(TestCase):
         is_intrinsic_mock.return_value = True
 
         result = self.function_policies._get_type(policy)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_type_must_work_for_policy_statements(self):
         policy = {
@@ -110,7 +110,7 @@ class TestFunctionPolicies(TestCase):
         expected = PolicyTypes.POLICY_STATEMENT
 
         result = self.function_policies._get_type(policy)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_type_must_work_for_policy_templates(self):
         policy = {
@@ -120,7 +120,7 @@ class TestFunctionPolicies(TestCase):
         expected = PolicyTypes.POLICY_TEMPLATE
 
         result = self.function_policies._get_type(policy)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_type_must_ignore_invalid_policy(self):
         policy = {
@@ -131,7 +131,7 @@ class TestFunctionPolicies(TestCase):
         expected = PolicyTypes.UNKNOWN
 
         result = self.function_policies._get_type(policy)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_type_must_ignore_invalid_policy_value_list(self):
         policy = ["invalid", "policy"]
@@ -140,7 +140,7 @@ class TestFunctionPolicies(TestCase):
         self.is_policy_template_mock.return_value = False
 
         result = self.function_policies._get_type(policy)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
         self.is_policy_template_mock.assert_called_once_with(policy)
 
     def test_get_policies_must_return_all_policies(self):
@@ -165,7 +165,7 @@ class TestFunctionPolicies(TestCase):
         ]
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_policies_must_ignore_if_resource_does_not_contain_policy(self):
         resource_properties = {
@@ -173,7 +173,7 @@ class TestFunctionPolicies(TestCase):
         expected = []
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_policies_must_ignore_if_policies_is_empty(self):
         resource_properties = {
@@ -182,7 +182,7 @@ class TestFunctionPolicies(TestCase):
         expected = []
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_policies_must_work_for_single_policy_string(self):
         resource_properties = {
@@ -193,7 +193,7 @@ class TestFunctionPolicies(TestCase):
         ]
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_policies_must_work_for_single_dict_with_managed_policy_intrinsic(self):
         resource_properties = {
@@ -206,7 +206,7 @@ class TestFunctionPolicies(TestCase):
         ]
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_policies_must_work_for_single_dict_with_policy_statement(self):
         resource_properties = {
@@ -219,7 +219,7 @@ class TestFunctionPolicies(TestCase):
         ]
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_get_policies_must_work_for_single_dict_of_policy_template(self):
         resource_properties = {
@@ -233,7 +233,7 @@ class TestFunctionPolicies(TestCase):
         ]
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
         self.is_policy_template_mock.assert_called_once_with(resource_properties["Policies"])
 
     def test_get_policies_must_work_for_single_dict_of_invalid_policy_template(self):
@@ -248,7 +248,7 @@ class TestFunctionPolicies(TestCase):
         ]
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
         self.is_policy_template_mock.assert_called_once_with({"InvalidPolicyTemplate": "some template"})
 
     def test_get_policies_must_work_for_unknown_policy_types(self):
@@ -266,7 +266,7 @@ class TestFunctionPolicies(TestCase):
         self.is_policy_template_mock.return_value = False
 
         result = self.function_policies._get_policies(resource_properties)
-        self.assertEquals(result, expected)
+        self.assertEqual(result, expected)
 
     def test_is_policy_template_must_detect_valid_policy_templates(self):
         template_name = "template_name"

@@ -5,6 +5,7 @@ from samtranslator.model.types import is_str
 from samtranslator.translator.arn_generator import ArnGenerator
 from .push import PushEventSource
 
+
 class CloudWatchLogs(PushEventSource):
     """CloudWatch Logs event source for SAM Functions."""
     resource_type = 'CloudWatchLogs'
@@ -27,25 +28,26 @@ class CloudWatchLogs(PushEventSource):
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
-        
         source_arn = self.get_source_arn()
         permission = self._construct_permission(function, source_arn=source_arn)
         subscription_filter = self.get_subscription_filter(function, permission)
         resources = [permission, subscription_filter]
 
         return resources
-    
+
     def get_source_arn(self):
         resource = "log-group:${__LogGroupName__}:*"
         partition = ArnGenerator.get_partition_name()
-        
+
         return fnSub(ArnGenerator.generate_arn(partition=partition, service='logs', resource=resource),
-                           {'__LogGroupName__': self.LogGroupName})
+                     {'__LogGroupName__': self.LogGroupName})
 
     def get_subscription_filter(self, function, permission):
         subscription_filter = SubscriptionFilter(self.logical_id, depends_on=[permission.logical_id])
         subscription_filter.LogGroupName = self.LogGroupName
         subscription_filter.FilterPattern = self.FilterPattern
         subscription_filter.DestinationArn = function.get_runtime_attr("arn")
+        if 'Condition' in function.resource_attributes:
+            subscription_filter.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 
         return subscription_filter

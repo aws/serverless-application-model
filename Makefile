@@ -39,17 +39,16 @@ init:
 	$(info [*] Install requirements...)
 	@pip install -r requirements/dev.txt -r requirements/base.txt
 
+flake:
+	$(info [*] Running flake8...)
+	@flake8 samtranslator
+
 test:
 	$(info [*] Run the unit test with minimum code coverage of $(CODE_COVERAGE)%...)
 	@pytest --cov samtranslator --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests
 
-build-docs:
-	$(info [*] Build documentation...)
-	@pip install -r docs/website/requirements.txt
-	@$(MAKE) -C docs/website html
-
 # Command to run everytime you make changes to verify everything works
-dev: test
+dev: flake test
 
 # Verifications to run before sending a pull request
 pr: init dev

@@ -1,4 +1,6 @@
 import json
+import cfnlint.core
+from cfnlint import Runner
 import itertools
 import os.path
 import hashlib
@@ -7,12 +9,13 @@ from functools import reduce, cmp_to_key
 
 from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
 from samtranslator.parser.parser import Parser
-from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidResourceException
 from samtranslator.model import Resource
 from samtranslator.model.sam_resources import SamSimpleTable
 from samtranslator.public.plugins import BasePlugin
 
 from tests.translator.helpers import get_template_parameter_values
+from tests.plugins.application.test_serverless_app_plugin import mock_get_region
 from samtranslator.yaml_helper import yaml_parse
 from parameterized import parameterized, param
 
@@ -22,9 +25,31 @@ from unittest import TestCase
 from samtranslator.translator.transform import transform
 from mock import Mock, MagicMock, patch
 
+BASE_PATH = os.path.dirname(__file__)
+INPUT_FOLDER = BASE_PATH + '/input'
+OUTPUT_FOLDER = BASE_PATH + '/output'
+# Do not sort AWS::Serverless::Function Layers Property.
+# Order of Layers is an important attribute and shouldn't be changed.
+DO_NOT_SORT = ['Layers']
 
-input_folder = 'tests/translator/input'
-output_folder = 'tests/translator/output'
+BASE_PATH = os.path.dirname(__file__)
+INPUT_FOLDER = os.path.join(BASE_PATH, 'input')
+OUTPUT_FOLDER = os.path.join(BASE_PATH, 'output')
+
+LINT_IGNORE_WARNINGS = [
+    'W2001', # unused parameters. Sometimes, SAM uses parameters and removes the param reference from the output template, but the parameter stays in the parameters section.
+    'W1001', # Ref/GetAtt with conditions. This incorrectly flags resources since it can't map conditions fully.
+    'E3001', # Check for resource availability in a region.
+    'W7001', # Check if mappings are used. Serverless::Application uses mappings, the output CFN doesn't use them anymore.
+    'W1020', # Sub isn't needed if it doesn't have a variable defined. SAM leaves `!Sub` in even if it tries to resolve variables.
+    'E2531', # we don't care if a runtime has been deprecated in our tests.
+    'E3038', # Serverless resources- test for invalid resources.
+]
+
+LINT_IGNORE_TESTS = [
+    'function_with_resource_refs', # Tests functionality of the translator in ways that result in improper GetAtt calls on CFN resources.
+    'api_with_canary_setting', # Has stage variable overrides for nonexistent stage variables.
+]
 
 
 def deep_sort_lists(value):
@@ -84,6 +109,43 @@ def custom_list_data_comparator(obj1, obj2):
         s1, s2 = type(obj1).__name__, type(obj2).__name__
         return (s1 > s2) - (s1 < s2)
 
+def mock_sar_service_call(self, service_call_function, logical_id, *args):
+    """
+    Current implementation: args[0] is always the application_id
+    """
+    application_id = args[0]
+    status = 'ACTIVE'
+    if application_id == "no-access":
+        raise InvalidResourceException(logical_id, "Cannot access application: {}.".format(application_id))
+    elif application_id == "non-existent":
+        raise InvalidResourceException(logical_id, "Cannot access application: {}.".format(application_id))
+    elif application_id == "invalid-semver":
+        raise InvalidResourceException(logical_id, "Cannot access application: {}.".format(application_id))
+    elif application_id == 1:
+        raise InvalidResourceException(logical_id, "Type of property 'ApplicationId' is invalid.".format(application_id))
+    elif application_id == "preparing" and self._wait_for_template_active_status < 2:
+        self._wait_for_template_active_status += 1
+        self.SLEEP_TIME_SECONDS = 0
+        self.TEMPLATE_WAIT_TIMEOUT_SECONDS = 2
+        status = "PREPARING"
+    elif application_id == "preparing-never-ready":
+        self._wait_for_template_active_status = True
+        self.SLEEP_TIME_SECONDS = 0
+        self.TEMPLATE_WAIT_TIMEOUT_SECONDS = 0
+        status = "PREPARING"
+    elif application_id == "expired":
+        status = "EXPIRED"
+    message = {
+        'ApplicationId': args[0],
+        'CreationTime': 'x',
+        'ExpirationTime': 'x',
+        'SemanticVersion': '1.1.1',
+        'Status': status,
+        'TemplateId': 'id-xx-xx',
+        'TemplateUrl': 'https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url'
+    }
+    return message
+
 # implicit_api, explicit_api, explicit_api_ref, api_cache tests currently have deployment IDs hardcoded in output file.
 # These ids are generated using sha1 hash of the swagger body for implicit
 # api and s3 location for explicit api.
@@ -92,7 +154,13 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        's3_with_condition',
+        'function_with_condition',
         'basic_function',
+        'basic_application',
+        'application_preparing_state',
+        'application_with_intrinsics',
+        'basic_layer',
         'cloudwatchevent',
         'cloudwatch_logs_with_ref',
         'cloudwatchlog',
@@ -103,15 +171,33 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_api',
         'explicit_api',
         'api_endpoint_configuration',
+        'api_with_auth_all_maximum',
+        'api_with_auth_all_minimum',
+        'api_with_auth_no_default',
+        'api_with_default_aws_iam_auth',
+        'api_with_method_aws_iam_auth',
+        'api_with_aws_iam_auth_overrides',
         'api_with_method_settings',
         'api_with_binary_media_types',
+        'api_with_binary_media_types_definition_body',
+        'api_with_minimum_compression_size',
         'api_with_resource_refs',
         'api_with_cors',
         'api_with_cors_and_only_methods',
         'api_with_cors_and_only_headers',
         'api_with_cors_and_only_origins',
         'api_with_cors_and_only_maxage',
+        'api_with_cors_and_only_credentials_false',
+        'api_with_cors_no_definitionbody',
+        'api_with_gateway_responses',
+        'api_with_gateway_responses_all',
+        'api_with_gateway_responses_minimal',
+        'api_with_gateway_responses_implicit',
+        'api_with_gateway_responses_string_status_code',
         'api_cache',
+        'api_with_access_log_setting',
+        'api_with_canary_setting',
+        'api_with_xray_tracing',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -119,20 +205,27 @@ class TestTranslatorEndToEnd(TestCase):
         's3_filter',
         's3_multiple_events_same_bucket',
         's3_multiple_functions',
+        's3_with_dependsOn',
         'sns',
         'sns_existing_other_subscription',
         'sns_topic_outside_template',
         'alexa_skill',
+        'alexa_skill_with_skill_id',
         'iot_rule',
+        'layers_with_intrinsics',
+        'layers_all_properties',
         'function_managed_inline_policy',
         'unsupported_resources',
         'intrinsic_functions',
         'basic_function_with_tags',
         'depends_on',
+        'function_event_conditions',
         'function_with_dlq',
         'function_with_kmskeyarn',
         'function_with_alias',
         'function_with_alias_intrinsics',
+        'function_with_custom_codedeploy_deployment_preference',
+        'function_with_custom_conditional_codedeploy_deployment_preference',
         'function_with_disabled_deployment_preference',
         'function_with_deployment_preference',
         'function_with_deployment_preference_all_parameters',
@@ -141,7 +234,13 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_resource_refs',
         'function_with_deployment_and_custom_role',
         'function_with_deployment_no_service_role',
+        'function_with_global_layers',
+        'function_with_layers',
+        'function_with_many_layers',
+        'function_with_permissions_boundary',
         'function_with_policy_templates',
+        'function_with_sns_event_source_all_parameters',
+        'global_handle_path_level_parameter',
         'globals_for_function',
         'globals_for_api',
         'globals_for_simpletable',
@@ -152,7 +251,12 @@ class TestTranslatorEndToEnd(TestCase):
         'simple_table_with_extra_tags',
         'explicit_api_with_invalid_events_config',
         'no_implicit_api_with_serverless_rest_api_resource',
-        'implicit_api_with_serverless_rest_api_resource'
+        'implicit_api_with_serverless_rest_api_resource',
+        'implicit_api_with_auth_and_conditions_max',
+        'implicit_api_with_many_conditions',
+        'implicit_and_explicit_api_with_conditions',
+        'api_with_cors_and_conditions_no_definitionbody',
+        'api_with_auth_and_conditions_all_max',
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -161,20 +265,20 @@ class TestTranslatorEndToEnd(TestCase):
       ] # Run all the above tests against each of the list of partitions to test against
       )
     )
+    @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_transform_success(self, testcase, partition_with_region):
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
-        manifest = yaml_parse(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(output_folder,partition_folder, testcase + '.json'), 'r'))
+        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json')
+        expected = json.load(open(expected_filepath, 'r'))
 
-        old_region = os.environ.get("AWS_DEFAULT_REGION", "")
-        os.environ["AWS_DEFAULT_REGION"] = region
-
-        try:
+        with patch('boto3.session.Session.region_name', region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
             mock_policy_loader.load.return_value = {
@@ -186,17 +290,103 @@ class TestTranslatorEndToEnd(TestCase):
 
             output_fragment = transform(
                 manifest, parameter_values, mock_policy_loader)
-        finally:
-            os.environ["AWS_DEFAULT_REGION"] = old_region
 
         print(json.dumps(output_fragment, indent=2))
+
+        # Run cfn-lint on translator test output files.
+        rules = cfnlint.core.get_rules([], LINT_IGNORE_WARNINGS, [])
 
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
+            output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        else: # deprecation warning catching in py2
+            import warnings
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore",category=DeprecationWarning)
+                output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        runner = cfnlint.Runner(rules, expected_filepath, output_template, [region])
+        matches = []
+
+        # Only run linter on normal/gov partitions. It errors on china regions
+        if testcase not in LINT_IGNORE_TESTS and partition != 'aws-cn':
+            matches = runner.run()
+        print('cfn-lint ({}): {}'.format(expected_filepath, matches))
 
         assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+        assert len(matches) == 0
+
+    @parameterized.expand(
+      itertools.product([
+        'explicit_api_openapi_3',
+        'api_with_auth_all_maximum_openapi_3',
+        'api_with_cors_openapi_3',
+        'api_with_gateway_responses_all_openapi_3',
+        'api_with_open_api_version',
+        'api_with_open_api_version_2',
+        'api_with_auth_all_minimum_openapi',
+        'api_with_swagger_and_openapi_with_auth',
+        'api_with_openapi_definition_body_no_flag'
+      ],
+      [
+       ("aws", "ap-southeast-1"),
+       ("aws-cn", "cn-north-1"),
+       ("aws-us-gov", "us-gov-west-1")
+      ] # Run all the above tests against each of the list of partitions to test against
+      )
+    )
+    @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    def test_transform_success_openapi3(self, testcase, partition_with_region):
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
+        manifest = json.loads(json.dumps(manifest))
+        partition_folder = partition if partition != "aws" else ""
+        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json')
+        expected = json.load(open(expected_filepath, 'r'))
+
+        with patch('boto3.session.Session.region_name', region):
+            parameter_values = get_template_parameter_values()
+            mock_policy_loader = MagicMock()
+            mock_policy_loader.load.return_value = {
+                'AWSLambdaBasicExecutionRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'.format(partition),
+                'AmazonDynamoDBFullAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess'.format(partition),
+                'AmazonDynamoDBReadOnlyAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess'.format(partition),
+                'AWSLambdaRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaRole'.format(partition),
+            }
+
+            output_fragment = transform(
+                manifest, parameter_values, mock_policy_loader)
+
+        print(json.dumps(output_fragment, indent=2))
+
+        # Run cfn-lint on translator test output files.
+        rules = cfnlint.core.get_rules([], LINT_IGNORE_WARNINGS, [])
+
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info.major >= 3:
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
+            output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        else: # deprecation warning catching in py2
+            import warnings
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore",category=DeprecationWarning)
+                output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        runner = cfnlint.Runner(rules, expected_filepath, output_template, [region])
+        matches = []
+
+        # Only run linter on normal/gov partitions. It errors on china regions
+        if testcase not in LINT_IGNORE_TESTS and partition != 'aws-cn':
+            matches = runner.run()
+        print('cfn-lint ({}): {}'.format(expected_filepath, matches))
+
+        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+        assert len(matches) == 0
 
     def _update_logical_id_hash(self, resources):
         """
@@ -259,29 +449,48 @@ class TestTranslatorEndToEnd(TestCase):
 
         # Update any Output References in the template
         for output_key, output_value in resources.get("Outputs", {}).items():
-            if output_value.get("Ref") in deployment_logical_id_dict:
-                output_value["Ref"] = deployment_logical_id_dict[output_value.get("Ref")]
+            if output_value.get("Value").get("Ref") in deployment_logical_id_dict:
+                output_value["Value"]["Ref"] = deployment_logical_id_dict[output_value.get("Value").get("Ref")]
 
     def _generate_new_deployment_hash(self, logical_id, dict_to_hash, rest_api_to_swagger_hash):
         data_bytes = json.dumps(dict_to_hash, separators=(',', ':'), sort_keys=True).encode("utf8")
         data_hash = hashlib.sha1(data_bytes).hexdigest()
         rest_api_to_swagger_hash[logical_id] = data_hash
 
-
 @pytest.mark.parametrize('testcase', [
     'error_api_duplicate_methods_same_path',
+    'error_api_gateway_responses_nonnumeric_status_code',
+    'error_api_gateway_responses_unknown_responseparameter',
+    'error_api_gateway_responses_unknown_responseparameter_property',
+    'error_api_invalid_auth',
+    'error_api_invalid_path',
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
+    'error_api_invalid_stagename',
+    'error_api_with_invalid_open_api_version',
     'error_api_invalid_restapiid',
+    'error_application_properties',
+    'error_application_does_not_exist',
+    'error_application_no_access',
+    'error_application_preparing_timeout',
     'error_cors_on_external_swagger',
     'error_invalid_cors_dict',
+    'error_invalid_findinmap',
+    'error_invalid_getatt',
+    'error_cors_credentials_true_with_wildcard_origin',
+    'error_cors_credentials_true_without_explicit_origin',
     'error_function_invalid_codeuri',
+    'error_function_invalid_api_event',
+    'error_function_invalid_autopublishalias',
+    'error_function_invalid_event_type',
+    'error_function_invalid_layer',
     'error_function_no_codeuri',
     'error_function_no_handler',
     'error_function_no_runtime',
     'error_function_with_deployment_preference_missing_alias',
     'error_function_with_invalid_deployment_preference_hook_property',
     'error_invalid_logical_id',
+    'error_layer_invalid_properties',
     'error_missing_queue',
     'error_missing_startingposition',
     'error_missing_stream',
@@ -294,6 +503,8 @@ class TestTranslatorEndToEnd(TestCase):
     'existing_permission_logical_id',
     'existing_role_logical_id',
     'error_invalid_template',
+    'error_resource_not_dict',
+    'error_resource_properties_not_dict',
     'error_globals_is_not_dict',
     'error_globals_unsupported_type',
     'error_globals_unsupported_property',
@@ -301,11 +512,16 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_policy_template_with_missing_parameter',
     'error_function_policy_template_invalid_value',
     'error_function_with_unknown_policy_template',
-    'error_function_with_invalid_policy_statement'
+    'error_function_with_invalid_policy_statement',
+    'error_function_with_invalid_condition_name',
+    'error_invalid_document_empty_semantic_version'
 ])
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
+@patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
+@patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
 def test_transform_invalid_document(testcase):
-    manifest = yaml.load(open(os.path.join(input_folder, testcase + '.yaml'), 'r'))
-    expected = json.load(open(os.path.join(output_folder, testcase + '.json'), 'r'))
+    manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+    expected = json.load(open(os.path.join(OUTPUT_FOLDER, testcase + '.json'), 'r'))
 
     mock_policy_loader = MagicMock()
     parameter_values = get_template_parameter_values()
@@ -317,6 +533,8 @@ def test_transform_invalid_document(testcase):
 
     assert error_message == expected.get('errorMessage')
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
+@patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
 def test_transform_unhandled_failure_empty_managed_policy_map():
     document = {
         'Transform': 'AWS::Serverless-2016-10-31',
@@ -372,6 +590,8 @@ def assert_metric_call(mock, transform, transform_failure=0, invalid_document=0)
     )
 
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
+@patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
 def test_swagger_body_sha_gets_recomputed():
 
     document = {
@@ -413,6 +633,8 @@ def test_swagger_body_sha_gets_recomputed():
     assert get_deployment_key(output_fragment) == deployment_key_changed
 
 
+@patch('boto3.session.Session.region_name', 'ap-southeast-1')
+@patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
 def test_swagger_definitionuri_sha_gets_recomputed():
 
     document = {
@@ -474,6 +696,8 @@ class TestFunctionVersionWithParameterReferences(TestCase):
             }
         }
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_logical_id_change_with_parameters(self):
         parameter_values = {
             'CodeKeyParam': 'value1'
@@ -488,6 +712,8 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         assert first_version_id != second_version_id
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_logical_id_remains_same_without_parameter_change(self):
         parameter_values = {
             'CodeKeyParam': 'value1'
@@ -501,6 +727,8 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
         assert first_version_id == second_version_id
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_logical_id_without_resolving_reference(self):
         # Now value of `CodeKeyParam` is not present in document
 
@@ -521,121 +749,9 @@ class TestFunctionVersionWithParameterReferences(TestCase):
         return output_fragment
 
 
-class TestParameterValuesHandling(TestCase):
-    """
-    Test how user-supplied parameters & default template parameter values from template get merged
-    """
-
-    def test_add_default_parameter_values_must_merge(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param2": {
-                    "Type": "String",
-                    "Default": "template default"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1",
-            "Param2": "template default"
-        }
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template,
-            parameter_values)
-        self.assertEquals(expected, result)
-
-    def test_add_default_parameter_values_must_override_user_specified_values(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param1": {
-                    "Type": "String",
-                    "Default": "template default"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEquals(expected, result)
-
-    def test_add_default_parameter_values_must_skip_params_without_defaults(self):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": {
-                "Param1": {
-                    "Type": "String"
-                },
-                "Param2": {
-                    "Type": "String"
-                }
-            }
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(sam_template, parameter_values)
-        self.assertEquals(expected, result)
-
-
-    @parameterized.expand([
-        # Array
-        param(["1", "2"]),
-
-        # String
-        param("something"),
-
-        # Some other non-parameter looking dictionary
-        param({"Param1": {"Foo": "Bar"}}),
-
-        param(None)
-    ])
-    def test_add_default_parameter_values_must_ignore_invalid_template_parameters(self, template_parameters):
-        parameter_values = {
-            "Param1": "value1"
-        }
-
-        expected = {
-            "Param1": "value1"
-        }
-
-        sam_template = {
-            "Parameters": template_parameters
-        }
-
-
-        sam_parser = Parser()
-        translator = Translator({}, sam_parser)
-        result = translator._add_default_parameter_values(
-            sam_template, parameter_values)
-        self.assertEquals(expected, result)
-
-
 class TestTemplateValidation(TestCase):
 
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_not_found(self):
         template = {
             "foo": "bar"
@@ -646,6 +762,7 @@ class TestTemplateValidation(TestCase):
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
 
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_is_empty(self):
         template = {
             "Resources": {}
@@ -657,9 +774,25 @@ class TestTemplateValidation(TestCase):
             translator.translate(template, {})
 
 
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_is_not_dict(self):
         template = {
             "Resources": [1,2,3]
+        }
+
+        with self.assertRaises(InvalidDocumentException):
+            sam_parser = Parser()
+            translator = Translator({}, sam_parser)
+            translator.translate(template, {})
+
+
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    def test_throws_when_resources_not_all_dicts(self):
+        template = {
+            "Resources": {
+                "notadict": None,
+                "MyResource": {}
+            }
         }
 
         with self.assertRaises(InvalidDocumentException):
@@ -671,6 +804,7 @@ class TestPluginsUsage(TestCase):
     # Tests if plugins are properly injected into the translator
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_prepare_plugins_must_add_required_plugins(self, make_policy_template_for_function_plugin_mock):
 
         # This is currently the only required plugin
@@ -678,9 +812,10 @@ class TestPluginsUsage(TestCase):
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
 
         sam_plugins = prepare_plugins([])
-        self.assertEquals(3, len(sam_plugins))
+        self.assertEqual(5, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_prepare_plugins_must_merge_input_plugins(self, make_policy_template_for_function_plugin_mock):
 
         required_plugin = BasePlugin("something")
@@ -688,12 +823,13 @@ class TestPluginsUsage(TestCase):
 
         custom_plugin = BasePlugin("someplugin")
         sam_plugins = prepare_plugins([custom_plugin])
-        self.assertEquals(4, len(sam_plugins))
+        self.assertEqual(6, len(sam_plugins))
 
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_prepare_plugins_must_handle_empty_input(self):
 
         sam_plugins = prepare_plugins(None)
-        self.assertEquals(3, len(sam_plugins)) # one required plugin
+        self.assertEqual(5, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.PolicyTemplatesProcessor")
     @patch("samtranslator.translator.translator.PolicyTemplatesForFunctionPlugin")
@@ -714,7 +850,7 @@ class TestPluginsUsage(TestCase):
 
         result = make_policy_template_for_function_plugin()
 
-        self.assertEquals(plugin_instance, result)
+        self.assertEqual(plugin_instance, result)
 
         policy_templates_processor_mock.get_default_policy_templates_json.assert_called_once_with()
         policy_templates_processor_mock.assert_called_once_with(default_templates)
@@ -723,6 +859,7 @@ class TestPluginsUsage(TestCase):
     @patch.object(Resource, "from_dict")
     @patch("samtranslator.translator.translator.SamPlugins")
     @patch("samtranslator.translator.translator.prepare_plugins")
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_transform_method_must_inject_plugins_when_creating_resources(self,
                                                                           prepare_plugins_mock,
                                                                           sam_plugins_class_mock,
@@ -750,7 +887,7 @@ class TestPluginsUsage(TestCase):
         resource_from_dict_mock.assert_called_with("MyTable",
                                                         manifest["Resources"]["MyTable"],
                                                         sam_plugins=sam_plugins_object_mock)
-        prepare_plugins_mock.assert_called_once_with(initial_plugins)
+        prepare_plugins_mock.assert_called_once_with(initial_plugins, {"AWS::Region": "ap-southeast-1"})
 
 def get_policy_mock():
     mock_policy_loader = MagicMock()

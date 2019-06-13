@@ -1,13 +1,16 @@
 {
+  "Parameters": {
+    "MySimpleTableParameter": {
+      "Default": "TableName",
+      "Type": "String"
+    }
+  },
   "Resources": {
     "MinimalTableWithTableName": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
         "TableName": "MySimpleTable",
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": 5,
-          "ReadCapacityUnits": 5
-        },
+        "BillingMode": "PAY_PER_REQUEST",
         "AttributeDefinitions": [
           {
             "AttributeName": "id",
@@ -28,10 +31,7 @@
         "TableName": {
           "Ref": "MySimpleTableParameter"
         },
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": 5,
-          "ReadCapacityUnits": 5
-        },
+        "BillingMode": "PAY_PER_REQUEST",
         "AttributeDefinitions": [
           {
             "AttributeName": "id",
@@ -52,10 +52,7 @@
         "TableName": {
           "Fn::Sub": "${AWS::StackName}MySimpleTable"
         },
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": 5,
-          "ReadCapacityUnits": 5
-        },
+        "BillingMode": "PAY_PER_REQUEST",
         "AttributeDefinitions": [
           {
             "AttributeName": "id",

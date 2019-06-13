@@ -15,6 +15,9 @@ Globals:
       # These are equivalent to image/gif and image/png when deployed
       - image~1gif
       - image~1png
+      
+    # Compression is triggered when response body size is greater than or equal to your configured threshold
+    MinimumCompressionSize: 1024
 
     # Logging, Metrics, Throttling, and all other Stage settings
     MethodSettings: [{

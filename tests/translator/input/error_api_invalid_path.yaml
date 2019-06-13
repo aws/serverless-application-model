@@ -1,0 +1,10 @@
+Resources:
+  ApiWithInvalidPath:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors: "'*'"
+      DefinitionBody:
+        swagger: 2.0
+        paths:
+          /foo:

@@ -1,0 +1,13 @@
+Conditions:
+  TestCondition:
+    Fn::Equals:
+      - test
+      - test
+Resources:
+  ConditionFunction:
+    Type: 'AWS::Serverless::Function'
+    Condition: "TestCondition"
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7

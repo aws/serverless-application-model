@@ -1,0 +1,8 @@
+{
+    "errors": [
+      {
+        "errorMessage": "Resource with id [MyApi] is invalid. The OpenApiVersion value must be of the format 3.0.0"
+      }
+    ], 
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApi] is invalid. The OpenApiVersion value must be of the format 3.0.0"
+  }

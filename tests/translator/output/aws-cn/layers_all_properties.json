@@ -1,0 +1,114 @@
+{
+  "Outputs": {
+    "LayerSub": {
+      "Value": {
+        "Fn::Sub": "${MyLayerd04062b365}"
+      }
+    }, 
+    "FunctionAtt": {
+      "Value": {
+        "Fn::GetAtt": [
+          "MyFunction", 
+          "Arn"
+        ]
+      }
+    }, 
+    "LayerName": {
+      "Value": {
+        "Ref": "MyLayerd04062b365"
+      }
+    }, 
+    "FunctionSub": {
+      "Value": {
+        "Fn::Sub": "${MyFunction}"
+      }
+    }, 
+    "FunctionName": {
+      "Value": {
+        "Ref": "MyFunction"
+      }
+    }
+  }, 
+  "Parameters": {
+    "LayerDeleteParam": {
+      "Default": "Delete", 
+      "Type": "String"
+    }
+  }, 
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Layers": [
+          {
+            "Ref": "MyLayerd04062b365"
+          }
+        ], 
+        "Code": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "Handler": "app.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python3.6"
+      }
+    }, 
+    "MyLayerd04062b365": {
+      "DeletionPolicy": "Delete", 
+      "Type": "AWS::Lambda::LayerVersion", 
+      "Properties": {
+        "Content": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
+        }, 
+        "LayerName": "MyLayer"
+      }
+    }, 
+    "MyLayerWithANamefda8c9ec8c": {
+      "DeletionPolicy": "Retain", 
+      "Type": "AWS::Lambda::LayerVersion", 
+      "Properties": {
+        "Content": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
+        }, 
+        "LayerName": "DifferentLayerName"
+      }
+    }, 
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -105,6 +105,9 @@ resource:
           # Validation Lambda functions that are run before & after traffic shifting
           PreTraffic: !Ref PreTrafficLambdaFunction
           PostTraffic: !Ref PostTrafficLambdaFunction
+        # Provide a custom role for CodeDeploy traffic shifting here, if you don't supply one
+        # SAM will create one for you with default permissions
+        Role: !Ref IAMRoleForCodeDeploy # Parameter example, you can pass an IAM ARN
 
   AliasErrorMetricGreaterThanZeroAlarm:
     Type: "AWS::CloudWatch::Alarm"
@@ -130,9 +133,11 @@ resource:
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: Resource
-          Value: !Ref MyLambdaFunction.Version
+          Value: !Sub "${MyLambdaFunction}:live"
         - Name: FunctionName
           Value: !Ref MyLambdaFunction
+        - Name: ExecutedVersion
+          Value: !GetAtt MyLambdaFunction.Version.Version
       EvaluationPeriods: 2
       MetricName: Errors
       Namespace: AWS/Lambda
@@ -151,7 +156,7 @@ resource:
             Action:
               - "codedeploy:PutLifecycleEventHookExecutionStatus"
             Resource:
-              !Sub 'arn:aws:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*'
+              !Sub 'arn:${AWS::Partition}:codedeploy:${AWS::Region}:${AWS::AccountId}:deploymentgroup:${ServerlessDeploymentApplication}/*'
         - Version: "2012-10-17"
           Statement:
           - Effect: "Allow"
@@ -162,6 +167,7 @@ resource:
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: false
+        Role: ""
       Environment:
         Variables:
           CurrentVersion: !Ref MyLambdaFunction.Version
@@ -176,6 +182,7 @@ CloudFormation, the following happens:
 - During traffic shifting, if any of the CloudWatch Alarms go to *Alarm* state, CodeDeploy will immediately flip the Alias back to old version and report a failure to CloudFormation.
 - After traffic shifting completes, CodeDeploy will invoke the **PostTraffic Hook** Lambda function. This is similar to PreTraffic Hook where the function must callback to CodeDeploy to report a Success or a Failure. PostTraffic hook is a great place to run integration tests or other validation actions.
 - If everything went well, the Alias will be pointing to the new Lambda Version.
+- If you supply the "Role" argument to the DeploymentPreference, it will prevent SAM from creating a role and instead use the provided CodeDeploy role for traffic shifting
 
 NOTE: Verify that your AWS SDK version supports PutLifecycleEventHookExecutionStatus. For example, Python requires SDK version 1.4.8 or newer.
 
@@ -216,7 +223,8 @@ They work as follows:
 - **AllAtOnce**: This is an instant shifting of 100% of traffic to new version. This is useful if you want to run
   run pre/post hooks but don't want a gradual deployment. If you have a pipeline, you can set Beta/Gamma stages to 
   deploy instantly because the speed of deployments matter more than safety here.
-
+- **Custom**: Aside from Above mentioned Configurations, Custom Codedeploy configuration are also supported.
+  (Example. Type: CustomCodeDeployConfiguration)
 
 PreTraffic & PostTraffic Hooks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -294,7 +302,7 @@ Internally, SAM will create the following resources in your CloudFormation stack
    SAM template belongs to its own Deployment Group.
 -  Adds ``UpdatePolicy`` on ``AWS::Lambda::Alias`` resource that is
    connected to the function's Deployment Group resource.
--  One ``AWS::IAM::Role`` called "CodeDeployServiceRole".
+-  One ``AWS::IAM::Role`` called "CodeDeployServiceRole", if no custom role is provided
 
 CodeDeploy assumes that there are no dependencies between Deployment Groups and hence will deploy them in parallel.
 Since every Lambda function is to its own CodeDeploy DeploymentGroup, they will be deployed in parallel.
@@ -302,5 +310,24 @@ The CodeDeploy service will assume the new CodeDeployServiceRole to Invoke any P
 
   NOTE: The CodeDeployServiceRole only allows InvokeFunction on functions with names prefixed with  ``CodeDeployHook_``. For example,  you should name your Hook functions as such: ``CodeDeployHook_PreTrafficHook``.
 
+Production errors preventing deployments
+~~~~~~~~~
+In some situations, an issue that is happening in production may prevent you from deploying a fix. This may happen when a deployment happens when traffic is too low to register enough errors to trigger a roll back, or where someone is sending malicious traffic through to a lambda and you haven’t accounted for the scenario where they do. 
+
+When this happens, the alarm for errors in the current lambda version is in an error state, which will cause code deploy to roll back any attempted deploys straight away.
+
+To release code in this situation, you need to
+
+- Go into the CodeDeploy console
+- Select the application you want to deploy to
+- Select the corresponding Deployment Group
+- Select “Edit”
+- Select “Advanced - optional”
+- Select "ignore alarm configuration"
+- Save the changes
+
+Run your deployment as usual
+
+Then once deployment has successfully run, return to the CodeDeploy console, and follow the above steps but this time deselect “ignore alarm configuration”.
 
 .. _Globals: globals.rst

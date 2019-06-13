@@ -3,6 +3,12 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   Stream AWS DynamoDB table activity from DynamoDB Stream to Splunk's HTTP event
   collector
+Parameters:
+  SplunkHecUrlParameter:
+    Type: String
+    AllowedPattern: '^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$'
+  SplunkHecTokenParameter:
+    Type: String
 Resources:
   splunkdynamodbstreamprocessor:
     Type: 'AWS::Serverless::Function'
@@ -28,8 +34,8 @@ Resources:
             BatchSize: 100
       Environment:
         Variables:
-          SPLUNK_HEC_URL: <enter value here>
-          SPLUNK_HEC_TOKEN: <enter value here>
+          SPLUNK_HEC_URL: !Ref SplunkHecUrlParameter
+          SPLUNK_HEC_TOKEN: !Ref SplunkHecTokenParameter
   Table1:
     Type: 'AWS::DynamoDB::Table'
     Properties:

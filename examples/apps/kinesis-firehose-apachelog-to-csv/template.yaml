@@ -3,12 +3,17 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: >-
   An Amazon Kinesis Firehose stream processor that converts input records from
   Apache Common Log format to CSV.
+Parameters: 
+  FunctionNameParameter: 
+    Type: String
+  TableNameParameter: 
+    Type: String
 Resources:
   kinesisfirehoseapachelogtocsv:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       CodeUri: .
       Description: >-
         An Amazon Kinesis Firehose stream processor that converts input records
@@ -16,27 +21,7 @@ Resources:
       MemorySize: 128
       Timeout: 3
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 'dynamodb:PutItem'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:dynamodb:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':table/*'
-            - Effect: Allow
-              Action:
-                - 'lambda:InvokeFunction'
-              Resource:
-                'Fn::Join':
-                  - ''
-                  - - 'arn:aws:lambda:'
-                    - Ref: 'AWS::Region'
-                    - ':'
-                    - Ref: 'AWS::AccountId'
-                    - ':function:*'
+        - LambdaInvokePolicy:
+            FunctionName: !Ref FunctionNameParameter
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableNameParameter

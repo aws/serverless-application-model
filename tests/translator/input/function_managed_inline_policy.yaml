@@ -1,3 +1,7 @@
+Parameters:
+  SomeManagedPolicyArn:
+    Type: String
+    Default: arn:aws:iam::aws:policy/OtherPolicy
 Resources:
   Function:
     Type: 'AWS::Serverless::Function'
@@ -19,4 +23,4 @@ Resources:
 
         # Intrinsic functions & custom policy ARNs must be supported
         - {"Ref": "SomeManagedPolicyArn"}
-        - arn:aws:1234:iam:policy/CustomerCreatedManagedPolicy
+        - arn:aws:iam::123456789012:policy/CustomerCreatedManagedPolicy

@@ -9,8 +9,9 @@ from samtranslator.model.exceptions import InvalidEventException
 class PullEventSource(ResourceMacro):
     """Base class for pull event sources for SAM Functions.
 
-    The pull events are Kinesis Streams, DynamoDB Streams, and SQS Queues. All of these correspond to an EventSourceMapping in
-    Lambda, and require that the execution role be given to Kinesis Streams, DynamoDB Streams, or SQS Queues, respectively.
+    The pull events are Kinesis Streams, DynamoDB Streams, and SQS Queues. All of these correspond to an
+    EventSourceMapping in Lambda, and require that the execution role be given to Kinesis Streams, DynamoDB
+    Streams, or SQS Queues, respectively.
 
     :cvar str policy_arn: The ARN of the AWS managed role policy corresponding to this pull event source
     """
@@ -19,7 +20,8 @@ class PullEventSource(ResourceMacro):
         'Stream': PropertyType(False, is_str()),
         'Queue': PropertyType(False, is_str()),
         'BatchSize': PropertyType(False, is_type(int)),
-        'StartingPosition': PropertyType(False, is_str())
+        'StartingPosition': PropertyType(False, is_str()),
+        'Enabled': PropertyType(False, is_type(bool))
     }
 
     def get_policy_arn(self):
@@ -52,7 +54,7 @@ class PullEventSource(ResourceMacro):
         if not self.Stream and not self.Queue:
             raise InvalidEventException(
                 self.relative_id, "No Queue (for SQS) or Stream (for Kinesis or DynamoDB) provided.")
-        
+
         if self.Stream and not self.StartingPosition:
             raise InvalidEventException(
                 self.relative_id, "StartingPosition is required for Kinesis and DynamoDB.")
@@ -61,6 +63,9 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition
         lambda_eventsourcemapping.BatchSize = self.BatchSize
+        lambda_eventsourcemapping.Enabled = self.Enabled
+        if 'Condition' in function.resource_attributes:
+            lambda_eventsourcemapping.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 
         if 'role' in kwargs:
             self._link_policy(kwargs['role'])

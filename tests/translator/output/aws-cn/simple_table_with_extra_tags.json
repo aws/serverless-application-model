@@ -1,12 +1,15 @@
 {
+  "Parameters": {
+    "TagValueParam": {
+      "Default": "value",
+      "Type": "String"
+    }
+  },
   "Resources": {
     "MinimalTableWithTags": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": 5,
-          "ReadCapacityUnits": 5
-        },
+        "BillingMode": "PAY_PER_REQUEST",
         "AttributeDefinitions": [
           {
             "AttributeName": "id",
@@ -35,7 +38,7 @@
             "Key": "TagKey3"
           },
           {
-            "Value": 123,
+            "Value": "123",
             "Key": "TagKey4"
           }
         ]

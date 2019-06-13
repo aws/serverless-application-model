@@ -1,0 +1,28 @@
+Resources:
+  NoAccess:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: no-access
+        SemanticVersion: 1.0.0
+
+  NonExistent:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: non-existent
+        SemanticVersion: 1.0.0
+
+  InvalidSemver:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: invalid-semver
+        SemanticVersion: 1.0.0
+  
+  ExpiredApplication:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: expired
+        SemanticVersion: 1.0.0

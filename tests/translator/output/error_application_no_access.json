@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [InvalidSemver] is invalid. Cannot access application: invalid-semver. Resource with id [NoAccess] is invalid. Cannot access application: no-access. Resource with id [NonExistent] is invalid. Cannot access application: non-existent."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 3. Resource with id [InvalidSemver] is invalid. Cannot access application: invalid-semver. Resource with id [NoAccess] is invalid. Cannot access application: no-access. Resource with id [NonExistent] is invalid. Cannot access application: non-existent."
+}

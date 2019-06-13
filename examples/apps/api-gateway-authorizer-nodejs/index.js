@@ -312,7 +312,8 @@ AuthPolicy.prototype = (function AuthPolicyClass() {
 
 
 exports.handler = (event, context, callback) => {
-    console.log('Client token:', event.authorizationToken);
+    // incoming token value
+    var token = event.authorizationToken;
     console.log('Method ARN:', event.methodArn);
 
     // validate the incoming token

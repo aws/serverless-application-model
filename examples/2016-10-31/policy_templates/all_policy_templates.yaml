@@ -40,6 +40,8 @@ Resources:
 
         - CloudFormationDescribeStacksPolicy: {}
 
+        - RekognitionDetectOnlyPolicy: {}
+
         - RekognitionNoDataAccessPolicy:
             CollectionId: id
 
@@ -78,4 +80,13 @@ Resources:
         - KMSDecryptPolicy:
             KeyId: keyId
 
+        - SESBulkTemplatedCrudPolicy:
+            IdentityName: name
 
+        - SESEmailTemplateCrudPolicy: {}
+
+        - FilterLogEventsPolicy:
+            LogGroupName: name
+
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: name

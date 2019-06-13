@@ -1,0 +1,38 @@
+Conditions:
+  TestCondition:
+    Fn::Equals:
+      - beta
+      - beta
+
+Resources:
+  MinimalLayer:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+
+  LayerWithContentUriObject:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri:
+        Bucket: somebucket
+        Key: somekey
+        Version: "v1"
+      RetentionPolicy: Delete
+
+  CompleteLayer:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      LayerName: MyAwesomeLayer
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      Description: Starter Lambda Layer
+      CompatibleRuntimes:
+        - python3.6
+        - python2.7
+      LicenseInfo: "License information"
+      RetentionPolicy: Retain
+
+  LayerWithCondition:
+    Type: 'AWS::Serverless::LayerVersion'
+    Condition: TestCondition    
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip  
