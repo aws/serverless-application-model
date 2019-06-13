@@ -1,8 +1,0 @@
-{
-  "name": "cloudfront-read-request-body",
-  "version": "1.0.0",
-  "description": "Sample for accessing request body in origin-request and viewer-request trigger implemented in NodeJS.",
-  "main": "index.js",
-  "repository": "https://github.com/awslabs/serverless-application-model/tree/master/examples/apps/cloudfront-read-request-body",
-  "author": "AWS"
-}
