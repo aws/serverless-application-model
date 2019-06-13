@@ -1,17 +1,22 @@
 # Help resolve intrinsic functions
 
-from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
+from samtranslator.intrinsics.actions import Action, SubAction, RefAction, \
+    GetAttAction, IfAction
 
 # All intrinsics are supported by default
-DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
+DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in
+                                [RefAction, SubAction, GetAttAction, IfAction]}
 
 
 class IntrinsicsResolver(object):
 
-    def __init__(self, parameters, supported_intrinsics=DEFAULT_SUPPORTED_INTRINSICS):
+    def __init__(self, parameters,
+                 supported_intrinsics=DEFAULT_SUPPORTED_INTRINSICS,
+                 conditions={}):
         """
         Instantiate the resolver
         :param dict parameters: Map of parameter names to their values
+        :param dict conditions: Map of condition names to their values
         :param dict supported_intrinsics: Dictionary of intrinsic functions this class supports along with the
             Action class that can process this intrinsic
         :raises TypeError: If parameters or the supported_intrinsics arguments are invalid
@@ -20,12 +25,16 @@ class IntrinsicsResolver(object):
         if parameters is None or not isinstance(parameters, dict):
             raise TypeError("parameters must be a valid dictionary")
 
+        if conditions is None or not isinstance(conditions, dict):
+            raise TypeError("parameters must be a valid dictionary")
+
         if not isinstance(supported_intrinsics, dict) \
                 or not all([isinstance(value, Action) for value in supported_intrinsics.values()]):
             raise TypeError("supported_intrinsics argument must be intrinsic names to corresponding Action classes")
 
         self.supported_intrinsics = supported_intrinsics
         self.parameters = parameters
+        self.conditions = conditions
 
     def resolve_parameter_refs(self, input):
         """
@@ -39,6 +48,19 @@ class IntrinsicsResolver(object):
         :return: A copy of a dictionary with parameter references replaced by actual value.
         """
         return self._traverse(input, self.parameters, self._try_resolve_parameter_refs)
+
+    def resolve_condition_refs(self, input):
+        """
+        Resolves references to parameters within the given dictionary recursively. Other intrinsic functions such as
+        !GetAtt, !Sub or !Ref to non-parameters will be left untouched.
+
+        Result is a dictionary where parameter values are inlined. Don't pass this dictionary directly into
+        transform's output because it changes the template structure by inlining parameter values.
+
+        :param input: Any primitive type (dict, array, string etc) whose values might contain intrinsic functions
+        :return: A copy of a dictionary with parameter references replaced by actual value.
+        """
+        return self._traverse(input, self.conditions, self._try_resolve_condition_refs)
 
     def resolve_sam_resource_refs(self, input, supported_resource_refs):
         """
@@ -175,6 +197,23 @@ class IntrinsicsResolver(object):
 
         function_type = list(input.keys())[0]
         return self.supported_intrinsics[function_type].resolve_parameter_refs(input, parameters)
+
+    def _try_resolve_condition_refs(self, input, conditions):
+        """
+        Try to resolve conditions references on the given input object. The object could be of any type.
+        If the input is not in the format used by intrinsics (ie. dictionary with one key), input is returned
+        unmodified. If the single key in dictionary is one of the supported intrinsic function types,
+        go ahead and try to resolve it.
+
+        :param input: Input object to resolve
+        :param parameters: Condition values used to for ref substitution
+        :return:
+        """
+        if not self._is_intrinsic_dict(input):
+            return input
+
+        function_type = list(input.keys())[0]
+        return self.supported_intrinsics[function_type].resolve_condition_refs(input, conditions)
 
     def _try_resolve_sam_resource_refs(self, input, supported_resource_refs):
         """
