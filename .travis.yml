@@ -1,9 +1,13 @@
 # Enable container based builds
 sudo: false
+dist: xenial   # required for Python >= 3.7
 language: python
 
 matrix:
   include:
+    - python: 3.7
+      env:
+        - TOXENV=py37
     - python: 3.6
       env:
         - TOXENV=py36
@@ -21,17 +25,3 @@ install:
 script:
 # Runs unit tests
 - tox
-
-# Build docs pages only from master branch
-- if [ "$TRAVIS_BRANCH" = "master" ]; then make build-docs; fi
-
-deploy:
-# Deploy the docs to Github Pages *only* from master branch
-- provider: pages
-  skip_cleanup: true
-  local_dir: docs/website/_build/html
-  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
-  keep-history: true
-  on:
-      branch: master
-

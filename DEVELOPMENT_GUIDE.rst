@@ -17,10 +17,8 @@ steps manually.
 
 1. Install Python Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Python 2.7 is our officially supported Python version. We have a future goal to support to Python3.6 but the code base
-currently does not work with Python3. To make future migration easier, any new code we write must be compatible with
-Python3. Follow the idioms from this `excellent cheatsheet`_ to make sure your code is compatible with both Python
-versions.
+Our officially supported Python versions are 2.7, 3.6, and 3.7. Follow the idioms from this `excellent cheatsheet`_ to
+make sure your code is compatible with both Python 2.7 and 3 versions.
 
 Setup Python locally using `pyenv`_
 

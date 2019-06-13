@@ -17,6 +17,7 @@ class SwaggerEditor(object):
 
     _OPTIONS_METHOD = "options"
     _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
+    _X_APIGW_BINARY_MEDIA_TYPES = 'x-amazon-apigateway-binary-media-types'
     _CONDITIONAL_IF = "Fn::If"
     _X_APIGW_GATEWAY_RESPONSES = 'x-amazon-apigateway-gateway-responses'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
@@ -253,6 +254,9 @@ class SwaggerEditor(object):
                                                                                            allowed_methods,
                                                                                            max_age,
                                                                                            allow_credentials)
+
+    def add_binary_media_types(self, binary_media_types):
+        self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = binary_media_types
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
                                           max_age=None, allow_credentials=None):
