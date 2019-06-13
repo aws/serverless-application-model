@@ -1,68 +1,13 @@
 {
   "Resources": {
-    "ApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+    "ServerlessApiDeploymente70e322247": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "ApiFunction"
+        "RestApiId": {
+          "Ref": "ServerlessApi"
         }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "Prod", 
-              "__ApiId__": {
-                "Ref": "ServerlessApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "ApiFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "ApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "ApiFunction": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Handler": "index.gethtml", 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "member_portal.zip"
-        }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "ApiFunctionRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "nodejs4.3", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        "Description": "RestApi deployment id: e70e322247bd7d33ec444c4732e7f532a222d44e", 
+        "StageName": "Stage"
       }
     }, 
     "ServerlessApi": {
@@ -178,29 +123,6 @@
         }
       }
     }, 
-    "ServerlessApiMyLambdaRequestAuthAuthorizerPermission": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "MyAuthFn", 
-            "Arn"
-          ]
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
     "ApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -223,18 +145,6 @@
             }
           ]
         }
-      }
-    }, 
-    "ServerlessApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessApiDeploymente70e322247"
-        }, 
-        "RestApiId": {
-          "Ref": "ServerlessApi"
-        }, 
-        "StageName": "Prod"
       }
     }, 
     "ApiFunctionPostHtmlPermissionTest": {
@@ -279,14 +189,151 @@
         }
       }
     }, 
-    "ServerlessApiDeploymente70e322247": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ServerlessApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessApiDeploymente70e322247"
+        }, 
         "RestApiId": {
           "Ref": "ServerlessApi"
         }, 
-        "Description": "RestApi deployment id: e70e322247bd7d33ec444c4732e7f532a222d44e", 
-        "StageName": "Stage"
+        "StageName": "Prod"
+      }
+    }, 
+    "ApiFunctionGetHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ApiFunctionGetHtmlPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ApiFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs4.3", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyAuthFn": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyAuthFnRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyAuthFnRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ServerlessApiMyLambdaRequestAuthAuthorizerPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyAuthFn", 
+            "Arn"
+          ]
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessApi"
+              }
+            }
+          ]
+        }
       }
     }
   }
