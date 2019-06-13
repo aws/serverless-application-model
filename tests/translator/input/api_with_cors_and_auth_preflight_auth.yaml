@@ -38,3 +38,10 @@ Resources:
             Identity:
               Headers:
                 - Authorization1
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
