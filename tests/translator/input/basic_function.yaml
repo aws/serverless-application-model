@@ -1,3 +1,10 @@
+Parameters:
+  SomeParameter:
+    Type: String
+    Default: param
+  SomeOtherParameter:
+    Type: String
+    Default: otherparam
 Resources:
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
@@ -28,7 +35,7 @@ Resources:
       CodeUri:
         Bucket: somebucket
         Key: somekey
-        Version: 1
+        Version: "1"
       Handler: hello.handler
       Runtime: python2.7
 
@@ -47,7 +54,6 @@ Resources:
         SubnetIds:
         - subnet-9d4a7b6c
         - subnet-65ea5f08
-        SubnetIdsUsingRef:
         - {Ref: SomeParameter}
         - {Ref: SomeOtherParameter}
       Role: arn:aws:iam::012345678901:role/lambda_basic_execution

@@ -1,4 +1,4 @@
-""" SAM macro definitions """
+﻿""" SAM macro definitions """
 from six import string_types
 
 import samtranslator.model.eventsources
@@ -53,7 +53,8 @@ class SamFunction(SamResourceMacro):
         'Layers': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
 
         # Intrinsic functions in value of Alias property are not supported, yet
-        'AutoPublishAlias': PropertyType(False, one_of(is_str()))
+        'AutoPublishAlias': PropertyType(False, one_of(is_str())),
+        'VersionDescription': PropertyType(False, is_str())
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.eventsources, samtranslator.model.eventsources.pull,
                                           samtranslator.model.eventsources.push,
@@ -264,8 +265,11 @@ class SamFunction(SamResourceMacro):
         event_resources = {}
         if self.Events:
             for logical_id, event_dict in self.Events.items():
-                event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
-                    self.logical_id + logical_id, event_dict, logical_id)
+                try:
+                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        self.logical_id + logical_id, event_dict, logical_id)
+                except (TypeError, AttributeError) as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 
@@ -286,8 +290,11 @@ class SamFunction(SamResourceMacro):
         resources = []
         if self.Events:
             for logical_id, event_dict in self.Events.items():
-                eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
-                    lambda_function.logical_id + logical_id, event_dict, logical_id)
+                try:
+                    eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        lambda_function.logical_id + logical_id, event_dict, logical_id)
+                except TypeError as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
 
                 kwargs = {
                     # When Alias is provided, connect all event sources to the alias and *not* the function
@@ -359,6 +366,7 @@ class SamFunction(SamResourceMacro):
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr('name')
+        lambda_version.Description = self.VersionDescription
 
         return lambda_version
 
@@ -373,7 +381,7 @@ class SamFunction(SamResourceMacro):
         """
 
         if not name:
-            raise ValueError("Alias name is required to create an alias")
+            raise InvalidResourceException(self.logical_id, "Alias name is required to create an alias")
 
         logical_id = "{id}Alias{suffix}".format(id=function.logical_id, suffix=name)
         alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())
@@ -434,9 +442,11 @@ class SamApi(SamResourceMacro):
         'MinimumCompressionSize': PropertyType(False, is_type(int)),
         'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
         'Auth': PropertyType(False, is_type(dict)),
+        'GatewayResponses': PropertyType(False, is_type(dict)),
         'AccessLogSetting': PropertyType(False, is_type(dict)),
         'CanarySetting': PropertyType(False, is_type(dict)),
-        'TracingEnabled': PropertyType(False, is_type(bool))
+        'TracingEnabled': PropertyType(False, is_type(bool)),
+        'OpenApiVersion': PropertyType(False, is_str())
     }
 
     referable_properties = {
@@ -469,9 +479,13 @@ class SamApi(SamResourceMacro):
                                      minimum_compression_size=self.MinimumCompressionSize,
                                      cors=self.Cors,
                                      auth=self.Auth,
+                                     gateway_responses=self.GatewayResponses,
                                      access_log_setting=self.AccessLogSetting,
                                      canary_setting=self.CanarySetting,
-                                     tracing_enabled=self.TracingEnabled)
+                                     tracing_enabled=self.TracingEnabled,
+                                     resource_attributes=self.resource_attributes,
+                                     passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+                                     open_api_version=self.OpenApiVersion)
 
         rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
 
@@ -557,7 +571,7 @@ class SamApplication(SamResourceMacro):
         'Location': PropertyType(True, one_of(is_str(), is_type(dict))),
         'TemplateUrl': PropertyType(False, is_str()),
         'Parameters': PropertyType(False, is_type(dict)),
-        'NotificationArns': PropertyType(False, list_of(is_str())),
+        'NotificationARNs': PropertyType(False, list_of(is_str())),
         'Tags': PropertyType(False, is_type(dict)),
         'TimeoutInMinutes': PropertyType(False, is_type(int))
     }
@@ -574,7 +588,7 @@ class SamApplication(SamResourceMacro):
         nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on,
                                    attributes=self.get_passthrough_resource_attributes())
         nested_stack.Parameters = self.Parameters
-        nested_stack.NotificationArns = self.NotificationArns
+        nested_stack.NotificationARNs = self.NotificationARNs
         application_tags = self._get_application_tags()
         nested_stack.Tags = self._construct_tag_list(self.Tags, application_tags)
         nested_stack.TimeoutInMinutes = self.TimeoutInMinutes

@@ -6,4 +6,5 @@ Resources:
       Handler: hello.handler
       Runtime: python2.7
       AutoPublishAlias: live
+      VersionDescription: sam-testing
 

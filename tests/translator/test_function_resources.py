@@ -470,7 +470,7 @@ class TestVersionsAndAliases(TestCase):
 
 
     def test_alias_creation_error(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidResourceException):
             self.sam_func._construct_alias(None, self.lambda_func, self.lambda_version)
 
     def test_get_resolved_alias_name_must_work(self):
@@ -514,7 +514,6 @@ class TestVersionsAndAliases(TestCase):
 
         ex = raises_assert.exception
         self.assertEqual(expected_exception_msg, ex.message)
-
 
     def _make_lambda_function(self, logical_id):
         func = LambdaFunction(logical_id)

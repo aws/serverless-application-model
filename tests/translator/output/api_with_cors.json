@@ -3,11 +3,11 @@
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "index.gethtml", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "member_portal.zip"
         }, 
-        "Handler": "index.gethtml", 
         "Role": {
           "Fn::GetAtt": [
             "ImplicitApiFunctionRole", 
@@ -89,40 +89,6 @@
         }
       }
     }, 
-    "ServerlessRestApiDeploymente13d39e2d1": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: e13d39e2d16b8aad18f87490157d347817fa3071", 
-        "StageName": "Stage"
-      }
-    }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment3a5a78688c"
-        }, 
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymente13d39e2d1"
-        }, 
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -158,9 +124,9 @@
                         "application/json": "{}\n"
                       }, 
                       "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Headers": "headers", 
                         "method.response.header.Access-Control-Allow-Origin": "origins", 
                         "method.response.header.Access-Control-Allow-Methods": "methods", 
-                        "method.response.header.Access-Control-Allow-Headers": "headers",
                         "method.response.header.Access-Control-Allow-Credentials": "'true'"
                       }
                     }
@@ -181,7 +147,7 @@
                       }, 
                       "Access-Control-Allow-Methods": {
                         "type": "string"
-                      },
+                      }, 
                       "Access-Control-Allow-Credentials": {
                         "type": "string"
                       }
@@ -208,9 +174,9 @@
                         "application/json": "{}\n"
                       }, 
                       "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Headers": "headers", 
                         "method.response.header.Access-Control-Allow-Origin": "origins", 
                         "method.response.header.Access-Control-Allow-Methods": "methods", 
-                        "method.response.header.Access-Control-Allow-Headers": "headers",
                         "method.response.header.Access-Control-Allow-Credentials": "'true'"
                       }
                     }
@@ -231,7 +197,7 @@
                       }, 
                       "Access-Control-Allow-Methods": {
                         "type": "string"
-                      },
+                      }, 
                       "Access-Control-Allow-Credentials": {
                         "type": "string"
                       }
@@ -256,6 +222,76 @@
             }
           }, 
           "swagger": "2.0"
+        }
+      }
+    }, 
+    "GetHtmlFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymente13d39e2d1"
+        }, 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ServerlessRestApiDeploymente13d39e2d1": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: e13d39e2d16b8aad18f87490157d347817fa3071", 
+        "StageName": "Stage"
+      }
+    }, 
+    "RestApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
         }
       }
     }, 
@@ -286,8 +322,43 @@
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 3a5a78688c9bc377d53aa4153a11f0c4f6e7364c",
+        "Description": "RestApi deployment id: 3a5a78688c9bc377d53aa4153a11f0c4f6e7364c", 
         "StageName": "Stage"
+      }
+    }, 
+    "RestApiFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "RestApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment3a5a78688c"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
       }
     }, 
     "ServerlessRestApi": {
@@ -424,6 +495,29 @@
           }, 
           "swagger": "2.0"
         }
+      }
+    }, 
+    "GetHtmlFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "GetHtmlFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "ImplicitApiFunctionAnyApiPermissionTest": {

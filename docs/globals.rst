@@ -68,10 +68,12 @@ Currently, the following resources and properties are being supported:
       AutoPublishAlias:
       DeploymentPreference:
       PermissionsBoundary:
+      ReservedConcurrentExecutions:
 
     Api:
       # Properties of AWS::Serverless::Api
       # Also works with Implicit APIs
+      Auth:
       Name:
       DefinitionUri:
       CacheClusterEnabled:
@@ -82,13 +84,15 @@ Currently, the following resources and properties are being supported:
       BinaryMediaTypes:
       MinimumCompressionSize:
       Cors:
+      GatewayResponses:
       AccessLogSetting:
       CanarySetting:
       TracingEnabled:
+      OpenApiVersion:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable
-      SSESpecification
+      SSESpecification:
 
 Implicit APIs
 ~~~~~~~~~~~~~

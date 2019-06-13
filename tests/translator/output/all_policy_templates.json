@@ -212,7 +212,7 @@
                   ],
                   "Resource": {
                     "Fn::Sub": [
-                      "arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain/${domainName}",
+                      "arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:domain/${domainName}/*",
                       {
                         "domainName": "name"
                       }
@@ -725,9 +725,11 @@
                   "Action": [
                     "serverlessrepo:CreateApplication",
                     "serverlessrepo:CreateApplicationVersion",
+                    "serverlessrepo:UpdateApplication",
                     "serverlessrepo:GetApplication",
                     "serverlessrepo:ListApplications",
-                    "serverlessrepo:ListApplicationVersions"
+                    "serverlessrepo:ListApplicationVersions",
+                    "serverlessrepo:ListApplicationDependencies"
                   ],
                   "Resource": [
                     {
@@ -1207,6 +1209,27 @@
                       "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
                       {
                         "parameterName": "name"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy49",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StartExecution"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                      {
+                        "stateMachineName": "name"
                       }
                     ]
                   }

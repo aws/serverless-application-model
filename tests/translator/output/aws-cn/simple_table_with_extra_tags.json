@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "TagValueParam": {
+      "Default": "value",
+      "Type": "String"
+    }
+  },
   "Resources": {
     "MinimalTableWithTags": {
       "Type": "AWS::DynamoDB::Table",
@@ -32,7 +38,7 @@
             "Key": "TagKey3"
           },
           {
-            "Value": 123,
+            "Value": "123",
             "Key": "TagKey4"
           }
         ]

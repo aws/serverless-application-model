@@ -1,0 +1,6 @@
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: node6.10
+  NotADit:

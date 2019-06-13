@@ -23,9 +23,12 @@ Resources:
             Method: GET
 
 Outputs:
-  ImplicitApiDeployment: !Ref ServerlessRestApi.Deployment
-  ImplicitApiStage: !Ref ServerlessRestApi.Stage
-
-  ExplicitApiDeployment: !Ref MyApi.Deployment
-  ExplicitApiStage: !Ref MyApi.Stage
+  ImplicitApiDeployment:
+    Value: !Ref ServerlessRestApi.Deployment
+  ImplicitApiStage:
+    Value: !Ref ServerlessRestApi.Stage
+  ExplicitApiDeployment:
+    Value: !Ref MyApi.Deployment
+  ExplicitApiStage:
+    Value: !Ref MyApi.Stage
 

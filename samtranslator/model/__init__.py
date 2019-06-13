@@ -96,7 +96,7 @@ class Resource(object):
             translator
         :returns: a Resource object populated from the provided parameters
         :rtype: Resource
-        :raises TypeError: if the provided parmeters are invalid
+        :raises TypeError: if the provided parameters are invalid
         """
 
         resource = cls(logical_id, relative_id=relative_id)
@@ -434,7 +434,8 @@ class SamResourceMacro(ResourceMacro):
         if not parameter_value:
             return parameter_value
         value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
-        if not isinstance(value, string_types):
+
+        if not isinstance(value, string_types) and not isinstance(value, dict):
             raise InvalidResourceException(self.logical_id,
                                            "Could not resolve parameter for '{}' or parameter is not a String."
                                            .format(parameter_name))
@@ -473,8 +474,8 @@ class ResourceTypeResolver(object):
         :rtype: class
         """
         if not self.can_resolve(resource_dict):
-            raise TypeError("Resource dict has missing or invalid value for key Type. Resource Dict is: " +
-                            str(resource_dict))
+            raise TypeError("Resource dict has missing or invalid value for key Type. Event Type is: {}.".format(
+                    resource_dict.get('Type')))
         if resource_dict['Type'] not in self.resource_types:
             raise TypeError("Invalid resource type {resource_type}".format(resource_type=resource_dict['Type']))
         return self.resource_types[resource_dict['Type']]

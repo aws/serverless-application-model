@@ -5,6 +5,7 @@ from mock import Mock
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.model.exceptions import InvalidDocumentException
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
@@ -21,6 +22,44 @@ class TestSwaggerEditor_init(TestCase):
     def test_must_succeed_on_valid_swagger(self):
         valid_swagger = {
             "swagger": "2.0",
+            "paths": {
+                "/foo": {},
+                "/bar": {}
+            }
+        }
+
+        editor = SwaggerEditor(valid_swagger)
+        self.assertIsNotNone(editor)
+
+        self.assertEqual(editor.paths, {"/foo": {}, "/bar": {}})
+
+    def test_must_fail_on_invalid_openapi_version(self):
+        invalid_swagger = {
+            "openapi": "2.3.0",
+            "paths": {
+                "/foo": {},
+                "/bar": {}
+            }
+        }
+
+        with self.assertRaises(ValueError):
+            SwaggerEditor(invalid_swagger)
+
+    def test_must_fail_on_invalid_openapi_version_2(self):
+        invalid_swagger = {
+            "openapi": "3.1.1.1",
+            "paths": {
+                "/foo": {},
+                "/bar": {}
+            }
+        }
+
+        with self.assertRaises(ValueError):
+            SwaggerEditor(invalid_swagger)
+
+    def test_must_succeed_on_valid_openapi3(self):
+        valid_swagger = {
+            "openapi": "3.0.1",
             "paths": {
                 "/foo": {},
                 "/bar": {}
@@ -104,6 +143,28 @@ class TestSwaggerEditor_has_integration(TestCase):
                             "a": "b"
                         }
                     },
+                    "post": {
+                        "Fn::If": [
+                            "Condition",
+                            {
+                                _X_INTEGRATION: {
+                                    "a": "b"
+                                }
+                            },
+                            {"Ref": "AWS::NoValue"}
+                        ]
+                    },
+                    "delete": {
+                        "Fn::If": [
+                            "Condition",
+                            {"Ref": "AWS::NoValue"},
+                            {
+                                _X_INTEGRATION: {
+                                    "a": "b"
+                                }
+                            }
+                        ]
+                    },
                     "somemethod": {
                         "foo": "value",
                     },
@@ -119,6 +180,12 @@ class TestSwaggerEditor_has_integration(TestCase):
 
     def test_must_find_integration(self):
         self.assertTrue(self.editor.has_integration("/foo", "get"))
+
+    def test_must_find_integration_with_condition(self):
+        self.assertTrue(self.editor.has_integration("/foo", "post"))
+
+    def test_must_find_integration_with_condition2(self):
+        self.assertTrue(self.editor.has_integration("/foo", "delete"))
 
     def test_must_not_find_integration(self):
         self.assertFalse(self.editor.has_integration("/foo", "somemethod"))
@@ -165,7 +232,7 @@ class TestSwaggerEditor_add_path(TestCase):
         path = "/badpath"
         method = "get"
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_path(path, method)
 
     def test_must_skip_existing_path(self):
@@ -229,6 +296,42 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
         actual = self.editor.swagger["paths"][path][method]
         self.assertEqual(expected, actual)
 
+    def test_must_add_new_integration_with_conditions_to_new_path(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        condition = "condition"
+        expected = {
+            "Fn::If": [
+                "condition",
+                {
+                    "responses": {},
+                    _X_INTEGRATION: {
+                        "type": "aws_proxy",
+                        "httpMethod": "POST",
+                        "uri": {
+                            "Fn::If": [
+                                "condition",
+                                integration_uri,
+                                {
+                                    "Ref": "AWS::NoValue"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "Ref": "AWS::NoValue"
+                }
+            ]
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, condition=condition)
+
+        self.assertTrue(self.editor.has_path(path, method))
+        actual = self.editor.swagger["paths"][path][method]
+        self.assertEqual(expected, actual)
+
     def test_must_add_new_integration_to_existing_path(self):
         path = "/foo"
         method = "post"
@@ -262,6 +365,37 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
 
         with self.assertRaises(ValueError):
             self.editor.add_lambda_integration("/bar", "get", "integrationUri")
+
+    def test_must_add_credentials_to_the_integration(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        expected = 'arn:aws:iam::*:user/*'
+        api_auth_config = {
+          "DefaultAuthorizer": "AWS_IAM",
+          "InvokeRole": "CALLER_CREDENTIALS"
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, None, api_auth_config)
+        actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]['credentials']
+        self.assertEqual(expected, actual)
+
+    def test_must_add_credentials_to_the_integration_overrides(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        expected = 'arn:aws:iam::*:role/xxxxxx'
+        api_auth_config = {
+          "DefaultAuthorizer": "MyAuth",
+        }
+        method_auth_config = {
+          "Authorizer": "AWS_IAM",
+          "InvokeRole": "arn:aws:iam::*:role/xxxxxx"
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri, method_auth_config, api_auth_config)
+        actual = self.editor.swagger["paths"][path][method][_X_INTEGRATION]['credentials']
+        self.assertEqual(expected, actual)
 
 
 class TestSwaggerEditor_iter_on_path(TestCase):
@@ -335,7 +469,7 @@ class TestSwaggerEditor_add_cors(TestCase):
     def test_must_fail_with_bad_values_for_path(self):
         path = "/bad"
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_cors(path, "origins", "headers", "methods")
 
     def test_must_fail_for_invalid_allowed_origin(self):

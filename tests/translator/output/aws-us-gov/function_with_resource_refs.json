@@ -1,50 +1,64 @@
 {
   "Outputs": {
     "AliasArn": {
-      "Ref": "MinimalFunctionAliaslive"
+      "Value": {
+        "Ref": "MinimalFunctionAliaslive"
+      }
     }, 
     "VersionArn": {
-      "Ref": "MinimalFunctionVersion640128d35d"
+      "Value": {
+        "Ref": "MinimalFunctionVersion640128d35d"
+      }
     }, 
     "VersionNumber": {
-      "Fn::GetAtt": [
-        "MinimalFunctionVersion640128d35d", 
-        "Version"
-      ]
+      "Value": {
+        "Fn::GetAtt": [
+          "MinimalFunctionVersion640128d35d", 
+          "Version"
+        ]
+      }
     }, 
     "AliasName": {
-      "Fn::GetAtt": [
-        "MinimalFunctionAliaslive", 
-        "Name"
-      ]
+      "Value": {
+        "Fn::GetAtt": [
+          "MinimalFunctionAliaslive", 
+          "Name"
+        ]
+      }
     }, 
     "UnResolvedVersion": {
-      "Ref": "FunctionWithoutAlias.Version"
+      "Value": {
+        "Ref": "FunctionWithoutAlias.Version"
+      }
     }, 
     "AliasInSub": {
-      "Fn::Sub": [
-        "Hello ${MinimalFunctionAliaslive} ${MinimalFunctionAliaslive.Name} ${SomeValue}", 
-        {
-          "SomeValue": "World"
-        }
-      ]
+      "Value": {
+        "Fn::Sub": [
+          "Hello ${MinimalFunctionAliaslive} ${MinimalFunctionAliaslive.Name} ${SomeValue}", 
+          {
+            "SomeValue": "World"
+          }
+        ]
+      }
     }, 
     "MustNotResolve": {
-      "Fn::GetAtt": [
-        "FunctionWithoutAlias", 
-        "Alias.Name"
-      ]
+      "Value": {
+        "Fn::GetAtt": [
+          "FunctionWithoutAlias", 
+          "Alias.Name"
+        ]
+      }
     }
   }, 
   "Resources": {
     "FunctionWithoutAlias": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
           "Fn::GetAtt": [
             "FunctionWithoutAliasRole", 
@@ -87,11 +101,11 @@
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
           "Fn::GetAtt": [
             "MinimalFunctionRole", 

@@ -1,0 +1,36 @@
+{
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionId": "EXAMPLE"
+        },
+        "request": {
+          "uri": "/experiment-pixel.jpg",
+          "method": "GET",
+          "clientIp": "2001:cdba::3257:9652",
+          "headers": {
+            "user-agent": [
+              {
+                "key": "User-Agent",
+                "value": "Test Agent"
+              }
+            ],
+            "host": [
+              {
+                "key": "Host",
+                "value": "d123.cf.net"
+              }
+            ],
+            "cookie": [
+              {
+                "key": "Cookie",
+                "value": "SomeCookie=1; AnotherOne=A;"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

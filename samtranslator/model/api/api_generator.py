@@ -1,9 +1,11 @@
 from collections import namedtuple
 from six import string_types
+import re
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
-                                            ApiGatewayStage, ApiGatewayAuthorizer)
+                                            ApiGatewayStage, ApiGatewayAuthorizer,
+                                            ApiGatewayResponse)
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
@@ -18,8 +20,10 @@ CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", 
 # Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
-AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
-AuthProperties.__new__.__defaults__ = (None, None)
+AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer", "InvokeRole"])
+AuthProperties.__new__.__defaults__ = (None, None, None)
+
+GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
 
 class ApiGenerator(object):
@@ -27,8 +31,9 @@ class ApiGenerator(object):
     def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on,
                  definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
-                 auth=None, access_log_setting=None, canary_setting=None, tracing_enabled=None,
-                 resource_attributes=None, passthrough_resource_attributes=None):
+                 auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
+                 tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
+                 open_api_version=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -43,6 +48,8 @@ class ApiGenerator(object):
         :param access_log_setting: Whether to send access logs and where for Stage
         :param canary_setting: Canary Setting for Stage
         :param tracing_enabled: Whether active tracing with X-ray is enabled
+        :param resource_attributes: Resource attributes to add to API resources
+        :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
@@ -59,9 +66,13 @@ class ApiGenerator(object):
         self.minimum_compression_size = minimum_compression_size
         self.cors = cors
         self.auth = auth
+        self.gateway_responses = gateway_responses
         self.access_log_setting = access_log_setting
         self.canary_setting = canary_setting
         self.tracing_enabled = tracing_enabled
+        self.resource_attributes = resource_attributes
+        self.passthrough_resource_attributes = passthrough_resource_attributes
+        self.open_api_version = open_api_version
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -69,7 +80,9 @@ class ApiGenerator(object):
         :returns: the RestApi to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayRestApi
         """
-        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on)
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
+        # NOTE: For backwards compatibility we need to retain BinaryMediaTypes on the CloudFormation Property
+        # Removing this and only setting x-amazon-apigateway-binary-media-types results in other issues.
         rest_api.BinaryMediaTypes = self.binary_media
         rest_api.MinimumCompressionSize = self.minimum_compression_size
 
@@ -85,8 +98,15 @@ class ApiGenerator(object):
             raise InvalidResourceException(self.logical_id,
                                            "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both")
 
+        if self.open_api_version:
+            if re.match(SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version) is None:
+                raise InvalidResourceException(
+                    self.logical_id, "The OpenApiVersion value must be of the format 3.0.0")
+
         self._add_cors()
         self._add_auth()
+        self._add_gateway_responses()
+        self._add_binary_media_types()
 
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
@@ -128,16 +148,18 @@ class ApiGenerator(object):
             body_s3['Version'] = s3_pointer['Version']
         return body_s3
 
-    def _construct_deployment(self, rest_api):
+    def _construct_deployment(self, rest_api, open_api_version):
         """Constructs and returns the ApiGateway Deployment.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi for this Deployment
         :returns: the Deployment to which this SAM Api corresponds
         :rtype: model.apigateway.ApiGatewayDeployment
         """
-        deployment = ApiGatewayDeployment(self.logical_id + 'Deployment')
+        deployment = ApiGatewayDeployment(self.logical_id + 'Deployment',
+                                          attributes=self.passthrough_resource_attributes)
         deployment.RestApiId = rest_api.get_runtime_attr('rest_api_id')
-        deployment.StageName = 'Stage'
+        if not self.open_api_version:
+            deployment.StageName = 'Stage'
 
         return deployment
 
@@ -153,7 +175,8 @@ class ApiGenerator(object):
         # This will NOT create duplicates because we allow only ONE stage per API resource
         stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
 
-        stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage')
+        stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage',
+                                attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)
         stage.StageName = self.stage_name
@@ -178,7 +201,7 @@ class ApiGenerator(object):
         """
 
         rest_api = self._construct_rest_api()
-        deployment = self._construct_deployment(rest_api)
+        deployment = self._construct_deployment(rest_api, self.open_api_version)
 
         swagger = None
         if rest_api.Body is not None:
@@ -237,6 +260,24 @@ class ApiGenerator(object):
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
 
+    def _add_binary_media_types(self):
+        """
+        Add binary media types to Swagger
+        """
+
+        if not self.binary_media:
+            return
+
+        # We don't raise an error here like we do for similar cases because that would be backwards incompatible
+        if self.binary_media and not self.definition_body:
+            return
+
+        editor = SwaggerEditor(self.definition_body)
+        editor.add_binary_media_types(self.binary_media)
+
+        # Assign the Swagger back to template
+        self.definition_body = editor.swagger
+
     def _add_auth(self):
         """
         Add Auth configuration to the Swagger file, if necessary
@@ -260,25 +301,103 @@ class ApiGenerator(object):
                                                             "'DefinitionBody' does not contain a valid Swagger")
         swagger_editor = SwaggerEditor(self.definition_body)
         auth_properties = AuthProperties(**self.auth)
-        authorizers = self._get_authorizers(auth_properties.Authorizers)
+        authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)
 
         if authorizers:
             swagger_editor.add_authorizers(authorizers)
             self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer)
 
         # Assign the Swagger back to template
+
+        self.definition_body = self._openapi_auth_postprocess(swagger_editor.swagger)
+
+    def _openapi_auth_postprocess(self, definition_body):
+        """
+        Convert auth components to openapi 3 in definition body if OpenApiVersion flag is specified.
+
+        If there is swagger defined in the definition body, we treat it as a swagger spec and do not
+        make any openapi 3 changes to it.
+        """
+        if definition_body.get('swagger') is not None:
+            return definition_body
+
+        if definition_body.get('openapi') is not None:
+            if self.open_api_version is None:
+                self.open_api_version = definition_body.get('openapi')
+
+        if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
+            if definition_body.get('securityDefinitions'):
+                definition_body['components'] = {}
+                definition_body['components']['securitySchemes'] = definition_body['securityDefinitions']
+                del definition_body['securityDefinitions']
+        return definition_body
+
+    def _add_gateway_responses(self):
+        """
+        Add Gateway Response configuration to the Swagger file, if necessary
+        """
+
+        if not self.gateway_responses:
+            return
+
+        if self.gateway_responses and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "GatewayResponses works only with inline Swagger specified in "
+                                 "'DefinitionBody' property")
+
+        # Make sure keys in the dict are recognized
+        for responses_key, responses_value in self.gateway_responses.items():
+            for response_key in responses_value.keys():
+                if response_key not in GatewayResponseProperties:
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        "Invalid property '{}' in 'GatewayResponses' property '{}'".format(response_key, responses_key))
+
+        if not SwaggerEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
+                self.logical_id, "Unable to add Auth configuration because "
+                                 "'DefinitionBody' does not contain a valid Swagger")
+
+        swagger_editor = SwaggerEditor(self.definition_body)
+
+        gateway_responses = {}
+        for response_type, response in self.gateway_responses.items():
+            gateway_responses[response_type] = ApiGatewayResponse(
+                api_logical_id=self.logical_id,
+                response_parameters=response.get('ResponseParameters', {}),
+                response_templates=response.get('ResponseTemplates', {}),
+                status_code=response.get('StatusCode', None)
+            )
+
+        if gateway_responses:
+            swagger_editor.add_gateway_responses(gateway_responses)
+
+        # Assign the Swagger back to template
         self.definition_body = swagger_editor.swagger
 
-    def _get_authorizers(self, authorizers_config):
+    def _get_authorizers(self, authorizers_config, default_authorizer=None):
+        authorizers = {}
+        if default_authorizer == 'AWS_IAM':
+            authorizers[default_authorizer] = ApiGatewayAuthorizer(
+                api_logical_id=self.logical_id,
+                name=default_authorizer,
+                is_aws_iam_authorizer=True
+            )
+
         if not authorizers_config:
+            if 'AWS_IAM' in authorizers:
+                return authorizers
             return None
 
         if not isinstance(authorizers_config, dict):
             raise InvalidResourceException(self.logical_id,
                                            "Authorizers must be a dictionary")
-        authorizers = {}
 
         for authorizer_name, authorizer in authorizers_config.items():
+            if not isinstance(authorizer, dict):
+                raise InvalidResourceException(self.logical_id,
+                                               "Authorizer %s must be a dictionary." % (authorizer_name))
+
             authorizers[authorizer_name] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id,
                 name=authorizer_name,
@@ -288,7 +407,6 @@ class ApiGenerator(object):
                 function_payload_type=authorizer.get('FunctionPayloadType'),
                 function_invoke_role=authorizer.get('FunctionInvokeRole')
             )
-
         return authorizers
 
     def _get_permission(self, authorizer_name, authorizer_lambda_function_arn):
@@ -297,7 +415,7 @@ class ApiGenerator(object):
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on)
+        rest_api = ApiGatewayRestApi(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
         api_id = rest_api.get_runtime_attr('rest_api_id')
 
         partition = ArnGenerator.get_partition_name()
@@ -305,7 +423,8 @@ class ApiGenerator(object):
         source_arn = fnSub(ArnGenerator.generate_arn(partition=partition, service='execute-api', resource=resource),
                            {"__ApiId__": api_id})
 
-        lambda_permission = LambdaPermission(self.logical_id + authorizer_name + 'AuthorizerPermission')
+        lambda_permission = LambdaPermission(self.logical_id + authorizer_name + 'AuthorizerPermission',
+                                             attributes=self.passthrough_resource_attributes)
         lambda_permission.Action = 'lambda:invokeFunction'
         lambda_permission.FunctionName = authorizer_lambda_function_arn
         lambda_permission.Principal = 'apigateway.amazonaws.com'
@@ -339,7 +458,7 @@ class ApiGenerator(object):
         if not default_authorizer:
             return
 
-        if not authorizers.get(default_authorizer):
+        if not authorizers.get(default_authorizer) and default_authorizer != 'AWS_IAM':
             raise InvalidResourceException(self.logical_id, "Unable to set DefaultAuthorizer because '" +
                                            default_authorizer + "' was not defined in 'Authorizers'")
 

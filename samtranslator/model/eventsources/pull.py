@@ -64,6 +64,8 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition
         lambda_eventsourcemapping.BatchSize = self.BatchSize
         lambda_eventsourcemapping.Enabled = self.Enabled
+        if 'Condition' in function.resource_attributes:
+            lambda_eventsourcemapping.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 
         if 'role' in kwargs:
             self._link_policy(kwargs['role'])

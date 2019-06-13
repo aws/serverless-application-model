@@ -657,3 +657,175 @@ class TestGlobalsObject(TestCase):
         result = globals.merge(type, properties)
 
         self.assertEqual(expected, result)
+
+class TestGlobalsOpenApi(TestCase):
+    template = {
+        "Globals": {
+            "Api": {
+                "OpenApiVersion": "3.0"
+            }
+        }
+    }
+
+    table_driven = [
+        {
+            "name": "happy case",
+            "input": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "__MANAGE_SWAGGER": True,
+                            "OpenApiVersion": "3.0",
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            },
+            "expected": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "__MANAGE_SWAGGER": True,
+                            "OpenApiVersion": "3.0",
+                            "DefinitionBody": {
+                                "openapi": "3.0"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "no openapi",
+            "input": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            },
+            "expected": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "Openapi set to 2.0",
+            "input": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "__MANAGE_SWAGGER": True,
+                            "OpenApiVersion": "2.0",
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            },
+            "expected": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "__MANAGE_SWAGGER": True,
+                            "OpenApiVersion": "2.0",
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "No definition body",
+            "input": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "__MANAGE_SWAGGER": True,
+                            "OpenApiVersion": "3.0"
+                        }
+                    }
+                }
+            },
+            "expected": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "__MANAGE_SWAGGER": True,
+                            "OpenApiVersion": "3.0"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "ignore customer defined swagger",
+            "input": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "OpenApiVersion": "3.0",
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            },
+            "expected": {
+                "Resources": {
+                    "MyApi": {
+                        "Type": "AWS::Serverless::Api",
+                        "Properties": {
+                            "OpenApiVersion": "3.0",
+                            "DefinitionBody": {
+                                "swagger": "2.0"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "No Resources",
+            "input": {
+                "some": "other",
+                "swagger": "donottouch"
+                },
+            "expected": {
+                "some": "other",
+                "swagger": "donottouch"
+            }
+        }
+    ]
+
+    def test_openapi_postprocess(self):
+        for test in self.table_driven:
+            global_obj = Globals(self.template)
+            global_obj.fix_openapi_definitions(test["input"])
+            self.assertEqual(test["input"], test["expected"], test["name"])

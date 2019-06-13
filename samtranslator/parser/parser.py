@@ -1,6 +1,7 @@
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException
 from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.plugins import LifeCycleEvents
+from samtranslator.public.sdk.template import SamTemplate
 
 
 class Parser:
@@ -25,5 +26,25 @@ class Parser:
                 sam_template["Resources"]):
             raise InvalidDocumentException(
                 [InvalidTemplateException("'Resources' section is required")])
+
+        if (not all(isinstance(sam_resource, dict) for sam_resource in sam_template["Resources"].values())):
+            raise InvalidDocumentException(
+                [InvalidTemplateException(
+                    "All 'Resources' must be Objects. If you're using YAML, this may be an "
+                    "indentation issue."
+                )])
+
+        sam_template_instance = SamTemplate(sam_template)
+
+        for resource_logical_id, sam_resource in sam_template_instance.iterate():
+            # NOTE: Properties isn't required for SimpleTable, so we can't check
+            # `not isinstance(sam_resources.get("Properties"), dict)` as this would be a breaking change.
+            # sam_resource.properties defaults to {} in SamTemplate init
+            if (not isinstance(sam_resource.properties, dict)):
+                raise InvalidDocumentException(
+                    [InvalidResourceException(resource_logical_id,
+                                              "All 'Resources' must be Objects and have a 'Properties' Object. If "
+                                              "you're using YAML, this may be an indentation issue."
+                                              )])
 
         SamTemplateValidator.validate(sam_template)

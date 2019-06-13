@@ -1,4 +1,6 @@
 from enum import Enum
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.types import is_str
 
 
 class SamResource(object):
@@ -19,6 +21,7 @@ class SamResource(object):
 
         self.resource_dict = resource_dict
         self.type = resource_dict.get("Type")
+        self.condition = resource_dict.get("Condition", None)
 
         # Properties is *not* required. Ex: SimpleTable resource has no required properties
         self.properties = resource_dict.get("Properties", {})
@@ -29,7 +32,15 @@ class SamResource(object):
 
         :return: True, if the resource is valid
         """
-        # As long as the type is valid.
+        # As long as the type is valid and type string.
+        # validate the condition should be string
+
+        if self.condition:
+
+            if not is_str()(self.condition, should_raise=False):
+                raise InvalidDocumentException([
+                    InvalidTemplateException("Every Condition member must be a string.")])
+
         return SamResourceType.has_value(self.type)
 
     def to_dict(self):
