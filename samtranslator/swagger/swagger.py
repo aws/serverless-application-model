@@ -418,7 +418,7 @@ class SwaggerEditor(object):
             # Excluding paramters section
             if normalized_method_name == "parameters":
                 continue
-            if not (add_default_auth_to_preflight is False and normalized_method_name == "options"):
+            if add_default_auth_to_preflight or normalized_method_name != "options":
                 self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
                                            default_authorizer=default_authorizer, is_default=True)
 
