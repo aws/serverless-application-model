@@ -20,8 +20,9 @@ CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", 
 # Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
-AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer", "InvokeRole"])
-AuthProperties.__new__.__defaults__ = (None, None, None)
+AuthProperties = namedtuple("_AuthProperties",
+                            ["Authorizers", "DefaultAuthorizer", "InvokeRole", "AddDefaultAuthorizerToCorsPreflight"])
+AuthProperties.__new__.__defaults__ = (None, None, None, True)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
@@ -308,7 +309,8 @@ class ApiGenerator(object):
 
         if authorizers:
             swagger_editor.add_authorizers(authorizers)
-            self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer)
+            self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer,
+                                         auth_properties.AddDefaultAuthorizerToCorsPreflight)
 
         # Assign the Swagger back to template
 
@@ -508,7 +510,8 @@ class ApiGenerator(object):
 
         return permissions
 
-    def _set_default_authorizer(self, swagger_editor, authorizers, default_authorizer):
+    def _set_default_authorizer(self, swagger_editor, authorizers, default_authorizer,
+                                add_default_auth_to_preflight=True):
         if not default_authorizer:
             return
 
@@ -517,7 +520,8 @@ class ApiGenerator(object):
                                            default_authorizer + "' was not defined in 'Authorizers'")
 
         for path in swagger_editor.iter_on_path():
-            swagger_editor.set_path_default_authorizer(path, default_authorizer, authorizers=authorizers)
+            swagger_editor.set_path_default_authorizer(path, default_authorizer, authorizers=authorizers,
+                                                       add_default_auth_to_preflight=add_default_auth_to_preflight)
 
     def _set_endpoint_configuration(self, rest_api, value):
         """

@@ -183,6 +183,8 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_minimum_compression_size',
         'api_with_resource_refs',
         'api_with_cors',
+        'api_with_cors_and_auth_no_preflight_auth',
+        'api_with_cors_and_auth_preflight_auth',
         'api_with_cors_and_only_methods',
         'api_with_cors_and_only_headers',
         'api_with_cors_and_only_origins',
