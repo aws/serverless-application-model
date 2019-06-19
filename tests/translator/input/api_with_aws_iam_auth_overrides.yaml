@@ -84,3 +84,35 @@ Resources:
             Auth:
               Authorizer: AWS_IAM
               InvokeRole: arn:aws:iam::456::role/something-else
+  MyFunctionNONEInvokeRole:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API3:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /MyFunctionNONEInvokeRole
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: NONE
+  MyFunctionNullInvokeRole:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        API3:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Method: get
+            Path: /MyFunctionNullInvokeRole
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: null
