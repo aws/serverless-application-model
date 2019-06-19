@@ -8,7 +8,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs8.10
-      CodeUri: s3://gbdx-build-artifacts/bbeck-test/423f9056eb70d25480852fc472b43dd5 #src/
+      CodeUri: src/
       Events:
         GetApi:
           Type: Api
