@@ -134,17 +134,19 @@ class DeploymentPreferenceCollection(object):
 
         return deployment_group
 
-    def _replace_deployment_types(self, value):
+    def _replace_deployment_types(self, value, key=None):
         if isinstance(value, list):
             for i in range(len(value)):
                 value[i] = self._replace_deployment_types(value[i])
             return value
         elif is_instrinsic(value):
             for (k, v) in value.items():
-                value[k] = self._replace_deployment_types(v)
+                value[k] = self._replace_deployment_types(v, k)
             return value
         else:
             if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
+                if key == "Fn::Sub":  # Don't nest a "Sub" in a "Sub"
+                    return ["CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value}]
                 return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
             return value
 

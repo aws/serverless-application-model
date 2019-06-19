@@ -6,6 +6,7 @@ from samtranslator.model.preferences.deployment_preference_collection import Dep
 from samtranslator.model.exceptions import (InvalidDocumentException, InvalidResourceException,
                                             DuplicateLogicalIdException, InvalidEventException)
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
@@ -62,6 +63,8 @@ class Translator:
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)
         intrinsics_resolver = IntrinsicsResolver(parameter_values)
+        mappings_resolver = IntrinsicsResolver(template.get('Mappings', {}),
+                                               {FindInMapAction.intrinsic_name: FindInMapAction()})
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
         document_errors = []
@@ -76,6 +79,7 @@ class Translator:
                 kwargs = macro.resources_to_link(sam_template['Resources'])
                 kwargs['managed_policy_map'] = self.managed_policy_map
                 kwargs['intrinsics_resolver'] = intrinsics_resolver
+                kwargs['mappings_resolver'] = mappings_resolver
                 kwargs['deployment_preference_collection'] = deployment_preference_collection
                 translated = macro.to_cloudformation(**kwargs)
 
