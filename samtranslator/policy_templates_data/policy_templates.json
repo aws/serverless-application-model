@@ -1051,9 +1051,7 @@
     "RekognitionFacesPolicy": {
       "Description": "Gives permission to compare and detect faces and labels",
       "Parameters": {
-        "CollectionId": {
-          "Description": "ID of the collection"
-        }
+
       },
       "Definition": {
         "Statement": [
@@ -1063,16 +1061,7 @@
               "rekognition:CompareFaces",
               "rekognition:DetectFaces"
             ],
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
-                {
-                  "collectionId": {
-                    "Ref": "CollectionId"
-                  }
-                }
-              ]
-            }
+            "Resource": "*"
           }
         ]
       }
