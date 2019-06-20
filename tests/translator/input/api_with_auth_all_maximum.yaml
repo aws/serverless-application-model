@@ -5,6 +5,7 @@ Resources:
       StageName: Prod
       Auth:
         DefaultAuthorizer: MyCognitoAuth
+        ApiKeyRequired: true
         Authorizers:
           MyCognitoAuth:
             UserPoolArn: arn:aws:1
