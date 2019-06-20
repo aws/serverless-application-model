@@ -632,6 +632,9 @@
         "Topic": {
           "type": "string"
         },
+        "Region": {
+          "type": "string"
+        },
         "FilterPolicy": {
           "type": "object"
         }
