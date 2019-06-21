@@ -4,6 +4,7 @@ from collections import namedtuple
 from six import string_types
 
 from samtranslator.model.intrinsics import is_instrinsic
+from samtranslator.model.exceptions import InvalidTemplateException
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
 
@@ -114,8 +115,16 @@ class FunctionPolicies(object):
 
         # Must handle intrinsic functions. Policy could be a primitive type or an intrinsic function
 
-        # Managed policies are either string or an intrinsic function that resolves to a string
-        if isinstance(policy, string_types) or is_instrinsic(policy):
+        # Managed policies are of type string
+        if isinstance(policy, string_types):
+            return PolicyTypes.MANAGED_POLICY
+
+        # Handle the special case for 'if' intrinsic function
+        if self._is_intrinsic_if(policy):
+            return self._get_type_from_intrinsic_if(policy)
+
+        # Intrinsic functions are treated as managed policies by default
+        if is_instrinsic(policy):
             return PolicyTypes.MANAGED_POLICY
 
         # Policy statement is a dictionary with the key "Statement" in it
@@ -143,6 +152,72 @@ class FunctionPolicies(object):
             len(policy) == 1 and \
             self._policy_template_processor.has(list(policy.keys())[0]) is True
 
+    def _is_intrinsic_if(self, policy):
+        """
+        Is the given policy data an intrinsic if? Intrinsic function 'if' is a dictionary with single
+        key - if
+
+        :param policy: Input value to check if it is an intrinsic if
+        :return: True, if yes
+        """
+        if policy is not None \
+                and isinstance(policy, dict) \
+                and len(policy) == 1:
+
+            key = list(policy.keys())[0]
+            return key.startswith("Fn::If")
+
+        return False
+
+    def _is_intrinsic_no_value(selfs, policy):
+        """
+        Is the given policy data an intrinsic Ref: AWS::NoValue? Intrinsic function is a dictionary with single
+        key - Ref and value - AWS::NoValue
+
+        :param policy: Input value to check if it is an intrinsic if
+        :return: True, if yes
+        """
+        if policy is not None \
+                and isinstance(policy, dict) \
+                and len(policy) == 1:
+
+            key = list(policy.keys())[0]
+            return key == "Ref" and policy["Ref"] == "AWS::NoValue"
+
+        return False
+
+
+    def _get_type_from_intrinsic_if(self, policy):
+        """
+        Returns the type of the given policy assuming that it is an intrinsic if function
+
+        :param policy: Input value to get type from
+        :return: PolicyTypes: Type of the given policy. PolicyTypes.UNKNOWN, if type could not be inferred
+        """
+        if not self._is_intrinsic_if(policy):
+            return PolicyTypes.UNKNOWN
+
+        intrinsic_if_value = policy["Fn::If"]
+
+        if not len(intrinsic_if_value) == 3:
+            raise InvalidTemplateException("Unexpected number of arguments to intrinsic function If")
+
+        if_data = intrinsic_if_value[1]
+        else_data = intrinsic_if_value[2]
+
+        if_data_type = self._get_type(if_data)
+        else_data_type = self._get_type(else_data)
+
+        if if_data_type == else_data_type:
+            return if_data_type
+
+        if self._is_intrinsic_no_value(if_data):
+            return else_data_type
+
+        if self._is_intrinsic_no_value(else_data):
+            return if_data_type
+
+        raise InvalidTemplateException("Could not resolve type of policy in intrinsic function If")
 
 class PolicyTypes(Enum):
     """
