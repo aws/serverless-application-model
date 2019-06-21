@@ -1,19 +1,19 @@
 {
     "Resources": {
       "MyFunctionWithApiKeyRequiredRole": {
-        "Type": "AWS::IAM::Role",
+        "Type": "AWS::IAM::Role", 
         "Properties": {
           "ManagedPolicyArns": [
             "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          ],
+          ], 
           "AssumeRolePolicyDocument": {
-            "Version": "2012-10-17",
+            "Version": "2012-10-17", 
             "Statement": [
               {
                 "Action": [
                   "sts:AssumeRole"
-                ],
-                "Effect": "Allow",
+                ], 
+                "Effect": "Allow", 
                 "Principal": {
                   "Service": [
                     "lambda.amazonaws.com"
@@ -23,20 +23,20 @@
             ]
           }
         }
-      },
+      }, 
       "MyFunctionWithApiKeyRequiredMyApiWithApiKeyRequiredPermissionTest": {
-        "Type": "AWS::Lambda::Permission",
+        "Type": "AWS::Lambda::Permission", 
         "Properties": {
-          "Action": "lambda:invokeFunction",
-          "Principal": "apigateway.amazonaws.com",
+          "Action": "lambda:invokeFunction", 
+          "Principal": "apigateway.amazonaws.com", 
           "FunctionName": {
             "Ref": "MyFunctionWithApiKeyRequired"
-          },
+          }, 
           "SourceArn": {
             "Fn::Sub": [
-              "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyRequiredTrue",
+              "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyRequiredTrue", 
               {
-                "__Stage__": "*",
+                "__Stage__": "*", 
                 "__ApiId__": {
                   "Ref": "MyApiWithoutAuth"
                 }
@@ -44,90 +44,91 @@
             ]
           }
         }
-      },
-      "MyApiWithoutAuthDeploymentcc6d6fc40a": {
-        "Type": "AWS::ApiGateway::Deployment",
+      }, 
+      "MyApiWithoutAuthDeployment3228c3480e": {
+        "Type": "AWS::ApiGateway::Deployment", 
         "Properties": {
           "RestApiId": {
             "Ref": "MyApiWithoutAuth"
-          },
-          "Description": "RestApi deployment id: cc6d6fc40a37188fe0115a039b24e397dc149478",
-          "StageName": "Stage"
+          }, 
+          "Description": "RestApi deployment id: 3228c3480e71b3b8f21b3fefff2c5ad79bebe54c"
         }
-      },
+      }, 
       "MyApiWithoutAuth": {
-        "Type": "AWS::ApiGateway::RestApi",
+        "Type": "AWS::ApiGateway::RestApi", 
         "Properties": {
           "Body": {
             "info": {
-              "version": "1.0",
+              "version": "1.0", 
               "title": {
                 "Ref": "AWS::StackName"
               }
-            },
+            }, 
             "paths": {
               "/ApiKeyRequiredTrue": {
                 "get": {
                   "x-amazon-apigateway-integration": {
-                    "httpMethod": "POST",
-                    "type": "aws_proxy",
+                    "httpMethod": "POST", 
+                    "type": "aws_proxy", 
                     "uri": {
                       "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithApiKeyRequired.Arn}/invocations"
                     }
-                  },
+                  }, 
                   "security": [
                     {
                       "api_key": []
                     }
-                  ],
+                  ], 
                   "responses": {}
                 }
               }
-            },
-            "swagger": "2.0",
-            "securityDefinitions": {
-              "api_key": {
-                "type": "apiKey",
-                "name": "x-api-key",
-                "in": "header"
-              }
+            }, 
+            "openapi": "3.0.1", 
+            "components": {
+                "securitySchemes": {
+                    "api_key": {
+                        "type": "apiKey", 
+                        "name": "x-api-key", 
+                        "in": "header"
+                    }
+                }
             }
-          },
+          }, 
           "EndpointConfiguration": {
             "Types": [
               "REGIONAL"
             ]
-          },
+          }, 
           "Parameters": {
             "endpointConfigurationTypes": "REGIONAL"
           }
         }
-      },
+      }, 
       "MyApiWithoutAuthProdStage": {
-        "Type": "AWS::ApiGateway::Stage",
+        "Type": "AWS::ApiGateway::Stage", 
         "Properties": {
           "DeploymentId": {
-            "Ref": "MyApiWithoutAuthDeploymentcc6d6fc40a"
-          },
+            "Ref": "MyApiWithoutAuthDeployment3228c3480e"
+          }, 
           "RestApiId": {
             "Ref": "MyApiWithoutAuth"
-          },
+          }, 
           "StageName": "Prod"
         }
-      },
+      }, 
       "MyFunctionWithApiKeyRequiredMyApiWithApiKeyRequiredPermissionProd": {
-        "Type": "AWS::Lambda::Permission",
+        "Type": "AWS::Lambda::Permission", 
         "Properties": {
-          "Action": "lambda:invokeFunction",
-          "Principal": "apigateway.amazonaws.com",
+          "Action": "lambda:invokeFunction", 
+          "Principal": "apigateway.amazonaws.com", 
           "FunctionName": {
             "Ref": "MyFunctionWithApiKeyRequired"
-          },
+          }, 
           "SourceArn": {
             "Fn::Sub": [
-              "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyRequiredTrue",
+              "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyRequiredTrue", 
               {
-                "__Stage__": "Prod",
+                "__Stage__": "Prod", 
                 "__ApiId__": {
                   "Ref": "MyApiWithoutAuth"
                 }
@@ -135,25 +136,25 @@
             ]
           }
         }
-      },
+      }, 
       "MyFunctionWithApiKeyRequired": {
-        "Type": "AWS::Lambda::Function",
+        "Type": "AWS::Lambda::Function", 
         "Properties": {
-          "Handler": "index.handler",
+          "Handler": "index.handler", 
           "Code": {
-            "S3Bucket": "bucket",
+            "S3Bucket": "bucket", 
             "S3Key": "key"
-          },
+          }, 
           "Role": {
             "Fn::GetAtt": [
-              "MyFunctionWithApiKeyRequiredRole",
+              "MyFunctionWithApiKeyRequiredRole", 
               "Arn"
             ]
-          },
-          "Runtime": "nodejs8.10",
+          }, 
+          "Runtime": "nodejs8.10", 
           "Tags": [
             {
-              "Value": "SAM",
+              "Value": "SAM", 
               "Key": "lambda:createdBy"
             }
           ]
