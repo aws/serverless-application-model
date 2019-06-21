@@ -116,6 +116,8 @@ class ApiGenerator(object):
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
+            # # Post Process OpenApi Auth Settings
+            self.definition_body = self._openapi_auth_postprocess(self.definition_body)
             rest_api.Body = self.definition_body
 
         if self.name:
@@ -318,8 +320,8 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)
 
         # Assign the Swagger back to template
-
-        self.definition_body = self._openapi_auth_postprocess(swagger_editor.swagger)
+        # self.definition_body = self._openapi_auth_postprocess(swagger_editor.swagger)
+        self.definition_body = swagger_editor.swagger
 
     def _openapi_auth_postprocess(self, definition_body):
         """
