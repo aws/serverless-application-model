@@ -186,7 +186,6 @@ class FunctionPolicies(object):
 
         return False
 
-
     def _get_type_from_intrinsic_if(self, policy):
         """
         Returns the type of the given policy assuming that it is an intrinsic if function
@@ -218,6 +217,7 @@ class FunctionPolicies(object):
             return if_data_type
 
         raise InvalidTemplateException("Could not resolve type of policy in intrinsic function If")
+
 
 class PolicyTypes(Enum):
     """
