@@ -21,7 +21,8 @@ CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", 
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
 AuthProperties = namedtuple("_AuthProperties",
-                            ["Authorizers", "DefaultAuthorizer", "InvokeRole", "AddDefaultAuthorizerToCorsPreflight", "ApiKeyRequired"])
+                            ["Authorizers", "DefaultAuthorizer", "InvokeRole", "AddDefaultAuthorizerToCorsPreflight",
+                             "ApiKeyRequired"])
 AuthProperties.__new__.__defaults__ = (None, None, None, True, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
@@ -310,7 +311,7 @@ class ApiGenerator(object):
         if authorizers:
             swagger_editor.add_authorizers_security_definitions(authorizers)
             self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer,
-                                auth_properties.AddDefaultAuthorizerToCorsPreflight)
+                                         auth_properties.AddDefaultAuthorizerToCorsPreflight)
 
         if auth_properties.ApiKeyRequired:
             swagger_editor.add_apikey_security_definition()

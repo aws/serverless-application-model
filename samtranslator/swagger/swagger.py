@@ -595,7 +595,6 @@ class SwaggerEditor(object):
                 if security != existing_security:
                     method_definition['security'] = security
 
-
     def add_auth_to_method(self, path, method_name, auth, api):
         """
         Adds auth settings for this path/method. Auth settings currently consist of Authorizers and ApiKeyRequired
