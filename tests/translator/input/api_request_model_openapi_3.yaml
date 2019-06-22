@@ -15,6 +15,19 @@ Resources:
             RequestModel:
               Model: User
               Required: true
+        Iam:
+          Type: Api
+          Properties:
+            RequestModel:
+              Model: User
+              Required: true
+            RestApiId:
+              Ref: HtmlApi
+            Method: get
+            Path: /iam
+            Auth:
+              Authorizer: AWS_IAM
+
 
   HtmlApi:
     Type: AWS::Serverless::Api
