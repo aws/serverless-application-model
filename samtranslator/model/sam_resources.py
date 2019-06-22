@@ -440,6 +440,7 @@ class SamApi(SamResourceMacro):
 
         'Name': PropertyType(False, one_of(is_str(), is_type(dict))),
         'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
+        'Tags': PropertyType(False, is_type(dict)),
         'DefinitionBody': PropertyType(False, is_type(dict)),
         'DefinitionUri': PropertyType(False, one_of(is_str(), is_type(dict))),
         'CacheClusterEnabled': PropertyType(False, is_type(bool)),
@@ -483,6 +484,7 @@ class SamApi(SamResourceMacro):
                                      self.DefinitionUri,
                                      self.Name,
                                      self.StageName,
+                                     tags=self.Tags,
                                      endpoint_configuration=self.EndpointConfiguration,
                                      method_settings=self.MethodSettings,
                                      binary_media=self.BinaryMediaTypes,
