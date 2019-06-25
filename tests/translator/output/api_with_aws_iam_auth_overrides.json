@@ -90,21 +90,33 @@
         }
       }
     }, 
-    "MyFunctionNONEInvokeRoleAPI3PermissionTest": {
+    "MyApiWithAwsIamAuthProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithAwsIamAuthDeployment3bec5f30f2"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuth"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "MyFunctionCallerCredentialsOverrideAPI3PermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "MyFunctionNONEInvokeRole"
+          "Ref": "MyFunctionCallerCredentialsOverride"
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNONEInvokeRole", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
+                "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
               }
             }
           ]
@@ -153,6 +165,84 @@
               }
             }
           ]
+        }
+      }
+    }, 
+    "MyFunctionMyCognitoAuthAPI1PermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunctionMyCognitoAuth"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionMyCognitoAuth", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApiWithAwsIamAuthNoCallerCredentials": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionNoCallerCredentials.Arn}/invocations"
+                  }
+                }, 
+                "security": [
+                  {
+                    "AWS_IAM": []
+                  }
+                ], 
+                "responses": {}
+              }, 
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionCallerCredentialsOverride.Arn}/invocations"
+                  }, 
+                  "credentials": "arn:aws:iam::*:user/*"
+                }, 
+                "security": [
+                  {
+                    "AWS_IAM": []
+                  }
+                ], 
+                "responses": {}
+              }
+            }
+          }, 
+          "swagger": "2.0", 
+          "securityDefinitions": {
+            "AWS_IAM": {
+              "in": "header", 
+              "type": "apiKey", 
+              "name": "Authorization", 
+              "x-amazon-apigateway-authtype": "awsSigv4"
+            }
+          }
         }
       }
     }, 
@@ -266,14 +356,25 @@
         }
       }
     }, 
-    "MyApiWithAwsIamAuthDeployment3bec5f30f2": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyFunctionNoCallerCredentialsAPI3PermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuth"
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunctionNoCallerCredentials"
         }, 
-        "Description": "RestApi deployment id: 3bec5f30f275272b5feee10af30f848d1ce4400d", 
-        "StageName": "Stage"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
+              }
+            }
+          ]
+        }
       }
     }, 
     "MyFunctionNONEInvokeRole": {
@@ -297,6 +398,27 @@
             "Key": "lambda:createdBy"
           }
         ]
+      }
+    }, 
+    "MyFunctionNoCallerCredentialsAPI3PermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunctionNoCallerCredentials"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
+              }
+            }
+          ]
+        }
       }
     }, 
     "MyFunctionNoneAuthRole": {
@@ -368,46 +490,68 @@
         }
       }
     }, 
-    "MyFunctionNONEInvokeRoleAPI3PermissionProd": {
+    "MyApiWithAwsIamAuthDeployment3bec5f30f2": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuth"
+        }, 
+        "Description": "RestApi deployment id: 3bec5f30f275272b5feee10af30f848d1ce4400d", 
+        "StageName": "Stage"
+      }
+    }, 
+    "MyApiWithAwsIamAuthNoCallerCredentialsDeployment38c75afec1": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
+        }, 
+        "Description": "RestApi deployment id: 38c75afec1f32ff6e177b0f49a2b9e86958f594e", 
+        "StageName": "Stage"
+      }
+    }, 
+    "MyFunctionCallerCredentialsOverrideAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "MyFunctionNONEInvokeRole"
+          "Ref": "MyFunctionCallerCredentialsOverride"
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNONEInvokeRole", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
               "__Stage__": "Prod", 
               "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
+                "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
               }
             }
           ]
         }
       }
     }, 
-    "MyFunctionWithoutAuthAPI2PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
+    "MyFunctionCallerCredentialsOverride": {
+      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionWithoutAuth"
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
         }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionWithoutAuth", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionCallerCredentialsOverrideRole", 
+            "Arn"
           ]
-        }
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "MyFunctionWithoutAuth": {
@@ -454,21 +598,45 @@
         }
       }
     }, 
-    "MyFunctionMyCognitoAuthAPI1PermissionProd": {
+    "MyFunctionNONEInvokeRoleAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "MyFunctionMyCognitoAuth"
+          "Ref": "MyFunctionNONEInvokeRole"
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionMyCognitoAuth", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNONEInvokeRole", 
             {
               "__Stage__": "Prod", 
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyFunctionNoCallerCredentialsRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ]
@@ -499,6 +667,72 @@
         }
       }
     }, 
+    "MyFunctionWithoutAuthAPI2PermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunctionWithoutAuth"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionWithoutAuth", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyFunctionCallerCredentialsOverrideRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyFunctionNONEInvokeRoleAPI3PermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunctionNONEInvokeRole"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNONEInvokeRole", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithAwsIamAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
     "MyFunctionMyCognitoAuthRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -521,6 +755,18 @@
             }
           ]
         }
+      }
+    }, 
+    "MyApiWithAwsIamAuthNoCallerCredentialsProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithAwsIamAuthNoCallerCredentialsDeployment38c75afec1"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
+        }, 
+        "StageName": "Prod"
       }
     }, 
     "MyFunctionCustomInvokeRoleAPI3PermissionTest": {
@@ -567,16 +813,27 @@
         ]
       }
     }, 
-    "MyApiWithAwsIamAuthProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "MyFunctionNoCallerCredentials": {
+      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthDeployment3bec5f30f2"
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
         }, 
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuth"
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionNoCallerCredentialsRole", 
+            "Arn"
+          ]
         }, 
-        "StageName": "Prod"
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "MyFunctionNoneAuthAPI3PermissionTest": {
