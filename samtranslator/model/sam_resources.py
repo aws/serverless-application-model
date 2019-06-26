@@ -87,6 +87,7 @@ class SamFunction(SamResourceMacro):
         """
         resources = []
         intrinsics_resolver = kwargs["intrinsics_resolver"]
+        mappings_resolver = kwargs.get("mappings_resolver", None)
 
         if self.DeadLetterQueue:
             self._validate_dlq()
@@ -105,7 +106,8 @@ class SamFunction(SamResourceMacro):
         if self.DeploymentPreference:
             self._validate_deployment_preference_and_add_update_policy(kwargs.get('deployment_preference_collection',
                                                                                   None),
-                                                                       lambda_alias, intrinsics_resolver)
+                                                                       lambda_alias, intrinsics_resolver,
+                                                                       mappings_resolver)
 
         managed_policy_map = kwargs.get('managed_policy_map', {})
         if not managed_policy_map:
@@ -268,7 +270,7 @@ class SamFunction(SamResourceMacro):
                 try:
                     event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         self.logical_id + logical_id, event_dict, logical_id)
-                except TypeError as e:
+                except (TypeError, AttributeError) as e:
                     raise InvalidEventException(logical_id, "{}".format(e))
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
@@ -392,12 +394,19 @@ class SamFunction(SamResourceMacro):
         return alias
 
     def _validate_deployment_preference_and_add_update_policy(self, deployment_preference_collection, lambda_alias,
-                                                              intrinsics_resolver):
+                                                              intrinsics_resolver, mappings_resolver):
         if 'Enabled' in self.DeploymentPreference:
             self.DeploymentPreference['Enabled'] = intrinsics_resolver.resolve_parameter_refs(
                 self.DeploymentPreference['Enabled'])
             if isinstance(self.DeploymentPreference['Enabled'], dict):
                 raise InvalidResourceException(self.logical_id, "'Enabled' must be a boolean value")
+
+        if 'Type' in self.DeploymentPreference:
+            # resolve intrinsics and mappings for Type
+            preference_type = self.DeploymentPreference['Type']
+            preference_type = intrinsics_resolver.resolve_parameter_refs(preference_type)
+            preference_type = mappings_resolver.resolve_parameter_refs(preference_type)
+            self.DeploymentPreference['Type'] = preference_type
 
         if deployment_preference_collection is None:
             raise ValueError('deployment_preference_collection required for parsing the deployment preference')
@@ -569,7 +578,7 @@ class SamApplication(SamResourceMacro):
         'Location': PropertyType(True, one_of(is_str(), is_type(dict))),
         'TemplateUrl': PropertyType(False, is_str()),
         'Parameters': PropertyType(False, is_type(dict)),
-        'NotificationArns': PropertyType(False, list_of(is_str())),
+        'NotificationARNs': PropertyType(False, list_of(is_str())),
         'Tags': PropertyType(False, is_type(dict)),
         'TimeoutInMinutes': PropertyType(False, is_type(int))
     }
@@ -586,7 +595,7 @@ class SamApplication(SamResourceMacro):
         nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on,
                                    attributes=self.get_passthrough_resource_attributes())
         nested_stack.Parameters = self.Parameters
-        nested_stack.NotificationArns = self.NotificationArns
+        nested_stack.NotificationARNs = self.NotificationARNs
         application_tags = self._get_application_tags()
         nested_stack.Tags = self._construct_tag_list(self.Tags, application_tags)
         nested_stack.TimeoutInMinutes = self.TimeoutInMinutes

@@ -1,8 +1,0 @@
-{
-  "errors": [
-    {
-      "errorMessage": "Transforming resource with id [IoTRuleFunc] attempts to create a new resource with id [IoTRuleFuncMyIoTRule] and type \"AWS::IoT::TopicRule\". A resource with that id already exists within this template. Please use a different id for that resource."
-    }
-  ], 
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Transforming resource with id [IoTRuleFunc] attempts to create a new resource with id [IoTRuleFuncMyIoTRule] and type \"AWS::IoT::TopicRule\". A resource with that id already exists within this template. Please use a different id for that resource.", 
-}

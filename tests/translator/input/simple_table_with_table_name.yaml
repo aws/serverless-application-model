@@ -1,3 +1,8 @@
+Parameters:
+  MySimpleTableParameter:
+    Type: String
+    Default: TableName
+
 Resources:
   MinimalTableWithTableName:
     Type: 'AWS::Serverless::SimpleTable'

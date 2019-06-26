@@ -19,3 +19,4 @@ Resources:
       NotificationConfiguration:
         TopicConfigurations:
         - Topic: my-super-awesome-topic
+          Event: s3:ObjectRemoved:*

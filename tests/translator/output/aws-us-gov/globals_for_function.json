@@ -7,7 +7,7 @@
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
           "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess"
         ], 
-        "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary",
+        "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary", 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -29,6 +29,14 @@
     "FunctionWithOverrides": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Layers": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
+          }, 
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer2:2"
+          }
+        ], 
         "TracingConfig": {
           "Mode": "PassThrough"
         }, 
@@ -37,6 +45,9 @@
           "S3Key": "hello.zip"
         }, 
         "VpcConfig": {
+          "SubnetIds": [
+            "sub-id-2"
+          ], 
           "SecurityGroupIds": [
             "sg-edcd9784", 
             "sg-123"
@@ -56,8 +67,8 @@
             "Key": "tag1"
           }
         ], 
-        "MemorySize": 512, 
         "ReservedConcurrentExecutions": 100, 
+        "MemorySize": 512, 
         "Environment": {
           "Variables": {
             "Var1": "value1", 
@@ -73,11 +84,7 @@
           ]
         }, 
         "Timeout": 100, 
-        "Runtime": "nodejs4.3",
-        "Layers": [
-          { "Fn::Sub": "arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer:1" },
-          { "Fn::Sub": "arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer2:2" }
-        ]
+        "Runtime": "nodejs4.3"
       }
     }, 
     "MinimalFunctionRole": {
@@ -87,7 +94,7 @@
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
           "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess"
         ], 
-        "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary",
+        "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary", 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -124,6 +131,11 @@
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Layers": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1"
+          }
+        ], 
         "TracingConfig": {
           "Mode": "Active"
         }, 
@@ -132,6 +144,9 @@
           "S3Key": "global.zip"
         }, 
         "VpcConfig": {
+          "SubnetIds": [
+            "sub-id-2"
+          ], 
           "SecurityGroupIds": [
             "sg-edcd9784"
           ]
@@ -146,8 +161,8 @@
             "Key": "tag1"
           }
         ], 
-        "MemorySize": 1024, 
         "ReservedConcurrentExecutions": 50, 
+        "MemorySize": 1024, 
         "Environment": {
           "Variables": {
             "Var1": "value1", 
@@ -162,10 +177,7 @@
           ]
         }, 
         "Timeout": 30, 
-        "Runtime": "python2.7",
-        "Layers": [
-          { "Fn::Sub": "arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer:1" }
-        ]
+        "Runtime": "python2.7"
       }
     }, 
     "MinimalFunctionAliaslive": {

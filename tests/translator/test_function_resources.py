@@ -15,6 +15,8 @@ class TestVersionsAndAliases(TestCase):
 
         self.intrinsics_resolver_mock = Mock()
         self.intrinsics_resolver_mock.resolve = Mock()
+        self.mappings_resolver_mock = Mock()
+        self.mappings_resolver_mock.resolve = Mock()
 
         self.code_uri = "s3://bucket/key?versionId=version"
         self.func_dict = {
@@ -98,6 +100,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs['deployment_preference_collection'] = deployment_preference_collection
         get_resolved_alias_name_mock.return_value = alias_name
@@ -136,6 +139,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"S3Bucket": "bucket", "S3Key": "key",
                                                                              "S3ObjectVersion": "version"}
         get_resolved_alias_name_mock.return_value = alias_name
@@ -199,6 +203,7 @@ class TestVersionsAndAliases(TestCase):
 
             kwargs = dict()
             kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+            kwargs["mappings_resolver"] = self.mappings_resolver_mock
             kwargs['deployment_preference_collection'] = self._make_deployment_preference_collection()
             sam_func.to_cloudformation(**kwargs)
 
@@ -257,6 +262,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs['deployment_preference_collection'] = deployment_preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = True
@@ -267,7 +273,7 @@ class TestVersionsAndAliases(TestCase):
         deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
         deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id,
                                                                      deploy_preference_dict)
-        self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(enabled)
+        self.intrinsics_resolver_mock.resolve_parameter_refs.assert_any_call(enabled)
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 

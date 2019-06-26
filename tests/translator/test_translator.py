@@ -1,4 +1,6 @@
 import json
+import cfnlint.core
+from cfnlint import Runner
 import itertools
 import os.path
 import hashlib
@@ -33,6 +35,21 @@ DO_NOT_SORT = ['Layers']
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = os.path.join(BASE_PATH, 'input')
 OUTPUT_FOLDER = os.path.join(BASE_PATH, 'output')
+
+LINT_IGNORE_WARNINGS = [
+    'W2001', # unused parameters. Sometimes, SAM uses parameters and removes the param reference from the output template, but the parameter stays in the parameters section.
+    'W1001', # Ref/GetAtt with conditions. This incorrectly flags resources since it can't map conditions fully.
+    'E3001', # Check for resource availability in a region.
+    'W7001', # Check if mappings are used. Serverless::Application uses mappings, the output CFN doesn't use them anymore.
+    'W1020', # Sub isn't needed if it doesn't have a variable defined. SAM leaves `!Sub` in even if it tries to resolve variables.
+    'E2531', # we don't care if a runtime has been deprecated in our tests.
+    'E3038', # Serverless resources- test for invalid resources.
+]
+
+LINT_IGNORE_TESTS = [
+    'function_with_resource_refs', # Tests functionality of the translator in ways that result in improper GetAtt calls on CFN resources.
+    'api_with_canary_setting', # Has stage variable overrides for nonexistent stage variables.
+]
 
 
 def deep_sort_lists(value):
@@ -206,6 +223,8 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_kmskeyarn',
         'function_with_alias',
         'function_with_alias_intrinsics',
+        'function_with_custom_codedeploy_deployment_preference',
+        'function_with_custom_conditional_codedeploy_deployment_preference',
         'function_with_disabled_deployment_preference',
         'function_with_deployment_preference',
         'function_with_deployment_preference_all_parameters',
@@ -220,6 +239,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_permissions_boundary',
         'function_with_policy_templates',
         'function_with_sns_event_source_all_parameters',
+        'global_handle_path_level_parameter',
         'globals_for_function',
         'globals_for_api',
         'globals_for_simpletable',
@@ -235,7 +255,7 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_api_with_many_conditions',
         'implicit_and_explicit_api_with_conditions',
         'api_with_cors_and_conditions_no_definitionbody',
-        'api_with_auth_and_conditions_all_max'
+        'api_with_auth_and_conditions_all_max',
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -254,7 +274,8 @@ class TestTranslatorEndToEnd(TestCase):
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
         partition_folder = partition if partition != "aws" else ""
-        expected = json.load(open(os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json'), 'r'))
+        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json')
+        expected = json.load(open(expected_filepath, 'r'))
 
         with patch('boto3.session.Session.region_name', region):
             parameter_values = get_template_parameter_values()
@@ -271,12 +292,29 @@ class TestTranslatorEndToEnd(TestCase):
 
         print(json.dumps(output_fragment, indent=2))
 
+        # Run cfn-lint on translator test output files.
+        rules = cfnlint.core.get_rules([], LINT_IGNORE_WARNINGS, [])
+
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
+            output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        else: # deprecation warning catching in py2
+            import warnings
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore",category=DeprecationWarning)
+                output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        runner = cfnlint.Runner(rules, expected_filepath, output_template, [region])
+        matches = []
+
+        # Only run linter on normal/gov partitions. It errors on china regions
+        if testcase not in LINT_IGNORE_TESTS and partition != 'aws-cn':
+            matches = runner.run()
+        print('cfn-lint ({}): {}'.format(expected_filepath, matches))
 
         assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+        assert len(matches) == 0
 
     def _update_logical_id_hash(self, resources):
         """
@@ -339,8 +377,8 @@ class TestTranslatorEndToEnd(TestCase):
 
         # Update any Output References in the template
         for output_key, output_value in resources.get("Outputs", {}).items():
-            if output_value.get("Ref") in deployment_logical_id_dict:
-                output_value["Ref"] = deployment_logical_id_dict[output_value.get("Ref")]
+            if output_value.get("Value").get("Ref") in deployment_logical_id_dict:
+                output_value["Value"]["Ref"] = deployment_logical_id_dict[output_value.get("Value").get("Ref")]
 
     def _generate_new_deployment_hash(self, logical_id, dict_to_hash, rest_api_to_swagger_hash):
         data_bytes = json.dumps(dict_to_hash, separators=(',', ':'), sort_keys=True).encode("utf8")
@@ -401,7 +439,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_policy_template_with_missing_parameter',
     'error_function_policy_template_invalid_value',
     'error_function_with_unknown_policy_template',
-    'error_function_with_invalid_policy_statement'
+    'error_function_with_invalid_policy_statement',
+    'error_function_with_invalid_condition_name'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)

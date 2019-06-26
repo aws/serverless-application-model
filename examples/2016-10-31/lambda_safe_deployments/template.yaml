@@ -9,7 +9,7 @@ Resources:
     Properties:
       Handler: safeTest.handler
       CodeUri: src/
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       AutoPublishAlias: live
       DeploymentPreference:
           Type: Linear10PercentEvery1Minute
@@ -35,7 +35,7 @@ Resources:
             Action:
               - "lambda:InvokeFunction"
             Resource: !Ref safeTest.Version
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: false

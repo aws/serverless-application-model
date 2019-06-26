@@ -6,8 +6,10 @@ Globals:
     MemorySize: 1024
     Timeout: 30
     VpcConfig:
-        SecurityGroupIds:
+      SecurityGroupIds:
         - sg-edcd9784
+      SubnetIds:
+        - sub-id-2
     Environment:
       Variables:
         Var1: value1
@@ -18,7 +20,7 @@ Globals:
     AutoPublishAlias: live
     PermissionsBoundary: arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary
     Layers:
-      - !Sub arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer:1
+      - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1
     ReservedConcurrentExecutions: 50
 
 Resources:
@@ -45,6 +47,6 @@ Resources:
       AutoPublishAlias: prod
       PermissionsBoundary: arn:aws:1234:iam:boundary/OverridePermissionsBoundary
       Layers:
-        - !Sub arn:${AWS:Partition}:lambda:${AWS:Region}:${AWS:AccountId}:layer:MyLayer2:2
+        - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer2:2
       ReservedConcurrentExecutions: 100
 

@@ -1,14 +1,21 @@
 {
+  "Conditions": {
+    "TestCondition": {
+      "Fn::Equals": [
+        "test", 
+        "test"
+      ]
+    }
+  }, 
   "Resources": {
     "ConditionFunction": {
       "Type": "AWS::Lambda::Function", 
-      "Condition": "this is a test",
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket",
+          "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
           "Fn::GetAtt": [
             "ConditionFunctionRole", 
@@ -22,11 +29,11 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    },
+      }, 
+      "Condition": "TestCondition"
+    }, 
     "ConditionFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "Condition": "this is a test",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -47,7 +54,8 @@
             }
           ]
         }
-      }
+      }, 
+      "Condition": "TestCondition"
     }
   }
 }
