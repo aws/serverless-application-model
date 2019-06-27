@@ -23,7 +23,7 @@ aws cloudformation package --template-file template.yaml --output-template-file 
 aws cloudformation deploy --template-file ./template.packaged.yaml --stack-name sam-example-api-lambda-image-content --capabilities CAPABILITY_IAM
 ```
 
-Invoke the API's root endpoint `/none` to see the API respond with a 200 (assuming you followed the optional step above). You will find the response body contains a png file. In the SAM template, we explicitly state `Authorizer: NONE` to make this a public/open endpoint (the Authorizer Lambda Function is not invoked).
+Invoke the API's root endpoint `/none` to see the API respond with a 200 (assuming you followed the optional step above). You will find the response body contains a png file. 
 
 Make sure you set the client's request headers with "accept" : "image/png" to make this example work.
 
