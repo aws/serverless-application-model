@@ -72,7 +72,10 @@ class Schedule(PushEventSource):
     principal = 'events.amazonaws.com'
     property_types = {
             'Schedule': PropertyType(True, is_str()),
-            'Input': PropertyType(False, is_str())
+            'Input': PropertyType(False, is_str()),
+            'Enabled': PropertyType(False, is_type(bool)),
+            'Name': PropertyType(False, is_str()),
+            'Description': PropertyType(False, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
@@ -93,6 +96,10 @@ class Schedule(PushEventSource):
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
+        if self.Enabled is not None:
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+        events_rule.Name = self.Name
+        events_rule.Description = self.Description
         events_rule.Targets = [self._construct_target(function)]
 
         source_arn = events_rule.get_runtime_attr("arn")
