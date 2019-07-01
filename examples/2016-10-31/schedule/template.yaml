@@ -13,3 +13,7 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: rate(5 minutes)
+            Name: function-schedule
+            Description: Timer to trigger ScheduledFunction every 5 minutes
+            Enabled: true
+
