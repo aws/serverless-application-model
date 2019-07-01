@@ -154,7 +154,10 @@
     "ScheduledFunctionSchedule": {
       "Type": "AWS::Events::Rule", 
       "Properties": {
-        "ScheduleExpression": "rate(1 minute)", 
+        "ScheduleExpression": "rate(1 minute)",
+        "Name": "test-schedule",
+	"Description": "test schedule",
+	"State": "ENABLED",	
         "Targets": [
           {
             "Id": "ScheduledFunctionScheduleLambdaTarget", 
