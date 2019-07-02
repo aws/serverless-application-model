@@ -344,6 +344,7 @@ class SNS(PushEventSource):
     principal = 'sns.amazonaws.com'
     property_types = {
             'Topic': PropertyType(True, is_str()),
+            'Region': PropertyType(False, is_str()),
             'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict)))))
     }
 
@@ -360,13 +361,15 @@ class SNS(PushEventSource):
             raise TypeError("Missing required keyword argument: function")
 
         return [self._construct_permission(function, source_arn=self.Topic),
-                self._inject_subscription(function, self.Topic, self.FilterPolicy)]
+                self._inject_subscription(function, self.Topic, self.Region, self.FilterPolicy)]
 
-    def _inject_subscription(self, function, topic, filterPolicy):
+    def _inject_subscription(self, function, topic, region, filterPolicy):
         subscription = SNSSubscription(self.logical_id)
         subscription.Protocol = 'lambda'
         subscription.Endpoint = function.get_runtime_attr("arn")
         subscription.TopicArn = topic
+        if region is not None:
+            subscription.Region = region
         if CONDITION in function.resource_attributes:
             subscription.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 

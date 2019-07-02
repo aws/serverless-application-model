@@ -31,7 +31,20 @@ class SnsEventSource(TestCase):
         self.assertEqual(subscription.TopicArn, 'arn:aws:sns:MyTopic')
         self.assertEqual(subscription.Protocol, 'lambda')
         self.assertEqual(subscription.Endpoint, 'arn:aws:lambda:mock')
+        self.assertIsNone(subscription.Region)
         self.assertIsNone(subscription.FilterPolicy)
+
+    def test_to_cloudformation_passes_the_region(self):
+        region = 'us-west-2'
+        self.sns_event_source.Region = region
+
+        resources = self.sns_event_source.to_cloudformation(
+            function=self.function)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[1].resource_type,
+                          'AWS::SNS::Subscription')
+        subscription = resources[1]
+        self.assertEqual(subscription.Region, region)
 
     def test_to_cloudformation_passes_the_filter_policy(self):
         filterPolicy = {
