@@ -246,7 +246,7 @@
       }
     },
     "ElasticsearchHttpPostPolicy": {
-      "Description": "Gives POST permissions to Elasticsearch",
+      "Description": "Gives POST and PUT permissions to Elasticsearch",
       "Parameters": {
         "DomainName": {
           "Description": "Name of Domain"
@@ -257,7 +257,8 @@
           {
             "Effect": "Allow",
             "Action": [
-              "es:ESHttpPost"
+              "es:ESHttpPost",
+              "es:ESHttpPut"
             ],
             "Resource": {
               "Fn::Sub": [
