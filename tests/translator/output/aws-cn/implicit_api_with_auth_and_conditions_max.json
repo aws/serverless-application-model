@@ -223,7 +223,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment13185ed4f8"
+          "Ref": "ServerlessRestApiDeployment6b0de9dc9a"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -594,17 +594,6 @@
       },
       "Condition": "FunctionCondition"
     },
-    "ServerlessRestApiDeployment13185ed4f8": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 13185ed4f830a9731f30c8561a781a0f560748c1",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -651,6 +640,17 @@
         }
       },
       "Condition": "FunctionCondition5"
+    },
+    "ServerlessRestApiDeployment6b0de9dc9a": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 6b0de9dc9a2450a248988d39c61e2ee23b257724",
+        "StageName": "Stage"
+      },
+      "Condition": "ServerlessRestApiCondition"
     },
     "MyFunction3WithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
@@ -772,6 +772,9 @@
                           }
                         },
                         "security": [
+                          {
+                            "api_key": []
+                          },
                           {
                             "MyCognitoAuth": []
                           }
@@ -916,19 +919,6 @@
           },
           "swagger": "2.0",
           "securityDefinitions": {
-            "MyCognitoAuth": {
-              "in": "header",
-              "type": "apiKey",
-              "name": "MyAuthorizationHeader",
-              "x-amazon-apigateway-authorizer": {
-                "identityValidationExpression": "myauthvalidationexpression",
-                "providerARNs": [
-                  "arn:aws:1"
-                ],
-                "type": "cognito_user_pools"
-              },
-              "x-amazon-apigateway-authtype": "cognito_user_pools"
-            },
             "MyLambdaTokenAuthNoneFunctionInvokeRole": {
               "in": "header",
               "type": "apiKey",
@@ -947,15 +937,39 @@
               },
               "x-amazon-apigateway-authtype": "custom"
             },
-            "MyCognitoAuthMultipleUserPools": {
+            "api_key": {
+              "type": "apiKey",
+              "name": "x-api-key",
+              "in": "header"
+            },
+            "MyLambdaRequestAuth": {
               "in": "header",
               "type": "apiKey",
-              "name": "MyAuthorizationHeader2",
+              "name": "Unused",
               "x-amazon-apigateway-authorizer": {
-                "identityValidationExpression": "myauthvalidationexpression2",
+                "type": "request",
+                "authorizerResultTtlInSeconds": 0,
+                "identitySource": "method.request.header.Authorization1, method.request.querystring.Authorization2, stageVariables.Authorization3, context.Authorization4",
+                "authorizerUri": {
+                  "Fn::Sub": [
+                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    {
+                      "__FunctionArn__": "arn:aws"
+                    }
+                  ]
+                },
+                "authorizerCredentials": "arn:aws:iam::123456789012:role/S3Access"
+              },
+              "x-amazon-apigateway-authtype": "custom"
+            },
+            "MyCognitoAuth": {
+              "in": "header",
+              "type": "apiKey",
+              "name": "MyAuthorizationHeader",
+              "x-amazon-apigateway-authorizer": {
+                "identityValidationExpression": "myauthvalidationexpression",
                 "providerARNs": [
-                  "arn:aws:2",
-                  "arn:aws:3"
+                  "arn:aws:1"
                 ],
                 "type": "cognito_user_pools"
               },
@@ -981,25 +995,19 @@
               },
               "x-amazon-apigateway-authtype": "custom"
             },
-            "MyLambdaRequestAuth": {
+            "MyCognitoAuthMultipleUserPools": {
               "in": "header",
               "type": "apiKey",
-              "name": "Unused",
+              "name": "MyAuthorizationHeader2",
               "x-amazon-apigateway-authorizer": {
-                "type": "request",
-                "authorizerResultTtlInSeconds": 0,
-                "identitySource": "method.request.header.Authorization1, method.request.querystring.Authorization2, stageVariables.Authorization3, context.Authorization4",
-                "authorizerUri": {
-                  "Fn::Sub": [
-                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
-                    {
-                      "__FunctionArn__": "arn:aws"
-                    }
-                  ]
-                },
-                "authorizerCredentials": "arn:aws:iam::123456789012:role/S3Access"
+                "identityValidationExpression": "myauthvalidationexpression2",
+                "providerARNs": [
+                  "arn:aws:2",
+                  "arn:aws:3"
+                ],
+                "type": "cognito_user_pools"
               },
-              "x-amazon-apigateway-authtype": "custom"
+              "x-amazon-apigateway-authtype": "cognito_user_pools"
             }
           }
         },

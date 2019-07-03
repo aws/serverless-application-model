@@ -123,9 +123,9 @@ class CloudWatchEvent(PushEventSource):
     resource_type = 'CloudWatchEvent'
     principal = 'events.amazonaws.com'
     property_types = {
-            'Pattern': PropertyType(False, is_type(dict)),
-            'Input': PropertyType(False, is_str()),
-            'InputPath': PropertyType(False, is_str())
+        'Pattern': PropertyType(False, is_type(dict)),
+        'Input': PropertyType(False, is_str()),
+        'InputPath': PropertyType(False, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
@@ -539,9 +539,9 @@ class Api(PushEventSource):
 
         if self.Auth:
             method_authorizer = self.Auth.get('Authorizer')
+            api_auth = api.get('Auth')
 
             if method_authorizer:
-                api_auth = api.get('Auth')
                 api_authorizers = api_auth and api_auth.get('Authorizers')
 
                 if method_authorizer != 'AWS_IAM':
@@ -566,6 +566,16 @@ class Api(PushEventSource):
                             'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
                                 method=self.Method, path=self.Path))
 
+            apikey_required_setting = self.Auth.get('ApiKeyRequired')
+            apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
+            if apikey_required_setting_is_false and not api_auth.get('ApiKeyRequired'):
+                raise InvalidEventException(
+                    self.relative_id,
+                    'Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] '
+                    'because the related API does not specify any ApiKeyRequired.'.format(
+                        method=self.Method, path=self.Path))
+
+            if method_authorizer or apikey_required_setting is not None:
                 editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
 
         if self.RequestModel:

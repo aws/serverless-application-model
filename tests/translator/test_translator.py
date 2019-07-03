@@ -260,6 +260,8 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_and_explicit_api_with_conditions',
         'api_with_cors_and_conditions_no_definitionbody',
         'api_with_auth_and_conditions_all_max',
+        'api_with_apikey_default_override',
+        'api_with_apikey_required',
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -331,7 +333,8 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_auth_all_minimum_openapi',
         'api_with_swagger_and_openapi_with_auth',
         'api_with_openapi_definition_body_no_flag',
-        'api_request_model_openapi_3'
+        'api_request_model_openapi_3',
+        'api_with_apikey_required_openapi_3'
       ],
       [
        ("aws", "ap-southeast-1"),

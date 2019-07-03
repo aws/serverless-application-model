@@ -162,3 +162,5 @@ Resources:
           Properties:
             Path: /users
             Method: put
+            Auth:
+              ApiKeyRequired: true
