@@ -808,14 +808,7 @@
                     "rekognition:CompareFaces",
                     "rekognition:DetectFaces"
                   ],
-                  "Resource": {
-                    "Fn::Sub": [
-                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
-                      {
-                        "collectionId": "collection"
-                      }
-                    ]
-                  },
+                  "Resource": "*",
                   "Effect": "Allow"
                 }
               ]

@@ -160,9 +160,9 @@ class SwaggerEditor(object):
 
         path_dict = self.get_path(path)
         path_dict[method][self._X_APIGW_INTEGRATION] = {
-                'type': 'aws_proxy',
-                'httpMethod': 'POST',
-                'uri': integration_uri
+            'type': 'aws_proxy',
+            'httpMethod': 'POST',
+            'uri': integration_uri
         }
 
         method_auth_config = method_auth_config or {}
@@ -389,7 +389,7 @@ class SwaggerEditor(object):
         # Allow-Methods is comma separated string
         return ','.join(allow_methods)
 
-    def add_authorizers(self, authorizers):
+    def add_authorizers_security_definitions(self, authorizers):
         """
         Add Authorizer definitions to the securityDefinitions part of Swagger.
 
@@ -400,11 +400,56 @@ class SwaggerEditor(object):
         for authorizer_name, authorizer in authorizers.items():
             self.security_definitions[authorizer_name] = authorizer.generate_swagger()
 
+    def add_awsiam_security_definition(self):
+        """
+        Adds AWS_IAM definition to the securityDefinitions part of Swagger.
+        Note: this method is idempotent
+        """
+
+        aws_iam_security_definition = {
+            'AWS_IAM': {
+                'x-amazon-apigateway-authtype': 'awsSigv4',
+                'type': 'apiKey',
+                'name': 'Authorization',
+                'in': 'header'
+            }
+        }
+
+        self.security_definitions = self.security_definitions or {}
+
+        # Only add the security definition if it doesn't exist.  This helps ensure
+        # that we minimize changes to the swagger in the case of user defined swagger
+        if 'AWS_IAM' not in self.security_definitions:
+            self.security_definitions.update(aws_iam_security_definition)
+
+    def add_apikey_security_definition(self):
+        """
+        Adds api_key definition to the securityDefinitions part of Swagger.
+        Note: this method is idempotent
+        """
+
+        api_key_security_definition = {
+            'api_key': {
+                "type": "apiKey",
+                "name": "x-api-key",
+                "in": "header"
+            }
+        }
+
+        self.security_definitions = self.security_definitions or {}
+
+        # Only add the security definition if it doesn't exist.  This helps ensure
+        # that we minimize changes to the swagger in the case of user defined swagger
+        if 'api_key' not in self.security_definitions:
+            self.security_definitions.update(api_key_security_definition)
+
     def set_path_default_authorizer(self, path, default_authorizer, authorizers,
                                     add_default_auth_to_preflight=True):
         """
-        Sets the DefaultAuthorizer for each method on this path. The DefaultAuthorizer won't be set if an Authorizer
-        was defined at the Function/Path/Method level
+        Adds the default_authorizer to the security block for each method on this path unless an Authorizer
+        was defined at the Function/Path/Method level. This is intended to be used to set the
+        authorizer security restriction for all api methods based upon the default configured in the
+        Serverless API.
 
         :param string path: Path name
         :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the
@@ -416,35 +461,170 @@ class SwaggerEditor(object):
 
         for method_name, method in self.get_path(path).items():
             normalized_method_name = self._normalize_method_name(method_name)
+
             # Excluding paramters section
             if normalized_method_name == "parameters":
                 continue
             if add_default_auth_to_preflight or normalized_method_name != "options":
-                self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
-                                           default_authorizer=default_authorizer, is_default=True)
+                normalized_method_name = self._normalize_method_name(method_name)
+                # It is possible that the method could have two definitions in a Fn::If block.
+                for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+                    # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                    if not self.method_definition_has_integration(method_definition):
+                        continue
+                    existing_security = method_definition.get('security', [])
+                    authorizer_list = ['AWS_IAM']
+                    if authorizers:
+                        authorizer_list.extend(authorizers.keys())
+                    authorizer_names = set(authorizer_list)
+                    existing_non_authorizer_security = []
+                    existing_authorizer_security = []
+
+                    # Split existing security into Authorizers and everything else
+                    # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
+                    # We want to ensure only a single Authorizer security entry exists while keeping everything else
+                    for security in existing_security:
+                        if authorizer_names.isdisjoint(security.keys()):
+                            existing_non_authorizer_security.append(security)
+                        else:
+                            existing_authorizer_security.append(security)
+
+                    none_idx = -1
+                    authorizer_security = []
+
+                    # Check for an existing Authorizer before applying the default. It would be simpler
+                    # if instead we applied the DefaultAuthorizer first and then simply
+                    # overwrote it if necessary, however, the order in which things get
+                    # applied (Function Api Events first; then Api Resource) complicates it.
+                    # Check if Function/Path/Method specified 'NONE' for Authorizer
+                    for idx, security in enumerate(existing_non_authorizer_security):
+                        is_none = any(key == 'NONE' for key in security.keys())
+
+                        if is_none:
+                            none_idx = idx
+                            break
+
+                    # NONE was found; remove it and don't add the DefaultAuthorizer
+                    if none_idx > -1:
+                        del existing_non_authorizer_security[none_idx]
+
+                    # Existing Authorizer found (defined at Function/Path/Method); use that instead of default
+                    elif existing_authorizer_security:
+                        authorizer_security = existing_authorizer_security
+
+                    # No existing Authorizer found; use default
+                    else:
+                        security_dict = {}
+                        security_dict[default_authorizer] = []
+                        authorizer_security = [security_dict]
+
+                    security = existing_non_authorizer_security + authorizer_security
+
+                    if security:
+                        method_definition['security'] = security
+
+                        # The first element of the method_definition['security'] should be AWS_IAM
+                        # because authorizer_list = ['AWS_IAM'] is hardcoded above
+                        if 'AWS_IAM' in method_definition['security'][0]:
+                            self.add_awsiam_security_definition()
+
+    def set_path_default_apikey_required(self, path):
+        """
+        Add the ApiKey security as required for each method on this path unless ApiKeyRequired
+        was defined at the Function/Path/Method level. This is intended to be used to set the
+        apikey security restriction for all api methods based upon the default configured in the
+        Serverless API.
+
+        :param string path: Path name
+        """
+
+        for method_name, _ in self.get_path(path).items():
+            # Excluding paramters section
+            if method_name == "parameters":
+                continue
+
+            normalized_method_name = self._normalize_method_name(method_name)
+            # It is possible that the method could have two definitions in a Fn::If block.
+            for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+                # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                if not self.method_definition_has_integration(method_definition):
+                    continue
+
+                existing_security = method_definition.get('security', [])
+                apikey_security_names = set(['api_key', 'api_key_false'])
+                existing_non_apikey_security = []
+                existing_apikey_security = []
+                apikey_security = []
+
+                # Split existing security into ApiKey and everything else
+                # (e.g. sigv4 (AWS_IAM), authorizers, NONE (marker for ignoring default authorizer))
+                # We want to ensure only a single ApiKey security entry exists while keeping everything else
+                for security in existing_security:
+                    if apikey_security_names.isdisjoint(security.keys()):
+                        existing_non_apikey_security.append(security)
+                    else:
+                        existing_apikey_security.append(security)
+
+                # Check for an existing method level ApiKey setting before applying the default. It would be simpler
+                # if instead we applied the default first and then simply
+                # overwrote it if necessary, however, the order in which things get
+                # applied (Function Api Events first; then Api Resource) complicates it.
+                # Check if Function/Path/Method specified 'False' for ApiKeyRequired
+                apikeyfalse_idx = -1
+                for idx, security in enumerate(existing_apikey_security):
+                    is_none = any(key == 'api_key_false' for key in security.keys())
+
+                    if is_none:
+                        apikeyfalse_idx = idx
+                        break
+
+                # api_key_false was found; remove it and don't add default api_key security setting
+                if apikeyfalse_idx > -1:
+                    del existing_apikey_security[apikeyfalse_idx]
+
+                # No existing ApiKey setting found or it's already set to the default
+                else:
+                    security_dict = {}
+                    security_dict['api_key'] = []
+                    apikey_security = [security_dict]
+
+                security = existing_non_apikey_security + apikey_security
+
+                if security != existing_security:
+                    method_definition['security'] = security
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
-        Adds auth settings for this path/method. Auth settings currently consist solely of Authorizers
-        but this method will eventually include setting other auth settings such as API Key,
-        Resource Policy, etc.
+        Adds auth settings for this path/method. Auth settings currently consist of Authorizers and ApiKeyRequired
+        but this method will eventually include setting other auth settings such as Resource Policy, etc.
+        This is used to configure the security for individual functions.
 
         :param string path: Path name
         :param string method_name: Method name
-        :param dict auth: Auth configuration such as Authorizers, ApiKey, ResourcePolicy (only Authorizers supported
-                          currently)
+        :param dict auth: Auth configuration such as Authorizers, ApiKeyRequired, ResourcePolicy
+                          (Authorizers and ApiKeyRequired supported currently)
         :param dict api: Reference to the related Api's properties as defined in the template.
         """
         method_authorizer = auth and auth.get('Authorizer')
         if method_authorizer:
-            api_auth = api.get('Auth')
-            api_authorizers = api_auth and api_auth.get('Authorizers')
-            default_authorizer = api_auth and api_auth.get('DefaultAuthorizer')
+            self._set_method_authorizer(path, method_name, method_authorizer)
 
-            self.set_method_authorizer(path, method_name, method_authorizer, api_authorizers, default_authorizer)
+        method_apikey_required = auth and auth.get('ApiKeyRequired')
+        if method_apikey_required is not None:
+            self._set_method_apikey_handling(path, method_name, method_apikey_required)
 
-    def set_method_authorizer(self, path, method_name, authorizer_name, authorizers, default_authorizer,
-                              is_default=False):
+    def _set_method_authorizer(self, path, method_name, authorizer_name):
+        """
+        Adds the authorizer_name to the security block for each method on this path.
+        This is used to configure the authorizer for individual functions.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param string authorizer_name: Name of the authorizer to use. Must be a key in the
+            authorizers param.
+        """
         normalized_method_name = self._normalize_method_name(method_name)
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
@@ -452,62 +632,15 @@ class SwaggerEditor(object):
             # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
             if not self.method_definition_has_integration(method_definition):
                 continue
+
             existing_security = method_definition.get('security', [])
-            # TEST: [{'sigv4': []}, {'api_key': []}])
-            authorizer_list = ['AWS_IAM']
-            if authorizers:
-                authorizer_list.extend(authorizers.keys())
-            authorizer_names = set(authorizer_list)
-            existing_non_authorizer_security = []
-            existing_authorizer_security = []
 
-            # Split existing security into Authorizers and everything else
-            # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
-            # We want to ensure only a single Authorizer security entry exists while keeping everything else
-            for security in existing_security:
-                if authorizer_names.isdisjoint(security.keys()):
-                    existing_non_authorizer_security.append(security)
-                else:
-                    existing_authorizer_security.append(security)
+            security_dict = {}
+            security_dict[authorizer_name] = []
+            authorizer_security = [security_dict]
 
-            none_idx = -1
-            authorizer_security = []
-
-            # If this is the Api-level DefaultAuthorizer we need to check for an
-            # existing Authorizer before applying the default. It would be simpler
-            # if instead we applied the DefaultAuthorizer first and then simply
-            # overwrote it if necessary, however, the order in which things get
-            # applied (Function Api Events first; then Api Resource) complicates it.
-            if is_default:
-                # Check if Function/Path/Method specified 'NONE' for Authorizer
-                for idx, security in enumerate(existing_non_authorizer_security):
-                    is_none = any(key == 'NONE' for key in security.keys())
-
-                    if is_none:
-                        none_idx = idx
-                        break
-
-                # NONE was found; remove it and don't add the DefaultAuthorizer
-                if none_idx > -1:
-                    del existing_non_authorizer_security[none_idx]
-
-                # Existing Authorizer found (defined at Function/Path/Method); use that instead of default
-                elif existing_authorizer_security:
-                    authorizer_security = existing_authorizer_security
-
-                # No existing Authorizer found; use default
-                else:
-                    security_dict = {}
-                    security_dict[authorizer_name] = []
-                    authorizer_security = [security_dict]
-
-            # This is a Function/Path/Method level Authorizer; simply set it
-            else:
-                security_dict = {}
-                security_dict[authorizer_name] = []
-                authorizer_security = [security_dict]
-
-            security = existing_non_authorizer_security + authorizer_security
+            # This assumes there are no autorizers already configured in the existing security block
+            security = existing_security + authorizer_security
 
             if security:
                 method_definition['security'] = security
@@ -515,18 +648,46 @@ class SwaggerEditor(object):
                 # The first element of the method_definition['security'] should be AWS_IAM
                 # because authorizer_list = ['AWS_IAM'] is hardcoded above
                 if 'AWS_IAM' in method_definition['security'][0]:
-                    aws_iam_security_definition = {
-                        'AWS_IAM': {
-                            'x-amazon-apigateway-authtype': 'awsSigv4',
-                            'type': 'apiKey',
-                            'name': 'Authorization',
-                            'in': 'header'
-                        }
-                    }
-                    if not self.security_definitions:
-                        self.security_definitions = aws_iam_security_definition
-                    elif 'AWS_IAM' not in self.security_definitions:
-                        self.security_definitions.update(aws_iam_security_definition)
+                    self.add_awsiam_security_definition()
+
+    def _set_method_apikey_handling(self, path, method_name, apikey_required):
+        """
+        Adds the apikey setting to the security block for each method on this path.
+        This is used to configure the authorizer for individual functions.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param bool apikey_required: Whether the apikey security is required
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+
+            existing_security = method_definition.get('security', [])
+
+            if apikey_required:
+                # We want to enable apikey required security
+                security_dict = {}
+                security_dict['api_key'] = []
+                apikey_security = [security_dict]
+                self.add_apikey_security_definition()
+            else:
+                # The method explicitly does NOT require apikey and there is an API default
+                # so let's add a marker 'api_key_false' so that we don't incorrectly override
+                # with the api default
+                security_dict = {}
+                security_dict['api_key_false'] = []
+                apikey_security = [security_dict]
+
+            # This assumes there are no autorizers already configured in the existing security block
+            security = existing_security + apikey_security
+
+            if security != existing_security:
+                method_definition['security'] = security
 
     def add_request_model_to_method(self, path, method_name, request_model):
         """
