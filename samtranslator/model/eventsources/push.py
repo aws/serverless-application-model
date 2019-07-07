@@ -79,7 +79,7 @@ class Schedule(PushEventSource):
         """Returns the CloudWatch Events Rule and Lambda Permission to which this Schedule event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
-        :returns: a list of vanilla CloudFormation Resources, to which this pull event expands
+        :returns: a list of vanilla CloudFormation Resources, to which this Schedule event expands
         :rtype: list
         """
         function = kwargs.get('function')
@@ -133,7 +133,7 @@ class CloudWatchEvent(PushEventSource):
         corresponds.
 
         :param dict kwargs: no existing resources need to be modified
-        :returns: a list of vanilla CloudFormation Resources, to which this pull event expands
+        :returns: a list of vanilla CloudFormation Resources, to which this CloudWatch Events event expands
         :rtype: list
         """
         function = kwargs.get('function')
