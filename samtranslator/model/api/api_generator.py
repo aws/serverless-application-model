@@ -13,6 +13,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_instrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.tags.resource_tagging import get_tag_list
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge",
@@ -31,7 +32,7 @@ GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusC
 class ApiGenerator(object):
 
     def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on,
-                 definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
+                 definition_body, definition_uri, name, stage_name, tags=None, endpoint_configuration=None,
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
                  auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
                  tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
@@ -47,6 +48,7 @@ class ApiGenerator(object):
         :param definition_uri: URI to API definition
         :param name: Name of the API Gateway resource
         :param stage_name: Name of the Stage
+        :param tags: Stage Tags
         :param access_log_setting: Whether to send access logs and where for Stage
         :param canary_setting: Canary Setting for Stage
         :param tracing_enabled: Whether active tracing with X-ray is enabled
@@ -63,6 +65,7 @@ class ApiGenerator(object):
         self.definition_uri = definition_uri
         self.name = name
         self.stage_name = stage_name
+        self.tags = tags
         self.endpoint_configuration = endpoint_configuration
         self.method_settings = method_settings
         self.binary_media = binary_media
@@ -197,6 +200,9 @@ class ApiGenerator(object):
 
         if swagger is not None:
             deployment.make_auto_deployable(stage, swagger)
+
+        if self.tags is not None:
+            stage.Tags = get_tag_list(self.tags)
 
         return stage
 
