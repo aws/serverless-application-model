@@ -1579,6 +1579,50 @@
           }
         ]
       }
+    },
+    "AppSyncCrudPolicy": {
+      "Description": "Gives create, read, update, and delete permissions to a AppSync resouce.",
+      "Parameters": {
+        "GraphQLAPIId": {
+          "Description": "The GraphQL API ID to access"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "appsync:Create*",
+              "appsync:StartSchemaCreation",
+              "appsync:GraphQL",
+              "appsync:Get*",
+              "appsync:List*",
+              "appsync:Update*",
+              "appsync:Delete*"
+            ],
+            "Resource": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:aws:appsync:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":apis/",
+                  {
+                    "Ref": "GraphQLAPIId"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
