@@ -10,6 +10,10 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: 'rate(1 minute)'
+            Name: test-schedule
+            Description: Test Schedule
+            Enabled: True
+
   TriggeredFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
