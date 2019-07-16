@@ -162,6 +162,7 @@ class TestTranslatorEndToEnd(TestCase):
         'application_with_intrinsics',
         'basic_layer',
         'cloudwatchevent',
+        'cloudwatchevent_schedule_properties',
         'cloudwatch_logs_with_ref',
         'cloudwatchlog',
         'streams',
