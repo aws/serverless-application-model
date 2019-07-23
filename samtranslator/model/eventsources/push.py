@@ -56,11 +56,11 @@ class PushEventSource(ResourceMacro):
         """
         if prefix is None:
             prefix = self.logical_id
-        if '-' in suffix or '_' in suffix:
+        if suffix.isalnum():
+            permission_logical_id = prefix + 'Permission' + suffix
+        else:
             generator = logical_id_generator.LogicalIdGenerator(prefix + 'Permission', suffix)
             permission_logical_id = generator.gen()
-        else:
-            permission_logical_id = prefix + 'Permission' + suffix
         lambda_permission = LambdaPermission(permission_logical_id,
                                              attributes=function.get_passthrough_resource_attributes())
         try:

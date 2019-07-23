@@ -185,11 +185,11 @@ class ApiGenerator(object):
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
         stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
-        if '-' in stage_name_prefix or '_' in stage_name_prefix:
+        if stage_name_prefix.isalnum():
+            stage_logical_id = self.logical_id + stage_name_prefix + 'Stage'
+        else:
             generator = logical_id_generator.LogicalIdGenerator(self.logical_id + 'Stage', stage_name_prefix)
             stage_logical_id = generator.gen()
-        else:
-            stage_logical_id = self.logical_id + stage_name_prefix + 'Stage'
         stage = ApiGatewayStage(stage_logical_id,
                                 attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
