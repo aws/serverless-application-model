@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from six import string_types
 
-from samtranslator.model.intrinsics import is_instrinsic
+from samtranslator.model.intrinsics import is_instrinsic, is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidTemplateException
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
@@ -120,7 +120,7 @@ class FunctionPolicies(object):
             return PolicyTypes.MANAGED_POLICY
 
         # Handle the special case for 'if' intrinsic function
-        if self._is_intrinsic_if(policy):
+        if is_intrinsic_if(policy):
             return self._get_type_from_intrinsic_if(policy)
 
         # Intrinsic functions are treated as managed policies by default
@@ -152,40 +152,6 @@ class FunctionPolicies(object):
             len(policy) == 1 and \
             self._policy_template_processor.has(list(policy.keys())[0]) is True
 
-    def _is_intrinsic_if(self, policy):
-        """
-        Is the given policy data an intrinsic if? Intrinsic function 'if' is a dictionary with single
-        key - if
-
-        :param policy: Input value to check if it is an intrinsic if
-        :return: True, if yes
-        """
-        if policy is not None \
-                and isinstance(policy, dict) \
-                and len(policy) == 1:
-
-            key = list(policy.keys())[0]
-            return key.startswith("Fn::If")
-
-        return False
-
-    def _is_intrinsic_no_value(selfs, policy):
-        """
-        Is the given policy data an intrinsic Ref: AWS::NoValue? Intrinsic function is a dictionary with single
-        key - Ref and value - AWS::NoValue
-
-        :param policy: Input value to check if it is an intrinsic if
-        :return: True, if yes
-        """
-        if policy is not None \
-                and isinstance(policy, dict) \
-                and len(policy) == 1:
-
-            key = list(policy.keys())[0]
-            return key == "Ref" and policy["Ref"] == "AWS::NoValue"
-
-        return False
-
     def _get_type_from_intrinsic_if(self, policy):
         """
         Returns the type of the given policy assuming that it is an intrinsic if function
@@ -193,13 +159,10 @@ class FunctionPolicies(object):
         :param policy: Input value to get type from
         :return: PolicyTypes: Type of the given policy. PolicyTypes.UNKNOWN, if type could not be inferred
         """
-        if not self._is_intrinsic_if(policy):
-            return PolicyTypes.UNKNOWN
-
         intrinsic_if_value = policy["Fn::If"]
 
         if not len(intrinsic_if_value) == 3:
-            raise InvalidTemplateException("Unexpected number of arguments to intrinsic function If")
+            raise InvalidTemplateException("Fn::If requires 3 arguments")
 
         if_data = intrinsic_if_value[1]
         else_data = intrinsic_if_value[2]
@@ -210,13 +173,14 @@ class FunctionPolicies(object):
         if if_data_type == else_data_type:
             return if_data_type
 
-        if self._is_intrinsic_no_value(if_data):
+        if is_intrinsic_no_value(if_data):
             return else_data_type
 
-        if self._is_intrinsic_no_value(else_data):
+        if is_intrinsic_no_value(else_data):
             return if_data_type
 
-        raise InvalidTemplateException("Could not resolve type of policy in intrinsic function If")
+        raise InvalidTemplateException("Different policy types within the same Fn::If statement is unsupported. "
+                                       "Separate different policy types into different Fn::If statements")
 
 
 class PolicyTypes(Enum):

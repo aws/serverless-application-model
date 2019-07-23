@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes, PolicyEntry
 from samtranslator.model.exceptions import InvalidTemplateException
+from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 
 class TestFunctionPolicies(TestCase):
 
@@ -340,7 +341,7 @@ class TestFunctionPolicies(TestCase):
             "Fn::If": "some value"
         }
 
-        self.assertTrue(self.function_policies._is_intrinsic_if(policy))
+        self.assertTrue(is_intrinsic_if(policy))
 
     def test_is_intrinsic_if_must_return_false_for_others(self):
         too_many_keys = {
@@ -352,16 +353,16 @@ class TestFunctionPolicies(TestCase):
             "Fn::Or": "some value"
         }
 
-        self.assertFalse(self.function_policies._is_intrinsic_if(too_many_keys))
-        self.assertFalse(self.function_policies._is_intrinsic_if(not_if))
-        self.assertFalse(self.function_policies._is_intrinsic_if(None))
+        self.assertFalse(is_intrinsic_if(too_many_keys))
+        self.assertFalse(is_intrinsic_if(not_if))
+        self.assertFalse(is_intrinsic_if(None))
 
     def test_is_intrinsic_no_value_must_return_true_for_no_value(self):
         policy = {
             "Ref": "AWS::NoValue"
         }
 
-        self.assertTrue(self.function_policies._is_intrinsic_no_value(policy))
+        self.assertTrue(is_intrinsic_no_value(policy))
 
     def test_is_intrinsic_no_value_must_return_false_for_other_value(self):
         bad_key = {
@@ -377,10 +378,10 @@ class TestFunctionPolicies(TestCase):
             "feR": "SWA::NoValue"
         }
 
-        self.assertFalse(self.function_policies._is_intrinsic_no_value(bad_key))
-        self.assertFalse(self.function_policies._is_intrinsic_no_value(bad_value))
-        self.assertFalse(self.function_policies._is_intrinsic_no_value(None))
-        self.assertFalse(self.function_policies._is_intrinsic_no_value(too_many_keys))
+        self.assertFalse(is_intrinsic_no_value(bad_key))
+        self.assertFalse(is_intrinsic_no_value(bad_value))
+        self.assertFalse(is_intrinsic_no_value(None))
+        self.assertFalse(is_intrinsic_no_value(too_many_keys))
 
     def test_get_type_with_intrinsic_if_must_return_managed_policy_type(self):
         managed_policy = {
@@ -469,11 +470,3 @@ class TestFunctionPolicies(TestCase):
 
         self.assertRaises(InvalidTemplateException, self.function_policies._get_type, policy_one)
         self.assertRaises(InvalidTemplateException, self.function_policies._get_type, policy_two)
-
-    def test_get_type_from_intrinsic_if_must_return_unknown_if_not_intrinsic_if(self):
-        policy = {
-            "Not::If": "some value"
-        }
-        expected_managed_policy = PolicyTypes.UNKNOWN
-
-        self.assertEquals(expected_managed_policy, self.function_policies._get_type_from_intrinsic_if(policy))
