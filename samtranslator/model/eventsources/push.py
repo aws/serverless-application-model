@@ -11,6 +11,7 @@ from samtranslator.model.sns import SNSSubscription
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iot import IotTopicRule
+from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -47,7 +48,8 @@ class PushEventSource(ResourceMacro):
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        lambda_permission = LambdaPermission(self.logical_id + 'Permission' + suffix,
+        permission_logical_id = logical_id_generator.LogicalIdGenerator(self.logical_id + 'Permission', suffix).gen()
+        lambda_permission = LambdaPermission(permission_logical_id,
                                              attributes=function.get_passthrough_resource_attributes())
 
         try:
