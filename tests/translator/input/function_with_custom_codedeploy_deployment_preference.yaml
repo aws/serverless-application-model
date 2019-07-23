@@ -1,0 +1,96 @@
+Mappings:
+  DeploymentPreferenceMap:
+    prod:
+      DeploymentPreference:
+        AllAtOnce
+    beta:
+      DeploymentPreference:
+        CustomDeployment
+
+Parameters:
+  Stage:
+    Type: String
+    Default: 'beta'
+  Deployment:
+    Type: String
+    Default: 'AllAtOnce'
+  Custom:
+    Type: String
+    Default: 'CustomDeployment'
+
+Conditions:
+  MyCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MinimalFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: TestDeploymentConfiguration
+
+  CustomWithFindInMap: # Doesn't work
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !FindInMap [DeploymentPreferenceMap, !Ref Stage, DeploymentPreference]
+
+  CustomWithCondition: # Works
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !If [MyCondition, TestDeploymentConfiguration, AllAtOnce]
+
+  CustomWithCondition2:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !If [MyCondition, !Sub "${Deployment}", !Ref Custom]
+
+  NormalWithSub:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !Sub ${Deployment}
+
+  CustomWithSub:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !Sub ${Custom}
+
+  NormalWithRef:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !Ref Deployment

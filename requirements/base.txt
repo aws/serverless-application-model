@@ -1,5 +1,5 @@
 boto3~=1.5
 enum34~=1.1; python_version<"3.4"
-jsonschema~=2.6
+jsonschema~=3.0
 six~=1.11
 

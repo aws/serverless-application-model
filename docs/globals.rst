@@ -73,6 +73,7 @@ Currently, the following resources and properties are being supported:
     Api:
       # Properties of AWS::Serverless::Api
       # Also works with Implicit APIs
+      Auth:
       Name:
       DefinitionUri:
       CacheClusterEnabled:
@@ -90,7 +91,7 @@ Currently, the following resources and properties are being supported:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable
-      SSESpecification
+      SSESpecification:
 
 Implicit APIs
 ~~~~~~~~~~~~~

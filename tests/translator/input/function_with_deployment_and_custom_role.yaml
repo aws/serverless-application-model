@@ -19,7 +19,7 @@ Resources:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
-      Role: !Ref DeploymentRole
+      Role: !GetAtt DeploymentRole.Arn
 
   DeploymentRole:
     Type: AWS::IAM::Role

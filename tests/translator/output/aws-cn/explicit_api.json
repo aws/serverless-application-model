@@ -1,5 +1,9 @@
 {
   "Parameters": {
+    "something": {
+      "Default": "something", 
+      "Type": "String"
+    }, 
     "MyStageName": {
       "Default": "Production", 
       "Type": "String"
@@ -9,11 +13,11 @@
     "GetHtmlFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "index.gethtml", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "webpage.zip"
         }, 
-        "Handler": "index.gethtml", 
         "Role": {
           "Fn::GetAtt": [
             "GetHtmlFunctionRole", 
@@ -160,17 +164,17 @@
     "GetHtmlApiStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
+        "DeploymentId": {
+          "Ref": "GetHtmlApiDeploymentf117c932f7"
+        }, 
+        "RestApiId": {
+          "Ref": "GetHtmlApi"
+        }, 
         "Variables": {
           "EndpointUri": {
             "Ref": "something"
           }, 
           "EndpointUri2": "http://example.com"
-        }, 
-        "RestApiId": {
-          "Ref": "GetHtmlApi"
-        }, 
-        "DeploymentId": {
-          "Ref": "GetHtmlApiDeploymentf117c932f7"
         }, 
         "StageName": {
           "Ref": "MyStageName"

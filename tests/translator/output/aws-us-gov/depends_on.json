@@ -74,8 +74,8 @@
           }
         ],
         "ProvisionedThroughput": {
-          "WriteCapacityUnits": "5",
-          "ReadCapacityUnits": "5"
+          "WriteCapacityUnits": 5,
+          "ReadCapacityUnits": 5
         }
       },
       "DependsOn": "MySamTable"

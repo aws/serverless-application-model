@@ -1,27 +1,35 @@
 {
   "Outputs": {
     "ImplicitApiDeployment": {
-      "Ref": "ServerlessRestApiDeploymente468b80e17"
+      "Value": {
+        "Ref": "ServerlessRestApiDeploymente468b80e17"
+      }
     }, 
     "ExplicitApiDeployment": {
-      "Ref": "MyApiDeployment359f256a3b"
+      "Value": {
+        "Ref": "MyApiDeployment359f256a3b"
+      }
     }, 
     "ExplicitApiStage": {
-      "Ref": "MyApifooStage"
+      "Value": {
+        "Ref": "MyApifooStage"
+      }
     }, 
     "ImplicitApiStage": {
-      "Ref": "ServerlessRestApiProdStage"
+      "Value": {
+        "Ref": "ServerlessRestApiProdStage"
+      }
     }
   }, 
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
           "Fn::GetAtt": [
             "MyFunctionRole", 

@@ -223,7 +223,8 @@ They work as follows:
 - **AllAtOnce**: This is an instant shifting of 100% of traffic to new version. This is useful if you want to run
   run pre/post hooks but don't want a gradual deployment. If you have a pipeline, you can set Beta/Gamma stages to 
   deploy instantly because the speed of deployments matter more than safety here.
-
+- **Custom**: Aside from Above mentioned Configurations, Custom Codedeploy configuration are also supported.
+  (Example. Type: CustomCodeDeployConfiguration)
 
 PreTraffic & PostTraffic Hooks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

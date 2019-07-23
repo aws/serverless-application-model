@@ -1,7 +1,12 @@
+Conditions:
+  TestCondition:
+    Fn::Equals:
+      - test
+      - test
 Resources:
   ConditionFunction:
     Type: 'AWS::Serverless::Function'
-    Condition: "this is a test"
+    Condition: "TestCondition"
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

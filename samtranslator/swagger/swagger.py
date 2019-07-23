@@ -404,7 +404,11 @@ class SwaggerEditor(object):
             authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
         """
+
         for method_name, method in self.get_path(path).items():
+            # Excluding paramters section
+            if method_name == "parameters":
+                continue
             self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
                                        default_authorizer=default_authorizer, is_default=True)
 
