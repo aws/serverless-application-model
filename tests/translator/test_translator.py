@@ -177,6 +177,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_maxage',
         'api_with_cors_and_only_credentials_false',
         'api_with_cors_no_definitionbody',
+        'api_with_incompatible_stage_name',
         'api_with_gateway_responses',
         'api_with_gateway_responses_all',
         'api_with_gateway_responses_minimal',
