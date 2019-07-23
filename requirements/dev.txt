@@ -9,7 +9,6 @@ pyyaml>=4.2b1
 pytest>=3.0.7
 mock>=2.0.0
 parameterized>=0.6.1
-requests>=2.20.0
 
 # Requirements for examples
 requests>=2.20.0
