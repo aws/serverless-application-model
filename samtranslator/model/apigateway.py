@@ -2,7 +2,7 @@ from re import match
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import is_type, one_of, is_str
+from samtranslator.model.types import is_type, one_of, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -40,6 +40,7 @@ class ApiGatewayStage(Resource):
             'Description': PropertyType(False, is_str()),
             'RestApiId': PropertyType(True, is_str()),
             'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
+            'Tags': PropertyType(False, list_of(is_type(dict))),
             'TracingEnabled': PropertyType(False, is_type(bool)),
             'Variables': PropertyType(False, is_type(dict)),
             "MethodSettings": PropertyType(False, is_type(list))

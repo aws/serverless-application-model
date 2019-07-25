@@ -33,7 +33,7 @@ def lambda_handler(event, context):
 
     operations = {
         'DELETE': lambda dynamo, x: dynamo.delete_item(TableName=table_name, **x),
-		'GET': lambda dynamo, x: dynamo.scan(TableName=table_name, **x) if x else dynamo.scan(TableName=table_name),
+	'GET': lambda dynamo, x: dynamo.scan(TableName=table_name, **x) if x else dynamo.scan(TableName=table_name),
         'POST': lambda dynamo, x: dynamo.put_item(TableName=table_name, **x),
         'PUT': lambda dynamo, x: dynamo.update_item(TableName=table_name, **x),
     }

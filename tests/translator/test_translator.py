@@ -162,6 +162,7 @@ class TestTranslatorEndToEnd(TestCase):
         'application_with_intrinsics',
         'basic_layer',
         'cloudwatchevent',
+        'cloudwatchevent_schedule_properties',
         'cloudwatch_logs_with_ref',
         'cloudwatchlog',
         'streams',
@@ -183,6 +184,8 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_minimum_compression_size',
         'api_with_resource_refs',
         'api_with_cors',
+        'api_with_cors_and_auth_no_preflight_auth',
+        'api_with_cors_and_auth_preflight_auth',
         'api_with_cors_and_only_methods',
         'api_with_cors_and_only_headers',
         'api_with_cors_and_only_origins',
@@ -198,6 +201,8 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_access_log_setting',
         'api_with_canary_setting',
         'api_with_xray_tracing',
+        'api_request_model',
+        'api_with_stage_tags',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -257,6 +262,8 @@ class TestTranslatorEndToEnd(TestCase):
         'implicit_and_explicit_api_with_conditions',
         'api_with_cors_and_conditions_no_definitionbody',
         'api_with_auth_and_conditions_all_max',
+        'api_with_apikey_default_override',
+        'api_with_apikey_required',
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -327,7 +334,9 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_open_api_version_2',
         'api_with_auth_all_minimum_openapi',
         'api_with_swagger_and_openapi_with_auth',
-        'api_with_openapi_definition_body_no_flag'
+        'api_with_openapi_definition_body_no_flag',
+        'api_request_model_openapi_3',
+        'api_with_apikey_required_openapi_3'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -469,6 +478,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_invalid_stagename',
     'error_api_with_invalid_open_api_version',
     'error_api_invalid_restapiid',
+    'error_api_invalid_request_model',
     'error_application_properties',
     'error_application_does_not_exist',
     'error_application_no_access',
