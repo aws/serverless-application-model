@@ -1,4 +1,5 @@
 ﻿import copy
+import json
 import re
 from six import string_types
 
@@ -257,7 +258,8 @@ class SwaggerEditor(object):
                                                                                            allow_credentials)
 
     def add_binary_media_types(self, binary_media_types):
-        self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = binary_media_types
+        bmt = json.loads(json.dumps(binary_media_types).replace('~1', '/'))
+        self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = bmt
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
                                           max_age=None, allow_credentials=None):
