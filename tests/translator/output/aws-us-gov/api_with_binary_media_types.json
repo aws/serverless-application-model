@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "BMT": {
+      "Default": "image~1jpg", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -103,17 +109,18 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "BinaryMediaTypes": [
-          "image/jpg", 
+          "image~1gif", 
           {
             "Fn::Join": [
-              "/", 
+              "~1", 
               [
                 "image", 
                 "png"
               ]
             ]
           }, 
-          "image/gif"
+          "application~1octet-stream", 
+          "image~1jpg"
         ], 
         "EndpointConfiguration": {
           "Types": [
@@ -145,7 +152,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentea8de7b9f0"
+          "Ref": "ServerlessRestApiDeployment9746c8328e"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -153,13 +160,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeploymentea8de7b9f0": {
+    "ServerlessRestApiDeployment9746c8328e": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: ea8de7b9f04eec70c7dba6863ed6ff707ea129de", 
+        "Description": "RestApi deployment id: 9746c8328eca81d7b29fed89d9203021b42242ec", 
         "StageName": "Stage"
       }
     }, 
@@ -189,7 +196,7 @@
           }, 
           "swagger": "2.0", 
           "x-amazon-apigateway-binary-media-types": [
-            "image/jpg", 
+            "image/gif", 
             {
               "Fn::Join": [
                 "/", 
@@ -202,10 +209,10 @@
           ]
         }, 
         "BinaryMediaTypes": [
-          "image/jpg", 
+          "image~1gif", 
           {
             "Fn::Join": [
-              "/", 
+              "~1", 
               [
                 "image", 
                 "png"

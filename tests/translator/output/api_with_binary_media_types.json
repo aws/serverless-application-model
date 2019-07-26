@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "BMT": {
+      "Default": "image~1jpg", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -47,16 +53,6 @@
         }
       }
     }, 
-    "ExplicitApiDeploymentf117c932f7": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
-        "StageName": "Stage"
-      }
-    }, 
     "ImplicitApiFunctionGetHtmlPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -103,17 +99,18 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "BinaryMediaTypes": [
-          "image/jpg", 
+          "image~1gif", 
           {
             "Fn::Join": [
-              "/", 
+              "~1", 
               [
                 "image", 
                 "png"
               ]
             ]
           }, 
-          "image/gif"
+          "application~1octet-stream", 
+          "image~1jpg"
         ], 
         "BodyS3Location": {
           "Bucket": "sam-demo-bucket", 
@@ -137,7 +134,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment706c6ba929"
+          "Ref": "ServerlessRestApiDeployment4f3fcf6bd1"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -145,13 +142,23 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeployment706c6ba929": {
+    "ExplicitApiDeploymentf117c932f7": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ServerlessRestApiDeployment4f3fcf6bd1": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 706c6ba9298c730536b2f4c51409cf33e5d616d4", 
+        "Description": "RestApi deployment id: 4f3fcf6bd13686961885c787e3a117b084ec6c3a", 
         "StageName": "Stage"
       }
     }, 
@@ -181,7 +188,7 @@
           }, 
           "swagger": "2.0", 
           "x-amazon-apigateway-binary-media-types": [
-            "image/jpg", 
+            "image/gif", 
             {
               "Fn::Join": [
                 "/", 
@@ -194,10 +201,10 @@
           ]
         }, 
         "BinaryMediaTypes": [
-          "image/jpg", 
+          "image~1gif", 
           {
             "Fn::Join": [
-              "/", 
+              "~1", 
               [
                 "image", 
                 "png"
