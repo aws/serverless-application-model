@@ -502,7 +502,7 @@ class Api(PushEventSource):
         if not stage or not suffix:
             raise RuntimeError("Could not add permission to lambda function.")
 
-        path = path.replace('{proxy+}', '*')
+        path = re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
         method = '*' if self.Method.lower() == 'any' else self.Method.upper()
 
         api_id = self.RestApiId
