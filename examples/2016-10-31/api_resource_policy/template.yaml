@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  StageName:
+    Default: 'prod'
+    Type: String
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async () => ‘Hello Worlds!'
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LambdaAPIDefinition
+            Method: Put
+            Path: /get
+
+  LambdaAPIDefinition:
+    Type: AWS::Serverless::Api
+    Properties:
+      Auth:
+        ResourcePolicy:
+          CustomStatements: [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }]
+      StageName: !Ref StageName
+      BinaryMediaTypes:
+        - image~1gif
+      EndpointConfiguration: PRIVATE
