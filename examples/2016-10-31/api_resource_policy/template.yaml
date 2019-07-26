@@ -9,7 +9,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       InlineCode: |
-        exports.handler = async () => ‘Hello Worlds!'
+        exports.handler = async () => "Hello World!"
       Handler: index.handler
       Runtime: nodejs8.10
       Events:
