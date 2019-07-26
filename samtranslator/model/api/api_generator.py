@@ -23,8 +23,8 @@ CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
 AuthProperties = namedtuple("_AuthProperties",
                             ["Authorizers", "DefaultAuthorizer", "InvokeRole", "AddDefaultAuthorizerToCorsPreflight",
-                             "ApiKeyRequired"])
-AuthProperties.__new__.__defaults__ = (None, None, None, True, None)
+                             "ApiKeyRequired", "ResourcePolicy"])
+AuthProperties.__new__.__defaults__ = (None, None, None, True, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
@@ -325,6 +325,8 @@ class ApiGenerator(object):
             swagger_editor.add_apikey_security_definition()
             self._set_default_apikey_required(swagger_editor)
 
+        if auth_properties.ResourcePolicy:
+            swagger_editor.add_resource_policy(auth_properties.ResourcePolicy)
         # Assign the Swagger back to template
         # self.definition_body = self._openapi_auth_postprocess(swagger_editor.swagger)
         self.definition_body = swagger_editor.swagger

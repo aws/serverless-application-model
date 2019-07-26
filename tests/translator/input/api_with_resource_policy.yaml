@@ -1,0 +1,12 @@
+Resources:
+ ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ResourcePolicy:
+          CustomStatements: [{
+              Action: 'execute-api:Invoke', # Optional; Default: execute-api:Invoke
+              Resource: ['execute-api:/*/*/*'], # Optional; constructed based on Stagename, Path, and Method.
+            }]
+      
