@@ -1,4 +1,5 @@
 ﻿import copy
+import re
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
@@ -16,6 +17,7 @@ class SwaggerEditor(object):
 
     _OPTIONS_METHOD = "options"
     _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
+    _X_APIGW_BINARY_MEDIA_TYPES = 'x-amazon-apigateway-binary-media-types'
     _CONDITIONAL_IF = "Fn::If"
     _X_APIGW_GATEWAY_RESPONSES = 'x-amazon-apigateway-gateway-responses'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
@@ -36,6 +38,7 @@ class SwaggerEditor(object):
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", {})
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
+        self.definitions = self._doc.get('definitions', {})
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -253,6 +256,9 @@ class SwaggerEditor(object):
                                                                                            max_age,
                                                                                            allow_credentials)
 
+    def add_binary_media_types(self, binary_media_types):
+        self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = binary_media_types
+
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
                                           max_age=None, allow_credentials=None):
         """
@@ -394,7 +400,8 @@ class SwaggerEditor(object):
         for authorizer_name, authorizer in authorizers.items():
             self.security_definitions[authorizer_name] = authorizer.generate_swagger()
 
-    def set_path_default_authorizer(self, path, default_authorizer, authorizers):
+    def set_path_default_authorizer(self, path, default_authorizer, authorizers,
+                                    add_default_auth_to_preflight=True):
         """
         Sets the DefaultAuthorizer for each method on this path. The DefaultAuthorizer won't be set if an Authorizer
         was defined at the Function/Path/Method level
@@ -403,14 +410,18 @@ class SwaggerEditor(object):
         :param string default_authorizer: Name of the authorizer to use as the default. Must be a key in the
             authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
+        :param bool add_default_auth_to_preflight: Bool of whether to add the default
+            authorizer to OPTIONS preflight requests.
         """
 
         for method_name, method in self.get_path(path).items():
+            normalized_method_name = self._normalize_method_name(method_name)
             # Excluding paramters section
-            if method_name == "parameters":
+            if normalized_method_name == "parameters":
                 continue
-            self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
-                                       default_authorizer=default_authorizer, is_default=True)
+            if add_default_auth_to_preflight or normalized_method_name != "options":
+                self.set_method_authorizer(path, method_name, default_authorizer, authorizers,
+                                           default_authorizer=default_authorizer, is_default=True)
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
@@ -517,6 +528,61 @@ class SwaggerEditor(object):
                     elif 'AWS_IAM' not in self.security_definitions:
                         self.security_definitions.update(aws_iam_security_definition)
 
+    def add_request_model_to_method(self, path, method_name, request_model):
+        """
+        Adds request model body parameter for this path/method.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param dict request_model: Model name
+        """
+        model_name = request_model and request_model.get('Model').lower()
+        model_required = request_model and request_model.get('Required')
+
+        normalized_method_name = self._normalize_method_name(method_name)
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+
+            if self._doc.get('swagger') is not None:
+
+                existing_parameters = method_definition.get('parameters', [])
+
+                parameter = {
+                    'in': 'body',
+                    'name': model_name,
+                    'schema': {
+                        '$ref': '#/definitions/{}'.format(model_name)
+                    }
+                }
+
+                if model_required is not None:
+                    parameter['required'] = model_required
+
+                existing_parameters.append(parameter)
+
+                method_definition['parameters'] = existing_parameters
+
+            elif self._doc.get("openapi") and \
+                    re.search(SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]) is not None:
+
+                method_definition['requestBody'] = {
+                    'content': {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/{}".format(model_name)
+                            }
+                        }
+
+                    }
+                }
+
+                if model_required is not None:
+                    method_definition['requestBody']['required'] = model_required
+
     def add_gateway_responses(self, gateway_responses):
         """
         Add Gateway Response definitions to Swagger.
@@ -527,6 +593,29 @@ class SwaggerEditor(object):
 
         for response_type, response in gateway_responses.items():
             self.gateway_responses[response_type] = response.generate_swagger()
+
+    def add_models(self, models):
+        """
+        Add Model definitions to Swagger.
+
+        :param dict models: Dictionary of Model schemas which gets translated
+        :return:
+        """
+
+        self.definitions = self.definitions or {}
+
+        for model_name, schema in models.items():
+
+            model_type = schema.get('type')
+            model_properties = schema.get('properties')
+
+            if not model_type:
+                raise ValueError("Invalid input. Value for type is required")
+
+            if not model_properties:
+                raise ValueError("Invalid input. Value for properties is required")
+
+            self.definitions[model_name.lower()] = schema
 
     @property
     def swagger(self):
@@ -543,6 +632,8 @@ class SwaggerEditor(object):
             self._doc["securityDefinitions"] = self.security_definitions
         if self.gateway_responses:
             self._doc[self._X_APIGW_GATEWAY_RESPONSES] = self.gateway_responses
+        if self.definitions:
+            self._doc['definitions'] = self.definitions
 
         return copy.deepcopy(self._doc)
 
@@ -554,10 +645,14 @@ class SwaggerEditor(object):
         :param dict data: Data to be validated
         :return: True, if data is a Swagger
         """
-        return bool(data) and \
-            isinstance(data, dict) and \
-            bool(data.get("swagger")) and \
-            isinstance(data.get('paths'), dict)
+
+        if bool(data) and isinstance(data, dict) and isinstance(data.get('paths'), dict):
+            if bool(data.get("swagger")):
+                return True
+            elif bool(data.get("openapi")):
+                return re.search(SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]) is not None
+            return False
+        return False
 
     @staticmethod
     def gen_skeleton():
@@ -595,3 +690,13 @@ class SwaggerEditor(object):
             return SwaggerEditor._X_ANY_METHOD
         else:
             return method
+
+    @staticmethod
+    def get_openapi_versions_supported_regex():
+        openapi_version_supported_regex = r"\A[2-3](\.\d)(\.\d)?$"
+        return openapi_version_supported_regex
+
+    @staticmethod
+    def get_openapi_version_3_regex():
+        openapi_version_3_regex = r"\A3(\.\d)(\.\d)?$"
+        return openapi_version_3_regex

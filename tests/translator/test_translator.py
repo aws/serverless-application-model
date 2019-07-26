@@ -179,9 +179,12 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_aws_iam_auth_overrides',
         'api_with_method_settings',
         'api_with_binary_media_types',
+        'api_with_binary_media_types_definition_body',
         'api_with_minimum_compression_size',
         'api_with_resource_refs',
         'api_with_cors',
+        'api_with_cors_and_auth_no_preflight_auth',
+        'api_with_cors_and_auth_preflight_auth',
         'api_with_cors_and_only_methods',
         'api_with_cors_and_only_headers',
         'api_with_cors_and_only_origins',
@@ -197,6 +200,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_access_log_setting',
         'api_with_canary_setting',
         'api_with_xray_tracing',
+        'api_request_model',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -267,6 +271,78 @@ class TestTranslatorEndToEnd(TestCase):
     @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_transform_success(self, testcase, partition_with_region):
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
+        manifest = json.loads(json.dumps(manifest))
+        partition_folder = partition if partition != "aws" else ""
+        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json')
+        expected = json.load(open(expected_filepath, 'r'))
+
+        with patch('boto3.session.Session.region_name', region):
+            parameter_values = get_template_parameter_values()
+            mock_policy_loader = MagicMock()
+            mock_policy_loader.load.return_value = {
+                'AWSLambdaBasicExecutionRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'.format(partition),
+                'AmazonDynamoDBFullAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess'.format(partition),
+                'AmazonDynamoDBReadOnlyAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess'.format(partition),
+                'AWSLambdaRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaRole'.format(partition),
+            }
+
+            output_fragment = transform(
+                manifest, parameter_values, mock_policy_loader)
+
+        print(json.dumps(output_fragment, indent=2))
+
+        # Run cfn-lint on translator test output files.
+        rules = cfnlint.core.get_rules([], LINT_IGNORE_WARNINGS, [])
+
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info.major >= 3:
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
+            output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        else: # deprecation warning catching in py2
+            import warnings
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore",category=DeprecationWarning)
+                output_template = cfnlint.decode.cfn_json.load(expected_filepath)
+        runner = cfnlint.Runner(rules, expected_filepath, output_template, [region])
+        matches = []
+
+        # Only run linter on normal/gov partitions. It errors on china regions
+        if testcase not in LINT_IGNORE_TESTS and partition != 'aws-cn':
+            matches = runner.run()
+        print('cfn-lint ({}): {}'.format(expected_filepath, matches))
+
+        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+        assert len(matches) == 0
+
+    @parameterized.expand(
+      itertools.product([
+        'explicit_api_openapi_3',
+        'api_with_auth_all_maximum_openapi_3',
+        'api_with_cors_openapi_3',
+        'api_with_gateway_responses_all_openapi_3',
+        'api_with_open_api_version',
+        'api_with_open_api_version_2',
+        'api_with_auth_all_minimum_openapi',
+        'api_with_swagger_and_openapi_with_auth',
+        'api_with_openapi_definition_body_no_flag',
+        'api_request_model_openapi_3'
+      ],
+      [
+       ("aws", "ap-southeast-1"),
+       ("aws-cn", "cn-north-1"),
+       ("aws-us-gov", "us-gov-west-1")
+      ] # Run all the above tests against each of the list of partitions to test against
+      )
+    )
+    @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    def test_transform_success_openapi3(self, testcase, partition_with_region):
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
@@ -395,7 +471,9 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_invalid_definitionuri',
     'error_api_invalid_definitionbody',
     'error_api_invalid_stagename',
+    'error_api_with_invalid_open_api_version',
     'error_api_invalid_restapiid',
+    'error_api_invalid_request_model',
     'error_application_properties',
     'error_application_does_not_exist',
     'error_application_no_access',
@@ -440,7 +518,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_policy_template_invalid_value',
     'error_function_with_unknown_policy_template',
     'error_function_with_invalid_policy_statement',
-    'error_function_with_invalid_condition_name'
+    'error_function_with_invalid_condition_name',
+    'error_invalid_document_empty_semantic_version'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)

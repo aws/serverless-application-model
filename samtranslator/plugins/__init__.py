@@ -1,6 +1,6 @@
 import logging
 
-from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidDocumentException
 from enum import Enum
 
 
@@ -128,7 +128,7 @@ class SamPlugins(object):
 
             try:
                 getattr(plugin, method_name)(*args, **kwargs)
-            except InvalidResourceException as ex:
+            except (InvalidResourceException, InvalidDocumentException) as ex:
                 # Don't need to log these because they don't result in crashes
                 raise ex
             except Exception as ex:

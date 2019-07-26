@@ -1,0 +1,291 @@
+{
+  "Resources": {
+    "ImplicitApiFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ImplicitApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs4.3", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ImplicitApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApiDeployment9252467a1e": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 9252467a1edc49ba35cb258640f5e3734cc9fab1"
+      }
+    }, 
+    "ImplicitApiFunctionGetHtmlPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ], 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.1.1", 
+          "components": {
+            "securitySchemes": {
+              "MyCognitoAuth": {
+                "in": "header", 
+                "type": "apiKey", 
+                "name": "Authorization", 
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    {
+                      "Fn::GetAtt": [
+                        "MyUserPool", 
+                        "Arn"
+                      ]
+                    }
+                  ], 
+                  "type": "cognito_user_pools"
+                }, 
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
+              }
+            }
+          }
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Name": "some api", 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod", 
+        "CacheClusterSize": "1.6", 
+        "Variables": {
+          "SomeVar": "Value"
+        }, 
+        "CacheClusterEnabled": true, 
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymente1212668e0"
+        }
+      }
+    }, 
+    "ServerlessRestApiDeploymente1212668e0": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: e1212668e096994ab32167666f5a877bd6ac5fad", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiSomeStageStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "SomeStage", 
+        "CacheClusterSize": "1.6", 
+        "Variables": {
+          "SomeVar": "Value"
+        }, 
+        "CacheClusterEnabled": true, 
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment9252467a1e"
+        }
+      }
+    }, 
+    "ImplicitApiFunctionGetHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyUserPool": {
+      "Type": "AWS::Cognito::UserPool", 
+      "Properties": {
+        "UsernameAttributes": [
+          "email"
+        ], 
+        "UserPoolName": "UserPoolName", 
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 8
+          }
+        }, 
+        "Schema": [
+          {
+            "AttributeDataType": "String", 
+            "Required": false, 
+            "Name": "email"
+          }
+        ]
+      }
+    }, 
+    "ServerlessRestApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ], 
+                "responses": {}
+              }
+            }
+          }, 
+          "swagger": "2.0", 
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "in": "header", 
+              "type": "apiKey", 
+              "name": "Authorization", 
+              "x-amazon-apigateway-authorizer": {
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool", 
+                      "Arn"
+                    ]
+                  }
+                ], 
+                "type": "cognito_user_pools"
+              }, 
+              "x-amazon-apigateway-authtype": "cognito_user_pools"
+            }
+          }
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Name": "some api", 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }
+  }
+}
