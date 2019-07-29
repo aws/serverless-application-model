@@ -754,61 +754,6 @@ class SwaggerEditor(object):
                 if model_required is not None:
                     method_definition['requestBody']['required'] = model_required
 
-    def add_request_model_to_method(self, path, method_name, request_model):
-        """
-        Adds request model body parameter for this path/method.
-
-        :param string path: Path name
-        :param string method_name: Method name
-        :param dict request_model: Model name
-        """
-        model_name = request_model and request_model.get('Model').lower()
-        model_required = request_model and request_model.get('Required')
-
-        normalized_method_name = self._normalize_method_name(method_name)
-        # It is possible that the method could have two definitions in a Fn::If block.
-        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
-
-            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
-            if not self.method_definition_has_integration(method_definition):
-                continue
-
-            if self._doc.get('swagger') is not None:
-
-                existing_parameters = method_definition.get('parameters', [])
-
-                parameter = {
-                    'in': 'body',
-                    'name': model_name,
-                    'schema': {
-                        '$ref': '#/definitions/{}'.format(model_name)
-                    }
-                }
-
-                if model_required is not None:
-                    parameter['required'] = model_required
-
-                existing_parameters.append(parameter)
-
-                method_definition['parameters'] = existing_parameters
-
-            elif self._doc.get("openapi") and \
-                    re.search(SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]) is not None:
-
-                method_definition['requestBody'] = {
-                    'content': {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/{}".format(model_name)
-                            }
-                        }
-
-                    }
-                }
-
-                if model_required is not None:
-                    method_definition['requestBody']['required'] = model_required
-
     def add_gateway_responses(self, gateway_responses):
         """
         Add Gateway Response definitions to Swagger.
