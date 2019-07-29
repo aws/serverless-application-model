@@ -1,4 +1,18 @@
 {
+  "Parameters": {
+    "ReadCapacity": {
+      "Default": 15,
+      "Type": "Number"
+    },
+    "WriteCapacity": {
+      "Default": 15,
+      "Type": "Number"
+    },
+    "EnableSSE": {
+      "Default": true,
+      "Type": "String"
+    }
+  },
   "Resources": {
     "MinimalTableRefParamLongForm": {
       "Type": "AWS::DynamoDB::Table",

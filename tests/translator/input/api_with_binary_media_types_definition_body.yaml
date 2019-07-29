@@ -1,0 +1,24 @@
+Globals:
+  Api:
+    BinaryMediaTypes:
+      - image/jpg
+      - {"Fn::Join": ["/", ["image", "png"]]}
+
+Resources:
+  ExplicitApiManagedSwagger:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      BinaryMediaTypes:
+        - image/gif
+
+  ExplicitApiDefinitionBody:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      BinaryMediaTypes:
+        - application/json
+      DefinitionBody: {
+          "paths": {}, 
+          "swagger": "2.0", 
+      }

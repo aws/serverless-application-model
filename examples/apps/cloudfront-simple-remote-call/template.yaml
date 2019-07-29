@@ -10,7 +10,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       CodeUri: .
       Description: >-
         Blueprint for generating a response from origin-request trigger

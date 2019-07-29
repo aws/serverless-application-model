@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "MyStageName": {
+      "Default": "beta", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "MyAwesomeFunctionAliasLive": {
       "Type": "AWS::Lambda::Alias", 
@@ -312,11 +318,11 @@
     "MyAwesomeFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
           "Fn::GetAtt": [
             "MyAwesomeFunctionRole", 
@@ -429,19 +435,16 @@
     "GetHtmlApiStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
-        "Variables": {
-          "LambdaFunction": {
-            "Fn::GetAtt": [
-              "MyAwesomeFunctionAliasLive", 
-              "Arn"
-            ]
-          }
+        "DeploymentId": {
+          "Ref": "GetHtmlApiDeploymentf117c932f7"
         }, 
         "RestApiId": {
           "Ref": "GetHtmlApi"
         }, 
-        "DeploymentId": {
-          "Ref": "GetHtmlApiDeploymentf117c932f7"
+        "Variables": {
+          "LambdaFunction": {
+            "Ref": "MyAwesomeFunction"
+          }
         }, 
         "StageName": {
           "Ref": "MyStageName"

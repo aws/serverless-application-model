@@ -87,3 +87,6 @@ Resources:
 
         - FilterLogEventsPolicy:
             LogGroupName: name
+
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: name

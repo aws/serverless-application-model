@@ -22,7 +22,18 @@ Resources:
           Properties:
             Path: /foo
             Method: any
-
+  RestApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
+  GetHtmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.handler
+      Runtime: nodejs8.10
   ExplicitApi:
     Type: AWS::Serverless::Api
     Properties:

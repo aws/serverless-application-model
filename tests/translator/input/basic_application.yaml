@@ -1,3 +1,8 @@
+Conditions:
+  TestCondition:
+    Fn::Equals:
+      - True
+      - False
 Resources:
   BasicApplication:
     Type: 'AWS::Serverless::Application'
@@ -16,7 +21,7 @@ Resources:
         TagName: TagValue
       Parameters:
         IdentityNameParameter: IdentityName
-      NotificationArns:
+      NotificationARNs:
         - arn:aws:sns:us-east-1:123456789012:sns-arn
       TimeoutInMinutes: 15
 
@@ -29,7 +34,7 @@ Resources:
 
   ApplicationWithCondition:
     Type: 'AWS::Serverless::Application'
-    Condition: "this is a test"    
+    Condition: TestCondition   
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
