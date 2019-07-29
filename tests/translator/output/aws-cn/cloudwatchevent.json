@@ -154,7 +154,7 @@
     "ScheduledFunctionSchedule": {
       "Type": "AWS::Events::Rule", 
       "Properties": {
-        "ScheduleExpression": "rate(1 minute)", 
+        "ScheduleExpression": "rate(1 minute)",
         "Targets": [
           {
             "Id": "ScheduledFunctionScheduleLambdaTarget", 

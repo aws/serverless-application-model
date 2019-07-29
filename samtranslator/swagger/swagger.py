@@ -1,4 +1,5 @@
 ﻿import copy
+import json
 import re
 from six import string_types
 
@@ -169,10 +170,18 @@ class SwaggerEditor(object):
         api_auth_config = api_auth_config or {}
         if method_auth_config.get('Authorizer') == 'AWS_IAM' \
            or api_auth_config.get('DefaultAuthorizer') == 'AWS_IAM' and not method_auth_config:
-            self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = self._generate_integration_credentials(
-                method_invoke_role=method_auth_config.get('InvokeRole'),
-                api_invoke_role=api_auth_config.get('InvokeRole')
+            method_invoke_role = method_auth_config.get('InvokeRole')
+            if not method_invoke_role and 'InvokeRole' in method_auth_config:
+                method_invoke_role = 'NONE'
+            api_invoke_role = api_auth_config.get('InvokeRole')
+            if not api_invoke_role and 'InvokeRole' in api_auth_config:
+                api_invoke_role = 'NONE'
+            credentials = self._generate_integration_credentials(
+                method_invoke_role=method_invoke_role,
+                api_invoke_role=api_invoke_role
             )
+            if credentials and credentials != 'NONE':
+                self.paths[path][method][self._X_APIGW_INTEGRATION]['credentials'] = credentials
 
         # If 'responses' key is *not* present, add it with an empty dict as value
         path_dict[method].setdefault('responses', {})
@@ -257,7 +266,8 @@ class SwaggerEditor(object):
                                                                                            allow_credentials)
 
     def add_binary_media_types(self, binary_media_types):
-        self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = binary_media_types
+        bmt = json.loads(json.dumps(binary_media_types).replace('~1', '/'))
+        self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = bmt
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
                                           max_age=None, allow_credentials=None):

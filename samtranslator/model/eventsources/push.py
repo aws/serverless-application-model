@@ -74,14 +74,17 @@ class Schedule(PushEventSource):
     principal = 'events.amazonaws.com'
     property_types = {
             'Schedule': PropertyType(True, is_str()),
-            'Input': PropertyType(False, is_str())
+            'Input': PropertyType(False, is_str()),
+            'Enabled': PropertyType(False, is_type(bool)),
+            'Name': PropertyType(False, is_str()),
+            'Description': PropertyType(False, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
         """Returns the CloudWatch Events Rule and Lambda Permission to which this Schedule event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
-        :returns: a list of vanilla CloudFormation Resources, to which this pull event expands
+        :returns: a list of vanilla CloudFormation Resources, to which this Schedule event expands
         :rtype: list
         """
         function = kwargs.get('function')
@@ -95,6 +98,10 @@ class Schedule(PushEventSource):
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
+        if self.Enabled is not None:
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+        events_rule.Name = self.Name
+        events_rule.Description = self.Description
         events_rule.Targets = [self._construct_target(function)]
 
         source_arn = events_rule.get_runtime_attr("arn")
@@ -135,7 +142,7 @@ class CloudWatchEvent(PushEventSource):
         corresponds.
 
         :param dict kwargs: no existing resources need to be modified
-        :returns: a list of vanilla CloudFormation Resources, to which this pull event expands
+        :returns: a list of vanilla CloudFormation Resources, to which this CloudWatch Events event expands
         :rtype: list
         """
         function = kwargs.get('function')
@@ -498,7 +505,7 @@ class Api(PushEventSource):
         if not stage or not suffix:
             raise RuntimeError("Could not add permission to lambda function.")
 
-        path = path.replace('{proxy+}', '*')
+        path = re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
         method = '*' if self.Method.lower() == 'any' else self.Method.upper()
 
         api_id = self.RestApiId
