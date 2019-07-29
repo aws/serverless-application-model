@@ -120,7 +120,7 @@ class ApiGenerator(object):
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
             # # Post Process OpenApi Auth Settings
-            self.definition_body = self._openapi_auth_postprocess(self.definition_body)
+            self.definition_body = self._openapi_postprocess(self.definition_body)
             rest_api.Body = self.definition_body
 
         if self.name:
