@@ -11,6 +11,7 @@ Resources:
           Type: SNS
           Properties:
             Topic: topicArn
+            Region: region
             FilterPolicy:
               store:
               - example_corp

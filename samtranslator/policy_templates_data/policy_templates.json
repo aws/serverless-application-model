@@ -246,7 +246,7 @@
       }
     },
     "ElasticsearchHttpPostPolicy": {
-      "Description": "Gives POST permissions to Elasticsearch",
+      "Description": "Gives POST and PUT permissions to Elasticsearch",
       "Parameters": {
         "DomainName": {
           "Description": "Name of Domain"
@@ -257,7 +257,8 @@
           {
             "Effect": "Allow",
             "Action": [
-              "es:ESHttpPost"
+              "es:ESHttpPost",
+              "es:ESHttpPut"
             ],
             "Resource": {
               "Fn::Sub": [
@@ -1051,9 +1052,7 @@
     "RekognitionFacesPolicy": {
       "Description": "Gives permission to compare and detect faces and labels",
       "Parameters": {
-        "CollectionId": {
-          "Description": "ID of the collection"
-        }
+
       },
       "Definition": {
         "Statement": [
@@ -1063,16 +1062,7 @@
               "rekognition:CompareFaces",
               "rekognition:DetectFaces"
             ],
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
-                {
-                  "collectionId": {
-                    "Ref": "CollectionId"
-                  }
-                }
-              ]
-            }
+            "Resource": "*"
           }
         ]
       }

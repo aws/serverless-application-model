@@ -28,7 +28,6 @@ Resources:
             Auth:
               Authorizer: AWS_IAM
 
-
   HtmlApi:
     Type: AWS::Serverless::Api
     Properties:

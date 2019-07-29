@@ -1,0 +1,51 @@
+Resources:
+  MyApiWithAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true
+
+  MyFunctionWithApiKeyRequiredDefault:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        MyApiWithApiKeyRequiredDefault:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAuth
+            Path: /ApiKeyDefault
+            Method: get
+  MyFunctionWithApiKeyRequiredTrue:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        MyApiWithApiKeyRequiredTrue:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAuth
+            Path: /ApiKeyTrue
+            Method: get
+            Auth:
+              ApiKeyRequired: true
+  MyFunctionWithApiKeyRequiredFalse:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        MyApiWithApiKeyRequiredFalse:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAuth
+            Path: /ApiKeyFalse
+            Method: get
+            Auth:
+              ApiKeyRequired: false

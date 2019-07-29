@@ -8,5 +8,6 @@ class SNSSubscription(Resource):
         'Endpoint': PropertyType(True, is_str()),
         'Protocol': PropertyType(True, is_str()),
         'TopicArn': PropertyType(True, is_str()),
+        'Region': PropertyType(False, is_str()),
         'FilterPolicy': PropertyType(False, is_type(dict))
     }

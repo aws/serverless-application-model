@@ -131,6 +131,7 @@ class TestSwaggerEditor_has_path(TestCase):
         self.assertTrue(self.editor.has_path("badpath"))
         self.assertFalse(self.editor.has_path("badpath", "somemethod"))
 
+
 class TestSwaggerEditor_has_integration(TestCase):
 
     def setUp(self):
@@ -725,6 +726,7 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         actual = options_config[_X_INTEGRATION]["responses"]["default"]["responseParameters"]
         self.assertEqual(expected, actual)
 
+
 class TestSwaggerEditor_make_cors_allowed_methods_for_path(TestCase):
 
     def setUp(self):
@@ -1113,3 +1115,119 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         }
 
         self.assertEqual(expected, editor.swagger['paths']['/foo']['get']['requestBody'])
+
+class TestSwaggerEditor_add_auth(TestCase):
+
+    def setUp(self):
+
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    "get": {
+                        _X_INTEGRATION: {
+                            "a": "b"
+                        }
+                    },
+                    "post":{
+                        _X_INTEGRATION: {
+                            "a": "b"
+                        }
+                    }
+                },
+                "/bar": {
+                    "get": {
+                        _X_INTEGRATION: {
+                            "a": "b"
+                        }
+                    }
+                },
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+
+    def test_add_apikey_security_definition_is_added(self):
+        expected = {
+            "type": "apiKey",
+            "name": "x-api-key",
+            "in": "header"
+        }
+
+        self.editor.add_apikey_security_definition()
+        self.assertIn('securityDefinitions', self.editor.swagger)
+        self.assertIn('api_key', self.editor.swagger["securityDefinitions"])
+        self.assertEqual(expected, self.editor.swagger["securityDefinitions"]['api_key'])
+
+    def test_must_add_default_apikey_to_all_paths(self):
+        expected = [{
+            "api_key": []
+        }]
+        path = "/foo"
+
+
+        self.editor.set_path_default_apikey_required(path)
+        methods = self.editor.swagger["paths"][path]
+        for method in methods:
+            self.assertEqual(expected, methods[method]["security"])
+
+    def test_add_default_apikey_to_all_paths_correctly_handles_method_level_settings(self):
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    "apikeyfalse": {
+                        _X_INTEGRATION: {
+                            "a": "b"
+                        },
+                        "security":[
+                            {"api_key_false":[]}
+                        ]
+                    },
+                    "apikeytrue": {
+                        _X_INTEGRATION: {
+                            "a": "b"
+                        },
+                        "security":[
+                            {"api_key":[]}
+                        ]
+                    },
+                    "apikeydefault":{
+                        _X_INTEGRATION: {
+                            "a": "b"
+                        }
+                    }
+                },
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+        api_key_exists = [{
+            "api_key": []
+        }]
+        path = "/foo"
+
+        self.editor.set_path_default_apikey_required(path)
+        self.assertEqual([], self.editor.swagger["paths"][path]['apikeyfalse']["security"])
+        self.assertEqual(api_key_exists, self.editor.swagger["paths"][path]['apikeytrue']["security"])
+        self.assertEqual(api_key_exists, self.editor.swagger["paths"][path]['apikeydefault']["security"])
+
+    def test_set_method_apikey_handling_apikeyrequired_false(self):
+        expected = [{
+            "api_key_false": []
+        }]
+        path = "/bar"
+        method = "get"
+
+        self.editor._set_method_apikey_handling(path, method, False)
+        self.assertEqual(expected, self.editor.swagger["paths"][path][method]["security"])
+
+    def test_set_method_apikey_handling_apikeyrequired_true(self):
+        expected = [{
+            "api_key": []
+        }]
+        path = "/bar"
+        method = "get"
+
+        self.editor._set_method_apikey_handling(path, method, True)
+        self.assertEqual(expected, self.editor.swagger["paths"][path][method]["security"])
