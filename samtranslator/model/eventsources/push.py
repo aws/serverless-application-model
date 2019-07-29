@@ -627,13 +627,15 @@ class Api(PushEventSource):
                     if not re.match('method\.request\.(query|path|header)', parameter_name):
                         raise InvalidEventException(
                             self.relative_id,
-                            "Invalid value for 'RequestParameters' property")
+                            "Invalid value for 'RequestParameters' property. Keys must be in the format "
+                            "'method.request.[query|path|header].{value}', e.g 'method.request.header.Authorization'.")
 
                     if not isinstance(parameter_value, dict) or not all(key in RequestParameterProperties
                                                                         for key in parameter_value.keys()):
                         raise InvalidEventException(
                             self.relative_id,
-                            "Invalid value for 'RequestParameters' property")
+                            "Invalid value for 'RequestParameters' property. Values must be an object, "
+                            "e.g { Required: true, Caching: false }")
 
                     settings = default_value.copy()
                     settings.update(parameter_value)
@@ -641,21 +643,22 @@ class Api(PushEventSource):
 
                     parameters.append(settings)
 
-                elif not isinstance(parameter, string_types):
-                    raise InvalidEventException(
-                        self.relative_id,
-                        "Invalid value for 'RequestParameters' property")
-
-                else:
+                elif isinstance(parameter, string_types):
                     if not re.match('method\.request\.(query|path|header)', parameter):
                         raise InvalidEventException(
                             self.relative_id,
-                            "Invalid value for 'RequestParameters' property")
+                            "Invalid value for 'RequestParameters' property. Keys must be in the format "
+                            "'method.request.[query|path|header].{value}', e.g 'method.request.header.Authorization'.")
 
                     settings = default_value.copy()
                     settings.update({'Name': parameter})
 
                     parameters.append(settings)
+
+                else:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Invalid value for 'RequestParameters' property. Property must be either a string or an object")
 
             editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
                                                     request_parameters=parameters)
