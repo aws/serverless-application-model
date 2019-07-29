@@ -632,6 +632,9 @@
         "Topic": {
           "type": "string"
         },
+        "Region": {
+          "type": "string"
+        },
         "FilterPolicy": {
           "type": "object"
         }
@@ -649,7 +652,16 @@
         },
         "Schedule": {
           "type": "string"
-        }
+        },
+	"Name": {
+	  "type": "string"
+	},
+	"Description": {
+	  "type": "string"
+	},
+	"Enabled": {
+	  "type": "boolean"
+	}
       },
       "required": [
         "Schedule"

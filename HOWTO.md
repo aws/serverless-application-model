@@ -53,7 +53,7 @@ packaged template that can be readily deployed to CloudFormation.
 $ aws cloudformation package \
     --template-file /path_to_template/template.yaml \
     --s3-bucket bucket-name \
-    --s3-prefix appname/branchname/version
+    --s3-prefix appname/branchname/version \
     --output-template-file packaged-template.yaml
 ```
 
@@ -63,7 +63,7 @@ Or using the aws-sam-cli
 $ sam package \
     --template-file /path_to_template/template.yaml \
     --s3-bucket bucket-name \
-    --s3-prefix appname/branchname/version
+    --s3-prefix appname/branchname/version \
     --output-template-file packaged-template.yaml
 ```
 
@@ -104,7 +104,7 @@ Or using aws-sam-cli
 ```bash
 $ sam deploy \
     --template-file /path_to_template/packaged-template.yaml \
-    --stack-name my-new-stack
+    --stack-name my-new-stack \
     --capabilities CAPABILITY_IAM
 ```
 
