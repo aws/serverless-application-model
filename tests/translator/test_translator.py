@@ -457,6 +457,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_multiple_resource_errors',
     'error_s3_not_in_template',
     'error_table_invalid_attributetype',
+    'error_table_primary_key_missing_name',
+    'error_table_primary_key_missing_type',
     'error_invalid_resource_parameters',
     'error_reserved_sam_tag',
     'existing_event_logical_id',
