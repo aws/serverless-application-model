@@ -140,6 +140,10 @@ Resources:
       #       UserPool: !Ref MyCognitoUserPool
 
 Outputs:
+    Region:
+      Description: "Region"
+      Value: !Ref AWS::Region
+
     ApiId:
       Description: "API ID"
       Value: !Ref MyApi
