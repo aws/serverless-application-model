@@ -5,6 +5,10 @@ Globals:
         CustomStatements: [{
             Action: 'execute-api:Invoke', 
             Resource: ['execute-api:/*/*/*']
+          },
+          {
+            Action: 'execute-api:blah', 
+            Resource: ['execute-api:/*/*/*']
           }]
 
 Resources:
@@ -23,14 +27,12 @@ Resources:
         "swagger": "2.0",
         "x-amazon-apigateway-policy": {
           "Version": "2012-10-17",
-          "Statement": [
-            {
+          "Statement": {
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
               "Principal": {
                 "Service": "lambda.amazonaws.com"
               }
-            }
-          ]
+          }
         }
       }

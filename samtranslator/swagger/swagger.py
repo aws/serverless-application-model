@@ -809,7 +809,8 @@ class SwaggerEditor(object):
                 if type(statement) is list:
                     statement.extend(custom_statements)
                 else:
-                    statement = [statement, custom_statements]
+                    statement = [statement]
+                    statement.extend(custom_statements)
 
                 self.resource_policy['Statement'] = statement
 

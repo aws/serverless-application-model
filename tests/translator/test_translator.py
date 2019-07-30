@@ -188,6 +188,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_stage_tags',
         'api_with_resource_policy',
         'api_with_resource_policy_global',
+        'api_with_resource_policy_global_intrinsic',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',

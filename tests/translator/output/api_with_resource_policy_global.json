@@ -4,7 +4,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment58f1e42d52"
+          "Ref": "ExplicitApiDeployment8d22456d58"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -12,13 +12,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ExplicitApiDeployment58f1e42d52": {
+    "ExplicitApiDeployment8d22456d58": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 58f1e42d52dd12dfb489548d19d360c7bfe7f87b", 
+        "Description": "RestApi deployment id: 8d22456d5883ad51c72f5d9be988d14f0a41182e", 
         "StageName": "Stage"
       }
     }, 
@@ -46,6 +46,12 @@
               }, 
               {
                 "Action": "execute-api:Invoke", 
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+              }, 
+              {
+                "Action": "execute-api:blah", 
                 "Resource": [
                   "execute-api:/*/*/*"
                 ]
