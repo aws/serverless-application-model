@@ -537,6 +537,11 @@ class SamSimpleTable(SamResourceMacro):
         dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         if self.PrimaryKey:
+            if 'Name' not in self.PrimaryKey or 'Type' not in self.PrimaryKey:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    '\'PrimaryKey\' is missing required Property \'Name\' or \'Type\'.'
+                )
             primary_key = {
                 'AttributeName': self.PrimaryKey['Name'],
                 'AttributeType': self._convert_attribute_type(self.PrimaryKey['Type'])
