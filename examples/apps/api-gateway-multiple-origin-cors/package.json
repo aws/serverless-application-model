@@ -9,7 +9,7 @@
   "author": "",
   "devDependencies": {
     "jest": "^23.1.0",
-    "lodash": ">=4.17.11",
+    "lodash": ">=4.17.13",
     "merge": ">=1.2.1"
   },
   "jest": {
