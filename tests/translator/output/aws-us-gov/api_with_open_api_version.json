@@ -112,23 +112,20 @@
         }
       }
     }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ExplicitApiDeployment1e9fbca603": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment01dd43a75f"
-        }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "StageName": "Prod"
+        "Description": "RestApi deployment id: 1e9fbca603907b0cfb3e8164fa9d4c3b95b4272d"
       }
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment3f1d889857"
+          "Ref": "ServerlessRestApiDeployment63c7ea66fa"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -136,13 +133,25 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeployment3f1d889857": {
+    "ServerlessRestApiDeployment63c7ea66fa": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 3f1d889857c22227451ab7a02be7ea74b2e9d5b4"
+        "Description": "RestApi deployment id: 63c7ea66fa789640585db13196d24833004df4e0"
+      }
+    }, 
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment1e9fbca603"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
       }
     }, 
     "ServerlessRestApi": {
@@ -219,15 +228,6 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
-      }
-    }, 
-    "ExplicitApiDeployment01dd43a75f": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: 01dd43a75fc0e125c678d20749bacde95d723928"
       }
     }
   }

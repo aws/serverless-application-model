@@ -89,6 +89,15 @@
         }
       }
     }, 
+    "ExplicitApiDeployment323af4d2f5": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 323af4d2f576d27b094bb4e64e6fd8ada81b630b"
+      }
+    }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -104,20 +113,11 @@
         }
       }
     }, 
-    "ServerlessRestApiDeploymentb9bf7835be": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: b9bf7835be8ea0cb2c188b846e03ff6f79f4d330"
-      }
-    }, 
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment5332c373d4"
+          "Ref": "ExplicitApiDeployment323af4d2f5"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -129,12 +129,21 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentb9bf7835be"
+          "Ref": "ServerlessRestApiDeployment3644a4133f"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "ServerlessRestApiDeployment3644a4133f": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 3644a4133f18ca79220abe30b7f27b7e9a55cd06"
       }
     }, 
     "ServerlessRestApi": {
@@ -203,15 +212,6 @@
           }, 
           "swagger": "2.0"
         }
-      }
-    }, 
-    "ExplicitApiDeployment5332c373d4": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7"
       }
     }
   }
