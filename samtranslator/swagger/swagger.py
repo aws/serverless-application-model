@@ -800,7 +800,12 @@ class SwaggerEditor(object):
             return
 
         custom_statements = resource_policy.get('CustomStatements')
+
         if custom_statements is not None:
+            print(type(custom_statements))
+            if not isinstance(custom_statements, list):
+                raise ValueError("Invalid input. CustomStatements must be a list.")
+
             self.resource_policy['Version'] = '2012-10-17'
             if self.resource_policy.get('Statement') is None:
                 self.resource_policy['Statement'] = custom_statements

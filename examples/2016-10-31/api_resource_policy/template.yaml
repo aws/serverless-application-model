@@ -5,19 +5,28 @@ Globals:
     Auth:
       ResourcePolicy:
         CustomStatements: [{
-          "Effect": "Allow",
-          "Principal": {
-            "Service": "lambda.amazonaws.com"
-          },
-          "Action": "sts:AssumeRole"
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "execute-api:*/*/*",
+            "Condition": {
+                "IpAddress": {
+                    "aws:SourceIp": "1.2.3.4"
+                }
+            }
         }]
-    EndpointConfiguration: PRIVATE
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
     Properties:
       InlineCode: |
-        exports.handler = async () => "Hello Worlds!"
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
       Handler: index.handler
       Runtime: nodejs8.10
       Events:
