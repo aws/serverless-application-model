@@ -62,7 +62,7 @@ class ApiGatewayAccount(Resource):
 
 
 class ApiGatewayDeployment(Resource):
-    _X_HASH_DELIMITER = '||'
+    _X_HASH_DELIMITER = "||"
 
     resource_type = 'AWS::ApiGateway::Deployment'
     property_types = {
@@ -92,14 +92,15 @@ class ApiGatewayDeployment(Resource):
         # to prevent redeployment when API has not changed
 
         # NOTE: `str(swagger)` is for backwards compatibility. Changing it to a JSON or something will break compat
-        # NOTE: If extending the hash data, make sure to add delimiter between the previous data and the new data.
-        hash_input = str(swagger)
+        hash_input = [str(swagger)]
         if openapi_version:
-            hash_input = hash_input + self._X_HASH_DELIMITER + str(openapi_version)
-        generator = logical_id_generator.LogicalIdGenerator(self.logical_id, hash_input)
+            hash_input.append(str(openapi_version))
+
+        data = self._X_HASH_DELIMITER.join(hash_input)
+        generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
         self.logical_id = generator.gen()
-        hash = generator.get_hash(length=40)  # Get the full hash
-        self.Description = "RestApi deployment id: {}".format(hash)
+        digest = generator.get_hash(length=40)  # Get the full hash
+        self.Description = "RestApi deployment id: {}".format(digest)
         stage.update_deployment_ref(self.logical_id)
 
 
