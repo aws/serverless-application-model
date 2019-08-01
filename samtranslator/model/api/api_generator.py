@@ -327,9 +327,8 @@ class ApiGenerator(object):
 
         if auth_properties.ResourcePolicy:
             swagger_editor.add_resource_policy(auth_properties.ResourcePolicy)
-        # Assign the Swagger back to template
-        # self.definition_body = self._openapi_auth_postprocess(swagger_editor.swagger)
-        self.definition_body = swagger_editor.swagger
+
+        self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
     def _add_gateway_responses(self):
         """
