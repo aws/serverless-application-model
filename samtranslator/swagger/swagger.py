@@ -21,6 +21,7 @@ class SwaggerEditor(object):
     _X_APIGW_BINARY_MEDIA_TYPES = 'x-amazon-apigateway-binary-media-types'
     _CONDITIONAL_IF = "Fn::If"
     _X_APIGW_GATEWAY_RESPONSES = 'x-amazon-apigateway-gateway-responses'
+    _X_APIGW_POLICY = 'x-amazon-apigateway-policy'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
 
     def __init__(self, doc):
@@ -39,6 +40,7 @@ class SwaggerEditor(object):
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", {})
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
+        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, {})
         self.definitions = self._doc.get('definitions', {})
 
     def get_path(self, path):
@@ -614,7 +616,6 @@ class SwaggerEditor(object):
         :param string path: Path name
         :param string method_name: Method name
         :param dict auth: Auth configuration such as Authorizers, ApiKeyRequired, ResourcePolicy
-                          (Authorizers and ApiKeyRequired supported currently)
         :param dict api: Reference to the related Api's properties as defined in the template.
         """
         method_authorizer = auth and auth.get('Authorizer')
@@ -787,6 +788,37 @@ class SwaggerEditor(object):
                 raise ValueError("Invalid input. Value for properties is required")
 
             self.definitions[model_name.lower()] = schema
+
+    def add_resource_policy(self, resource_policy):
+        """
+        Add resource policy definition to Swagger.
+
+        :param dict resource_policy: Dictionary of resource_policy statements which gets translated
+        :return:
+        """
+        if resource_policy is None:
+            return
+
+        custom_statements = resource_policy.get('CustomStatements')
+
+        if custom_statements is not None:
+            if not isinstance(custom_statements, list):
+                custom_statements = [custom_statements]
+
+            self.resource_policy['Version'] = '2012-10-17'
+            if self.resource_policy.get('Statement') is None:
+                self.resource_policy['Statement'] = custom_statements
+            else:
+                statement = self.resource_policy['Statement']
+                if isinstance(statement, list):
+                    statement.extend(custom_statements)
+                else:
+                    statement = [statement]
+                    statement.extend(custom_statements)
+
+                self.resource_policy['Statement'] = statement
+
+            self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
     @property
     def swagger(self):
