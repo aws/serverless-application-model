@@ -146,15 +146,6 @@
         }
       }
     }, 
-    "MyApiDeploymentc3ee011ecc": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "Description": "RestApi deployment id: c3ee011ecc11fa841524767079400e1fb8a3d57c"
-      }
-    }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -472,6 +463,15 @@
         }
       }
     }, 
+    "MyApiDeploymentcc3ee70601": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: cc3ee706016a512ef6fe9e3608b7b637fd4c7abd"
+      }
+    }, 
     "MyApiMyLambdaTokenAuthNoneFunctionInvokeRoleAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -494,7 +494,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentc3ee011ecc"
+          "Ref": "MyApiDeploymentcc3ee70601"
         }, 
         "RestApiId": {
           "Ref": "MyApi"

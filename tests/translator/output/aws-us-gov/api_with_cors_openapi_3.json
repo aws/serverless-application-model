@@ -261,7 +261,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentdd32a75aeb"
+          "Ref": "ServerlessRestApiDeployment5e7d1b38bf"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -273,7 +273,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentbabea58445"
+          "Ref": "ExplicitApiDeployment8cc53ffaa5"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -326,6 +326,15 @@
         }
       }
     }, 
+    "ExplicitApiDeployment8cc53ffaa5": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 8cc53ffaa59a19b69e73d5b422142c7396739b16"
+      }
+    }, 
     "RestApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -349,22 +358,13 @@
         ]
       }
     }, 
-    "ExplicitApiDeploymentbabea58445": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: babea584458ca2e980baa334bd70f8b193375895"
-      }
-    }, 
-    "ServerlessRestApiDeploymentdd32a75aeb": {
+    "ServerlessRestApiDeployment5e7d1b38bf": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: dd32a75aeb16c5183a85dd7fe7591c4b88387b6d"
+        "Description": "RestApi deployment id: 5e7d1b38bf567c46a1fc95b97a22d3cbf171216c"
       }
     }, 
     "ServerlessRestApi": {

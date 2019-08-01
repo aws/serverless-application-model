@@ -62,11 +62,29 @@
         }
       }
     }, 
+    "MyApiWithLambdaRequestAuthDeployment7c3972b020": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaRequestAuth"
+        }, 
+        "Description": "RestApi deployment id: 7c3972b020afc5a3f348a527f9cbf5108557b930"
+      }
+    }, 
+    "MyApiWithCognitoAuthDeploymente1765ad6c1": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        }, 
+        "Description": "RestApi deployment id: e1765ad6c129adfb32be52dea3fa053e2ce02d51"
+      }
+    }, 
     "MyApiWithLambdaRequestAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaRequestAuthDeployment26f2ec8dc2"
+          "Ref": "MyApiWithLambdaRequestAuthDeployment7c3972b020"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
@@ -97,31 +115,34 @@
         }
       }
     }, 
-    "MyApiWithLambdaTokenAuthDeployment12dbbda3a3": {
+    "MyApiWithLambdaTokenAuthDeploymentfc5424e34c": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
         }, 
-        "Description": "RestApi deployment id: 12dbbda3a3bf53e42069a9045c5a54b8650b092d"
+        "Description": "RestApi deployment id: fc5424e34c86d9c2c71ee87d32bc82555a3c577d"
       }
     }, 
-    "MyApiWithCognitoAuthDeployment2813ca7ed8": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyFnLambdaRequestPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithCognitoAuth"
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
         }, 
-        "Description": "RestApi deployment id: 2813ca7ed87e18b2a034b30d5c5696abd95d7c66"
-      }
-    }, 
-    "MyApiWithLambdaRequestAuthDeployment26f2ec8dc2": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithLambdaRequestAuth"
-        }, 
-        "Description": "RestApi deployment id: 26f2ec8dc2f36b8ae66401fa2c1e915b6c9130e2"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-request", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithLambdaRequestAuth"
+              }
+            }
+          ]
+        }
       }
     }, 
     "MyFnLambdaTokenPermissionTest": {
@@ -217,7 +238,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeployment2813ca7ed8"
+          "Ref": "MyApiWithCognitoAuthDeploymente1765ad6c1"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
@@ -240,27 +261,6 @@
               "__Stage__": "Prod", 
               "__ApiId__": {
                 "Ref": "MyApiWithCognitoAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "MyFnLambdaRequestPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFn"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-request", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithLambdaRequestAuth"
               }
             }
           ]
@@ -471,7 +471,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaTokenAuthDeployment12dbbda3a3"
+          "Ref": "MyApiWithLambdaTokenAuthDeploymentfc5424e34c"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"

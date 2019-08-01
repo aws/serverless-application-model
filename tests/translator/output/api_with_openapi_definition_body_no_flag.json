@@ -68,6 +68,15 @@
         }
       }
     }, 
+    "ExplicitApiDeployment63a10e26af": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 63a10e26af7194aefd61ead891c470ed75ce20be"
+      }
+    }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -163,7 +172,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment748947f06a"
+          "Ref": "ExplicitApiDeployment63a10e26af"
         }
       }
     }, 
@@ -207,15 +216,6 @@
             "Name": "email"
           }
         ]
-      }
-    }, 
-    "ExplicitApiDeployment748947f06a": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: 748947f06a1a8de71a295f51af31d94b932fe2fc"
       }
     }, 
     "ServerlessRestApi": {
