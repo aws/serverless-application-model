@@ -473,16 +473,13 @@
         }
       }
     }, 
-    "MyApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "MyApiDeployment98ad824f7d": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiDeploymente181e32adc"
-        }, 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "StageName": "Prod"
+        "Description": "RestApi deployment id: 98ad824f7db83981e747e44ba34d318c7fa410c8"
       }
     }, 
     "MyFunctionWithNoAuthorizerPermissionProd": {
@@ -506,13 +503,16 @@
         }
       }
     }, 
-    "MyApiDeploymente181e32adc": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment98ad824f7d"
+        }, 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: e181e32adcccf59d699baf300078344166614113"
+        "StageName": "Prod"
       }
     }, 
     "MyFunctionWithDefaultAuthorizerPermissionProd": {

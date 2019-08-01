@@ -54,20 +54,11 @@
         }
       }
     }, 
-    "MyApiWithLambdaTokenAuthDeployment5100134cea": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithLambdaTokenAuth"
-        }, 
-        "Description": "RestApi deployment id: 5100134cea4b4506bd0894f86bfe775c9903ae82"
-      }
-    }, 
     "MyApiWithLambdaRequestAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaRequestAuthDeployment195678a2e7"
+          "Ref": "MyApiWithLambdaRequestAuthDeployment14ab3ddf12"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
@@ -96,15 +87,6 @@
             }
           ]
         }
-      }
-    }, 
-    "MyApiWithLambdaRequestAuthDeployment195678a2e7": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithLambdaRequestAuth"
-        }, 
-        "Description": "RestApi deployment id: 195678a2e73ee92ca367f5b4ba814c6e0022df01"
       }
     }, 
     "MyFnLambdaRequestPermissionTest": {
@@ -217,11 +199,20 @@
         }
       }
     }, 
+    "MyApiWithLambdaRequestAuthDeployment14ab3ddf12": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaRequestAuth"
+        }, 
+        "Description": "RestApi deployment id: 14ab3ddf12ee76d46cac076ecffc24b3acd2fb7f"
+      }
+    }, 
     "MyApiWithCognitoAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeploymentcae360c856"
+          "Ref": "MyApiWithCognitoAuthDeployment87cdbda651"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
@@ -374,15 +365,6 @@
         }
       }
     }, 
-    "MyApiWithCognitoAuthDeploymentcae360c856": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithCognitoAuth"
-        }, 
-        "Description": "RestApi deployment id: cae360c856d65fceaffb4bf24ebf5c4eac239e53"
-      }
-    }, 
     "MyUserPool": {
       "Type": "AWS::Cognito::UserPool", 
       "Properties": {
@@ -455,12 +437,21 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaTokenAuthDeployment5100134cea"
+          "Ref": "MyApiWithLambdaTokenAuthDeployment4fdb5f4e3c"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "MyApiWithCognitoAuthDeployment87cdbda651": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        }, 
+        "Description": "RestApi deployment id: 87cdbda651523df8d04d15fc50f72ae8ead08c1d"
       }
     }, 
     "MyApiWithLambdaRequestAuth": {
@@ -521,6 +512,15 @@
             }
           }
         }
+      }
+    }, 
+    "MyApiWithLambdaTokenAuthDeployment4fdb5f4e3c": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaTokenAuth"
+        }, 
+        "Description": "RestApi deployment id: 4fdb5f4e3c6e0e2b12af6d7a637ce66bb5bf7d0a"
       }
     }
   }
