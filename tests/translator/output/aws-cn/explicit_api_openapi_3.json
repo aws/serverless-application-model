@@ -37,7 +37,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiWithInlineSwaggerDeployment09cda3d97b"
+          "Ref": "ApiWithInlineSwaggerDeployment74abcb3a5b"
         }, 
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"
@@ -76,6 +76,15 @@
         }, 
         "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
         "StageName": "Stage"
+      }
+    }, 
+    "ApiWithInlineSwaggerDeployment74abcb3a5b": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ApiWithInlineSwagger"
+        }, 
+        "Description": "RestApi deployment id: 74abcb3a5bbe7ad58dfc543740af3be156736130"
       }
     }, 
     "GetHtmlFunctionRole": {
@@ -179,15 +188,6 @@
         "StageName": {
           "Ref": "MyStageName"
         }
-      }
-    }, 
-    "ApiWithInlineSwaggerDeployment09cda3d97b": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ApiWithInlineSwagger"
-        }, 
-        "Description": "RestApi deployment id: 09cda3d97b008bed7bd4ebb1b5304ed622492941"
       }
     }
   }

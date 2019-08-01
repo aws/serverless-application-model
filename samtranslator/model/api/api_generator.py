@@ -193,7 +193,7 @@ class ApiGenerator(object):
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(stage, swagger)
+            deployment.make_auto_deployable(stage, self.open_api_version, swagger)
 
         return stage
 

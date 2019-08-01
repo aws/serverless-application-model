@@ -58,7 +58,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaRequestAuthDeployment54a6335ed7"
+          "Ref": "MyApiWithLambdaRequestAuthDeployment14ab3ddf12"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
@@ -131,13 +131,25 @@
         }
       }
     }, 
-    "MyApiWithLambdaTokenAuthDeployment2ac4484273": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyFnCognitoPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithLambdaTokenAuth"
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
         }, 
-        "Description": "RestApi deployment id: 2ac4484273f55c601b17c8491ffad73a979b2aeb"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognito", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithCognitoAuth"
+              }
+            }
+          ]
+        }
       }
     }, 
     "MyAuthFn": {
@@ -161,15 +173,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "MyApiWithCognitoAuthDeployment2eadfec019": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithCognitoAuth"
-        }, 
-        "Description": "RestApi deployment id: 2eadfec019d342cb7f6d66f595b9ab88e82fa00a"
       }
     }, 
     "MyFnRole": {
@@ -196,11 +199,20 @@
         }
       }
     }, 
+    "MyApiWithLambdaRequestAuthDeployment14ab3ddf12": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaRequestAuth"
+        }, 
+        "Description": "RestApi deployment id: 14ab3ddf12ee76d46cac076ecffc24b3acd2fb7f"
+      }
+    }, 
     "MyApiWithCognitoAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeployment2eadfec019"
+          "Ref": "MyApiWithCognitoAuthDeployment87cdbda651"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
@@ -227,36 +239,6 @@
             }
           ]
         }
-      }
-    }, 
-    "MyApiWithLambdaRequestAuthDeployment54a6335ed7": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithLambdaRequestAuth"
-        }, 
-        "Description": "RestApi deployment id: 54a6335ed76c2060eaf1fff2ff6522f20ecaef0f"
-      }
-    }, 
-    "MyUserPool": {
-      "Type": "AWS::Cognito::UserPool", 
-      "Properties": {
-        "UsernameAttributes": [
-          "email"
-        ], 
-        "UserPoolName": "UserPoolName", 
-        "Policies": {
-          "PasswordPolicy": {
-            "MinimumLength": 8
-          }
-        }, 
-        "Schema": [
-          {
-            "AttributeDataType": "String", 
-            "Required": false, 
-            "Name": "email"
-          }
-        ]
       }
     }, 
     "MyApiWithLambdaRequestAuthMyLambdaRequestAuthAuthorizerPermission": {
@@ -383,25 +365,25 @@
         }
       }
     }, 
-    "MyFnCognitoPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
+    "MyUserPool": {
+      "Type": "AWS::Cognito::UserPool", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFn"
+        "UsernameAttributes": [
+          "email"
+        ], 
+        "UserPoolName": "UserPoolName", 
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 8
+          }
         }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognito", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithCognitoAuth"
-              }
-            }
-          ]
-        }
+        "Schema": [
+          {
+            "AttributeDataType": "String", 
+            "Required": false, 
+            "Name": "email"
+          }
+        ]
       }
     }, 
     "MyFn": {
@@ -455,12 +437,21 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaTokenAuthDeployment2ac4484273"
+          "Ref": "MyApiWithLambdaTokenAuthDeployment4fdb5f4e3c"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "MyApiWithCognitoAuthDeployment87cdbda651": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        }, 
+        "Description": "RestApi deployment id: 87cdbda651523df8d04d15fc50f72ae8ead08c1d"
       }
     }, 
     "MyApiWithLambdaRequestAuth": {
@@ -521,6 +512,15 @@
             }
           }
         }
+      }
+    }, 
+    "MyApiWithLambdaTokenAuthDeployment4fdb5f4e3c": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaTokenAuth"
+        }, 
+        "Description": "RestApi deployment id: 4fdb5f4e3c6e0e2b12af6d7a637ce66bb5bf7d0a"
       }
     }
   }
