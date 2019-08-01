@@ -1,14 +1,5 @@
 {
   "Resources": {
-    "MyApiWithLambdaTokenAuthDeployment0add72ee5b": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithLambdaTokenAuth"
-        }, 
-        "Description": "RestApi deployment id: 0add72ee5b93d4332ccfaf6b521b1d6c98346235"
-      }
-    }, 
     "MyApiWithCognitoAuth": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -75,7 +66,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaRequestAuthDeploymente9da24fd8b"
+          "Ref": "MyApiWithLambdaRequestAuthDeployment26f2ec8dc2"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
@@ -106,25 +97,31 @@
         }
       }
     }, 
-    "MyFnLambdaRequestPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
+    "MyApiWithLambdaTokenAuthDeployment12dbbda3a3": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFn"
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaTokenAuth"
         }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-request", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithLambdaRequestAuth"
-              }
-            }
-          ]
-        }
+        "Description": "RestApi deployment id: 12dbbda3a3bf53e42069a9045c5a54b8650b092d"
+      }
+    }, 
+    "MyApiWithCognitoAuthDeployment2813ca7ed8": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        }, 
+        "Description": "RestApi deployment id: 2813ca7ed87e18b2a034b30d5c5696abd95d7c66"
+      }
+    }, 
+    "MyApiWithLambdaRequestAuthDeployment26f2ec8dc2": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithLambdaRequestAuth"
+        }, 
+        "Description": "RestApi deployment id: 26f2ec8dc2f36b8ae66401fa2c1e915b6c9130e2"
       }
     }, 
     "MyFnLambdaTokenPermissionTest": {
@@ -220,7 +217,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeploymentc77185482f"
+          "Ref": "MyApiWithCognitoAuthDeployment2813ca7ed8"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
@@ -249,25 +246,25 @@
         }
       }
     }, 
-    "MyUserPool": {
-      "Type": "AWS::Cognito::UserPool", 
+    "MyFnLambdaRequestPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "UsernameAttributes": [
-          "email"
-        ], 
-        "UserPoolName": "UserPoolName", 
-        "Policies": {
-          "PasswordPolicy": {
-            "MinimumLength": 8
-          }
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
         }, 
-        "Schema": [
-          {
-            "AttributeDataType": "String", 
-            "Required": false, 
-            "Name": "email"
-          }
-        ]
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda-request", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithLambdaRequestAuth"
+              }
+            }
+          ]
+        }
       }
     }, 
     "MyApiWithLambdaRequestAuthMyLambdaRequestAuthAuthorizerPermission": {
@@ -402,13 +399,25 @@
         }
       }
     }, 
-    "MyApiWithCognitoAuthDeploymentc77185482f": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyUserPool": {
+      "Type": "AWS::Cognito::UserPool", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithCognitoAuth"
+        "UsernameAttributes": [
+          "email"
+        ], 
+        "UserPoolName": "UserPoolName", 
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 8
+          }
         }, 
-        "Description": "RestApi deployment id: c77185482f5da13033fc9807c218b651c53a8c6c"
+        "Schema": [
+          {
+            "AttributeDataType": "String", 
+            "Required": false, 
+            "Name": "email"
+          }
+        ]
       }
     }, 
     "MyFn": {
@@ -432,15 +441,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "MyApiWithLambdaRequestAuthDeploymente9da24fd8b": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithLambdaRequestAuth"
-        }, 
-        "Description": "RestApi deployment id: e9da24fd8b2ad6c40b7137492a1a1c9a3cdf1908"
       }
     }, 
     "MyAuthFnRole": {
@@ -471,7 +471,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaTokenAuthDeployment0add72ee5b"
+          "Ref": "MyApiWithLambdaTokenAuthDeployment12dbbda3a3"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
