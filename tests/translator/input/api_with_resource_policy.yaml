@@ -5,8 +5,8 @@ Resources:
       StageName: Prod
       Auth:
         ResourcePolicy:
-          CustomStatements: [{
+          CustomStatements: {
               Action: 'execute-api:Invoke', 
               Resource: ['execute-api:/*/*/*']
-            }]
+            }
       

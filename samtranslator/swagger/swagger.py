@@ -803,7 +803,7 @@ class SwaggerEditor(object):
 
         if custom_statements is not None:
             if not isinstance(custom_statements, list):
-                raise ValueError("Invalid input. CustomStatements must be a list.")
+                custom_statements = [custom_statements]
 
             self.resource_policy['Version'] = '2012-10-17'
             if self.resource_policy.get('Statement') is None:
