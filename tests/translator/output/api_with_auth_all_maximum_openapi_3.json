@@ -466,7 +466,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment18e0cddfbf"
+          "Ref": "MyApiDeploymente181e32adc"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -493,6 +493,15 @@
             }
           ]
         }
+      }
+    }, 
+    "MyApiDeploymente181e32adc": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: e181e32adcccf59d699baf300078344166614113"
       }
     }, 
     "MyFunctionWithDefaultAuthorizerPermissionProd": {

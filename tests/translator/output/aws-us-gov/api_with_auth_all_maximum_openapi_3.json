@@ -431,6 +431,15 @@
         }
       }
     }, 
+    "MyApiDeploymentcc3d4f033f": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: cc3d4f033f302fc0827f2ec54ee1b394474f3bc8"
+      }
+    }, 
     "MyFunctionWithCognitoMultipleUserPoolsAuthorizerPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -474,7 +483,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment26330d35c8"
+          "Ref": "MyApiDeploymentcc3d4f033f"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
