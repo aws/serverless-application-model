@@ -89,15 +89,6 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment2bcbad30d7": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: 2bcbad30d76c3d64bfb45cf0c5e883588cf75944"
-      }
-    }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -121,20 +112,20 @@
         }
       }
     }, 
-    "ExplicitApiDeployment323af4d2f5": {
+    "ServerlessRestApiDeployment3146d7e6fb": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
-          "Ref": "ExplicitApi"
+          "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 323af4d2f576d27b094bb4e64e6fd8ada81b630b"
+        "Description": "RestApi deployment id: 3146d7e6fbaece0e0eb82d0c91c86c9b74dc217b"
       }
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment2bcbad30d7"
+          "Ref": "ServerlessRestApiDeployment3146d7e6fb"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -142,16 +133,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ExplicitApiDeployment4154e1c30c": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment323af4d2f5"
-        }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "StageName": "Prod"
+        "Description": "RestApi deployment id: 4154e1c30c97469d4946280461125dbfd4324f15"
       }
     }, 
     "ServerlessRestApi": {
@@ -228,6 +216,18 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    }, 
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment4154e1c30c"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
       }
     }
   }

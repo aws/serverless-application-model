@@ -68,6 +68,15 @@
         }
       }
     }, 
+    "ServerlessRestApiDeployment83a174fb31": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 83a174fb31472bc23ccc2f0d96eebff659e59cd2"
+      }
+    }, 
     "ImplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -104,23 +113,20 @@
         }
       }
     }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ExplicitApiDeploymentd9a0f2ae4f": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment1e9fbca603"
-        }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "StageName": "Prod"
+        "Description": "RestApi deployment id: d9a0f2ae4fe2d97b9b91644934a878b6a08cf1c3"
       }
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentacd2d469b0"
+          "Ref": "ServerlessRestApiDeployment83a174fb31"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -128,22 +134,16 @@
         "StageName": "Prod"
       }
     }, 
-    "ExplicitApiDeployment1e9fbca603": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeploymentd9a0f2ae4f"
+        }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 1e9fbca603907b0cfb3e8164fa9d4c3b95b4272d"
-      }
-    }, 
-    "ServerlessRestApiDeploymentacd2d469b0": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: acd2d469b0bc58a0e115764c4385e0254ae0bd7e"
+        "StageName": "Prod"
       }
     }, 
     "ServerlessRestApi": {
