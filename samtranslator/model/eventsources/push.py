@@ -367,18 +367,18 @@ class SNS(PushEventSource):
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
-        return [self._construct_permission(function, source_arn=self.Topic),
-                self._inject_subscription(function, self.Topic, self.Region, self.FilterPolicy)]
+        subscription = self._inject_subscription('lambda', function.get_runtime_attr("arn"), self.Topic, self.Region, self.FilterPolicy, function.resource_attributes)
+        return [self._construct_permission(function, source_arn=self.Topic), subscription]
 
-    def _inject_subscription(self, function, topic, region, filterPolicy):
+    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, resource_attributes):
         subscription = SNSSubscription(self.logical_id)
-        subscription.Protocol = 'lambda'
-        subscription.Endpoint = function.get_runtime_attr("arn")
+        subscription.Protocol = protocol
+        subscription.Endpoint = endpoint
         subscription.TopicArn = topic
         if region is not None:
             subscription.Region = region
-        if CONDITION in function.resource_attributes:
-            subscription.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
+        if CONDITION in resource_attributes:
+            subscription.set_resource_attribute(CONDITION, resource_attributes[CONDITION])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
