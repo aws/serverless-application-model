@@ -93,7 +93,7 @@ resource:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery10Minutes
@@ -163,7 +163,7 @@ resource:
             Action:
               - "lambda:InvokeFunction"
             Resource: !GetAtt MyLambdaFunction.Arn
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: false
