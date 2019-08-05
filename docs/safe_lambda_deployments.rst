@@ -162,7 +162,7 @@ resource:
           - Effect: "Allow"
             Action:
               - "lambda:InvokeFunction"
-            Resource: !Ref MyLambdaFunction.Version
+            Resource: !GetAtt MyLambdaFunction.Arn
       Runtime: nodejs6.10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
@@ -286,7 +286,7 @@ Hooks are extremely powerful because:
           - Effect: "Allow"
             Action:
               - "lambda:InvokeFunction"
-            Resource: !Ref MyLambdaFunction.Version
+            Resource: !GetAtt MyLambdaFunction.Arn
 
 Checkout the lambda_safe_deployments_ folder for an example for how to create SAM template that contains a hook function.
 
