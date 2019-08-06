@@ -20,11 +20,11 @@ class CognitoUserPool(Resource):
             'SmsAuthenticationMessage': PropertyType(False, is_str()),
             'SmsConfiguration': PropertyType(False, list_of(dict)),
             'SmsVerificationMessage': PropertyType(False, is_str()),
-            'UsernameAttributes': PropertyType(False, list_of(is_str())), 
+            'UsernameAttributes': PropertyType(False, list_of(is_str())),
             'UserPoolAddOns': PropertyType(False, list_of(dict)),
             'UserPoolName': PropertyType(False, is_str()),
             'UserPoolTags': PropertyType(False, is_str()),
-            'VerificationMessageTemplate': PropertyType(False, is_type(dict))         
+            'VerificationMessageTemplate': PropertyType(False, is_type(dict))
     }
 
     runtime_attrs = {

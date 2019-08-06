@@ -41,14 +41,15 @@ class PushEventSource(ResourceMacro):
     """
     principal = None
 
-    def _construct_permission(self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None):
+    def _construct_permission(
+            self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
         source triggers.
 
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        if prefix is None:        
+        if prefix is None:
             prefix = self.logical_id
         lambda_permission = LambdaPermission(prefix + 'Permission' + suffix,
                                              attributes=function.get_passthrough_resource_attributes())
@@ -687,6 +688,7 @@ class IoTRule(PushEventSource):
 
         return rule
 
+
 class Cognito(PushEventSource):
     resource_type = 'Cognito'
     principal = 'cognito-idp.amazonaws.com'
@@ -704,7 +706,9 @@ class Cognito(PushEventSource):
                     'userpool': resources[userpool_id],
                     'userpool_id': userpool_id
                 }
-        raise InvalidEventException(self.relative_id, "Cognito events must reference a Cognito UserPool in the same template.")
+        raise InvalidEventException(
+            self.relative_id,
+            "Cognito events must reference a Cognito UserPool in the same template.")
 
     def to_cloudformation(self, **kwargs):
         function = kwargs.get('function')
@@ -722,22 +726,20 @@ class Cognito(PushEventSource):
         userpool_id = kwargs['userpool_id']
 
         resources = []
-        resources.append(self._construct_permission(function, event_source_token=self.UserPool, prefix=function.logical_id + "Cognito"))
+        resources.append(
+            self._construct_permission(
+                function, event_source_token=self.UserPool, prefix=function.logical_id + "Cognito"))
 
         self._inject_lambda_config(function, userpool)
         resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
         return resources
 
     def _inject_lambda_config(self, function, userpool):
-        base_event_mapping = {
-            'Function': function.get_runtime_attr("arn")
-        }
-
         event_triggers = self.Trigger
         if isinstance(self.Trigger, string_types):
             event_triggers = [self.Trigger]
 
-        #TODO can these be conditional?
+        # TODO can these be conditional?
 
         properties = userpool.get('Properties', None)
         if properties is None:
@@ -754,7 +756,7 @@ class Cognito(PushEventSource):
                 lambda_config[event_trigger] = function.get_runtime_attr("arn")
             else:
                 raise InvalidEventException(
-                    self.relative_id, 
+                    self.relative_id,
                     'Cognito trigger "{trigger}" defined multiple times.'.format(
                         trigger=self.Trigger))
-        return userpool        
+        return userpool
