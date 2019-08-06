@@ -6,7 +6,8 @@ do_not_verify = {
     'AWS::S3::Bucket': 'AWS::S3::Bucket',
     'AWS::SNS::Topic': 'AWS::SNS::Topic',
     'AWS::DynamoDB::Table': 'AWS::Serverless::SimpleTable',
-    'AWS::CloudFormation::Stack': 'AWS::Serverless::Application'
+    'AWS::CloudFormation::Stack': 'AWS::Serverless::Application',
+    'AWS::Cognito::UserPool': 'AWS::Cognito::UserPool'
 }
 
 

@@ -11,6 +11,7 @@ from samtranslator.model.sns import SNSSubscription
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iot import IotTopicRule
+from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -683,3 +684,75 @@ class IoTRule(PushEventSource):
             rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         return rule
+
+class Cognito(PushEventSource):
+    resource_type = 'Cognito'
+    principal = 'cognito-idp.amazonaws.com'
+
+    property_types = {
+        'UserPool': PropertyType(True, is_str()),
+        'Trigger': PropertyType(True, is_str())
+    }
+
+    def resources_to_link(self, resources):
+        if isinstance(self.UserPool, dict) and 'Ref' in self.UserPool:
+            userpool_id = self.UserPool['Ref']
+            if userpool_id in resources:
+                return {
+                    'userpool': resources[userpool_id],
+                    'userpool_id': userpool_id
+                }
+        raise InvalidEventException(self.relative_id, "Cognito events must reference a Cognito UserPool in the same template.")
+
+    def to_cloudformation(self, **kwargs):
+        function = kwargs.get('function')
+
+        if not function:
+            raise TypeError("Missing required keyword argument: function")
+
+        if 'userpool' not in kwargs or kwargs['userpool'] is None:
+            raise TypeError("Missing required keyword argument: userpool")
+
+        if 'userpool_id' not in kwargs or kwargs['userpool_id'] is None:
+            raise TypeError("Missing required keyword argument: userpool_id")
+
+        userpool = kwargs['userpool']
+        userpool_id = kwargs['userpool_id']
+
+        resources = []
+        resources.append(self._construct_permission(function, event_source_token=self.UserPool))
+
+        self._inject_lambda_config(function, userpool)
+        resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
+        return resources
+
+    def _inject_lambda_config(self, function, userpool):
+        base_event_mapping = {
+            'Function': function.get_runtime_attr("arn")
+        }
+
+        event_triggers = self.Trigger
+        if isinstance(self.Trigger, string_types):
+            event_triggers = [self.Trigger]
+
+        #TODO can these be conditional?
+
+        properties = userpool.get('Properties', None)
+        if properties is None:
+            properties = {}
+            userpool['Properties'] = properties
+
+        lambda_config = properties.get('LambdaConfig', None)
+        if lambda_config is None:
+            lambda_config = {}
+            properties['LambdaConfig'] = lambda_config
+
+        for event_trigger in event_triggers:
+            if event_trigger not in lambda_config:
+                lambda_config[event_trigger] = function.get_runtime_attr("arn")
+            else:
+                raise InvalidEventException(
+                    self.relative_id, 
+                    'Cognito trigger "{trigger}" defined multiple times.'.format(
+                        trigger=self.Trigger))
+        return userpool        
