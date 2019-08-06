@@ -68,6 +68,15 @@ ReservedConcurrentExecutions       All
 Events Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Cognito
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+======================== ================================== ========================
+     Property Name        Intrinsic(s) Supported            Reasons
+======================== ================================== ========================
+UserPool                 Ref of a AWS::Cognito::UserPool    Properties in the AWS::Cognito::UserPool are used to construct different attributes.
+Trigger                  All
+======================== ================================== ========================
+
 S3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ======================== ================================== ========================
