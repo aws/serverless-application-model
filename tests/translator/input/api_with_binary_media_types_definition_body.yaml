@@ -1,8 +1,13 @@
+Parameters:
+  BMT:
+    Type: String
+    Default: image~1jpeg
 Globals:
   Api:
     BinaryMediaTypes:
-      - image/jpg
-      - {"Fn::Join": ["/", ["image", "png"]]}
+      - !Ref BMT
+      - image~1jpg
+      - {"Fn::Join": ["~1", ["image", "png"]]}
 
 Resources:
   ExplicitApiManagedSwagger:
@@ -10,14 +15,14 @@ Resources:
     Properties:
       StageName: Prod
       BinaryMediaTypes:
-        - image/gif
+        - image~1gif
 
   ExplicitApiDefinitionBody:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       BinaryMediaTypes:
-        - application/json
+        - application~1json
       DefinitionBody: {
           "paths": {}, 
           "swagger": "2.0", 

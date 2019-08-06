@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "BMT": {
+      "Default": "image~1jpg", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -47,16 +53,6 @@
         }
       }
     }, 
-    "ExplicitApiDeploymentf117c932f7": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
-        "StageName": "Stage"
-      }
-    }, 
     "ImplicitApiFunctionGetHtmlPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -103,17 +99,18 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "BinaryMediaTypes": [
-          "image/jpg", 
+          "image~1gif", 
           {
             "Fn::Join": [
-              "/", 
+              "~1", 
               [
                 "image", 
                 "png"
               ]
             ]
           }, 
-          "image/gif"
+          "application~1octet-stream", 
+          "image~1jpg"
         ], 
         "EndpointConfiguration": {
           "Types": [
@@ -145,7 +142,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentd244838cf7"
+          "Ref": "ServerlessRestApiDeploymentcc75b253a7"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -153,13 +150,23 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeploymentd244838cf7": {
+    "ServerlessRestApiDeploymentcc75b253a7": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: d244838cf7da9d22daa2df81b63056f8b578f711", 
+        "Description": "RestApi deployment id: cc75b253a750cc6450a4de493f56a526d23b52d4", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiDeploymentf117c932f7": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
         "StageName": "Stage"
       }
     }, 
@@ -189,7 +196,7 @@
           }, 
           "swagger": "2.0", 
           "x-amazon-apigateway-binary-media-types": [
-            "image/jpg", 
+            "image/gif", 
             {
               "Fn::Join": [
                 "/", 
@@ -202,10 +209,10 @@
           ]
         }, 
         "BinaryMediaTypes": [
-          "image/jpg", 
+          "image~1gif", 
           {
             "Fn::Join": [
-              "/", 
+              "~1", 
               [
                 "image", 
                 "png"
