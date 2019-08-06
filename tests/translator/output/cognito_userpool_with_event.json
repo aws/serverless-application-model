@@ -9,7 +9,19 @@
               "ImplicitApiFunction", "Arn"
             ]
           },
-          "PreAuthentication": "Test"
+          "PreAuthentication": "Test",
+          "Test1": {
+            "Fn::GetAtt": [
+              "ImplicitApiFunction",
+              "Arn"
+            ]
+          },
+          "Test2": {
+            "Fn::GetAtt": [
+              "ImplicitApiFunction",
+              "Arn"
+            ]
+          }          
         }
       }
     },
@@ -60,7 +72,7 @@
         }
       }
     },    
-    "ImplicitApiFunctionOneTriggerPermission": {
+    "ImplicitApiFunctionCognitoPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:invokeFunction",

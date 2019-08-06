@@ -41,14 +41,16 @@ class PushEventSource(ResourceMacro):
     """
     principal = None
 
-    def _construct_permission(self, function, source_arn=None, source_account=None, suffix="", event_source_token=None):
+    def _construct_permission(self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
         source triggers.
 
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        lambda_permission = LambdaPermission(self.logical_id + 'Permission' + suffix,
+        if prefix is None:        
+            prefix = self.logical_id
+        lambda_permission = LambdaPermission(prefix + 'Permission' + suffix,
                                              attributes=function.get_passthrough_resource_attributes())
 
         try:
@@ -691,7 +693,7 @@ class Cognito(PushEventSource):
 
     property_types = {
         'UserPool': PropertyType(True, is_str()),
-        'Trigger': PropertyType(True, is_str())
+        'Trigger': PropertyType(True, one_of(is_str(), list_of(is_str())))
     }
 
     def resources_to_link(self, resources):
@@ -720,7 +722,7 @@ class Cognito(PushEventSource):
         userpool_id = kwargs['userpool_id']
 
         resources = []
-        resources.append(self._construct_permission(function, event_source_token=self.UserPool))
+        resources.append(self._construct_permission(function, event_source_token=self.UserPool, prefix=function.logical_id + "Cognito"))
 
         self._inject_lambda_config(function, userpool)
         resources.append(CognitoUserPool.from_dict(userpool_id, userpool))

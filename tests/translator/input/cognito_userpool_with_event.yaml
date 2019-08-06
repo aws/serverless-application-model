@@ -17,3 +17,9 @@ Resources:
             UserPool: 
               Ref: UserPool
             Trigger: PreSignUp
+        TwoTrigger:
+          Type: Cognito
+          Properties:
+            UserPool: 
+              Ref: UserPool
+            Trigger: [Test1, Test2]        
