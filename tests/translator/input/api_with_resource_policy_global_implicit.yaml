@@ -1,0 +1,26 @@
+Globals:
+  Api:
+    Auth:
+      ResourcePolicy:
+        CustomStatements: [{
+            Action: 'execute-api:Invoke', 
+            Resource: ['execute-api:/*/*/*']
+          },
+          {
+            Action: 'execute-api:blah', 
+            Resource: ['execute-api:/*/*/*']
+          }]
+Resources:
+  MinimalFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        AddItem:
+          Type: Api
+          Properties:
+            Path: /add
+            Method: post
+

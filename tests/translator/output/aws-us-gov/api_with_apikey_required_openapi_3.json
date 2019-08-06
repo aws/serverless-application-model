@@ -45,6 +45,15 @@
         }
       }
     }, 
+    "MyApiWithoutAuthDeployment36e0aae784": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithoutAuth"
+        }, 
+        "Description": "RestApi deployment id: 36e0aae784b2c12681164079395d2d416638051f"
+      }
+    }, 
     "MyApiWithoutAuth": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -99,7 +108,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithoutAuthDeploymentfee0b2b452"
+          "Ref": "MyApiWithoutAuthDeployment36e0aae784"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithoutAuth"
@@ -149,15 +158,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "MyApiWithoutAuthDeploymentfee0b2b452": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithoutAuth"
-        }, 
-        "Description": "RestApi deployment id: fee0b2b45266fff45b8edba43206618eabefebfe"
       }
     }
   }

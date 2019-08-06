@@ -19,12 +19,12 @@
     "configure-cognito-user-pool": "npm run set-cognito-user-pool-id && npm run set-cognito-user-pool-client-id && npm run set-api-id && npm run set-api-url && npm run update-user-pool-client && npm run create-user-pool-domain",
     "set-cognito-user-pool-id": "npm config set COGNITO_USER_POOL_ID $(aws cloudformation describe-stacks --stack-name $(npm config get STACK_NAME) --query 'Stacks[].Outputs[?OutputKey==`CognitoUserPoolId`].OutputValue' --output text)",
     "set-cognito-user-pool-client-id": "npm config set COGNITO_USER_POOL_CLIENT_ID $(aws cloudformation describe-stacks --stack-name $(npm config get STACK_NAME) --query 'Stacks[].Outputs[?OutputKey==`CognitoUserPoolClientId`].OutputValue' --output text)",
-    "set-api-url": "npm config set API_URL $(aws cloudformation describe-stacks --stack-name sam-example-api-cognito-auth --query 'Stacks[].Outputs[?OutputKey==`ApiUrl`].OutputValue' --output text)",
-    "set-api-id": "npm config set API_ID $(aws cloudformation describe-stacks --stack-name sam-example-api-cognito-auth --query 'Stacks[].Outputs[?OutputKey==`ApiId`].OutputValue' --output text)",
+    "set-api-url": "npm config set API_URL $(aws cloudformation describe-stacks --stack-name $(npm config get STACK_NAME) --query 'Stacks[].Outputs[?OutputKey==`ApiUrl`].OutputValue' --output text)",
+    "set-api-id": "npm config set API_ID $(aws cloudformation describe-stacks --stack-name $(npm config get STACK_NAME) --query 'Stacks[].Outputs[?OutputKey==`ApiId`].OutputValue' --output text)",
     "update-user-pool-client": "aws cognito-idp update-user-pool-client --user-pool-id $(npm config get COGNITO_USER_POOL_ID) --client-id $(npm config get COGNITO_USER_POOL_CLIENT_ID) --supported-identity-providers COGNITO --callback-urls \"[\\\"$(npm config get API_URL)\\\"]\" --allowed-o-auth-flows code implicit --allowed-o-auth-scopes openid email --allowed-o-auth-flows-user-pool-client",
     "create-user-pool-domain": "aws cognito-idp create-user-pool-domain --domain $(npm config get API_ID) --user-pool-id $(npm config get COGNITO_USER_POOL_ID)",
-    "open-signup-page": "open \"https://$(npm config get API_ID).auth.us-east-1.amazoncognito.com/signup?response_type=code&client_id=$(npm config get COGNITO_USER_POOL_CLIENT_ID)&redirect_uri=$(npm config get API_URL)\"",
-    "open-login-page": "open \"https://$(npm config get API_ID).auth.us-east-1.amazoncognito.com/login?response_type=code&client_id=$(npm config get COGNITO_USER_POOL_CLIENT_ID)&redirect_uri=$(npm config get API_URL)\"",
+    "open-signup-page": "open \"https://$(npm config get API_ID).auth.$(aws cloudformation describe-stacks --stack-name $(npm config get STACK_NAME) --query 'Stacks[].Outputs[?OutputKey==`Region`].OutputValue' --output text).amazoncognito.com/signup?response_type=code&client_id=$(npm config get COGNITO_USER_POOL_CLIENT_ID)&redirect_uri=$(npm config get API_URL)\"",
+    "open-login-page": "open \"https://$(npm config get API_ID).auth.$(aws cloudformation describe-stacks --stack-name $(npm config get STACK_NAME) --query 'Stacks[].Outputs[?OutputKey==`Region`].OutputValue' --output text).amazoncognito.com/login?response_type=code&client_id=$(npm config get COGNITO_USER_POOL_CLIENT_ID)&redirect_uri=$(npm config get API_URL)\"",
     "open-api-ui": "open \"$(npm config get API_URL)\""
   }
 }
