@@ -93,8 +93,6 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: !Ref CognitoUserPoolName
-      LambdaConfig:
-        PreSignUp: !GetAtt PreSignupLambdaFunction.Arn
       Policies:
         PasswordPolicy:
           MinimumLength: 8
