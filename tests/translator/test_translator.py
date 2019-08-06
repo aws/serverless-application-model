@@ -458,6 +458,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_missing_startingposition',
     'error_missing_stream',
     'error_multiple_resource_errors',
+    'error_null_application_id',
     'error_s3_not_in_template',
     'error_table_invalid_attributetype',
     'error_table_primary_key_missing_name',
