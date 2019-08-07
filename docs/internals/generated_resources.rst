@@ -141,7 +141,7 @@ Example:
       ...
       Events:
         CognitoTrigger:
-          Type: S3
+          Type: Cognito
           Properties:
             UserPool: !Ref MyUserPool
             Trigger: PreSignUp
