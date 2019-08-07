@@ -20,8 +20,8 @@ Resources:
             Method: get
             RequestParameters:
               - method.request.header.Authorization:
-                  Required: True
-                  Caching: True
+                  Required: true
+                  Caching: true
 
   NoApiParameterFunction:
     Type: AWS::Serverless::Function
@@ -36,5 +36,5 @@ Resources:
             Path: /
             Method: get
             RequestParameters:
-              - method.request.query.type
+              - method.request.querystring.type
               - method.request.path.id

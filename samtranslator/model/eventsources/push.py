@@ -17,7 +17,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 
 CONDITION = 'Condition'
 
-RequestParameterProperties = ["Required", "Caching"]
+REQUEST_PARAMETER_PROPERTIES = ["Required", "Caching"]
 
 
 class PushEventSource(ResourceMacro):
@@ -624,13 +624,14 @@ class Api(PushEventSource):
 
                     parameter_name, parameter_value = next(iter(parameter.items()))
 
-                    if not re.match('method\.request\.(query|path|header)', parameter_name):
+                    if not re.match('method\.request\.(querystring|path|header)', parameter_name):
                         raise InvalidEventException(
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property. Keys must be in the format "
-                            "'method.request.[query|path|header].{value}', e.g 'method.request.header.Authorization'.")
+                            "'method.request.[querystring|path|header].{value}', "
+                            "e.g 'method.request.header.Authorization'.")
 
-                    if not isinstance(parameter_value, dict) or not all(key in RequestParameterProperties
+                    if not isinstance(parameter_value, dict) or not all(key in REQUEST_PARAMETER_PROPERTIES
                                                                         for key in parameter_value.keys()):
                         raise InvalidEventException(
                             self.relative_id,
@@ -644,11 +645,12 @@ class Api(PushEventSource):
                     parameters.append(settings)
 
                 elif isinstance(parameter, string_types):
-                    if not re.match('method\.request\.(query|path|header)', parameter):
+                    if not re.match('method\.request\.(querystring|path|header)', parameter):
                         raise InvalidEventException(
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property. Keys must be in the format "
-                            "'method.request.[query|path|header].{value}', e.g 'method.request.header.Authorization'.")
+                            "'method.request.[querystring|path|header].{value}', "
+                            "e.g 'method.request.header.Authorization'.")
 
                     settings = default_value.copy()
                     settings.update({'Name': parameter})

@@ -23,6 +23,7 @@ class SwaggerEditor(object):
     _X_APIGW_GATEWAY_RESPONSES = 'x-amazon-apigateway-gateway-responses'
     _X_APIGW_POLICY = 'x-amazon-apigateway-policy'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
+    _CACHE_KEY_PARAMETERS = 'cacheKeyParameters'
 
     def __init__(self, doc):
         """
@@ -846,6 +847,9 @@ class SwaggerEditor(object):
                 location_name = parameter_name.replace('method.request.', '')
                 location, name = location_name.split('.')
 
+                if location == 'querystring':
+                    location = 'query'
+
                 parameter = {
                     'in': location,
                     'name': name,
@@ -858,9 +862,9 @@ class SwaggerEditor(object):
                 if request_parameter['Caching']:
 
                     integration = method_definition[self._X_APIGW_INTEGRATION]
-                    cache_parameters = integration.get('cacheKeyParameters', [])
+                    cache_parameters = integration.get(self._CACHE_KEY_PARAMETERS, [])
                     cache_parameters.append(parameter_name)
-                    integration['cacheKeyParameters'] = cache_parameters
+                    integration[self._CACHE_KEY_PARAMETERS] = cache_parameters
 
             method_definition['parameters'] = existing_parameters
 

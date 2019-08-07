@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Simple API Endpoint configured using Swagger specified inline and backed by a Lambda function
+Globals:
+  Api:
+    CacheClusterEnabled: true
+    CacheClusterSize: '0.5'
+
 Resources:
 
   MyLambdaFunction:
@@ -8,7 +13,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs8.10
-      CodeUri: src/
+      CodeUri: s3://gbdx-build-artifacts/bbeck-test/423f9056eb70d25480852fc472b43dd5 #src/
       Events:
         GetApi:
           Type: Api
@@ -17,9 +22,9 @@ Resources:
             Method: POST
             RequestParameters:
               - method.request.header.Authorization:
-                  Required: True
-                  Caching: True
-              - method.request.query.type
+                  Required: true
+                  Caching: true
+              - method.request.querystring.type
 
 Outputs:
 
