@@ -24,6 +24,12 @@ class SwaggerEditor(object):
     _X_APIGW_POLICY = 'x-amazon-apigateway-policy'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
     _CACHE_KEY_PARAMETERS = 'cacheKeyParameters'
+    # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
+    _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
+    _POLICY_TYPE_IAM = "Iam"
+    _POLICY_TYPE_IP = "Ip"
+    _POLICY_TYPE_VPC = "Vpc"
+
 
     def __init__(self, doc):
         """
@@ -372,9 +378,6 @@ class SwaggerEditor(object):
                         Empty string, otherwise
         """
 
-        # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
-        all_http_methods = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
-
         if not self.has_path(path):
             return ""
 
@@ -383,7 +386,7 @@ class SwaggerEditor(object):
 
         if self._X_ANY_METHOD in methods:
             # API Gateway's ANY method is not a real HTTP method but a wildcard representing all HTTP methods
-            allow_methods = all_http_methods
+            allow_methods = self._ALL_HTTP_METHODS
         else:
             allow_methods = methods
             allow_methods.append("options")  # Always add Options to the CORS methods response
@@ -790,7 +793,7 @@ class SwaggerEditor(object):
 
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy):
+    def add_resource_policy(self, resource_policy, path):
         """
         Add resource policy definition to Swagger.
 
@@ -800,26 +803,166 @@ class SwaggerEditor(object):
         if resource_policy is None:
             return
 
+        iam_allow_list = resource_policy.get('IamAllowList')
+        iam_deny_list = resource_policy.get('IamDenyList')
+        ip_allow_list = resource_policy.get('IpAllowList')
+        ip_deny_list = resource_policy.get('IpDenyList')
+        source_vpc_allow_list = resource_policy.get('SourceVpcAllowList')
+        source_vpc_deny_list = resource_policy.get('SourceVpcDenyList')
         custom_statements = resource_policy.get('CustomStatements')
 
+        if iam_allow_list is not None:
+            self._add_iam_resource_policy_for_method(iam_allow_list, path, "Allow")
+
+        if iam_deny_list is not None:
+            self._add_iam_resource_policy_for_method(iam_deny_list, path, "Deny")
+
+        if ip_allow_list is not None:
+            self._add_ip_resource_policy_for_method(ip_allow_list, "NotIpAddress")
+
+        if ip_deny_list is not None:
+            self._add_ip_resource_policy_for_method(ip_deny_list, "IpAddress")
+
+        if source_vpc_allow_list is not None:
+            for endpoint in source_vpc_allow_list:
+                self._add_vpc_resource_policy_for_method(endpoint, "StringNotEquals")
+
+        if source_vpc_deny_list is not None:
+            for endpoint in source_vpc_deny_list:
+                self._add_vpc_resource_policy_for_method(endpoint, "StringEquals")
+
         if custom_statements is not None:
-            if not isinstance(custom_statements, list):
-                custom_statements = [custom_statements]
+            self._add_custom_statement(custom_statements)
+        self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
-            self.resource_policy['Version'] = '2012-10-17'
-            if self.resource_policy.get('Statement') is None:
-                self.resource_policy['Statement'] = custom_statements
-            else:
-                statement = self.resource_policy['Statement']
-                if isinstance(statement, list):
-                    statement.extend(custom_statements)
-                else:
-                    statement = [statement]
-                    statement.extend(custom_statements)
+    def _add_iam_resource_policy_for_method(self, policy_list, path, effect):
+        if not self.has_path(path):
+            return
 
-                self.resource_policy['Statement'] = statement
+        if not policy_list:
+            return
 
-            self._doc[self._X_APIGW_POLICY] = self.resource_policy
+        if not effect in ["Allow", "Deny"]:
+            return
+
+        if not isinstance(policy_list, list):
+            policy_list = [policy_list]
+
+        self.resource_policy['Version'] = '2012-10-17'
+        policy_statement = {}
+        policy_statement['Effect'] = effect
+        policy_statement['Action'] = "execute-api:Invoke"
+        policy_statement['Resource'] = ["execute-api:*/*/*"]
+        policy_statement['Principal'] = {"AWS": policy_list}
+
+        if self.resource_policy.get('Statement') is None:
+            self.resource_policy['Statement'] = policy_statement
+        else:
+            statement = self.resource_policy['Statement']
+            if not isinstance(statement, list):
+                statement = [statement]
+            statement.extend(policy_statement)
+            self.resource_policy['Statement'] = statement
+        # # At this point, value of Swagger path should be a dictionary with method names being the keys
+        # methods = list(self.get_path(path).keys())
+
+        # if self._X_ANY_METHOD in methods:
+        #     # API Gateway's ANY method is not a real HTTP method but a wildcard representing all HTTP methods
+        #     allow_methods = self._ALL_HTTP_METHODS
+        # else:
+        #     allow_methods = methods
+
+    def _add_ip_resource_policy_for_method(self, ip_list, conditional):
+        if not ip_list:
+            return
+
+        if not isinstance(ip_list, list):
+            ip_list = [ip_list]
+
+        if not conditional in ["IpAddress", "NotIpAddress"]:
+            return
+
+        self.resource_policy['Version'] = '2012-10-17'
+        allow_statement = {}
+        allow_statement['Effect'] = "Allow"
+        allow_statement['Action'] = "execute-api:Invoke"
+        allow_statement['Resource'] = ["execute-api:*/*/*"]
+        allow_statement['Principal'] = "*"
+
+        deny_statement = {}
+        deny_statement['Effect'] = "Deny"
+        deny_statement['Action'] = "execute-api:Invoke"
+        deny_statement['Resource'] = ["execute-api:*/*/*"]
+        deny_statement['Principal'] = "*"
+        deny_statement['Condition'] = {conditional: {"aws:SourceIp": ip_list}}
+
+        if self.resource_policy.get('Statement') is None:
+            self.resource_policy['Statement'] = [allow_statement, deny_statement]
+        else:
+            statement = self.resource_policy['Statement']
+            if not isinstance(statement, list):
+                statement = [statement]
+            if allow_statement not in statement:
+                statement.extend(allow_statement)
+            if deny_statement not in statement:
+                statement.extend(deny_statement)
+            self.resource_policy['Statement'] = statement
+
+    def _add_vpc_resource_policy_for_method(self, vpc, conditional):
+        vpce_regex = r"^vpce-"
+        if not vpc:
+            return
+
+        if not conditional in ["StringNotEquals", "StringEquals"]:
+            return
+
+        if not re.match(vpce_regex, vpc):
+            endpoint = "aws:SourceVpc"
+        else:
+            endpoint = "aws:SourceVpce"
+
+        self.resource_policy['Version'] = '2012-10-17'
+        allow_statement = {}
+        allow_statement['Effect'] = "Allow"
+        allow_statement['Action'] = "execute-api:Invoke"
+        allow_statement['Resource'] = ["execute-api:*/*/*"]
+        allow_statement['Principal'] = "*"
+
+        deny_statement = {}
+        deny_statement['Effect'] = "Deny"
+        deny_statement['Action'] = "execute-api:Invoke"
+        deny_statement['Resource'] = ["execute-api:*/*/*"]
+        deny_statement['Principal'] = "*"
+        deny_statement['Condition'] = {conditional: {endpoint: vpc}}
+
+        if self.resource_policy.get('Statement') is None:
+            self.resource_policy['Statement'] = [allow_statement, deny_statement]
+        else:
+            statement = self.resource_policy['Statement']
+            if not isinstance(statement, list):
+                statement = [statement]
+            if allow_statement not in statement:
+                statement.extend([allow_statement])
+            if deny_statement not in statement:
+                statement.extend([deny_statement])
+            self.resource_policy['Statement'] = statement
+
+    def _add_custom_statement(self, custom_statements):
+        if custom_statements is None:
+            return
+
+        if not isinstance(custom_statements, list):
+            custom_statements = [custom_statements]
+
+        self.resource_policy['Version'] = '2012-10-17'
+        if self.resource_policy.get('Statement') is None:
+            self.resource_policy['Statement'] = custom_statements
+        else:
+            statement = self.resource_policy['Statement']
+            if not isinstance(statement, list):
+                statement = [statement]
+            statement.extend(custom_statements)
+            self.resource_policy['Statement'] = statement
 
     def add_request_parameters_to_method(self, path, method_name, request_parameters):
         """

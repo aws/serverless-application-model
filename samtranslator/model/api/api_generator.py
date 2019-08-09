@@ -331,7 +331,8 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)
 
         if auth_properties.ResourcePolicy:
-            swagger_editor.add_resource_policy(auth_properties.ResourcePolicy)
+            for path in swagger_editor.iter_on_path():
+                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path)
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 

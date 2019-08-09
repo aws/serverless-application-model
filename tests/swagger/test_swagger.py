@@ -1,4 +1,5 @@
 import copy
+import json
 
 from unittest import TestCase
 from mock import Mock
@@ -1252,6 +1253,21 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
 
         self.editor = SwaggerEditor(self.original_swagger)
 
+
+class TestSwaggerEditor_add_resource_policy(TestCase):
+    def setUp(self):
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    "get": {},
+                    "put": {}
+                }
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+
     def test_must_add_parameter_to_method_with_required_and_caching_true(self):
 
         parameters = [{
@@ -1312,6 +1328,83 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
                         },
                         'parameters': [{'test': 'existing parameter'}]
                     }
+    def test_must_add_custom_statements(self):
+
+        resourcePolicy = {
+            'CustomStatements': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:/*/*/*']
+            },
+            {
+                'Action': 'execute-api:blah', 
+                'Resource': ['execute-api:/*/*/*']
+            }]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo")
+
+        expected = {
+            "Version": "2012-10-17", 
+            "Statement": [
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+              }, 
+              {
+                "Action": "execute-api:blah", 
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+              }
+            ]
+        }
+
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+
+    def test_must_add_iam_allow(self):
+
+        resourcePolicy = {
+            'IamAllowList': [
+                "123456"
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": {
+                'Effect': 'Allow',
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:*/*/*'], 
+                'Principal': {
+                    'AWS': ['123456']
+                }
+            }
+        }
+
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+
+    def test_must_add_iam_deny(self):
+
+        resourcePolicy = {
+            'IamDenyList': [
+                "123456"
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": {
+                'Effect': 'Deny',
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:*/*/*'], 
+                'Principal': {
+                    'AWS': ['123456']
                 }
             }
         }
@@ -1366,3 +1459,152 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
         expected = {}
 
         self.assertEqual(expected, editor.swagger['paths']['/foo']['get'])
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+
+    def test_must_add_ip_allow(self):
+
+        resourcePolicy = {
+            'IpAllowList': [
+                "1.2.3.4"
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:*/*/*'],
+                'Effect': 'Allow',
+                'Principal': '*'
+            },
+            {
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:*/*/*'],
+                'Effect': 'Deny',
+                'Condition': {
+                    'NotIpAddress': {
+                        'aws:SourceIp': ['1.2.3.4']
+                    }
+                },
+                'Principal': '*'
+            }]
+        }
+
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+
+    def test_must_add_ip_deny(self):
+
+        resourcePolicy = {
+            'IpDenyList': [
+                "1.2.3.4"
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:*/*/*'],
+                'Effect': 'Allow',
+                'Principal': '*'
+            },
+            {
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:*/*/*'],
+                'Effect': 'Deny',
+                'Condition': {
+                    'IpAddress': {
+                        'aws:SourceIp': ['1.2.3.4']
+                    }
+                },
+                'Principal': '*'
+            }]
+        }
+
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+
+    def test_must_add_vpc_allow(self):
+
+        resourcePolicy = {
+            'SourceVpcAllowList': [
+                "vpc-123",
+                "vpce-345"
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': ['execute-api:*/*/*'],
+                    'Effect': 'Allow',
+                    'Principal': '*'
+                },
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': ['execute-api:*/*/*'],
+                    'Effect': 'Deny',
+                    'Condition': {
+                        'StringNotEquals': {
+                            'aws:SourceVpc': 'vpc-123'
+                        }
+                    },
+                    'Principal': '*'
+                },
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': ['execute-api:*/*/*'],
+                    'Effect': 'Deny',
+                    'Condition': {
+                        'StringNotEquals': {
+                            'aws:SourceVpce': 'vpce-345'
+                        }
+                    },
+                    'Principal': '*'
+                }
+            ]
+        }
+
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+
+    def test_must_add_vpc_deny(self):
+
+        resourcePolicy = {
+            'SourceVpcDenyList': [
+                "vpc-123"
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': ['execute-api:*/*/*'],
+                    'Effect': 'Allow',
+                    'Principal': '*'
+                },
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': ['execute-api:*/*/*'],
+                    'Effect': 'Deny',
+                    'Condition': {
+                        'StringEquals': {
+                            'aws:SourceVpc': 'vpc-123'
+                        }
+                    },
+                    'Principal': '*'
+                }
+            ]
+        }
+
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
