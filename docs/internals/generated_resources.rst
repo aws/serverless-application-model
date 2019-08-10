@@ -184,6 +184,7 @@ Example:
           Type: SNS
           Properties:
             Topic: arn:aws:sns:us-east-1:123456789012:my_topic
+            SqsSubscription: true
       ...
 
 Additional generated resources:
@@ -192,8 +193,13 @@ Additional generated resources:
 CloudFormation Resource Type       Logical ID 
 ================================== ================================
 AWS::Lambda::Permissions           MyFunction\ **MyTrigger**\ Permission
-AWS::SNS::Subscription             MyFunction\ **MyTrigger** 
+AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger**\ EventSourceMapping
+AWS::SNS::Subscription             MyFunction\ **MyTrigger**
+AWS::SQS::Queue                    MyFunction\ **MyTrigger**\ Queue
+AWS::SQS::QueuePolicy              MyFunction\ **MyTrigger**\ QueuePolicy
 ================================== ================================
+
+  NOTE: ``AWS::Lambda::Permissions`` resources are only generated if SqsSubscription is ``false``. ``AWS::Lambda::EventSourceMapping``, ``AWS::SQS::Queue``, ``AWS::SQS::QueuePolicy`` resources are only generated if SqsSubscription is ``true``.
 
 Kinesis
 ^^^^^^^
