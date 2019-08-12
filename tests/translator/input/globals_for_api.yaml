@@ -8,6 +8,7 @@ Globals:
       Authorizers:
         MyCognitoAuth:
           UserPoolArn: !GetAtt MyUserPool.Arn
+      ApiKeyRequired: true
     Variables:
       SomeVar: Value
 

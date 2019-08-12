@@ -7,6 +7,7 @@ from samtranslator.model import InvalidResourceException
 from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion
 from samtranslator.model.apigateway import ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayDeployment
+from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.sam_resources import SamFunction
 from samtranslator.model.sam_resources import SamApi
 
@@ -121,3 +122,36 @@ class TestOpenApi(TestCase):
 
         self.assertEqual(deployment.__len__(), 1)
         self.assertEqual(deployment[0].StageName, "Stage")
+
+class TestApiTags(TestCase):
+    kwargs = {
+        'intrinsics_resolver': IntrinsicsResolver({}),
+        'event_resources': [],
+        'managed_policy_map': {
+            "foo": "bar"
+        }
+    }
+
+    def test_with_no_tags(self):
+        api = SamApi("foo")
+        api.Tags = {}
+
+        resources = api.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, ApiGatewayStage)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].Tags, [])
+
+    def test_with_tags(self):
+        api = SamApi("foo")
+        api.Tags = {
+            'MyKey': 'MyValue'
+        }
+
+        resources = api.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, ApiGatewayStage)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].Tags, [
+            {'Key': 'MyKey', 'Value': 'MyValue'}
+        ])

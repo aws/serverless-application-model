@@ -93,7 +93,7 @@ resource:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery10Minutes
@@ -162,8 +162,8 @@ resource:
           - Effect: "Allow"
             Action:
               - "lambda:InvokeFunction"
-            Resource: !Ref MyLambdaFunction.Version
-      Runtime: nodejs6.10
+            Resource: !GetAtt MyLambdaFunction.Arn
+      Runtime: nodejs8.10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: false
@@ -286,7 +286,7 @@ Hooks are extremely powerful because:
           - Effect: "Allow"
             Action:
               - "lambda:InvokeFunction"
-            Resource: !Ref MyLambdaFunction.Version
+            Resource: !GetAtt MyLambdaFunction.Arn
 
 Checkout the lambda_safe_deployments_ folder for an example for how to create SAM template that contains a hook function.
 

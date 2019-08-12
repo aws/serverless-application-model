@@ -33,7 +33,8 @@
           ]
         },
         "Protocol": "lambda",
-        "TopicArn": "topicArn"
+        "TopicArn": "topicArn",
+        "Region": "region"
       }
     },
     "MyAwesomeFunctionNotificationTopicPermission": {

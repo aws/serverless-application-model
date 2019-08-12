@@ -2,7 +2,7 @@ from re import match
 
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.model.types import is_type, one_of, is_str
+from samtranslator.model.types import is_type, one_of, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -40,6 +40,7 @@ class ApiGatewayStage(Resource):
             'Description': PropertyType(False, is_str()),
             'RestApiId': PropertyType(True, is_str()),
             'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
+            'Tags': PropertyType(False, list_of(is_type(dict))),
             'TracingEnabled': PropertyType(False, is_type(bool)),
             'Variables': PropertyType(False, is_type(dict)),
             "MethodSettings": PropertyType(False, is_type(list))
@@ -61,6 +62,8 @@ class ApiGatewayAccount(Resource):
 
 
 class ApiGatewayDeployment(Resource):
+    _X_HASH_DELIMITER = "||"
+
     resource_type = 'AWS::ApiGateway::Deployment'
     property_types = {
             'Description': PropertyType(False, is_str()),
@@ -73,9 +76,10 @@ class ApiGatewayDeployment(Resource):
         "deployment_id": lambda self: ref(self.logical_id),
     }
 
-    def make_auto_deployable(self, stage, swagger=None):
+    def make_auto_deployable(self, stage, openapi_version=None, swagger=None):
         """
-        Sets up the resource such that it will triggers a re-deployment when Swagger changes
+        Sets up the resource such that it will trigger a re-deployment when Swagger changes
+        or the openapi version changes.
 
         :param swagger: Dictionary containing the Swagger definition of the API
         """
@@ -88,10 +92,15 @@ class ApiGatewayDeployment(Resource):
         # to prevent redeployment when API has not changed
 
         # NOTE: `str(swagger)` is for backwards compatibility. Changing it to a JSON or something will break compat
-        generator = logical_id_generator.LogicalIdGenerator(self.logical_id, str(swagger))
+        hash_input = [str(swagger)]
+        if openapi_version:
+            hash_input.append(str(openapi_version))
+
+        data = self._X_HASH_DELIMITER.join(hash_input)
+        generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
         self.logical_id = generator.gen()
-        hash = generator.get_hash(length=40)  # Get the full hash
-        self.Description = "RestApi deployment id: {}".format(hash)
+        digest = generator.get_hash(length=40)  # Get the full hash
+        self.Description = "RestApi deployment id: {}".format(digest)
         stage.update_deployment_ref(self.logical_id)
 
 

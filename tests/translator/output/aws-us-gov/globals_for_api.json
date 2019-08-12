@@ -91,6 +91,9 @@
                 "security": [
                   {
                     "MyCognitoAuth": []
+                  }, 
+                  {
+                    "api_key": []
                   }
                 ], 
                 "responses": {}
@@ -115,6 +118,11 @@
                 "type": "cognito_user_pools"
               }, 
               "x-amazon-apigateway-authtype": "cognito_user_pools"
+            }, 
+            "api_key": {
+              "type": "apiKey", 
+              "name": "x-api-key", 
+              "in": "header"
             }
           }
         }, 
@@ -142,7 +150,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentc969c99f9d"
+          "Ref": "ServerlessRestApiDeployment6fd1928d9b"
         }
       }
     }, 
@@ -159,8 +167,18 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentd5fa0145e9"
+          "Ref": "ExplicitApiDeployment43e01e673d"
         }
+      }
+    }, 
+    "ExplicitApiDeployment43e01e673d": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 43e01e673d7acbd09e4c38ff78dd6ddaf2ed1d55", 
+        "StageName": "Stage"
       }
     }, 
     "ImplicitApiFunctionGetHtmlPermissionProd": {
@@ -184,23 +202,13 @@
         }
       }
     }, 
-    "ServerlessRestApiDeploymentc969c99f9d": {
+    "ServerlessRestApiDeployment6fd1928d9b": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: c969c99f9d6b6921dff605a206e8989bdb7d1bc7", 
-        "StageName": "Stage"
-      }
-    }, 
-    "ExplicitApiDeploymentd5fa0145e9": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: d5fa0145e9e6393911d32967e66fd7091d605483", 
+        "Description": "RestApi deployment id: 6fd1928d9b9ad3c711a371e1337306458029f8bd", 
         "StageName": "Stage"
       }
     }, 
@@ -248,6 +256,9 @@
                 "security": [
                   {
                     "MyCognitoAuth": []
+                  }, 
+                  {
+                    "api_key": []
                   }
                 ], 
                 "responses": {}
@@ -272,6 +283,11 @@
                 "type": "cognito_user_pools"
               }, 
               "x-amazon-apigateway-authtype": "cognito_user_pools"
+            }, 
+            "api_key": {
+              "type": "apiKey", 
+              "name": "x-api-key", 
+              "in": "header"
             }
           }
         }, 

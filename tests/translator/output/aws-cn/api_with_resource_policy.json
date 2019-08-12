@@ -1,0 +1,60 @@
+{
+  "Resources": {
+    "ExplicitApiDeploymente11dac9531": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: e11dac9531e1328d9249c42ac3e40044b4159d60", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeploymente11dac9531"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {}, 
+          "swagger": "2.0", 
+          "x-amazon-apigateway-policy": {
+            "Version": "2012-10-17", 
+            "Statement": [
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+              }
+            ]
+          }
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }
+  }
+}
