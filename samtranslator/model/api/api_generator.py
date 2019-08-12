@@ -332,7 +332,8 @@ class ApiGenerator(object):
 
         if auth_properties.ResourcePolicy:
             for path in swagger_editor.iter_on_path():
-                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path)
+                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path,
+                                                   self.logical_id, self.stage_name)
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 

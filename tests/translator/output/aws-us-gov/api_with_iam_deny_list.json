@@ -43,26 +43,26 @@
         }
       }
     }, 
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentb66e41a54e"
-        }, 
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiDeploymentb66e41a54e": {
+    "ServerlessRestApiDeploymentcd2fa40e47": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: b66e41a54efb15ad39da449898198c46afb9fc19", 
+        "Description": "RestApi deployment id: cd2fa40e471867b0757992eddb5c1351785cf367", 
         "StageName": "Stage"
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymentcd2fa40e47"
+        }, 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod"
       }
     }, 
     "MyFunctionRole": {
@@ -119,12 +119,20 @@
             "Statement": {
               "Action": "execute-api:Invoke", 
               "Resource": [
-                "execute-api:*/*/*"
+                {
+                  "Fn::Sub": [
+                    "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                    {
+                      "__Stage__": "Prod", 
+                      "__ApiId__": "ServerlessRestApi"
+                    }
+                  ]
+                }
               ], 
               "Effect": "Deny", 
               "Principal": {
                 "AWS": [
-                  "509068902971"
+                  "12345"
                 ]
               }
             }

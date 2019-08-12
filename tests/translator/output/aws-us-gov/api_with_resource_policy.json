@@ -1,25 +1,92 @@
 {
   "Resources": {
-    "ExplicitApiDeploymente11dac9531": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ImplicitApiFunction": {
+      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
         }, 
-        "Description": "RestApi deployment id: e11dac9531e1328d9249c42ac3e40044b4159d60", 
-        "StageName": "Stage"
+        "Role": {
+          "Fn::GetAtt": [
+            "ImplicitApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs4.3", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ImplicitApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeploymente11dac9531"
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ImplicitApiFunctionGetHtmlPermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
         }, 
-        "RestApiId": {
-          "Ref": "ExplicitApi"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ImplicitApiFunctionGetHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
         }, 
-        "StageName": "Prod"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
       }
     }, 
     "ExplicitApi": {
@@ -32,7 +99,20 @@
               "Ref": "AWS::StackName"
             }
           }, 
-          "paths": {}, 
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
           "swagger": "2.0", 
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
@@ -54,6 +134,28 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    }, 
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment5039851c65"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApiDeployment5039851c65": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 5039851c65a79cf1c3f802939216adde601a8dd7", 
+        "StageName": "Stage"
       }
     }
   }

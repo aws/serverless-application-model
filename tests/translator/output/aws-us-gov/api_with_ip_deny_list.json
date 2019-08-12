@@ -43,26 +43,26 @@
         }
       }
     }, 
-    "ServerlessRestApiDeploymente04c6298db": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: e04c6298dbbfcf86ec2d18bf7a7d3f3b3e97c202", 
-        "StageName": "Stage"
-      }
-    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymente04c6298db"
+          "Ref": "ServerlessRestApiDeployment331d160bc9"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "ServerlessRestApiDeployment331d160bc9": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 331d160bc9208a52e1caff2aad23841eacc1dcc8", 
+        "StageName": "Stage"
       }
     }, 
     "MyFunctionRole": {
@@ -120,7 +120,15 @@
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [
-                  "execute-api:*/*/*"
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
                 ], 
                 "Effect": "Allow", 
                 "Principal": "*"
@@ -128,7 +136,15 @@
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [
-                  "execute-api:*/*/*"
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
                 ], 
                 "Effect": "Deny", 
                 "Condition": {

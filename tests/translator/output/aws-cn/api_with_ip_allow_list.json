@@ -43,26 +43,26 @@
         }
       }
     }, 
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment7b32cc4558"
-        }, 
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiDeployment7b32cc4558": {
+    "ServerlessRestApiDeployment0c0180caa9": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 7b32cc4558c8c0697ceb9679ed5fdca8a9699521", 
+        "Description": "RestApi deployment id: 0c0180caa927626d8bfbf57b54234895919b1340", 
         "StageName": "Stage"
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment0c0180caa9"
+        }, 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod"
       }
     }, 
     "MyFunctionRole": {
@@ -120,7 +120,15 @@
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [
-                  "execute-api:*/*/*"
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
                 ], 
                 "Effect": "Allow", 
                 "Principal": "*"
@@ -128,7 +136,15 @@
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [
-                  "execute-api:*/*/*"
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
                 ], 
                 "Effect": "Deny", 
                 "Condition": {

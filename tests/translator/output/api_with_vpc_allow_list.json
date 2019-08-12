@@ -47,7 +47,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentc24a2d0aef"
+          "Ref": "ServerlessRestApiDeploymente4fcfbfe5e"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -55,13 +55,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeploymentc24a2d0aef": {
+    "ServerlessRestApiDeploymente4fcfbfe5e": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: c24a2d0aefcb8b15607bcfcf397c4a53ab8c7655", 
+        "Description": "RestApi deployment id: e4fcfbfe5e0a97340951446ecdc05d10665249ab", 
         "StageName": "Stage"
       }
     }, 
@@ -120,7 +120,15 @@
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [
-                  "execute-api:*/*/*"
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
                 ], 
                 "Effect": "Allow", 
                 "Principal": "*"
@@ -128,7 +136,15 @@
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [
-                  "execute-api:*/*/*"
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
                 ], 
                 "Effect": "Deny", 
                 "Condition": {

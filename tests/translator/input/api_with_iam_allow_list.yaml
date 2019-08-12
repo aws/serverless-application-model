@@ -2,7 +2,7 @@ Globals:
   Api:
     Auth:
       ResourcePolicy:
-        IamAllowList: ['509068902971']
+        IamAllowList: ['12345']
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function

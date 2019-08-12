@@ -189,9 +189,6 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_xray_tracing',
         'api_request_model',
         'api_with_stage_tags',
-        'api_with_resource_policy',
-        'api_with_resource_policy_global',
-        'api_with_resource_policy_global_implicit',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -367,7 +364,10 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_ip_allow_list',
         'api_with_ip_deny_list',
         'api_with_vpc_allow_list',
-        'api_with_vpc_deny_list'
+        'api_with_vpc_deny_list',
+        'api_with_resource_policy',
+        'api_with_resource_policy_global',
+        'api_with_resource_policy_global_implicit'
       ],
       [
         ("aws", "ap-southeast-1"),

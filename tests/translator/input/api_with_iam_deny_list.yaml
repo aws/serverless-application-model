@@ -2,7 +2,7 @@ Globals:
   Api:
     Auth:
       ResourcePolicy:
-        IamDenyList: ['509068902971']
+        IamDenyList: ['12345']
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function

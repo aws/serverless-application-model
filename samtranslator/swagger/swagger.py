@@ -4,8 +4,9 @@ import re
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
-from samtranslator.model.intrinsics import make_conditional
+from samtranslator.model.intrinsics import make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.translator.arn_generator import ArnGenerator
 
 
 class SwaggerEditor(object):
@@ -29,7 +30,6 @@ class SwaggerEditor(object):
     _POLICY_TYPE_IAM = "Iam"
     _POLICY_TYPE_IP = "Ip"
     _POLICY_TYPE_VPC = "Vpc"
-
 
     def __init__(self, doc):
         """
@@ -793,7 +793,7 @@ class SwaggerEditor(object):
 
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy, path):
+    def add_resource_policy(self, resource_policy, path, api_id, stage):
         """
         Add resource policy definition to Swagger.
 
@@ -812,37 +812,48 @@ class SwaggerEditor(object):
         custom_statements = resource_policy.get('CustomStatements')
 
         if iam_allow_list is not None:
-            self._add_iam_resource_policy_for_method(iam_allow_list, path, "Allow")
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            self._add_iam_resource_policy_for_method(iam_allow_list, "Allow", resource_list)
 
         if iam_deny_list is not None:
-            self._add_iam_resource_policy_for_method(iam_deny_list, path, "Deny")
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            self._add_iam_resource_policy_for_method(iam_deny_list, "Deny", resource_list)
 
         if ip_allow_list is not None:
-            self._add_ip_resource_policy_for_method(ip_allow_list, "NotIpAddress")
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            self._add_ip_resource_policy_for_method(ip_allow_list, "NotIpAddress", resource_list)
 
         if ip_deny_list is not None:
-            self._add_ip_resource_policy_for_method(ip_deny_list, "IpAddress")
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            self._add_ip_resource_policy_for_method(ip_deny_list, "IpAddress", resource_list)
 
         if source_vpc_allow_list is not None:
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
             for endpoint in source_vpc_allow_list:
-                self._add_vpc_resource_policy_for_method(endpoint, "StringNotEquals")
+                self._add_vpc_resource_policy_for_method(endpoint, "StringNotEquals", resource_list)
 
         if source_vpc_deny_list is not None:
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
             for endpoint in source_vpc_deny_list:
-                self._add_vpc_resource_policy_for_method(endpoint, "StringEquals")
+                self._add_vpc_resource_policy_for_method(endpoint, "StringEquals", resource_list)
 
         if custom_statements is not None:
             self._add_custom_statement(custom_statements)
-        self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
-    def _add_iam_resource_policy_for_method(self, policy_list, path, effect):
-        if not self.has_path(path):
-            return
+        if self._doc.get(self._X_APIGW_POLICY) is None:
+            self._doc[self._X_APIGW_POLICY] = self.resource_policy
+            print(self.resource_policy)
+        else:
+            apigw_policy = self._doc[self._X_APIGW_POLICY]
+            apigw_policy['Version'] = resource_policy['Version']
+            apigw_policy['Statement'].extend(resource_policy.get('Statement'))
+            self._doc[self._X_APIGW_POLICY] = apigw_policy
 
+    def _add_iam_resource_policy_for_method(self, policy_list, effect, resource_list):
         if not policy_list:
             return
 
-        if not effect in ["Allow", "Deny"]:
+        if effect not in ["Allow", "Deny"]:
             return
 
         if not isinstance(policy_list, list):
@@ -852,7 +863,7 @@ class SwaggerEditor(object):
         policy_statement = {}
         policy_statement['Effect'] = effect
         policy_statement['Action'] = "execute-api:Invoke"
-        policy_statement['Resource'] = ["execute-api:*/*/*"]
+        policy_statement['Resource'] = resource_list
         policy_statement['Principal'] = {"AWS": policy_list}
 
         if self.resource_policy.get('Statement') is None:
@@ -863,36 +874,50 @@ class SwaggerEditor(object):
                 statement = [statement]
             statement.extend(policy_statement)
             self.resource_policy['Statement'] = statement
-        # # At this point, value of Swagger path should be a dictionary with method names being the keys
-        # methods = list(self.get_path(path).keys())
 
-        # if self._X_ANY_METHOD in methods:
-        #     # API Gateway's ANY method is not a real HTTP method but a wildcard representing all HTTP methods
-        #     allow_methods = self._ALL_HTTP_METHODS
-        # else:
-        #     allow_methods = methods
+    def _get_method_path_uri_list(self, path, api_id, stage):
+        # It turns out that APIGW doesn't like trailing slashes in paths (#665)
+        # and removes as a part of their behaviour, but this isn't documented.
+        # The regex removes the tailing slash to ensure the permission works as intended
+        # At this point, value of Swagger path should be a dictionary with method names being the keys
+        methods = list(self.get_path(path).keys())
+        uri_list = []
+        path = re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
 
-    def _add_ip_resource_policy_for_method(self, ip_list, conditional):
+        for m in methods:
+            method = '*' if m.lower() == 'any' else m.upper()
+
+            # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
+            resource = '${__ApiId__}/' + '${__Stage__}/' + method + path
+            partition = ArnGenerator.get_partition_name(None)
+            if partition is None:
+                partition = "aws"
+            source_arn = fnSub(ArnGenerator.generate_arn(partition=partition, service='execute-api', resource=resource),
+                               {"__ApiId__": api_id, "__Stage__": stage})
+            uri_list.extend([source_arn])
+        return uri_list
+
+    def _add_ip_resource_policy_for_method(self, ip_list, conditional, resource_list):
         if not ip_list:
             return
 
         if not isinstance(ip_list, list):
             ip_list = [ip_list]
 
-        if not conditional in ["IpAddress", "NotIpAddress"]:
+        if conditional not in ["IpAddress", "NotIpAddress"]:
             return
 
         self.resource_policy['Version'] = '2012-10-17'
         allow_statement = {}
         allow_statement['Effect'] = "Allow"
         allow_statement['Action'] = "execute-api:Invoke"
-        allow_statement['Resource'] = ["execute-api:*/*/*"]
+        allow_statement['Resource'] = resource_list
         allow_statement['Principal'] = "*"
 
         deny_statement = {}
         deny_statement['Effect'] = "Deny"
         deny_statement['Action'] = "execute-api:Invoke"
-        deny_statement['Resource'] = ["execute-api:*/*/*"]
+        deny_statement['Resource'] = resource_list
         deny_statement['Principal'] = "*"
         deny_statement['Condition'] = {conditional: {"aws:SourceIp": ip_list}}
 
@@ -908,14 +933,17 @@ class SwaggerEditor(object):
                 statement.extend(deny_statement)
             self.resource_policy['Statement'] = statement
 
-    def _add_vpc_resource_policy_for_method(self, vpc, conditional):
-        vpce_regex = r"^vpce-"
+    def _add_vpc_resource_policy_for_method(self, vpc, conditional, resource_list):
+        """
+        Add a Source VPC whitelist/blacklist policy to the method
+        """
         if not vpc:
             return
 
-        if not conditional in ["StringNotEquals", "StringEquals"]:
+        if conditional not in ["StringNotEquals", "StringEquals"]:
             return
 
+        vpce_regex = r"^vpce-"
         if not re.match(vpce_regex, vpc):
             endpoint = "aws:SourceVpc"
         else:
@@ -925,13 +953,13 @@ class SwaggerEditor(object):
         allow_statement = {}
         allow_statement['Effect'] = "Allow"
         allow_statement['Action'] = "execute-api:Invoke"
-        allow_statement['Resource'] = ["execute-api:*/*/*"]
+        allow_statement['Resource'] = resource_list
         allow_statement['Principal'] = "*"
 
         deny_statement = {}
         deny_statement['Effect'] = "Deny"
         deny_statement['Action'] = "execute-api:Invoke"
-        deny_statement['Resource'] = ["execute-api:*/*/*"]
+        deny_statement['Resource'] = resource_list
         deny_statement['Principal'] = "*"
         deny_statement['Condition'] = {conditional: {endpoint: vpc}}
 

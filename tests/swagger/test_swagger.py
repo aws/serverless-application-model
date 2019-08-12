@@ -2,7 +2,7 @@ import copy
 import json
 
 from unittest import TestCase
-from mock import Mock
+from mock import Mock, patch
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -1336,24 +1336,24 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 'Resource': ['execute-api:/*/*/*']
             },
             {
-                'Action': 'execute-api:blah', 
+                'Action': 'execute-api:blah',
                 'Resource': ['execute-api:/*/*/*']
             }]
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
         expected = {
-            "Version": "2012-10-17", 
+            "Version": "2012-10-17",
             "Statement": [
               {
-                "Action": "execute-api:Invoke", 
+                "Action": "execute-api:Invoke",
                 "Resource": [
                   "execute-api:/*/*/*"
                 ]
-              }, 
+              },
               {
-                "Action": "execute-api:blah", 
+                "Action": "execute-api:blah",
                 "Resource": [
                   "execute-api:/*/*/*"
                 ]
@@ -1363,6 +1363,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
 
+    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_iam_allow(self):
 
         resourcePolicy = {
@@ -1371,14 +1372,25 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
         expected = {
-            "Version": "2012-10-17",
-            "Statement": {
-                'Effect': 'Allow',
+            'Version': '2012-10-17',
+            'Statement': {
                 'Action': 'execute-api:Invoke',
-                'Resource': ['execute-api:*/*/*'], 
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Allow',
                 'Principal': {
                     'AWS': ['123456']
                 }
@@ -1387,6 +1399,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
 
+    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_iam_deny(self):
 
         resourcePolicy = {
@@ -1395,14 +1408,25 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
         expected = {
-            "Version": "2012-10-17",
-            "Statement": {
-                'Effect': 'Deny',
+            'Version': '2012-10-17',
+            'Statement': {
                 'Action': 'execute-api:Invoke',
-                'Resource': ['execute-api:*/*/*'], 
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Deny',
                 'Principal': {
                     'AWS': ['123456']
                 }
@@ -1461,6 +1485,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(expected, editor.swagger['paths']['/foo']['get'])
         self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
 
+    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_ip_allow(self):
 
         resourcePolicy = {
@@ -1469,19 +1494,41 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
         expected = {
             'Version': '2012-10-17',
             'Statement': [{
                 'Action': 'execute-api:Invoke',
-                'Resource': ['execute-api:*/*/*'],
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                 'Effect': 'Allow',
                 'Principal': '*'
             },
             {
                 'Action': 'execute-api:Invoke',
-                'Resource': ['execute-api:*/*/*'],
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                 'Effect': 'Deny',
                 'Condition': {
                     'NotIpAddress': {
@@ -1494,6 +1541,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
 
+    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_ip_deny(self):
 
         resourcePolicy = {
@@ -1502,19 +1550,41 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
         expected = {
             'Version': '2012-10-17',
             'Statement': [{
                 'Action': 'execute-api:Invoke',
-                'Resource': ['execute-api:*/*/*'],
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                 'Effect': 'Allow',
                 'Principal': '*'
             },
             {
                 'Action': 'execute-api:Invoke',
-                'Resource': ['execute-api:*/*/*'],
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                 'Effect': 'Deny',
                 'Condition': {
                     'IpAddress': {
@@ -1527,6 +1597,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
 
+    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_vpc_allow(self):
 
         resourcePolicy = {
@@ -1536,20 +1607,42 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
         expected = {
             'Version': '2012-10-17',
             'Statement': [
                 {
                     'Action': 'execute-api:Invoke',
-                    'Resource': ['execute-api:*/*/*'],
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                     'Effect': 'Allow',
                     'Principal': '*'
                 },
                 {
                     'Action': 'execute-api:Invoke',
-                    'Resource': ['execute-api:*/*/*'],
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                     'Effect': 'Deny',
                     'Condition': {
                         'StringNotEquals': {
@@ -1560,7 +1653,18 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 },
                 {
                     'Action': 'execute-api:Invoke',
-                    'Resource': ['execute-api:*/*/*'],
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                     'Effect': 'Deny',
                     'Condition': {
                         'StringNotEquals': {
@@ -1574,6 +1678,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
 
+    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_vpc_deny(self):
 
         resourcePolicy = {
@@ -1582,20 +1687,42 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
         expected = {
             'Version': '2012-10-17',
             'Statement': [
                 {
                     'Action': 'execute-api:Invoke',
-                    'Resource': ['execute-api:*/*/*'],
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                     'Effect': 'Allow',
                     'Principal': '*'
                 },
                 {
                     'Action': 'execute-api:Invoke',
-                    'Resource': ['execute-api:*/*/*'],
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
                     'Effect': 'Deny',
                     'Condition': {
                         'StringEquals': {
@@ -1605,6 +1732,62 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     'Principal': '*'
                 }
             ]
+        }
+
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+
+    @patch("boto3.session.Session.region_name", "eu-west-2")
+    def test_must_add_iam_allow_and_custom(self):
+
+        resourcePolicy = {
+            'IamAllowList': [
+                "123456"
+            ],
+            'CustomStatements': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:/*/*/*']
+            },
+            {
+                'Action': 'execute-api:blah',
+                'Resource': ['execute-api:/*/*/*']
+            }]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Allow',
+                'Principal': {
+                    'AWS': ['123456']
+                }
+            },
+            {
+                "Action": "execute-api:Invoke",
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+            },
+            {
+                "Action": "execute-api:blah",
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+            }]
         }
 
         self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])

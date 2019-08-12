@@ -12,27 +12,22 @@ Globals:
           }]
 
 Resources:
- ExplicitApi:
+  ImplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /
+            Method: get
+
+  ExplicitApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      DefinitionBody: {
-        "info": {
-          "version": "1.0",
-          "title": {
-            "Ref": "AWS::StackName"
-          }
-        },
-        "paths": {},
-        "swagger": "2.0",
-        "x-amazon-apigateway-policy": {
-          "Version": "2012-10-17",
-          "Statement": {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com"
-              }
-          }
-        }
-      }
