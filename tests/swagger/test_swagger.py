@@ -1328,6 +1328,17 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         },
                         'parameters': [{'test': 'existing parameter'}]
                     }
+                }
+            }
+        }
+        self.editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected = {}
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get'])
+        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+
+
     def test_must_add_custom_statements(self):
 
         resourcePolicy = {

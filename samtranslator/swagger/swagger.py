@@ -842,7 +842,6 @@ class SwaggerEditor(object):
 
         if self._doc.get(self._X_APIGW_POLICY) is None:
             self._doc[self._X_APIGW_POLICY] = self.resource_policy
-            print(self.resource_policy)
         else:
             apigw_policy = self._doc[self._X_APIGW_POLICY]
             apigw_policy['Version'] = resource_policy['Version']
