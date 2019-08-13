@@ -22,6 +22,7 @@ from samtranslator.model.lambda_ import (LambdaFunction, LambdaVersion, LambdaAl
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 
 
 class SamFunction(SamResourceMacro):
@@ -212,10 +213,34 @@ class SamFunction(SamResourceMacro):
 
             if policy_entry.type is PolicyTypes.POLICY_STATEMENT:
 
-                policy_documents.append({
-                    'PolicyName': execution_role.logical_id + 'Policy' + str(index),
-                    'PolicyDocument': policy_entry.data
-                })
+                if is_intrinsic_if(policy_entry.data):
+
+                    intrinsic_if = policy_entry.data
+                    then_statement = intrinsic_if["Fn::If"][1]
+                    else_statement = intrinsic_if["Fn::If"][2]
+
+                    if not is_intrinsic_no_value(then_statement):
+                        then_statement = {
+                            'PolicyName': execution_role.logical_id + 'Policy' + str(index),
+                            'PolicyDocument': then_statement
+                        }
+                        intrinsic_if["Fn::If"][1] = then_statement
+
+                    if not is_intrinsic_no_value(else_statement):
+                        else_statement = {
+                            'PolicyName': execution_role.logical_id + 'Policy' + str(index),
+                            'PolicyDocument': else_statement
+                        }
+                        intrinsic_if["Fn::If"][2] = else_statement
+
+                    policy_documents.append(intrinsic_if)
+
+                else:
+                    policy_documents.append({
+                        'PolicyName': execution_role.logical_id + 'Policy' + str(index),
+                        'PolicyDocument': policy_entry.data
+                    })
+
             elif policy_entry.type is PolicyTypes.MANAGED_POLICY:
 
                 # There are three options:

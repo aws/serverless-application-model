@@ -1,0 +1,71 @@
+{
+  "Conditions": {
+    "DummyCondition": {
+      "Fn::Equals": [
+        "",
+        ""
+      ]
+    }
+  },
+  "Resources": {
+    "FunctionWithConditionalPolicy": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "A function that has Fn::If in the policies property",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionWithConditionalPolicyRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7"
+      }
+    },
+    "FunctionWithConditionalPolicyRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          {
+            "Fn::If": [
+              "DummyCondition",
+              {
+                "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess"
+              },
+              {
+                "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess"
+              }
+            ]
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
