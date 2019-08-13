@@ -3,7 +3,7 @@ flake8>=3.3.0
 tox>=2.2.1
 pytest-cov>=2.4.0
 pylint>=1.7.2,<2.0
-pyyaml>=4.2b1
+pyyaml>=5.1
 
 # Test requirements
 pytest>=3.0.7
