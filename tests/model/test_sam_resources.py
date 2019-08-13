@@ -132,6 +132,7 @@ class TestApiTags(TestCase):
         }
     }
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_with_no_tags(self):
         api = SamApi("foo")
         api.Tags = {}
@@ -142,6 +143,7 @@ class TestApiTags(TestCase):
         self.assertEqual(deployment.__len__(), 1)
         self.assertEqual(deployment[0].Tags, [])
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     def test_with_tags(self):
         api = SamApi("foo")
         api.Tags = {
