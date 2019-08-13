@@ -140,33 +140,33 @@ def is_instrinsic(input):
     return False
 
 
-def is_intrinsic_if(policy):
+def is_intrinsic_if(input):
     """
-    Is the given policy data an intrinsic if? Intrinsic function 'if' is a dictionary with single
+    Is the given input an intrinsic if? Intrinsic function 'if' is a dictionary with single
     key - if
 
-    :param policy: Input value to check if it is an intrinsic if
+    :param input: Input value to check if it is an intrinsic if
     :return: True, if yes
     """
 
-    if not is_instrinsic(policy):
+    if not is_instrinsic(input):
         return False
 
-    key = list(policy.keys())[0]
+    key = list(input.keys())[0]
     return key == "Fn::If"
 
 
-def is_intrinsic_no_value(policy):
+def is_intrinsic_no_value(input):
     """
-    Is the given policy data an intrinsic Ref: AWS::NoValue? Intrinsic function is a dictionary with single
+    Is the given input an intrinsic Ref: AWS::NoValue? Intrinsic function is a dictionary with single
     key - Ref and value - AWS::NoValue
 
-    :param policy: Input value to check if it is an intrinsic if
+    :param input: Input value to check if it is an intrinsic if
     :return: True, if yes
     """
 
-    if not is_instrinsic(policy):
+    if not is_instrinsic(input):
         return False
 
-    key = list(policy.keys())[0]
-    return key == "Ref" and policy["Ref"] == "AWS::NoValue"
+    key = list(input.keys())[0]
+    return key == "Ref" and input["Ref"] == "AWS::NoValue"
