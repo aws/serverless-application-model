@@ -2,6 +2,7 @@ from samtranslator.plugins import BasePlugin
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
+from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 
 
 class PolicyTemplatesForFunctionPlugin(BasePlugin):
@@ -55,27 +56,59 @@ class PolicyTemplatesForFunctionPlugin(BasePlugin):
                 result.append(policy_entry.data)
                 continue
 
-            # We are processing policy templates. We know they have a particular structure:
-            # {"templateName": { parameter_values_dict }}
-            template_data = policy_entry.data
-            template_name = list(template_data.keys())[0]
-            template_parameters = list(template_data.values())[0]
+            if is_intrinsic_if(policy_entry.data):
+                # If policy is an intrinsic if, we need to process each sub-statement separately
+                processed_intrinsic_if = self._process_intrinsic_if_policy_template(logical_id, policy_entry)
+                result.append(processed_intrinsic_if)
+                continue
 
-            try:
-
-                # 'convert' will return a list of policy statements
-                result.append(self._policy_template_processor.convert(template_name, template_parameters))
-
-            except InsufficientParameterValues as ex:
-                # Exception's message will give lot of specific details
-                raise InvalidResourceException(logical_id, str(ex))
-            except InvalidParameterValues:
-                raise InvalidResourceException(logical_id,
-                                               "Must specify valid parameter values for policy template '{}'"
-                                               .format(template_name))
+            converted_policy = self._process_policy_template(logical_id, policy_entry.data)
+            result.append(converted_policy)
 
         # Save the modified policies list to the input
         resource_properties[FunctionPolicies.POLICIES_PROPERTY_NAME] = result
+
+    def _process_intrinsic_if_policy_template(self, logical_id, policy_entry):
+        intrinsic_if = policy_entry.data
+        then_statement = intrinsic_if["Fn::If"][1]
+        else_statement = intrinsic_if["Fn::If"][2]
+
+        processed_then_statement = then_statement \
+            if is_intrinsic_no_value(then_statement) \
+            else self._process_policy_template(logical_id, then_statement)
+
+        processed_else_statement = else_statement \
+            if is_intrinsic_no_value(else_statement) \
+            else self._process_policy_template(logical_id, else_statement)
+
+        processed_intrinsic_if = {
+            "Fn::If": [
+                policy_entry.data["Fn::If"][0],
+                processed_then_statement,
+                processed_else_statement
+            ]
+        }
+
+        return processed_intrinsic_if
+
+    def _process_policy_template(self, logical_id, template_data):
+
+        # We are processing policy templates. We know they have a particular structure:
+        # {"templateName": { parameter_values_dict }}
+        template_name = list(template_data.keys())[0]
+        template_parameters = list(template_data.values())[0]
+        try:
+
+            # 'convert' will return a list of policy statements
+            return self._policy_template_processor.convert(template_name, template_parameters)
+
+        except InsufficientParameterValues as ex:
+            # Exception's message will give lot of specific details
+            raise InvalidResourceException(logical_id, str(ex))
+        except InvalidParameterValues:
+            raise InvalidResourceException(logical_id,
+                                           "Must specify valid parameter values for policy template '{}'"
+                                           .format(template_name))
 
     def _is_supported(self, resource_type):
         """
