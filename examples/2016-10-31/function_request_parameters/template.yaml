@@ -13,7 +13,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs8.10
-      CodeUri: s3://gbdx-build-artifacts/bbeck-test/423f9056eb70d25480852fc472b43dd5 #src/
+      CodeUri: src/
       Events:
         GetApi:
           Type: Api
@@ -30,4 +30,4 @@ Outputs:
 
   ApiURL:
     Description: "API endpoint URL for Prod environment"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/get"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/post"
