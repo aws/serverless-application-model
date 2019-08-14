@@ -1201,7 +1201,8 @@
                   "Effect": "Allow",
                   "Action": [
                     "ssm:GetParameters",
-                    "ssm:GetParameter"
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
                   ],
                   "Resource": {
                     "Fn::Sub": [
