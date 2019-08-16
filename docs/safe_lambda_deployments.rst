@@ -107,7 +107,7 @@ resource:
           PostTraffic: !Ref PostTrafficLambdaFunction
         # Provide a custom role for CodeDeploy traffic shifting here, if you don't supply one
         # SAM will create one for you with default permissions
-        Role: !Ref IAMRoleForCodeDeploy # Parameter example, you can pass an IAM ARN
+        Role: !GetAtt IAMRoleForCodeDeploy.Arn # Parameter example, you can pass an IAM ARN
 
   AliasErrorMetricGreaterThanZeroAlarm:
     Type: "AWS::CloudWatch::Alarm"
