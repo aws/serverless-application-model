@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Simple API Endpoint configured using Swagger specified inline and backed by a Lambda function
+Globals:
+  Api:
+    CacheClusterEnabled: true
+    CacheClusterSize: '0.5'
+
+Resources:
+
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      CodeUri: src/
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /post
+            Method: POST
+            RequestParameters:
+              - method.request.header.Authorization:
+                  Required: true
+                  Caching: true
+              - method.request.querystring.type
+
+Outputs:
+
+  ApiURL:
+    Description: "API endpoint URL for Prod environment"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/post"

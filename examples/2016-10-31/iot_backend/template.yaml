@@ -6,7 +6,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs10.x
       CodeUri: src/
       Policies:
         - DynamoDBCrudPolicy:
@@ -19,11 +19,7 @@ Resources:
         IoT:
           Type: IoTRule
           Properties:
-            AwsIotSqlVersion: 2016-03-23
+            AwsIotSqlVersion: '2016-03-23'
             Sql: "SELECT * FROM 'iot2ddb'"
   Table:
     Type: AWS::Serverless::SimpleTable
-    Properties:
-      PrimaryKey:
-        Name: id
-        Type: String
