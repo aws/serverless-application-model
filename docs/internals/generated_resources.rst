@@ -128,6 +128,46 @@ AWS::Lambda::Permissions           MyFunction\ **ThumbnailApi**\ Permission\ **P
 
   NOTE: ``ServerlessRestApi*`` resources are generated one per stack.
 
+Cognito
+^^^
+
+Example:
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        CognitoTrigger:
+          Type: Cognito
+          Properties:
+            UserPool: !Ref MyUserPool
+            Trigger: PreSignUp
+      ...
+
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID 
+================================== ================================
+AWS::Lambda::Permissions           *MyFunction*\ CognitoPermission
+AWS::Cognito::UserPool             Existing MyUserPool resource is modified to append ``LambdaConfig`` 
+                                   property where the Lambda function trigger is defined
+================================== ================================
+
+  NOTE: You **must** refer to a Cognito UserPool defined in the same template. This is for two reasons:
+  
+  1. SAM needs to add a ``LambdaConfig`` property to the UserPool resource by reading and modifying the 
+  resource definition
+
+  2. Lambda triggers are specified as a property on the UserPool resource. Since CloudFormation cannot modify a resource
+  created outside of the stack, this bucket needs to be defined within the template.
+
 S3
 ^^^
 

@@ -383,6 +383,39 @@
       ],
       "type": "object"
     },
+    "AWS::Serverless::Function.CognitoEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "UserPool": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "Trigger": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "required": [
+        "UserPool",
+        "Trigger"
+      ],      
+      "type": "object"
+    },
     "AWS::Serverless::Function.DynamoDBEvent": {
       "additionalProperties": false,
       "properties": {
@@ -443,6 +476,9 @@
             },
             {
               "$ref": "#/definitions/AWS::Serverless::Function.AlexaSkillEvent"
+            },
+            {
+              "$ref": "#/definitions/AWS::Serverless::Function.CognitoEvent"
             }
           ]
         },

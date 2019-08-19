@@ -137,6 +137,7 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        'cognito_userpool_with_event',
         's3_with_condition',
         'function_with_condition',
         'basic_function',
@@ -426,6 +427,7 @@ class TestTranslatorEndToEnd(TestCase):
         rest_api_to_swagger_hash[logical_id] = data_hash
 
 @pytest.mark.parametrize('testcase', [
+    'error_cognito_userpool_duplicate_trigger',
     'error_api_duplicate_methods_same_path',
     'error_api_gateway_responses_nonnumeric_status_code',
     'error_api_gateway_responses_unknown_responseparameter',
