@@ -1,0 +1,31 @@
+Globals:
+  Api:
+    # Send/receive binary data through the APIs
+    BinaryMediaTypes:
+      - application~octet-stream
+      - image~png
+Resources:
+  MyLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      InlineCode: |
+        exports.handler = function(event, context) {
+            var imageHex = "\x42\x4d\x3c\x00\x00\x00\x00\x00\x00\x00\x36\x00\x00\x00\x28\x00"+ 
+            "\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x18\x00\x00\x00"+ 
+            "\x00\x00\x06\x00\x00\x00\x27\x00\x00\x00\x27\x00\x00\x00\x00\x00"+
+            "\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00"; 
+            context.done(null, { 
+              "body":Buffer.from(imageHex).toString('base64'), 
+              "isBase64Encoded": "true",
+            });
+        };
+      Events:
+        GetImage:
+          Type: Api
+          Properties:
+            Path: /lambda
+            Method: get
+            ContentHandling: CONVERT_TO_BINARY
+

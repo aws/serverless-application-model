@@ -165,6 +165,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_aws_iam_auth_overrides',
         'api_with_method_settings',
         'api_with_binary_media_types',
+        'api_with_binary_media_content_handling',
         'api_with_binary_media_types_definition_body',
         'api_with_minimum_compression_size',
         'api_with_resource_refs',
@@ -489,7 +490,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_unknown_policy_template',
     'error_function_with_invalid_policy_statement',
     'error_function_with_invalid_condition_name',
-    'error_invalid_document_empty_semantic_version'
+    'error_invalid_document_empty_semantic_version',
+    'error_api_with_binary_media_invalid_content_handling'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)

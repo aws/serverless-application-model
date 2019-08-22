@@ -1,0 +1,151 @@
+{
+  "Resources": {
+    "MyLambdaRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyLambdaGetImagePermissionTest": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyLambda"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment4a03e9a761"
+        }, 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ServerlessRestApiDeployment4a03e9a761": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 4a03e9a76190b3516ebac8d37ee8941bd9264b11", 
+        "StageName": "Stage"
+      }
+    }, 
+    "MyLambdaGetImagePermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyLambda"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/lambda", 
+            {
+              "__Stage__": "Prod", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ServerlessRestApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/lambda": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "contentHandling": "CONVERT_TO_BINARY", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambda.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
+          "swagger": "2.0", 
+          "x-amazon-apigateway-binary-media-types": [
+            "application~octet-stream", 
+            "image~png"
+          ]
+        }, 
+        "BinaryMediaTypes": [
+          "application~octet-stream", 
+          "image~png"
+        ]
+      }
+    }, 
+    "MyLambda": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "ZipFile": "exports.handler = function(event, context) {\n    var imageHex = \"\\x42\\x4d\\x3c\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x36\\x00\\x00\\x00\\x28\\x00\"+ \n    \"\\x00\\x00\\x01\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x01\\x00\\x18\\x00\\x00\\x00\"+ \n    \"\\x00\\x00\\x06\\x00\\x00\\x00\\x27\\x00\\x00\\x00\\x27\\x00\\x00\\x00\\x00\\x00\"+\n    \"\\x00\\x00\\x00\\x00\\x00\\x00\\xff\\xff\\xff\\xff\\x00\\x00\"; \n    context.done(null, { \n      \"body\":Buffer.from(imageHex).toString('base64'), \n      \"isBase64Encoded\": \"true\",\n    });\n};\n"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyLambdaRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

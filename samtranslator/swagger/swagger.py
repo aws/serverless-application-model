@@ -24,6 +24,7 @@ class SwaggerEditor(object):
     _X_APIGW_POLICY = 'x-amazon-apigateway-policy'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
     _CACHE_KEY_PARAMETERS = 'cacheKeyParameters'
+    _CONTENT_HANDLING_ALLOWED_VALUES = ["CONVERT_TO_BINARY", "CONVERT_TO_TEXT"]
 
     def __init__(self, doc):
         """
@@ -271,6 +272,22 @@ class SwaggerEditor(object):
     def add_binary_media_types(self, binary_media_types):
         bmt = json.loads(json.dumps(binary_media_types).replace('~1', '/'))
         self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = bmt
+
+    def add_content_handling(self, path, method_name, content_handling):
+        """
+        Adds content handling parameter for this path/method.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param dict content_handling: ContentHandling setting value
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+            method_definition[self._X_APIGW_INTEGRATION]['contentHandling'] = content_handling
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
                                           max_age=None, allow_credentials=None):

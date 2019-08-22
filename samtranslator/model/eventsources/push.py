@@ -404,7 +404,8 @@ class Api(PushEventSource):
             'RestApiId': PropertyType(True, is_str()),
             'Auth': PropertyType(False, is_type(dict)),
             'RequestModel': PropertyType(False, is_type(dict)),
-            'RequestParameters': PropertyType(False, is_type(list))
+            'RequestParameters': PropertyType(False, is_type(list)),
+            'ContentHandling': PropertyType(False, is_str())
     }
 
     def resources_to_link(self, resources):
@@ -613,6 +614,17 @@ class Api(PushEventSource):
 
                 editor.add_request_model_to_method(path=self.Path, method_name=self.Method,
                                                    request_model=self.RequestModel)
+
+        if self.ContentHandling:
+            content_handling = self.ContentHandling
+
+            if content_handling:
+                if content_handling not in ['CONVERT_TO_BINARY', 'CONVERT_TO_TEXT']:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        'Unable to set ContentHandling, must be one of {contentHandlingList}'
+                        .format(contentHandlingList=['CONVERT_TO_BINARY', 'CONVERT_TO_TEXT']))
+                editor.add_content_handling(self.Path, self.Method, content_handling)
 
         if self.RequestParameters:
 
