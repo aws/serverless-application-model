@@ -19,6 +19,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 CONDITION = 'Condition'
 
 REQUEST_PARAMETER_PROPERTIES = ["Required", "Caching"]
+CONTENT_HANDLING_ALLOWED_VALUES = ["CONVERT_TO_BINARY", "CONVERT_TO_TEXT"]
 
 
 class PushEventSource(ResourceMacro):
@@ -619,11 +620,11 @@ class Api(PushEventSource):
             content_handling = self.ContentHandling
 
             if content_handling:
-                if content_handling not in ['CONVERT_TO_BINARY', 'CONVERT_TO_TEXT']:
+                if content_handling not in CONTENT_HANDLING_ALLOWED_VALUES:
                     raise InvalidEventException(
                         self.relative_id,
                         'Unable to set ContentHandling, must be one of {contentHandlingList}'
-                        .format(contentHandlingList=['CONVERT_TO_BINARY', 'CONVERT_TO_TEXT']))
+                        .format(contentHandlingList=CONTENT_HANDLING_ALLOWED_VALUES))
                 editor.add_content_handling(self.Path, self.Method, content_handling)
 
         if self.RequestParameters:

@@ -24,7 +24,6 @@ class SwaggerEditor(object):
     _X_APIGW_POLICY = 'x-amazon-apigateway-policy'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
     _CACHE_KEY_PARAMETERS = 'cacheKeyParameters'
-    _CONTENT_HANDLING_ALLOWED_VALUES = ["CONVERT_TO_BINARY", "CONVERT_TO_TEXT"]
 
     def __init__(self, doc):
         """
