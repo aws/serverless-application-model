@@ -1587,6 +1587,155 @@
           }
         ]
       }
+    },
+    "CodeCommitCrudPolicy": {
+      "Description": "Gives permissions to create/read/update/delete objects within a specific codecommit repository",
+      "Parameters": {
+        "RepositoryName": {
+          "Description": "Name of the CodeCommit Repository"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "codecommit:GitPull",
+              "codecommit:GitPush",
+              "codecommit:CreateBranch",
+              "codecommit:DeleteBranch",
+              "codecommit:GetBranch",
+              "codecommit:ListBranches",
+              "codecommit:MergeBranchesByFastForward",
+              "codecommit:MergeBranchesBySquash",
+              "codecommit:MergeBranchesByThreeWay",
+              "codecommit:UpdateDefaultBranch",
+              "codecommit:BatchDescribeMergeConflicts",
+              "codecommit:CreateUnreferencedMergeCommit",
+              "codecommit:DescribeMergeConflicts",
+              "codecommit:GetMergeCommit",
+              "codecommit:GetMergeOptions",
+              "codecommit:BatchGetPullRequests",
+              "codecommit:CreatePullRequest",
+              "codecommit:DescribePullRequestEvents",
+              "codecommit:GetCommentsForPullRequest",
+              "codecommit:GetCommitsFromMergeBase",
+              "codecommit:GetMergeConflicts",
+              "codecommit:GetPullRequest",
+              "codecommit:ListPullRequests",
+              "codecommit:MergePullRequestByFastForward",
+              "codecommit:MergePullRequestBySquash",
+              "codecommit:MergePullRequestByThreeWay",
+              "codecommit:PostCommentForPullRequest",
+              "codecommit:UpdatePullRequestDescription",
+              "codecommit:UpdatePullRequestStatus",
+              "codecommit:UpdatePullRequestTitle",
+              "codecommit:DeleteFile",
+              "codecommit:GetBlob",
+              "codecommit:GetFile",
+              "codecommit:GetFolder",
+              "codecommit:PutFile",
+              "codecommit:DeleteCommentContent",
+              "codecommit:GetComment",
+              "codecommit:GetCommentsForComparedCommit",
+              "codecommit:PostCommentForComparedCommit",
+              "codecommit:PostCommentReply",
+              "codecommit:UpdateComment",
+              "codecommit:BatchGetCommits",
+              "codecommit:CreateCommit",
+              "codecommit:GetCommit",
+              "codecommit:GetCommitHistory",
+              "codecommit:GetDifferences",
+              "codecommit:GetObjectIdentifier",
+              "codecommit:GetReferences",
+              "codecommit:GetTree",
+              "codecommit:GetRepository",
+              "codecommit:UpdateRepositoryDescription",
+              "codecommit:ListTagsForResource",
+              "codecommit:TagResource",
+              "codecommit:UntagResource",
+              "codecommit:GetRepositoryTriggers",
+              "codecommit:PutRepositoryTriggers",
+              "codecommit:TestRepositoryTriggers",
+              "codecommit:GetBranch",
+              "codecommit:GetCommit",
+              "codecommit:UploadArchive",
+              "codecommit:GetUploadArchiveStatus",
+              "codecommit:CancelUploadArchive"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:codecommit:${AWS::Region}:${AWS::AccountId}:${repositoryName}",
+                {
+                  "repositoryName": {
+                    "Ref": "RepositoryName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CodeCommitReadPolicy": {
+      "Description": "Gives permissions to read objects within a specific codecommit repository",
+      "Parameters": {
+        "RepositoryName": {
+          "Description": "Name of the CodeCommit Repository"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "codecommit:GitPull",
+              "codecommit:GetBranch",
+              "codecommit:ListBranches",
+              "codecommit:BatchDescribeMergeConflicts",
+              "codecommit:DescribeMergeConflicts",
+              "codecommit:GetMergeCommit",
+              "codecommit:GetMergeOptions",
+              "codecommit:BatchGetPullRequests",
+              "codecommit:DescribePullRequestEvents",
+              "codecommit:GetCommentsForPullRequest",
+              "codecommit:GetCommitsFromMergeBase",
+              "codecommit:GetMergeConflicts",
+              "codecommit:GetPullRequest",
+              "codecommit:ListPullRequests",
+              "codecommit:GetBlob",
+              "codecommit:GetFile",
+              "codecommit:GetFolder",
+              "codecommit:GetComment",
+              "codecommit:GetCommentsForComparedCommit",
+              "codecommit:BatchGetCommits",
+              "codecommit:GetCommit",
+              "codecommit:GetCommitHistory",
+              "codecommit:GetDifferences",
+              "codecommit:GetObjectIdentifier",
+              "codecommit:GetReferences",
+              "codecommit:GetTree",
+              "codecommit:GetRepository",
+              "codecommit:ListTagsForResource",
+              "codecommit:GetRepositoryTriggers",
+              "codecommit:TestRepositoryTriggers",
+              "codecommit:GetBranch",
+              "codecommit:GetCommit",
+              "codecommit:GetUploadArchiveStatus"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:codecommit:${AWS::Region}:${AWS::AccountId}:${repositoryName}",
+                {
+                  "repositoryName": {
+                    "Ref": "RepositoryName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
