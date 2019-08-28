@@ -13,6 +13,8 @@ from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
 
+LOG = logging.getLogger(__name__)
+
 
 class ServerlessAppPlugin(BasePlugin):
     """
@@ -156,7 +158,7 @@ class ServerlessAppPlugin(BasePlugin):
         except EndpointConnectionError as e:
             # No internet connection. Don't break verification, but do show a warning.
             warning_message = "{}. Unable to verify access to {}/{}.".format(e, app_id, semver)
-            logging.warning(warning_message)
+            LOG.warning(warning_message)
             self._applications[key] = {'Unable to verify'}
 
     def _handle_create_cfn_template_request(self, app_id, semver, key, logical_id):
@@ -326,7 +328,7 @@ class ServerlessAppPlugin(BasePlugin):
         """
         try:
             response = service_call_lambda(*args)
-            logging.info(response)
+            LOG.info(response)
             return response
         except ClientError as e:
             error_code = e.response['Error']['Code']
@@ -334,7 +336,7 @@ class ServerlessAppPlugin(BasePlugin):
                 raise InvalidResourceException(logical_id, e.response['Error']['Message'])
 
             # 'ForbiddenException'- SAR rejects connection
-            logging.exception(e)
+            LOG.exception(e)
             raise e
 
     def _resource_is_supported(self, resource_type):
