@@ -79,6 +79,7 @@ class ApiGenerator(object):
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.open_api_version = open_api_version
+        self.remove_extra_stage = open_api_version
         self.models = models
 
     def _construct_rest_api(self):
@@ -158,7 +159,7 @@ class ApiGenerator(object):
             body_s3['Version'] = s3_pointer['Version']
         return body_s3
 
-    def _construct_deployment(self, rest_api, open_api_version):
+    def _construct_deployment(self, rest_api):
         """Constructs and returns the ApiGateway Deployment.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi for this Deployment
@@ -168,7 +169,7 @@ class ApiGenerator(object):
         deployment = ApiGatewayDeployment(self.logical_id + 'Deployment',
                                           attributes=self.passthrough_resource_attributes)
         deployment.RestApiId = rest_api.get_runtime_attr('rest_api_id')
-        if not self.open_api_version:
+        if not self.remove_extra_stage:
             deployment.StageName = 'Stage'
 
         return deployment
@@ -199,7 +200,7 @@ class ApiGenerator(object):
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(stage, self.open_api_version, swagger)
+            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger)
 
         if self.tags is not None:
             stage.Tags = get_tag_list(self.tags)
@@ -214,7 +215,7 @@ class ApiGenerator(object):
         """
 
         rest_api = self._construct_rest_api()
-        deployment = self._construct_deployment(rest_api, self.open_api_version)
+        deployment = self._construct_deployment(rest_api)
 
         swagger = None
         if rest_api.Body is not None:

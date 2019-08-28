@@ -47,6 +47,16 @@
         }
       }
     }, 
+    "ExplicitApiDeployment9252467a1e": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 9252467a1edc49ba35cb258640f5e3734cc9fab1", 
+        "StageName": "Stage"
+      }
+    }, 
     "ImplicitApiFunctionGetHtmlPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -66,15 +76,6 @@
             }
           ]
         }
-      }
-    }, 
-    "ExplicitApiDeployment63a10e26af": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: 63a10e26af7194aefd61ead891c470ed75ce20be"
       }
     }, 
     "ExplicitApi": {
@@ -172,7 +173,7 @@
         }, 
         "CacheClusterEnabled": true, 
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment63a10e26af"
+          "Ref": "ExplicitApiDeployment9252467a1e"
         }
       }
     }, 
