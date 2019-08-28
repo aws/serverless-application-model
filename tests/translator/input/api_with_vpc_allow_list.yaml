@@ -23,3 +23,15 @@ Resources:
           Properties:
             Method: Put
             Path: /get
+        ProxyAny:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: MyApi
+            Path: /{proxy+}
+            Method: ANY
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
