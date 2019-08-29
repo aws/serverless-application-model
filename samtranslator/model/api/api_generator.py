@@ -13,6 +13,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_instrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.tags.resource_tagging import get_tag_list
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge",
@@ -21,8 +22,9 @@ CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", 
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
 AuthProperties = namedtuple("_AuthProperties",
-                            ["Authorizers", "DefaultAuthorizer", "InvokeRole", "AddDefaultAuthorizerToCorsPreflight"])
-AuthProperties.__new__.__defaults__ = (None, None, None, True)
+                            ["Authorizers", "DefaultAuthorizer", "InvokeRole", "AddDefaultAuthorizerToCorsPreflight",
+                             "ApiKeyRequired", "ResourcePolicy"])
+AuthProperties.__new__.__defaults__ = (None, None, None, True, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
@@ -30,7 +32,7 @@ GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusC
 class ApiGenerator(object):
 
     def __init__(self, logical_id, cache_cluster_enabled, cache_cluster_size, variables, depends_on,
-                 definition_body, definition_uri, name, stage_name, endpoint_configuration=None,
+                 definition_body, definition_uri, name, stage_name, tags=None, endpoint_configuration=None,
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
                  auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
                  tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
@@ -46,6 +48,7 @@ class ApiGenerator(object):
         :param definition_uri: URI to API definition
         :param name: Name of the API Gateway resource
         :param stage_name: Name of the Stage
+        :param tags: Stage Tags
         :param access_log_setting: Whether to send access logs and where for Stage
         :param canary_setting: Canary Setting for Stage
         :param tracing_enabled: Whether active tracing with X-ray is enabled
@@ -62,6 +65,7 @@ class ApiGenerator(object):
         self.definition_uri = definition_uri
         self.name = name
         self.stage_name = stage_name
+        self.tags = tags
         self.endpoint_configuration = endpoint_configuration
         self.method_settings = method_settings
         self.binary_media = binary_media
@@ -75,6 +79,7 @@ class ApiGenerator(object):
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.open_api_version = open_api_version
+        self.remove_extra_stage = open_api_version
         self.models = models
 
     def _construct_rest_api(self):
@@ -115,6 +120,8 @@ class ApiGenerator(object):
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
+            # # Post Process OpenApi Auth Settings
+            self.definition_body = self._openapi_postprocess(self.definition_body)
             rest_api.Body = self.definition_body
 
         if self.name:
@@ -152,7 +159,7 @@ class ApiGenerator(object):
             body_s3['Version'] = s3_pointer['Version']
         return body_s3
 
-    def _construct_deployment(self, rest_api, open_api_version):
+    def _construct_deployment(self, rest_api):
         """Constructs and returns the ApiGateway Deployment.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi for this Deployment
@@ -162,7 +169,7 @@ class ApiGenerator(object):
         deployment = ApiGatewayDeployment(self.logical_id + 'Deployment',
                                           attributes=self.passthrough_resource_attributes)
         deployment.RestApiId = rest_api.get_runtime_attr('rest_api_id')
-        if not self.open_api_version:
+        if not self.remove_extra_stage:
             deployment.StageName = 'Stage'
 
         return deployment
@@ -193,7 +200,10 @@ class ApiGenerator(object):
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(stage, self.open_api_version, swagger)
+            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger)
+
+        if self.tags is not None:
+            stage.Tags = get_tag_list(self.tags)
 
         return stage
 
@@ -205,7 +215,7 @@ class ApiGenerator(object):
         """
 
         rest_api = self._construct_rest_api()
-        deployment = self._construct_deployment(rest_api, self.open_api_version)
+        deployment = self._construct_deployment(rest_api)
 
         swagger = None
         if rest_api.Body is not None:
@@ -308,11 +318,16 @@ class ApiGenerator(object):
         authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)
 
         if authorizers:
-            swagger_editor.add_authorizers(authorizers)
+            swagger_editor.add_authorizers_security_definitions(authorizers)
             self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer,
                                          auth_properties.AddDefaultAuthorizerToCorsPreflight)
 
-        # Assign the Swagger back to template
+        if auth_properties.ApiKeyRequired:
+            swagger_editor.add_apikey_security_definition()
+            self._set_default_apikey_required(swagger_editor)
+
+        if auth_properties.ResourcePolicy:
+            swagger_editor.add_resource_policy(auth_properties.ResourcePolicy)
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
@@ -505,6 +520,10 @@ class ApiGenerator(object):
         for path in swagger_editor.iter_on_path():
             swagger_editor.set_path_default_authorizer(path, default_authorizer, authorizers=authorizers,
                                                        add_default_auth_to_preflight=add_default_auth_to_preflight)
+
+    def _set_default_apikey_required(self, swagger_editor):
+        for path in swagger_editor.iter_on_path():
+            swagger_editor.set_path_default_apikey_required(path)
 
     def _set_endpoint_configuration(self, rest_api, value):
         """

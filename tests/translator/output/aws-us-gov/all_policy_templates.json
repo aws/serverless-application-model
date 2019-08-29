@@ -207,7 +207,8 @@
               "Statement": [
                 {
                   "Action": [
-                    "es:ESHttpPost"
+                    "es:ESHttpPost",
+                    "es:ESHttpPut"
                   ],
                   "Resource": {
                     "Fn::Sub": [
@@ -808,14 +809,7 @@
                     "rekognition:CompareFaces",
                     "rekognition:DetectFaces"
                   ],
-                  "Resource": {
-                    "Fn::Sub": [
-                      "arn:${AWS::Partition}:rekognition:${AWS::Region}:${AWS::AccountId}:collection/${collectionId}",
-                      {
-                        "collectionId": "collection"
-                      }
-                    ]
-                  },
+                  "Resource": "*",
                   "Effect": "Allow"
                 }
               ]

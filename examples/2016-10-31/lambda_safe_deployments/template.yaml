@@ -34,7 +34,7 @@ Resources:
           - Effect: "Allow"
             Action:
               - "lambda:InvokeFunction"
-            Resource: !Ref safeTest.Version
+            Resource: !GetAtt safeTest.Arn
       Runtime: nodejs8.10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:

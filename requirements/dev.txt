@@ -3,15 +3,15 @@ flake8>=3.3.0
 tox>=2.2.1
 pytest-cov>=2.4.0
 pylint>=1.7.2,<2.0
-pyyaml>=4.2b1
+pyyaml>=5.1
 
 # Test requirements
 pytest>=3.0.7
-py>=1.4.33
 mock>=2.0.0
 parameterized>=0.6.1
+
+# Requirements for examples
 requests>=2.20.0
-cfn-lint>=0.18.1
 
 # CLI requirements
 docopt>=0.6.2

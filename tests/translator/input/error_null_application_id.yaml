@@ -1,0 +1,7 @@
+Resources:
+  Application:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: null
+        SemanticVersion: 1.0.0

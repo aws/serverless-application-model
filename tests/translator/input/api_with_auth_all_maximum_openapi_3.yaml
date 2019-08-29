@@ -6,6 +6,7 @@ Resources:
       OpenApiVersion: '3.0.1'
       Auth:
         DefaultAuthorizer: MyCognitoAuth
+        ApiKeyRequired: true
         Authorizers:
           MyCognitoAuth:
             UserPoolArn: arn:aws:1

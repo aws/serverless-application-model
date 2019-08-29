@@ -1,0 +1,7 @@
+Resources:
+  Table:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Id: id
+        Type: String

@@ -1,0 +1,38 @@
+Globals:
+  Api:
+    Auth:
+      ResourcePolicy:
+        CustomStatements: [{
+            Action: 'execute-api:Invoke', 
+            Resource: ['execute-api:/*/*/*']
+          },
+          {
+            Action: 'execute-api:blah', 
+            Resource: ['execute-api:/*/*/*']
+          }]
+
+Resources:
+ ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody: {
+        "info": {
+          "version": "1.0",
+          "title": {
+            "Ref": "AWS::StackName"
+          }
+        },
+        "paths": {},
+        "swagger": "2.0",
+        "x-amazon-apigateway-policy": {
+          "Version": "2012-10-17",
+          "Statement": {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+          }
+        }
+      }

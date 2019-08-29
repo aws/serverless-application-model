@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Globals:
+  Api:
+    Auth:
+      ResourcePolicy:
+        CustomStatements: [{
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "execute-api:*/*/*",
+            "Condition": {
+                "IpAddress": {
+                    "aws:SourceIp": "1.2.3.4"
+                }
+            }
+        }]
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Method: Put
+            Path: /get

@@ -1,0 +1,17 @@
+Conditions:
+  DummyCondition:
+    !Equals ["", ""]
+
+Resources:
+  FunctionWithConditionalPolicy:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: A function that has Fn::If in the policies property
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Policies:
+        - !If
+          - DummyCondition
+          - !Sub arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess
+          - !Sub arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess

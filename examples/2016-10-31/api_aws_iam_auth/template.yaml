@@ -8,7 +8,7 @@ Resources:
       StageName: Prod
       Auth:
         DefaultAuthorizer: AWS_IAM
-        InvokeRole: CALLER_CREDENTIALS
+        InvokeRole: CALLER_CREDENTIALS # default, can specify other role or NONE
 
   MyFunction:
     Type: AWS::Serverless::Function
