@@ -33,7 +33,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-      OpenApiVersion: '3.0.1'
+      OpenApiVersion: 3.0
       Models:
         User:
           type: object

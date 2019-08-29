@@ -1,5 +1,14 @@
 {
   "Resources": {
+    "HtmlApiDeployment5ae7e42cea": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "Description": "RestApi deployment id: 5ae7e42cea0640a3318bf508535850cd792a52dc"
+      }
+    }, 
     "HtmlFunctionIamPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -19,15 +28,6 @@
             }
           ]
         }
-      }
-    }, 
-    "HtmlApiDeploymentbe02cbff83": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: be02cbff831c2acb5672650bc54b204366bef429"
       }
     }, 
     "HtmlFunctionRole": {
@@ -58,7 +58,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeploymentbe02cbff83"
+          "Ref": "HtmlApiDeployment5ae7e42cea"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -149,7 +149,7 @@
               }
             }
           }, 
-          "openapi": "3.0.1", 
+          "openapi": "3.0", 
           "components": {
             "securitySchemes": {
               "AWS_IAM": {
