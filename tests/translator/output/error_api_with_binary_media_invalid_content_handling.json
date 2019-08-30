@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyLambda] is invalid. Event with id [GetImage] is invalid. Unable to set ContentHandling, must be one of ['CONVERT_TO_BINARY', 'CONVERT_TO_TEXT']"
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyLambda] is invalid. Event with id [GetImage] is invalid. Unable to set ContentHandling, must be one of ['CONVERT_TO_BINARY', 'CONVERT_TO_TEXT']"
+}
