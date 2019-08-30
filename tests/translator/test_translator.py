@@ -3,6 +3,7 @@ import itertools
 import os.path
 import hashlib
 import sys
+import difflib
 from functools import reduce, cmp_to_key
 
 from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
@@ -349,14 +350,26 @@ class TestTranslatorEndToEnd(TestCase):
             output_fragment = transform(
                 manifest, parameter_values, mock_policy_loader)
 
-        print(json.dumps(output_fragment, indent=2))
-
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
 
-        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+        sorted_expected = deep_sort_lists(expected)
+        sorted_actual = deep_sort_lists(output_fragment)
+
+        print(
+            ''.join(
+                difflib.unified_diff(
+                    json.dumps(sorted_expected, indent=2).splitlines(1),
+                    json.dumps(sorted_actual, indent=2).splitlines(1),
+                    fromfile='expected',
+                    tofile='actual',
+                )
+            )
+        )
+            
+        assert sorted_expected == sorted_actual 
 
     def _update_logical_id_hash(self, resources):
         """
