@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Example of processing messages on an SNS-SQS with Lambda
+Resources:
+  MyTopic:
+    Type: AWS::SNS::Topic
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./index.js
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        MySQSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref MyTopic
+            SqsSubscription: true
+
+Outputs:
+  MyTopic:
+    Description: "MyTopic ARN"
+    Value: !Ref MyTopic

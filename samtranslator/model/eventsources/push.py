@@ -10,6 +10,8 @@ from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
+from samtranslator.model.eventsources.pull import SQS
+from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -358,7 +360,8 @@ class SNS(PushEventSource):
     property_types = {
             'Topic': PropertyType(True, is_str()),
             'Region': PropertyType(False, is_str()),
-            'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict)))))
+            'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
+            'SqsSubscription': PropertyType(False, is_type(bool))
     }
 
     def to_cloudformation(self, **kwargs):
@@ -369,27 +372,66 @@ class SNS(PushEventSource):
         :rtype: list
         """
         function = kwargs.get('function')
+        role = kwargs.get('role')
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
-        return [self._construct_permission(function, source_arn=self.Topic),
-                self._inject_subscription(function, self.Topic, self.Region, self.FilterPolicy)]
+        # SNS -> Lambda
+        if not self.SqsSubscription:
+            subscription = self._inject_subscription(
+                'lambda', function.get_runtime_attr("arn"),
+                self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
+            )
+            return [self._construct_permission(function, source_arn=self.Topic), subscription]
 
-    def _inject_subscription(self, function, topic, region, filterPolicy):
+        # SNS -> SQS -> Lambda
+        resources = []
+        queue = self._inject_sqs_queue()
+        queue_policy = self._inject_sqs_queue_policy(self.Topic, queue)
+        subscription = self._inject_subscription(
+            'sqs', queue.get_runtime_attr('arn'),
+            self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
+        )
+
+        resources = resources + self._inject_sqs_event_source_mapping(function, role, queue.get_runtime_attr('arn'))
+        resources.append(queue)
+        resources.append(queue_policy)
+        resources.append(subscription)
+        return resources
+
+    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, resource_attributes):
         subscription = SNSSubscription(self.logical_id)
-        subscription.Protocol = 'lambda'
-        subscription.Endpoint = function.get_runtime_attr("arn")
+        subscription.Protocol = protocol
+        subscription.Endpoint = endpoint
         subscription.TopicArn = topic
         if region is not None:
             subscription.Region = region
-        if CONDITION in function.resource_attributes:
-            subscription.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
+        if CONDITION in resource_attributes:
+            subscription.set_resource_attribute(CONDITION, resource_attributes[CONDITION])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
 
         return subscription
+
+    def _inject_sqs_queue(self):
+        return SQSQueue(self.logical_id + 'Queue')
+
+    def _inject_sqs_event_source_mapping(self, function, role, queue_arn):
+        event_source = SQS(self.logical_id + 'EventSourceMapping')
+        event_source.Queue = queue_arn
+        event_source.BatchSize = 10
+        event_source.Enabled = True
+        return event_source.to_cloudformation(function=function, role=role)
+
+    def _inject_sqs_queue_policy(self, topic_arn, queue):
+        policy = SQSQueuePolicy(self.logical_id + 'QueuePolicy')
+        policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(
+            topic_arn, queue.get_runtime_attr('arn')
+        )
+        policy.Queues = [queue.get_runtime_attr('queue_url')]
+        return policy
 
 
 class Api(PushEventSource):

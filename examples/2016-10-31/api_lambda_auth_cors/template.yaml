@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CORS enabled API Gateway that uses a Lambda TOKEN Authorizer by default
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false # removes MyAuthorizer from the automatically created OPTIONS methods
+        Authorizers:
+          MyAuthorizer:
+            FunctionArn: !GetAtt AuthorizerFunction.Arn
+      Cors:
+        AllowHeaders: "'Authorization'" # this is the default header used by TOKEN authorizers
+        AllowOrigin: "'http://localhost:8080'"
+
+  AuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: authorizer.handler
+      Runtime: nodejs10.x
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      Runtime: nodejs10.x
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /
+            Method: get
+
+Outputs:
+  HelloWorldUrl:
+    Description: 'HelloWorldFunction Prod stage URL'
+    Value: !Sub 'https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/'

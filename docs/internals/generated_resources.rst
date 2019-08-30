@@ -121,7 +121,7 @@ CloudFormation Resource Type       Logical ID
 AWS::ApiGateway::RestApi           *ServerlessRestApi* 
 AWS::ApiGateway::Stage             *ServerlessRestApi*\ **Prod**\ Stage 
 AWS::ApiGateway::Deployment        *ServerlessRestApi*\ Deployment\ *SHA* (10 Digits of SHA256 of Swagger)
-AWS::Lambda::Permissions           MyFunction\ **ThumbnailApi**\ Permission\ **Prod** 
+AWS::Lambda::Permission            MyFunction\ **ThumbnailApi**\ Permission\ **Prod** 
                                    (Prod is the default Stage Name for implicit APIs)
 ================================== ================================
 
@@ -195,7 +195,7 @@ Additional generated resources:
 ================================== ================================
 CloudFormation Resource Type       Logical ID 
 ================================== ================================
-AWS::Lambda::Permissions           MyFunction\ **S3Trigger**\ Permission
+AWS::Lambda::Permission            MyFunction\ **S3Trigger**\ Permission
 AWS::S3::Bucket                    Existing MyBucket resource is modified to append ``NotificationConfiguration`` 
                                    property where the Lambda function trigger is defined
 ================================== ================================
@@ -224,6 +224,7 @@ Example:
           Type: SNS
           Properties:
             Topic: arn:aws:sns:us-east-1:123456789012:my_topic
+            SqsSubscription: true
       ...
 
 Additional generated resources:
@@ -231,9 +232,14 @@ Additional generated resources:
 ================================== ================================
 CloudFormation Resource Type       Logical ID 
 ================================== ================================
-AWS::Lambda::Permissions           MyFunction\ **MyTrigger**\ Permission
-AWS::SNS::Subscription             MyFunction\ **MyTrigger** 
+AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
+AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger**\ EventSourceMapping
+AWS::SNS::Subscription             MyFunction\ **MyTrigger**
+AWS::SQS::Queue                    MyFunction\ **MyTrigger**\ Queue
+AWS::SQS::QueuePolicy              MyFunction\ **MyTrigger**\ QueuePolicy
 ================================== ================================
+
+  NOTE: ``AWS::Lambda::Permission`` resources are only generated if SqsSubscription is ``false``. ``AWS::Lambda::EventSourceMapping``, ``AWS::SQS::Queue``, ``AWS::SQS::QueuePolicy`` resources are only generated if SqsSubscription is ``true``.
 
 Kinesis
 ^^^^^^^
@@ -259,7 +265,7 @@ Additional generated resources:
 ================================== ================================
 CloudFormation Resource Type       Logical ID 
 ================================== ================================
-AWS::Lambda::Permissions           MyFunction\ **MyTrigger**\ Permission
+AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
 AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger** 
 ================================== ================================
 
@@ -286,7 +292,7 @@ Additional generated resources:
 ================================== ================================
 CloudFormation Resource Type       Logical ID 
 ================================== ================================
-AWS::Lambda::Permissions           MyFunction\ **MyTrigger**\ Permission
+AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
 AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger** 
 ================================== ================================
 
@@ -314,7 +320,7 @@ Additional generated resources:
 ================================== ================================
 CloudFormation Resource Type       Logical ID 
 ================================== ================================
-AWS::Lambda::Permissions           MyFunction\ **MyTrigger**\ Permission
+AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
 AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger** 
 ================================== ================================
 
@@ -341,7 +347,7 @@ Additional generated resources:
 ================================== ================================
 CloudFormation Resource Type       Logical ID 
 ================================== ================================
-AWS::Lambda::Permissions           MyFunction\ **MyTimer**\ Permission
+AWS::Lambda::Permission            MyFunction\ **MyTimer**\ Permission
 AWS::Events::Rule                  MyFunction\ **MyTimer** 
 ================================== ================================
 
@@ -371,7 +377,7 @@ Additional generated resources:
 ================================== ================================
 CloudFormation Resource Type       Logical ID 
 ================================== ================================
-AWS::Lambda::Permissions           MyFunction\ **OnTerminate**\ Permission
+AWS::Lambda::Permission            MyFunction\ **OnTerminate**\ Permission
 AWS::Events::Rule                  MyFunction\ **OnTerminate** 
 ================================== ================================
 
