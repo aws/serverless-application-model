@@ -43,26 +43,26 @@
         }
       }
     }, 
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment93aa7ab2a4"
-        }, 
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiDeployment93aa7ab2a4": {
+    "ServerlessRestApiDeployment76920744dd": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 93aa7ab2a40faba8cc862985b2d7a9cf7a26e094", 
+        "Description": "RestApi deployment id: 76920744dddba46eab650de0dea51e352ce7709f", 
         "StageName": "Stage"
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment76920744dd"
+        }, 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod"
       }
     }, 
     "MyFunctionRole": {
@@ -149,6 +149,29 @@
                 "Effect": "Deny", 
                 "Condition": {
                   "NotIpAddress": {
+                    "aws:SourceIp": [
+                      "1.2.3.4"
+                    ]
+                  }
+                }, 
+                "Principal": "*"
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Deny", 
+                "Condition": {
+                  "IpAddress": {
                     "aws:SourceIp": [
                       "1.2.3.4"
                     ]

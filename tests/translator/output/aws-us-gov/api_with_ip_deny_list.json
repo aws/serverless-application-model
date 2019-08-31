@@ -47,7 +47,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment331d160bc9"
+          "Ref": "ServerlessRestApiDeploymentc3603b681f"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -55,13 +55,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeployment331d160bc9": {
+    "ServerlessRestApiDeploymentc3603b681f": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 331d160bc9208a52e1caff2aad23841eacc1dcc8", 
+        "Description": "RestApi deployment id: c3603b681fb1519de63ec993c5c34950423ffa82", 
         "StageName": "Stage"
       }
     }, 
@@ -117,6 +117,26 @@
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
             "Statement": [
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Allow", 
+                "Principal": {
+                  "AWS": [
+                    "12345"
+                  ]
+                }
+              }, 
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [

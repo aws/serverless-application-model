@@ -1,5 +1,6 @@
 from collections import namedtuple
 from six import string_types
+import re
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage, ApiGatewayAuthorizer,
@@ -217,7 +218,6 @@ class ApiGenerator(object):
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
-
         rest_api = self._construct_rest_api()
         deployment = self._construct_deployment(rest_api)
 

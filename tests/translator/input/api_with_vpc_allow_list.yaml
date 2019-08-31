@@ -3,6 +3,8 @@ Globals:
     Auth:
       ResourcePolicy:
         SourceVpcAllowList: ['vpc-1234']
+        SourceVpcDenyList: ['vpce-5678']
+
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -23,13 +25,12 @@ Resources:
           Properties:
             Method: Put
             Path: /get
-        ProxyAny:
+        Fetch:
           Type: Api
           Properties:
-            RestApiId: 
-              Ref: MyApi
-            Path: /{proxy+}
-            Method: ANY
+            Method: Post
+            Path: /fetch
+
   MyApi:
     Type: AWS::Serverless::Api
     Properties:

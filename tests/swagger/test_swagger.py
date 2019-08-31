@@ -1253,21 +1253,6 @@ class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
 
         self.editor = SwaggerEditor(self.original_swagger)
 
-
-class TestSwaggerEditor_add_resource_policy(TestCase):
-    def setUp(self):
-        self.original_swagger = {
-            "swagger": "2.0",
-            "paths": {
-                "/foo": {
-                    "get": {},
-                    "put": {}
-                }
-            }
-        }
-
-        self.editor = SwaggerEditor(self.original_swagger)
-
     def test_must_add_parameter_to_method_with_required_and_caching_true(self):
 
         parameters = [{
@@ -1331,13 +1316,73 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 }
             }
         }
-        self.editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        editor = SwaggerEditor(original_swagger)
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': False,
+            'Caching': False
+        }]
+
+        editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected_parameters = [
+            {
+                'test': 'existing parameter'
+            },
+            {
+                'in': 'header',
+                'required': False,
+                'name': 'Authorization',
+                'type': 'string'
+            }
+        ]
+
+        method_swagger = editor.swagger['paths']['/foo']['get']
+
+        self.assertEqual(expected_parameters, method_swagger['parameters'])
+        self.assertNotIn('cacheKeyParameters', method_swagger[_X_INTEGRATION].keys())
+
+    def test_must_not_add_parameter_to_method_without_integration(self):
+        original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {}
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_swagger)
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': True,
+            'Caching': True
+        }]
+
+        editor.add_request_parameters_to_method('/foo', 'get', parameters)
 
         expected = {}
 
         self.assertEqual(expected, editor.swagger['paths']['/foo']['get'])
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
 
+
+class TestSwaggerEditor_add_resource_policy(TestCase):
+    def setUp(self):
+
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    "get": {},
+                    "put": {}
+                }
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_add_custom_statements(self):
 
@@ -1444,56 +1489,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             }
         }
 
-        editor = SwaggerEditor(original_swagger)
-
-        parameters = [{
-            'Name': 'method.request.header.Authorization',
-            'Required': False,
-            'Caching': False
-        }]
-
-        editor.add_request_parameters_to_method('/foo', 'get', parameters)
-
-        expected_parameters = [
-            {
-                'test': 'existing parameter'
-            },
-            {
-                'in': 'header',
-                'required': False,
-                'name': 'Authorization',
-                'type': 'string'
-            }
-        ]
-
-        method_swagger = editor.swagger['paths']['/foo']['get']
-
-        self.assertEqual(expected_parameters, method_swagger['parameters'])
-        self.assertNotIn('cacheKeyParameters', method_swagger[_X_INTEGRATION].keys())
-
-    def test_must_not_add_parameter_to_method_without_integration(self):
-        original_swagger = {
-            "swagger": "2.0",
-            "paths": {
-                "/foo": {
-                    'get': {}
-                }
-            }
-        }
-
-        editor = SwaggerEditor(original_swagger)
-
-        parameters = [{
-            'Name': 'method.request.header.Authorization',
-            'Required': True,
-            'Caching': True
-        }]
-
-        editor.add_request_parameters_to_method('/foo', 'get', parameters)
-
-        expected = {}
-
-        self.assertEqual(expected, editor.swagger['paths']['/foo']['get'])
         self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
 
     @patch("boto3.session.Session.region_name", "eu-west-2")

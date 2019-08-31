@@ -3,6 +3,7 @@ Globals:
     Auth:
       ResourcePolicy:
         IpAllowList: ['1.2.3.4']
+        IpDenyList: ['1.2.3.4']
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function

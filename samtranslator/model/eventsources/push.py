@@ -554,7 +554,7 @@ class Api(PushEventSource):
         if not stage or not suffix:
             raise RuntimeError("Could not add permission to lambda function.")
 
-        path = re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
+        path = SwaggerEditor.get_path_without_trailing_slash(path)
         method = '*' if self.Method.lower() == 'any' else self.Method.upper()
 
         api_id = self.RestApiId
@@ -636,6 +636,15 @@ class Api(PushEventSource):
 
             if method_authorizer or apikey_required_setting is not None:
                 editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+
+            if self.Auth.get('ResourcePolicy'):
+                resource_policy = self.Auth.get('ResourcePolicy')
+                """
+                At this point the stage name resolution hasnt occured yet so we are going to apply
+                the resource policy on all stages of the API
+                """
+                editor.add_resource_policy(resource_policy=resource_policy,
+                                           path=self.Path, api_id=self.RestApiId, stage='*')
 
         if self.RequestModel:
             method_model = self.RequestModel.get('Model')

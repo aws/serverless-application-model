@@ -22,16 +22,6 @@
         ]
       }
     }, 
-    "ServerlessRestApiDeploymentf38468318c": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: f38468318cebd719216ef62ce07cce1b936f4480", 
-        "StageName": "Stage"
-      }
-    }, 
     "MyFunctionApiPermissionTest": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -53,11 +43,21 @@
         }
       }
     }, 
+    "ServerlessRestApiDeployment866b766904": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 866b766904e9e69d6e12370a44b3fb37525ccd66", 
+        "StageName": "Stage"
+      }
+    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentf38468318c"
+          "Ref": "ServerlessRestApiDeployment866b766904"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -116,26 +116,52 @@
           "swagger": "2.0", 
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
-            "Statement": {
-              "Action": "execute-api:Invoke", 
-              "Resource": [
-                {
-                  "Fn::Sub": [
-                    "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-                    {
-                      "__Stage__": "Prod", 
-                      "__ApiId__": "ServerlessRestApi"
-                    }
+            "Statement": [
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "*", 
+                        "__ApiId__": {
+                          "Ref": "ServerlessRestApi"
+                        }
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Allow", 
+                "Principal": {
+                  "AWS": [
+                    "12345"
                   ]
                 }
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "AWS": [
-                  "12345"
-                ]
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "*", 
+                        "__ApiId__": {
+                          "Ref": "ServerlessRestApi"
+                        }
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Deny", 
+                "Principal": {
+                  "AWS": [
+                    "67890"
+                  ]
+                }
               }
-            }
+            ]
           }
         }, 
         "EndpointConfiguration": {

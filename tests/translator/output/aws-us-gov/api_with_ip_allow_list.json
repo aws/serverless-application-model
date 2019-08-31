@@ -22,13 +22,13 @@
         ]
       }
     }, 
-    "ServerlessRestApiDeployment304f1f8933": {
+    "ServerlessRestApiDeployment33b7a8bd6f": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 304f1f893366bc8aaca9b1c432bfcddab6169f80", 
+        "Description": "RestApi deployment id: 33b7a8bd6f35b44ef3dcfb319c3ce64cf03a9937", 
         "StageName": "Stage"
       }
     }, 
@@ -57,7 +57,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment304f1f8933"
+          "Ref": "ServerlessRestApiDeployment33b7a8bd6f"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -149,6 +149,29 @@
                 "Effect": "Deny", 
                 "Condition": {
                   "NotIpAddress": {
+                    "aws:SourceIp": [
+                      "1.2.3.4"
+                    ]
+                  }
+                }, 
+                "Principal": "*"
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ServerlessRestApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Deny", 
+                "Condition": {
+                  "IpAddress": {
                     "aws:SourceIp": [
                       "1.2.3.4"
                     ]

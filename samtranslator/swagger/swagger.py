@@ -840,15 +840,13 @@ class SwaggerEditor(object):
         if custom_statements is not None:
             self._add_custom_statement(custom_statements)
 
-        if self._doc.get(self._X_APIGW_POLICY) is None:
-            self._doc[self._X_APIGW_POLICY] = self.resource_policy
-        else:
-            apigw_policy = self._doc[self._X_APIGW_POLICY]
-            apigw_policy['Version'] = resource_policy['Version']
-            apigw_policy['Statement'].extend(resource_policy.get('Statement'))
-            self._doc[self._X_APIGW_POLICY] = apigw_policy
+        self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
     def _add_iam_resource_policy_for_method(self, policy_list, effect, resource_list):
+        """
+        This method generates a policy statement to grant/deny specific IAM users access to the API method and
+        appends it to the swagger under `x-amazon-apigateway-policy`
+        """
         if not policy_list:
             return
 
@@ -871,20 +869,22 @@ class SwaggerEditor(object):
             statement = self.resource_policy['Statement']
             if not isinstance(statement, list):
                 statement = [statement]
-            statement.extend(policy_statement)
+            statement.extend([policy_statement])
             self.resource_policy['Statement'] = statement
 
     def _get_method_path_uri_list(self, path, api_id, stage):
-        # It turns out that APIGW doesn't like trailing slashes in paths (#665)
-        # and removes as a part of their behaviour, but this isn't documented.
-        # The regex removes the tailing slash to ensure the permission works as intended
-        # At this point, value of Swagger path should be a dictionary with method names being the keys
+        """
+        It turns out that APIGW doesn't like trailing slashes in paths (#665)
+        and removes as a part of their behavior, but this isn't documented.
+        The regex removes the trailing slash to ensure the permission works as intended
+        """
         methods = list(self.get_path(path).keys())
+
         uri_list = []
-        path = re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
+        path = SwaggerEditor.get_path_without_trailing_slash(path)
 
         for m in methods:
-            method = '*' if m.lower() == 'any' else m.upper()
+            method = '*' if (m.lower() == self._X_ANY_METHOD or m.lower() == 'any') else m.upper()
 
             # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
             resource = '${__ApiId__}/' + '${__Stage__}/' + method + path
@@ -897,6 +897,10 @@ class SwaggerEditor(object):
         return uri_list
 
     def _add_ip_resource_policy_for_method(self, ip_list, conditional, resource_list):
+        """
+        This method generates a policy statement to grant/deny specific IP address ranges access to the API method and
+        appends it to the swagger under `x-amazon-apigateway-policy`
+        """
         if not ip_list:
             return
 
@@ -927,14 +931,15 @@ class SwaggerEditor(object):
             if not isinstance(statement, list):
                 statement = [statement]
             if allow_statement not in statement:
-                statement.extend(allow_statement)
+                statement.extend([allow_statement])
             if deny_statement not in statement:
-                statement.extend(deny_statement)
+                statement.extend([deny_statement])
             self.resource_policy['Statement'] = statement
 
     def _add_vpc_resource_policy_for_method(self, vpc, conditional, resource_list):
         """
-        Add a Source VPC whitelist/blacklist policy to the method
+        This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
+        appends it to the swagger under `x-amazon-apigateway-policy`
         """
         if not vpc:
             return
@@ -1125,3 +1130,7 @@ class SwaggerEditor(object):
     @staticmethod
     def safe_compare_regex_with_string(regex, data):
         return re.match(regex, str(data)) is not None
+    
+    @staticmethod
+    def get_path_without_trailing_slash(path):
+        return re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
