@@ -93,8 +93,6 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: !Ref CognitoUserPoolName
-      LambdaConfig:
-        PreSignUp: !GetAtt PreSignupLambdaFunction.Arn
       Policies:
         PasswordPolicy:
           MinimumLength: 8
@@ -124,20 +122,12 @@ Resources:
       MemorySize: 128
       Runtime: nodejs8.10
       Timeout: 3
-
-  LambdaCognitoUserPoolExecutionPermission:
-    Type: AWS::Lambda::Permission
-    Properties: 
-      Action: lambda:InvokeFunction
-      FunctionName: !GetAtt PreSignupLambdaFunction.Arn
-      Principal: cognito-idp.amazonaws.com
-      SourceArn: !Sub 'arn:${AWS::Partition}:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${MyCognitoUserPool}'
-      # TODO: Add a CognitoUserPool Event Source to SAM to create this permission for you.
-      # Events:
-      #   CognitoUserPoolPreSignup:
-      #     Type: CognitoUserPool
-      #     Properties:
-      #       UserPool: !Ref MyCognitoUserPool
+      Events:
+        CognitoUserPoolPreSignup:
+          Type: Cognito
+          Properties:
+            UserPool: !Ref MyCognitoUserPool
+            Trigger: PreSignUp
 
 Outputs:
     Region:

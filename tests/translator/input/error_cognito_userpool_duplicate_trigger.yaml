@@ -1,0 +1,23 @@
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+
+  ImplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        OneTrigger:
+          Type: Cognito
+          Properties:
+            UserPool: 
+              Ref: UserPool
+            Trigger: PreSignUp
+        TwoTrigger:
+          Type: Cognito
+          Properties:
+            UserPool: 
+              Ref: UserPool
+            Trigger: PreSignUp            

@@ -1,0 +1,109 @@
+Resources:
+
+  InvalidNameStringParameterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RequestParameters:
+              - Authorization
+
+  InvalidNameLocationStringParameterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RequestParameters:
+              - method.request.invalid.Authorization
+
+  InvalidNameDictParameterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RequestParameters:
+              - Authorization:
+                  Required: true
+
+    InvalidNameLocationDictParameterFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: s3://sam-demo-bucket/member_portal.zip
+        Handler: index.gethtml
+        Runtime: nodejs4.3
+        Events:
+          GetHtml:
+            Type: Api
+            Properties:
+              Path: /
+              Method: get
+              RequestParameters:
+                - method.request.invalid.Authorization:
+                    Required: true
+
+  ParameterNotDictFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RequestParameters:
+              - method.request.header.Authorization: notadict
+
+  ParameterInvalidFieldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RequestParameters:
+              - method.request.header.Authorization:
+                  invalid: field
+
+  ParameterNotDictOrStringFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RequestParameters:
+              - [Authorization]

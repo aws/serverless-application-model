@@ -667,7 +667,13 @@
                     "s3:GetObjectVersion",
                     "s3:PutObject",
                     "s3:PutObjectAcl",
-                    "s3:DeleteObject"
+                    "s3:DeleteObject",
+		    "s3:DeleteObjectTagging",
+		    "s3:DeleteObjectVersionTagging",
+		    "s3:GetObjectTagging",
+		    "s3:GetObjectVersionTagging",
+		    "s3:PutObjectTagging",
+		    "s3:PutObjectVersionTagging"
                   ],
                   "Resource": [
                     {
@@ -1196,7 +1202,8 @@
                   "Effect": "Allow",
                   "Action": [
                     "ssm:GetParameters",
-                    "ssm:GetParameter"
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
                   ],
                   "Resource": {
                     "Fn::Sub": [

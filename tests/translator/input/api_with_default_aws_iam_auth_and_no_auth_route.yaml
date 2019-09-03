@@ -1,0 +1,29 @@
+Resources:
+  MyApiWithAwsIamAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+
+  MyFunctionWithAwsIamAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        MyApiWithAwsIamAuth:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Path: /
+            Method: post
+        MyApiWithNoAuth:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: 'NONE'

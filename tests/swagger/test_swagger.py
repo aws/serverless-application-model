@@ -1116,6 +1116,7 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
 
         self.assertEqual(expected, editor.swagger['paths']['/foo']['get']['requestBody'])
 
+
 class TestSwaggerEditor_add_auth(TestCase):
 
     def setUp(self):
@@ -1231,3 +1232,137 @@ class TestSwaggerEditor_add_auth(TestCase):
 
         self.editor._set_method_apikey_handling(path, method, True)
         self.assertEqual(expected, self.editor.swagger["paths"][path][method]["security"])
+
+
+class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
+
+    def setUp(self):
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        }
+                    }
+                }
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+
+    def test_must_add_parameter_to_method_with_required_and_caching_true(self):
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': True,
+            'Caching': True
+        }]
+
+        self.editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected_parameters = [
+            {
+                'in': 'header',
+                'required': True,
+                'name': 'Authorization',
+                'type': 'string'
+            }
+        ]
+
+        method_swagger = self.editor.swagger['paths']['/foo']['get']
+
+        self.assertEqual(expected_parameters, method_swagger['parameters'])
+        self.assertEqual(['method.request.header.Authorization'], method_swagger[_X_INTEGRATION]['cacheKeyParameters'])
+
+    def test_must_add_parameter_to_method_with_required_and_caching_false(self):
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': False,
+            'Caching': False
+        }]
+
+        self.editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected_parameters = [
+            {
+                'in': 'header',
+                'required': False,
+                'name': 'Authorization',
+                'type': 'string'
+            }
+        ]
+
+        method_swagger = self.editor.swagger['paths']['/foo']['get']
+
+        self.assertEqual(expected_parameters, method_swagger['parameters'])
+        self.assertNotIn('cacheKeyParameters', method_swagger[_X_INTEGRATION].keys())
+
+    def test_must_add_parameter_to_method_with_existing_parameters(self):
+
+        original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        },
+                        'parameters': [{'test': 'existing parameter'}]
+                    }
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_swagger)
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': False,
+            'Caching': False
+        }]
+
+        editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected_parameters = [
+            {
+                'test': 'existing parameter'
+            },
+            {
+                'in': 'header',
+                'required': False,
+                'name': 'Authorization',
+                'type': 'string'
+            }
+        ]
+
+        method_swagger = editor.swagger['paths']['/foo']['get']
+
+        self.assertEqual(expected_parameters, method_swagger['parameters'])
+        self.assertNotIn('cacheKeyParameters', method_swagger[_X_INTEGRATION].keys())
+
+    def test_must_not_add_parameter_to_method_without_integration(self):
+        original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {}
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_swagger)
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': True,
+            'Caching': True
+        }]
+
+        editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected = {}
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get'])
