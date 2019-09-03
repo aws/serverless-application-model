@@ -3,6 +3,8 @@ import logging
 from samtranslator.model.exceptions import InvalidResourceException, InvalidDocumentException
 from enum import Enum
 
+LOG = logging.getLogger(__name__)
+
 
 class SamPlugins(object):
     """
@@ -132,7 +134,7 @@ class SamPlugins(object):
                 # Don't need to log these because they don't result in crashes
                 raise ex
             except Exception as ex:
-                logging.exception("Plugin '%s' raised an exception: %s", plugin.name, ex)
+                LOG.exception("Plugin '%s' raised an exception: %s", plugin.name, ex)
                 raise ex
 
     def __len__(self):

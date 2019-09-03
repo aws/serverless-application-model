@@ -137,6 +137,7 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        'cognito_userpool_with_event',
         's3_with_condition',
         'function_with_condition',
         'basic_function',
@@ -159,6 +160,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_auth_all_minimum',
         'api_with_auth_no_default',
         'api_with_default_aws_iam_auth',
+        'api_with_default_aws_iam_auth_and_no_auth_route',
         'api_with_method_aws_iam_auth',
         'api_with_aws_iam_auth_overrides',
         'api_with_method_settings',
@@ -198,6 +200,7 @@ class TestTranslatorEndToEnd(TestCase):
         's3_multiple_functions',
         's3_with_dependsOn',
         'sns',
+        'sns_sqs',
         'sns_existing_other_subscription',
         'sns_topic_outside_template',
         'alexa_skill',
@@ -235,6 +238,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_conditional_managed_policy_and_ref_no_value',
         'function_with_conditional_policy_template',
         'function_with_conditional_policy_template_and_ref_no_value',
+        'function_with_request_parameters',
         'global_handle_path_level_parameter',
         'globals_for_function',
         'globals_for_api',
@@ -424,6 +428,7 @@ class TestTranslatorEndToEnd(TestCase):
         rest_api_to_swagger_hash[logical_id] = data_hash
 
 @pytest.mark.parametrize('testcase', [
+    'error_cognito_userpool_duplicate_trigger',
     'error_api_duplicate_methods_same_path',
     'error_api_gateway_responses_nonnumeric_status_code',
     'error_api_gateway_responses_unknown_responseparameter',
@@ -456,6 +461,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_no_runtime',
     'error_function_with_deployment_preference_missing_alias',
     'error_function_with_invalid_deployment_preference_hook_property',
+    'error_function_invalid_request_parameters',
     'error_invalid_logical_id',
     'error_layer_invalid_properties',
     'error_missing_queue',
@@ -469,9 +475,9 @@ class TestTranslatorEndToEnd(TestCase):
     'error_table_primary_key_missing_type',
     'error_invalid_resource_parameters',
     'error_reserved_sam_tag',
-    'existing_event_logical_id',
-    'existing_permission_logical_id',
-    'existing_role_logical_id',
+    'error_existing_event_logical_id',
+    'error_existing_permission_logical_id',
+    'error_existing_role_logical_id',
     'error_invalid_template',
     'error_resource_not_dict',
     'error_resource_properties_not_dict',

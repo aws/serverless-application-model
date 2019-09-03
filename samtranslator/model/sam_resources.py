@@ -617,7 +617,7 @@ class SamApplication(SamResourceMacro):
         'Location': PropertyType(True, one_of(is_str(), is_type(dict))),
         'TemplateUrl': PropertyType(False, is_str()),
         'Parameters': PropertyType(False, is_type(dict)),
-        'NotificationARNs': PropertyType(False, list_of(is_str())),
+        'NotificationARNs': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         'Tags': PropertyType(False, is_type(dict)),
         'TimeoutInMinutes': PropertyType(False, is_type(int))
     }
