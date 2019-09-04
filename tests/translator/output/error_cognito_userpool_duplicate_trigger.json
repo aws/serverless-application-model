@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [ImplicitApiFunction] is invalid. Event with id [TwoTrigger] is invalid. Cognito trigger \"PreSignUp\" defined multiple times."
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ImplicitApiFunction] is invalid. Event with id [TwoTrigger] is invalid. Cognito trigger \"PreSignUp\" defined multiple times."
+}

@@ -61,8 +61,7 @@
         "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
         "StageName": "Stage"
       }
-    }, 
-
+    },
     "ImplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {

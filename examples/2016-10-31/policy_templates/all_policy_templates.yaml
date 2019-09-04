@@ -90,3 +90,9 @@ Resources:
 
         - StepFunctionsExecutionPolicy:
             StateMachineName: name
+
+        - CodeCommitCrudPolicy:
+            RepositoryName: name
+
+        - CodeCommitReadPolicy:
+            RepositoryName: name
