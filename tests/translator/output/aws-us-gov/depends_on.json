@@ -80,25 +80,6 @@
       },
       "DependsOn": "MySamTable"
     },
-    "MyFunctionMyApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
-            {
-              "__Stage__": "*",
-              "__ApiId__": "MyExplicitApi"
-            }
-          ]
-        }
-      }
-    },
     "MyExplicitApidevStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
@@ -165,7 +146,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
-              "__Stage__": "dev",
+              "__Stage__": "*",
               "__ApiId__": "MyExplicitApi"
             }
           ]

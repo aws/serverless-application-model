@@ -30,7 +30,7 @@ class ApiEventSource(TestCase):
         self.assertIsInstance(perm, LambdaPermission)
 
         try:
-            arn = self._extract_path_from_arn("{}PermissionTest".format(self.logical_id), perm)
+            arn = self._extract_path_from_arn("{}PermissionProd".format(self.logical_id), perm)
         except AttributeError:
             self.fail("Permission class isn't valid")
 
@@ -45,7 +45,7 @@ class ApiEventSource(TestCase):
         self.assertIsInstance(perm, LambdaPermission)
 
         try:
-            arn = self._extract_path_from_arn("{}PermissionTest".format(self.logical_id), perm)
+            arn = self._extract_path_from_arn("{}PermissionProd".format(self.logical_id), perm)
         except AttributeError:
             self.fail("Permission class isn't valid")
 
@@ -60,7 +60,7 @@ class ApiEventSource(TestCase):
         self.assertIsInstance(perm, LambdaPermission)
 
         try:
-            arn = self._extract_path_from_arn("{}PermissionTest".format(self.logical_id), perm)
+            arn = self._extract_path_from_arn("{}PermissionProd".format(self.logical_id), perm)
         except AttributeError:
             self.fail("Permission class isn't valid")
 
@@ -75,7 +75,7 @@ class ApiEventSource(TestCase):
         self.assertIsInstance(perm, LambdaPermission)
 
         try:
-            arn = self._extract_path_from_arn("{}PermissionTest".format(self.logical_id), perm)
+            arn = self._extract_path_from_arn("{}PermissionProd".format(self.logical_id), perm)
         except AttributeError:
             self.fail("Permission class isn't valid")
 
@@ -90,7 +90,7 @@ class ApiEventSource(TestCase):
         self.assertIsInstance(perm, LambdaPermission)
 
         try:
-            arn = self._extract_path_from_arn("{}PermissionTest".format(self.logical_id), perm)
+            arn = self._extract_path_from_arn("{}PermissionProd".format(self.logical_id), perm)
         except AttributeError:
             self.fail("Permission class isn't valid")
 

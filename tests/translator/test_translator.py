@@ -266,6 +266,7 @@ class TestTranslatorEndToEnd(TestCase):
     @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_transform_success(self, testcase, partition_with_region):
+        print("Here.............")
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
@@ -275,7 +276,7 @@ class TestTranslatorEndToEnd(TestCase):
         partition_folder = partition if partition != "aws" else ""
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json')
         expected = json.load(open(expected_filepath, 'r'))
-
+        print("success till here..............")
         with patch('boto3.session.Session.region_name', region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
