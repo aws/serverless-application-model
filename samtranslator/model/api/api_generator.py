@@ -1,7 +1,5 @@
 from collections import namedtuple
 from six import string_types
-import re
-
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage, ApiGatewayAuthorizer,
@@ -107,9 +105,10 @@ class ApiGenerator(object):
                                            "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both")
 
         if self.open_api_version:
-            if re.match(SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version) is None:
-                raise InvalidResourceException(
-                    self.logical_id, "The OpenApiVersion value must be of the format 3.0.0")
+            if not SwaggerEditor.safe_compare_regex_with_string(SwaggerEditor.get_openapi_versions_supported_regex(),
+                                                                self.open_api_version):
+                raise InvalidResourceException(self.logical_id,
+                                               "The OpenApiVersion value must be of the format \"3.0.0\"")
 
         self._add_cors()
         self._add_auth()
@@ -412,11 +411,12 @@ class ApiGenerator(object):
         if definition_body.get('swagger') is not None:
             return definition_body
 
-        if definition_body.get('openapi') is not None:
-            if self.open_api_version is None:
-                self.open_api_version = definition_body.get('openapi')
+        if definition_body.get('openapi') is not None and self.open_api_version is None:
+            self.open_api_version = definition_body.get('openapi')
 
-        if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
+        if self.open_api_version and \
+           SwaggerEditor.safe_compare_regex_with_string(SwaggerEditor.get_openapi_version_3_regex(),
+                                                        self.open_api_version):
             if definition_body.get('securityDefinitions'):
                 components = definition_body.get('components', {})
                 components['securitySchemes'] = definition_body['securityDefinitions']
