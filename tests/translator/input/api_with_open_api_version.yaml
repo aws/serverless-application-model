@@ -1,6 +1,6 @@
 Globals:
   Api:
-    OpenApiVersion: '3.0.1'
+    OpenApiVersion: 3.0.1
     Cors: '*'
 
 Resources:

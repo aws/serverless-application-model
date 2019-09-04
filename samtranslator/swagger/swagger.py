@@ -740,8 +740,8 @@ class SwaggerEditor(object):
                 method_definition['parameters'] = existing_parameters
 
             elif self._doc.get("openapi") and \
-                    re.search(SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]) is not None:
-
+                    SwaggerEditor.safe_compare_regex_with_string(
+                        SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]):
                 method_definition['requestBody'] = {
                     'content': {
                         "application/json": {
@@ -901,8 +901,8 @@ class SwaggerEditor(object):
             if bool(data.get("swagger")):
                 return True
             elif bool(data.get("openapi")):
-                return re.search(SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]) is not None
-            return False
+                return SwaggerEditor.safe_compare_regex_with_string(
+                    SwaggerEditor.get_openapi_version_3_regex(), data["openapi"])
         return False
 
     @staticmethod
@@ -951,3 +951,7 @@ class SwaggerEditor(object):
     def get_openapi_version_3_regex():
         openapi_version_3_regex = r"\A3(\.\d)(\.\d)?$"
         return openapi_version_3_regex
+
+    @staticmethod
+    def safe_compare_regex_with_string(regex, data):
+        return re.match(regex, str(data)) is not None

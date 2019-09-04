@@ -1,0 +1,21 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody: {}
+      OpenApiVersion: 3
+      StageName: 'prod'
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda.handler
+      CodeUri: s3://bucket/api
+      Runtime: nodejs8.10
+      Events:
+        ProxyApiRoot:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: "/"
+            Method: ANY
