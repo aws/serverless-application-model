@@ -350,6 +350,8 @@ class TestTranslatorEndToEnd(TestCase):
             output_fragment = transform(
                 manifest, parameter_values, mock_policy_loader)
 
+        print('SAM Translator Full Output:\n' + json.dumps(output_fragment, indent=2))
+
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
             self._update_logical_id_hash(expected)
@@ -358,7 +360,7 @@ class TestTranslatorEndToEnd(TestCase):
         sorted_expected = deep_sort_lists(expected)
         sorted_actual = deep_sort_lists(output_fragment)
 
-        print(
+        print('Output Diff:\n'
             ''.join(
                 difflib.unified_diff(
                     json.dumps(sorted_expected, indent=2).splitlines(1),
