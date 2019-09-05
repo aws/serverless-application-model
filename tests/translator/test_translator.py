@@ -259,7 +259,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_apikey_default_override',
         'api_with_apikey_required',
         'api_with_path_parameters',
-        'kinesis_stream'
+        'function_with_batch_window'
       ],
       [
        ("aws", "ap-southeast-1"),
