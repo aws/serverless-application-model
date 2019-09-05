@@ -14,6 +14,7 @@ from samtranslator.model.eventsources.pull import SQS
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.model.cognito import CognitoUserPool
+from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -55,9 +56,13 @@ class PushEventSource(ResourceMacro):
         """
         if prefix is None:
             prefix = self.logical_id
-        lambda_permission = LambdaPermission(prefix + 'Permission' + suffix,
+        if suffix.isalnum():
+            permission_logical_id = prefix + 'Permission' + suffix
+        else:
+            generator = logical_id_generator.LogicalIdGenerator(prefix + 'Permission', suffix)
+            permission_logical_id = generator.gen()
+        lambda_permission = LambdaPermission(permission_logical_id,
                                              attributes=function.get_passthrough_resource_attributes())
-
         try:
             # Name will not be available for Alias resources
             function_name_or_arn = function.get_runtime_attr("name")
