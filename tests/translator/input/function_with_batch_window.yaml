@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EventSourceMapping example with MaximumBatchingWindowInSeconds property
+
+Parameters:
+  MyBatchingWindowParam:
+    Type: Number
+    Default: 45
+    Description: parameter for batching window in seconds
+
+Resources:
+  MyFunctionForBatchingExample:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      InlineCode: |
+
+        exports.handler = async (event) => {
+            return {
+            statusCode: 200,
+            body: JSON.stringify(event),
+            headers: {}
+            }
+        }
+      Runtime: nodejs8.10
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            MaximumBatchingWindowInSeconds: 20
+            StartingPosition: LATEST
+        StreamEvent:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream1.Arn
+            MaximumBatchingWindowInSeconds: !Ref MyBatchingWindowParam
+            StartingPosition: LATEST
+        DynamoDBStreamEvent:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt DynamoDBTable.StreamArn
+            BatchSize: 100
+            MaximumBatchingWindowInSeconds: !Ref MyBatchingWindowParam
+            StartingPosition: TRIM_HORIZON
+
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
+
+  KinesisStream1:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE

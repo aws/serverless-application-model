@@ -65,6 +65,7 @@ class LambdaEventSourceMapping(Resource):
             'Enabled': PropertyType(False, is_type(bool)),
             'EventSourceArn': PropertyType(True, is_str()),
             'FunctionName': PropertyType(True, is_str()),
+            'MaximumBatchingWindowInSeconds': PropertyType(False, is_type(int)),
             'StartingPosition': PropertyType(False, is_str())
     }
 

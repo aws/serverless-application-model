@@ -10,6 +10,7 @@ from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_instrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
+from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -184,8 +185,12 @@ class ApiGenerator(object):
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
         stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
-
-        stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage',
+        if stage_name_prefix.isalnum():
+            stage_logical_id = self.logical_id + stage_name_prefix + 'Stage'
+        else:
+            generator = logical_id_generator.LogicalIdGenerator(self.logical_id + 'Stage', stage_name_prefix)
+            stage_logical_id = generator.gen()
+        stage = ApiGatewayStage(stage_logical_id,
                                 attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)
