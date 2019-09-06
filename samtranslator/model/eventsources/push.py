@@ -493,7 +493,6 @@ class Api(PushEventSource):
         return {
             'explicit_api': explicit_api,
             'explicit_api_stage': {
-                'permitted_stage': permitted_stage,
                 'suffix': stage_suffix
             }
         }
