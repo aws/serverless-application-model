@@ -1,11 +1,35 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "MyBatchingWindowParam": {
+      "Default": 45,
+      "Type": "Number",
+      "Description": "parameter for batching window in seconds"
+    }
+  },
   "Resources": {
-    "HelloWorldFnRole": {
+    "MyFunctionForBatchingExampleStream": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "MaximumBatchingWindowInSeconds": 20,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "KinesisStream",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunctionForBatchingExample"
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "MyFunctionForBatchingExampleRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole"
         ],
         "AssumeRolePolicyDocument": {
@@ -26,51 +50,108 @@
         }
       }
     },
-    "HelloWorldFnStream": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "MaximumBatchingWindowInSeconds": 20,
-        "EventSourceArn": {
-          "Fn::GetAtt": [
-            "GreetingStream",
-            "Arn"
-          ]
-        },
-        "FunctionName": {
-          "Ref": "HelloWorldFn"
-        },
-        "StartingPosition": "LATEST"
-      }
-    },
-    "GreetingStream": {
+    "KinesisStream1": {
       "Type": "AWS::Kinesis::Stream",
       "Properties": {
         "ShardCount": 1
       }
     },
-    "HelloWorldFn": {
+    "MyFunctionForBatchingExampleDynamoDBStreamEvent": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "MaximumBatchingWindowInSeconds": {
+          "Ref": "MyBatchingWindowParam"
+        },
+        "BatchSize": 100,
+        "FunctionName": {
+          "Ref": "MyFunctionForBatchingExample"
+        },
+        "StartingPosition": "TRIM_HORIZON",
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "DynamoDBTable",
+            "StreamArn"
+          ]
+        }
+      }
+    },
+    "MyFunctionForBatchingExample": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
+        "Handler": "index.handler",
         "Code": {
           "ZipFile": "\nexports.handler = async (event) => {\n    return {\n    statusCode: 200,\n    body: JSON.stringify(event),\n    headers: {}\n    }\n}\n"
         },
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionForBatchingExampleRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs8.10",
         "Tags": [
           {
             "Value": "SAM",
             "Key": "lambda:createdBy"
           }
+        ]
+      }
+    },
+    "DynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "KeySchema": [
+          {
+            "KeyType": "HASH",
+            "AttributeName": "id"
+          }
         ],
-        "Handler": "index.handler",
-        "Role": {
+        "StreamSpecification": {
+          "StreamViewType": "NEW_IMAGE"
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 5,
+          "ReadCapacityUnits": 5
+        }
+      }
+    },
+    "MyFunctionForBatchingExampleStreamEvent": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "MaximumBatchingWindowInSeconds": {
+          "Ref": "MyBatchingWindowParam"
+        },
+        "EventSourceArn": {
           "Fn::GetAtt": [
-            "HelloWorldFnRole",
+            "KinesisStream1",
             "Arn"
           ]
         },
-        "Timeout": 10,
-        "Runtime": "nodejs8.10"
+        "FunctionName": {
+          "Ref": "MyFunctionForBatchingExample"
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "KinesisStream": {
+      "Type": "AWS::Kinesis::Stream",
+      "Properties": {
+        "ShardCount": 1
       }
     }
   },
-  "Description": "EventSourceMapping example"
+  "Parameters": {
+    "MyBatchingWindowParam": {
+      "Default": 45,
+      "Type": "Number",
+      "Description": "parameter for batching window in seconds"
+    }
+  },
+  "Description": "EventSourceMapping example with MaximumBatchingWindowInSeconds property"
 }
