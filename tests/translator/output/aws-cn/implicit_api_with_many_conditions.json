@@ -123,28 +123,6 @@
     }
   },
   "Resources": {
-    "helloworld5ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld5"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub5",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond5"
-    },
     "helloworld7ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -157,7 +135,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub7",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -179,28 +157,6 @@
         "StageName": "Prod"
       },
       "Condition": "ServerlessRestApiCondition"
-    },
-    "helloworld9ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld9"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub9",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond9"
     },
     "helloworld1Role": {
       "Type": "AWS::IAM::Role",
@@ -402,28 +358,6 @@
       },
       "Condition": "Cond1"
     },
-    "helloApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "hello"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/sub",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "MyCondition"
-    },
     "helloworld9": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -449,28 +383,6 @@
       },
       "Condition": "Cond9"
     },
-    "helloworld3ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld3"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub3",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond3"
-    },
     "helloApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -483,7 +395,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/sub",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -505,7 +417,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub2",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -527,28 +439,6 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub3",
             {
-              "__Stage__": "Prod",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond3"
-    },
-    "helloworld2ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld2"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub2",
-            {
               "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
@@ -557,7 +447,7 @@
           ]
         }
       },
-      "Condition": "Cond2"
+      "Condition": "Cond3"
     },
     "helloworld1ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
@@ -571,7 +461,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub1",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -618,7 +508,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub6",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -627,72 +517,6 @@
         }
       },
       "Condition": "Cond6"
-    },
-    "helloworld7ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld7"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub7",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond7"
-    },
-    "helloworld8ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld8"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub8",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond8"
-    },
-    "helloworld4ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld4"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub4",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond4"
     },
     "ServerlessRestApiDeployment5d9ff7b9fd": {
       "Type": "AWS::ApiGateway::Deployment",
@@ -704,28 +528,6 @@
         "StageName": "Stage"
       },
       "Condition": "ServerlessRestApiCondition"
-    },
-    "helloworld1ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld1"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub1",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond1"
     },
     "helloworld4Role": {
       "Type": "AWS::IAM::Role",
@@ -752,50 +554,6 @@
       },
       "Condition": "Cond4"
     },
-    "helloworld6ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld6"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub6",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond6"
-    },
-    "helloworldApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "helloworld"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "Cond"
-    },
     "helloworldApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -808,7 +566,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -855,7 +613,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub5",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -877,7 +635,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub8",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -1049,7 +807,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub9",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -1171,7 +929,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/sub4",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }

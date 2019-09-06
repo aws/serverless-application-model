@@ -24,28 +24,7 @@
           ]
         }
       }
-    }, 
-    "RestApiFunctionCompleteItemPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "RestApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/complete", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "RestApiFunctionAddItemPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -58,7 +37,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/add", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -66,28 +45,7 @@
           ]
         }
       }
-    }, 
-    "RestApiFunctionAddItemPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "RestApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/add", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "GetHtmlFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -100,7 +58,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/*", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -130,28 +88,7 @@
         "Description": "RestApi deployment id: aaf8bd4588f47e1167b22b3aadb5fdf6f2d306aa", 
         "StageName": "Stage"
       }
-    }, 
-    "RestApiFunctionGetListPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "RestApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/getlist", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "GetHtmlFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -199,28 +136,7 @@
           ]
         }
       }
-    }, 
-    "GetHtmlFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "GetHtmlFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/*", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "RestApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -256,7 +172,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/getlist", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -349,7 +265,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/complete", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }

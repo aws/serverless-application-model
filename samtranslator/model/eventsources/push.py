@@ -498,7 +498,6 @@ class Api(PushEventSource):
         return {
             'explicit_api': explicit_api,
             'explicit_api_stage': {
-                'permitted_stage': permitted_stage,
                 'suffix': stage_suffix
             }
         }
@@ -535,13 +534,12 @@ class Api(PushEventSource):
     def _get_permissions(self, resources_to_link):
         permissions = []
 
-        permissions.append(self._get_permission(resources_to_link, "*", "Test"))
-
         # By default, implicit APIs get a stage called Prod. If the API event refers to an
         # explicit API using RestApiId property, we should grab the stage name of the explicit API
-        permitted_stage = suffix = "Prod"
+        # all stages for an API are given permission
+        permitted_stage = "*"
+        suffix = "Prod"
         if 'explicit_api_stage' in resources_to_link:
-            permitted_stage = resources_to_link['explicit_api_stage']['permitted_stage']
             suffix = resources_to_link['explicit_api_stage']['suffix']
 
         permissions.append(self._get_permission(resources_to_link, permitted_stage, suffix))

@@ -93,26 +93,7 @@
           ]
         }
       }
-    }, 
-    "HyphenFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "HyphenFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": "HyphenApi"
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "UnderscoreApiDeploymentc6c2bbcee6": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
@@ -135,7 +116,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "hoge-fuga", 
+              "__Stage__": "*",
               "__ApiId__": "HyphenApi"
             }
           ]
@@ -189,32 +170,13 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "hoge_fuga", 
+              "__Stage__": "*",
               "__ApiId__": "UnderscoreApi"
             }
           ]
         }
       }
-    }, 
-    "UnderscoreFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "UnderscoreFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": "UnderscoreApi"
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "HyphenFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {

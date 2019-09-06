@@ -1,26 +1,5 @@
 {
   "Resources": {
-    "HtmlFunctionIamPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "HtmlFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/iam", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "HtmlApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
     "HtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -69,7 +48,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/iam", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "HtmlApi"
               }
@@ -140,7 +119,7 @@
               }
             }
           }, 
-          "openapi": "3.0", 
+          "openapi": "3.0",
           "components": {
             "securitySchemes": {
               "AWS_IAM": {
@@ -165,33 +144,14 @@
       }
     }, 
     "HtmlApiDeployment59eeb787ee": {
-      "Type": "AWS::ApiGateway::Deployment", 
+      "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
-        }, 
+        },
         "Description": "RestApi deployment id: 59eeb787ee1561329a07e10162ac3718998e9f91"
       }
-    }, 
-    "HtmlFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "HtmlFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": "HtmlApi"
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "HtmlFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -204,7 +164,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": "HtmlApi"
             }
           ]

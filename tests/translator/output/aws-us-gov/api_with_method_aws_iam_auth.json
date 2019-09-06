@@ -1,26 +1,5 @@
 {
   "Resources": {
-    "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunctionWithAwsIamAuth"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "MyApiWithoutAuth"
-              }
-            }
-          ]
-        }
-      }
-    },
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -33,7 +12,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithoutAuth"
               }
@@ -136,27 +115,6 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/",
             {
-              "__Stage__": "Prod",
-              "__ApiId__": {
-                "Ref": "MyApiWithoutAuth"
-              }
-            }
-          ]
-        }
-      }
-    },
-    "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthAndDefaultInvokeRolePermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunctionWithAwsIamAuth"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/",
-            {
               "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithoutAuth"
@@ -223,7 +181,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithoutAuth"
               }
@@ -250,27 +208,6 @@
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
-              }
-            }
-          ]
-        }
-      }
-    },
-    "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthAndCustomInvokeRolePermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunctionWithAwsIamAuth"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "MyApiWithoutAuth"
               }
             }
           ]

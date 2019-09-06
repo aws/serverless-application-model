@@ -24,7 +24,7 @@
             "Fn::Sub": [
               "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyTrue", 
               {
-                "__Stage__": "Prod", 
+                "__Stage__": "*",
                 "__ApiId__": {
                   "Ref": "MyApiWithAuth"
                 }
@@ -45,7 +45,7 @@
             "Fn::Sub": [
               "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyFalse", 
               {
-                "__Stage__": "Prod", 
+                "__Stage__": "*",
                 "__ApiId__": {
                   "Ref": "MyApiWithAuth"
                 }
@@ -53,28 +53,7 @@
             ]
           }
         }
-      }, 
-      "MyFunctionWithApiKeyRequiredFalseMyApiWithApiKeyRequiredFalsePermissionTest": {
-        "Type": "AWS::Lambda::Permission", 
-        "Properties": {
-          "Action": "lambda:invokeFunction", 
-          "Principal": "apigateway.amazonaws.com", 
-          "FunctionName": {
-            "Ref": "MyFunctionWithApiKeyRequiredFalse"
-          }, 
-          "SourceArn": {
-            "Fn::Sub": [
-              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyFalse", 
-              {
-                "__Stage__": "*", 
-                "__ApiId__": {
-                  "Ref": "MyApiWithAuth"
-                }
-              }
-            ]
-          }
-        }
-      }, 
+      },
       "MyFunctionWithApiKeyRequiredTrue": {
         "Type": "AWS::Lambda::Function", 
         "Properties": {
@@ -133,7 +112,7 @@
             "Fn::Sub": [
               "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyDefault", 
               {
-                "__Stage__": "Prod", 
+                "__Stage__": "*",
                 "__ApiId__": {
                   "Ref": "MyApiWithAuth"
                 }
@@ -222,49 +201,7 @@
             ]
           }
         }
-      }, 
-      "MyFunctionWithApiKeyRequiredDefaultMyApiWithApiKeyRequiredDefaultPermissionTest": {
-        "Type": "AWS::Lambda::Permission", 
-        "Properties": {
-          "Action": "lambda:invokeFunction", 
-          "Principal": "apigateway.amazonaws.com", 
-          "FunctionName": {
-            "Ref": "MyFunctionWithApiKeyRequiredDefault"
-          }, 
-          "SourceArn": {
-            "Fn::Sub": [
-              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyDefault", 
-              {
-                "__Stage__": "*", 
-                "__ApiId__": {
-                  "Ref": "MyApiWithAuth"
-                }
-              }
-            ]
-          }
-        }
-      }, 
-      "MyFunctionWithApiKeyRequiredTrueMyApiWithApiKeyRequiredTruePermissionTest": {
-        "Type": "AWS::Lambda::Permission", 
-        "Properties": {
-          "Action": "lambda:invokeFunction", 
-          "Principal": "apigateway.amazonaws.com", 
-          "FunctionName": {
-            "Ref": "MyFunctionWithApiKeyRequiredTrue"
-          }, 
-          "SourceArn": {
-            "Fn::Sub": [
-              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyTrue", 
-              {
-                "__Stage__": "*", 
-                "__ApiId__": {
-                  "Ref": "MyApiWithAuth"
-                }
-              }
-            ]
-          }
-        }
-      }, 
+      },
       "MyFunctionWithApiKeyRequiredTrueRole": {
         "Type": "AWS::IAM::Role", 
         "Properties": {

@@ -23,28 +23,7 @@
           ]
         }
       }
-    }, 
-    "MyFunctionWithApiKeyRequiredMyApiWithApiKeyRequiredPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionWithApiKeyRequired"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyRequiredTrue", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithoutAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyApiWithoutAuthDeployment36e0aae784": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
@@ -128,7 +107,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyRequiredTrue", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithoutAuth"
               }

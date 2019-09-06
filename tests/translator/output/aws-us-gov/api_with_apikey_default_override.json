@@ -22,7 +22,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyTrue",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAuth"
               }
@@ -32,27 +32,6 @@
       }
     },
     "MyFunctionWithApiKeyRequiredFalseMyApiWithApiKeyRequiredFalsePermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunctionWithApiKeyRequiredFalse"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyFalse",
-            {
-              "__Stage__": "Prod",
-              "__ApiId__": {
-                "Ref": "MyApiWithAuth"
-              }
-            }
-          ]
-        }
-      }
-    },
-    "MyFunctionWithApiKeyRequiredFalseMyApiWithApiKeyRequiredFalsePermissionTest": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:invokeFunction",
@@ -143,7 +122,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyDefault",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAuth"
               }
@@ -217,48 +196,6 @@
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
-              }
-            }
-          ]
-        }
-      }
-    },
-    "MyFunctionWithApiKeyRequiredDefaultMyApiWithApiKeyRequiredDefaultPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunctionWithApiKeyRequiredDefault"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyDefault",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "MyApiWithAuth"
-              }
-            }
-          ]
-        }
-      }
-    },
-    "MyFunctionWithApiKeyRequiredTrueMyApiWithApiKeyRequiredTruePermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunctionWithApiKeyRequiredTrue"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/ApiKeyTrue",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "MyApiWithAuth"
               }
             }
           ]

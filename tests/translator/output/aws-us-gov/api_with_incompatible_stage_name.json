@@ -91,26 +91,7 @@
           ]
         }
       }
-    }, 
-    "HyphenFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "HyphenFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": "HyphenApi"
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "HyphenFunctionGetHtmlPermission0c8ecc62cb": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -123,7 +104,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "hoge-fuga", 
+              "__Stage__": "*",
               "__ApiId__": "HyphenApi"
             }
           ]
@@ -177,32 +158,13 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "hoge_fuga", 
+              "__Stage__": "*",
               "__ApiId__": "UnderscoreApi"
             }
           ]
         }
       }
-    }, 
-    "UnderscoreFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "UnderscoreFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": "UnderscoreApi"
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "HyphenFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
