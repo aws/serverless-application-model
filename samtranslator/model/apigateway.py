@@ -76,7 +76,7 @@ class ApiGatewayDeployment(Resource):
         "deployment_id": lambda self: ref(self.logical_id),
     }
 
-    def make_auto_deployable(self, stage, openapi_version=None, swagger=None):
+    def make_auto_deployable(self, stage, openapi_version=None, function_name=None, swagger=None):
         """
         Sets up the resource such that it will trigger a re-deployment when Swagger changes
         or the openapi version changes.
@@ -95,6 +95,9 @@ class ApiGatewayDeployment(Resource):
         hash_input = [str(swagger)]
         if openapi_version:
             hash_input.append(str(openapi_version))
+
+        if function_name:
+            hash_input.append(str(function_name))
 
         data = self._X_HASH_DELIMITER.join(hash_input)
         generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)

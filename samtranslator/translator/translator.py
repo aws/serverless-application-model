@@ -31,6 +31,16 @@ class Translator:
         self.plugins = plugins
         self.sam_parser = sam_parser
 
+    def get_function_name(self, sam_template):
+        function_name = None
+        sam_resources = sam_template['Resources']
+        resource_values = list(sam_resources.values())
+
+        for item in resource_values:
+            if item.get('Type').strip() == 'AWS::Serverless::Function':
+                function_name = item.get('Properties').get('FunctionName')
+        return function_name
+
     def translate(self, sam_template, parameter_values):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
@@ -80,6 +90,8 @@ class Translator:
                 kwargs['intrinsics_resolver'] = intrinsics_resolver
                 kwargs['mappings_resolver'] = mappings_resolver
                 kwargs['deployment_preference_collection'] = deployment_preference_collection
+                # add the value at FunctionName property if the function is referenced with the api resource
+                kwargs['function_name'] = self.get_function_name(sam_template)
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
