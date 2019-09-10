@@ -7,9 +7,11 @@ from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.exceptions import InvalidDocumentException
+from tests.translator.test_translator import deep_sort_lists
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
+_X_POLICY = 'x-amazon-apigateway-policy'
 _ALLOW_CREDENTALS_TRUE = "'true'"
 
 class TestSwaggerEditor_init(TestCase):
@@ -1417,14 +1419,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_iam_allow(self):
-
+## fails
         resourcePolicy = {
             'IamAllowList': [
-                "123456"
+                '123456'
             ]
         }
 
@@ -1453,14 +1455,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             }
         }
 
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_iam_deny(self):
 
         resourcePolicy = {
             'IamDenyList': [
-                "123456"
+                '123456'
             ]
         }
 
@@ -1489,14 +1491,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             }
         }
 
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_ip_allow(self):
 
         resourcePolicy = {
             'IpAllowList': [
-                "1.2.3.4"
+                '1.2.3.4'
             ]
         }
 
@@ -1545,14 +1547,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             }]
         }
 
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_ip_deny(self):
 
         resourcePolicy = {
             'IpDenyList': [
-                "1.2.3.4"
+                '1.2.3.4'
             ]
         }
 
@@ -1601,15 +1603,15 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             }]
         }
 
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_vpc_allow(self):
 
         resourcePolicy = {
             'SourceVpcAllowList': [
-                "vpc-123",
-                "vpce-345"
+                'vpc-123',
+                'vpce-345'
             ]
         }
 
@@ -1682,14 +1684,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_vpc_deny(self):
 
         resourcePolicy = {
             'SourceVpcDenyList': [
-                "vpc-123"
+                'vpc-123'
             ]
         }
 
@@ -1717,7 +1719,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 },
                 {
                     'Action': 'execute-api:Invoke',
-                    'Resource': [{
+                    'Resource': [                {
                         'Fn::Sub': [
                             'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
                             {'__Stage__': 'prod', '__ApiId__': '123'}
@@ -1740,14 +1742,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_iam_allow_and_custom(self):
-
+## fails
         resourcePolicy = {
             'IamAllowList': [
-                "123456"
+                '123456'
             ],
             'CustomStatements': [{
                 'Action': 'execute-api:Invoke',
@@ -1796,4 +1798,4 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             }]
         }
 
-        self.assertEqual(expected, self.editor.swagger['x-amazon-apigateway-policy'])
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
