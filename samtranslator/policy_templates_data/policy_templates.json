@@ -1795,6 +1795,39 @@
           }
         ]
       }
+    },
+    "AthenaQueryPolicy": {
+      "Description": "Gives permissions to execute Athena queries",
+      "Parameters": {
+        "WorkGroupName": {
+          "Description": "Name of the Athena Workgroup",
+	  "Default": "primary"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "athena:GetWorkGroup",
+              "athena:GetQueryExecution",
+              "athena:StartQueryExecution",
+              "athena:StopQueryExecution",
+              "athena:GetQueryResults"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:${workgroupName}",
+                {
+                  "workgroupName": {
+                    "Ref": "WorkGroupName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
