@@ -22,47 +22,26 @@
         ]
       }
     }, 
-    "MyFunctionApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
+    "ServerlessRestApiDeployment866b766904": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
         }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
+        "Description": "RestApi deployment id: 866b766904e9e69d6e12370a44b3fb37525ccd66", 
+        "StageName": "Stage"
       }
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentad2e86883f"
+          "Ref": "ServerlessRestApiDeployment866b766904"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiDeploymentad2e86883f": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: ad2e86883ff0677d26b8cba85e4675fd2dbe134e", 
-        "StageName": "Stage"
       }
     }, 
     "MyFunctionRole": {
@@ -124,8 +103,10 @@
                     "Fn::Sub": [
                       "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "*", 
+                        "__ApiId__": {
+                          "Ref": "ServerlessRestApi"
+                        }
                       }
                     ]
                   }
@@ -144,37 +125,20 @@
                     "Fn::Sub": [
                       "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
-                      }
-                    ]
-                  }
-                ], 
-                "Effect": "Allow", 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  {
-                    "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-                      {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "*", 
+                        "__ApiId__": {
+                          "Ref": "ServerlessRestApi"
+                        }
                       }
                     ]
                   }
                 ], 
                 "Effect": "Deny", 
-                "Condition": {
-                  "IpAddress": {
-                    "aws:SourceIp": [
-                      "1.2.3.4"
-                    ]
-                  }
-                }, 
-                "Principal": "*"
+                "Principal": {
+                  "AWS": [
+                    "67890"
+                  ]
+                }
               }
             ]
           }
@@ -201,7 +165,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }

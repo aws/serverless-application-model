@@ -803,38 +803,38 @@ class SwaggerEditor(object):
         if resource_policy is None:
             return
 
-        iam_allow_list = resource_policy.get('IamAllowList')
-        iam_deny_list = resource_policy.get('IamDenyList')
-        ip_allow_list = resource_policy.get('IpAllowList')
-        ip_deny_list = resource_policy.get('IpDenyList')
-        source_vpc_allow_list = resource_policy.get('SourceVpcAllowList')
-        source_vpc_deny_list = resource_policy.get('SourceVpcDenyList')
+        aws_account_whitelist = resource_policy.get('AwsAccountWhitelist')
+        aws_account_blacklist = resource_policy.get('AwsAccountBlacklist')
+        ip_range_whitelist = resource_policy.get('IpRangeWhitelist')
+        ip_range_blacklist = resource_policy.get('IpRangeBlacklist')
+        source_vpc_whitelist = resource_policy.get('SourceVpcWhitelist')
+        source_vpc_blacklist = resource_policy.get('SourceVpcBlacklist')
         custom_statements = resource_policy.get('CustomStatements')
 
-        if iam_allow_list is not None:
+        if aws_account_whitelist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_iam_resource_policy_for_method(iam_allow_list, "Allow", resource_list)
+            self._add_iam_resource_policy_for_method(aws_account_whitelist, "Allow", resource_list)
 
-        if iam_deny_list is not None:
+        if aws_account_blacklist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_iam_resource_policy_for_method(iam_deny_list, "Deny", resource_list)
+            self._add_iam_resource_policy_for_method(aws_account_blacklist, "Deny", resource_list)
 
-        if ip_allow_list is not None:
+        if ip_range_whitelist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_ip_resource_policy_for_method(ip_allow_list, "NotIpAddress", resource_list)
+            self._add_ip_resource_policy_for_method(ip_range_whitelist, "NotIpAddress", resource_list)
 
-        if ip_deny_list is not None:
+        if ip_range_blacklist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_ip_resource_policy_for_method(ip_deny_list, "IpAddress", resource_list)
+            self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
-        if source_vpc_allow_list is not None:
+        if source_vpc_whitelist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            for endpoint in source_vpc_allow_list:
+            for endpoint in source_vpc_whitelist:
                 self._add_vpc_resource_policy_for_method(endpoint, "StringNotEquals", resource_list)
 
-        if source_vpc_deny_list is not None:
+        if source_vpc_blacklist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            for endpoint in source_vpc_deny_list:
+            for endpoint in source_vpc_blacklist:
                 self._add_vpc_resource_policy_for_method(endpoint, "StringEquals", resource_list)
 
         if custom_statements is not None:
@@ -1130,7 +1130,7 @@ class SwaggerEditor(object):
     @staticmethod
     def safe_compare_regex_with_string(regex, data):
         return re.match(regex, str(data)) is not None
-    
+
     @staticmethod
     def get_path_without_trailing_slash(path):
         return re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)

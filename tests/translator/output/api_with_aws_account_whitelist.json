@@ -22,42 +22,11 @@
         ]
       }
     }, 
-    "MyFunctionApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "ServerlessRestApiDeploymentcd2fa40e47": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: cd2fa40e471867b0757992eddb5c1351785cf367", 
-        "StageName": "Stage"
-      }
-    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentcd2fa40e47"
+          "Ref": "ServerlessRestApiDeployment8cac9116b3"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -65,11 +34,21 @@
         "StageName": "Prod"
       }
     }, 
+    "ServerlessRestApiDeployment8cac9116b3": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 8cac9116b3043ae846906649daabb2f133cd976e", 
+        "StageName": "Stage"
+      }
+    }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -106,7 +85,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -116,35 +95,53 @@
           "swagger": "2.0", 
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
-            "Statement": {
-              "Action": "execute-api:Invoke", 
-              "Resource": [
-                {
-                  "Fn::Sub": [
-                    "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-                    {
-                      "__Stage__": "Prod", 
-                      "__ApiId__": "ServerlessRestApi"
-                    }
+            "Statement": [
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "*", 
+                        "__ApiId__": {
+                          "Ref": "ServerlessRestApi"
+                        }
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Allow", 
+                "Principal": {
+                  "AWS": [
+                    "12345"
                   ]
                 }
-              ], 
-              "Effect": "Deny", 
-              "Principal": {
-                "AWS": [
-                  "12345"
-                ]
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      {
+                        "__Stage__": "*", 
+                        "__ApiId__": {
+                          "Ref": "ServerlessRestApi"
+                        }
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Deny", 
+                "Principal": {
+                  "AWS": [
+                    "67890"
+                  ]
+                }
               }
-            }
+            ]
           }
-        }, 
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     }, 
@@ -158,9 +155,9 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }

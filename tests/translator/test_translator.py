@@ -359,12 +359,12 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
-        'api_with_iam_allow_list',
-        'api_with_iam_deny_list',
-        'api_with_ip_allow_list',
-        'api_with_ip_deny_list',
-        'api_with_vpc_allow_list',
-        'api_with_vpc_deny_list',
+        'api_with_aws_account_whitelist',
+        'api_with_aws_account_blacklist',
+        'api_with_ip_range_whitelist',
+        'api_with_ip_range_blacklist',
+        'api_with_source_vpc_whitelist',
+        'api_with_source_vpc_blacklist',
         'api_with_resource_policy',
         'api_with_resource_policy_global',
         'api_with_resource_policy_global_implicit'

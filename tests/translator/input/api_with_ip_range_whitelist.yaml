@@ -2,7 +2,8 @@ Globals:
   Api:
     Auth:
       ResourcePolicy:
-        IamDenyList: ['12345']
+        IpRangeWhitelist: ['1.2.3.4']
+        IpRangeBlacklist: ['1.2.3.4']
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function

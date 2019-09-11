@@ -18,10 +18,10 @@ Resources:
           Properties:
             Auth:
               ResourcePolicy:
-                IamAllowList: [
+                AwsAccountWhitelist: [
                   "12345"
                 ]
-                IamDenyList: [
+                AwsAccountBlacklist: [
                   "67890"
                 ]
             Method: Put

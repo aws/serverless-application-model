@@ -22,32 +22,11 @@
         ]
       }
     }, 
-    "MyFunctionApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment58bae06e3f"
+          "Ref": "ServerlessRestApiDeployment9f51cca2cf"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -55,13 +34,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeployment58bae06e3f": {
+    "ServerlessRestApiDeployment9f51cca2cf": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 58bae06e3fc57cd27e4edfbb81d1d5af271892f0", 
+        "Description": "RestApi deployment id: 9f51cca2cf4e454c3ac200133f21bcd80341c24f", 
         "StageName": "Stage"
       }
     }, 
@@ -131,26 +110,6 @@
                   }
                 ], 
                 "Effect": "Allow", 
-                "Principal": {
-                  "AWS": [
-                    "12345"
-                  ]
-                }
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  {
-                    "Fn::Sub": [
-                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-                      {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
-                      }
-                    ]
-                  }
-                ], 
-                "Effect": "Allow", 
                 "Principal": "*"
               }, 
               {
@@ -168,10 +127,8 @@
                 ], 
                 "Effect": "Deny", 
                 "Condition": {
-                  "IpAddress": {
-                    "aws:SourceIp": [
-                      "1.2.3.4"
-                    ]
+                  "StringEquals": {
+                    "aws:SourceVpce": "vpce-3456"
                   }
                 }, 
                 "Principal": "*"
@@ -193,7 +150,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }

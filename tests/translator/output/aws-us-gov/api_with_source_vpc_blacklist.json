@@ -22,42 +22,21 @@
         ]
       }
     }, 
-    "ServerlessRestApiDeployment0fb94d038c": {
+    "ServerlessRestApiDeployment829e07383e": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 0fb94d038c93899077114cddb8f2950d988d8980", 
+        "Description": "RestApi deployment id: 829e07383e1a1c0c161c27d399dcd32537399916", 
         "StageName": "Stage"
-      }
-    }, 
-    "MyFunctionApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
       }
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment0fb94d038c"
+          "Ref": "ServerlessRestApiDeployment829e07383e"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -69,7 +48,7 @@
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -106,7 +85,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -122,7 +101,7 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
                       {
                         "__Stage__": "Prod", 
                         "__ApiId__": "ServerlessRestApi"
@@ -138,7 +117,7 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
                       {
                         "__Stage__": "Prod", 
                         "__ApiId__": "ServerlessRestApi"
@@ -148,33 +127,8 @@
                 ], 
                 "Effect": "Deny", 
                 "Condition": {
-                  "NotIpAddress": {
-                    "aws:SourceIp": [
-                      "1.2.3.4"
-                    ]
-                  }
-                }, 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  {
-                    "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-                      {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
-                      }
-                    ]
-                  }
-                ], 
-                "Effect": "Deny", 
-                "Condition": {
-                  "IpAddress": {
-                    "aws:SourceIp": [
-                      "1.2.3.4"
-                    ]
+                  "StringEquals": {
+                    "aws:SourceVpce": "vpce-3456"
                   }
                 }, 
                 "Principal": "*"
@@ -202,9 +156,9 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }

@@ -1425,7 +1425,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
     def test_must_add_iam_allow(self):
 ## fails
         resourcePolicy = {
-            'IamAllowList': [
+            'AwsAccountWhitelist': [
                 '123456'
             ]
         }
@@ -1461,7 +1461,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
     def test_must_add_iam_deny(self):
 
         resourcePolicy = {
-            'IamDenyList': [
+            'AwsAccountBlacklist': [
                 '123456'
             ]
         }
@@ -1497,7 +1497,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
     def test_must_add_ip_allow(self):
 
         resourcePolicy = {
-            'IpAllowList': [
+            'IpRangeWhitelist': [
                 '1.2.3.4'
             ]
         }
@@ -1553,7 +1553,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
     def test_must_add_ip_deny(self):
 
         resourcePolicy = {
-            'IpDenyList': [
+            'IpRangeBlacklist': [
                 '1.2.3.4'
             ]
         }
@@ -1609,7 +1609,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
     def test_must_add_vpc_allow(self):
 
         resourcePolicy = {
-            'SourceVpcAllowList': [
+            'SourceVpcWhitelist': [
                 'vpc-123',
                 'vpce-345'
             ]
@@ -1690,7 +1690,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
     def test_must_add_vpc_deny(self):
 
         resourcePolicy = {
-            'SourceVpcDenyList': [
+            'SourceVpcBlacklist': [
                 'vpc-123'
             ]
         }
@@ -1748,7 +1748,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
     def test_must_add_iam_allow_and_custom(self):
 ## fails
         resourcePolicy = {
-            'IamAllowList': [
+            'AwsAccountWhitelist': [
                 '123456'
             ],
             'CustomStatements': [{

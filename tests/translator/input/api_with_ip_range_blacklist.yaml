@@ -2,7 +2,8 @@ Globals:
   Api:
     Auth:
       ResourcePolicy:
-        SourceVpcDenyList: ['vpce-3456']
+        IpRangeBlacklist: ['1.2.3.4']
+        AwsAccountWhitelist: ['12345']
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -23,4 +24,3 @@ Resources:
           Properties:
             Method: Put
             Path: /get
-        

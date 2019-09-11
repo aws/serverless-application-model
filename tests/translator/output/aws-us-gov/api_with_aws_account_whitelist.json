@@ -22,42 +22,21 @@
         ]
       }
     }, 
-    "ServerlessRestApiDeployment829e07383e": {
+    "ServerlessRestApiDeployment78191f4f14": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 829e07383e1a1c0c161c27d399dcd32537399916", 
+        "Description": "RestApi deployment id: 78191f4f140a169230aeaf878f73630f2588ae6b", 
         "StageName": "Stage"
-      }
-    }, 
-    "MyFunctionApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
       }
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment829e07383e"
+          "Ref": "ServerlessRestApiDeployment78191f4f14"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -124,14 +103,20 @@
                     "Fn::Sub": [
                       "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "*", 
+                        "__ApiId__": {
+                          "Ref": "ServerlessRestApi"
+                        }
                       }
                     ]
                   }
                 ], 
                 "Effect": "Allow", 
-                "Principal": "*"
+                "Principal": {
+                  "AWS": [
+                    "12345"
+                  ]
+                }
               }, 
               {
                 "Action": "execute-api:Invoke", 
@@ -140,19 +125,20 @@
                     "Fn::Sub": [
                       "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "*", 
+                        "__ApiId__": {
+                          "Ref": "ServerlessRestApi"
+                        }
                       }
                     ]
                   }
                 ], 
                 "Effect": "Deny", 
-                "Condition": {
-                  "StringEquals": {
-                    "aws:SourceVpce": "vpce-3456"
-                  }
-                }, 
-                "Principal": "*"
+                "Principal": {
+                  "AWS": [
+                    "67890"
+                  ]
+                }
               }
             ]
           }
@@ -179,7 +165,7 @@
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*", 
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }

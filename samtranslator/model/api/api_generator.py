@@ -1,6 +1,5 @@
 from collections import namedtuple
 from six import string_types
-import re
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage, ApiGatewayAuthorizer,

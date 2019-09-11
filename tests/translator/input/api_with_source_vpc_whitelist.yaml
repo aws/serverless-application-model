@@ -2,8 +2,8 @@ Globals:
   Api:
     Auth:
       ResourcePolicy:
-        SourceVpcAllowList: ['vpc-1234']
-        SourceVpcDenyList: ['vpce-5678']
+        SourceVpcWhitelist: ['vpc-1234']
+        SourceVpcBlacklist: ['vpce-5678']
 
 Resources:
   MyFunction:

@@ -47,25 +47,14 @@
         }
       }
     }, 
-    "ImplicitApiFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
+    "ExplicitApiDeploymentb7f6356895": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "ImplicitApiFunction"
+        "RestApiId": {
+          "Ref": "ExplicitApi"
         }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ExplicitApi"
-              }
-            }
-          ]
-        }
+        "Description": "RestApi deployment id: b7f6356895d0e80d14740194d5c15ab01639af7d", 
+        "StageName": "Stage"
       }
     }, 
     "ImplicitApiFunctionGetHtmlPermissionProd": {
@@ -80,7 +69,7 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*", 
               "__ApiId__": {
                 "Ref": "ExplicitApi"
               }
@@ -146,16 +135,6 @@
           "Ref": "ExplicitApi"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "ExplicitApiDeploymentb7f6356895": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: b7f6356895d0e80d14740194d5c15ab01639af7d", 
-        "StageName": "Stage"
       }
     }
   }
