@@ -1800,8 +1800,7 @@
       "Description": "Gives permissions to execute Athena queries",
       "Parameters": {
         "WorkGroupName": {
-          "Description": "Name of the Athena Workgroup",
-	  "Default": "primary"
+          "Description": "Name of the Athena Workgroup"
         }
       },
       "Definition": {
@@ -1817,7 +1816,7 @@
             ],
             "Resource": {
               "Fn::Sub": [
-                "arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:${workgroupName}",
+                "arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${workgroupName}",
                 {
                   "workgroupName": {
                     "Ref": "WorkGroupName"
