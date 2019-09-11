@@ -1,6 +1,6 @@
 {
   "Resources": {
-    "ImplicitApiFunction": {
+    "ExplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
         "Handler": "index.gethtml", 
@@ -10,7 +10,7 @@
         }, 
         "Role": {
           "Fn::GetAtt": [
-            "ImplicitApiFunctionRole", 
+            "ExplicitApiFunctionRole", 
             "Arn"
           ]
         }, 
@@ -23,7 +23,19 @@
         ]
       }
     }, 
-    "ImplicitApiFunctionRole": {
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment1841dcfb96"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
@@ -47,13 +59,13 @@
         }
       }
     }, 
-    "ImplicitApiFunctionGetHtmlPermissionProd": {
+    "ExplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "ImplicitApiFunction"
+          "Ref": "ExplicitApiFunction"
         }, 
         "SourceArn": {
           "Fn::Sub": [
@@ -68,13 +80,13 @@
         }
       }
     }, 
-    "ExplicitApiDeployment7f003b4fdb": {
+    "ExplicitApiDeployment1841dcfb96": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 7f003b4fdb908a43647da326ce4d85a72c1c18d9", 
+        "Description": "RestApi deployment id: 1841dcfb96dea59305633d78a77e81b1a537dced", 
         "StageName": "Stage"
       }
     }, 
@@ -102,10 +114,56 @@
               }
             }
           }, 
-          "swagger": "2.0", 
+          "swagger": 2.0, 
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
             "Statement": [
+              {
+                "Action": "sts:AssumeRole", 
+                "Effect": "Allow", 
+                "Principal": {
+                  "Service": "lambda.amazonaws.com"
+                }
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ExplicitApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Allow", 
+                "Principal": "*"
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ExplicitApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Deny", 
+                "Condition": {
+                  "NotIpAddress": {
+                    "aws:SourceIp": [
+                      "1.2.3.4"
+                    ]
+                  }
+                }, 
+                "Principal": "*"
+              }, 
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [
@@ -121,18 +179,6 @@
             ]
           }
         }
-      }
-    }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment7f003b4fdb"
-        }, 
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "StageName": "Prod"
       }
     }
   }

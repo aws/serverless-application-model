@@ -1,6 +1,6 @@
 {
   "Resources": {
-    "ImplicitApiFunction": {
+    "ExplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
         "Handler": "index.gethtml", 
@@ -10,7 +10,7 @@
         }, 
         "Role": {
           "Fn::GetAtt": [
-            "ImplicitApiFunctionRole", 
+            "ExplicitApiFunctionRole", 
             "Arn"
           ]
         }, 
@@ -23,49 +23,14 @@
         ]
       }
     }, 
-    "ImplicitApiFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+    "ExplicitApiDeployment05ad8508ea": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "ImplicitApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "ImplicitApiFunction"
+        "RestApiId": {
+          "Ref": "ExplicitApi"
         }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ExplicitApi"
-              }
-            }
-          ]
-        }
+        "Description": "RestApi deployment id: 05ad8508ea2fba75e3e1695154b7c3b455c6d5c9", 
+        "StageName": "Stage"
       }
     }, 
     "ExplicitApi": {
@@ -85,7 +50,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -119,7 +84,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment5039851c65"
+          "Ref": "ExplicitApiDeployment05ad8508ea"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -127,14 +92,49 @@
         "StageName": "Prod"
       }
     }, 
-    "ExplicitApiDeployment5039851c65": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ExplicitApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApiFunctionGetHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
         }, 
-        "Description": "RestApi deployment id: 5039851c65a79cf1c3f802939216adde601a8dd7", 
-        "StageName": "Stage"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
       }
     }
   }

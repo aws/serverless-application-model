@@ -7,12 +7,13 @@ Globals:
             Resource: ['execute-api:/*/*/*']
           },
           {
-            Action: 'execute-api:blah', 
+            Action: 'execute-api:blah',
             Resource: ['execute-api:/*/*/*']
-          }]
-
+          }
+        ]
+        IpRangeWhitelist: [ '1.2.3.4' ]
 Resources:
-  ImplicitApiFunction:
+  ExplicitApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
@@ -31,3 +32,24 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          version: '1.0'
+          title: !Ref AWS::StackName
+        paths:
+          "/":
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations
+              responses: {}
+        x-amazon-apigateway-policy:
+          Version: '2012-10-17'
+          Statement:
+            Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal: 
+              Service: 'lambda.amazonaws.com'
+

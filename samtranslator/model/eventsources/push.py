@@ -449,6 +449,7 @@ class Api(PushEventSource):
 
             # Api Event sources must "always" be paired with a Serverless::Api
             'RestApiId': PropertyType(True, is_str()),
+            'Stage': PropertyType(False, is_str()),
             'Auth': PropertyType(False, is_type(dict)),
             'RequestModel': PropertyType(False, is_type(dict)),
             'RequestParameters': PropertyType(False, is_type(list))
@@ -541,6 +542,7 @@ class Api(PushEventSource):
         suffix = "Prod"
         if 'explicit_api_stage' in resources_to_link:
             suffix = resources_to_link['explicit_api_stage']['suffix']
+        self.Stage = suffix
 
         permissions.append(self._get_permission(resources_to_link, permitted_stage, suffix))
         return permissions
@@ -644,7 +646,7 @@ class Api(PushEventSource):
                 the resource policy on all stages of the API
                 """
                 editor.add_resource_policy(resource_policy=resource_policy,
-                                           path=self.Path, api_id=self.RestApiId, stage='*')
+                                           path=self.Path, api_id=self.RestApiId, stage=self.Stage)
 
         if self.RequestModel:
             method_model = self.RequestModel.get('Model')

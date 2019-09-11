@@ -846,12 +846,18 @@ class SwaggerEditor(object):
         """
         This method generates a policy statement to grant/deny specific IAM users access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
+        :raises ValueError: If the effect passed in does not match the allowed values.
         """
         if not policy_list:
             return
 
         if effect not in ["Allow", "Deny"]:
-            return
+            raise ValueError('Effect must be one of {}'.format(['Allow', 'Deny']))
+
+        if not isinstance(policy_list, (dict, list)):
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Type of '{}' must be a list or dictionary"
+                                          .format(policy_list))])
 
         if not isinstance(policy_list, list):
             policy_list = [policy_list]
@@ -900,6 +906,7 @@ class SwaggerEditor(object):
         """
         This method generates a policy statement to grant/deny specific IP address ranges access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
+        :raises ValueError: If the conditional passed in does not match the allowed values.
         """
         if not ip_list:
             return
@@ -908,7 +915,7 @@ class SwaggerEditor(object):
             ip_list = [ip_list]
 
         if conditional not in ["IpAddress", "NotIpAddress"]:
-            return
+            raise ValueError('Conditional must be one of {}'.format(["IpAddress", "NotIpAddress"]))
 
         self.resource_policy['Version'] = '2012-10-17'
         allow_statement = {}
@@ -940,12 +947,13 @@ class SwaggerEditor(object):
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
+        :raises ValueError: If the conditional passed in does not match the allowed values.
         """
         if not vpc:
             return
 
         if conditional not in ["StringNotEquals", "StringEquals"]:
-            return
+            raise ValueError('Conditional must be one of {}'.format(["StringNotEquals", "StringEquals"]))
 
         vpce_regex = r"^vpce-"
         if not re.match(vpce_regex, vpc):

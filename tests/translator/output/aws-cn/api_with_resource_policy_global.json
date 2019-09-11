@@ -1,6 +1,6 @@
 {
   "Resources": {
-    "ImplicitApiFunction": {
+    "ExplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
         "Handler": "index.gethtml", 
@@ -10,7 +10,7 @@
         }, 
         "Role": {
           "Fn::GetAtt": [
-            "ImplicitApiFunctionRole", 
+            "ExplicitApiFunctionRole", 
             "Arn"
           ]
         }, 
@@ -23,7 +23,19 @@
         ]
       }
     }, 
-    "ImplicitApiFunctionRole": {
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment1007035b03"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
@@ -47,23 +59,13 @@
         }
       }
     }, 
-    "ExplicitApiDeploymenta3b7be9c95": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: a3b7be9c95c8a9edb454b44047d4e6aa0a13d4e9", 
-        "StageName": "Stage"
-      }
-    }, 
-    "ImplicitApiFunctionGetHtmlPermissionProd": {
+    "ExplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
-          "Ref": "ImplicitApiFunction"
+          "Ref": "ExplicitApiFunction"
         }, 
         "SourceArn": {
           "Fn::Sub": [
@@ -95,17 +97,63 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
               }
             }
           }, 
-          "swagger": "2.0", 
+          "swagger": 2.0, 
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
             "Statement": [
+              {
+                "Action": "sts:AssumeRole", 
+                "Effect": "Allow", 
+                "Principal": {
+                  "Service": "lambda.amazonaws.com"
+                }
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ExplicitApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Allow", 
+                "Principal": "*"
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      {
+                        "__Stage__": "Prod", 
+                        "__ApiId__": "ExplicitApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Deny", 
+                "Condition": {
+                  "NotIpAddress": {
+                    "aws:SourceIp": [
+                      "1.2.3.4"
+                    ]
+                  }
+                }, 
+                "Principal": "*"
+              }, 
               {
                 "Action": "execute-api:Invoke", 
                 "Resource": [
@@ -131,16 +179,14 @@
         }
       }
     }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ExplicitApiDeployment1007035b03": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeploymenta3b7be9c95"
-        }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "StageName": "Prod"
+        "Description": "RestApi deployment id: 1007035b036e9a089f7d56697b684ce119fff0cf", 
+        "StageName": "Stage"
       }
     }
   }
