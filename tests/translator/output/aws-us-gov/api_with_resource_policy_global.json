@@ -1,13 +1,54 @@
 {
+  "Parameters": {
+    "StageName": {
+      "Default": "MyOwnStage", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
-    "ExplicitApiDeployment29206c63f6": {
+    "ExplicitApiDeployment81b55110cd": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 29206c63f67ee052f71b92163c9c2be0e48498f0", 
+        "Description": "RestApi deployment id: 81b55110cd180d9befc82fb98c8959611ef5976f", 
         "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiFunctionGetHtmlPermissionStage": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApiStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment81b55110cd"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": {
+          "Ref": "StageName"
+        }
       }
     }, 
     "ExplicitApiFunction": {
@@ -31,18 +72,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment29206c63f6"
-        }, 
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "StageName": "Prod"
       }
     }, 
     "ExplicitApiFunctionRole": {
@@ -69,27 +98,6 @@
         }
       }
     }, 
-    "ExplicitApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "ExplicitApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ExplicitApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -107,7 +115,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -132,7 +140,9 @@
                     "Fn::Sub": [
                       "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
                       {
-                        "__Stage__": "Prod", 
+                        "__Stage__": {
+                          "Ref": "StageName"
+                        }, 
                         "__ApiId__": "ExplicitApi"
                       }
                     ]
@@ -148,7 +158,9 @@
                     "Fn::Sub": [
                       "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
                       {
-                        "__Stage__": "Prod", 
+                        "__Stage__": {
+                          "Ref": "StageName"
+                        }, 
                         "__ApiId__": "ExplicitApi"
                       }
                     ]

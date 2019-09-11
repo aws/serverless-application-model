@@ -1,3 +1,7 @@
+Parameters:
+  StageName:
+    Type: String
+    Default: MyOwnStage
 Globals:
   Api:
     Auth:
@@ -31,7 +35,7 @@ Resources:
   ExplicitApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Prod
+      StageName: !Ref StageName
       DefinitionBody:
         swagger: 2.0
         info:
@@ -43,7 +47,7 @@ Resources:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations
               responses: {}
         x-amazon-apigateway-policy:
           Version: '2012-10-17'

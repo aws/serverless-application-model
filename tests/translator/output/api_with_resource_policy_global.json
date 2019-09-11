@@ -1,5 +1,56 @@
 {
+  "Parameters": {
+    "StageName": {
+      "Default": "MyOwnStage", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
+    "ExplicitApiDeploymenta4feb3869b": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: a4feb3869b7e479e2b721afa915ab7b14833920e", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiFunctionGetHtmlPermissionStage": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApiStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeploymenta4feb3869b"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": {
+          "Ref": "StageName"
+        }
+      }
+    }, 
     "ExplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -21,18 +72,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment1841dcfb96"
-        }, 
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "StageName": "Prod"
       }
     }, 
     "ExplicitApiFunctionRole": {
@@ -59,37 +98,6 @@
         }
       }
     }, 
-    "ExplicitApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "ExplicitApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ExplicitApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "ExplicitApiDeployment1841dcfb96": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: 1841dcfb96dea59305633d78a77e81b1a537dced", 
-        "StageName": "Stage"
-      }
-    }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -107,7 +115,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -132,7 +140,9 @@
                     "Fn::Sub": [
                       "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
                       {
-                        "__Stage__": "Prod", 
+                        "__Stage__": {
+                          "Ref": "StageName"
+                        }, 
                         "__ApiId__": "ExplicitApi"
                       }
                     ]
@@ -148,7 +158,9 @@
                     "Fn::Sub": [
                       "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
                       {
-                        "__Stage__": "Prod", 
+                        "__Stage__": {
+                          "Ref": "StageName"
+                        }, 
                         "__ApiId__": "ExplicitApi"
                       }
                     ]
