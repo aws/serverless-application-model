@@ -4,8 +4,9 @@ import re
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
-from samtranslator.model.intrinsics import make_conditional
+from samtranslator.model.intrinsics import make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.translator.arn_generator import ArnGenerator
 
 
 class SwaggerEditor(object):
@@ -24,6 +25,11 @@ class SwaggerEditor(object):
     _X_APIGW_POLICY = 'x-amazon-apigateway-policy'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
     _CACHE_KEY_PARAMETERS = 'cacheKeyParameters'
+    # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
+    _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
+    _POLICY_TYPE_IAM = "Iam"
+    _POLICY_TYPE_IP = "Ip"
+    _POLICY_TYPE_VPC = "Vpc"
 
     def __init__(self, doc):
         """
@@ -372,9 +378,6 @@ class SwaggerEditor(object):
                         Empty string, otherwise
         """
 
-        # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
-        all_http_methods = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
-
         if not self.has_path(path):
             return ""
 
@@ -383,7 +386,7 @@ class SwaggerEditor(object):
 
         if self._X_ANY_METHOD in methods:
             # API Gateway's ANY method is not a real HTTP method but a wildcard representing all HTTP methods
-            allow_methods = all_http_methods
+            allow_methods = self._ALL_HTTP_METHODS
         else:
             allow_methods = methods
             allow_methods.append("options")  # Always add Options to the CORS methods response
@@ -790,7 +793,7 @@ class SwaggerEditor(object):
 
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy):
+    def add_resource_policy(self, resource_policy, path, api_id, stage):
         """
         Add resource policy definition to Swagger.
 
@@ -800,26 +803,206 @@ class SwaggerEditor(object):
         if resource_policy is None:
             return
 
+        aws_account_whitelist = resource_policy.get('AwsAccountWhitelist')
+        aws_account_blacklist = resource_policy.get('AwsAccountBlacklist')
+        ip_range_whitelist = resource_policy.get('IpRangeWhitelist')
+        ip_range_blacklist = resource_policy.get('IpRangeBlacklist')
+        source_vpc_whitelist = resource_policy.get('SourceVpcWhitelist')
+        source_vpc_blacklist = resource_policy.get('SourceVpcBlacklist')
         custom_statements = resource_policy.get('CustomStatements')
 
+        if aws_account_whitelist is not None:
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            self._add_iam_resource_policy_for_method(aws_account_whitelist, "Allow", resource_list)
+
+        if aws_account_blacklist is not None:
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            self._add_iam_resource_policy_for_method(aws_account_blacklist, "Deny", resource_list)
+
+        if ip_range_whitelist is not None:
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            self._add_ip_resource_policy_for_method(ip_range_whitelist, "NotIpAddress", resource_list)
+
+        if ip_range_blacklist is not None:
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
+
+        if source_vpc_whitelist is not None:
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            for endpoint in source_vpc_whitelist:
+                self._add_vpc_resource_policy_for_method(endpoint, "StringNotEquals", resource_list)
+
+        if source_vpc_blacklist is not None:
+            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            for endpoint in source_vpc_blacklist:
+                self._add_vpc_resource_policy_for_method(endpoint, "StringEquals", resource_list)
+
         if custom_statements is not None:
-            if not isinstance(custom_statements, list):
-                custom_statements = [custom_statements]
+            self._add_custom_statement(custom_statements)
 
-            self.resource_policy['Version'] = '2012-10-17'
-            if self.resource_policy.get('Statement') is None:
-                self.resource_policy['Statement'] = custom_statements
-            else:
-                statement = self.resource_policy['Statement']
-                if isinstance(statement, list):
-                    statement.extend(custom_statements)
-                else:
-                    statement = [statement]
-                    statement.extend(custom_statements)
+        self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
-                self.resource_policy['Statement'] = statement
+    def _add_iam_resource_policy_for_method(self, policy_list, effect, resource_list):
+        """
+        This method generates a policy statement to grant/deny specific IAM users access to the API method and
+        appends it to the swagger under `x-amazon-apigateway-policy`
+        :raises ValueError: If the effect passed in does not match the allowed values.
+        """
+        if not policy_list:
+            return
 
-            self._doc[self._X_APIGW_POLICY] = self.resource_policy
+        if effect not in ["Allow", "Deny"]:
+            raise ValueError('Effect must be one of {}'.format(['Allow', 'Deny']))
+
+        if not isinstance(policy_list, (dict, list)):
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Type of '{}' must be a list or dictionary"
+                                          .format(policy_list))])
+
+        if not isinstance(policy_list, list):
+            policy_list = [policy_list]
+
+        self.resource_policy['Version'] = '2012-10-17'
+        policy_statement = {}
+        policy_statement['Effect'] = effect
+        policy_statement['Action'] = "execute-api:Invoke"
+        policy_statement['Resource'] = resource_list
+        policy_statement['Principal'] = {"AWS": policy_list}
+
+        if self.resource_policy.get('Statement') is None:
+            self.resource_policy['Statement'] = policy_statement
+        else:
+            statement = self.resource_policy['Statement']
+            if not isinstance(statement, list):
+                statement = [statement]
+            statement.extend([policy_statement])
+            self.resource_policy['Statement'] = statement
+
+    def _get_method_path_uri_list(self, path, api_id, stage):
+        """
+        It turns out that APIGW doesn't like trailing slashes in paths (#665)
+        and removes as a part of their behavior, but this isn't documented.
+        The regex removes the trailing slash to ensure the permission works as intended
+        """
+        methods = list(self.get_path(path).keys())
+
+        uri_list = []
+        path = SwaggerEditor.get_path_without_trailing_slash(path)
+
+        for m in methods:
+            method = '*' if (m.lower() == self._X_ANY_METHOD or m.lower() == 'any') else m.upper()
+
+            # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
+            resource = '${__ApiId__}/' + '${__Stage__}/' + method + path
+            partition = ArnGenerator.get_partition_name(None)
+            if partition is None:
+                partition = "aws"
+            source_arn = fnSub(ArnGenerator.generate_arn(partition=partition, service='execute-api', resource=resource),
+                               {"__ApiId__": api_id, "__Stage__": stage})
+            uri_list.extend([source_arn])
+        return uri_list
+
+    def _add_ip_resource_policy_for_method(self, ip_list, conditional, resource_list):
+        """
+        This method generates a policy statement to grant/deny specific IP address ranges access to the API method and
+        appends it to the swagger under `x-amazon-apigateway-policy`
+        :raises ValueError: If the conditional passed in does not match the allowed values.
+        """
+        if not ip_list:
+            return
+
+        if not isinstance(ip_list, list):
+            ip_list = [ip_list]
+
+        if conditional not in ["IpAddress", "NotIpAddress"]:
+            raise ValueError('Conditional must be one of {}'.format(["IpAddress", "NotIpAddress"]))
+
+        self.resource_policy['Version'] = '2012-10-17'
+        allow_statement = {}
+        allow_statement['Effect'] = "Allow"
+        allow_statement['Action'] = "execute-api:Invoke"
+        allow_statement['Resource'] = resource_list
+        allow_statement['Principal'] = "*"
+
+        deny_statement = {}
+        deny_statement['Effect'] = "Deny"
+        deny_statement['Action'] = "execute-api:Invoke"
+        deny_statement['Resource'] = resource_list
+        deny_statement['Principal'] = "*"
+        deny_statement['Condition'] = {conditional: {"aws:SourceIp": ip_list}}
+
+        if self.resource_policy.get('Statement') is None:
+            self.resource_policy['Statement'] = [allow_statement, deny_statement]
+        else:
+            statement = self.resource_policy['Statement']
+            if not isinstance(statement, list):
+                statement = [statement]
+            if allow_statement not in statement:
+                statement.extend([allow_statement])
+            if deny_statement not in statement:
+                statement.extend([deny_statement])
+            self.resource_policy['Statement'] = statement
+
+    def _add_vpc_resource_policy_for_method(self, vpc, conditional, resource_list):
+        """
+        This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
+        appends it to the swagger under `x-amazon-apigateway-policy`
+        :raises ValueError: If the conditional passed in does not match the allowed values.
+        """
+        if not vpc:
+            return
+
+        if conditional not in ["StringNotEquals", "StringEquals"]:
+            raise ValueError('Conditional must be one of {}'.format(["StringNotEquals", "StringEquals"]))
+
+        vpce_regex = r"^vpce-"
+        if not re.match(vpce_regex, vpc):
+            endpoint = "aws:SourceVpc"
+        else:
+            endpoint = "aws:SourceVpce"
+
+        self.resource_policy['Version'] = '2012-10-17'
+        allow_statement = {}
+        allow_statement['Effect'] = "Allow"
+        allow_statement['Action'] = "execute-api:Invoke"
+        allow_statement['Resource'] = resource_list
+        allow_statement['Principal'] = "*"
+
+        deny_statement = {}
+        deny_statement['Effect'] = "Deny"
+        deny_statement['Action'] = "execute-api:Invoke"
+        deny_statement['Resource'] = resource_list
+        deny_statement['Principal'] = "*"
+        deny_statement['Condition'] = {conditional: {endpoint: vpc}}
+
+        if self.resource_policy.get('Statement') is None:
+            self.resource_policy['Statement'] = [allow_statement, deny_statement]
+        else:
+            statement = self.resource_policy['Statement']
+            if not isinstance(statement, list):
+                statement = [statement]
+            if allow_statement not in statement:
+                statement.extend([allow_statement])
+            if deny_statement not in statement:
+                statement.extend([deny_statement])
+            self.resource_policy['Statement'] = statement
+
+    def _add_custom_statement(self, custom_statements):
+        if custom_statements is None:
+            return
+
+        if not isinstance(custom_statements, list):
+            custom_statements = [custom_statements]
+
+        self.resource_policy['Version'] = '2012-10-17'
+        if self.resource_policy.get('Statement') is None:
+            self.resource_policy['Statement'] = custom_statements
+        else:
+            statement = self.resource_policy['Statement']
+            if not isinstance(statement, list):
+                statement = [statement]
+            statement.extend(custom_statements)
+            self.resource_policy['Statement'] = statement
 
     def add_request_parameters_to_method(self, path, method_name, request_parameters):
         """
@@ -955,3 +1138,7 @@ class SwaggerEditor(object):
     @staticmethod
     def safe_compare_regex_with_string(regex, data):
         return re.match(regex, str(data)) is not None
+
+    @staticmethod
+    def get_path_without_trailing_slash(path):
+        return re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
