@@ -1,0 +1,28 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Auth:
+              ResourcePolicy:
+                AwsAccountWhitelist: [
+                  "12345"
+                ]
+                AwsAccountBlacklist: [
+                  "67890"
+                ]
+            Method: Put
+            Path: /get

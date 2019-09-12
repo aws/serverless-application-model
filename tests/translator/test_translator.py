@@ -189,9 +189,6 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_xray_tracing',
         'api_request_model',
         'api_with_stage_tags',
-        'api_with_resource_policy',
-        'api_with_resource_policy_global',
-        'api_with_resource_policy_global_implicit',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -358,6 +355,58 @@ class TestTranslatorEndToEnd(TestCase):
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
 
+        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+
+    @parameterized.expand(
+      itertools.product([
+        'api_with_aws_account_whitelist',
+        'api_with_aws_account_blacklist',
+        'api_with_ip_range_whitelist',
+        'api_with_ip_range_blacklist',
+        'api_with_source_vpc_whitelist',
+        'api_with_source_vpc_blacklist',
+        'api_with_resource_policy',
+        'api_with_resource_policy_global',
+        'api_with_resource_policy_global_implicit'
+      ],
+      [
+        ("aws", "ap-southeast-1"),
+        ("aws-cn", "cn-north-1"),
+        ("aws-us-gov", "us-gov-west-1")
+      ] # Run all the above tests against each of the list of partitions to test against
+      )
+    )
+    @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    def test_transform_success_resource_policy(self, testcase, partition_with_region):
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
+        manifest = json.loads(json.dumps(manifest))
+        partition_folder = partition if partition != "aws" else ""
+        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json')
+        expected = json.load(open(expected_filepath, 'r'))
+
+        with patch('boto3.session.Session.region_name', region):
+            parameter_values = get_template_parameter_values()
+            mock_policy_loader = MagicMock()
+            mock_policy_loader.load.return_value = {
+                'AWSLambdaBasicExecutionRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'.format(partition),
+                'AmazonDynamoDBFullAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess'.format(partition),
+                'AmazonDynamoDBReadOnlyAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess'.format(partition),
+                'AWSLambdaRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaRole'.format(partition),
+            }
+
+            output_fragment = transform(
+                manifest, parameter_values, mock_policy_loader)
+        print(json.dumps(output_fragment, indent=2))
+
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info.major >= 3:
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
         assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
 
     def _update_logical_id_hash(self, resources):
