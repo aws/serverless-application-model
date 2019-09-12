@@ -641,10 +641,6 @@ class Api(PushEventSource):
 
             if self.Auth.get('ResourcePolicy'):
                 resource_policy = self.Auth.get('ResourcePolicy')
-                """
-                At this point the stage name resolution hasnt occured yet so we are going to apply
-                the resource policy on all stages of the API
-                """
                 editor.add_resource_policy(resource_policy=resource_policy,
                                            path=self.Path, api_id=self.RestApiId, stage=self.Stage)
 
