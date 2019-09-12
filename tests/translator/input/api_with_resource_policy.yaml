@@ -1,5 +1,5 @@
 Resources:
- ExplicitApi:
+  ExplicitApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
@@ -9,4 +9,19 @@ Resources:
               Action: 'execute-api:Invoke', 
               Resource: ['execute-api:/*/*/*']
             }
+  ExplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /
+            Method: get
+
       

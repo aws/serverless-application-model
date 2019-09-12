@@ -217,7 +217,6 @@ class ApiGenerator(object):
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
-
         rest_api = self._construct_rest_api()
         deployment = self._construct_deployment(rest_api)
 
@@ -331,7 +330,9 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)
 
         if auth_properties.ResourcePolicy:
-            swagger_editor.add_resource_policy(auth_properties.ResourcePolicy)
+            for path in swagger_editor.iter_on_path():
+                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path,
+                                                   self.logical_id, self.stage_name)
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 

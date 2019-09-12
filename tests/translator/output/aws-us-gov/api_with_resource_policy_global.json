@@ -1,25 +1,101 @@
 {
+  "Parameters": {
+    "StageName": {
+      "Default": "MyOwnStage", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment8d22456d58"
-        }, 
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
-    "ExplicitApiDeployment8d22456d58": {
+    "ExplicitApiDeployment81b55110cd": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 8d22456d5883ad51c72f5d9be988d14f0a41182e", 
+        "Description": "RestApi deployment id: 81b55110cd180d9befc82fb98c8959611ef5976f", 
         "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiFunctionGetHtmlPermissionStage": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApiStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment81b55110cd"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": {
+          "Ref": "StageName"
+        }
+      }
+    }, 
+    "ExplicitApiFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ExplicitApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs4.3", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ExplicitApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
       }
     }, 
     "ExplicitApi": {
@@ -32,8 +108,21 @@
               "Ref": "AWS::StackName"
             }
           }, 
-          "paths": {}, 
-          "swagger": "2.0", 
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
+          "swagger": 2.0, 
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
             "Statement": [
@@ -43,6 +132,49 @@
                 "Principal": {
                   "Service": "lambda.amazonaws.com"
                 }
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      {
+                        "__Stage__": {
+                          "Ref": "StageName"
+                        }, 
+                        "__ApiId__": "ExplicitApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Allow", 
+                "Principal": "*"
+              }, 
+              {
+                "Action": "execute-api:Invoke", 
+                "Resource": [
+                  {
+                    "Fn::Sub": [
+                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      {
+                        "__Stage__": {
+                          "Ref": "StageName"
+                        }, 
+                        "__ApiId__": "ExplicitApi"
+                      }
+                    ]
+                  }
+                ], 
+                "Effect": "Deny", 
+                "Condition": {
+                  "NotIpAddress": {
+                    "aws:SourceIp": [
+                      "1.2.3.4"
+                    ]
+                  }
+                }, 
+                "Principal": "*"
               }, 
               {
                 "Action": "execute-api:Invoke", 

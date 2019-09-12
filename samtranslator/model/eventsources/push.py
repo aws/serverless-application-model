@@ -449,6 +449,7 @@ class Api(PushEventSource):
 
             # Api Event sources must "always" be paired with a Serverless::Api
             'RestApiId': PropertyType(True, is_str()),
+            'Stage': PropertyType(False, is_str()),
             'Auth': PropertyType(False, is_type(dict)),
             'RequestModel': PropertyType(False, is_type(dict)),
             'RequestParameters': PropertyType(False, is_type(list))
@@ -541,6 +542,7 @@ class Api(PushEventSource):
         suffix = "Prod"
         if 'explicit_api_stage' in resources_to_link:
             suffix = resources_to_link['explicit_api_stage']['suffix']
+        self.Stage = suffix
 
         permissions.append(self._get_permission(resources_to_link, permitted_stage, suffix))
         return permissions
@@ -554,7 +556,7 @@ class Api(PushEventSource):
         if not stage or not suffix:
             raise RuntimeError("Could not add permission to lambda function.")
 
-        path = re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
+        path = SwaggerEditor.get_path_without_trailing_slash(path)
         method = '*' if self.Method.lower() == 'any' else self.Method.upper()
 
         api_id = self.RestApiId
@@ -636,6 +638,11 @@ class Api(PushEventSource):
 
             if method_authorizer or apikey_required_setting is not None:
                 editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+
+            if self.Auth.get('ResourcePolicy'):
+                resource_policy = self.Auth.get('ResourcePolicy')
+                editor.add_resource_policy(resource_policy=resource_policy,
+                                           path=self.Path, api_id=self.RestApiId, stage=self.Stage)
 
         if self.RequestModel:
             method_model = self.RequestModel.get('Model')
