@@ -1,3 +1,4 @@
+import json
 from re import match
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
@@ -75,7 +76,7 @@ class ApiGatewayDeployment(Resource):
         "deployment_id": lambda self: ref(self.logical_id),
     }
 
-    def make_auto_deployable(self, stage, openapi_version=None, swagger=None):
+    def make_auto_deployable(self, stage, openapi_version=None, swagger=None, domain=None):
         """
         Sets up the resource such that it will trigger a re-deployment when Swagger changes
         or the openapi version changes.
@@ -94,6 +95,9 @@ class ApiGatewayDeployment(Resource):
         hash_input = [str(swagger)]
         if openapi_version:
             hash_input.append(str(openapi_version))
+        if domain:
+            hash_input.append(self._X_HASH_DELIMITER)
+            hash_input.append(json.dumps(domain))
 
         data = self._X_HASH_DELIMITER.join(hash_input)
         generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
@@ -152,13 +156,13 @@ class ApiGatewayResponse(object):
         return None if status_code is None else str(status_code)
 
 
-class ApiGatewayDomain(Resource):
+class ApiGatewayDomainName(Resource):
     resource_type = 'AWS::ApiGateway::DomainName'
     property_types = {
             'RegionalCertificateArn': PropertyType(False, is_str()),
             'DomainName': PropertyType(True, is_str()),
             'EndpointConfiguration': PropertyType(False, is_type(dict)),
-            'CertificateArn': PropertyType(False, is_type(dict))
+            'CertificateArn': PropertyType(False, is_str())
     }
 
 

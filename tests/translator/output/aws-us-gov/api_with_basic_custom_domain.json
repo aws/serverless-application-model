@@ -1,0 +1,378 @@
+{
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyFunctionAnotherGetPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/anotherget", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyAnotherApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApiBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "DomainName": "api-example.com", 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }
+    }, 
+    "MyFunctionImplicitGetPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/implicit", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyAnotherApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyAnotherApiDeploymentf2f7085602"
+        }, 
+        "RestApiId": {
+          "Ref": "MyAnotherApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "MyFunctionFetchPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyAnotherApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/anotherget": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.0.1"
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }, 
+    "MyApiDeployment741a18827c": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: 741a18827c1162e2a404218e7fcc64a14c4c4962"
+      }
+    }, 
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/get": {
+              "put": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }, 
+            "/fetch": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.0.1"
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }, 
+    "MyAnotherApiBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "DomainName": "another-example.com", 
+        "RestApiId": {
+          "Ref": "MyAnotherApi"
+        }, 
+        "Stage": {
+          "Ref": "MyAnotherApiProdStage"
+        }
+      }
+    }, 
+    "MyAnotherApiDeploymentf2f7085602": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyAnotherApi"
+        }, 
+        "Description": "RestApi deployment id: f2f7085602d0780fff20b1e48acdee5e50889afc"
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment15c5513463"
+        }, 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ApiGatewayDomainName776aed2979": {
+      "Type": "AWS::ApiGateway::DomainName", 
+      "Properties": {
+        "CertificateArn": "my-api-cert-arn", 
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        }, 
+        "DomainName": "api-example.com"
+      }
+    }, 
+    "ServerlessRestApiDeployment15c5513463": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 15c5513463f336ce7d80f9107134351289f4dc75", 
+        "StageName": "Stage"
+      }
+    }, 
+    "MyApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment741a18827c"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ServerlessRestApiBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "DomainName": "another-example.com", 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Stage": {
+          "Ref": "ServerlessRestApiProdStage"
+        }
+      }
+    }, 
+    "ServerlessRestApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/implicit": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
+          "swagger": "2.0"
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }, 
+    "ApiGatewayDomainName7a5525b8a3": {
+      "Type": "AWS::ApiGateway::DomainName", 
+      "Properties": {
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "RegionalCertificateArn": "another-api-arn", 
+        "DomainName": "another-example.com"
+      }
+    }, 
+    "MyFunctionApiPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApi"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

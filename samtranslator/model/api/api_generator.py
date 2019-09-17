@@ -3,7 +3,7 @@ from six import string_types
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage, ApiGatewayAuthorizer,
-                                            ApiGatewayResponse, ApiGatewayDomain,
+                                            ApiGatewayResponse, ApiGatewayDomainName,
                                             ApiGatewayBasePathMapping)
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
@@ -14,6 +14,7 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge",
@@ -206,7 +207,7 @@ class ApiGenerator(object):
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger)
+            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger, self.domain)
 
         if self.tags is not None:
             stage.Tags = get_tag_list(self.tags)
@@ -222,10 +223,17 @@ class ApiGenerator(object):
            self.domain.get('CertificateArn') is None:
             return None, None
 
-        domain = ApiGatewayDomain(self.logical_id + 'Domain',
+        # We are trying to resolve the intrinsics if present before caluclating the logical_id of the Domain resource
+        # Since this resource must be shared among APIs that use the same domain name, we want to generate the logical
+        # id based on the domain dict. 
+        intrinsic_resolver = IntrinsicsResolver(self.domain)
+        prefix = intrinsic_resolver.resolve_parameter_refs(self.domain)
+
+        logical_id = logical_id_generator.LogicalIdGenerator("", self.domain).gen()
+
+        domain = ApiGatewayDomainName('ApiGatewayDomainName' + logical_id,
                                   attributes=self.passthrough_resource_attributes)
         domain.DomainName = self.domain.get('DomainName')
-
         endpoint = self.domain.get('EndpointConfiguration')
 
         if endpoint is None or endpoint not in ['EDGE', 'REGIONAL']:
@@ -236,7 +244,7 @@ class ApiGenerator(object):
         else:
             domain.CertificateArn = self.domain.get('CertificateArn')
 
-        domain.EndpointConfiguration = {"Types": endpoint}
+        domain.EndpointConfiguration = {"Types": [endpoint]}
         basepath_mapping = ApiGatewayBasePathMapping(self.logical_id + 'BasePathMapping',
                                                      attributes=self.passthrough_resource_attributes)
         basepath_mapping.DomainName = self.domain.get('DomainName')
