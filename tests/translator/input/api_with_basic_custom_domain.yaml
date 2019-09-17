@@ -1,8 +1,17 @@
+Parameters:
+  MyDomainName: 
+    Type: String
+    Default: another-example.com
+
+  MyDomainCert: 
+    Type: String
+    Default: another-api-arn
+
 Globals:
   Api:
     Domain:
-      DomainName: 'another-example.com'
-      CertificateArn: 'another-api-arn'
+      DomainName: !Ref MyDomainName
+      CertificateArn: !Ref MyDomainCert
 
 Resources:
   MyFunction:

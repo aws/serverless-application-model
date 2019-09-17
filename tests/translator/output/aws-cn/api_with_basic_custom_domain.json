@@ -1,4 +1,14 @@
 {
+  "Parameters": {
+    "MyDomainName": {
+      "Default": "changethistosomethingelse.com", 
+      "Type": "String"
+    }, 
+    "MyDomainCert": {
+      "Default": "another-api-arn", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -55,16 +65,20 @@
         }
       }
     }, 
-    "MyApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ApiGatewayDomainName173069e4f1": {
+      "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiDeployment89cd000cbd"
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
         }, 
-        "RestApiId": {
-          "Ref": "MyApi"
+        "RegionalCertificateArn": {
+          "Ref": "MyDomainCert"
         }, 
-        "StageName": "Prod"
+        "DomainName": {
+          "Ref": "MyDomainName"
+        }
       }
     }, 
     "MyFunctionImplicitGetPermissionProd": {
@@ -92,22 +106,12 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyAnotherApiDeployment2c72539fd9"
+          "Ref": "MyAnotherApiDeployment2413525d13"
         }, 
         "RestApiId": {
           "Ref": "MyAnotherApi"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiDeploymentd099245fb5": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: d099245fb560a6117ebb37d418da8821c19f1eac", 
-        "StageName": "Stage"
       }
     }, 
     "MyFunctionFetchPermissionProd": {
@@ -191,6 +195,16 @@
         }
       }
     }, 
+    "ServerlessRestApiDeployment270fa2bc5f": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 270fa2bc5f6c52b746b70a78543587be3a667235", 
+        "StageName": "Stage"
+      }
+    }, 
     "MyApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -242,7 +256,9 @@
     "MyAnotherApiBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
-        "DomainName": "another-example.com", 
+        "DomainName": {
+          "Ref": "MyDomainName"
+        }, 
         "RestApiId": {
           "Ref": "MyAnotherApi"
         }, 
@@ -251,23 +267,11 @@
         }
       }
     }, 
-    "ApiGatewayDomainName7a5525b8a3": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "RegionalCertificateArn": "another-api-arn", 
-        "DomainName": "another-example.com"
-      }
-    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentd099245fb5"
+          "Ref": "ServerlessRestApiDeployment270fa2bc5f"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -290,7 +294,9 @@
     "ServerlessRestApiBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
-        "DomainName": "another-example.com", 
+        "DomainName": {
+          "Ref": "MyDomainName"
+        }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
@@ -306,6 +312,15 @@
           "Ref": "MyApi"
         }, 
         "Description": "RestApi deployment id: 89cd000cbddb1c29971deeacaae04e90ea1e119d"
+      }
+    }, 
+    "MyAnotherApiDeployment2413525d13": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyAnotherApi"
+        }, 
+        "Description": "RestApi deployment id: 2413525d13b0589eeee6bd9e11e846a5ba674449"
       }
     }, 
     "ServerlessRestApi": {
@@ -344,13 +359,16 @@
         }
       }
     }, 
-    "MyAnotherApiDeployment2c72539fd9": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyAnotherApi"
+        "DeploymentId": {
+          "Ref": "MyApiDeployment89cd000cbd"
         }, 
-        "Description": "RestApi deployment id: 2c72539fd9adc5fd0c09978483c04d77bcf938d7"
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "StageName": "Prod"
       }
     }, 
     "MyFunctionApiPermissionProd": {
