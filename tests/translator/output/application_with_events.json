@@ -1,0 +1,71 @@
+{
+    "Resources": {
+      "Images": {
+        "Type": "AWS::S3::Bucket",
+        "DependsOn": [
+          "BasicApplicationFunctionInsideApplicationPermission"
+        ],
+        "Properties": {
+          "NotificationConfiguration": {
+            "LambdaConfigurations": [
+              {
+                "Function": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:"
+                      },
+                      {
+                        "Fn::GetAtt": [
+                          "BasicApplication",
+                          "Outputs.FunctionInsideApplication"
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                "Event": "s3:ObjectCreated:*"
+              }
+            ]
+          }
+        }
+      },
+      "BasicApplication": {
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+          "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
+          "Tags": [
+            {
+              "Key": "lambda:createdBy",
+              "Value": "SAM"
+            },
+            {
+              "Key": "serverlessrepo:applicationId",
+              "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world"
+            },
+            {
+              "Key": "serverlessrepo:semanticVersion",
+              "Value": "1.0.2"
+            }
+          ]
+        }
+      },
+      "BasicApplicationFunctionInsideApplicationPermission": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "FunctionName": {
+            "Fn::GetAtt": [
+              "BasicApplication",
+              "Outputs.FunctionInsideApplication"
+            ]
+          },
+          "Principal": "s3.amazonaws.com",
+          "SourceAccount": {
+            "Ref": "AWS::AccountId"
+          }
+        }
+      }
+    }
+  }
