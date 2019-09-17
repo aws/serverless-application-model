@@ -1,5 +1,4 @@
 from re import match
-
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import is_type, one_of, is_str, list_of
@@ -151,6 +150,26 @@ class ApiGatewayResponse(object):
 
     def _status_code_string(self, status_code):
         return None if status_code is None else str(status_code)
+
+
+class ApiGatewayDomain(Resource):
+    resource_type = 'AWS::ApiGateway::DomainName'
+    property_types = {
+            'RegionalCertificateArn': PropertyType(False, is_str()),
+            'DomainName': PropertyType(True, is_str()),
+            'EndpointConfiguration': PropertyType(False, is_type(dict)),
+            'CertificateArn': PropertyType(False, is_type(dict))
+    }
+
+
+class ApiGatewayBasePathMapping(Resource):
+    resource_type = 'AWS::ApiGateway::BasePathMapping'
+    property_types = {
+        'BasePath': PropertyType(False, is_str()),
+        'DomainName': PropertyType(True, is_str()),
+        'RestApiId': PropertyType(False, is_str()),
+        'Stage': PropertyType(False, is_str())
+    }
 
 
 class ApiGatewayAuthorizer(object):
