@@ -14,7 +14,6 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple("_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge",
@@ -223,16 +222,10 @@ class ApiGenerator(object):
            self.domain.get('CertificateArn') is None:
             return None, None
 
-        # We are trying to resolve the intrinsics if present before caluclating the logical_id of the Domain resource
-        # Since this resource must be shared among APIs that use the same domain name, we want to generate the logical
-        # id based on the domain dict. 
-        intrinsic_resolver = IntrinsicsResolver(self.domain)
-        prefix = intrinsic_resolver.resolve_parameter_refs(self.domain)
-
         logical_id = logical_id_generator.LogicalIdGenerator("", self.domain).gen()
 
         domain = ApiGatewayDomainName('ApiGatewayDomainName' + logical_id,
-                                  attributes=self.passthrough_resource_attributes)
+                                      attributes=self.passthrough_resource_attributes)
         domain.DomainName = self.domain.get('DomainName')
         endpoint = self.domain.get('EndpointConfiguration')
 

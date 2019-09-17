@@ -314,7 +314,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_openapi_definition_body_no_flag',
         'api_request_model_openapi_3',
         'api_with_apikey_required_openapi_3',
-        'api_with_basic_custom_domain_regional'
+        'api_with_basic_custom_domain'
       ],
       [
        ("aws", "ap-southeast-1"),

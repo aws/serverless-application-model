@@ -1,7 +1,7 @@
 {
   "Parameters": {
     "MyDomainName": {
-      "Default": "changethistosomethingelse.com", 
+      "Default": "another-example.com", 
       "Type": "String"
     }, 
     "MyDomainCert": {
