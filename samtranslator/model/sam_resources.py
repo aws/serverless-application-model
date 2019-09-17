@@ -22,8 +22,7 @@ from samtranslator.model.lambda_ import (LambdaFunction, LambdaVersion, LambdaAl
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
-
+from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value, fnSub, fnJoin
 
 class SamFunction(SamResourceMacro):
     """SAM function macro.
@@ -449,6 +448,92 @@ class SamFunction(SamResourceMacro):
             lambda_alias.set_resource_attribute("UpdatePolicy",
                                                 deployment_preference_collection.update_policy(
                                                     self.logical_id).to_dict())
+
+
+class SamFunctionReference(SamResourceMacro):
+    """SAM function reference macro.
+    """
+    resource_type = 'AWS::Serverless::FunctionReference'
+    property_types = {
+        'FunctionName': PropertyType(True, one_of(is_str(), is_type(dict))),
+        'Events': PropertyType(False, dict_of(is_str(), is_type(dict))),
+    }
+    event_resolver = ResourceTypeResolver(samtranslator.model.eventsources, samtranslator.model.eventsources.pull,
+                                          samtranslator.model.eventsources.push,
+                                          samtranslator.model.eventsources.cloudwatchlogs)
+
+    runtime_attrs = {
+        "name": lambda self: self.FunctionName,
+        "arn": lambda self: fnJoin('', [fnSub('arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:'), self.FunctionName])
+    }
+
+    def resources_to_link(self, resources):
+        try:
+            return {
+                'event_resources': self._event_resources_to_link(resources)
+            }
+        except InvalidEventException as e:
+            raise InvalidResourceException(self.logical_id, e.message)
+
+    def to_cloudformation(self, **kwargs):
+        """Returns the event resources to which this SAM Function corresponds.
+
+        :param dict kwargs: already-converted resources that may need to be modified when converting this \
+        macro to pure CloudFormation
+        :returns: a list of vanilla CloudFormation Resources, to which this Function expands
+        :rtype: list
+        """
+        resources = []
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        mappings_resolver = kwargs.get("mappings_resolver", None)
+
+        try:
+            resources += self._generate_event_resources(kwargs['event_resources'])
+        except InvalidEventException as e:
+            raise InvalidResourceException(self.logical_id, e.message)
+
+        return resources
+
+    def _event_resources_to_link(self, resources):
+        event_resources = {}
+        if self.Events:
+            for logical_id, event_dict in self.Events.items():
+                try:
+                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        self.logical_id + logical_id, event_dict, logical_id)
+                except (TypeError, AttributeError) as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
+                event_resources[logical_id] = event_source.resources_to_link(resources)
+        return event_resources
+
+    def _generate_event_resources(self, event_resources):
+        """Generates and returns the resources associated with this function's events.
+
+        :param event_resources: All the event sources associated with this Lambda function
+
+        :returns: a list containing the function's event resources
+        :rtype: list
+        """
+        resources = []
+        if self.Events:
+            for logical_id, event_dict in self.Events.items():
+                try:
+                    eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        self.logical_id + logical_id, event_dict, logical_id)
+                except TypeError as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
+
+                kwargs = {
+                    # When Alias is provided, connect all event sources to the alias and *not* the function
+                    'function': self,
+                    'role': '',
+                }
+
+                for name, resource in event_resources[logical_id].items():
+                    kwargs[name] = resource
+                resources += eventsource.to_cloudformation(**kwargs)
+
+        return resources
 
 
 class SamApi(SamResourceMacro):

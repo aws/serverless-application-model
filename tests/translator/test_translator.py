@@ -137,6 +137,7 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        'referencefunction_s3',
         'cognito_userpool_with_event',
         's3_with_condition',
         'function_with_condition',

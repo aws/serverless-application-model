@@ -1,0 +1,57 @@
+{
+  "Resources": {
+    "Images": {
+      "Type": "AWS::S3::Bucket",
+      "DependsOn": [
+        "ThumbnailFunctionImageBucketPermission"
+      ],      
+      "Properties": {
+        "NotificationConfiguration": {
+          "LambdaConfigurations": [
+            {
+              "Function": {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:"
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "FirstPart",
+                          "-LastPart"
+                        ]
+                      ]
+                    }
+                  ]
+                ]
+              },
+              "Event": "s3:ObjectCreated:*"
+            }
+          ]
+        }
+      }
+    },
+    "ThumbnailFunctionImageBucketPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "FunctionName": {
+          "Fn::Join": [
+            "",
+            [
+              "FirstPart",
+              "-LastPart"
+            ]
+          ]
+        },
+        "Principal": "s3.amazonaws.com",
+        "SourceAccount": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    }
+  }
+}
