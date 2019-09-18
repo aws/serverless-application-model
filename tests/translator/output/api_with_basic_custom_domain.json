@@ -53,18 +53,6 @@
         }
       }
     }, 
-    "MyApiBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping", 
-      "Properties": {
-        "DomainName": "api-example.com", 
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
-      }
-    }, 
     "ApiGatewayDomainName173069e4f1": {
       "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
@@ -163,13 +151,29 @@
         }
       }
     }, 
-    "MyApiDeployment8188886fcd": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ApiGatewayDomainName461285836f": {
+      "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
+        "CertificateArn": "my-api-cert-arn", 
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        }, 
+        "DomainName": "api-example.com"
+      }
+    }, 
+    "MyApifetchBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "BasePath": "fetch", 
+        "DomainName": "api-example.com", 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 8188886fcd59941c0634ba12f830ce0db7e11d5c"
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
       }
     }, 
     "MyFunctionRole": {
@@ -193,6 +197,19 @@
               }
             }
           ]
+        }
+      }
+    }, 
+    "MyApigetBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "BasePath": "get", 
+        "DomainName": "api-example.com", 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Stage": {
+          "Ref": "MyApiProdStage"
         }
       }
     }, 
@@ -260,6 +277,15 @@
         "StageName": "Stage"
       }
     }, 
+    "MyApiDeployment345fbac8f2": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: 345fbac8f2a7592c5592018ad06db6de00590d35"
+      }
+    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
@@ -270,18 +296,6 @@
           "Ref": "ServerlessRestApi"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "ApiGatewayDomainName776aed2979": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "CertificateArn": "my-api-cert-arn", 
-        "EndpointConfiguration": {
-          "Types": [
-            "EDGE"
-          ]
-        }, 
-        "DomainName": "api-example.com"
       }
     }, 
     "ServerlessRestApiBasePathMapping": {
@@ -302,7 +316,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment8188886fcd"
+          "Ref": "MyApiDeployment345fbac8f2"
         }, 
         "RestApiId": {
           "Ref": "MyApi"

@@ -238,13 +238,40 @@ class ApiGenerator(object):
             domain.CertificateArn = self.domain.get('CertificateArn')
 
         domain.EndpointConfiguration = {"Types": [endpoint]}
-        basepath_mapping = ApiGatewayBasePathMapping(self.logical_id + 'BasePathMapping',
-                                                     attributes=self.passthrough_resource_attributes)
-        basepath_mapping.DomainName = self.domain.get('DomainName')
-        basepath_mapping.RestApiId = ref(rest_api.logical_id)
-        basepath_mapping.Stage = ref(rest_api.logical_id + '.Stage')
 
-        return domain, basepath_mapping
+        # Create BasepathMappings
+        if self.domain.get('BasePath') and isinstance(self.domain.get('BasePath'), string_types):
+            basepaths = [self.domain.get('BasePath')]
+        elif self.domain.get('BasePath') and isinstance(self.domain.get('BasePath'), list):
+            basepaths = self.domain.get('BasePath')
+            # Cloudformation restricts you from adding '/' with other paths. '/' is also the default basepath value
+            if '/' in basepaths:
+                basepaths = None
+        else:
+            basepaths = None
+
+        basepath_resource_list = []
+
+        if basepaths is None:
+            basepath_mapping = ApiGatewayBasePathMapping(self.logical_id + 'BasePathMapping',
+                                                         attributes=self.passthrough_resource_attributes)
+            basepath_mapping.DomainName = self.domain.get('DomainName')
+            basepath_mapping.RestApiId = ref(rest_api.logical_id)
+            basepath_mapping.Stage = ref(rest_api.logical_id + '.Stage')
+            basepath_resource_list.extend([basepath_mapping])
+        else:
+            for path in basepaths:
+                path = path.strip('/')
+                logical_id = "{}{}{}".format(self.logical_id, path, 'BasePathMapping')
+                basepath_mapping = ApiGatewayBasePathMapping(logical_id,
+                                                             attributes=self.passthrough_resource_attributes)
+                basepath_mapping.DomainName = self.domain.get('DomainName')
+                basepath_mapping.RestApiId = ref(rest_api.logical_id)
+                basepath_mapping.Stage = ref(rest_api.logical_id + '.Stage')
+                basepath_mapping.BasePath = path
+                basepath_resource_list.extend([basepath_mapping])
+
+        return domain, basepath_resource_list
 
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM API resource

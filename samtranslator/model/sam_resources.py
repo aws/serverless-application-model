@@ -535,7 +535,9 @@ class SamApi(SamResourceMacro):
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
         if domain:
-            resources.extend([domain, basepath_mapping])
+            resources.extend([domain])
+        if basepath_mapping:
+            resources.extend(basepath_mapping)
         return resources
 
 

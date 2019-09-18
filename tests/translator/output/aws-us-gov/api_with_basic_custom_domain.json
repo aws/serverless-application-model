@@ -168,13 +168,29 @@
         }
       }
     }, 
-    "MyApiDeployment741a18827c": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ApiGatewayDomainName461285836f": {
+      "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
+        "CertificateArn": "my-api-cert-arn", 
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        }, 
+        "DomainName": "api-example.com"
+      }
+    }, 
+    "MyApifetchBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "BasePath": "fetch", 
+        "DomainName": "api-example.com", 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 741a18827c1162e2a404218e7fcc64a14c4c4962"
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
       }
     }, 
     "MyFunctionRole": {
@@ -201,9 +217,10 @@
         }
       }
     }, 
-    "MyApiBasePathMapping": {
+    "MyApigetBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
+        "BasePath": "get", 
         "DomainName": "api-example.com", 
         "RestApiId": {
           "Ref": "MyApi"
@@ -275,6 +292,15 @@
         }
       }
     }, 
+    "MyApiDeploymentb70cda6c19": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: b70cda6c195d5d7d6300422874b03fdf3ac8cf16"
+      }
+    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
@@ -285,18 +311,6 @@
           "Ref": "ServerlessRestApi"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "ApiGatewayDomainName776aed2979": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "CertificateArn": "my-api-cert-arn", 
-        "EndpointConfiguration": {
-          "Types": [
-            "EDGE"
-          ]
-        }, 
-        "DomainName": "api-example.com"
       }
     }, 
     "ServerlessRestApiBasePathMapping": {
@@ -317,7 +331,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment741a18827c"
+          "Ref": "MyApiDeploymentb70cda6c19"
         }, 
         "RestApiId": {
           "Ref": "MyApi"

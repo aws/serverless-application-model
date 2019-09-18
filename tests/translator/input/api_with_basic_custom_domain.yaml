@@ -61,6 +61,7 @@ Resources:
         DomainName: 'api-example.com'
         CertificateArn: 'my-api-cert-arn'
         EndpointConfiguration: 'EDGE'
+        BasePath: [ "/get", "/fetch" ]
 
   MyAnotherApi:
     Type: AWS::Serverless::Api
