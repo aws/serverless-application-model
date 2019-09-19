@@ -642,7 +642,7 @@ class Api(PushEventSource):
             if self.Auth.get('ResourcePolicy'):
                 resource_policy = self.Auth.get('ResourcePolicy')
                 editor.add_resource_policy(resource_policy=resource_policy,
-                                           path=self.Path, api_id=self.RestApiId, stage=self.Stage)
+                                           path=self.Path, api_id=self.RestApiId.get('Ref'), stage=self.Stage)
 
         if self.RequestModel:
             method_model = self.RequestModel.get('Model')
