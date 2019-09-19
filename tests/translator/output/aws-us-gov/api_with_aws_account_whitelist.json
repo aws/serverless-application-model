@@ -22,26 +22,26 @@
         ]
       }
     }, 
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment43d887b916"
-        }, 
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
-    "ServerlessRestApiDeployment43d887b916": {
+    "ServerlessRestApiDeploymentd028bd9355": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 43d887b916b7fd023460544e5e010c67544fd983", 
+        "Description": "RestApi deployment id: d028bd935587bcc8cc07ae2c47a491a0475540a0", 
         "StageName": "Stage"
+      }
+    }, 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeploymentd028bd9355"
+        }, 
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "StageName": "Prod"
       }
     }, 
     "MyFunctionRole": {
@@ -104,9 +104,7 @@
                       "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
                       {
                         "__Stage__": "Prod", 
-                        "__ApiId__": {
-                          "Ref": "ServerlessRestApi"
-                        }
+                        "__ApiId__": "ServerlessRestApi"
                       }
                     ]
                   }
@@ -126,9 +124,7 @@
                       "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
                       {
                         "__Stage__": "Prod", 
-                        "__ApiId__": {
-                          "Ref": "ServerlessRestApi"
-                        }
+                        "__ApiId__": "ServerlessRestApi"
                       }
                     ]
                   }
