@@ -24,6 +24,7 @@ from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value, fnSub, fnJoin, fnGetAtt
 
+
 class SamEventsResource(SamResourceMacro):
     """Base class for resources that can have events.
     """
@@ -76,14 +77,14 @@ class SamEventsResource(SamResourceMacro):
                     raise InvalidEventException(logical_id, "{}".format(e))
 
                 function = lambda_function
-                if not function_resolver is None:
+                if function_resolver is not None:
                     function = function_resolver(self, logical_id)
                 kwargs = {
                     # When Alias is provided, connect all event sources to the alias and *not* the function
                     'function': function,
                 }
-                if not execution_role is None:
-                    kwargs.update({ 'role': execution_role })
+                if execution_role is not None:
+                    kwargs.update({'role': execution_role})
 
                 for name, resource in event_resources[logical_id].items():
                     kwargs[name] = resource
@@ -179,10 +180,11 @@ class SamFunction(SamEventsResource):
             lambda_function.Role = execution_role.get_runtime_attr('arn')
             resources.append(execution_role)
 
-        function_resolver = lambda self, logical_id: lambda_alias or lambda_function
         try:
-            resources += self._generate_event_resources(lambda_function, kwargs['event_resources'], 
-                function_resolver=function_resolver, execution_role=execution_role)
+            resources += self._generate_event_resources(
+                lambda_function, kwargs['event_resources'],
+                function_resolver=lambda self, logical_id: lambda_alias or lambda_function,
+                execution_role=execution_role)
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
@@ -471,10 +473,16 @@ class SamStackFunctionReference(SamResourceMacro):
         'FunctionName': PropertyType(True, is_str()),
         'Parent': PropertyType(True, any_type())
     }
-    
+
     runtime_attrs = {
-        "name": lambda self: fnGetAtt(self.Parent.logical_id, 'Outputs.' + self.FunctionName),
-        "arn": lambda self: fnJoin('', [fnSub('arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:'), fnGetAtt(self.Parent.logical_id, 'Outputs.' + self.FunctionName)])
+        "name": lambda self:
+            fnGetAtt(self.Parent.logical_id, 'Outputs.' + self.FunctionName),
+        "arn": lambda self:
+            fnJoin('',
+                   [
+                        fnSub('arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:'),
+                        fnGetAtt(self.Parent.logical_id, 'Outputs.' + self.FunctionName)
+                   ])
     }
 
 
@@ -490,8 +498,13 @@ class SamFunctionReference(SamEventsResource):
     )
 
     runtime_attrs = {
-        "name": lambda self: self.FunctionName,
-        "arn": lambda self: fnJoin('', [fnSub('arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:'), self.FunctionName])
+        "name": lambda self:
+            self.FunctionName,
+        "arn": lambda self:
+            fnJoin('', [
+                            fnSub('arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:'),
+                            self.FunctionName
+                        ])
     }
 
     def to_cloudformation(self, **kwargs):
@@ -503,8 +516,6 @@ class SamFunctionReference(SamEventsResource):
         :rtype: list
         """
         resources = []
-        intrinsics_resolver = kwargs["intrinsics_resolver"]
-        mappings_resolver = kwargs.get("mappings_resolver", None)
 
         try:
             resources += self._generate_event_resources(self, kwargs['event_resources'])
@@ -702,12 +713,10 @@ class SamApplication(SamEventsResource):
         nested_stack = self._construct_nested_stack()
         resources.append(nested_stack)
 
-        intrinsics_resolver = kwargs["intrinsics_resolver"]
-        mappings_resolver = kwargs.get("mappings_resolver", None)
-
-        function_resolver = lambda self, logical_id: self._create_helper(logical_id)
         try:
-            resources += self._generate_event_resources(nested_stack, kwargs['event_resources'],function_resolver=function_resolver)
+            resources += self._generate_event_resources(
+                nested_stack, kwargs['event_resources'],
+                function_resolver=lambda self, logical_id: self._create_helper(logical_id))
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
