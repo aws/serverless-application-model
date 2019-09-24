@@ -13,7 +13,7 @@
       "Type": "String"
     }, 
     "EndpointConf": {
-      "Default": "another-api-arn", 
+      "Default": "REGIONAL", 
       "Type": "String"
     }
   }, 
@@ -133,7 +133,7 @@
       }, 
       "Condition": "C1"
     }, 
-    "ApiGatewayDomainNamef8d8bda894": {
+    "ApiGatewayDomainName2bd847e760": {
       "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
         "EndpointConfiguration": {
@@ -212,13 +212,13 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApiDeploymentac2caeea69": {
+    "MyApiDeploymentb73cd6313c": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: ac2caeea69730e71b178de57276aa395d2a638c3"
+        "Description": "RestApi deployment id: b73cd6313c957bca233f1137e39ffbe99e448848"
       }, 
       "Condition": "C1"
     }, 
@@ -226,7 +226,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentac2caeea69"
+          "Ref": "MyApiDeploymentb73cd6313c"
         }, 
         "RestApiId": {
           "Ref": "MyApi"

@@ -13,7 +13,7 @@
       "Type": "String"
     }, 
     "EndpointConf": {
-      "Default": "another-api-arn", 
+      "Default": "REGIONAL", 
       "Type": "String"
     }
   }, 
@@ -76,16 +76,6 @@
         "Stage": {
           "Ref": "MyApiProdStage"
         }
-      }, 
-      "Condition": "C1"
-    }, 
-    "MyApiDeployment192ca15c7a": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "Description": "RestApi deployment id: 192ca15c7a5e6b4de65ea39cc5b9ef6c666acce6"
       }, 
       "Condition": "C1"
     }, 
@@ -154,21 +144,6 @@
       }, 
       "Condition": "C1"
     }, 
-    "ApiGatewayDomainName288aa2d89b": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "RegionalCertificateArn": "another-api-arn", 
-        "DomainName": {
-          "Fn::Sub": "example-cn-north-1.com"
-        }
-      }, 
-      "Condition": "C1"
-    }, 
     "MyApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -230,11 +205,36 @@
       }, 
       "Condition": "C1"
     }, 
+    "MyApiDeployment6cfbc38395": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: 6cfbc383958724f1d2d4d05d6e76f8670e66831f"
+      }, 
+      "Condition": "C1"
+    }, 
+    "ApiGatewayDomainName4bfafc5803": {
+      "Type": "AWS::ApiGateway::DomainName", 
+      "Properties": {
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "RegionalCertificateArn": "another-api-arn", 
+        "DomainName": {
+          "Fn::Sub": "example-cn-north-1.com"
+        }
+      }, 
+      "Condition": "C1"
+    }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment192ca15c7a"
+          "Ref": "MyApiDeployment6cfbc38395"
         }, 
         "RestApiId": {
           "Ref": "MyApi"

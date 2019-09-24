@@ -13,7 +13,7 @@
       "Type": "String"
     }, 
     "EndpointConf": {
-      "Default": "another-api-arn", 
+      "Default": "REGIONAL", 
       "Type": "String"
     }
   }, 
@@ -60,6 +60,16 @@
             }
           ]
         }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyApiDeploymentc15ba09b92": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: c15ba09b92a98c578c133496aa7d330c1666c2b8"
       }, 
       "Condition": "C1"
     }, 
@@ -205,7 +215,7 @@
       }, 
       "Condition": "C1"
     }, 
-    "ApiGatewayDomainName20b795454d": {
+    "ApiGatewayDomainNamedf402213e0": {
       "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
         "EndpointConfiguration": {
@@ -220,21 +230,11 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApiDeployment291e07c4b8": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "Description": "RestApi deployment id: 291e07c4b82e7be0c7bd982058d406892842d918"
-      }, 
-      "Condition": "C1"
-    }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment291e07c4b8"
+          "Ref": "MyApiDeploymentc15ba09b92"
         }, 
         "RestApiId": {
           "Ref": "MyApi"

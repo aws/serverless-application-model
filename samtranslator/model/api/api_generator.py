@@ -217,10 +217,14 @@ class ApiGenerator(object):
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
-        if self.domain is None or \
-           self.domain.get('DomainName') is None or \
-           self.domain.get('CertificateArn') is None:
+        if self.domain is None:
             return None, None
+
+        if self.domain.get('DomainName') is None or \
+           self.domain.get('CertificateArn') is None:
+            raise InvalidResourceException(self.logical_id,
+                                           "Custom Domains only works if both DomainName and CertificateArn"
+                                           " are provided")
 
         logical_id = logical_id_generator.LogicalIdGenerator("", self.domain).gen()
 
@@ -229,8 +233,12 @@ class ApiGenerator(object):
         domain.DomainName = self.domain.get('DomainName')
         endpoint = self.domain.get('EndpointConfiguration')
 
-        if endpoint is None or endpoint not in ['EDGE', 'REGIONAL']:
+        if endpoint is None:
             endpoint = 'REGIONAL'
+        elif endpoint not in ['EDGE', 'REGIONAL']:
+            raise InvalidResourceException(self.logical_id,
+                                           "EndpointConfiguration for Custom Domains must be"
+                                           " one of {}".format(['EDGE', 'REGIONAL']))
 
         if endpoint == 'REGIONAL':
             domain.RegionalCertificateArn = self.domain.get('CertificateArn')
