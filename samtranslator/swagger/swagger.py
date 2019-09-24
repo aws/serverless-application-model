@@ -24,7 +24,6 @@ class SwaggerEditor(object):
     _X_APIGW_GATEWAY_RESPONSES = 'x-amazon-apigateway-gateway-responses'
     _X_APIGW_POLICY = 'x-amazon-apigateway-policy'
     _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
-    _CACHE_KEY_PARAMETERS = 'cacheKeyParameters'
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
     _POLICY_TYPE_IAM = "Iam"
@@ -1003,53 +1002,6 @@ class SwaggerEditor(object):
                 statement = [statement]
             statement.extend(custom_statements)
             self.resource_policy['Statement'] = statement
-
-    def add_request_parameters_to_method(self, path, method_name, request_parameters):
-        """
-        Add Parameters to Swagger.
-
-        :param string path: Path name
-        :param string method_name: Method name
-        :param list request_parameters: Dictionary of Parameters
-        :return:
-        """
-
-        normalized_method_name = self._normalize_method_name(method_name)
-        # It is possible that the method could have two definitions in a Fn::If block.
-        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
-
-            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
-            if not self.method_definition_has_integration(method_definition):
-                continue
-
-            existing_parameters = method_definition.get('parameters', [])
-
-            for request_parameter in request_parameters:
-
-                parameter_name = request_parameter['Name']
-                location_name = parameter_name.replace('method.request.', '')
-                location, name = location_name.split('.')
-
-                if location == 'querystring':
-                    location = 'query'
-
-                parameter = {
-                    'in': location,
-                    'name': name,
-                    'required': request_parameter['Required'],
-                    'type': 'string'
-                }
-
-                existing_parameters.append(parameter)
-
-                if request_parameter['Caching']:
-
-                    integration = method_definition[self._X_APIGW_INTEGRATION]
-                    cache_parameters = integration.get(self._CACHE_KEY_PARAMETERS, [])
-                    cache_parameters.append(parameter_name)
-                    integration[self._CACHE_KEY_PARAMETERS] = cache_parameters
-
-            method_definition['parameters'] = existing_parameters
 
     @property
     def swagger(self):

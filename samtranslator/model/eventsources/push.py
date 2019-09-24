@@ -21,8 +21,6 @@ from samtranslator.swagger.swagger import SwaggerEditor
 
 CONDITION = 'Condition'
 
-REQUEST_PARAMETER_PROPERTIES = ["Required", "Caching"]
-
 
 class PushEventSource(ResourceMacro):
     """Base class for push event sources for SAM Functions.
@@ -451,8 +449,7 @@ class Api(PushEventSource):
             'RestApiId': PropertyType(True, is_str()),
             'Stage': PropertyType(False, is_str()),
             'Auth': PropertyType(False, is_type(dict)),
-            'RequestModel': PropertyType(False, is_type(dict)),
-            'RequestParameters': PropertyType(False, is_type(list))
+            'RequestModel': PropertyType(False, is_type(dict))
     }
 
     def resources_to_link(self, resources):
@@ -665,61 +662,6 @@ class Api(PushEventSource):
 
                 editor.add_request_model_to_method(path=self.Path, method_name=self.Method,
                                                    request_model=self.RequestModel)
-
-        if self.RequestParameters:
-
-            default_value = {
-                'Required': False,
-                'Caching': False
-            }
-
-            parameters = []
-            for parameter in self.RequestParameters:
-
-                if isinstance(parameter, dict):
-
-                    parameter_name, parameter_value = next(iter(parameter.items()))
-
-                    if not re.match('method\.request\.(querystring|path|header)\.', parameter_name):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Invalid value for 'RequestParameters' property. Keys must be in the format "
-                            "'method.request.[querystring|path|header].{value}', "
-                            "e.g 'method.request.header.Authorization'.")
-
-                    if not isinstance(parameter_value, dict) or not all(key in REQUEST_PARAMETER_PROPERTIES
-                                                                        for key in parameter_value.keys()):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Invalid value for 'RequestParameters' property. Values must be an object, "
-                            "e.g { Required: true, Caching: false }")
-
-                    settings = default_value.copy()
-                    settings.update(parameter_value)
-                    settings.update({'Name': parameter_name})
-
-                    parameters.append(settings)
-
-                elif isinstance(parameter, string_types):
-                    if not re.match('method\.request\.(querystring|path|header)\.', parameter):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Invalid value for 'RequestParameters' property. Keys must be in the format "
-                            "'method.request.[querystring|path|header].{value}', "
-                            "e.g 'method.request.header.Authorization'.")
-
-                    settings = default_value.copy()
-                    settings.update({'Name': parameter})
-
-                    parameters.append(settings)
-
-                else:
-                    raise InvalidEventException(
-                        self.relative_id,
-                        "Invalid value for 'RequestParameters' property. Property must be either a string or an object")
-
-            editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
-                                                    request_parameters=parameters)
 
         api["DefinitionBody"] = editor.swagger
 
