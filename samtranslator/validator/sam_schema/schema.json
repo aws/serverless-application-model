@@ -292,6 +292,119 @@
       ],
       "type": "object"
     },
+    "AWS::Serverless::FunctionReference": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Events": {
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                  "$ref": "#/definitions/AWS::Serverless::Function.EventSource"
+                }
+              },
+              "type": "object"
+            },            
+            "FunctionName": {
+              "type": "string"
+            }   
+          },
+          "required": [
+            "FunctionName"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::FunctionReference"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Properties",
+        "Type"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Application": {
+      "additionalProperties": false,
+      "properties": {
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "Events": {
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                  "$ref": "#/definitions/AWS::Serverless::Function.EventSource"
+                }
+              },
+              "type": "object"
+            },
+            "Location": {
+              "anyOf": [
+                {
+                  "type": [
+                    "string"
+                  ]
+                },
+                {
+                  "$ref": "#/definitions/AWS::Serverless::Application.Location"
+                }
+              ]
+            },
+            "NotificationARNs": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "Parameters": {
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "Tags": {
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "TemplateUrl": {
+              "type": "string"
+            },            
+            "TimeoutInMinutes": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "Location"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::Application"
+          ],
+          "type": "string"
+        }        
+      },
+      "required": [
+        "Properties",
+        "Type"
+      ],
+      "type": "object"
+    },
     "AWS::Serverless::Function.AlexaSkillEvent": {
       "additionalProperties": false,
       "properties": {
