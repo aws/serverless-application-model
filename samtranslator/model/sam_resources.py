@@ -503,6 +503,7 @@ class SamApi(SamResourceMacro):
 
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
+        self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
 
         api_generator = ApiGenerator(self.logical_id,
                                      self.CacheClusterEnabled,
