@@ -252,9 +252,6 @@ class ApiGenerator(object):
             basepaths = [self.domain.get('BasePath')]
         elif self.domain.get('BasePath') and isinstance(self.domain.get('BasePath'), list):
             basepaths = self.domain.get('BasePath')
-            # Cloudformation restricts you from adding '/' with other paths. '/' is also the default basepath value
-            if '/' in basepaths:
-                basepaths = None
         else:
             basepaths = None
 
@@ -269,7 +266,7 @@ class ApiGenerator(object):
             basepath_resource_list.extend([basepath_mapping])
         else:
             for path in basepaths:
-                path = path.strip('/')
+                path = ''.join(e for e in path if e.isalnum())
                 logical_id = "{}{}{}".format(self.logical_id, path, 'BasePathMapping')
                 basepath_mapping = ApiGatewayBasePathMapping(logical_id,
                                                              attributes=self.passthrough_resource_attributes)

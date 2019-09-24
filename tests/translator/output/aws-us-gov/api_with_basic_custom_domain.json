@@ -42,7 +42,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/anotherget", 
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/another/get", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -78,7 +78,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyAnotherApiDeploymentf2f7085602"
+          "Ref": "MyAnotherApiDeployment619d82c169"
         }, 
         "RestApiId": {
           "Ref": "MyAnotherApi"
@@ -118,7 +118,7 @@
             }
           }, 
           "paths": {
-            "/anotherget": {
+            "/another/get": {
               "post": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST", 
@@ -192,13 +192,17 @@
         }
       }
     }, 
-    "MyApiDeploymentb70cda6c19": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyApigetBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
+        "BasePath": "get", 
+        "DomainName": "api-example.com", 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: b70cda6c195d5d7d6300422874b03fdf3ac8cf16"
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
       }
     }, 
     "MyApi": {
@@ -261,26 +265,13 @@
         }
       }
     }, 
-    "MyApigetBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping", 
-      "Properties": {
-        "BasePath": "get", 
-        "DomainName": "api-example.com", 
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
-      }
-    }, 
-    "MyAnotherApiDeploymentf2f7085602": {
+    "MyApiDeploymentb70cda6c19": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
-          "Ref": "MyAnotherApi"
+          "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: f2f7085602d0780fff20b1e48acdee5e50889afc"
+        "Description": "RestApi deployment id: b70cda6c195d5d7d6300422874b03fdf3ac8cf16"
       }
     }, 
     "ServerlessRestApiProdStage": {
@@ -303,6 +294,15 @@
         }, 
         "Description": "RestApi deployment id: 15c5513463f336ce7d80f9107134351289f4dc75", 
         "StageName": "Stage"
+      }
+    }, 
+    "MyAnotherApiDeployment619d82c169": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyAnotherApi"
+        }, 
+        "Description": "RestApi deployment id: 619d82c169072c33e3a62ae66f9bbe723d9f6d71"
       }
     }, 
     "MyApiProdStage": {

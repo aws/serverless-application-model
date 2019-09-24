@@ -50,7 +50,7 @@ Resources:
           Properties:
             RestApiId: !Ref MyAnotherApi
             Method: Post
-            Path: /anotherget
+            Path: /another/get
 
   MyApi:
     Type: AWS::Serverless::Api
