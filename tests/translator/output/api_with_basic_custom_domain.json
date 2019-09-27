@@ -10,26 +10,25 @@
     }
   }, 
   "Resources": {
-    "MyFunction": {
-      "Type": "AWS::Lambda::Function", 
+    "MyFunctionImplicitGetPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Handler": "index.handler", 
-        "Code": {
-          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
         }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "MyFunctionRole", 
-            "Arn"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/implicit", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
           ]
-        }, 
-        "Runtime": "nodejs8.10", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        }
       }
     }, 
     "MyFunctionAnotherGetPermissionProd": {
@@ -53,167 +52,47 @@
         }
       }
     }, 
-    "MyApifetchBasePathMapping": {
+    "MyAnotherApiBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
-        "BasePath": "fetch", 
-        "DomainName": "api-example.com", 
+        "DomainName": "another-example.com", 
         "RestApiId": {
-          "Ref": "MyApi"
+          "Ref": "MyAnotherApi"
         }, 
         "Stage": {
-          "Ref": "MyApiProdStage"
+          "Ref": "MyAnotherApiProdStage"
         }
       }
     }, 
-    "MyFunctionImplicitGetPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/implicit", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "MyAnotherApiProdStage": {
+    "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyAnotherApiDeployment298b716713"
+          "Ref": "ServerlessRestApiDeploymentbfc913cadd"
         }, 
         "RestApiId": {
-          "Ref": "MyAnotherApi"
+          "Ref": "ServerlessRestApi"
         }, 
         "StageName": "Prod"
       }
     }, 
-    "MyAnotherApiDeployment298b716713": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyAnotherApi"
-        }, 
-        "Description": "RestApi deployment id: 298b71671363fe1258648c4e2231d5efb81ee2cb"
-      }
-    }, 
-    "MyFunctionFetchPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "MyAnotherApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0", 
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          }, 
-          "paths": {
-            "/another/get": {
-              "post": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
-                  }
-                }, 
-                "responses": {}
-              }
-            }
-          }, 
-          "openapi": "3.0.1"
-        }
-      }
-    }, 
-    "ApiGatewayDomainName461285836f": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "CertificateArn": "my-api-cert-arn", 
-        "EndpointConfiguration": {
-          "Types": [
-            "EDGE"
-          ]
-        }, 
-        "DomainName": "api-example.com"
-      }
-    }, 
-    "ServerlessRestApiDeployment6f245e96ee": {
+    "ServerlessRestApiDeploymentbfc913cadd": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 6f245e96ee393dcf04d340172a2d8f590cff7bff", 
+        "Description": "RestApi deployment id: bfc913caddb202a47127e0e76466ec861a0d643a", 
         "StageName": "Stage"
       }
     }, 
-    "MyFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+    "MyAnotherApiDeploymentdb326cbbeb": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "MyApigetBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping", 
-      "Properties": {
-        "BasePath": "get", 
-        "DomainName": "api-example.com", 
         "RestApiId": {
-          "Ref": "MyApi"
+          "Ref": "MyAnotherApi"
         }, 
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
+        "Description": "RestApi deployment id: db326cbbeb414a456a1fc90ed87c3ca3eb7e096f"
       }
     }, 
     "MyApi": {
@@ -256,37 +135,92 @@
         }
       }
     }, 
-    "MyAnotherApiBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping", 
+    "ApiGatewayDomainName461285836f": {
+      "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
-        "DomainName": "another-example.com", 
-        "RestApiId": {
-          "Ref": "MyAnotherApi"
+        "CertificateArn": "my-api-cert-arn", 
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
         }, 
-        "Stage": {
-          "Ref": "MyAnotherApiProdStage"
-        }
+        "DomainName": "api-example.com"
       }
     }, 
-    "MyApiDeployment345fbac8f2": {
+    "MyApiDeploymente8b6567c21": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 345fbac8f2a7592c5592018ad06db6de00590d35"
+        "Description": "RestApi deployment id: e8b6567c2175a539627c1d0e9c94a7737679c7de"
       }
     }, 
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ApiGatewayDomainNamed12ce5c759": {
+      "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment6f245e96ee"
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
         }, 
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
+        "RegionalCertificateArn": "another-api-arn", 
+        "DomainName": "another-example.com"
+      }
+    }, 
+    "ApiGatewayDomainName7a5525b8a3": {
+      "Type": "AWS::ApiGateway::DomainName", 
+      "Properties": {
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
         }, 
-        "StageName": "Prod"
+        "RegionalCertificateArn": "another-api-arn", 
+        "DomainName": "another-example.com"
+      }
+    }, 
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyFunctionFetchPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApi"
+              }
+            }
+          ]
+        }
       }
     }, 
     "ServerlessRestApiBasePathMapping": {
@@ -301,11 +235,101 @@
         }
       }
     }, 
+    "MyAnotherApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyAnotherApiDeploymentdb326cbbeb"
+        }, 
+        "RestApiId": {
+          "Ref": "MyAnotherApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "MyAnotherApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/another/get": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.0.1"
+        }
+      }
+    }, 
+    "MyApifetchBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "BasePath": "fetch", 
+        "DomainName": "api-example.com", 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }
+    }, 
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApigetBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "BasePath": "get", 
+        "DomainName": "api-example.com", 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }
+    }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment345fbac8f2"
+          "Ref": "MyApiDeploymente8b6567c21"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -339,18 +363,6 @@
           }, 
           "swagger": "2.0"
         }
-      }
-    }, 
-    "ApiGatewayDomainName7a5525b8a3": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "RegionalCertificateArn": "another-api-arn", 
-        "DomainName": "another-example.com"
       }
     }, 
     "MyFunctionApiPermissionProd": {

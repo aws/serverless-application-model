@@ -1,0 +1,66 @@
+Parameters:
+  MyDomainName: 
+    Type: String
+    Default: api-edge.com
+
+  MyDomainCert: 
+    Type: String
+    Default: my-edge-api-arn
+
+  MyHostedZone:
+    Type: String
+    Default: myregionalhostedzoneid
+
+Globals:
+  Api:
+    Domain:
+      DomainName: !Ref MyDomainName
+      CertificateArn: !Ref MyDomainCert
+      Route53:
+        EvaluateTargetHealth: true
+        HostedZoneId: !Ref MyHostedZone
+
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        Fetch:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Method: Post
+            Path: /fetch/another
+        ImplicitGet:
+          Type: Api
+          Properties:
+            Method: Post
+            Path: /implicit
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: Prod
+      Domain:
+        DomainName: 'api-regional.com'
+        CertificateArn: 'my-regional-cert-arn'
+        EndpointConfiguration: EDGE
+        BasePath:
+          - /fetch
+        Route53:
+         HostedZoneId: my-edge-hosted-zone
+         IpV6: true
+
+

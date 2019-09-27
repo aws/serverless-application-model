@@ -10,7 +10,7 @@ from .s3_utils.uri_parser import construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
-from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
+from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage, ApiGatewayDomainName
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import (InvalidEventException,
@@ -489,6 +489,7 @@ class SamApi(SamResourceMacro):
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
         "Deployment": ApiGatewayDeployment.resource_type,
+        "DomainName": ApiGatewayDomainName.resource_type
     }
 
     def to_cloudformation(self, **kwargs):
@@ -531,7 +532,7 @@ class SamApi(SamResourceMacro):
                                      models=self.Models,
                                      domain=self.Domain)
 
-        rest_api, deployment, stage, permissions, domain, basepath_mapping = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions, domain, basepath_mapping, route53 = api_generator.to_cloudformation()
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
@@ -539,6 +540,8 @@ class SamApi(SamResourceMacro):
             resources.extend([domain])
         if basepath_mapping:
             resources.extend(basepath_mapping)
+        if route53:
+            resources.extend([route53])
         return resources
 
 

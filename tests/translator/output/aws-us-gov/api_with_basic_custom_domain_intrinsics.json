@@ -63,13 +63,18 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApiDeploymentc15ba09b92": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ApiGatewayDomainNamedf402213e0": {
+      "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
         }, 
-        "Description": "RestApi deployment id: c15ba09b92a98c578c133496aa7d330c1666c2b8"
+        "RegionalCertificateArn": "another-api-arn", 
+        "DomainName": {
+          "Fn::Sub": "example-us-gov-west-1.com"
+        }
       }, 
       "Condition": "C1"
     }, 
@@ -215,18 +220,13 @@
       }, 
       "Condition": "C1"
     }, 
-    "ApiGatewayDomainNamedf402213e0": {
-      "Type": "AWS::ApiGateway::DomainName", 
+    "MyApiDeployment0ba140d008": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
+        "RestApiId": {
+          "Ref": "MyApi"
         }, 
-        "RegionalCertificateArn": "another-api-arn", 
-        "DomainName": {
-          "Fn::Sub": "example-us-gov-west-1.com"
-        }
+        "Description": "RestApi deployment id: 0ba140d00843cdd83115b4d663463aa0f21c4fef"
       }, 
       "Condition": "C1"
     }, 
@@ -234,7 +234,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentc15ba09b92"
+          "Ref": "MyApiDeployment0ba140d008"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
