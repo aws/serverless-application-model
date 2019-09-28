@@ -228,7 +228,8 @@ class ApiGenerator(object):
                                            " are provided")
 
         self.domain['ApiDomainName'] = "{}{}".format('ApiGatewayDomainName',
-                                                     logical_id_generator.LogicalIdGenerator("", self.domain.get('DomainName')).gen())
+                                                     logical_id_generator.
+                                                     LogicalIdGenerator("", self.domain.get('DomainName')).gen())
 
         domain = ApiGatewayDomainName(self.domain.get('ApiDomainName'),
                                       attributes=self.passthrough_resource_attributes)

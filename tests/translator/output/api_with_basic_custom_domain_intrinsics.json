@@ -63,6 +63,31 @@
       }, 
       "Condition": "C1"
     }, 
+    "ApiGatewayDomainNamec0ed6fae34": {
+      "Type": "AWS::ApiGateway::DomainName", 
+      "Properties": {
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "RegionalCertificateArn": "another-api-arn", 
+        "DomainName": {
+          "Fn::Sub": "example-ap-southeast-1.com"
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyApiDeployment6e1ee39b06": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: 6e1ee39b068c65688d05f859c3952e41396ecede"
+      }, 
+      "Condition": "C1"
+    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
@@ -133,69 +158,6 @@
       }, 
       "Condition": "C1"
     }, 
-    "ServerlessRestApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0", 
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          }, 
-          "paths": {
-            "/implicit": {
-              "Fn::If": [
-                "C1", 
-                {
-                  "post": {
-                    "Fn::If": [
-                      "C1", 
-                      {
-                        "x-amazon-apigateway-integration": {
-                          "httpMethod": "POST", 
-                          "type": "aws_proxy", 
-                          "uri": {
-                            "Fn::If": [
-                              "C1", 
-                              {
-                                "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
-                              }, 
-                              {
-                                "Ref": "AWS::NoValue"
-                              }
-                            ]
-                          }
-                        }, 
-                        "responses": {}
-                      }, 
-                      {
-                        "Ref": "AWS::NoValue"
-                      }
-                    ]
-                  }
-                }, 
-                {
-                  "Ref": "AWS::NoValue"
-                }
-              ]
-            }
-          }, 
-          "swagger": "2.0"
-        }
-      }, 
-      "Condition": "C1"
-    }, 
-    "MyApiDeployment9c28d20064": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "Description": "RestApi deployment id: 9c28d20064b889d33964c909f03a6eb8da6b7c59"
-      }, 
-      "Condition": "C1"
-    }, 
     "MyApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -249,34 +211,6 @@
       }, 
       "Condition": "C1"
     }, 
-    "ApiGatewayDomainName2bd847e760": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "RegionalCertificateArn": "another-api-arn", 
-        "DomainName": {
-          "Fn::Sub": "example-ap-southeast-1.com"
-        }
-      }, 
-      "Condition": "C1"
-    }, 
-    "MyApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiDeployment9c28d20064"
-        }, 
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "StageName": "Prod"
-      }, 
-      "Condition": "C1"
-    }, 
     "ServerlessRestApiDeployment43c34b4e46": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
@@ -285,6 +219,72 @@
         }, 
         "Description": "RestApi deployment id: 43c34b4e46d381101dd94b95856a2cea244411b4", 
         "StageName": "Stage"
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment6e1ee39b06"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "StageName": "Prod"
+      }, 
+      "Condition": "C1"
+    }, 
+    "ServerlessRestApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/implicit": {
+              "Fn::If": [
+                "C1", 
+                {
+                  "post": {
+                    "Fn::If": [
+                      "C1", 
+                      {
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST", 
+                          "type": "aws_proxy", 
+                          "uri": {
+                            "Fn::If": [
+                              "C1", 
+                              {
+                                "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                              }, 
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        }, 
+                        "responses": {}
+                      }, 
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                }, 
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          }, 
+          "swagger": "2.0"
+        }
       }, 
       "Condition": "C1"
     }, 
