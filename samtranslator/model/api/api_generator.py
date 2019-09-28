@@ -228,7 +228,7 @@ class ApiGenerator(object):
                                            " are provided")
 
         self.domain['ApiDomainName'] = "{}{}".format('ApiGatewayDomainName',
-                                                     logical_id_generator.LogicalIdGenerator("", self.domain).gen())
+                                                     logical_id_generator.LogicalIdGenerator("", self.domain.get('DomainName')).gen())
 
         domain = ApiGatewayDomainName(self.domain.get('ApiDomainName'),
                                       attributes=self.passthrough_resource_attributes)
@@ -286,7 +286,7 @@ class ApiGenerator(object):
             if route53.get('HostedZoneId') is None:
                 raise InvalidResourceException(self.logical_id,
                                                "HostedZoneId is required to enable Route53 support on Custom Domains.")
-            logical_id = logical_id_generator.LogicalIdGenerator("", self.domain).gen()
+            logical_id = logical_id_generator.LogicalIdGenerator("", route53.get('HostedZoneId')).gen()
             record_set_group = Route53RecordSetGroup('RecordSetGroup' + logical_id,
                                                      attributes=self.passthrough_resource_attributes)
             record_set_group.HostedZoneId = route53.get('HostedZoneId')
@@ -295,22 +295,23 @@ class ApiGenerator(object):
         return domain, basepath_resource_list, record_set_group
 
     def _construct_record_sets_for_domain(self, domain):
-        record_set_list = []
+        recordset_list = []
         recordset = {}
         route53 = domain.get('Route53')
 
         recordset['Name'] = domain.get('DomainName')
         recordset['Type'] = 'A'
         recordset['AliasTarget'] = self._construct_alias_target(self.domain)
-        record_set_list.extend([recordset])
+        recordset_list.extend([recordset])
 
+        recordset_ipv6 = {}
         if route53.get('IpV6') is not None and route53.get('IpV6') is True:
-            recordset['Name'] = domain.get('DomainName')
-            recordset['Type'] = 'AAAA'
-            recordset['AliasTarget'] = self._construct_alias_target(self.domain)
-            record_set_list.extend([recordset])
+            recordset_ipv6['Name'] = domain.get('DomainName')
+            recordset_ipv6['Type'] = 'AAAA'
+            recordset_ipv6['AliasTarget'] = self._construct_alias_target(self.domain)
+            recordset_list.extend([recordset_ipv6])
 
-        return record_set_list
+        return recordset_list
 
     def _construct_alias_target(self, domain):
         alias_target = {}
@@ -323,8 +324,12 @@ class ApiGenerator(object):
             alias_target['HostedZoneId'] = fnGetAtt(self.domain.get('ApiDomainName'), 'RegionalHostedZoneId')
             alias_target['DNSName'] = fnGetAtt(self.domain.get('ApiDomainName'), 'RegionalDomainName')
         else:
+            if route53.get('DistributionDomainName') is None:
+                raise InvalidResourceException(self.logical_id,
+                                               "Custom Domains support for EDGE requires the name "
+                                               "of a Distribution resource")
             alias_target['HostedZoneId'] = 'Z2FDTNDATAQYW2'
-            alias_target['DNSName'] = domain.get('DomainName')
+            alias_target['DNSName'] = route53.get('DistributionDomainName')
         return alias_target
 
     def to_cloudformation(self):
