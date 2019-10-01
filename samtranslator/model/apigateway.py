@@ -79,9 +79,11 @@ class ApiGatewayDeployment(Resource):
     def make_auto_deployable(self, stage, openapi_version=None, swagger=None, domain=None):
         """
         Sets up the resource such that it will trigger a re-deployment when Swagger changes
-        or the openapi version changes.
+        or the openapi version changes or a domain resource changes.
 
         :param swagger: Dictionary containing the Swagger definition of the API
+        :param openapi_version: string containing value of OpenApiVersion flag in the template
+        :param domain: Dictionary containing the custom domain configuration for the API
         """
         if not swagger:
             return
