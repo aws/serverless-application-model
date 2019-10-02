@@ -89,6 +89,7 @@ Currently, the following resources and properties are being supported:
       CanarySetting:
       TracingEnabled:
       OpenApiVersion:
+      Domain:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable

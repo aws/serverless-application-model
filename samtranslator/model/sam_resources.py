@@ -482,7 +482,8 @@ class SamApi(SamResourceMacro):
         'CanarySetting': PropertyType(False, is_type(dict)),
         'TracingEnabled': PropertyType(False, is_type(bool)),
         'OpenApiVersion': PropertyType(False, is_str()),
-        'Models': PropertyType(False, is_type(dict))
+        'Models': PropertyType(False, is_type(dict)),
+        'Domain': PropertyType(False, is_type(dict))
     }
 
     referable_properties = {
@@ -502,6 +503,7 @@ class SamApi(SamResourceMacro):
 
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
+        self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
 
         api_generator = ApiGenerator(self.logical_id,
                                      self.CacheClusterEnabled,
@@ -526,13 +528,17 @@ class SamApi(SamResourceMacro):
                                      resource_attributes=self.resource_attributes,
                                      passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
                                      open_api_version=self.OpenApiVersion,
-                                     models=self.Models)
+                                     models=self.Models,
+                                     domain=self.Domain)
 
-        rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions, domain, basepath_mapping = api_generator.to_cloudformation()
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
-
+        if domain:
+            resources.extend([domain])
+        if basepath_mapping:
+            resources.extend(basepath_mapping)
         return resources
 
 

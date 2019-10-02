@@ -313,7 +313,9 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_swagger_and_openapi_with_auth',
         'api_with_openapi_definition_body_no_flag',
         'api_request_model_openapi_3',
-        'api_with_apikey_required_openapi_3'
+        'api_with_apikey_required_openapi_3',
+        'api_with_basic_custom_domain',
+        'api_with_basic_custom_domain_intrinsics',
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -542,7 +544,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_invalid_policy_statement',
     'error_function_with_invalid_condition_name',
     'error_invalid_document_empty_semantic_version',
-    'error_api_with_invalid_open_api_version_type'
+    'error_api_with_invalid_open_api_version_type',
+    'error_api_with_custom_domains_invalid'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)

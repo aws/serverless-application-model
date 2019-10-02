@@ -184,6 +184,7 @@ MinimumCompressionSize              All
 Cors                                All
 TracingEnabled                      All
 OpenApiVersion                      None
+Domain                              All
 ================================== ======================== ========================
 
 

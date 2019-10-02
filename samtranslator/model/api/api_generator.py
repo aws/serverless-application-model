@@ -3,7 +3,8 @@ from six import string_types
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage, ApiGatewayAuthorizer,
-                                            ApiGatewayResponse)
+                                            ApiGatewayResponse, ApiGatewayDomainName,
+                                            ApiGatewayBasePathMapping)
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
@@ -35,7 +36,7 @@ class ApiGenerator(object):
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
                  auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
                  tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
-                 open_api_version=None, models=None):
+                 open_api_version=None, models=None, domain=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -80,6 +81,7 @@ class ApiGenerator(object):
         self.open_api_version = open_api_version
         self.remove_extra_stage = open_api_version
         self.models = models
+        self.domain = domain
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -204,12 +206,77 @@ class ApiGenerator(object):
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger)
+            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger, self.domain)
 
         if self.tags is not None:
             stage.Tags = get_tag_list(self.tags)
 
         return stage
+
+    def _construct_api_domain(self, rest_api):
+        """
+        Constructs and returns the ApiGateway Domain and BasepathMapping
+        """
+        if self.domain is None:
+            return None, None
+
+        if self.domain.get('DomainName') is None or \
+           self.domain.get('CertificateArn') is None:
+            raise InvalidResourceException(self.logical_id,
+                                           "Custom Domains only works if both DomainName and CertificateArn"
+                                           " are provided")
+
+        logical_id = logical_id_generator.LogicalIdGenerator("", self.domain).gen()
+
+        domain = ApiGatewayDomainName('ApiGatewayDomainName' + logical_id,
+                                      attributes=self.passthrough_resource_attributes)
+        domain.DomainName = self.domain.get('DomainName')
+        endpoint = self.domain.get('EndpointConfiguration')
+
+        if endpoint is None:
+            endpoint = 'REGIONAL'
+        elif endpoint not in ['EDGE', 'REGIONAL']:
+            raise InvalidResourceException(self.logical_id,
+                                           "EndpointConfiguration for Custom Domains must be"
+                                           " one of {}".format(['EDGE', 'REGIONAL']))
+
+        if endpoint == 'REGIONAL':
+            domain.RegionalCertificateArn = self.domain.get('CertificateArn')
+        else:
+            domain.CertificateArn = self.domain.get('CertificateArn')
+
+        domain.EndpointConfiguration = {"Types": [endpoint]}
+
+        # Create BasepathMappings
+        if self.domain.get('BasePath') and isinstance(self.domain.get('BasePath'), string_types):
+            basepaths = [self.domain.get('BasePath')]
+        elif self.domain.get('BasePath') and isinstance(self.domain.get('BasePath'), list):
+            basepaths = self.domain.get('BasePath')
+        else:
+            basepaths = None
+
+        basepath_resource_list = []
+
+        if basepaths is None:
+            basepath_mapping = ApiGatewayBasePathMapping(self.logical_id + 'BasePathMapping',
+                                                         attributes=self.passthrough_resource_attributes)
+            basepath_mapping.DomainName = self.domain.get('DomainName')
+            basepath_mapping.RestApiId = ref(rest_api.logical_id)
+            basepath_mapping.Stage = ref(rest_api.logical_id + '.Stage')
+            basepath_resource_list.extend([basepath_mapping])
+        else:
+            for path in basepaths:
+                path = ''.join(e for e in path if e.isalnum())
+                logical_id = "{}{}{}".format(self.logical_id, path, 'BasePathMapping')
+                basepath_mapping = ApiGatewayBasePathMapping(logical_id,
+                                                             attributes=self.passthrough_resource_attributes)
+                basepath_mapping.DomainName = self.domain.get('DomainName')
+                basepath_mapping.RestApiId = ref(rest_api.logical_id)
+                basepath_mapping.Stage = ref(rest_api.logical_id + '.Stage')
+                basepath_mapping.BasePath = path
+                basepath_resource_list.extend([basepath_mapping])
+
+        return domain, basepath_resource_list
 
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM API resource
@@ -218,6 +285,7 @@ class ApiGenerator(object):
         :rtype: tuple
         """
         rest_api = self._construct_rest_api()
+        domain, basepath_mapping = self._construct_api_domain(rest_api)
         deployment = self._construct_deployment(rest_api)
 
         swagger = None
@@ -229,7 +297,7 @@ class ApiGenerator(object):
         stage = self._construct_stage(deployment, swagger)
         permissions = self._construct_authorizer_lambda_permission()
 
-        return rest_api, deployment, stage, permissions
+        return rest_api, deployment, stage, permissions, domain, basepath_mapping
 
     def _add_cors(self):
         """
