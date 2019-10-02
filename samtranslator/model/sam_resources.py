@@ -532,7 +532,8 @@ class SamApi(SamResourceMacro):
                                      models=self.Models,
                                      domain=self.Domain)
 
-        rest_api, deployment, stage, permissions, domain, basepath_mapping, usage_plan = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions, domain, basepath_mapping, \
+            usage_plan = api_generator.to_cloudformation()
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)

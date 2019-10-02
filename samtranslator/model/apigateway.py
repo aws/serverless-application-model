@@ -177,6 +177,7 @@ class ApiGatewayBasePathMapping(Resource):
         'Stage': PropertyType(False, is_str())
     }
 
+
 class ApiGatewayUsagePlan(Resource):
     print("inside usage plan......")
     resource_type = 'AWS::ApiGateway::UsagePlan'

@@ -13,9 +13,8 @@ Resources:
      Properties:
        StageName: Prod
        Auth:
-         ApiKeyRequired: true
-         # UsagePlan:
-          # CreateUsagePlan: NONE
+         UsagePlan:
+          CreateUsagePlan: NONE
 
    MyFunctionOne:
      Type: AWS::Serverless::Function
