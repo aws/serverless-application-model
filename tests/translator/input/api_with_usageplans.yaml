@@ -1,0 +1,67 @@
+Resources:
+   MyApiOne:
+     Type: AWS::Serverless::Api
+     Properties:
+       StageName: Prod
+       Auth:
+         ApiKeyRequired: true
+         UsagePlan:
+          CreateUsagePlan: SINGLE # SHARED, NONE
+
+   MyApiTwo:
+     Type: AWS::Serverless::Api
+     Properties:
+       StageName: Prod
+       Auth:
+         ApiKeyRequired: true
+         # UsagePlan:
+          # CreateUsagePlan: NONE
+
+   MyFunctionOne:
+     Type: AWS::Serverless::Function
+     Properties:
+       Handler: index.handler
+       Runtime: nodejs8.10
+       InlineCode: |
+         exports.handler = async (event) => {
+           return {
+           statusCode: 200,
+           body: JSON.stringify(event),
+           headers: {}
+           }
+         }
+       Events:
+         ApiKey:
+           Type: Api
+           Properties:
+             RestApiId:
+               Ref: MyApiOne
+             Method: get
+             Path: /path/one
+
+   MyFunctionTwo:
+     Type: AWS::Serverless::Function
+     Properties:
+       Handler: index.handler
+       Runtime: nodejs8.10
+       InlineCode: |
+         exports.handler = async (event) => {
+           return {
+           statusCode: 200,
+           body: JSON.stringify(event),
+           headers: {}
+           }
+         }
+       Events:
+         ApiKey:
+           Type: Api
+           Properties:
+             RestApiId:
+               Ref: MyApiTwo
+             Method: get
+             Path: /path/two
+Outputs:
+    ApiUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/'

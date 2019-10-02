@@ -9,6 +9,9 @@ from samtranslator.model.apigateway import (
     ApiGatewayResponse,
     ApiGatewayDomainName,
     ApiGatewayBasePathMapping,
+    ApiGatewayUsagePlan,
+    ApiGatewayUsagePlanKey,
+    ApiGatewayApiKey
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.exceptions import InvalidResourceException
@@ -37,14 +40,22 @@ AuthProperties = namedtuple(
         "AddDefaultAuthorizerToCorsPreflight",
         "ApiKeyRequired",
         "ResourcePolicy",
+        "UsagePlan",
     ],
 )
-AuthProperties.__new__.__defaults__ = (None, None, None, True, None, None)
+AuthProperties.__new__.__defaults__ = (None, None, None, True, None, None, None)
+UsagePlanProperties = namedtuple("_UsagePlanProperties",
+                                 ["CreateUsagePlan", "UsagePlanId"])
+UsagePlanProperties.__new__.__defaults__ = (None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
 
 class ApiGenerator(object):
+    usage_plan_shared = False
+    stage_keys_shared = list()
+    api_stages_shared = list()
+    depends_on_shared = list()
     def __init__(
         self,
         logical_id,
@@ -392,8 +403,9 @@ class ApiGenerator(object):
 
         stage = self._construct_stage(deployment, swagger, redeploy_restapi_parameters)
         permissions = self._construct_authorizer_lambda_permission()
+        usage_plan = self._construct_usage_plan(rest_api_stage=stage)
 
-        return rest_api, deployment, stage, permissions, domain, basepath_mapping, route53
+        return rest_api, deployment, stage, permissions, domain, basepath_mapping, route53, usage_plan
 
     def _add_cors(self):
         """
@@ -517,6 +529,110 @@ class ApiGenerator(object):
                 )
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
+
+    def _construct_usage_plan(self, rest_api_stage=None):
+        """Constructs and returns the ApiGateway UsagePlan, ApiGateway UsagePlanKey, ApiGateway ApiKey for Auth.
+
+        :param model.apigateway.ApiGatewayStage stage: the stage of rest api
+        :returns: the UsagePlan, UsagePlanKey, ApiKey for this SAM Api
+        :rtype: model.apigateway.ApiGatewayUsagePlan, model.apigateway.ApiGatewayUsagePlanKey,
+                model.apigateway.ApiGatewayApiKey
+        """
+        if not self.auth:
+            return []
+        auth_properties = AuthProperties(**self.auth)
+        if auth_properties.UsagePlan:
+            usage_plan_properties = auth_properties.UsagePlan
+
+            # throws error if the property invalid/ unsupported for UsagePlan
+            if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
+                raise InvalidResourceException(
+                    self.logical_id, "Invalid value for 'UsagePlan' property")
+
+            usage_plan = None
+            if usage_plan_properties.get('CreateUsagePlan') is None:
+                raise ValueError('Parameter "CreateUsagePlan" is a required parameter for "UsagePlan"'
+                                 ' but was not provided.')
+
+            if usage_plan_properties.get('CreateUsagePlan') == 'SINGLE':
+
+                # create a usage plan for this api
+                usage_plan_logical_id = usage_plan_properties.get('UsagePlanId')
+                if usage_plan_logical_id is None:
+                    usage_plan_logical_id = self.logical_id + 'UsagePlan'
+                    usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id, depends_on=[self.logical_id])
+                    api_stages = list()
+                    api_stage = dict()
+                    api_stage['ApiId'] = ref(self.logical_id)
+                    api_stage['Stage'] = ref(rest_api_stage.logical_id)
+                    api_stages.append(api_stage)
+                    usage_plan.ApiStages = api_stages
+                else:
+                    usage_plan_logical_id = usage_plan_logical_id.get('Ref')
+
+                # create an api key resource for this api
+                api_key_logical_id = self.logical_id + 'ApiKey'
+
+                api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
+                api_key.Enabled = True
+                stage_keys = list()
+                stage_key = dict()
+                stage_key['RestApiId'] = ref(self.logical_id)
+                stage_key['StageName'] = ref(rest_api_stage.logical_id)
+                stage_keys.append(stage_key)
+                api_key.StageKeys = stage_keys
+
+                # create a mapping between api key and the usage plan
+                usage_plan_key_logical_id = self.logical_id + 'UsagePlanKey'
+                usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id,
+                                                        depends_on=[api_key_logical_id])
+                usage_plan_key.KeyId = ref(api_key_logical_id)
+                usage_plan_key.KeyType = 'API_KEY'
+                usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)
+
+            elif usage_plan_properties.get('CreateUsagePlan') == 'SHARED':
+                usage_plan_logical_id = usage_plan_properties.get('UsagePlanId')
+                if usage_plan_logical_id is None:
+                    # create a usage plan for all the apis
+                    usage_plan_logical_id = 'ServerlessUsagePlan'
+                    ApiGenerator.depends_on_shared.append(self.logical_id)
+                    usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id,
+                                                     depends_on=ApiGenerator.depends_on_shared)
+                else:
+                    usage_plan_logical_id = usage_plan_logical_id.get('Ref')
+
+                api_stage = dict()
+                api_stage['ApiId'] = ref(self.logical_id)
+                api_stage['Stage'] = ref(rest_api_stage.logical_id)
+                ApiGenerator.api_stages_shared.append(api_stage)
+                usage_plan.ApiStages = ApiGenerator.api_stages_shared
+
+                # create an api key resource for this api
+                api_key_logical_id = 'ServerlessApiKey'
+                api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
+                api_key.Enabled = True
+                stage_key = dict()
+                stage_key['RestApiId'] = ref(self.logical_id)
+                stage_key['StageName'] = ref(rest_api_stage.logical_id)
+                ApiGenerator.stage_keys_shared.append(stage_key)
+                api_key.StageKeys = ApiGenerator.stage_keys_shared
+
+                # create a mapping between api key and the usage plan
+                usage_plan_key_logical_id = 'ServerlessUsagePlanKey'
+                usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id,
+                                                        depends_on=[api_key_logical_id])
+                usage_plan_key.KeyId = ref(api_key_logical_id)
+                usage_plan_key.KeyType = 'API_KEY'
+                usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)
+
+            elif usage_plan_properties.get('CreateUsagePlan') != 'NONE':
+                raise ValueError(
+                    self.logical_id, "'CreateUsagePlan' accepts only NONE, SINGLE and SHARED values")
+
+            if usage_plan is None:
+                return api_key, usage_plan_key
+            else:
+                return usage_plan, api_key, usage_plan_key
 
     def _add_gateway_responses(self):
         """
