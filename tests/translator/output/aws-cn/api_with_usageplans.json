@@ -36,13 +36,13 @@
         "MyApiOne"
       ]
     },
-    "MyApiTwoDeployment03730b64c4": {
+    "MyApiTwoDeploymentd91da8cd6b": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiTwo"
         },
-        "Description": "RestApi deployment id: 03730b64c486cc490deefb3b8225244b0fe85d34",
+        "Description": "RestApi deployment id: d91da8cd6b5dd1aac1b481a4ee5e76c316d4eed8",
         "StageName": "Stage"
       }
     },
@@ -50,7 +50,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeployment03730b64c4"
+          "Ref": "MyApiTwoDeploymentd91da8cd6b"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -236,23 +236,11 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionTwo.Arn}/invocations"
                   }
                 },
-                "security": [
-                  {
-                    "api_key": []
-                  }
-                ],
                 "responses": {}
               }
             }
           },
-          "swagger": "2.0",
-          "securityDefinitions": {
-            "api_key": {
-              "type": "apiKey",
-              "name": "x-api-key",
-              "in": "header"
-            }
-          }
+          "swagger": "2.0"
         },
         "EndpointConfiguration": {
           "Types": [

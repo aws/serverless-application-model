@@ -625,7 +625,9 @@ class ApiGenerator(object):
                 usage_plan_key.KeyType = 'API_KEY'
                 usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)
 
-            elif usage_plan_properties.get('CreateUsagePlan') != 'NONE':
+            elif usage_plan_properties.get('CreateUsagePlan') == 'NONE':
+                return
+            else:
                 raise ValueError(
                     self.logical_id, "'CreateUsagePlan' accepts only NONE, SINGLE and SHARED values")
 

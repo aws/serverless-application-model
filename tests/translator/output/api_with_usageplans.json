@@ -8,6 +8,16 @@
     }
   },
   "Resources": {
+    "MyApiTwoDeployment771320e502": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiTwo"
+        },
+        "Description": "RestApi deployment id: 771320e50237bd01a499cb4aa31963c6ae4e2407",
+        "StageName": "Stage"
+      }
+    },
     "MyApiOneUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
       "Properties": {
@@ -30,7 +40,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeploymente9d97923b9"
+          "Ref": "MyApiTwoDeployment771320e502"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -107,16 +117,6 @@
       "DependsOn": [
         "MyApiOneApiKey"
       ]
-    },
-    "MyApiTwoDeploymente9d97923b9": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiTwo"
-        },
-        "Description": "RestApi deployment id: e9d97923b94d0801cd85a8970b3c3f84aa274003",
-        "StageName": "Stage"
-      }
     },
     "MyFunctionTwo": {
       "Type": "AWS::Lambda::Function",
@@ -236,23 +236,11 @@
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionTwo.Arn}/invocations"
                   }
                 },
-                "security": [
-                  {
-                    "api_key": []
-                  }
-                ],
                 "responses": {}
               }
             }
           },
-          "swagger": "2.0",
-          "securityDefinitions": {
-            "api_key": {
-              "type": "apiKey",
-              "name": "x-api-key",
-              "in": "header"
-            }
-          }
+          "swagger": "2.0"
         }
       }
     },

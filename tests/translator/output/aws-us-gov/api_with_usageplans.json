@@ -32,21 +32,11 @@
         }
       }
     },
-    "MyApiTwoDeployment0e45b81469": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiTwo"
-        },
-        "Description": "RestApi deployment id: 0e45b814691166a59217a088512ee30710a12369",
-        "StageName": "Stage"
-      }
-    },
     "MyApiTwoProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeployment0e45b81469"
+          "Ref": "MyApiTwoDeployment72084f34b8"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -236,23 +226,11 @@
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionTwo.Arn}/invocations"
                   }
                 },
-                "security": [
-                  {
-                    "api_key": []
-                  }
-                ],
                 "responses": {}
               }
             }
           },
-          "swagger": "2.0",
-          "securityDefinitions": {
-            "api_key": {
-              "type": "apiKey",
-              "name": "x-api-key",
-              "in": "header"
-            }
-          }
+          "swagger": "2.0"
         },
         "EndpointConfiguration": {
           "Types": [
@@ -310,6 +288,16 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    },
+    "MyApiTwoDeployment72084f34b8": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiTwo"
+        },
+        "Description": "RestApi deployment id: 72084f34b87cdeb328925d6dc312c7eef7c4f50e",
+        "StageName": "Stage"
       }
     },
     "MyFunctionOne": {
