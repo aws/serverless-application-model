@@ -177,6 +177,42 @@ class ApiGatewayBasePathMapping(Resource):
         'Stage': PropertyType(False, is_str())
     }
 
+class ApiGatewayUsagePlan(Resource):
+    print("inside usage plan......")
+    resource_type = 'AWS::ApiGateway::UsagePlan'
+    property_types = {
+            'ApiStages': PropertyType(False, is_type(list))
+    }
+    runtime_attrs = {
+        "usage_plan_id": lambda self: ref(self.logical_id),
+    }
+
+
+class ApiGatewayUsagePlanKey(Resource):
+    resource_type = 'AWS::ApiGateway::UsagePlanKey'
+    property_types = {
+            'KeyId': PropertyType(True, is_str()),
+            'KeyType': PropertyType(True, is_str()),
+            'UsagePlanId': PropertyType(True, is_str())
+    }
+
+
+class ApiGatewayApiKey(Resource):
+    resource_type = 'AWS::ApiGateway::ApiKey'
+    property_types = {
+            'CustomerId': PropertyType(False, is_str()),
+            'Description': PropertyType(False, is_str()),
+            'Enabled': PropertyType(False, is_type(bool)),
+            'GenerateDistinctId': PropertyType(False, is_type(bool)),
+            'Name': PropertyType(False, is_str()),
+            'StageKeys': PropertyType(False, is_type(list)),
+            'Value': PropertyType(False, is_str())
+    }
+
+    runtime_attrs = {
+        "api_key_id": lambda self: ref(self.logical_id),
+    }
+
 
 class ApiGatewayAuthorizer(object):
     _VALID_FUNCTION_PAYLOAD_TYPES = [None, 'TOKEN', 'REQUEST']
