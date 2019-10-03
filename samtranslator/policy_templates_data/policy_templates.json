@@ -117,7 +117,8 @@
               "dynamodb:UpdateItem",
               "dynamodb:BatchWriteItem",
               "dynamodb:BatchGetItem",
-              "dynamodb:DescribeTable"
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
             ],
             "Resource": [
               {
