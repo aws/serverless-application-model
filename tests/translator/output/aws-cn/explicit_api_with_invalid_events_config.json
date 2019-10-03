@@ -35,32 +35,13 @@
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/add", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": "ApiWithInlineSwagger"
             }
           ]
         }
       }
-    }, 
-    "MyFunctionAddApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/add", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": "ApiWithInlineSwagger"
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "ApiWithInlineSwaggerProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {

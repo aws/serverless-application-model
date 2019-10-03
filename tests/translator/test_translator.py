@@ -137,6 +137,7 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        'cognito_userpool_with_event',
         's3_with_condition',
         'function_with_condition',
         'basic_function',
@@ -159,6 +160,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_auth_all_minimum',
         'api_with_auth_no_default',
         'api_with_default_aws_iam_auth',
+        'api_with_default_aws_iam_auth_and_no_auth_route',
         'api_with_method_aws_iam_auth',
         'api_with_aws_iam_auth_overrides',
         'api_with_method_settings',
@@ -175,6 +177,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_cors_and_only_maxage',
         'api_with_cors_and_only_credentials_false',
         'api_with_cors_no_definitionbody',
+        'api_with_incompatible_stage_name',
         'api_with_gateway_responses',
         'api_with_gateway_responses_all',
         'api_with_gateway_responses_minimal',
@@ -186,9 +189,6 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_xray_tracing',
         'api_request_model',
         'api_with_stage_tags',
-        'api_with_resource_policy',
-        'api_with_resource_policy_global',
-        'api_with_resource_policy_global_implicit',
         's3',
         's3_create_remove',
         's3_existing_lambda_notification_configuration',
@@ -198,6 +198,7 @@ class TestTranslatorEndToEnd(TestCase):
         's3_multiple_functions',
         's3_with_dependsOn',
         'sns',
+        'sns_sqs',
         'sns_existing_other_subscription',
         'sns_topic_outside_template',
         'alexa_skill',
@@ -235,6 +236,7 @@ class TestTranslatorEndToEnd(TestCase):
         'function_with_conditional_managed_policy_and_ref_no_value',
         'function_with_conditional_policy_template',
         'function_with_conditional_policy_template_and_ref_no_value',
+        'function_with_request_parameters',
         'global_handle_path_level_parameter',
         'globals_for_function',
         'globals_for_api',
@@ -255,6 +257,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_apikey_default_override',
         'api_with_apikey_required',
         'api_with_path_parameters',
+        'function_with_batch_window'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -354,6 +357,58 @@ class TestTranslatorEndToEnd(TestCase):
 
         assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
 
+    @parameterized.expand(
+      itertools.product([
+        'api_with_aws_account_whitelist',
+        'api_with_aws_account_blacklist',
+        'api_with_ip_range_whitelist',
+        'api_with_ip_range_blacklist',
+        'api_with_source_vpc_whitelist',
+        'api_with_source_vpc_blacklist',
+        'api_with_resource_policy',
+        'api_with_resource_policy_global',
+        'api_with_resource_policy_global_implicit'
+      ],
+      [
+        ("aws", "ap-southeast-1"),
+        ("aws-cn", "cn-north-1"),
+        ("aws-us-gov", "us-gov-west-1")
+      ] # Run all the above tests against each of the list of partitions to test against
+      )
+    )
+    @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
+    @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+    def test_transform_success_resource_policy(self, testcase, partition_with_region):
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
+        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
+        manifest = json.loads(json.dumps(manifest))
+        partition_folder = partition if partition != "aws" else ""
+        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + '.json')
+        expected = json.load(open(expected_filepath, 'r'))
+
+        with patch('boto3.session.Session.region_name', region):
+            parameter_values = get_template_parameter_values()
+            mock_policy_loader = MagicMock()
+            mock_policy_loader.load.return_value = {
+                'AWSLambdaBasicExecutionRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'.format(partition),
+                'AmazonDynamoDBFullAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess'.format(partition),
+                'AmazonDynamoDBReadOnlyAccess': 'arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess'.format(partition),
+                'AWSLambdaRole': 'arn:{}:iam::aws:policy/service-role/AWSLambdaRole'.format(partition),
+            }
+
+            output_fragment = transform(
+                manifest, parameter_values, mock_policy_loader)
+        print(json.dumps(output_fragment, indent=2))
+
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info.major >= 3:
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
+        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+
     def _update_logical_id_hash(self, resources):
         """
         Brute force method for updating all APIGW Deployment LogicalIds and references to a consistent hash
@@ -424,6 +479,7 @@ class TestTranslatorEndToEnd(TestCase):
         rest_api_to_swagger_hash[logical_id] = data_hash
 
 @pytest.mark.parametrize('testcase', [
+    'error_cognito_userpool_duplicate_trigger',
     'error_api_duplicate_methods_same_path',
     'error_api_gateway_responses_nonnumeric_status_code',
     'error_api_gateway_responses_unknown_responseparameter',
@@ -456,6 +512,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_no_runtime',
     'error_function_with_deployment_preference_missing_alias',
     'error_function_with_invalid_deployment_preference_hook_property',
+    'error_function_invalid_request_parameters',
     'error_invalid_logical_id',
     'error_layer_invalid_properties',
     'error_missing_queue',
@@ -469,9 +526,9 @@ class TestTranslatorEndToEnd(TestCase):
     'error_table_primary_key_missing_type',
     'error_invalid_resource_parameters',
     'error_reserved_sam_tag',
-    'existing_event_logical_id',
-    'existing_permission_logical_id',
-    'existing_role_logical_id',
+    'error_existing_event_logical_id',
+    'error_existing_permission_logical_id',
+    'error_existing_role_logical_id',
     'error_invalid_template',
     'error_resource_not_dict',
     'error_resource_properties_not_dict',
@@ -484,7 +541,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_unknown_policy_template',
     'error_function_with_invalid_policy_statement',
     'error_function_with_invalid_condition_name',
-    'error_invalid_document_empty_semantic_version'
+    'error_invalid_document_empty_semantic_version',
+    'error_api_with_invalid_open_api_version_type'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)

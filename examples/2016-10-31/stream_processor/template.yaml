@@ -6,13 +6,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs10.x
       CodeUri: src/
       Events:
         Stream:
           Type: Kinesis
           Properties:
             Stream: !GetAtt Stream.Arn
+            MaximumBatchingWindowInSeconds: 20
             StartingPosition: TRIM_HORIZON
 
   Stream:

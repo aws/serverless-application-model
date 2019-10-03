@@ -1,0 +1,89 @@
+{
+  "Resources": {
+    "UserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "Properties": {
+        "LambdaConfig": {
+          "PreSignUp": {
+            "Fn::GetAtt": [
+              "ImplicitApiFunction", "Arn"
+            ]
+          },
+          "PreAuthentication": "Test",
+          "Test1": {
+            "Fn::GetAtt": [
+              "ImplicitApiFunction",
+              "Arn"
+            ]
+          },
+          "Test2": {
+            "Fn::GetAtt": [
+              "ImplicitApiFunction",
+              "Arn"
+            ]
+          }          
+        }
+      }
+    },
+    "ImplicitApiFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ImplicitApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs4.3", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "ImplicitApiFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },    
+    "ImplicitApiFunctionCognitoPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
+        },
+        "EventSourceToken": {
+          "Ref": "UserPool"
+        },
+        "Principal": "cognito-idp.amazonaws.com"
+      }
+    }
+  }
+}

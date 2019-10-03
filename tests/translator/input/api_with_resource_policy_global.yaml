@@ -1,3 +1,7 @@
+Parameters:
+  StageName:
+    Type: String
+    Default: MyOwnStage
 Globals:
   Api:
     Auth:
@@ -7,32 +11,49 @@ Globals:
             Resource: ['execute-api:/*/*/*']
           },
           {
-            Action: 'execute-api:blah', 
+            Action: 'execute-api:blah',
             Resource: ['execute-api:/*/*/*']
-          }]
-
+          }
+        ]
+        IpRangeWhitelist: [ '1.2.3.4' ]
 Resources:
- ExplicitApi:
+  ExplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /
+            Method: get
+
+  ExplicitApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Prod
-      DefinitionBody: {
-        "info": {
-          "version": "1.0",
-          "title": {
-            "Ref": "AWS::StackName"
-          }
-        },
-        "paths": {},
-        "swagger": "2.0",
-        "x-amazon-apigateway-policy": {
-          "Version": "2012-10-17",
-          "Statement": {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com"
-              }
-          }
-        }
-      }
+      StageName: !Ref StageName
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          version: '1.0'
+          title: !Ref AWS::StackName
+        paths:
+          "/":
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations
+              responses: {}
+        x-amazon-apigateway-policy:
+          Version: '2012-10-17'
+          Statement:
+            Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal: 
+              Service: 'lambda.amazonaws.com'
+

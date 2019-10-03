@@ -1,14 +1,17 @@
 import copy
+import json
 
 from unittest import TestCase
-from mock import Mock
+from mock import Mock, patch
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.exceptions import InvalidDocumentException
+from tests.translator.test_translator import deep_sort_lists
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
+_X_POLICY = 'x-amazon-apigateway-policy'
 _ALLOW_CREDENTALS_TRUE = "'true'"
 
 class TestSwaggerEditor_init(TestCase):
@@ -1116,6 +1119,7 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
 
         self.assertEqual(expected, editor.swagger['paths']['/foo']['get']['requestBody'])
 
+
 class TestSwaggerEditor_add_auth(TestCase):
 
     def setUp(self):
@@ -1231,3 +1235,567 @@ class TestSwaggerEditor_add_auth(TestCase):
 
         self.editor._set_method_apikey_handling(path, method, True)
         self.assertEqual(expected, self.editor.swagger["paths"][path][method]["security"])
+
+
+class TestSwaggerEditor_add_request_parameter_to_method(TestCase):
+
+    def setUp(self):
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        }
+                    }
+                }
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+
+    def test_must_add_parameter_to_method_with_required_and_caching_true(self):
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': True,
+            'Caching': True
+        }]
+
+        self.editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected_parameters = [
+            {
+                'in': 'header',
+                'required': True,
+                'name': 'Authorization',
+                'type': 'string'
+            }
+        ]
+
+        method_swagger = self.editor.swagger['paths']['/foo']['get']
+
+        self.assertEqual(expected_parameters, method_swagger['parameters'])
+        self.assertEqual(['method.request.header.Authorization'], method_swagger[_X_INTEGRATION]['cacheKeyParameters'])
+
+    def test_must_add_parameter_to_method_with_required_and_caching_false(self):
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': False,
+            'Caching': False
+        }]
+
+        self.editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected_parameters = [
+            {
+                'in': 'header',
+                'required': False,
+                'name': 'Authorization',
+                'type': 'string'
+            }
+        ]
+
+        method_swagger = self.editor.swagger['paths']['/foo']['get']
+
+        self.assertEqual(expected_parameters, method_swagger['parameters'])
+        self.assertNotIn('cacheKeyParameters', method_swagger[_X_INTEGRATION].keys())
+
+    def test_must_add_parameter_to_method_with_existing_parameters(self):
+
+        original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {
+                        'x-amazon-apigateway-integration': {
+                            'test': 'must have integration'
+                        },
+                        'parameters': [{'test': 'existing parameter'}]
+                    }
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_swagger)
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': False,
+            'Caching': False
+        }]
+
+        editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected_parameters = [
+            {
+                'test': 'existing parameter'
+            },
+            {
+                'in': 'header',
+                'required': False,
+                'name': 'Authorization',
+                'type': 'string'
+            }
+        ]
+
+        method_swagger = editor.swagger['paths']['/foo']['get']
+
+        self.assertEqual(expected_parameters, method_swagger['parameters'])
+        self.assertNotIn('cacheKeyParameters', method_swagger[_X_INTEGRATION].keys())
+
+    def test_must_not_add_parameter_to_method_without_integration(self):
+        original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    'get': {}
+                }
+            }
+        }
+
+        editor = SwaggerEditor(original_swagger)
+
+        parameters = [{
+            'Name': 'method.request.header.Authorization',
+            'Required': True,
+            'Caching': True
+        }]
+
+        editor.add_request_parameters_to_method('/foo', 'get', parameters)
+
+        expected = {}
+
+        self.assertEqual(expected, editor.swagger['paths']['/foo']['get'])
+
+
+class TestSwaggerEditor_add_resource_policy(TestCase):
+    def setUp(self):
+
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    "get": {},
+                    "put": {}
+                }
+            }
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+
+    def test_must_add_custom_statements(self):
+
+        resourcePolicy = {
+            'CustomStatements': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:/*/*/*']
+            },
+            {
+                'Action': 'execute-api:blah',
+                'Resource': ['execute-api:/*/*/*']
+            }]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": "execute-api:Invoke",
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+              },
+              {
+                "Action": "execute-api:blah",
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+              }
+            ]
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    @patch("boto3.session.Session.region_name", "eu-west-2")
+    def test_must_add_iam_allow(self):
+## fails
+        resourcePolicy = {
+            'AwsAccountWhitelist': [
+                '123456'
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': {
+                'Action': 'execute-api:Invoke',
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Allow',
+                'Principal': {
+                    'AWS': ['123456']
+                }
+            }
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    @patch("boto3.session.Session.region_name", "eu-west-2")
+    def test_must_add_iam_deny(self):
+
+        resourcePolicy = {
+            'AwsAccountBlacklist': [
+                '123456'
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': {
+                'Action': 'execute-api:Invoke',
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Deny',
+                'Principal': {
+                    'AWS': ['123456']
+                }
+            }
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    @patch("boto3.session.Session.region_name", "eu-west-2")
+    def test_must_add_ip_allow(self):
+
+        resourcePolicy = {
+            'IpRangeWhitelist': [
+                '1.2.3.4'
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Allow',
+                'Principal': '*'
+            },
+            {
+                'Action': 'execute-api:Invoke',
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Deny',
+                'Condition': {
+                    'NotIpAddress': {
+                        'aws:SourceIp': ['1.2.3.4']
+                    }
+                },
+                'Principal': '*'
+            }]
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    @patch("boto3.session.Session.region_name", "eu-west-2")
+    def test_must_add_ip_deny(self):
+
+        resourcePolicy = {
+            'IpRangeBlacklist': [
+                '1.2.3.4'
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Allow',
+                'Principal': '*'
+            },
+            {
+                'Action': 'execute-api:Invoke',
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Deny',
+                'Condition': {
+                    'IpAddress': {
+                        'aws:SourceIp': ['1.2.3.4']
+                    }
+                },
+                'Principal': '*'
+            }]
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    @patch("boto3.session.Session.region_name", "eu-west-2")
+    def test_must_add_vpc_allow(self):
+
+        resourcePolicy = {
+            'SourceVpcWhitelist': [
+                'vpc-123',
+                'vpce-345'
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                    'Effect': 'Allow',
+                    'Principal': '*'
+                },
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                    'Effect': 'Deny',
+                    'Condition': {
+                        'StringNotEquals': {
+                            'aws:SourceVpc': 'vpc-123'
+                        }
+                    },
+                    'Principal': '*'
+                },
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                    'Effect': 'Deny',
+                    'Condition': {
+                        'StringNotEquals': {
+                            'aws:SourceVpce': 'vpce-345'
+                        }
+                    },
+                    'Principal': '*'
+                }
+            ]
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    @patch("boto3.session.Session.region_name", "eu-west-2")
+    def test_must_add_vpc_deny(self):
+
+        resourcePolicy = {
+            'SourceVpcBlacklist': [
+                'vpc-123'
+            ]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                    'Effect': 'Allow',
+                    'Principal': '*'
+                },
+                {
+                    'Action': 'execute-api:Invoke',
+                    'Resource': [                {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                    'Effect': 'Deny',
+                    'Condition': {
+                        'StringEquals': {
+                            'aws:SourceVpc': 'vpc-123'
+                        }
+                    },
+                    'Principal': '*'
+                }
+            ]
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    @patch("boto3.session.Session.region_name", "eu-west-2")
+    def test_must_add_iam_allow_and_custom(self):
+## fails
+        resourcePolicy = {
+            'AwsAccountWhitelist': [
+                '123456'
+            ],
+            'CustomStatements': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': ['execute-api:/*/*/*']
+            },
+            {
+                'Action': 'execute-api:blah',
+                'Resource': ['execute-api:/*/*/*']
+            }]
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            'Version': '2012-10-17',
+            'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Resource': [{
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    },
+                    {
+                        'Fn::Sub': [
+                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                        ]
+                    }],
+                'Effect': 'Allow',
+                'Principal': {
+                    'AWS': ['123456']
+                }
+            },
+            {
+                "Action": "execute-api:Invoke",
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+            },
+            {
+                "Action": "execute-api:blah",
+                "Resource": [
+                  "execute-api:/*/*/*"
+                ]
+            }]
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))

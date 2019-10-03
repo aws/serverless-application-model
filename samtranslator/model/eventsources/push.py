@@ -10,12 +10,18 @@ from samtranslator.model.s3 import S3Bucket
 from samtranslator.model.sns import SNSSubscription
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
+from samtranslator.model.eventsources.pull import SQS
+from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
 from samtranslator.model.iot import IotTopicRule
+from samtranslator.model.cognito import CognitoUserPool
+from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 
 CONDITION = 'Condition'
+
+REQUEST_PARAMETER_PROPERTIES = ["Required", "Caching"]
 
 
 class PushEventSource(ResourceMacro):
@@ -40,16 +46,23 @@ class PushEventSource(ResourceMacro):
     """
     principal = None
 
-    def _construct_permission(self, function, source_arn=None, source_account=None, suffix="", event_source_token=None):
+    def _construct_permission(
+            self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None):
         """Constructs the Lambda Permission resource allowing the source service to invoke the function this event
         source triggers.
 
         :returns: the permission resource
         :rtype: model.lambda_.LambdaPermission
         """
-        lambda_permission = LambdaPermission(self.logical_id + 'Permission' + suffix,
+        if prefix is None:
+            prefix = self.logical_id
+        if suffix.isalnum():
+            permission_logical_id = prefix + 'Permission' + suffix
+        else:
+            generator = logical_id_generator.LogicalIdGenerator(prefix + 'Permission', suffix)
+            permission_logical_id = generator.gen()
+        lambda_permission = LambdaPermission(permission_logical_id,
                                              attributes=function.get_passthrough_resource_attributes())
-
         try:
             # Name will not be available for Alias resources
             function_name_or_arn = function.get_runtime_attr("name")
@@ -352,7 +365,8 @@ class SNS(PushEventSource):
     property_types = {
             'Topic': PropertyType(True, is_str()),
             'Region': PropertyType(False, is_str()),
-            'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict)))))
+            'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
+            'SqsSubscription': PropertyType(False, is_type(bool))
     }
 
     def to_cloudformation(self, **kwargs):
@@ -363,27 +377,66 @@ class SNS(PushEventSource):
         :rtype: list
         """
         function = kwargs.get('function')
+        role = kwargs.get('role')
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
-        return [self._construct_permission(function, source_arn=self.Topic),
-                self._inject_subscription(function, self.Topic, self.Region, self.FilterPolicy)]
+        # SNS -> Lambda
+        if not self.SqsSubscription:
+            subscription = self._inject_subscription(
+                'lambda', function.get_runtime_attr("arn"),
+                self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
+            )
+            return [self._construct_permission(function, source_arn=self.Topic), subscription]
 
-    def _inject_subscription(self, function, topic, region, filterPolicy):
+        # SNS -> SQS -> Lambda
+        resources = []
+        queue = self._inject_sqs_queue()
+        queue_policy = self._inject_sqs_queue_policy(self.Topic, queue)
+        subscription = self._inject_subscription(
+            'sqs', queue.get_runtime_attr('arn'),
+            self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
+        )
+
+        resources = resources + self._inject_sqs_event_source_mapping(function, role, queue.get_runtime_attr('arn'))
+        resources.append(queue)
+        resources.append(queue_policy)
+        resources.append(subscription)
+        return resources
+
+    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, resource_attributes):
         subscription = SNSSubscription(self.logical_id)
-        subscription.Protocol = 'lambda'
-        subscription.Endpoint = function.get_runtime_attr("arn")
+        subscription.Protocol = protocol
+        subscription.Endpoint = endpoint
         subscription.TopicArn = topic
         if region is not None:
             subscription.Region = region
-        if CONDITION in function.resource_attributes:
-            subscription.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
+        if CONDITION in resource_attributes:
+            subscription.set_resource_attribute(CONDITION, resource_attributes[CONDITION])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
 
         return subscription
+
+    def _inject_sqs_queue(self):
+        return SQSQueue(self.logical_id + 'Queue')
+
+    def _inject_sqs_event_source_mapping(self, function, role, queue_arn):
+        event_source = SQS(self.logical_id + 'EventSourceMapping')
+        event_source.Queue = queue_arn
+        event_source.BatchSize = 10
+        event_source.Enabled = True
+        return event_source.to_cloudformation(function=function, role=role)
+
+    def _inject_sqs_queue_policy(self, topic_arn, queue):
+        policy = SQSQueuePolicy(self.logical_id + 'QueuePolicy')
+        policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(
+            topic_arn, queue.get_runtime_attr('arn')
+        )
+        policy.Queues = [queue.get_runtime_attr('queue_url')]
+        return policy
 
 
 class Api(PushEventSource):
@@ -396,8 +449,10 @@ class Api(PushEventSource):
 
             # Api Event sources must "always" be paired with a Serverless::Api
             'RestApiId': PropertyType(True, is_str()),
+            'Stage': PropertyType(False, is_str()),
             'Auth': PropertyType(False, is_type(dict)),
-            'RequestModel': PropertyType(False, is_type(dict))
+            'RequestModel': PropertyType(False, is_type(dict)),
+            'RequestParameters': PropertyType(False, is_type(list))
     }
 
     def resources_to_link(self, resources):
@@ -444,7 +499,6 @@ class Api(PushEventSource):
         return {
             'explicit_api': explicit_api,
             'explicit_api_stage': {
-                'permitted_stage': permitted_stage,
                 'suffix': stage_suffix
             }
         }
@@ -481,14 +535,14 @@ class Api(PushEventSource):
     def _get_permissions(self, resources_to_link):
         permissions = []
 
-        permissions.append(self._get_permission(resources_to_link, "*", "Test"))
-
         # By default, implicit APIs get a stage called Prod. If the API event refers to an
         # explicit API using RestApiId property, we should grab the stage name of the explicit API
-        permitted_stage = suffix = "Prod"
+        # all stages for an API are given permission
+        permitted_stage = "*"
+        suffix = "Prod"
         if 'explicit_api_stage' in resources_to_link:
-            permitted_stage = resources_to_link['explicit_api_stage']['permitted_stage']
             suffix = resources_to_link['explicit_api_stage']['suffix']
+        self.Stage = suffix
 
         permissions.append(self._get_permission(resources_to_link, permitted_stage, suffix))
         return permissions
@@ -502,7 +556,7 @@ class Api(PushEventSource):
         if not stage or not suffix:
             raise RuntimeError("Could not add permission to lambda function.")
 
-        path = re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
+        path = SwaggerEditor.get_path_without_trailing_slash(path)
         method = '*' if self.Method.lower() == 'any' else self.Method.upper()
 
         api_id = self.RestApiId
@@ -552,7 +606,7 @@ class Api(PushEventSource):
                 api_authorizers = api_auth and api_auth.get('Authorizers')
 
                 if method_authorizer != 'AWS_IAM':
-                    if not api_authorizers:
+                    if method_authorizer != 'NONE' and not api_authorizers:
                         raise InvalidEventException(
                             self.relative_id,
                             'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
@@ -585,6 +639,11 @@ class Api(PushEventSource):
             if method_authorizer or apikey_required_setting is not None:
                 editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
 
+            if self.Auth.get('ResourcePolicy'):
+                resource_policy = self.Auth.get('ResourcePolicy')
+                editor.add_resource_policy(resource_policy=resource_policy,
+                                           path=self.Path, api_id=self.RestApiId.get('Ref'), stage=self.Stage)
+
         if self.RequestModel:
             method_model = self.RequestModel.get('Model')
 
@@ -606,6 +665,61 @@ class Api(PushEventSource):
 
                 editor.add_request_model_to_method(path=self.Path, method_name=self.Method,
                                                    request_model=self.RequestModel)
+
+        if self.RequestParameters:
+
+            default_value = {
+                'Required': False,
+                'Caching': False
+            }
+
+            parameters = []
+            for parameter in self.RequestParameters:
+
+                if isinstance(parameter, dict):
+
+                    parameter_name, parameter_value = next(iter(parameter.items()))
+
+                    if not re.match('method\.request\.(querystring|path|header)\.', parameter_name):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Invalid value for 'RequestParameters' property. Keys must be in the format "
+                            "'method.request.[querystring|path|header].{value}', "
+                            "e.g 'method.request.header.Authorization'.")
+
+                    if not isinstance(parameter_value, dict) or not all(key in REQUEST_PARAMETER_PROPERTIES
+                                                                        for key in parameter_value.keys()):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Invalid value for 'RequestParameters' property. Values must be an object, "
+                            "e.g { Required: true, Caching: false }")
+
+                    settings = default_value.copy()
+                    settings.update(parameter_value)
+                    settings.update({'Name': parameter_name})
+
+                    parameters.append(settings)
+
+                elif isinstance(parameter, string_types):
+                    if not re.match('method\.request\.(querystring|path|header)\.', parameter):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Invalid value for 'RequestParameters' property. Keys must be in the format "
+                            "'method.request.[querystring|path|header].{value}', "
+                            "e.g 'method.request.header.Authorization'.")
+
+                    settings = default_value.copy()
+                    settings.update({'Name': parameter})
+
+                    parameters.append(settings)
+
+                else:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Invalid value for 'RequestParameters' property. Property must be either a string or an object")
+
+            editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
+                                                    request_parameters=parameters)
 
         api["DefinitionBody"] = editor.swagger
 
@@ -683,3 +797,76 @@ class IoTRule(PushEventSource):
             rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         return rule
+
+
+class Cognito(PushEventSource):
+    resource_type = 'Cognito'
+    principal = 'cognito-idp.amazonaws.com'
+
+    property_types = {
+        'UserPool': PropertyType(True, is_str()),
+        'Trigger': PropertyType(True, one_of(is_str(), list_of(is_str())))
+    }
+
+    def resources_to_link(self, resources):
+        if isinstance(self.UserPool, dict) and 'Ref' in self.UserPool:
+            userpool_id = self.UserPool['Ref']
+            if userpool_id in resources:
+                return {
+                    'userpool': resources[userpool_id],
+                    'userpool_id': userpool_id
+                }
+        raise InvalidEventException(
+            self.relative_id,
+            "Cognito events must reference a Cognito UserPool in the same template.")
+
+    def to_cloudformation(self, **kwargs):
+        function = kwargs.get('function')
+
+        if not function:
+            raise TypeError("Missing required keyword argument: function")
+
+        if 'userpool' not in kwargs or kwargs['userpool'] is None:
+            raise TypeError("Missing required keyword argument: userpool")
+
+        if 'userpool_id' not in kwargs or kwargs['userpool_id'] is None:
+            raise TypeError("Missing required keyword argument: userpool_id")
+
+        userpool = kwargs['userpool']
+        userpool_id = kwargs['userpool_id']
+
+        resources = []
+        resources.append(
+            self._construct_permission(
+                function, event_source_token=self.UserPool, prefix=function.logical_id + "Cognito"))
+
+        self._inject_lambda_config(function, userpool)
+        resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
+        return resources
+
+    def _inject_lambda_config(self, function, userpool):
+        event_triggers = self.Trigger
+        if isinstance(self.Trigger, string_types):
+            event_triggers = [self.Trigger]
+
+        # TODO can these be conditional?
+
+        properties = userpool.get('Properties', None)
+        if properties is None:
+            properties = {}
+            userpool['Properties'] = properties
+
+        lambda_config = properties.get('LambdaConfig', None)
+        if lambda_config is None:
+            lambda_config = {}
+            properties['LambdaConfig'] = lambda_config
+
+        for event_trigger in event_triggers:
+            if event_trigger not in lambda_config:
+                lambda_config[event_trigger] = function.get_runtime_attr("arn")
+            else:
+                raise InvalidEventException(
+                    self.relative_id,
+                    'Cognito trigger "{trigger}" defined multiple times.'.format(
+                        trigger=self.Trigger))
+        return userpool

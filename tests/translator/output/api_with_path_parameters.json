@@ -48,25 +48,6 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/*/resources",
             {
-              "__Stage__": "Prod",
-              "__ApiId__": "HtmlApi"
-            }
-          ]
-        }
-      }
-    },
-    "HtmlFunctionGetHtmlPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "HtmlFunction"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/*/resources",
-            {
               "__Stage__": "*",
               "__ApiId__": "HtmlApi"
             }

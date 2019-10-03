@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: API Gateway with Lambda Token Authorizer
+Description: API Gateway with Lambda Request Authorizer
 Resources:
   MyApi:
     Type: AWS::Serverless::Api

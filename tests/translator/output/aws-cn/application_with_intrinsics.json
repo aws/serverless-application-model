@@ -1,70 +1,78 @@
 {
-  "Resources": {
-    "ApplicationRefParameter": {
-      "Type": "AWS::CloudFormation::Stack",
-      "Properties": {
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          },
-          {
-            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world",
-            "Key": "serverlessrepo:applicationId"
-          },
-          {
-            "Value": "1.0.0",
-            "Key": "serverlessrepo:semanticVersion"
-          }
-        ]
-      }
-    },
-    "ApplicationFindInMap": {
-      "Type": "AWS::CloudFormation::Stack",
-      "Properties": {
-        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          },
-          {
-            "Value": "arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world",
-            "Key": "serverlessrepo:applicationId"
-          },
-          {
-            "Value": "1.0.2",
-            "Key": "serverlessrepo:semanticVersion"
-          }
-        ]
-      }
-    }
-  },
   "Parameters": {
     "ApplicationIdParam": {
-      "Type": "String",
-      "Default": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world"
-    },
+      "Default": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world", 
+      "Type": "String"
+    }, 
     "VersionParam": {
-      "Type": "String",
-      "Default": "1.0.0"
+      "Default": "1.0.0", 
+      "Type": "String"
     }
-  },
+  }, 
   "Mappings": {
     "ApplicationLocations": {
-      "ap-southeast-1": {
-        "ApplicationId": "arn:aws:serverlessrepo:ap-southeast-1:123456789012:applications/hello-world",
-        "Version": "1.0.1"
-      },
       "cn-north-1": {
-        "ApplicationId": "arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world",
-        "Version": "1.0.2"
-      },
+        "Version": "1.0.2", 
+        "ApplicationId": "arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world"
+      }, 
       "us-gov-west-1": {
-        "ApplicationId": "arn:aws-gov:serverlessrepo:us-gov-west-1:123456789012:applications/hello-world",
-        "Version": "1.0.3"
+        "Version": "1.0.3", 
+        "ApplicationId": "arn:aws-gov:serverlessrepo:us-gov-west-1:123456789012:applications/hello-world"
+      }, 
+      "ap-southeast-1": {
+        "Version": "1.0.1", 
+        "ApplicationId": "arn:aws:serverlessrepo:ap-southeast-1:123456789012:applications/hello-world"
       }
+    }
+  }, 
+  "Resources": {
+    "ApplicationFindInMap": {
+      "Type": "AWS::CloudFormation::Stack", 
+      "Properties": {
+        "NotificationARNs": [
+          {
+            "Ref": "Sns"
+          }
+        ], 
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }, 
+          {
+            "Value": "arn:aws-cn:serverlessrepo:cn-north-1:123456789012:applications/hello-world", 
+            "Key": "serverlessrepo:applicationId"
+          }, 
+          {
+            "Value": "1.0.2", 
+            "Key": "serverlessrepo:semanticVersion"
+          }
+        ]
+      }
+    }, 
+    "ApplicationRefParameter": {
+      "Type": "AWS::CloudFormation::Stack", 
+      "Properties": {
+        "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }, 
+          {
+            "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world", 
+            "Key": "serverlessrepo:applicationId"
+          }, 
+          {
+            "Value": "1.0.0", 
+            "Key": "serverlessrepo:semanticVersion"
+          }
+        ]
+      }
+    }, 
+    "Sns": {
+      "Type": "AWS::SNS::Topic"
     }
   }
 }
