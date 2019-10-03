@@ -63,19 +63,28 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApigetBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping", 
+    "ApiGatewayDomainNamec0ed6fae34": {
+      "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
-        "BasePath": "get", 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "RegionalCertificateArn": "another-api-arn", 
         "DomainName": {
           "Fn::Sub": "example-ap-southeast-1.com"
-        }, 
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyApiDeployment6e1ee39b06": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
+        "Description": "RestApi deployment id: 6e1ee39b068c65688d05f859c3952e41396ecede"
       }, 
       "Condition": "C1"
     }, 
@@ -133,17 +142,18 @@
       }, 
       "Condition": "C1"
     }, 
-    "ApiGatewayDomainName2bd847e760": {
-      "Type": "AWS::ApiGateway::DomainName", 
+    "MyApigetBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "RegionalCertificateArn": "another-api-arn", 
+        "BasePath": "get", 
         "DomainName": {
           "Fn::Sub": "example-ap-southeast-1.com"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Stage": {
+          "Ref": "MyApiProdStage"
         }
       }, 
       "Condition": "C1"
@@ -212,21 +222,11 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApiDeploymentb73cd6313c": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "Description": "RestApi deployment id: b73cd6313c957bca233f1137e39ffbe99e448848"
-      }, 
-      "Condition": "C1"
-    }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentb73cd6313c"
+          "Ref": "MyApiDeployment6e1ee39b06"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
