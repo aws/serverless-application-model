@@ -318,6 +318,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_apikey_required_openapi_3',
         'api_with_basic_custom_domain',
         'api_with_basic_custom_domain_intrinsics',
+        'api_with_custom_domain_route53'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -548,6 +549,7 @@ class TestTranslatorEndToEnd(TestCase):
     'error_invalid_document_empty_semantic_version',
     'error_api_with_invalid_open_api_version_type',
     'error_api_with_custom_domains_invalid',
+    'error_api_with_custom_domains_route53_invalid',
     'error_api_usage_plan_invalid_parameter'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')

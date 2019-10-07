@@ -92,6 +92,16 @@
       }, 
       "Condition": "C1"
     }, 
+    "MyApiDeploymentf260697bb0": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: f260697bb02eda112f7c58d850cf875f82e745a4"
+      }, 
+      "Condition": "C1"
+    }, 
     "ServerlessRestApiDeployment599c0b434d": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
@@ -205,17 +215,20 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApiDeployment6cfbc38395": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeploymentf260697bb0"
+        }, 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 6cfbc383958724f1d2d4d05d6e76f8670e66831f"
+        "StageName": "Prod"
       }, 
       "Condition": "C1"
     }, 
-    "ApiGatewayDomainName4bfafc5803": {
+    "ApiGatewayDomainNamec0cd2d9dfc": {
       "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
         "EndpointConfiguration": {
@@ -227,19 +240,6 @@
         "DomainName": {
           "Fn::Sub": "example-cn-north-1.com"
         }
-      }, 
-      "Condition": "C1"
-    }, 
-    "MyApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiDeployment6cfbc38395"
-        }, 
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "StageName": "Prod"
       }, 
       "Condition": "C1"
     }, 

@@ -53,6 +53,27 @@
         }
       }
     }, 
+    "MyApiDeploymentf93c9d77b0": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: f93c9d77b03a49d41597a99e8aaecf51eb585698"
+      }
+    }, 
+    "ApiGatewayDomainName23cdccdf9c": {
+      "Type": "AWS::ApiGateway::DomainName", 
+      "Properties": {
+        "CertificateArn": "my-api-cert-arn", 
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        }, 
+        "DomainName": "api-example.com"
+      }
+    }, 
     "MyFunctionImplicitGetPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -78,7 +99,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyAnotherApiDeploymentc61fb61d5c"
+          "Ref": "MyAnotherApiDeployment78a7819e1c"
         }, 
         "RestApiId": {
           "Ref": "MyAnotherApi"
@@ -141,18 +162,6 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
-      }
-    }, 
-    "ApiGatewayDomainName461285836f": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "CertificateArn": "my-api-cert-arn", 
-        "EndpointConfiguration": {
-          "Types": [
-            "EDGE"
-          ]
-        }, 
-        "DomainName": "api-example.com"
       }
     }, 
     "MyApifetchBasePathMapping": {
@@ -265,44 +274,47 @@
         }
       }
     }, 
-    "MyApiDeploymentaf6c57ee88": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ApiGatewayDomainNameeab65c1531": {
+      "Type": "AWS::ApiGateway::DomainName", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
         }, 
-        "Description": "RestApi deployment id: af6c57ee88bdbf0d8ace828d5ac9cc02dba55922"
+        "RegionalCertificateArn": "another-api-arn", 
+        "DomainName": "another-example.com"
       }
     }, 
-    "ServerlessRestApiDeploymentd099245fb5": {
+    "ServerlessRestApiDeployment06e2333f46": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: d099245fb560a6117ebb37d418da8821c19f1eac", 
+        "Description": "RestApi deployment id: 06e2333f46f9e8ce75b6d105e0fb5b1b7fed3aca", 
         "StageName": "Stage"
+      }
+    }, 
+    "MyAnotherApiDeployment78a7819e1c": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyAnotherApi"
+        }, 
+        "Description": "RestApi deployment id: 78a7819e1cd42aa753a8dfc29d0026d44aaf6335"
       }
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentd099245fb5"
+          "Ref": "ServerlessRestApiDeployment06e2333f46"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "MyAnotherApiDeploymentc61fb61d5c": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyAnotherApi"
-        }, 
-        "Description": "RestApi deployment id: c61fb61d5cfc17e7e2f188dc18c5b11745bb6bc8"
       }
     }, 
     "ServerlessRestApiBasePathMapping": {
@@ -321,7 +333,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentaf6c57ee88"
+          "Ref": "MyApiDeploymentf93c9d77b0"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -363,18 +375,6 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
-      }
-    }, 
-    "ApiGatewayDomainName7a5525b8a3": {
-      "Type": "AWS::ApiGateway::DomainName", 
-      "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "RegionalCertificateArn": "another-api-arn", 
-        "DomainName": "another-example.com"
       }
     }, 
     "MyFunctionApiPermissionProd": {

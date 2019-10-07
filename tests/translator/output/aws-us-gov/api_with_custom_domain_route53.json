@@ -1,0 +1,248 @@
+{
+  "Parameters": {
+    "ACMCertificateArn": {
+      "Default": "cert-arn-in-us-east-1", 
+      "Type": "String"
+    }, 
+    "DomainName": {
+      "Default": "example.com", 
+      "Type": "String"
+    }
+  }, 
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs8.10", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyFunctionFetchPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ApiGatewayDomainName0caaf24ab1": {
+      "Type": "AWS::ApiGateway::DomainName", 
+      "Properties": {
+        "CertificateArn": "cert-arn-in-us-east-1", 
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        }, 
+        "DomainName": "example.com"
+      }
+    }, 
+    "MyApifetchBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "BasePath": "fetch", 
+        "DomainName": "example.com", 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }
+    }, 
+    "RecordSetGroupbd00d962a4": {
+      "Type": "AWS::Route53::RecordSetGroup", 
+      "Properties": {
+        "HostedZoneId": "ZQ1UAL4EFZVME", 
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "HostedZoneId": "Z2FDTNDATAQYW2", 
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "Distribution", 
+                  "DomainName"
+                ]
+              }
+            }, 
+            "Type": "A", 
+            "Name": "example.com"
+          }, 
+          {
+            "AliasTarget": {
+              "HostedZoneId": "Z2FDTNDATAQYW2", 
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "Distribution", 
+                  "DomainName"
+                ]
+              }
+            }, 
+            "Type": "AAAA", 
+            "Name": "example.com"
+          }
+        ]
+      }
+    }, 
+    "MyApiDeploymentf3b0901355": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Description": "RestApi deployment id: f3b0901355f3d895ddaa0964df0aef6171c1d400"
+      }
+    }, 
+    "Distribution": {
+      "Type": "AWS::CloudFront::Distribution", 
+      "Properties": {
+        "DistributionConfig": {
+          "Origins": [
+            {
+              "DomainName": {
+                "Ref": "DomainName"
+              }, 
+              "Id": {
+                "Ref": "DomainName"
+              }, 
+              "CustomOriginConfig": {
+                "OriginProtocolPolicy": "https-only", 
+                "HTTPPort": 80, 
+                "HTTPSPort": 443
+              }
+            }
+          ], 
+          "PriceClass": "PriceClass_100", 
+          "Enabled": true, 
+          "DefaultCacheBehavior": {
+            "Compress": true, 
+            "TargetOriginId": {
+              "Ref": "DomainName"
+            }, 
+            "ViewerProtocolPolicy": "redirect-to-https", 
+            "ForwardedValues": {
+              "QueryString": false
+            }, 
+            "SmoothStreaming": false, 
+            "AllowedMethods": [
+              "HEAD", 
+              "DELETE", 
+              "POST", 
+              "GET", 
+              "OPTIONS", 
+              "PUT", 
+              "PATCH"
+            ]
+          }, 
+          "ViewerCertificate": {
+            "SslSupportMethod": "sni-only", 
+            "AcmCertificateArn": {
+              "Ref": "ACMCertificateArn"
+            }
+          }, 
+          "HttpVersion": "http2"
+        }
+      }
+    }, 
+    "MyApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeploymentf3b0901355"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/fetch": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.0.1"
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }
+  }
+}
