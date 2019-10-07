@@ -1,0 +1,84 @@
+Conditions:
+  C1:
+    Fn::Equals:
+    - true
+    - true
+Parameters:
+  UsagePlanType:
+    Type: String
+    Default: SINGLE
+Globals:
+  Api:
+    OpenApiVersion: 3.0.0
+    Auth:
+      ApiKeyRequired: true
+      UsagePlan:
+        CreateUsagePlan:
+          Ref: UsagePlanType
+Resources:
+  MyApiOne:
+    Condition: C1
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+  MyApiTwo:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUsagePlan: NONE
+          UsagePlanId:
+            Ref: MyApiTwoUsagePlan
+  MyApiTwoUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn:
+    - MyApiTwo
+    Properties:
+      ApiStages:
+      - ApiId:
+          Ref: MyApiTwo
+        Stage:
+          Ref: MyApiTwo.Stage
+  MyFunctionOne:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      InlineCode: "exports.handler = async (event) => {\n  return {\n  statusCode:\
+        \ 200,\n  body: JSON.stringify(event),\n  headers: {}\n  }\n}\n"
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiOne
+            Method: get
+            Path: /path/one
+      CodeUri: s3://shreygan-test-west-2/9814c8d431fdafddf24acd99bad01422
+  MyFunctionTwo:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      InlineCode: "exports.handler = async (event) => {\n  return {\n  statusCode:\
+        \ 200,\n  body: JSON.stringify(event),\n  headers: {}\n  }\n}\n"
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiTwo
+            Method: get
+            Path: /path/two
+      CodeUri: s3://shreygan-test-west-2/9814c8d431fdafddf24acd99bad01422
+Outputs:
+  ApiOneUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  ApiTwoUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApiTwo}.execute-api.${AWS::Region}.amazonaws.com/Prod/

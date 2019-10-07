@@ -555,13 +555,13 @@ class ApiGenerator(object):
 
         # doesn't allow giving UsagePlanId when CreateUsagePlan is SINGLE or SHARED
         if usage_plan_type is None:
-            raise ValueError('Parameter "CreateUsagePlan" is a required parameter for "UsagePlan"'
-                             ' but was not provided.')
+            raise InvalidResourceException(self.logical_id, 'Parameter "CreateUsagePlan" is a required parameter '
+                                                            'for "UsagePlan" but was not provided.')
 
         if usage_plan_properties.get('CreateUsagePlan') == 'SINGLE':
             if usage_plan_properties.get('UsagePlanId') is not None:
-                raise ValueError('Invalid property "UsagePlanId". '
-                                 'This field can be given only when "CreateUsagePlan" is NONE')
+                raise InvalidResourceException(self.logical_id, 'Invalid property "UsagePlanId". This field '
+                                                                'can be given only when "CreateUsagePlan" is NONE')
 
             usage_plan_logical_id = self.logical_id + 'UsagePlan'
             # create a usage plan for this Api
@@ -577,8 +577,8 @@ class ApiGenerator(object):
             usage_plan_key = self._construct_usage_plan_key(usage_plan_logical_id, usage_plan_type, api_key)
         elif usage_plan_type == 'SHARED':
             if usage_plan_properties.get('UsagePlanId') is not None:
-                raise ValueError('Invalid property "UsagePlanId". '
-                                 'This field can be given only when "CreateUsagePlan" is NONE')
+                raise InvalidResourceException(self.logical_id, 'Invalid property "UsagePlanId". This field '
+                                                                'can be given only when "CreateUsagePlan" is NONE')
             # create a usage plan for all the apis
             usage_plan_logical_id = 'ServerlessUsagePlan'
             ApiGenerator.depends_on_shared.append(self.logical_id)
@@ -595,15 +595,19 @@ class ApiGenerator(object):
 
         elif usage_plan_type == 'NONE':
             if usage_plan_properties.get('UsagePlanId') is None:
-                raise ValueError('"UsagePlanId" must be given when "CreateUsagePlan" is "NONE"')
+                raise InvalidResourceException(self.logical_id, '"UsagePlanId" must be given when '
+                                                                '"CreateUsagePlan" is "NONE"')
 
             usage_plan_logical_id = usage_plan_properties.get('UsagePlanId')
+            if type(usage_plan_logical_id) == dict:
+                usage_plan_logical_id = usage_plan_logical_id.get('Ref')
+
             api_key = self._construct_api_key(usage_plan_logical_id, usage_plan_type, rest_api_stage)
             usage_plan_key = self._construct_usage_plan_key(usage_plan_logical_id, usage_plan_type, api_key)
 
         else:
-            raise ValueError(
-                    self.logical_id, "'CreateUsagePlan' accepts only NONE, SINGLE and SHARED values")
+            raise InvalidResourceException(self.logical_id, "'CreateUsagePlan' accepts only "
+                                                            "NONE, SINGLE and SHARED values")
 
         if usage_plan is None:
             return api_key, usage_plan_key
