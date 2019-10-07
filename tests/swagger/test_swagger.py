@@ -1456,7 +1456,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_iam_deny(self):
 
         resourcePolicy = {
@@ -1492,7 +1491,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_ip_allow(self):
 
         resourcePolicy = {
@@ -1548,7 +1546,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_ip_deny(self):
 
         resourcePolicy = {
@@ -1604,7 +1601,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_vpc_allow(self):
 
         resourcePolicy = {
@@ -1685,7 +1681,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_vpc_deny(self):
 
         resourcePolicy = {
@@ -1743,9 +1738,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_iam_allow_and_custom(self):
-## fails
         resourcePolicy = {
             'AwsAccountWhitelist': [
                 '123456'
