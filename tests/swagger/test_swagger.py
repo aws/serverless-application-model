@@ -1421,7 +1421,6 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    @patch("boto3.session.Session.region_name", "eu-west-2")
     def test_must_add_iam_allow(self):
 ## fails
         resourcePolicy = {
@@ -1438,14 +1437,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 'Action': 'execute-api:Invoke',
                 'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                 'Effect': 'Allow',
@@ -1474,14 +1473,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 'Action': 'execute-api:Invoke',
                 'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                 'Effect': 'Deny',
@@ -1510,14 +1509,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 'Action': 'execute-api:Invoke',
                 'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                 'Effect': 'Allow',
@@ -1527,14 +1526,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 'Action': 'execute-api:Invoke',
                 'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                 'Effect': 'Deny',
@@ -1566,14 +1565,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 'Action': 'execute-api:Invoke',
                 'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                 'Effect': 'Allow',
@@ -1583,14 +1582,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 'Action': 'execute-api:Invoke',
                 'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                 'Effect': 'Deny',
@@ -1624,14 +1623,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     'Action': 'execute-api:Invoke',
                     'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                     'Effect': 'Allow',
@@ -1641,14 +1640,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     'Action': 'execute-api:Invoke',
                     'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                     'Effect': 'Deny',
@@ -1663,14 +1662,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     'Action': 'execute-api:Invoke',
                     'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                     'Effect': 'Deny',
@@ -1704,14 +1703,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     'Action': 'execute-api:Invoke',
                     'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                     'Effect': 'Allow',
@@ -1721,14 +1720,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     'Action': 'execute-api:Invoke',
                     'Resource': [                {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                     'Effect': 'Deny',
@@ -1769,14 +1768,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 'Action': 'execute-api:Invoke',
                 'Resource': [{
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/PUT/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     },
                     {
                         'Fn::Sub': [
-                            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/foo',
-                            {'__Stage__': 'prod', '__ApiId__': '123'}
+                            'execute-api:/${__Stage__}/GET/foo',
+                            {'__Stage__': 'prod'}
                         ]
                     }],
                 'Effect': 'Allow',

@@ -6,13 +6,13 @@
     }
   }, 
   "Resources": {
-    "ExplicitApiDeployment81b55110cd": {
+    "ExplicitApiDeploymente173c8c5c6": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 81b55110cd180d9befc82fb98c8959611ef5976f", 
+        "Description": "RestApi deployment id: e173c8c5c6055492b897fc85a73484cfdba2742f", 
         "StageName": "Stage"
       }
     }, 
@@ -41,7 +41,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment81b55110cd"
+          "Ref": "ExplicitApiDeploymente173c8c5c6"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -138,12 +138,11 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      "execute-api:/${__Stage__}/GET/", 
                       {
                         "__Stage__": {
                           "Ref": "StageName"
-                        }, 
-                        "__ApiId__": "ExplicitApi"
+                        }
                       }
                     ]
                   }
@@ -156,12 +155,11 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      "execute-api:/${__Stage__}/GET/", 
                       {
                         "__Stage__": {
                           "Ref": "StageName"
-                        }, 
-                        "__ApiId__": "ExplicitApi"
+                        }
                       }
                     ]
                   }
