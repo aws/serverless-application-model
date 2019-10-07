@@ -425,100 +425,113 @@ class ApiGenerator(object):
         if not self.auth:
             return []
         auth_properties = AuthProperties(**self.auth)
-        if auth_properties.UsagePlan:
-            usage_plan_properties = auth_properties.UsagePlan
+        if auth_properties.UsagePlan is None:
+            return []
+        usage_plan_properties = auth_properties.UsagePlan
 
-            # throws error if the property invalid/ unsupported for UsagePlan
-            if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
-                raise InvalidResourceException(
-                    self.logical_id, "Invalid value for 'UsagePlan' property")
+        # throws error if the property invalid/ unsupported for UsagePlan
+        if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
+            raise InvalidResourceException(
+                self.logical_id, "Invalid property for 'UsagePlan'")
 
-            usage_plan = None
-            if usage_plan_properties.get('CreateUsagePlan') is None:
-                raise ValueError('Parameter "CreateUsagePlan" is a required parameter for "UsagePlan"'
-                                 ' but was not provided.')
+        usage_plan_type = usage_plan_properties.get('CreateUsagePlan')
+        usage_plan = None
 
-            if usage_plan_properties.get('CreateUsagePlan') == 'SINGLE':
+        # doesn't allow giving UsagePlanId when CreateUsagePlan is SINGLE or SHARED
+        if usage_plan_type is None:
+            raise ValueError('Parameter "CreateUsagePlan" is a required parameter for "UsagePlan"'
+                             ' but was not provided.')
 
-                # create a usage plan for this api
-                usage_plan_logical_id = usage_plan_properties.get('UsagePlanId')
-                if usage_plan_logical_id is None:
-                    usage_plan_logical_id = self.logical_id + 'UsagePlan'
-                    usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id, depends_on=[self.logical_id])
-                    api_stages = list()
-                    api_stage = dict()
-                    api_stage['ApiId'] = ref(self.logical_id)
-                    api_stage['Stage'] = ref(rest_api_stage.logical_id)
-                    api_stages.append(api_stage)
-                    usage_plan.ApiStages = api_stages
-                else:
-                    usage_plan_logical_id = usage_plan_logical_id.get('Ref')
+        if usage_plan_properties.get('CreateUsagePlan') == 'SINGLE':
+            if usage_plan_properties.get('UsagePlanId') is not None:
+                raise ValueError('Invalid property "UsagePlanId". '
+                                 'This field can be given only when "CreateUsagePlan" is NONE')
 
-                # create an api key resource for this api
-                api_key_logical_id = self.logical_id + 'ApiKey'
+            usage_plan_logical_id = self.logical_id + 'UsagePlan'
+            # create a usage plan for this Api
+            usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id, depends_on=[self.logical_id])
+            api_stages = list()
+            api_stage = dict()
+            api_stage['ApiId'] = ref(self.logical_id)
+            api_stage['Stage'] = ref(rest_api_stage.logical_id)
+            api_stages.append(api_stage)
+            usage_plan.ApiStages = api_stages
 
-                api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
-                api_key.Enabled = True
-                stage_keys = list()
-                stage_key = dict()
-                stage_key['RestApiId'] = ref(self.logical_id)
-                stage_key['StageName'] = ref(rest_api_stage.logical_id)
-                stage_keys.append(stage_key)
-                api_key.StageKeys = stage_keys
+            api_key = self._construct_api_key(usage_plan_logical_id, usage_plan_type, rest_api_stage)
+            usage_plan_key = self._construct_usage_plan_key(usage_plan_logical_id, usage_plan_type, api_key)
+        elif usage_plan_type == 'SHARED':
+            if usage_plan_properties.get('UsagePlanId') is not None:
+                raise ValueError('Invalid property "UsagePlanId". '
+                                 'This field can be given only when "CreateUsagePlan" is NONE')
+            # create a usage plan for all the apis
+            usage_plan_logical_id = 'ServerlessUsagePlan'
+            ApiGenerator.depends_on_shared.append(self.logical_id)
+            usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id,
+                                             depends_on=ApiGenerator.depends_on_shared)
+            api_stage = dict()
+            api_stage['ApiId'] = ref(self.logical_id)
+            api_stage['Stage'] = ref(rest_api_stage.logical_id)
+            ApiGenerator.api_stages_shared.append(api_stage)
+            usage_plan.ApiStages = ApiGenerator.api_stages_shared
 
-                # create a mapping between api key and the usage plan
-                usage_plan_key_logical_id = self.logical_id + 'UsagePlanKey'
-                usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id,
-                                                        depends_on=[api_key_logical_id])
-                usage_plan_key.KeyId = ref(api_key_logical_id)
-                usage_plan_key.KeyType = 'API_KEY'
-                usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)
+            api_key = self._construct_api_key(usage_plan_logical_id, usage_plan_type, rest_api_stage)
+            usage_plan_key = self._construct_usage_plan_key(usage_plan_logical_id, usage_plan_type, api_key)
 
-            elif usage_plan_properties.get('CreateUsagePlan') == 'SHARED':
-                usage_plan_logical_id = usage_plan_properties.get('UsagePlanId')
-                if usage_plan_logical_id is None:
-                    # create a usage plan for all the apis
-                    usage_plan_logical_id = 'ServerlessUsagePlan'
-                    ApiGenerator.depends_on_shared.append(self.logical_id)
-                    usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id,
-                                                     depends_on=ApiGenerator.depends_on_shared)
-                else:
-                    usage_plan_logical_id = usage_plan_logical_id.get('Ref')
+        elif usage_plan_type == 'NONE':
+            if usage_plan_properties.get('UsagePlanId') is None:
+                raise ValueError('"UsagePlanId" must be given when "CreateUsagePlan" is "NONE"')
 
-                api_stage = dict()
-                api_stage['ApiId'] = ref(self.logical_id)
-                api_stage['Stage'] = ref(rest_api_stage.logical_id)
-                ApiGenerator.api_stages_shared.append(api_stage)
-                usage_plan.ApiStages = ApiGenerator.api_stages_shared
+            usage_plan_logical_id = usage_plan_properties.get('UsagePlanId')
+            api_key = self._construct_api_key(usage_plan_logical_id, usage_plan_type, rest_api_stage)
+            usage_plan_key = self._construct_usage_plan_key(usage_plan_logical_id, usage_plan_type, api_key)
 
-                # create an api key resource for this api
-                api_key_logical_id = 'ServerlessApiKey'
-                api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
-                api_key.Enabled = True
-                stage_key = dict()
-                stage_key['RestApiId'] = ref(self.logical_id)
-                stage_key['StageName'] = ref(rest_api_stage.logical_id)
-                ApiGenerator.stage_keys_shared.append(stage_key)
-                api_key.StageKeys = ApiGenerator.stage_keys_shared
-
-                # create a mapping between api key and the usage plan
-                usage_plan_key_logical_id = 'ServerlessUsagePlanKey'
-                usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id,
-                                                        depends_on=[api_key_logical_id])
-                usage_plan_key.KeyId = ref(api_key_logical_id)
-                usage_plan_key.KeyType = 'API_KEY'
-                usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)
-
-            elif usage_plan_properties.get('CreateUsagePlan') == 'NONE':
-                return
-            else:
-                raise ValueError(
+        else:
+            raise ValueError(
                     self.logical_id, "'CreateUsagePlan' accepts only NONE, SINGLE and SHARED values")
 
-            if usage_plan is None:
-                return api_key, usage_plan_key
-            else:
-                return usage_plan, api_key, usage_plan_key
+        if usage_plan is None:
+            return api_key, usage_plan_key
+        else:
+            return usage_plan, api_key, usage_plan_key
+
+    def _construct_api_key(self, usage_plan_logical_id, usage_plan_type, rest_api_stage):
+        if usage_plan_type == 'SHARED':
+            # create an api key resource for all the apis
+            api_key_logical_id = 'ServerlessApiKey'
+            api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
+            api_key.Enabled = True
+            stage_key = dict()
+            stage_key['RestApiId'] = ref(self.logical_id)
+            stage_key['StageName'] = ref(rest_api_stage.logical_id)
+            ApiGenerator.stage_keys_shared.append(stage_key)
+            api_key.StageKeys = ApiGenerator.stage_keys_shared
+        else:
+            # create an api key resource for this api
+            api_key_logical_id = self.logical_id + 'ApiKey'
+            api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
+            api_key.Enabled = True
+            stage_keys = list()
+            stage_key = dict()
+            stage_key['RestApiId'] = ref(self.logical_id)
+            stage_key['StageName'] = ref(rest_api_stage.logical_id)
+            stage_keys.append(stage_key)
+            api_key.StageKeys = stage_keys
+        return api_key
+
+    def _construct_usage_plan_key(self, usage_plan_logical_id, usage_plan_type, api_key):
+        if usage_plan_type == 'SHARED':
+            # create a mapping between api key and the usage plan
+            usage_plan_key_logical_id = 'ServerlessUsagePlanKey'
+        else:
+            # create a mapping between api key and the usage plan
+            usage_plan_key_logical_id = self.logical_id + 'UsagePlanKey'
+
+        usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id, depends_on=[api_key.logical_id])
+        usage_plan_key.KeyId = ref(api_key.logical_id)
+        usage_plan_key.KeyType = 'API_KEY'
+        usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)
+
+        return usage_plan_key
 
     def _add_gateway_responses(self):
         """

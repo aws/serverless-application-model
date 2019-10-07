@@ -6,15 +6,44 @@ Resources:
        Auth:
          ApiKeyRequired: true
          UsagePlan:
-          CreateUsagePlan: SINGLE # SHARED, NONE
+          CreateUsagePlan: SHARED
 
    MyApiTwo:
      Type: AWS::Serverless::Api
      Properties:
        StageName: Prod
        Auth:
+         ApiKeyRequired: true
          UsagePlan:
           CreateUsagePlan: NONE
+          UsagePlanId: MyApiTwoUsagePlan
+
+   MyApiThree:
+     Type: AWS::Serverless::Api
+     Properties:
+       StageName: Prod
+       Auth:
+         ApiKeyRequired: true
+         UsagePlan:
+          CreateUsagePlan: SINGLE
+
+   MyApiFour:
+     Type: AWS::Serverless::Api
+     Properties:
+       StageName: Prod
+       Auth:
+         ApiKeyRequired: true
+         UsagePlan:
+          CreateUsagePlan: SHARED
+
+   MyApiTwoUsagePlan:
+      Type: AWS::ApiGateway::UsagePlan
+      DependsOn:
+        - MyApiTwo
+      Properties:
+        ApiStages:
+          - ApiId: !Ref MyApiTwo
+            Stage: !Ref MyApiTwo.Stage
 
    MyFunctionOne:
      Type: AWS::Serverless::Function
@@ -59,8 +88,65 @@ Resources:
                Ref: MyApiTwo
              Method: get
              Path: /path/two
+
+   MyFunctionThree:
+     Type: AWS::Serverless::Function
+     Properties:
+       Handler: index.handler
+       Runtime: nodejs8.10
+       InlineCode: |
+         exports.handler = async (event) => {
+           return {
+           statusCode: 200,
+           body: JSON.stringify(event),
+           headers: {}
+           }
+         }
+       Events:
+         ApiKey:
+           Type: Api
+           Properties:
+             RestApiId:
+               Ref: MyApiThree
+             Method: get
+             Path: /path/three
+
+   MyFunctionFour:
+     Type: AWS::Serverless::Function
+     Properties:
+       Handler: index.handler
+       Runtime: nodejs8.10
+       InlineCode: |
+         exports.handler = async (event) => {
+           return {
+           statusCode: 200,
+           body: JSON.stringify(event),
+           headers: {}
+           }
+         }
+       Events:
+         ApiKey:
+           Type: Api
+           Properties:
+             RestApiId:
+               Ref: MyApiFour
+             Method: get
+             Path: /path/four
+
 Outputs:
-    ApiUrl:
+    ApiOneUrl:
       Description: "API endpoint URL for Prod environment"
       Value:
         Fn::Sub: 'https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
+    ApiTwoUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApiTwo}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
+    ApiThreeUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApiThree}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
+    ApiFourUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApiFour}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
