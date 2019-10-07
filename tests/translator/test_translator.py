@@ -605,6 +605,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_with_event_dest_invalid",
         "error_function_with_event_dest_type",
         "error_function_with_api_key_false",
+        "error_api_usage_plan_invalid_parameter",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
