@@ -43,16 +43,6 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment1df013b4bb": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: 1df013b4bb69de8da845b9fe47a5010017e4959d", 
-        "StageName": "Stage"
-      }
-    }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
@@ -63,6 +53,16 @@
           "Ref": "MyApi"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "ServerlessRestApiDeploymente137534328": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: e1375343284100b701b94f5b3d70cde0563eca05", 
+        "StageName": "Stage"
       }
     }, 
     "MyApiDeployment5332c373d4": {
@@ -79,7 +79,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment1df013b4bb"
+          "Ref": "ServerlessRestApiDeploymente137534328"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -171,10 +171,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -187,10 +186,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -208,10 +206,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -229,10 +226,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch", 
+                      "execute-api:/${__Stage__}/POST/fetch", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -245,10 +241,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch", 
+                      "execute-api:/${__Stage__}/POST/fetch", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -266,10 +261,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch", 
+                      "execute-api:/${__Stage__}/POST/fetch", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }

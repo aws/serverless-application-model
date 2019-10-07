@@ -22,21 +22,11 @@
         ]
       }
     }, 
-    "ServerlessRestApiDeployment2adabda9e0": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: 2adabda9e0f4f56199a98530d73b978c7a986276", 
-        "StageName": "Stage"
-      }
-    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment2adabda9e0"
+          "Ref": "ServerlessRestApiDeployment9042dce526"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -66,6 +56,16 @@
             }
           ]
         }
+      }
+    }, 
+    "ServerlessRestApiDeployment9042dce526": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 9042dce526aaebf4138c89cce3779fd4ec217cf5", 
+        "StageName": "Stage"
       }
     }, 
     "ServerlessRestApi": {
@@ -101,10 +101,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -117,10 +116,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }

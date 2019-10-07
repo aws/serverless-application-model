@@ -6,7 +6,6 @@ from six import string_types
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
-from samtranslator.translator.arn_generator import ArnGenerator
 
 
 class SwaggerEditor(object):
@@ -891,15 +890,9 @@ class SwaggerEditor(object):
 
         for m in methods:
             method = '*' if (m.lower() == self._X_ANY_METHOD or m.lower() == 'any') else m.upper()
-
-            # RestApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
-            resource = '${__ApiId__}/' + '${__Stage__}/' + method + path
-            partition = ArnGenerator.get_partition_name(None)
-            if partition is None:
-                partition = "aws"
-            source_arn = fnSub(ArnGenerator.generate_arn(partition=partition, service='execute-api', resource=resource),
-                               {"__ApiId__": api_id, "__Stage__": stage})
-            uri_list.extend([source_arn])
+            resource = "execute-api:/${__Stage__}/" + method + path
+            resource = fnSub(resource, {"__Stage__": stage})
+            uri_list.extend([resource])
         return uri_list
 
     def _add_ip_resource_policy_for_method(self, ip_list, conditional, resource_list):

@@ -22,13 +22,13 @@
         ]
       }
     }, 
-    "ServerlessRestApiDeployment829e07383e": {
+    "ServerlessRestApiDeployment023bd5bca7": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 829e07383e1a1c0c161c27d399dcd32537399916", 
+        "Description": "RestApi deployment id: 023bd5bca761c7eb2832fb8a1a5dfa344af40f78", 
         "StageName": "Stage"
       }
     }, 
@@ -36,7 +36,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment829e07383e"
+          "Ref": "ServerlessRestApiDeployment023bd5bca7"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -101,10 +101,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -117,10 +116,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
