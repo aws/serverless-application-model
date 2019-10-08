@@ -20,6 +20,7 @@ Resources:
         OnTerminate:
           Type: CloudWatchEvent
           Properties:
+            EventBusName: ExternalEventBridge
             Pattern:
               detail:
                 state:
