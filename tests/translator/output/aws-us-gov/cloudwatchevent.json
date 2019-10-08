@@ -90,6 +90,7 @@
             ]
           }
         }, 
+        "EventBusName": "ExternalEventBridge",
         "Targets": [
           {
             "Id": "TriggeredFunctionOnTerminateLambdaTarget", 
