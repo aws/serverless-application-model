@@ -994,7 +994,9 @@ class SwaggerEditor(object):
             statement = self.resource_policy['Statement']
             if not isinstance(statement, list):
                 statement = [statement]
-            statement.extend(custom_statements)
+            for s in custom_statements:
+                if s not in statement:
+                    statement.append(s)
             self.resource_policy['Statement'] = statement
 
     def add_request_parameters_to_method(self, path, method_name, request_parameters):
