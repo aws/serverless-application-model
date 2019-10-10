@@ -56,9 +56,13 @@ class Client:
 
         final_qualifier = arn_qualifier if arn_qualifier else extraneous_qualifier
 
-        function_arn = FunctionArnFields.build_arn_string(
-            arn_fields.region, arn_fields.account_id, arn_fields.name, final_qualifier
-        )
+        try:
+            # GGC v1.9.0 or newer
+            function_arn = FunctionArnFields.build_function_arn(arn_fields.unqualified_arn, final_qualifier)
+        except AttributeError:
+            # older GGC version
+            raise AttributeError('class FunctionArnFields has no attribute \'build_function_arn\'. build_function_arn '
+                                 'is introduced in GGC v1.9.0. Please check your GGC version.')
 
         # ClientContext must be base64 if given, but is an option parameter
         try:
@@ -76,7 +80,7 @@ class Client:
         # Payload is an optional parameter
         payload = kwargs.get('Payload', b'')
         invocation_type = kwargs.get('InvocationType', 'RequestResponse')
-        customer_logger.info('Invoking local lambda "{}" with payload "{}" and client context "{}"'.format(
+        customer_logger.debug('Invoking local lambda "{}" with payload "{}" and client context "{}"'.format(
             function_arn, payload, client_context))
 
         # Post the work to IPC and return the result of that work
@@ -89,7 +93,7 @@ class Client:
         give this Lambda client a raw payload/client context to invoke with, rather than having it built for them.
         This lets you include custom ExtensionMap_ values like subject which are needed for our internal pinned Lambdas.
         """
-        customer_logger.info('Invoking Lambda function "{}" with Greengrass Message "{}"'.format(function_arn, payload))
+        customer_logger.debug('Invoking Lambda function "{}" with Greengrass Message "{}"'.format(function_arn, payload))
 
         try:
             invocation_id = self.ipc.post_work(function_arn, payload, client_context, invocation_type)

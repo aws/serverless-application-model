@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2010-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  */
 
 /*
@@ -18,8 +18,8 @@ const os = require('os');
 const util = require('util');
 
 function publishCallback(err, data) {
-    console.log(err);
-    console.log(data);
+    console.log('Publish response: '+data);
+    console.log('Publish error: '+err);
 }
 
 const myPlatform = util.format('%s-%s', os.platform(), os.release());
