@@ -1372,6 +1372,25 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy52",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "kms:Encrypt",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                      {
+                        "keyId": "keyId"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ],
         "AssumeRolePolicyDocument": {
