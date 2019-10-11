@@ -29,6 +29,12 @@
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
         "Policies": [
           {
             "PolicyName": "KitchenSinkFunctionRolePolicy0",
