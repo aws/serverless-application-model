@@ -166,7 +166,7 @@ resource:
       Runtime: nodejs8.10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
-        Enabled: false
+        Enabled: False
         Role: ""
       Environment:
         Variables:
@@ -273,7 +273,7 @@ Hooks are extremely powerful because:
 
     FunctionName: 'CodeDeployHook_preTrafficHook'
     DeploymentPreference:
-        Enabled: false
+        Enabled: False
     Policies:
         - Version: "2012-10-17"
           Statement:

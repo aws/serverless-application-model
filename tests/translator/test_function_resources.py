@@ -170,6 +170,7 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
         preference_collection = self._make_deployment_preference_collection()
         preference_collection.get.return_value = DeploymentPreference.from_dict(sam_func.logical_id,
                                                                                 deploy_preference_dict)
@@ -227,6 +228,8 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
+
         preference_collection = self._make_deployment_preference_collection()
         preference_collection.get.return_value = DeploymentPreference.from_dict(sam_func.logical_id,
                                                                                 deploy_preference_dict)
@@ -280,8 +283,9 @@ class TestVersionsAndAliases(TestCase):
         self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
         self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_instrinsic_ref_enabled_dict_parameter(self, get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_intrinsic_ref_enabled_dict_parameter(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
         enabled = {"Ref": "MyEnabledFlag"}
         deploy_preference_dict = {"Type": "LINEAR", "Enabled": enabled}
@@ -302,13 +306,47 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
         kwargs['deployment_preference_collection'] = deployment_preference_collection
-        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"key": "value"}
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"MyEnabledFlag": True}
         get_resolved_alias_name_mock.return_value = alias_name
 
-        with self.assertRaises(InvalidResourceException):
-            sam_func.to_cloudformation(**kwargs)
+        sam_func.to_cloudformation(**kwargs)
+        self.assertTrue(sam_func.DeploymentPreference['Enabled'])
+
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch.object(SamFunction, "_get_resolved_alias_name")
+    def test_sam_function_with_deployment_preference_intrinsic_findinmap_enabled_dict_parameter(self, get_resolved_alias_name_mock):
+        alias_name = "AliasName"
+        enabled = {"Fn::FindInMap": ["FooMap", "FooKey", "Enabled"]}
+        deploy_preference_dict = {"Type": "LINEAR", "Enabled": enabled}
+        func = {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "CodeUri": self.code_uri,
+                "Runtime": "nodejs4.3",
+                "Handler": "index.handler",
+                "AutoPublishAlias": alias_name,
+                "DeploymentPreference": deploy_preference_dict
+            }
+        }
+
+        sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
+
+        kwargs = dict()
+        kwargs["managed_policy_map"] = {"a": "b"}
+        kwargs["event_resources"] = []
+        kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        deployment_preference_collection = self._make_deployment_preference_collection()
+        kwargs['deployment_preference_collection'] = deployment_preference_collection
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"MyEnabledFlag": True}
+        self.mappings_resolver_mock.resolve_parameter_refs.return_value = True
+        get_resolved_alias_name_mock.return_value = alias_name
+
+        sam_func.to_cloudformation(**kwargs)
+        self.assertTrue(sam_func.DeploymentPreference['Enabled'])
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_version_creation(self, LogicalIdGeneratorMock):

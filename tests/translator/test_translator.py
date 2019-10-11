@@ -779,6 +779,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
 class TestTemplateValidation(TestCase):
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_not_found(self):
         template = {
@@ -790,6 +791,7 @@ class TestTemplateValidation(TestCase):
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_is_empty(self):
         template = {
@@ -802,6 +804,7 @@ class TestTemplateValidation(TestCase):
             translator.translate(template, {})
 
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_is_not_dict(self):
         template = {
@@ -814,6 +817,7 @@ class TestTemplateValidation(TestCase):
             translator.translate(template, {})
 
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resources_not_all_dicts(self):
         template = {
@@ -915,7 +919,7 @@ class TestPluginsUsage(TestCase):
         resource_from_dict_mock.assert_called_with("MyTable",
                                                         manifest["Resources"]["MyTable"],
                                                         sam_plugins=sam_plugins_object_mock)
-        prepare_plugins_mock.assert_called_once_with(initial_plugins, {"AWS::Region": "ap-southeast-1"})
+        prepare_plugins_mock.assert_called_once_with(initial_plugins, {"AWS::Region": "ap-southeast-1", "AWS::Partition": "aws"})
 
 def get_policy_mock():
     mock_policy_loader = MagicMock()
