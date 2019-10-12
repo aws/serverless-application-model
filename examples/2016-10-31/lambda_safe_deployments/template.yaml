@@ -3,7 +3,8 @@ Transform: AWS::Serverless-2016-10-31
 Description: A sample Lambda Safe Deployment Application
 
 Resources:
-
+  mySNSTopic:
+          Type: AWS::SNS::Topic
   safeTest:
     Type: AWS::Serverless::Function
     Properties:
@@ -15,6 +16,14 @@ Resources:
           Type: Linear10PercentEvery1Minute
           Hooks:
             PreTraffic: !Ref preTrafficHook
+
+          TriggerConfigurations:
+            - TriggerEvents:
+                - DeploymentSuccess
+                - DeploymentFailure
+              TriggerName: TestTrigger
+              TriggerTargetArn: !Ref mySNSTopic
+
 
   preTrafficHook:
     Type: AWS::Serverless::Function
