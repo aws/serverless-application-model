@@ -123,7 +123,19 @@
             "CodeDeployServiceRole", 
             "Arn"
           ]
-        }
+        },
+        "TriggerConfigurations": [
+          {
+            "TriggerEvents": [
+              "DeploymentSuccess",
+              "DeploymentFailure"
+            ],
+            "TriggerTargetArn": {
+              "Ref": "MySNSTopic"
+            },
+            "TriggerName": "TestTrigger"
+          }
+        ]
       }
     }, 
     "MySanityTestFunction": {
@@ -265,6 +277,9 @@
           ]
         }
       }
+    },
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
     }
   }
 }
