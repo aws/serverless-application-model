@@ -152,5 +152,4 @@ Resources:
         - CodeCommitReadPolicy:
             RepositoryName: name
 
-        - EventBridgePutEventsPolicy:
-            EventBusName: name
+        - EventBridgePutEventsPolicy: {}

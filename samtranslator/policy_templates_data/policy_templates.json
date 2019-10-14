@@ -1738,11 +1738,7 @@
       }
     },
     "EventBridgePutEventsPolicy": {
-      "Description": "Gives permission to put events onto an event bus",
-      "Parameters": {
-        "EventBusName": {
-          "Description":"The name of the event bus to which to put the event."
-        }
+      "Description": "Gives permission to put events onto an event bus"
       },
       "Definition": {
         "Statement": [
@@ -1751,16 +1747,7 @@
             "Action": [
               "events:PutEvents"
             ],
-            "Resource": {
-              "Fn::Sub": [
-                "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/${eventBusName}",
-                {
-                  "eventBusName": {
-                    "Ref": "EventBusName"
-                  }
-                }
-              ]
-            }
+            "Resource": "*"
           }
         ]
       }

@@ -1382,14 +1382,7 @@
                   "Action": [
                     "events:PutEvents"
                   ],
-                  "Resource": {
-                    "Fn::Sub": [
-                      "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/${eventBusName}",
-                      {
-                        "eventBusName": "name"
-                      }
-                    ]
-                  }
+                  "Resource": "*"
                 }
               ]
             }
