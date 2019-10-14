@@ -8,13 +8,15 @@ Globals:
             "Effect": "Allow",
             "Principal": "*",
             "Action": "execute-api:Invoke",
-            "Resource": "execute-api:*/*/*",
+            "Resource": "execute-api:/Prod/PUT/get",
             "Condition": {
                 "IpAddress": {
                     "aws:SourceIp": "1.2.3.4"
                 }
             }
         }]
+        # OR you can use the following, they both do the same thing
+        IpRangeBlacklist: ['1.2.3.4']
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function

@@ -23,13 +23,34 @@
         ]
       }
     }, 
-    "ExplicitApiDeployment05ad8508ea": {
+    "ExplicitApiFunctionPutHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/three", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApiDeployment07fc5ee8d3": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 05ad8508ea2fba75e3e1695154b7c3b455c6d5c9", 
+        "Description": "RestApi deployment id: 07fc5ee8d3073a50b2164fe22c3e49e5abb343ec", 
         "StageName": "Stage"
       }
     }, 
@@ -44,8 +65,32 @@
             }
           }, 
           "paths": {
-            "/": {
+            "/one": {
               "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }, 
+            "/three": {
+              "put": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }, 
+            "/two": {
+              "post": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
@@ -84,12 +129,33 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeployment05ad8508ea"
+          "Ref": "ExplicitApiDeployment07fc5ee8d3"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApiFunctionPostHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/two", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
       }
     }, 
     "ExplicitApiFunctionRole": {
@@ -126,7 +192,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/one", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
