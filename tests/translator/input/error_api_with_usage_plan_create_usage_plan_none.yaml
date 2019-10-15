@@ -5,6 +5,7 @@ Globals:
         ApiKeyRequired: true
         UsagePlan:
           CreateUsagePlan: NONE
+          UsagePlanId: !Ref usageplanid
 
 Resources:
    MyApiOne:

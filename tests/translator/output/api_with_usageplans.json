@@ -367,14 +367,6 @@
         "ApiStages": [
           {
             "ApiId": {
-              "Ref": "MyApiOne"
-            },
-            "Stage": {
-              "Ref": "MyApiOneProdStage"
-            }
-          },
-          {
-            "ApiId": {
               "Ref": "MyApiFour"
             },
             "Stage": {
@@ -384,7 +376,6 @@
         ]
       },
       "DependsOn": [
-        "MyApiOne",
         "MyApiFour"
       ]
     },
@@ -471,18 +462,6 @@
         "StageName": "Prod"
       }
     },
-    "MyApiFourProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiFourDeploymente7cfed53d1"
-        },
-        "RestApiId": {
-          "Ref": "MyApiFour"
-        },
-        "StageName": "Prod"
-      }
-    },
     "MyApiOneProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
@@ -505,32 +484,17 @@
         "StageName": "Stage"
       }
     },
-    "ServerlessApiKey": {
-      "Type": "AWS::ApiGateway::ApiKey",
+    "MyApiFourProdStage": {
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
-        "Enabled": true,
-        "StageKeys": [
-          {
-            "RestApiId": {
-              "Ref": "MyApiOne"
-            },
-            "StageName": {
-              "Ref": "MyApiOneProdStage"
-            }
-          },
-          {
-            "RestApiId": {
-              "Ref": "MyApiFour"
-            },
-            "StageName": {
-              "Ref": "MyApiFourProdStage"
-            }
-          }
-        ]
-      },
-      "DependsOn": [
-        "ServerlessUsagePlan"
-      ]
+        "DeploymentId": {
+          "Ref": "MyApiFourDeploymente7cfed53d1"
+        },
+        "RestApiId": {
+          "Ref": "MyApiFour"
+        },
+        "StageName": "Prod"
+      }
     },
     "MyApiThreeUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
@@ -548,6 +512,25 @@
       },
       "DependsOn": [
         "MyApiThree"
+      ]
+    },
+    "ServerlessApiKey": {
+      "Type": "AWS::ApiGateway::ApiKey",
+      "Properties": {
+        "Enabled": true,
+        "StageKeys": [
+          {
+            "RestApiId": {
+              "Ref": "MyApiFour"
+            },
+            "StageName": {
+              "Ref": "MyApiFourProdStage"
+            }
+          }
+        ]
+      },
+      "DependsOn": [
+        "ServerlessUsagePlan"
       ]
     },
     "MyApiTwoDeploymente9d97923b9": {

@@ -402,26 +402,10 @@
         "ApiStages": [
           {
             "ApiId": {
-              "Ref": "MyApiOne"
-            },
-            "Stage": {
-              "Ref": "MyApiOneProdStage"
-            }
-          },
-          {
-            "ApiId": {
               "Ref": "MyApiFour"
             },
             "Stage": {
               "Ref": "MyApiFourProdStage"
-            }
-          },
-          {
-            "ApiId": {
-              "Ref": "MyApiOne"
-            },
-            "Stage": {
-              "Ref": "MyApiOneProdStage"
             }
           },
           {
@@ -435,9 +419,7 @@
         ]
       },
       "DependsOn": [
-        "MyApiOne",
         "MyApiFour",
-        "MyApiOne",
         "MyApiFour"
       ]
     },
@@ -514,18 +496,6 @@
         "StageName": "Prod"
       }
     },
-    "MyApiFourProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiFourDeploymentf92b67251a"
-        },
-        "RestApiId": {
-          "Ref": "MyApiFour"
-        },
-        "StageName": "Prod"
-      }
-    },
     "MyApiOneProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
@@ -548,48 +518,17 @@
         "StageName": "Stage"
       }
     },
-    "ServerlessApiKey": {
-      "Type": "AWS::ApiGateway::ApiKey",
+    "MyApiFourProdStage": {
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
-        "Enabled": true,
-        "StageKeys": [
-          {
-            "RestApiId": {
-              "Ref": "MyApiOne"
-            },
-            "StageName": {
-              "Ref": "MyApiOneProdStage"
-            }
-          },
-          {
-            "RestApiId": {
-              "Ref": "MyApiFour"
-            },
-            "StageName": {
-              "Ref": "MyApiFourProdStage"
-            }
-          },
-          {
-            "RestApiId": {
-              "Ref": "MyApiOne"
-            },
-            "StageName": {
-              "Ref": "MyApiOneProdStage"
-            }
-          },
-          {
-            "RestApiId": {
-              "Ref": "MyApiFour"
-            },
-            "StageName": {
-              "Ref": "MyApiFourProdStage"
-            }
-          }
-        ]
-      },
-      "DependsOn": [
-        "ServerlessUsagePlan"
-      ]
+        "DeploymentId": {
+          "Ref": "MyApiFourDeploymentf92b67251a"
+        },
+        "RestApiId": {
+          "Ref": "MyApiFour"
+        },
+        "StageName": "Prod"
+      }
     },
     "MyApiThreeUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
@@ -607,6 +546,33 @@
       },
       "DependsOn": [
         "MyApiThree"
+      ]
+    },
+    "ServerlessApiKey": {
+      "Type": "AWS::ApiGateway::ApiKey",
+      "Properties": {
+        "Enabled": true,
+        "StageKeys": [
+          {
+            "RestApiId": {
+              "Ref": "MyApiFour"
+            },
+            "StageName": {
+              "Ref": "MyApiFourProdStage"
+            }
+          },
+          {
+            "RestApiId": {
+              "Ref": "MyApiFour"
+            },
+            "StageName": {
+              "Ref": "MyApiFourProdStage"
+            }
+          }
+        ]
+      },
+      "DependsOn": [
+        "ServerlessUsagePlan"
       ]
     },
     "MyFunctionThree": {

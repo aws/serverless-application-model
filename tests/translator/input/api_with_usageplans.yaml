@@ -1,29 +1,33 @@
+Globals:
+  Api:
+    Auth:
+      ApiKeyRequired: true
+      UsagePlan:
+        CreateUsagePlan: SHARED
+
 Resources:
    MyApiOne:
      Type: AWS::Serverless::Api
      Properties:
        StageName: Prod
        Auth:
-         ApiKeyRequired: true
          UsagePlan:
-          CreateUsagePlan: SHARED
+          CreateUsagePlan: NONE
 
    MyApiTwo:
      Type: AWS::Serverless::Api
      Properties:
        StageName: Prod
        Auth:
-         ApiKeyRequired: true
          UsagePlan:
-          CreateUsagePlan: NONE
-          UsagePlanId: !Ref MyApiTwoUsagePlan
+           CreateUsagePlan: SINGLE
+           UsagePlanId: !Ref MyApiTwoUsagePlan
 
    MyApiThree:
      Type: AWS::Serverless::Api
      Properties:
        StageName: Prod
        Auth:
-         ApiKeyRequired: true
          UsagePlan:
           CreateUsagePlan: SINGLE
 
@@ -31,10 +35,6 @@ Resources:
      Type: AWS::Serverless::Api
      Properties:
        StageName: Prod
-       Auth:
-         ApiKeyRequired: true
-         UsagePlan:
-          CreateUsagePlan: SHARED
 
    MyApiTwoUsagePlan:
       Type: AWS::ApiGateway::UsagePlan

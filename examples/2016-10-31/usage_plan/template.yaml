@@ -29,10 +29,8 @@ Resources:
      Properties:
        StageName: Prod
        Auth:
-         ApiKeyRequired: true
          UsagePlan:
-          CreateUsagePlan: NONE
-          UsagePlanId: !Ref MyApiTwoUsagePlan
+          CreateUsagePlan: SHARED
 
    MyApiTwoUsagePlan:
       Type: AWS::ApiGateway::UsagePlan
