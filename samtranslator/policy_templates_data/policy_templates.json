@@ -798,6 +798,32 @@
         ]
       }
     },
+    "KMSEncryptPolicy": {
+      "Description": "Gives permission to encrypt with KMS Key",
+      "Parameters": {
+        "KeyId": {
+          "Description": "ID of the KMS Key"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "kms:Encrypt",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                {
+                  "keyId": {
+                    "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "PollyFullAccessPolicy": {
       "Description": "Gives full access permissions to Polly lexicon resources",
       "Parameters": {
