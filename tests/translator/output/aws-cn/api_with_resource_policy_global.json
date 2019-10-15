@@ -6,18 +6,14 @@
     }
   }, 
   "Resources": {
-    "ExplicitApiStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ExplicitApiDeploymente173c8c5c6": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment2fa8a93a1f"
-        }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "StageName": {
-          "Ref": "StageName"
-        }
+        "Description": "RestApi deployment id: e173c8c5c6055492b897fc85a73484cfdba2742f", 
+        "StageName": "Stage"
       }
     }, 
     "ExplicitApiFunctionGetHtmlPermissionStage": {
@@ -41,14 +37,18 @@
         }
       }
     }, 
-    "ExplicitApiDeployment2fa8a93a1f": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ExplicitApiStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeploymente173c8c5c6"
+        }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: 2fa8a93a1f0177bfd94304dfc620cc8f6930af28", 
-        "StageName": "Stage"
+        "StageName": {
+          "Ref": "StageName"
+        }
       }
     }, 
     "ExplicitApiFunction": {
@@ -138,12 +138,11 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      "execute-api:/${__Stage__}/GET/", 
                       {
                         "__Stage__": {
                           "Ref": "StageName"
-                        }, 
-                        "__ApiId__": "ExplicitApi"
+                        }
                       }
                     ]
                   }
@@ -156,12 +155,11 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+                      "execute-api:/${__Stage__}/GET/", 
                       {
                         "__Stage__": {
                           "Ref": "StageName"
-                        }, 
-                        "__ApiId__": "ExplicitApi"
+                        }
                       }
                     ]
                   }

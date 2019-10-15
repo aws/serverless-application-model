@@ -23,6 +23,37 @@
         ]
       }
     }, 
+    "ExplicitApiDeploymentd2036decb3": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: d2036decb36ce147b7738a97c419737ea7e02555", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiFunctionPutHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/three", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -34,8 +65,32 @@
             }
           }, 
           "paths": {
-            "/": {
+            "/one": {
               "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }, 
+            "/three": {
+              "put": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }, 
+            "/two": {
+              "post": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
@@ -62,26 +117,37 @@
         }
       }
     }, 
-    "ExplicitApiDeploymentcdee3f2ed1": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: cdee3f2ed1733103d54a04f635e1acc120e714c1", 
-        "StageName": "Stage"
-      }
-    }, 
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentcdee3f2ed1"
+          "Ref": "ExplicitApiDeploymentd2036decb3"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApiFunctionPostHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/two", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
       }
     }, 
     "ExplicitApiFunctionRole": {
@@ -118,7 +184,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/one", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
