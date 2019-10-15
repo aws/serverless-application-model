@@ -1739,6 +1739,7 @@
     },
     "EventBridgePutEventsPolicy": {
       "Description": "Gives permission to put Events to event buses",
+      "Parameters": {},
       "Definition": {
         "Statement": [
           {
