@@ -26,7 +26,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentad2e86883f"
+          "Ref": "ServerlessRestApiDeployment5e467ed97e"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -34,14 +34,25 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeploymentad2e86883f": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyFunctionApiPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
         }, 
-        "Description": "RestApi deployment id: ad2e86883ff0677d26b8cba85e4675fd2dbe134e", 
-        "StageName": "Stage"
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
+            }
+          ]
+        }
       }
     }, 
     "MyFunctionRole": {
@@ -66,6 +77,16 @@
             }
           ]
         }
+      }
+    }, 
+    "ServerlessRestApiDeployment5e467ed97e": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 5e467ed97e429eadbf1e8e5a36ac9738d37bb79f", 
+        "StageName": "Stage"
       }
     }, 
     "ServerlessRestApi": {
@@ -101,10 +122,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -121,10 +141,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -137,10 +156,9 @@
                 "Resource": [
                   {
                     "Fn::Sub": [
-                      "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+                      "execute-api:/${__Stage__}/PUT/get", 
                       {
-                        "__Stage__": "Prod", 
-                        "__ApiId__": "ServerlessRestApi"
+                        "__Stage__": "Prod"
                       }
                     ]
                   }
@@ -165,27 +183,6 @@
         }, 
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
-        }
-      }
-    }, 
-    "MyFunctionApiPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
         }
       }
     }

@@ -21,7 +21,21 @@ Resources:
           Properties:
             RestApiId:
               Ref: ExplicitApi
-            Path: /
+            Path: /one
             Method: get
+        PostHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /two
+            Method: post
+        PutHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /three
+            Method: put
 
       
