@@ -258,7 +258,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_apikey_required',
         'api_with_path_parameters',
         'function_with_batch_window',
-        'api_with_swagger_no_auth'
+        'api_with_swagger_authorizer_none'
       ],
       [
        ("aws", "ap-southeast-1"),
