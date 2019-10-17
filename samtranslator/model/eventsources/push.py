@@ -578,6 +578,7 @@ class Api(PushEventSource):
         swagger_body = api.get("DefinitionBody")
         if swagger_body is None:
             return
+
         function_arn = function.get_runtime_attr('arn')
         partition = ArnGenerator.get_partition_name()
         uri = fnSub('arn:' + partition + ':apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/' +
@@ -601,6 +602,7 @@ class Api(PushEventSource):
         if self.Auth:
             method_authorizer = self.Auth.get('Authorizer')
             api_auth = api.get('Auth')
+
             if method_authorizer:
                 api_authorizers = api_auth and api_auth.get('Authorizers')
 
@@ -618,6 +620,7 @@ class Api(PushEventSource):
                             'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
                             'because it wasn\'t defined in the API\'s Authorizers.'.format(
                                 authorizer=method_authorizer, method=self.Method, path=self.Path))
+
                     if method_authorizer == 'NONE' and not api_auth.get('DefaultAuthorizer'):
                         raise InvalidEventException(
                             self.relative_id,
