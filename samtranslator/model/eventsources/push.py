@@ -529,8 +529,7 @@ class Api(PushEventSource):
         resources.extend(self._get_permissions(kwargs))
 
         explicit_api = kwargs['explicit_api']
-        if explicit_api.get("__MANAGE_SWAGGER"):
-            self._add_swagger_integration(explicit_api, function)
+        self._add_swagger_integration(explicit_api, function)
 
         return resources
 
@@ -579,31 +578,29 @@ class Api(PushEventSource):
         swagger_body = api.get("DefinitionBody")
         if swagger_body is None:
             return
-
         function_arn = function.get_runtime_attr('arn')
         partition = ArnGenerator.get_partition_name()
         uri = fnSub('arn:' + partition + ':apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/' +
                     make_shorthand(function_arn) + '/invocations')
 
         editor = SwaggerEditor(swagger_body)
+        if api.get("__MANAGE_SWAGGER"):
+            if editor.has_integration(self.Path, self.Method):
+                # Cannot add the Lambda Integration, if it is already present
+                raise InvalidEventException(
+                    self.relative_id,
+                    'API method "{method}" defined multiple times for path "{path}".'.format(
+                        method=self.Method, path=self.Path))
 
-        if editor.has_integration(self.Path, self.Method):
-            # Cannot add the Lambda Integration, if it is already present
-            raise InvalidEventException(
-                self.relative_id,
-                'API method "{method}" defined multiple times for path "{path}".'.format(
-                    method=self.Method, path=self.Path))
+            condition = None
+            if CONDITION in function.resource_attributes:
+                condition = function.resource_attributes[CONDITION]
 
-        condition = None
-        if CONDITION in function.resource_attributes:
-            condition = function.resource_attributes[CONDITION]
-
-        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get('Auth'), condition=condition)
+            editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get('Auth'), condition=condition)
 
         if self.Auth:
             method_authorizer = self.Auth.get('Authorizer')
             api_auth = api.get('Auth')
-
             if method_authorizer:
                 api_authorizers = api_auth and api_auth.get('Authorizers')
 
@@ -621,7 +618,6 @@ class Api(PushEventSource):
                             'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
                             'because it wasn\'t defined in the API\'s Authorizers.'.format(
                                 authorizer=method_authorizer, method=self.Method, path=self.Path))
-
                     if method_authorizer == 'NONE' and not api_auth.get('DefaultAuthorizer'):
                         raise InvalidEventException(
                             self.relative_id,
@@ -639,89 +635,90 @@ class Api(PushEventSource):
                         method=self.Method, path=self.Path))
 
             if method_authorizer or apikey_required_setting is not None:
-                editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+                if editor.has_path(self.Path):
+                    editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
 
             if self.Auth.get('ResourcePolicy'):
                 resource_policy = self.Auth.get('ResourcePolicy')
                 editor.add_resource_policy(resource_policy=resource_policy,
                                            path=self.Path, api_id=self.RestApiId.get('Ref'), stage=self.Stage)
+        if api.get("__MANAGE_SWAGGER"):
+            if self.RequestModel:
+                method_model = self.RequestModel.get('Model')
 
-        if self.RequestModel:
-            method_model = self.RequestModel.get('Model')
-
-            if method_model:
-                api_models = api.get('Models')
-                if not api_models:
-                    raise InvalidEventException(
-                        self.relative_id,
-                        'Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] '
-                        'because the related API does not define any Models.'.format(
-                            model=method_model, method=self.Method, path=self.Path))
-
-                if not api_models.get(method_model):
-                    raise InvalidEventException(
-                        self.relative_id,
-                        'Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] '
-                        'because it wasn\'t defined in the API\'s Models.'.format(
-                            model=method_model, method=self.Method, path=self.Path))
-
-                editor.add_request_model_to_method(path=self.Path, method_name=self.Method,
-                                                   request_model=self.RequestModel)
-
-        if self.RequestParameters:
-
-            default_value = {
-                'Required': False,
-                'Caching': False
-            }
-
-            parameters = []
-            for parameter in self.RequestParameters:
-
-                if isinstance(parameter, dict):
-
-                    parameter_name, parameter_value = next(iter(parameter.items()))
-
-                    if not re.match('method\.request\.(querystring|path|header)\.', parameter_name):
+                if method_model:
+                    api_models = api.get('Models')
+                    if not api_models:
                         raise InvalidEventException(
                             self.relative_id,
-                            "Invalid value for 'RequestParameters' property. Keys must be in the format "
-                            "'method.request.[querystring|path|header].{value}', "
-                            "e.g 'method.request.header.Authorization'.")
+                            'Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] '
+                            'because the related API does not define any Models.'.format(
+                                model=method_model, method=self.Method, path=self.Path))
 
-                    if not isinstance(parameter_value, dict) or not all(key in REQUEST_PARAMETER_PROPERTIES
-                                                                        for key in parameter_value.keys()):
+                    if not api_models.get(method_model):
                         raise InvalidEventException(
                             self.relative_id,
-                            "Invalid value for 'RequestParameters' property. Values must be an object, "
-                            "e.g { Required: true, Caching: false }")
+                            'Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] '
+                            'because it wasn\'t defined in the API\'s Models.'.format(
+                                model=method_model, method=self.Method, path=self.Path))
 
-                    settings = default_value.copy()
-                    settings.update(parameter_value)
-                    settings.update({'Name': parameter_name})
+                    editor.add_request_model_to_method(path=self.Path, method_name=self.Method,
+                                                       request_model=self.RequestModel)
 
-                    parameters.append(settings)
+            if self.RequestParameters:
 
-                elif isinstance(parameter, string_types):
-                    if not re.match('method\.request\.(querystring|path|header)\.', parameter):
+                default_value = {
+                    'Required': False,
+                    'Caching': False
+                }
+
+                parameters = []
+                for parameter in self.RequestParameters:
+
+                    if isinstance(parameter, dict):
+
+                        parameter_name, parameter_value = next(iter(parameter.items()))
+
+                        if not re.match('method\.request\.(querystring|path|header)\.', parameter_name):
+                            raise InvalidEventException(
+                                self.relative_id,
+                                "Invalid value for 'RequestParameters' property. Keys must be in the format "
+                                "'method.request.[querystring|path|header].{value}', "
+                                "e.g 'method.request.header.Authorization'.")
+
+                        if not isinstance(parameter_value, dict) or not all(key in REQUEST_PARAMETER_PROPERTIES
+                                                                            for key in parameter_value.keys()):
+                            raise InvalidEventException(
+                                self.relative_id,
+                                "Invalid value for 'RequestParameters' property. Values must be an object, "
+                                "e.g { Required: true, Caching: false }")
+
+                        settings = default_value.copy()
+                        settings.update(parameter_value)
+                        settings.update({'Name': parameter_name})
+
+                        parameters.append(settings)
+
+                    elif isinstance(parameter, string_types):
+                        if not re.match('method\.request\.(querystring|path|header)\.', parameter):
+                            raise InvalidEventException(
+                                self.relative_id,
+                                "Invalid value for 'RequestParameters' property. Keys must be in the format "
+                                "'method.request.[querystring|path|header].{value}', "
+                                "e.g 'method.request.header.Authorization'.")
+
+                        settings = default_value.copy()
+                        settings.update({'Name': parameter})
+
+                        parameters.append(settings)
+
+                    else:
                         raise InvalidEventException(
-                            self.relative_id,
-                            "Invalid value for 'RequestParameters' property. Keys must be in the format "
-                            "'method.request.[querystring|path|header].{value}', "
-                            "e.g 'method.request.header.Authorization'.")
+                            self.relative_id, "Invalid value for 'RequestParameters' property. "
+                                              "Property must be either a string or an object")
 
-                    settings = default_value.copy()
-                    settings.update({'Name': parameter})
-
-                    parameters.append(settings)
-
-                else:
-                    raise InvalidEventException(
-                        self.relative_id,
-                        "Invalid value for 'RequestParameters' property. Property must be either a string or an object")
-
-            editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
-                                                    request_parameters=parameters)
+                editor.add_request_parameters_to_method(path=self.Path, method_name=self.Method,
+                                                        request_parameters=parameters)
 
         api["DefinitionBody"] = editor.swagger
 
