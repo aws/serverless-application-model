@@ -38,7 +38,7 @@ Resources:
       Runtime: nodejs8.10
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
-        Enabled: false
+        Enabled: False
       Environment:
         Variables:
           CurrentVersion: !Ref safeTest.Version

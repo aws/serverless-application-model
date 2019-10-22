@@ -421,10 +421,11 @@ class SamFunction(SamResourceMacro):
     def _validate_deployment_preference_and_add_update_policy(self, deployment_preference_collection, lambda_alias,
                                                               intrinsics_resolver, mappings_resolver):
         if 'Enabled' in self.DeploymentPreference:
-            self.DeploymentPreference['Enabled'] = intrinsics_resolver.resolve_parameter_refs(
-                self.DeploymentPreference['Enabled'])
-            if isinstance(self.DeploymentPreference['Enabled'], dict):
-                raise InvalidResourceException(self.logical_id, "'Enabled' must be a boolean value")
+            # resolve intrinsics and mappings for Type
+            enabled = self.DeploymentPreference['Enabled']
+            enabled = intrinsics_resolver.resolve_parameter_refs(enabled)
+            enabled = mappings_resolver.resolve_parameter_refs(enabled)
+            self.DeploymentPreference['Enabled'] = enabled
 
         if 'Type' in self.DeploymentPreference:
             # resolve intrinsics and mappings for Type
