@@ -156,6 +156,6 @@ Resources:
 
         - KMSEncryptPolicy:
             KeyId: keyId
-        
+
         - AthenaQueryPolicy:
             WorkGroupName: name
