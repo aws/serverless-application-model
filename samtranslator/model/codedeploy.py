@@ -23,6 +23,7 @@ class CodeDeployDeploymentGroup(Resource):
         'DeploymentConfigName': PropertyType(False, one_of(is_str(), is_type(dict))),
         'DeploymentStyle': PropertyType(False, is_type(dict)),
         'ServiceRoleArn': PropertyType(True, one_of(is_str(), is_type(dict))),
+        'TriggerConfigurations': PropertyType(False, is_type(list))
     }
 
     runtime_attrs = {
