@@ -37,11 +37,12 @@ Resources:
         CertificateArn: !Ref ACMCertificateArn
         EndpointConfiguration: EDGE
         BasePath:
-          - /fetch
+          - /home
         Route53:
          HostedZoneId: ZQ1UAL4EFZVME
          IpV6: true
-         DistributionDomainName: !GetAtt Distribution.DomainName
+## ====== Everything below here is optional, leave this out if you want to use the internal Api Gateway distribution =======
+         DistributionDomainName: !GetAtt Distribution.DomainName 
 
   Distribution:
     Type: AWS::CloudFront::Distribution
