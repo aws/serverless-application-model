@@ -90,7 +90,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyAnotherApiDeploymente89573907a"
+          "Ref": "MyAnotherApiDeployment48a61be119"
         }, 
         "RestApiId": {
           "Ref": "MyAnotherApi"
@@ -116,18 +116,6 @@
               }
             }
           ]
-        }
-      }
-    }, 
-    "MyAnotherApiBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping", 
-      "Properties": {
-        "DomainName": "another-example.com", 
-        "RestApiId": {
-          "Ref": "MyAnotherApi"
-        }, 
-        "Stage": {
-          "Ref": "MyAnotherApiProdStage"
         }
       }
     }, 
@@ -159,13 +147,17 @@
         }
       }
     }, 
-    "MyApiDeploymentddf2dae73e": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyApifetchBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
+        "BasePath": "fetch", 
+        "DomainName": "api-example.com", 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: ddf2dae73e4e91595e8de4be7a30a1d207f32aab"
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
       }
     }, 
     "MyFunctionRole": {
@@ -245,13 +237,16 @@
         }
       }
     }, 
-    "MyAnotherApiDeploymente89573907a": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "MyAnotherApiBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
+        "DomainName": "another-example.com", 
         "RestApiId": {
           "Ref": "MyAnotherApi"
         }, 
-        "Description": "RestApi deployment id: e89573907aa0c18379ba3bcc497b31454e88a664"
+        "Stage": {
+          "Ref": "MyAnotherApiProdStage"
+        }
       }
     }, 
     "ApiGatewayDomainNameeab65c1531": {
@@ -266,24 +261,21 @@
         "DomainName": "another-example.com"
       }
     }, 
-    "MyApifetchBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping", 
+    "ServerlessRestApiDeployment3c44da8ffd": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "BasePath": "fetch", 
-        "DomainName": "api-example.com", 
         "RestApiId": {
-          "Ref": "MyApi"
+          "Ref": "ServerlessRestApi"
         }, 
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
+        "Description": "RestApi deployment id: 3c44da8ffdf3025dc792391a61590b92e8e2ff48", 
+        "StageName": "Stage"
       }
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment7db01b740c"
+          "Ref": "ServerlessRestApiDeployment3c44da8ffd"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -291,14 +283,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeployment7db01b740c": {
+    "MyApiDeploymentbfb0243af9": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
-          "Ref": "ServerlessRestApi"
+          "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 7db01b740cb897c4fc4175031f25e8123cc57ca9", 
-        "StageName": "Stage"
+        "Description": "RestApi deployment id: bfb0243af9bffaabaf3bbc9d980266c6d6eb8471"
       }
     }, 
     "ServerlessRestApiBasePathMapping": {
@@ -317,12 +308,21 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentddf2dae73e"
+          "Ref": "MyApiDeploymentbfb0243af9"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
         "StageName": "Prod"
+      }
+    }, 
+    "MyAnotherApiDeployment48a61be119": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyAnotherApi"
+        }, 
+        "Description": "RestApi deployment id: 48a61be119a247807ea0ef8378e6aa16592f90fa"
       }
     }, 
     "ServerlessRestApi": {

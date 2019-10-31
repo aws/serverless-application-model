@@ -326,9 +326,7 @@ class ApiGenerator(object):
             alias_target['DNSName'] = fnGetAtt(self.domain.get('ApiDomainName'), 'RegionalDomainName')
         else:
             if route53.get('DistributionDomainName') is None:
-                raise InvalidResourceException(self.logical_id,
-                                               "Custom Domains support for EDGE requires the name "
-                                               "of a Distribution resource")
+                route53['DistributionDomainName'] = fnGetAtt(self.domain.get('ApiDomainName'), 'DistributionDomainName')
             alias_target['HostedZoneId'] = 'Z2FDTNDATAQYW2'
             alias_target['DNSName'] = route53.get('DistributionDomainName')
         return alias_target
