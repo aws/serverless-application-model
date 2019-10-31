@@ -403,7 +403,8 @@ class SNS(PushEventSource):
             self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
         )
 
-        resources = resources + self._inject_sqs_event_source_mapping(function, role, queue_arn)
+        event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)
+        resources = resources + event_source
         resources.append(queue)
         resources.append(queue_policy)
         resources.append(subscription)
@@ -427,15 +428,15 @@ class SNS(PushEventSource):
     def _inject_sqs_queue(self):
         return SQSQueue(self.logical_id + 'Queue')
 
-    def _inject_sqs_event_source_mapping(self, function, role, queue_arn):
+    def _inject_sqs_event_source_mapping(self, function, role, queue_arn, batch_size=None, enabled=None):
         event_source = SQS(self.logical_id + 'EventSourceMapping')
         event_source.Queue = queue_arn
-        event_source.BatchSize = 10
-        event_source.Enabled = True
+        event_source.BatchSize = batch_size or 10
+        event_source.Enabled = enabled or True
         return event_source.to_cloudformation(function=function, role=role)
 
-    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url):
-        policy = SQSQueuePolicy(self.logical_id + 'QueuePolicy')
+    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, logical_id=None):
+        policy = SQSQueuePolicy(logical_id or self.logical_id + 'QueuePolicy')
         policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(
             topic_arn, queue_arn
         )
