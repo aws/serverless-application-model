@@ -368,7 +368,7 @@ class SNS(PushEventSource):
             'Topic': PropertyType(True, is_str()),
             'Region': PropertyType(False, is_str()),
             'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
-            'SqsSubscription': PropertyType(False, is_type(bool))
+            'SqsSubscription': PropertyType(False, one_of(is_type(bool), is_type(dict)))
     }
 
     def to_cloudformation(self, **kwargs):
@@ -392,20 +392,42 @@ class SNS(PushEventSource):
             )
             return [self._construct_permission(function, source_arn=self.Topic), subscription]
 
-        # SNS -> SQS -> Lambda
+        # SNS -> SQS(Create New) -> Lambda
+        if isinstance(self.SqsSubscription, bool):
+            resources = []
+            queue = self._inject_sqs_queue()
+            queue_arn = queue.get_runtime_attr('arn')
+            queue_url = queue.get_runtime_attr('queue_url')
+
+            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url)
+            subscription = self._inject_subscription(
+                'sqs', queue_arn,
+                self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
+            )
+            event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)
+
+            resources = resources + event_source
+            resources.append(queue)
+            resources.append(queue_policy)
+            resources.append(subscription)
+            return resources
+
+        # SNS -> SQS(Existing) -> Lambda
         resources = []
-        queue = self._inject_sqs_queue()
-        queue_arn = queue.get_runtime_attr('arn')
-        queue_url = queue.get_runtime_attr('queue_url')
-        queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url)
+        queue_arn = self.SqsSubscription.get('QueueArn', None)
+        queue_url = self.SqsSubscription.get('QueueUrl', None)
+        queue_policy_logical_id = self.SqsSubscription.get('QueuePolicyLogicalId', None)
+        batch_size = self.SqsSubscription.get('BatchSize', None)
+        enabled = self.SqsSubscription.get('Enabled', None)
+
+        queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, queue_policy_logical_id)
         subscription = self._inject_subscription(
             'sqs', queue_arn,
             self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
         )
+        event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)
 
-        event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)
         resources = resources + event_source
-        resources.append(queue)
         resources.append(queue_policy)
         resources.append(subscription)
         return resources
