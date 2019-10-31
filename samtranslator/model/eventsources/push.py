@@ -395,13 +395,15 @@ class SNS(PushEventSource):
         # SNS -> SQS -> Lambda
         resources = []
         queue = self._inject_sqs_queue()
-        queue_policy = self._inject_sqs_queue_policy(self.Topic, queue)
+        queue_arn = queue.get_runtime_attr('arn')
+        queue_url = queue.get_runtime_attr('queue_url')
+        queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url)
         subscription = self._inject_subscription(
-            'sqs', queue.get_runtime_attr('arn'),
+            'sqs', queue_arn,
             self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
         )
 
-        resources = resources + self._inject_sqs_event_source_mapping(function, role, queue.get_runtime_attr('arn'))
+        resources = resources + self._inject_sqs_event_source_mapping(function, role, queue_arn)
         resources.append(queue)
         resources.append(queue_policy)
         resources.append(subscription)
@@ -432,12 +434,12 @@ class SNS(PushEventSource):
         event_source.Enabled = True
         return event_source.to_cloudformation(function=function, role=role)
 
-    def _inject_sqs_queue_policy(self, topic_arn, queue):
+    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url):
         policy = SQSQueuePolicy(self.logical_id + 'QueuePolicy')
         policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(
-            topic_arn, queue.get_runtime_attr('arn')
+            topic_arn, queue_arn
         )
-        policy.Queues = [queue.get_runtime_attr('queue_url')]
+        policy.Queues = [queue_url]
         return policy
 
 
