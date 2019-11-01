@@ -65,19 +65,6 @@
         "DomainName": "example.com"
       }
     }, 
-    "MyApifetchBasePathMapping": {
-      "Type": "AWS::ApiGateway::BasePathMapping", 
-      "Properties": {
-        "BasePath": "fetch", 
-        "DomainName": "example.com", 
-        "RestApiId": {
-          "Ref": "MyApi"
-        }, 
-        "Stage": {
-          "Ref": "MyApiProdStage"
-        }
-      }
-    }, 
     "RecordSetGroupbd00d962a4": {
       "Type": "AWS::Route53::RecordSetGroup", 
       "Properties": {
@@ -88,8 +75,8 @@
               "HostedZoneId": "Z2FDTNDATAQYW2", 
               "DNSName": {
                 "Fn::GetAtt": [
-                  "Distribution", 
-                  "DomainName"
+                  "ApiGatewayDomainName0caaf24ab1", 
+                  "DistributionDomainName"
                 ]
               }
             }, 
@@ -101,8 +88,8 @@
               "HostedZoneId": "Z2FDTNDATAQYW2", 
               "DNSName": {
                 "Fn::GetAtt": [
-                  "Distribution", 
-                  "DomainName"
+                  "ApiGatewayDomainName0caaf24ab1", 
+                  "DistributionDomainName"
                 ]
               }
             }, 
@@ -112,71 +99,33 @@
         ]
       }
     }, 
-    "MyApiDeployment22e6f8d813": {
+    "MyApioneBasePathMapping": {
+      "Type": "AWS::ApiGateway::BasePathMapping", 
+      "Properties": {
+        "BasePath": "one", 
+        "DomainName": "example.com", 
+        "RestApiId": {
+          "Ref": "MyApi"
+        }, 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }
+    }, 
+    "MyApiDeploymentfb330328f1": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 22e6f8d8130f68b2813a6e31d74b0ecccbf7820d"
-      }
-    }, 
-    "Distribution": {
-      "Type": "AWS::CloudFront::Distribution", 
-      "Properties": {
-        "DistributionConfig": {
-          "Origins": [
-            {
-              "DomainName": {
-                "Ref": "DomainName"
-              }, 
-              "Id": {
-                "Ref": "DomainName"
-              }, 
-              "CustomOriginConfig": {
-                "OriginProtocolPolicy": "https-only", 
-                "HTTPPort": 80, 
-                "HTTPSPort": 443
-              }
-            }
-          ], 
-          "PriceClass": "PriceClass_100", 
-          "Enabled": true, 
-          "DefaultCacheBehavior": {
-            "Compress": true, 
-            "TargetOriginId": {
-              "Ref": "DomainName"
-            }, 
-            "ViewerProtocolPolicy": "redirect-to-https", 
-            "ForwardedValues": {
-              "QueryString": false
-            }, 
-            "SmoothStreaming": false, 
-            "AllowedMethods": [
-              "HEAD", 
-              "DELETE", 
-              "POST", 
-              "GET", 
-              "OPTIONS", 
-              "PUT", 
-              "PATCH"
-            ]
-          }, 
-          "ViewerCertificate": {
-            "SslSupportMethod": "sni-only", 
-            "AcmCertificateArn": {
-              "Ref": "ACMCertificateArn"
-            }
-          }, 
-          "HttpVersion": "http2"
-        }
+        "Description": "RestApi deployment id: fb330328f152e4bb4b7d68e8b976b009e0558035"
       }
     }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment22e6f8d813"
+          "Ref": "MyApiDeploymentfb330328f1"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
