@@ -177,7 +177,7 @@ class ApiGenerator(object):
 
         return deployment
 
-    def _construct_stage(self, deployment, swagger):
+    def _construct_stage(self, deployment, swagger, function_name):
         """Constructs and returns the ApiGateway Stage.
 
         :param model.apigateway.ApiGatewayDeployment deployment: the Deployment for this Stage
@@ -207,7 +207,7 @@ class ApiGenerator(object):
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger, self.domain)
+            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger, self.domain, function_name)
 
         if self.tags is not None:
             stage.Tags = get_tag_list(self.tags)
@@ -331,12 +331,13 @@ class ApiGenerator(object):
             alias_target['DNSName'] = route53.get('DistributionDomainName')
         return alias_target
 
-    def to_cloudformation(self):
+    def to_cloudformation(self, function_name):
         """Generates CloudFormation resources from a SAM API resource
 
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
+        # print("Kwargs......", self.kwargs)
         rest_api = self._construct_rest_api()
         domain, basepath_mapping, route53 = self._construct_api_domain(rest_api)
         deployment = self._construct_deployment(rest_api)
@@ -347,7 +348,7 @@ class ApiGenerator(object):
         elif rest_api.BodyS3Location is not None:
             swagger = rest_api.BodyS3Location
 
-        stage = self._construct_stage(deployment, swagger)
+        stage = self._construct_stage(deployment, swagger, function_name)
         permissions = self._construct_authorizer_lambda_permission()
 
         return rest_api, deployment, stage, permissions, domain, basepath_mapping, route53

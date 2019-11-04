@@ -31,6 +31,16 @@ class Translator:
         self.plugins = plugins
         self.sam_parser = sam_parser
 
+    function_name = ""
+
+    def _get_function_name(self, resource_dict):
+        print("type(resource....dict....)", type(resource_dict))
+        if resource_dict.get("Type", "").strip() == 'AWS::Serverless::Function':
+            print("FunctionName:   ", self.function_name)
+            self.function_name = self.function_name + (resource_dict.get('Properties', "").get('FunctionName') or "")
+            print("FunctionName:   ", self.function_name)
+        return self.function_name
+
     def translate(self, sam_template, parameter_values):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
@@ -68,19 +78,24 @@ class Translator:
         supported_resource_refs = SupportedResourceReferences()
         document_errors = []
         changed_logical_ids = {}
-
+        import pdb;
+        pdb.set_trace()
+        print("---------number of resources-------------------------", len(self._get_resources_to_iterate(sam_template, macro_resolver)))
+        print("//////////////////sam resources////////////////////////////")
+        print(sam_template)
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
                 macro = macro_resolver\
                     .resolve_resource_type(resource_dict)\
                     .from_dict(logical_id, resource_dict, sam_plugins=sam_plugins)
-
+                print("resource_dict", resource_dict)
                 kwargs = macro.resources_to_link(sam_template['Resources'])
                 kwargs['managed_policy_map'] = self.managed_policy_map
                 kwargs['intrinsics_resolver'] = intrinsics_resolver
                 kwargs['mappings_resolver'] = mappings_resolver
                 kwargs['deployment_preference_collection'] = deployment_preference_collection
                 kwargs['conditions'] = template.get('Conditions')
+                kwargs['function_name'] = self._get_function_name(resource_dict)
 
                 translated = macro.to_cloudformation(**kwargs)
 

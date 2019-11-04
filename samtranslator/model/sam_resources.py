@@ -734,6 +734,7 @@ class SamApi(SamResourceMacro):
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
+        function_name = kwargs.get('function_name')
 
         api_generator = ApiGenerator(self.logical_id,
                                      self.CacheClusterEnabled,
@@ -761,7 +762,8 @@ class SamApi(SamResourceMacro):
                                      models=self.Models,
                                      domain=self.Domain)
 
-        rest_api, deployment, stage, permissions, domain, basepath_mapping, route53 = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions, domain, basepath_mapping, \
+            route53 = api_generator.to_cloudformation(function_name)
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
