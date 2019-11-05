@@ -57,6 +57,12 @@
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "Policies": [
           {
             "PolicyName": "OnePolicyTemplateRolePolicy0",
@@ -115,6 +121,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "Policies": [
           {
@@ -213,6 +225,12 @@
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
           "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "Policies": [
           {
