@@ -14,7 +14,7 @@ mock_policy_loader.load.return_value = {
     'AmazonDynamoDBReadOnlyAccess': 'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
     'AWSLambdaRole': 'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
 }
-'''
+
 @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
 def test_redeploy_explicit_api():
     """
@@ -44,7 +44,6 @@ def test_redeploy_explicit_api():
     # Now, update an unrelated property. This should NOT generate a new deploymentId
     manifest["Resources"]["ExplicitApi"]["Properties"]["StageName"] = "newStageName"
     assert updated_deployment_ids == translate_and_find_deployment_ids(manifest)
-'''
 
 
 @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
@@ -55,7 +54,7 @@ def test_redeploy_implicit_api():
             'FirstLambdaFunction': {
                 'Type': "AWS::Serverless::Function",
                 "Properties": {
-                   "FunctionName": "InitialFunction",
+                    "FunctionName": "InitialFunction",
                     "CodeUri": "s3://bucket/code.zip",
                     "Handler": "index.handler",
                     "Runtime": "nodejs4.3",
@@ -77,48 +76,20 @@ def test_redeploy_implicit_api():
                     "Handler": "index.handler",
                     "Runtime": "nodejs4.3",
                     "Events": {
-                        "MyApi2": {
-                            "RestApiId": "MyApiHere",
+                        "MyApi": {
                             "Type": "Api",
                             "Properties": {
-                                "Path": "/",
+                                "Path": "/second",
                                 "Method": "get"
                             }
                         }
                     }
                 }
-            },
-            'MyApiHere': {
-                    'Type': "AWS::Serverless::Api",
-                    "Properties": {
-                        "StageName": "Prod"
-                    }
             }
         }
     }
 
     original_deployment_ids = translate_and_find_deployment_ids(manifest)
-    print("printing original deployment ids.............")
-    print(original_deployment_ids)
-    print("......hetyyyyy...")
-    # Update function name of the first Lambda should redeploy API
-    # print("FirstLambdaFunction initially", manifest["Resources"]["FirstLambdaFunction"]["Properties"]["FunctionName"])
-    # print("SecondLambdaFunction initially", manifest["Resources"]["SecondLambdaFunction"]["Properties"]["FunctionName"])
-
-    manifest["Resources"]["FirstLambdaFunction"]["Properties"]["FunctionName"] = "Changedfunctionname" # ["FunctionName"] = "ModifiedFunctionName"
-    # manifest["Resources"]["SecondLambdaFunction"]["Properties"]["FunctionName"] = "ChangedfunctionnameTwo" # ["FunctionName"] = "ModifiedFunctionName"
-    third_updated_deployment_ids = translate_and_find_deployment_ids(manifest)
-    print("printing later deployment ids.............")
-    print(third_updated_deployment_ids)
-    print("Hellooo.....", third_updated_deployment_ids)
-    print("Original.....", original_deployment_ids)
-    print("......hetyyyyy...")
-
-    import pdb; pdb.set_trace()
-    # print("FirstLambdaFunction", manifest["Resources"]["FirstLambdaFunction"]["Properties"]["FunctionName"])
-    # print("SecondLambdaFunction", manifest["Resources"]["FirstLambdaFunction"]["Properties"]["FunctionName"])
-
-    assert third_updated_deployment_ids != original_deployment_ids
 
     # Update API of one Lambda function should redeploy API
     manifest["Resources"]["FirstLambdaFunction"]["Properties"]["Events"]["MyApi"]["Properties"]["Method"] = "post"
@@ -126,13 +97,17 @@ def test_redeploy_implicit_api():
     assert original_deployment_ids != first_updated_deployment_ids
 
     # Update API of second Lambda function should redeploy API
-    manifest["Resources"]["SecondLambdaFunction"]["Properties"]["Events"]["MyApi2"]["Properties"]["Method"] = "post"
+    manifest["Resources"]["SecondLambdaFunction"]["Properties"]["Events"]["MyApi"]["Properties"]["Method"] = "post"
     second_updated_deployment_ids = translate_and_find_deployment_ids(manifest)
     assert first_updated_deployment_ids != second_updated_deployment_ids
 
     # Now, update an unrelated property. This should NOT generate a new deploymentId
     manifest["Resources"]["SecondLambdaFunction"]["Properties"]["Runtime"] = "java"
     assert second_updated_deployment_ids == translate_and_find_deployment_ids(manifest)
+
+    manifest["Resources"]["FirstLambdaFunction"]["Properties"]["FunctionName"] = "ChangedFunctionName"
+    fourth_updated_deployment_ids = translate_and_find_deployment_ids(manifest)
+    assert fourth_updated_deployment_ids != second_updated_deployment_ids
 
 
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
@@ -149,8 +124,8 @@ def translate_and_find_deployment_ids(manifest):
     return deployment_ids
 
 
-# class TestApiGatewayDeploymentResource(TestCase):
-'''
+class TestApiGatewayDeploymentResource(TestCase):
+
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_make_auto_deployable_with_swagger_dict(self, LogicalIdGeneratorMock):
         prefix = "prefix"
@@ -172,9 +147,7 @@ def translate_and_find_deployment_ids(manifest):
         generator_mock.gen.assert_called_once_with()
         generator_mock.get_hash.assert_called_once_with(length=40) # getting full SHA
         stage.update_deployment_ref.assert_called_once_with(id_val)
-'''
 
-'''
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_make_auto_deployable_no_swagger(self, LogicalIdGeneratorMock):
         prefix = "prefix"
@@ -187,4 +160,3 @@ def translate_and_find_deployment_ids(manifest):
 
         LogicalIdGeneratorMock.assert_not_called()
         stage.update_deployment_ref.assert_not_called()
-'''
