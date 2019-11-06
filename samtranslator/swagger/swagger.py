@@ -88,7 +88,7 @@ class SwaggerEditor(object):
         """
         Checks a method definition to make sure it has an apigw integration
 
-        :param dict method_defintion: method definition dictionary
+        :param dict method_definition: method definition dictionary
         :return: True if an integration exists
         """
         if method_definition.get(self._X_APIGW_INTEGRATION):
@@ -477,7 +477,7 @@ class SwaggerEditor(object):
         for method_name, method in self.get_path(path).items():
             normalized_method_name = self._normalize_method_name(method_name)
 
-            # Excluding paramters section
+            # Excluding parameters section
             if normalized_method_name == "parameters":
                 continue
             if add_default_auth_to_preflight or normalized_method_name != "options":
@@ -555,7 +555,7 @@ class SwaggerEditor(object):
         """
 
         for method_name, _ in self.get_path(path).items():
-            # Excluding paramters section
+            # Excluding parameters section
             if method_name == "parameters":
                 continue
 
