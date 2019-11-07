@@ -28,7 +28,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName:
-       Fn::Sub: FunctionName # "Fn::Join": ["", ["Some", "Function", "Name"]] # Fn::Sub: FunctionName # Ref: FunctionName
+        Fn::Sub: FunctionName
       CodeUri:
         Bucket:
           Ref: CodeBucket

@@ -33,11 +33,13 @@ class Translator:
 
     function_names = dict()
 
-    def _get_function_name(self, resource_dict, parameter_values):
+    def _get_function_names(self, resource_dict, parameter_values):
         if resource_dict.get("Type", "").strip() == 'AWS::Serverless::Function':
             if resource_dict.get('Properties', "").get('Events', ""):
                 events = list(resource_dict.get('Properties', "").get('Events', "").values())
                 for item in events:
+                    # If the function event type is `Api`then gets the function name and
+                    # adds to the function_names dict with key as the api_name and value as the function_name
                     if item.get('Type', "") == 'Api' and item.get('Properties', None) and item.get('Properties', "")\
                             .get('RestApiId', None):
                         rest_api = item.get('Properties', "").get('RestApiId', "")
@@ -45,15 +47,14 @@ class Translator:
                             api_name = item.get('Properties', "").get('RestApiId', "").get('Ref', None)
                         else:
                             api_name = item.get('Properties', "").get('RestApiId', None)
-                        # grep for Type: Api
-                        # if exists get the restApiId
-                        # add/concat the function name to the corresponding restapiid
-                        # test with api event, some other function event/ make pr should do the work i guess??
                         if api_name:
                             function_name = resource_dict.get('Properties', "").get("FunctionName", None)
                             if type(function_name) == str:
+                                # All the function_names for associated functions will be concatenated
                                 self.function_names[api_name] = self.function_names.get(api_name, "") +\
                                                             resource_dict.get('Properties', "").get('FunctionName', "")
+                            # Resolving intrinsics and gets the function name
+                            # This gets the function names only for Ref and Fn::Sub intrinsics
                             elif type(function_name) == dict:
                                 if function_name.get('Ref'):
                                     self.function_names[api_name] = self.function_names.get(api_name, "") + \
@@ -61,8 +62,6 @@ class Translator:
                                 if function_name.get('Fn::Sub'):
                                     self.function_names[api_name] = self.function_names.get(api_name, "") + \
                                         parameter_values.get(function_name.get('Fn::Sub'))
-                                    # get the function_name ref or sub : Key
-                                    # get the value from the parameter values using Ke
         return self.function_names
 
     def translate(self, sam_template, parameter_values):
@@ -93,6 +92,7 @@ class Translator:
             parameter_values=parameter_values,
             sam_plugins=sam_plugins
         )
+
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)
         intrinsics_resolver = IntrinsicsResolver(parameter_values)
@@ -101,19 +101,22 @@ class Translator:
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
         document_errors = []
+
         changed_logical_ids = {}
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
                 macro = macro_resolver\
                     .resolve_resource_type(resource_dict)\
                     .from_dict(logical_id, resource_dict, sam_plugins=sam_plugins)
+
                 kwargs = macro.resources_to_link(sam_template['Resources'])
                 kwargs['managed_policy_map'] = self.managed_policy_map
                 kwargs['intrinsics_resolver'] = intrinsics_resolver
                 kwargs['mappings_resolver'] = mappings_resolver
                 kwargs['deployment_preference_collection'] = deployment_preference_collection
                 kwargs['conditions'] = template.get('Conditions')
-                kwargs['function_names'] = self._get_function_name(resource_dict, parameter_values)
+                # add the value of FunctionName property if the function is referenced with the api resource
+                kwargs['function_names'] = self._get_function_names(resource_dict, parameter_values)
 
                 translated = macro.to_cloudformation(**kwargs)
 
