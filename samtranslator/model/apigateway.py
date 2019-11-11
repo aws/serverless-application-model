@@ -98,7 +98,6 @@ class ApiGatewayDeployment(Resource):
         if openapi_version:
             hash_input.append(str(openapi_version))
         if domain:
-            hash_input.append(self._X_HASH_DELIMITER)
             hash_input.append(json.dumps(domain))
 
         data = self._X_HASH_DELIMITER.join(hash_input)

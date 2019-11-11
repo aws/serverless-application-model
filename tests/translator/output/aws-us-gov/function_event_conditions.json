@@ -206,7 +206,13 @@
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole", 
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -319,6 +325,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",

@@ -1,5 +1,5 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, is_str
+from samtranslator.model.types import is_type, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnGetAtt
 
 
@@ -10,7 +10,8 @@ class IAMRole(Resource):
             'ManagedPolicyArns': PropertyType(False, is_type(list)),
             'Path': PropertyType(False, is_str()),
             'Policies': PropertyType(False, is_type(list)),
-            'PermissionsBoundary': PropertyType(False, is_str())
+            'PermissionsBoundary': PropertyType(False, is_str()),
+            'Tags': PropertyType(False, list_of(is_type(dict))),
     }
 
     runtime_attrs = {

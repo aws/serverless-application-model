@@ -273,6 +273,7 @@ class SamFunction(SamResourceMacro):
         execution_role.ManagedPolicyArns = list(managed_policy_arns)
         execution_role.Policies = policy_documents or None
         execution_role.PermissionsBoundary = self.PermissionsBoundary
+        execution_role.Tags = self._construct_tag_list(self.Tags)
 
         return execution_role
 

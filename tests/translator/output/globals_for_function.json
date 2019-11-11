@@ -8,7 +8,21 @@
           "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
-        "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary", 
+        "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          },
+          {
+            "Value": "newvalue1",
+            "Key": "newtag1"
+          },
+          {
+            "Value": "value1",
+            "Key": "tag1"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -96,7 +110,17 @@
           "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess",
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
-        "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary", 
+        "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          },
+          {
+            "Value": "value1",
+            "Key": "tag1"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
