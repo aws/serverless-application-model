@@ -130,6 +130,9 @@ class ApiGenerator(object):
         if self.name:
             rest_api.Name = self.name
 
+        if self.tags is not None:
+            rest_api.Tags = get_tag_list(self.tags)
+
         return rest_api
 
     def _construct_body_s3_dict(self):

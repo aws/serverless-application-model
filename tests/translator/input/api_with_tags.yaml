@@ -4,7 +4,7 @@ Parameters:
     Default: value
 
 Resources:
-  MyApiWithStageTags:
+  MyApiWithTags:
       Type: "AWS::Serverless::Api"
       Properties:
         StageName: Prod
