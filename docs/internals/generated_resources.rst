@@ -385,7 +385,7 @@ AWS::Lambda::Permission            MyFunction\ **MyTimer**\ Permission
 AWS::Events::Rule                  MyFunction\ **MyTimer** 
 ================================== ================================
 
-CloudWatchEvent
+CloudWatchEvent (superseded by EventBridgeRule, see below)
 ^^^^^^^^^^^^^^^
 
 Example:
@@ -401,9 +401,13 @@ Example:
           Type: CloudWatchEvent
           Properties:
             Pattern:
+              source:
+                - aws.ec2
+              detail-type:
+                - EC2 Instance State-change Notification
               detail:
                 state:
-                  - terminated   
+                  - terminated
       ...
 
 Additional generated resources:
@@ -415,6 +419,39 @@ AWS::Lambda::Permission            MyFunction\ **OnTerminate**\ Permission
 AWS::Events::Rule                  MyFunction\ **OnTerminate** 
 ================================== ================================
 
+EventBridgeRule
+^^^^^^^^^^^^^^^
+
+Example:
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        OnTerminate:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - aws.ec2
+              detail-type:
+                - EC2 Instance State-change Notification
+              detail:
+                state:
+                  - terminated
+      ...
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID
+================================== ================================
+AWS::Lambda::Permission            MyFunction\ **OnTerminate**\ Permission
+AWS::Events::Rule                  MyFunction\ **OnTerminate**
+================================== ================================
 
 AWS::Serverless::Api
 --------------------

@@ -42,7 +42,7 @@ Resources:
               Resource: '*'
       Events:
         WatchSecurityGroupRule:
-          Type: CloudWatchEvent
+          Type: EventBridgeRule
           Description: Detects EC2 Security Group Events to Send to Teams
           Properties:
             EventBusName: event-bus-name

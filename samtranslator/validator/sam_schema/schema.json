@@ -354,6 +354,24 @@
       ],
       "type": "object"
     },
+    "AWS::Serverless::Function.EventBridgeRule": {
+      "additionalProperties": false,
+      "properties": {
+        "Input": {
+          "type": "string"
+        },
+        "InputPath": {
+          "type": "string"
+        },
+        "Pattern": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "Pattern"
+      ],
+      "type": "object"
+    },
     "AWS::Serverless::Function.LogEvent": {
       "additionalProperties": false,
       "properties": {
@@ -470,6 +488,9 @@
             },
             {
               "$ref": "#/definitions/AWS::Serverless::Function.CloudWatchEventEvent"
+            },
+            {
+              "$ref": "#/definitions/AWS::Serverless::Function.EventBridgeRule"
             },
             {
               "$ref": "#/definitions/AWS::Serverless::Function.LogEvent"
