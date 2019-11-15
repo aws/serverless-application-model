@@ -181,6 +181,15 @@ class TestParameterReferenceResolution(TestCase):
         self.assertEqual(resolver.resolve_parameter_refs(input), expected)
         resolver._try_resolve_parameter_refs.assert_not_called()
 
+    def test_short_circuit_on_empty_conditions(self):
+        resolver = IntrinsicsResolver({})
+        resolver._try_resolve_condition_refs = Mock()  # Mock other methods to detect any actual calls
+        input = {"Ref": "foo"}
+        expected = {"Ref": "foo"}
+
+        self.assertEqual(resolver.resolve_condition_refs(input), expected)
+        resolver._try_resolve_condition_refs.assert_not_called()
+
 class TestResourceReferenceResolution(TestCase):
 
     def setUp(self):
@@ -234,10 +243,11 @@ class TestSupportedIntrinsics(TestCase):
         resolver = IntrinsicsResolver({})
 
         # This needs to be updated when new intrinsics are added
-        self.assertEqual(3, len(resolver.supported_intrinsics))
+        self.assertEqual(4, len(resolver.supported_intrinsics))
         self.assertTrue("Ref" in resolver.supported_intrinsics)
         self.assertTrue("Fn::Sub" in resolver.supported_intrinsics)
         self.assertTrue("Fn::GetAtt" in resolver.supported_intrinsics)
+        self.assertTrue("Fn::If" in resolver.supported_intrinsics)
 
     def test_configure_supported_intrinsics(self):
         class SomeAction(Action):
@@ -275,3 +285,13 @@ class TestSupportedIntrinsics(TestCase):
 
         with self.assertRaises(TypeError):
             IntrinsicsResolver({}, [1,2,3])
+
+    def test_configure_conditional_intrinsics_must_error_for_none_input(self):
+
+        with self.assertRaises(TypeError):
+            IntrinsicsResolver({}, conditions=None)
+
+    def test_configure_conditional_intrinsics_must_error_for_non_dict_input(self):
+
+        with self.assertRaises(TypeError):
+            IntrinsicsResolver({}, conditions=[1,2,3])

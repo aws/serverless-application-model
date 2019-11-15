@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mock import patch, Mock
-from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction, FindInMapAction
+from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction, FindInMapAction, EqualsAction, IfAction, LogicAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
@@ -1129,5 +1129,151 @@ class TestFindInMapCanResolveParameterRefs(TestCase):
         }
         expected = "value3"
         output = self.ref.resolve_parameter_refs(input, mappings)
+
+        self.assertEqual(expected, output)
+
+
+class TestLogicResolveParameterRefs(TestCase):
+
+    def setUp(self):
+        class RealLogicAction(LogicAction):
+            intrinsic_name = "ALogicFunction"
+
+        self.ref = RealLogicAction()
+
+    def test_return_unchanged_dict_for_refs(self):
+        input = {
+            "ALogicFunction": ["Parameter A", "Parameter B2"]
+        }
+        output = self.ref.resolve_resource_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_return_unchanged_dict_for_id_refs(self):
+        input = {
+            "ALogicFunction": ["Parameter A", "Parameter B2"]
+        }
+        output = self.ref.resolve_resource_id_refs(input, {})
+
+        self.assertEqual(input, output)
+
+
+class TestEqualsResolveParameterRefs(TestCase):
+
+    def setUp(self):
+        self.ref = EqualsAction()
+
+    @patch.object(EqualsAction, "can_handle")
+    def test_cannot_handle(self, can_handle_mock):
+        input = {
+            "Fn::Equals": ["a", "b"]
+        }
+        can_handle_mock.return_value = False
+        output = self.ref.resolve_parameter_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_value_not_list_of_length_two(self):
+        input = {
+            "Fn::Equals": ["a string"]
+        }
+
+        with self.assertRaises(InvalidDocumentException):
+            self.ref.resolve_parameter_refs(input, {})
+
+    def test_value_are_equals(self):
+        input = {
+            "Fn::Equals": ["a string", "a string"]
+        }
+        expected = True
+        output = self.ref.resolve_parameter_refs(input, {})
+
+        self.assertEqual(expected, output)
+
+    def test_value_are_not_equals(self):
+        input = {
+            "Fn::Equals": [[], False]
+        }
+        expected = False
+        output = self.ref.resolve_parameter_refs(input, {})
+
+        self.assertEqual(expected, output)
+
+
+class TestIfResolveParameterRefs(TestCase):
+
+    def setUp(self):
+        self.ref = IfAction()
+
+    @patch.object(IfAction, "can_handle")
+    def test_cannot_handle(self, can_handle_mock):
+        input = {
+            "Fn::If": ["a", "b", "c"]
+        }
+        can_handle_mock.return_value = False
+        output = self.ref.resolve_condition_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_return_unchanged_dict_with_params(self):
+        input = {
+            "ALogicFunction": ["Parameter A", "Parameter B2"]
+        }
+        output = self.ref.resolve_parameter_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_value_not_list(self):
+        input = {
+            "Fn::If": "a string"
+        }
+        with self.assertRaises(InvalidDocumentException):
+            self.ref.resolve_condition_refs(input, {})
+
+    def test_value_not_list_of_length_three(self):
+        input = {
+            "Fn::If": ["a string"]
+        }
+
+        with self.assertRaises(InvalidDocumentException):
+            self.ref.resolve_condition_refs(input, {})
+
+    def test_condition_not_string(self):
+        input = {
+            "Fn::if": [["CondA"], "ValueTrue", "ValueFalse"]
+        }
+        output = self.ref.resolve_condition_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_condition_not_found(self):
+        input = {
+            "Fn::If": ["CondA", "ValueTrue", "ValueFalse"]
+        }
+        output = self.ref.resolve_condition_refs(input, {})
+
+        self.assertEqual(input, output)
+
+    def test_condition_is_true(self):
+        mappings = {
+            "CondA": True
+        }
+        input = {
+            "Fn::If": ["CondA", "This is true", "This is false"]
+        }
+        expected = "This is true"
+        output = self.ref.resolve_condition_refs(input, mappings)
+
+        self.assertEqual(expected, output)
+
+    def test_condition_is_false(self):
+        mappings = {
+            "CondA": False
+        }
+        input = {
+            "Fn::If": ["CondA", "This is true", "This is false"]
+        }
+        expected = "This is false"
+        output = self.ref.resolve_condition_refs(input, mappings)
 
         self.assertEqual(expected, output)

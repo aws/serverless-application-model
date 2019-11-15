@@ -26,6 +26,12 @@ class Action(object):
         """
         raise NotImplementedError("Subclass must implement this method")
 
+    def resolve_condition_refs(self, input_dict, conditions):
+        """
+        Subclass must implement this method to resolve condition reference
+        """
+        return input_dict
+
     def resolve_resource_refs(self, input_dict, supported_resource_refs):
         """
         Subclass must implement this method to resolve resource references
@@ -553,3 +559,101 @@ class FindInMapAction(Action):
             return input_dict
 
         return parameters[map_name][top_level_key][second_level_key]
+
+
+class LogicAction(Action):
+    """
+    This abstract class intends to factorise behavior reserved for logic
+    function
+    """
+
+    def resolve_resource_refs(self, input_dict, supported_resource_refs):
+        """
+        Logic functions do not interact with resources
+
+        :param input_dict:
+        :param supported_resource_refs:
+        :return: the exact :ref:input_dict with no modification
+        """
+        return input_dict
+
+    def resolve_resource_id_refs(self, input_dict,
+                                 supported_resource_id_refs):
+        """
+        Logic functions do not interact with resources
+
+        :param input_dict:
+        :param supported_resource_id_refs:
+        :return: the exact :ref:input_dict with no modification
+        """
+        return input_dict
+
+
+class IfAction(LogicAction):
+    intrinsic_name = "Fn::If"
+
+    def resolve_parameter_refs(self, input_dict, conditions):
+        return input_dict
+
+    def resolve_condition_refs(self, input_dict, conditions):
+        """
+        Resolves references that are present in the parameters and returns the
+        value. If it is not in parameters/conditions, this method simply
+        returns the input unchanged.
+
+        :param input_dict: Dictionary representing the If function. Must
+        contain only one key and it should be "If".
+            Ex: {Fn::If: ["foo", "bar", "baz"]}
+
+        :param conditions: Dictionary of condition values
+        :return:
+        """
+        if not self.can_handle(input_dict):
+            return input_dict
+
+        condition_params = input_dict[self.intrinsic_name]
+
+        if not isinstance(condition_params, list) or \
+                len(condition_params) != 3:
+            raise InvalidDocumentException(
+                [InvalidTemplateException(
+                    'Invalid If value {}. If expects an array with 3 values.'
+                    .format(condition_params))])
+
+        condition_name, true_value, false_value = condition_params
+
+        if condition_name in conditions:
+            return true_value if conditions[condition_name] else false_value
+        else:
+            return input_dict
+
+
+class EqualsAction(LogicAction):
+    intrinsic_name = "Fn::Equals"
+
+    def resolve_parameter_refs(self, input_dict, parameters):
+        """
+        Evaluate an equal comparision between two operands.
+
+        :param input_dict: Dictionary representing the Equals function. Must
+            contain only one key and it should be "Equals".
+            Ex: {Fn::Equals: ["foo", "bar"]}
+
+        :param parameters: Dictionary of parameter values for operation
+        :return:
+        """
+        if not self.can_handle(input_dict):
+            return input_dict
+
+        comp_params = input_dict[self.intrinsic_name]
+
+        if not isinstance(comp_params, list) or \
+                len(comp_params) != 2:
+            raise InvalidDocumentException(
+                [InvalidTemplateException(
+                    'Invalid Equals value {}. If expects an array with 2 '
+                    'values.'.format(comp_params))])
+
+        left_value, right_value = comp_params
+
+        return left_value == right_value
