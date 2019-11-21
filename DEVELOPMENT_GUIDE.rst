@@ -17,7 +17,7 @@ steps manually.
 
 1. Install Python Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Our officially supported Python versions are 2.7, 3.6, and 3.7. Follow the idioms from this `excellent cheatsheet`_ to
+Our officially supported Python versions are 2.7, 3.6, 3.7 and 3.8. Follow the idioms from this `excellent cheatsheet`_ to
 make sure your code is compatible with both Python 2.7 and 3 versions.
 
 Setup Python locally using `pyenv`_
