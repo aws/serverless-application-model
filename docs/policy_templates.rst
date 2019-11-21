@@ -1,7 +1,7 @@
 Policy Templates
 ================
 
-When you define a Serverless Function, SAM automatically creates the IAM Role required to run the function. Let's say
+When you define a Serverless Function, SAM doesn't automatically creates the IAM Role required to run the function. Let's say
 your function needs to access couple of DynamoDB tables, you need to give your function explicit permissions to access
 the tables. You can do this by adding AWS Managed Policies to Serverless Function resource definition in your SAM 
 template.
