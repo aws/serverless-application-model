@@ -21,7 +21,13 @@ class PullEventSource(ResourceMacro):
         'Queue': PropertyType(False, is_str()),
         'BatchSize': PropertyType(False, is_type(int)),
         'StartingPosition': PropertyType(False, is_str()),
-        'Enabled': PropertyType(False, is_type(bool))
+        'Enabled': PropertyType(False, is_type(bool)),
+        'MaximumBatchingWindowInSeconds': PropertyType(False, is_type(int)),
+        'MaximumRetryAttempts': PropertyType(False, is_type(int)),
+        'BisectBatchOnFunctionError': PropertyType(False, is_type(bool)),
+        'MaximumRecordAgeInSeconds': PropertyType(False, is_type(int)),
+        'DestinationConfig': PropertyType(False, is_type(dict)),
+        'ParallelizationFactor': PropertyType(False, is_type(int))
     }
 
     def get_policy_arn(self):
@@ -64,6 +70,13 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition
         lambda_eventsourcemapping.BatchSize = self.BatchSize
         lambda_eventsourcemapping.Enabled = self.Enabled
+        lambda_eventsourcemapping.MaximumBatchingWindowInSeconds = self.MaximumBatchingWindowInSeconds
+        lambda_eventsourcemapping.MaximumRetryAttempts = self.MaximumRetryAttempts
+        lambda_eventsourcemapping.BisectBatchOnFunctionError = self.BisectBatchOnFunctionError
+        lambda_eventsourcemapping.MaximumRecordAgeInSeconds = self.MaximumRecordAgeInSeconds
+        lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
+        lambda_eventsourcemapping.ParallelizationFactor = self.ParallelizationFactor
+
         if 'Condition' in function.resource_attributes:
             lambda_eventsourcemapping.set_resource_attribute('Condition', function.resource_attributes['Condition'])
 

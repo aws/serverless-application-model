@@ -69,27 +69,6 @@
         ]
       }
     }, 
-    "MyFunctionNullInvokeRoleAPI3PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionNullInvokeRole"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNullInvokeRole", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
     "MyApiWithAwsIamAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
@@ -100,27 +79,6 @@
           "Ref": "MyApiWithAwsIamAuth"
         }, 
         "StageName": "Prod"
-      }
-    }, 
-    "MyFunctionCallerCredentialsOverrideAPI3PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionCallerCredentialsOverride"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
-              }
-            }
-          ]
-        }
       }
     }, 
     "MyFunctionWithoutAuthRole": {
@@ -159,7 +117,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionCustomInvokeRole", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
               }
@@ -180,7 +138,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionMyCognitoAuth", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
               }
@@ -258,7 +216,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionWithoutAuth", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
               }
@@ -266,28 +224,7 @@
           ]
         }
       }
-    }, 
-    "MyFunctionMyCognitoAuthAPI1PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionMyCognitoAuth"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionMyCognitoAuth", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyFunctionDefaultInvokeRoleAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -300,7 +237,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionDefaultInvokeRole", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
               }
@@ -355,28 +292,7 @@
           ]
         }
       }
-    }, 
-    "MyFunctionNoCallerCredentialsAPI3PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionNoCallerCredentials"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyFunctionNONEInvokeRole": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -412,7 +328,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
               }
@@ -468,28 +384,7 @@
           ]
         }
       }
-    }, 
-    "MyFunctionDefaultInvokeRoleAPI3PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionDefaultInvokeRole"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionDefaultInvokeRole", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyApiWithAwsIamAuthDeployment3bec5f30f2": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
@@ -522,7 +417,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuthNoCallerCredentials"
               }
@@ -589,7 +484,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNullInvokeRole", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
               }
@@ -610,7 +505,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNONEInvokeRole", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
               }
@@ -666,28 +561,7 @@
           ]
         }
       }
-    }, 
-    "MyFunctionWithoutAuthAPI2PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionWithoutAuth"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionWithoutAuth", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyFunctionCallerCredentialsOverrideRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -711,28 +585,7 @@
           ]
         }
       }
-    }, 
-    "MyFunctionNONEInvokeRoleAPI3PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionNONEInvokeRole"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNONEInvokeRole", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyFunctionMyCognitoAuthRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -768,28 +621,7 @@
         }, 
         "StageName": "Prod"
       }
-    }, 
-    "MyFunctionCustomInvokeRoleAPI3PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionCustomInvokeRole"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionCustomInvokeRole", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyFunctionDefaultInvokeRole": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -835,28 +667,7 @@
           }
         ]
       }
-    }, 
-    "MyFunctionNoneAuthAPI3PermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunctionNoneAuth"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNoneAuth", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithAwsIamAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyApiWithAwsIamAuth": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -1027,7 +838,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/MyFunctionNoneAuth", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithAwsIamAuth"
               }

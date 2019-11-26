@@ -1,7 +1,5 @@
 from collections import namedtuple
 from six import string_types
-import re
-
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage, ApiGatewayAuthorizer,
@@ -12,6 +10,7 @@ from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_instrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
+from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -107,9 +106,10 @@ class ApiGenerator(object):
                                            "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both")
 
         if self.open_api_version:
-            if re.match(SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version) is None:
-                raise InvalidResourceException(
-                    self.logical_id, "The OpenApiVersion value must be of the format 3.0.0")
+            if not SwaggerEditor.safe_compare_regex_with_string(SwaggerEditor.get_openapi_versions_supported_regex(),
+                                                                self.open_api_version):
+                raise InvalidResourceException(self.logical_id,
+                                               "The OpenApiVersion value must be of the format \"3.0.0\"")
 
         self._add_cors()
         self._add_auth()
@@ -185,8 +185,12 @@ class ApiGenerator(object):
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
         stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
-
-        stage = ApiGatewayStage(self.logical_id + stage_name_prefix + 'Stage',
+        if stage_name_prefix.isalnum():
+            stage_logical_id = self.logical_id + stage_name_prefix + 'Stage'
+        else:
+            generator = logical_id_generator.LogicalIdGenerator(self.logical_id + 'Stage', stage_name_prefix)
+            stage_logical_id = generator.gen()
+        stage = ApiGatewayStage(stage_logical_id,
                                 attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
         stage.update_deployment_ref(deployment.logical_id)
@@ -213,7 +217,6 @@ class ApiGenerator(object):
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
-
         rest_api = self._construct_rest_api()
         deployment = self._construct_deployment(rest_api)
 
@@ -327,7 +330,9 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)
 
         if auth_properties.ResourcePolicy:
-            swagger_editor.add_resource_policy(auth_properties.ResourcePolicy)
+            for path in swagger_editor.iter_on_path():
+                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path,
+                                                   self.logical_id, self.stage_name)
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
@@ -412,11 +417,12 @@ class ApiGenerator(object):
         if definition_body.get('swagger') is not None:
             return definition_body
 
-        if definition_body.get('openapi') is not None:
-            if self.open_api_version is None:
-                self.open_api_version = definition_body.get('openapi')
+        if definition_body.get('openapi') is not None and self.open_api_version is None:
+            self.open_api_version = definition_body.get('openapi')
 
-        if self.open_api_version and re.match(SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version):
+        if self.open_api_version and \
+           SwaggerEditor.safe_compare_regex_with_string(SwaggerEditor.get_openapi_version_3_regex(),
+                                                        self.open_api_version):
             if definition_body.get('securityDefinitions'):
                 components = definition_body.get('components', {})
                 components['securitySchemes'] = definition_body['securityDefinitions']

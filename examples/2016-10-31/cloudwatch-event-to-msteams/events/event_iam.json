@@ -1,0 +1,64 @@
+{
+    "version": "0",
+    "id": "xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.ec2",
+    "account": "123456789012",
+    "time": "2018-07-22T09:49:51Z",
+    "region": "ap-southeast-2",
+    "resources": [],
+    "detail": {
+        "eventVersion": "1.05",
+        "userIdentity": {
+            "type": "IAMUser",
+            "principalId": "XXXXXXXXXXXXXXXXXXX",
+            "arn": "arn:aws:iam::123456789012:user/john.doh",
+            "accountId": "123456789012",
+            "accessKeyId": "XXXXXXXXXXXXXXXXXXX",
+            "userName": "john.doh",
+            "sessionContext": {
+                "attributes": {
+                    "mfaAuthenticated": "false",
+                    "creationDate": "2018-07-22T02:00:21Z"
+                }
+            },
+            "invokedBy": "signin.amazonaws.com"
+        },
+        "eventTime": "2018-07-22T09:49:51Z",
+        "eventSource": "ec2.amazonaws.com",
+        "eventName": "AuthorizeSecurityGroupIngress",
+        "awsRegion": "ap-southeast-2",
+        "sourceIPAddress": "192.168.1.1",
+        "userAgent": "signin.amazonaws.com",
+        "requestParameters": {
+            "groupId": "sg-xxxxxxxxxxxxxxx",
+            "ipPermissions": {
+                "items": [
+                    {
+                        "ipProtocol": "tcp",
+                        "fromPort": 22,
+                        "toPort": 22,
+                        "groups": {},
+                        "ipRanges": {
+                            "items": [
+                                {
+                                    "cidrIp": "0.0.0.0/0",
+                                    "description": "to lazy to put correct ip, lets give everyone access"
+                                }
+                            ]
+                        },
+                        "ipv6Ranges": {},
+                        "prefixListIds": {}
+                    }
+                ]
+            }
+        },
+        "responseElements": {
+            "requestId": "xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            "_return": true
+        },
+        "requestID": "xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "eventID": "xxxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "eventType": "AwsApiCall"
+    }
+}

@@ -1,0 +1,56 @@
+Resources:
+  HyphenFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HyphenApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+
+  HyphenApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: hoge-fuga
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string
+  
+  UnderscoreFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: UnderscoreApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+
+  UnderscoreApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: hoge_fuga
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string

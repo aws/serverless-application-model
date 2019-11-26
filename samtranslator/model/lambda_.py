@@ -65,6 +65,12 @@ class LambdaEventSourceMapping(Resource):
             'Enabled': PropertyType(False, is_type(bool)),
             'EventSourceArn': PropertyType(True, is_str()),
             'FunctionName': PropertyType(True, is_str()),
+            'MaximumBatchingWindowInSeconds': PropertyType(False, is_type(int)),
+            'MaximumRetryAttempts': PropertyType(False, is_type(int)),
+            'BisectBatchOnFunctionError': PropertyType(False, is_type(bool)),
+            'MaximumRecordAgeInSeconds': PropertyType(False, is_type(int)),
+            'DestinationConfig': PropertyType(False, is_type(dict)),
+            'ParallelizationFactor': PropertyType(False, is_type(int)),
             'StartingPosition': PropertyType(False, is_str())
     }
 

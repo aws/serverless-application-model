@@ -38,3 +38,7 @@ Resources:
         - ApplicationLocations
         - !Ref 'AWS::Region'
         - Version
+      NotificationARNs:
+        - !Ref Sns
+  Sns:
+    Type: AWS::SNS::Topic

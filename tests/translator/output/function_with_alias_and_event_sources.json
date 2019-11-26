@@ -82,28 +82,7 @@
         }, 
         "StartingPosition": "LATEST"
       }
-    }, 
-    "MyAwesomeFunctionImplicitApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/add", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "MyAwesomeFunctionIoTRule": {
       "Type": "AWS::IoT::TopicRule", 
       "Properties": {
@@ -146,7 +125,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/add", 
             {
-              "__Stage__": "Prod", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -212,28 +191,7 @@
         }, 
         "Name": "MyGetApi"
       }
-    }, 
-    "MyAwesomeFunctionExplicitApiPermissionTest": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "GetHtmlApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
+    },
     "ServerlessRestApiDeployment79e6116109": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
@@ -463,9 +421,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": {
-                "Ref": "MyStageName"
-              }, 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "GetHtmlApi"
               }

@@ -1,0 +1,194 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "MyBatchingWindowParam": {
+      "Default": 45,
+      "Type": "Number",
+      "Description": "parameter for batching window in seconds"
+    }
+  },
+  "Resources": {
+    "MySqsQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyFunctionForBatchingExampleStream": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "MaximumBatchingWindowInSeconds": 20,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "KinesisStream",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunctionForBatchingExample"
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "DynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "KeySchema": [
+          {
+            "KeyType": "HASH",
+            "AttributeName": "id"
+          }
+        ],
+        "StreamSpecification": {
+          "StreamViewType": "NEW_IMAGE"
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 5,
+          "ReadCapacityUnits": 5
+        }
+      }
+    },
+    "MyFunctionForBatchingExampleRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "MyFunctionForBatchingExampleRolePolicy0",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": {
+                          "Fn::GetAtt": [
+                            "MySqsQueue",
+                            "QueueName"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "KinesisStream1": {
+      "Type": "AWS::Kinesis::Stream",
+      "Properties": {
+        "ShardCount": 1
+      }
+    },
+    "MyFunctionForBatchingExampleDynamoDBStreamEvent": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "MaximumBatchingWindowInSeconds": {
+          "Ref": "MyBatchingWindowParam"
+        },
+        "FunctionName": {
+          "Ref": "MyFunctionForBatchingExample"
+        },
+        "MaximumRecordAgeInSeconds": 86400,
+        "BatchSize": 100,
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "MySqsQueue",
+                "Arn"
+              ]
+            }
+          }
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "DynamoDBTable",
+            "StreamArn"
+          ]
+        },
+        "StartingPosition": "TRIM_HORIZON",
+        "ParallelizationFactor": 8,
+        "MaximumRetryAttempts": 100,
+        "BisectBatchOnFunctionError": true
+      }
+    },
+    "MyFunctionForBatchingExample": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Code": {
+          "ZipFile": "\nexports.handler = async (event) => {\n    return {\n    statusCode: 200,\n    body: JSON.stringify(event),\n    headers: {}\n    }\n}\n"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionForBatchingExampleRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs8.10",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "MyFunctionForBatchingExampleStreamEvent": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "MaximumBatchingWindowInSeconds": {
+          "Ref": "MyBatchingWindowParam"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "KinesisStream1",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunctionForBatchingExample"
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
+    "KinesisStream": {
+      "Type": "AWS::Kinesis::Stream",
+      "Properties": {
+        "ShardCount": 1
+      }
+    }
+  }
+}

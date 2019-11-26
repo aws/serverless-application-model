@@ -87,28 +87,6 @@
       },
       "Condition": "implicithello2condition"
     },
-    "implicithello2ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "implicithello2"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello2",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "implicithello2condition"
-    },
     "explicithello1": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
@@ -159,28 +137,6 @@
       },
       "Condition": "ServerlessRestApiCondition"
     },
-    "explicithello2ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "explicithello2"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello2",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "explicitapi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "explicithello2condition"
-    },
     "explicithello1ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -193,7 +149,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello1",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "explicitapi"
               }
@@ -240,7 +196,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello1",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -312,7 +268,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello2",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "explicitapi"
               }
@@ -433,7 +389,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello2",
             {
-              "__Stage__": "Prod",
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
               }
@@ -442,28 +398,6 @@
         }
       },
       "Condition": "implicithello2condition"
-    },
-    "explicithello1ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "explicithello1"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/explicit/hello1",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "explicitapi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "explicithello1condition"
     },
     "explicithello1Role": {
       "Type": "AWS::IAM::Role",
@@ -489,28 +423,6 @@
         }
       },
       "Condition": "explicithello1condition"
-    },
-    "implicithello1ApiEventPermissionTest": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:invokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "implicithello1"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/implicit/hello1",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "implicithello1condition"
     },
     "explicitapiDeployment9fcb053eda": {
       "Type": "AWS::ApiGateway::Deployment",
