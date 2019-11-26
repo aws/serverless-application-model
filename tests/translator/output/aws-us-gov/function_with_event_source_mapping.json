@@ -8,6 +8,9 @@
     }
   },
   "Resources": {
+    "MySqsQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
     "MyFunctionForBatchingExampleStream": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
@@ -24,13 +27,65 @@
         "StartingPosition": "LATEST"
       }
     },
+    "DynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "KeySchema": [
+          {
+            "KeyType": "HASH",
+            "AttributeName": "id"
+          }
+        ],
+        "StreamSpecification": {
+          "StreamViewType": "NEW_IMAGE"
+        },
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "WriteCapacityUnits": 5,
+          "ReadCapacityUnits": 5
+        }
+      }
+    },
     "MyFunctionForBatchingExampleRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole",
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole"
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "MyFunctionForBatchingExampleRolePolicy0",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": {
+                          "Fn::GetAtt": [
+                            "MySqsQueue",
+                            "QueueName"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
         ],
         "Tags": [
           {
@@ -68,17 +123,31 @@
         "MaximumBatchingWindowInSeconds": {
           "Ref": "MyBatchingWindowParam"
         },
-        "BatchSize": 100,
         "FunctionName": {
           "Ref": "MyFunctionForBatchingExample"
         },
-        "StartingPosition": "TRIM_HORIZON",
+        "MaximumRecordAgeInSeconds": 86400,
+        "BatchSize": 100,
+        "DestinationConfig": {
+          "OnFailure": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "MySqsQueue",
+                "Arn"
+              ]
+            }
+          }
+        },
         "EventSourceArn": {
           "Fn::GetAtt": [
             "DynamoDBTable",
             "StreamArn"
           ]
-        }
+        },
+        "StartingPosition": "TRIM_HORIZON",
+        "ParallelizationFactor": 8,
+        "MaximumRetryAttempts": 100,
+        "BisectBatchOnFunctionError": true
       }
     },
     "MyFunctionForBatchingExample": {
@@ -101,30 +170,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    },
-    "DynamoDBTable": {
-      "Type": "AWS::DynamoDB::Table",
-      "Properties": {
-        "KeySchema": [
-          {
-            "KeyType": "HASH",
-            "AttributeName": "id"
-          }
-        ],
-        "StreamSpecification": {
-          "StreamViewType": "NEW_IMAGE"
-        },
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "id",
-            "AttributeType": "S"
-          }
-        ],
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": 5,
-          "ReadCapacityUnits": 5
-        }
       }
     },
     "MyFunctionForBatchingExampleStreamEvent": {
@@ -151,13 +196,5 @@
         "ShardCount": 1
       }
     }
-  },
-  "Parameters": {
-    "MyBatchingWindowParam": {
-      "Default": 45,
-      "Type": "Number",
-      "Description": "parameter for batching window in seconds"
-    }
-  },
-  "Description": "EventSourceMapping example with MaximumBatchingWindowInSeconds property"
+  }
 }

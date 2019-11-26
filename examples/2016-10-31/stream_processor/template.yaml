@@ -8,21 +8,33 @@ Resources:
       Handler: index.handler
       Runtime: nodejs10.x
       CodeUri: src/
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt MySnsTopic.TopicName
       Events:
         Stream:
           Type: Kinesis
           Properties:
             Stream: !GetAtt Stream.Arn
             MaximumBatchingWindowInSeconds: 20
+            ParallelizationFactor: 8
+            MaximumRetryAttempts: 100
+            BisectBatchOnFunctionError: true
+            MaximumRecordAgeInSeconds: 604800
             StartingPosition: TRIM_HORIZON
+            DestinationConfig:
+              OnFailure:
+                Destination: !Ref MySnsTopic
 
   Stream:
     Type: AWS::Kinesis::Stream
     Properties:
       ShardCount: 1
 
-Outputs:
+  MySnsTopic:
+    Type: AWS::SNS::Topic
 
+Outputs:
     KinesisStream:
       Description: "Kinesis Stream that will trigger Lambda function upon new records"
       Value: !GetAtt Stream.Arn
