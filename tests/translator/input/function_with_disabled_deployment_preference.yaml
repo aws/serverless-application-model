@@ -7,5 +7,5 @@ Resources:
       Runtime: python2.7
       AutoPublishAlias: live
       DeploymentPreference:
-        Enabled: false
+        Enabled: False
         Type: AllAtOnce

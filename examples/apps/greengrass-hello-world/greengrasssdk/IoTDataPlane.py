@@ -112,11 +112,12 @@ class Client:
             }
         }
 
-        customer_logger.info('Publishing message on topic "{}" with Payload "{}"'.format(topic, payload))
+        customer_logger.debug('Publishing message on topic "{}" with Payload "{}"'.format(topic, payload))
         self.lambda_client._invoke_internal(
             function_arn,
             payload,
-            base64.b64encode(json.dumps(client_context).encode())
+            base64.b64encode(json.dumps(client_context).encode()),
+            'Event'
         )
 
     def _get_required_parameter(self, parameter_name, **kwargs):
@@ -135,7 +136,7 @@ class Client:
             }
         }
 
-        customer_logger.info('Calling shadow service on topic "{}" with payload "{}"'.format(topic, payload))
+        customer_logger.debug('Calling shadow service on topic "{}" with payload "{}"'.format(topic, payload))
         response = self.lambda_client._invoke_internal(
             function_arn,
             payload,

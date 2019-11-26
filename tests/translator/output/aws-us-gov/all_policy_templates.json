@@ -29,6 +29,12 @@
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
         "Policies": [
           {
             "PolicyName": "KitchenSinkFunctionRolePolicy0",
@@ -120,7 +126,8 @@
                     "dynamodb:UpdateItem",
                     "dynamodb:BatchWriteItem",
                     "dynamodb:BatchGetItem",
-                    "dynamodb:DescribeTable"
+                    "dynamodb:DescribeTable",
+                    "dynamodb:ConditionCheckItem"
                   ],
                   "Resource": [
                     {
@@ -1369,6 +1376,25 @@
                       }
                     ]
                   }
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy52",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "kms:Encrypt",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                      {
+                        "keyId": "keyId"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
                 }
               ]
             }

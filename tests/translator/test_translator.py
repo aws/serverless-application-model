@@ -257,7 +257,8 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_apikey_default_override',
         'api_with_apikey_required',
         'api_with_path_parameters',
-        'function_with_event_source_mapping'
+        'function_with_event_source_mapping',
+        'api_with_swagger_authorizer_none'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -313,7 +314,10 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_swagger_and_openapi_with_auth',
         'api_with_openapi_definition_body_no_flag',
         'api_request_model_openapi_3',
-        'api_with_apikey_required_openapi_3'
+        'api_with_apikey_required_openapi_3',
+        'api_with_basic_custom_domain',
+        'api_with_basic_custom_domain_intrinsics',
+        'api_with_custom_domain_route53'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -542,7 +546,10 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_invalid_policy_statement',
     'error_function_with_invalid_condition_name',
     'error_invalid_document_empty_semantic_version',
-    'error_api_with_invalid_open_api_version_type'
+    'error_api_with_invalid_open_api_version_type',
+    'error_api_with_custom_domains_invalid',
+    'error_api_with_custom_domains_route53_invalid',
+    'error_api_event_import_vaule_reference'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
@@ -779,6 +786,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
 
 class TestTemplateValidation(TestCase):
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_not_found(self):
         template = {
@@ -790,6 +798,7 @@ class TestTemplateValidation(TestCase):
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_is_empty(self):
         template = {
@@ -802,6 +811,7 @@ class TestTemplateValidation(TestCase):
             translator.translate(template, {})
 
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resource_is_not_dict(self):
         template = {
@@ -814,6 +824,7 @@ class TestTemplateValidation(TestCase):
             translator.translate(template, {})
 
 
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_throws_when_resources_not_all_dicts(self):
         template = {
@@ -915,7 +926,7 @@ class TestPluginsUsage(TestCase):
         resource_from_dict_mock.assert_called_with("MyTable",
                                                         manifest["Resources"]["MyTable"],
                                                         sam_plugins=sam_plugins_object_mock)
-        prepare_plugins_mock.assert_called_once_with(initial_plugins, {"AWS::Region": "ap-southeast-1"})
+        prepare_plugins_mock.assert_called_once_with(initial_plugins, {"AWS::Region": "ap-southeast-1", "AWS::Partition": "aws"})
 
 def get_policy_mock():
     mock_policy_loader = MagicMock()

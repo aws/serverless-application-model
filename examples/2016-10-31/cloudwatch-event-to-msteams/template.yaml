@@ -45,6 +45,7 @@ Resources:
           Type: CloudWatchEvent
           Description: Detects EC2 Security Group Events to Send to Teams
           Properties:
+            EventBusName: default
             Pattern:
               source:
                 - "aws.ec2"

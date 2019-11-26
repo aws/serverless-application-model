@@ -159,8 +159,14 @@
         "Properties": {
           "ManagedPolicyArns": [
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          ], 
-          "AssumeRolePolicyDocument": {
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
             "Version": "2012-10-17", 
             "Statement": [
               {
@@ -183,8 +189,14 @@
         "Properties": {
           "ManagedPolicyArns": [
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          ], 
-          "AssumeRolePolicyDocument": {
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
             "Version": "2012-10-17", 
             "Statement": [
               {
@@ -207,8 +219,14 @@
         "Properties": {
           "ManagedPolicyArns": [
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          ], 
-          "AssumeRolePolicyDocument": {
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
             "Version": "2012-10-17", 
             "Statement": [
               {

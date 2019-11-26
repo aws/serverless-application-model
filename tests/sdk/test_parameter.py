@@ -114,7 +114,8 @@ class TestSAMParameterValues(TestCase):
 
         expected = {
             "Param1": "value1",
-            "AWS::Region": "ap-southeast-1"
+            "AWS::Region": "ap-southeast-1",
+            "AWS::Partition": "aws"
         }
 
         sam_parameter_values = SamParameterValues(parameter_values)
@@ -128,7 +129,39 @@ class TestSAMParameterValues(TestCase):
         }
 
         expected = {
-            "AWS::Region": "value1"
+            "AWS::Region": "value1",
+            "AWS::Partition": "aws"
+        }
+
+        sam_parameter_values = SamParameterValues(parameter_values)
+        sam_parameter_values.add_pseudo_parameter_values()
+        self.assertEqual(expected, sam_parameter_values.parameter_values)
+
+    @patch('boto3.session.Session.region_name', 'us-gov-west-1')
+    def test_add_pseudo_parameter_values_aws_partition(self):
+        parameter_values = {
+            "Param1": "value1"
+        }
+
+        expected = {
+            "Param1": "value1",
+            "AWS::Region": "us-gov-west-1",
+            "AWS::Partition": "aws-us-gov"
+        }
+
+        sam_parameter_values = SamParameterValues(parameter_values)
+        sam_parameter_values.add_pseudo_parameter_values()
+        self.assertEqual(expected, sam_parameter_values.parameter_values)
+
+    @patch('boto3.session.Session.region_name', 'us-gov-west-1')
+    def test_add_pseudo_parameter_values_aws_partition_not_override(self):
+        parameter_values = {
+            "AWS::Partition": "aws"
+        }
+
+        expected = {
+            "AWS::Partition": "aws",
+            "AWS::Region": "us-gov-west-1"
         }
 
         sam_parameter_values = SamParameterValues(parameter_values)

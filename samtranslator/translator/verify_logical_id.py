@@ -7,7 +7,9 @@ do_not_verify = {
     'AWS::SNS::Topic': 'AWS::SNS::Topic',
     'AWS::DynamoDB::Table': 'AWS::Serverless::SimpleTable',
     'AWS::CloudFormation::Stack': 'AWS::Serverless::Application',
-    'AWS::Cognito::UserPool': 'AWS::Cognito::UserPool'
+    'AWS::Cognito::UserPool': 'AWS::Cognito::UserPool',
+    'AWS::ApiGateway::DomainName': 'AWS::ApiGateway::DomainName',
+    'AWS::ApiGateway::BasePathMapping': 'AWS::ApiGateway::BasePathMapping'
 }
 
 

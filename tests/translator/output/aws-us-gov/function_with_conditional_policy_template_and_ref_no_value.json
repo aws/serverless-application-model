@@ -38,6 +38,12 @@
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "Policies": [
           {
             "Fn::If": [

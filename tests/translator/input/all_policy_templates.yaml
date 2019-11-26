@@ -151,3 +151,6 @@ Resources:
 
         - CodeCommitReadPolicy:
             RepositoryName: name
+
+        - KMSEncryptPolicy:
+            KeyId: keyId

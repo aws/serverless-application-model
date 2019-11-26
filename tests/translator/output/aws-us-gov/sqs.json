@@ -7,6 +7,12 @@
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [{

@@ -80,6 +80,9 @@ Resources:
         - KMSDecryptPolicy:
             KeyId: keyId
 
+        - KMSEncryptPolicy:
+            KeyId: keyId
+
         - SESBulkTemplatedCrudPolicy:
             IdentityName: name
 

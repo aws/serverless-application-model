@@ -33,7 +33,6 @@ def test_redeploy_explicit_api():
             }
         }
     }
-
     original_deployment_ids = translate_and_find_deployment_ids(manifest)
 
     # Now update the API specification. This should redeploy the API by creating a new deployment resource

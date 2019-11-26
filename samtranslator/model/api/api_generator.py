@@ -1,9 +1,11 @@
 from collections import namedtuple
 from six import string_types
-from samtranslator.model.intrinsics import ref
+from samtranslator.model.intrinsics import ref, fnGetAtt
 from samtranslator.model.apigateway import (ApiGatewayDeployment, ApiGatewayRestApi,
                                             ApiGatewayStage, ApiGatewayAuthorizer,
-                                            ApiGatewayResponse)
+                                            ApiGatewayResponse, ApiGatewayDomainName,
+                                            ApiGatewayBasePathMapping)
+from samtranslator.model.route53 import Route53RecordSetGroup
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
@@ -35,7 +37,7 @@ class ApiGenerator(object):
                  method_settings=None, binary_media=None, minimum_compression_size=None, cors=None,
                  auth=None, gateway_responses=None, access_log_setting=None, canary_setting=None,
                  tracing_enabled=None, resource_attributes=None, passthrough_resource_attributes=None,
-                 open_api_version=None, models=None):
+                 open_api_version=None, models=None, domain=None):
         """Constructs an API Generator class that generates API Gateway resources
 
         :param logical_id: Logical id of the SAM API Resource
@@ -80,6 +82,7 @@ class ApiGenerator(object):
         self.open_api_version = open_api_version
         self.remove_extra_stage = open_api_version
         self.models = models
+        self.domain = domain
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -204,12 +207,129 @@ class ApiGenerator(object):
         stage.TracingEnabled = self.tracing_enabled
 
         if swagger is not None:
-            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger)
+            deployment.make_auto_deployable(stage, self.remove_extra_stage, swagger, self.domain)
 
         if self.tags is not None:
             stage.Tags = get_tag_list(self.tags)
 
         return stage
+
+    def _construct_api_domain(self, rest_api):
+        """
+        Constructs and returns the ApiGateway Domain and BasepathMapping
+        """
+        if self.domain is None:
+            return None, None, None
+
+        if self.domain.get('DomainName') is None or \
+           self.domain.get('CertificateArn') is None:
+            raise InvalidResourceException(self.logical_id,
+                                           "Custom Domains only works if both DomainName and CertificateArn"
+                                           " are provided")
+
+        self.domain['ApiDomainName'] = "{}{}".format('ApiGatewayDomainName',
+                                                     logical_id_generator.
+                                                     LogicalIdGenerator("", self.domain.get('DomainName')).gen())
+
+        domain = ApiGatewayDomainName(self.domain.get('ApiDomainName'),
+                                      attributes=self.passthrough_resource_attributes)
+        domain.DomainName = self.domain.get('DomainName')
+        endpoint = self.domain.get('EndpointConfiguration')
+
+        if endpoint is None:
+            endpoint = 'REGIONAL'
+            self.domain['EndpointConfiguration'] = 'REGIONAL'
+        elif endpoint not in ['EDGE', 'REGIONAL']:
+            raise InvalidResourceException(self.logical_id,
+                                           "EndpointConfiguration for Custom Domains must be"
+                                           " one of {}".format(['EDGE', 'REGIONAL']))
+
+        if endpoint == 'REGIONAL':
+            domain.RegionalCertificateArn = self.domain.get('CertificateArn')
+        else:
+            domain.CertificateArn = self.domain.get('CertificateArn')
+
+        domain.EndpointConfiguration = {"Types": [endpoint]}
+
+        # Create BasepathMappings
+        if self.domain.get('BasePath') and isinstance(self.domain.get('BasePath'), string_types):
+            basepaths = [self.domain.get('BasePath')]
+        elif self.domain.get('BasePath') and isinstance(self.domain.get('BasePath'), list):
+            basepaths = self.domain.get('BasePath')
+        else:
+            basepaths = None
+
+        basepath_resource_list = []
+
+        if basepaths is None:
+            basepath_mapping = ApiGatewayBasePathMapping(self.logical_id + 'BasePathMapping',
+                                                         attributes=self.passthrough_resource_attributes)
+            basepath_mapping.DomainName = self.domain.get('DomainName')
+            basepath_mapping.RestApiId = ref(rest_api.logical_id)
+            basepath_mapping.Stage = ref(rest_api.logical_id + '.Stage')
+            basepath_resource_list.extend([basepath_mapping])
+        else:
+            for path in basepaths:
+                path = ''.join(e for e in path if e.isalnum())
+                logical_id = "{}{}{}".format(self.logical_id, path, 'BasePathMapping')
+                basepath_mapping = ApiGatewayBasePathMapping(logical_id,
+                                                             attributes=self.passthrough_resource_attributes)
+                basepath_mapping.DomainName = self.domain.get('DomainName')
+                basepath_mapping.RestApiId = ref(rest_api.logical_id)
+                basepath_mapping.Stage = ref(rest_api.logical_id + '.Stage')
+                basepath_mapping.BasePath = path
+                basepath_resource_list.extend([basepath_mapping])
+
+        # Create the Route53 RecordSetGroup resource
+        record_set_group = None
+        if self.domain.get('Route53') is not None:
+            route53 = self.domain.get('Route53')
+            if route53.get('HostedZoneId') is None:
+                raise InvalidResourceException(self.logical_id,
+                                               "HostedZoneId is required to enable Route53 support on Custom Domains.")
+            logical_id = logical_id_generator.LogicalIdGenerator("", route53.get('HostedZoneId')).gen()
+            record_set_group = Route53RecordSetGroup('RecordSetGroup' + logical_id,
+                                                     attributes=self.passthrough_resource_attributes)
+            record_set_group.HostedZoneId = route53.get('HostedZoneId')
+            record_set_group.RecordSets = self._construct_record_sets_for_domain(self.domain)
+
+        return domain, basepath_resource_list, record_set_group
+
+    def _construct_record_sets_for_domain(self, domain):
+        recordset_list = []
+        recordset = {}
+        route53 = domain.get('Route53')
+
+        recordset['Name'] = domain.get('DomainName')
+        recordset['Type'] = 'A'
+        recordset['AliasTarget'] = self._construct_alias_target(self.domain)
+        recordset_list.extend([recordset])
+
+        recordset_ipv6 = {}
+        if route53.get('IpV6') is not None and route53.get('IpV6') is True:
+            recordset_ipv6['Name'] = domain.get('DomainName')
+            recordset_ipv6['Type'] = 'AAAA'
+            recordset_ipv6['AliasTarget'] = self._construct_alias_target(self.domain)
+            recordset_list.extend([recordset_ipv6])
+
+        return recordset_list
+
+    def _construct_alias_target(self, domain):
+        alias_target = {}
+        route53 = domain.get('Route53')
+        target_health = route53.get('EvaluateTargetHealth')
+
+        if target_health is not None:
+            alias_target['EvaluateTargetHealth'] = target_health
+        if domain.get('EndpointConfiguration') == 'REGIONAL':
+            alias_target['HostedZoneId'] = fnGetAtt(self.domain.get('ApiDomainName'), 'RegionalHostedZoneId')
+            alias_target['DNSName'] = fnGetAtt(self.domain.get('ApiDomainName'), 'RegionalDomainName')
+        else:
+            if route53.get('DistributionDomainName') is None:
+                route53['DistributionDomainName'] = fnGetAtt(self.domain.get('ApiDomainName'), 'DistributionDomainName')
+            alias_target['HostedZoneId'] = 'Z2FDTNDATAQYW2'
+            alias_target['DNSName'] = route53.get('DistributionDomainName')
+        return alias_target
 
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM API resource
@@ -218,6 +338,7 @@ class ApiGenerator(object):
         :rtype: tuple
         """
         rest_api = self._construct_rest_api()
+        domain, basepath_mapping, route53 = self._construct_api_domain(rest_api)
         deployment = self._construct_deployment(rest_api)
 
         swagger = None
@@ -229,7 +350,7 @@ class ApiGenerator(object):
         stage = self._construct_stage(deployment, swagger)
         permissions = self._construct_authorizer_lambda_permission()
 
-        return rest_api, deployment, stage, permissions
+        return rest_api, deployment, stage, permissions, domain, basepath_mapping, route53
 
     def _add_cors(self):
         """

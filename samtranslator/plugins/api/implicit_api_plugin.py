@@ -150,6 +150,11 @@ class ImplicitApiPlugin(BasePlugin):
                 raise InvalidEventException(logicalId,
                                             "Api Event must have a String specified for 'Method'.")
 
+            # !Ref is resolved by this time. If it is still a dict, we can't parse/use this Api.
+            if (isinstance(api_id, dict)):
+                raise InvalidEventException(logicalId,
+                                            "Api Event must reference an Api in the same template.")
+
             api_dict = self.api_conditions.setdefault(api_id, {})
             method_conditions = api_dict.setdefault(path, {})
             method_conditions[method] = condition
