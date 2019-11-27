@@ -132,6 +132,9 @@ class DeploymentPreferenceCollection(object):
         if deployment_preference.role:
             deployment_group.ServiceRoleArn = deployment_preference.role
 
+        if deployment_preference.trigger_configurations:
+            deployment_group.TriggerConfigurations = deployment_preference.trigger_configurations
+
         return deployment_group
 
     def _replace_deployment_types(self, value, key=None):

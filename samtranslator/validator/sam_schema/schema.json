@@ -336,6 +336,9 @@
     "AWS::Serverless::Function.CloudWatchEventEvent": {
       "additionalProperties": false,
       "properties": {
+        "EventBusName": {
+          "type": "string"
+        },
         "Input": {
           "type": "string"
         },

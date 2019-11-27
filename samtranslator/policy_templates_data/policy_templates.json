@@ -117,7 +117,8 @@
               "dynamodb:UpdateItem",
               "dynamodb:BatchWriteItem",
               "dynamodb:BatchGetItem",
-              "dynamodb:DescribeTable"
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
             ],
             "Resource": [
               {
@@ -782,6 +783,32 @@
         "Statement": [
           {
             "Action": "kms:Decrypt",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                {
+                  "keyId": {
+                    "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "KMSEncryptPolicy": {
+      "Description": "Gives permission to encrypt with KMS Key",
+      "Parameters": {
+        "KeyId": {
+          "Description": "ID of the KMS Key"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "kms:Encrypt",
             "Effect": "Allow",
             "Resource": {
               "Fn::Sub": [

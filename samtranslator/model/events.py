@@ -7,6 +7,7 @@ class EventsRule(Resource):
     resource_type = 'AWS::Events::Rule'
     property_types = {
             'Description': PropertyType(False, is_str()),
+            'EventBusName': PropertyType(False, is_str()),
             'EventPattern': PropertyType(False, is_type(dict)),
             'Name': PropertyType(False, is_str()),
             'RoleArn': PropertyType(False, is_str()),

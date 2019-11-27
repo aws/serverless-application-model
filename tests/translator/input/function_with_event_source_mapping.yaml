@@ -1,6 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: EventSourceMapping example with MaximumBatchingWindowInSeconds property
 
 Parameters:
   MyBatchingWindowParam:
@@ -23,6 +22,9 @@ Resources:
             }
         }
       Runtime: nodejs8.10
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt MySqsQueue.QueueName
       Events:
         Stream:
           Type: Kinesis
@@ -42,7 +44,14 @@ Resources:
             Stream: !GetAtt DynamoDBTable.StreamArn
             BatchSize: 100
             MaximumBatchingWindowInSeconds: !Ref MyBatchingWindowParam
+            ParallelizationFactor: 8
+            MaximumRetryAttempts: 100
+            BisectBatchOnFunctionError: true
+            MaximumRecordAgeInSeconds: 86400
             StartingPosition: TRIM_HORIZON
+            DestinationConfig:
+              OnFailure:
+                Destination: !GetAtt MySqsQueue.Arn
 
   KinesisStream:
     Type: AWS::Kinesis::Stream
@@ -67,3 +76,6 @@ Resources:
         WriteCapacityUnits: 5
       StreamSpecification:
         StreamViewType: NEW_IMAGE
+
+  MySqsQueue:
+    Type: AWS::SQS::Queue

@@ -10,7 +10,7 @@ from .s3_utils.uri_parser import construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
-from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage
+from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage, ApiGatewayDomainName
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import (InvalidEventException,
@@ -198,6 +198,10 @@ class SamFunction(SamResourceMacro):
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaBasicExecutionRole')]
         if self.Tracing:
             managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn('AWSXrayWriteOnlyAccess'))
+        if self.VpcConfig:
+            managed_policy_arns.append(
+                ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaVPCAccessExecutionRole')
+            )
 
         function_policies = FunctionPolicies({"Policies": self.Policies},
                                              # No support for policy templates in the "core"
@@ -269,6 +273,7 @@ class SamFunction(SamResourceMacro):
         execution_role.ManagedPolicyArns = list(managed_policy_arns)
         execution_role.Policies = policy_documents or None
         execution_role.PermissionsBoundary = self.PermissionsBoundary
+        execution_role.Tags = self._construct_tag_list(self.Tags)
 
         return execution_role
 
@@ -421,10 +426,11 @@ class SamFunction(SamResourceMacro):
     def _validate_deployment_preference_and_add_update_policy(self, deployment_preference_collection, lambda_alias,
                                                               intrinsics_resolver, mappings_resolver):
         if 'Enabled' in self.DeploymentPreference:
-            self.DeploymentPreference['Enabled'] = intrinsics_resolver.resolve_parameter_refs(
-                self.DeploymentPreference['Enabled'])
-            if isinstance(self.DeploymentPreference['Enabled'], dict):
-                raise InvalidResourceException(self.logical_id, "'Enabled' must be a boolean value")
+            # resolve intrinsics and mappings for Type
+            enabled = self.DeploymentPreference['Enabled']
+            enabled = intrinsics_resolver.resolve_parameter_refs(enabled)
+            enabled = mappings_resolver.resolve_parameter_refs(enabled)
+            self.DeploymentPreference['Enabled'] = enabled
 
         if 'Type' in self.DeploymentPreference:
             # resolve intrinsics and mappings for Type
@@ -482,12 +488,14 @@ class SamApi(SamResourceMacro):
         'CanarySetting': PropertyType(False, is_type(dict)),
         'TracingEnabled': PropertyType(False, is_type(bool)),
         'OpenApiVersion': PropertyType(False, is_str()),
-        'Models': PropertyType(False, is_type(dict))
+        'Models': PropertyType(False, is_type(dict)),
+        'Domain': PropertyType(False, is_type(dict))
     }
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
         "Deployment": ApiGatewayDeployment.resource_type,
+        "DomainName": ApiGatewayDomainName.resource_type
     }
 
     def to_cloudformation(self, **kwargs):
@@ -502,6 +510,7 @@ class SamApi(SamResourceMacro):
 
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
+        self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
 
         api_generator = ApiGenerator(self.logical_id,
                                      self.CacheClusterEnabled,
@@ -526,13 +535,19 @@ class SamApi(SamResourceMacro):
                                      resource_attributes=self.resource_attributes,
                                      passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
                                      open_api_version=self.OpenApiVersion,
-                                     models=self.Models)
+                                     models=self.Models,
+                                     domain=self.Domain)
 
-        rest_api, deployment, stage, permissions = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions, domain, basepath_mapping, route53 = api_generator.to_cloudformation()
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
-
+        if domain:
+            resources.extend([domain])
+        if basepath_mapping:
+            resources.extend(basepath_mapping)
+        if route53:
+            resources.extend([route53])
         return resources
 
 

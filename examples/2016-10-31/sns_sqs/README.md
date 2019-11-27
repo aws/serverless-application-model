@@ -15,5 +15,5 @@ After your CloudFormation Stack has completed creation, send a message to the SN
 
 ```bash
 YOUR_SNS_TOPIC_ARN=arn:aws:sns:us-east-1:[your_account_id]:[your_topic_name]; \
-aws sqs send-message --target-arn $YOUR_SNS_TOPIC_ARN --message '{ "myMessage": "Hello SAM!" }'
+aws sns publish --target-arn $YOUR_SNS_TOPIC_ARN --message '{ "myMessage": "Hello SAM!" }'
 ```

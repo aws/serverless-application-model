@@ -20,10 +20,12 @@ from samtranslator.model.exceptions import InvalidResourceException
 :param role: An IAM role ARN that CodeDeploy will use for traffic shifting, an IAM role will not be created if
     this is supplied
 :param enabled: Whether this deployment preference is enabled (true by default)
+:param trigger_configurations: Information about triggers associated with the deployment group. Duplicates are
+    not allowed.
 """
 DeploymentPreferenceTuple = namedtuple('DeploymentPreferenceTuple',
                                        ['deployment_type', 'pre_traffic_hook', 'post_traffic_hook', 'alarms',
-                                        'enabled', 'role'])
+                                        'enabled', 'role', 'trigger_configurations'])
 
 
 class DeploymentPreference(DeploymentPreferenceTuple):
@@ -42,7 +44,7 @@ class DeploymentPreference(DeploymentPreferenceTuple):
         """
         enabled = deployment_preference_dict.get('Enabled', True)
         if not enabled:
-            return DeploymentPreference(None, None, None, None, False, None)
+            return DeploymentPreference(None, None, None, None, False, None, None)
 
         if 'Type' not in deployment_preference_dict:
             raise InvalidResourceException(logical_id, "'DeploymentPreference' is missing required Property 'Type'")
@@ -57,4 +59,6 @@ class DeploymentPreference(DeploymentPreferenceTuple):
         post_traffic_hook = hooks.get('PostTraffic', None)
         alarms = deployment_preference_dict.get('Alarms', None)
         role = deployment_preference_dict.get('Role', None)
-        return DeploymentPreference(deployment_type, pre_traffic_hook, post_traffic_hook, alarms, enabled, role)
+        trigger_configurations = deployment_preference_dict.get('TriggerConfigurations', None)
+        return DeploymentPreference(deployment_type, pre_traffic_hook, post_traffic_hook, alarms, enabled, role,
+                                    trigger_configurations)

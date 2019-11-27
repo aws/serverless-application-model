@@ -8,6 +8,8 @@ def client(client_type, *args):
         from .Lambda import Client
     elif client_type == 'iot-data':
         from .IoTDataPlane import Client
+    elif client_type == 'secretsmanager':
+        from .SecretsManager import Client
     else:
         raise Exception('Client type {} is not recognized.'.format(repr(client_type)))
 

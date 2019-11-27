@@ -28,7 +28,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -52,7 +58,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -123,7 +135,19 @@
             "CodeDeployServiceRole", 
             "Arn"
           ]
-        }
+        },
+        "TriggerConfigurations": [
+          {
+            "TriggerEvents": [
+              "DeploymentSuccess",
+              "DeploymentFailure"
+            ],
+            "TriggerTargetArn": {
+              "Ref": "MySNSTopic"
+            },
+            "TriggerName": "TestTrigger"
+          }
+        ]
       }
     }, 
     "MySanityTestFunction": {
@@ -247,7 +271,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -265,6 +295,9 @@
           ]
         }
       }
+    },
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
     }
   }
 }
