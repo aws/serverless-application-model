@@ -143,6 +143,7 @@ class CloudWatchEvent(PushEventSource):
     resource_type = 'CloudWatchEvent'
     principal = 'events.amazonaws.com'
     property_types = {
+        'EventBusName': PropertyType(False, is_str()),
         'Pattern': PropertyType(False, is_type(dict)),
         'Input': PropertyType(False, is_str()),
         'InputPath': PropertyType(False, is_str())
@@ -164,6 +165,7 @@ class CloudWatchEvent(PushEventSource):
         resources = []
 
         events_rule = EventsRule(self.logical_id)
+        events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
         events_rule.Targets = [self._construct_target(function)]
         if CONDITION in function.resource_attributes:
