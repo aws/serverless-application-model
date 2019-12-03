@@ -36,7 +36,8 @@ class Globals(object):
             "Layers",
             "DeploymentPreference",
             "PermissionsBoundary",
-            "ReservedConcurrentExecutions"
+            "ReservedConcurrentExecutions",
+            "ProvisionedConcurrencyConfig"
         ],
 
         # Everything except

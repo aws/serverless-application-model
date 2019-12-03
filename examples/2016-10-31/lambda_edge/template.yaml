@@ -1,6 +1,24 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Sample SAM configuration for Lambda@Edge to ease deployment and further updates
+Parameters:
+
+  ProvisionedConcurrency:
+    Type: String
+    Default: 10
+  EnableAliasProvisionedConcurrency:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+
+Globals:
+
+  Function:
+    ProvisionedConcurrencyConfig:
+      ProvisionedConcurrentExecutions: !If [AliasProvisionedConcurrencyEnabled, !Ref ProvisionedConcurrency, !Ref 'AWS::NoValue']
+
 Resources:
 
     CFDistribution:
