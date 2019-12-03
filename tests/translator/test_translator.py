@@ -542,7 +542,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_function_with_invalid_policy_statement',
     'error_function_with_invalid_condition_name',
     'error_invalid_document_empty_semantic_version',
-    'error_api_with_invalid_open_api_version_type'
+    'error_api_with_invalid_open_api_version_type',
+    'error_function_with_no_alias_provisioned_concurrency'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)

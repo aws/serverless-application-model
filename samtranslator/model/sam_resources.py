@@ -55,7 +55,8 @@ class SamFunction(SamResourceMacro):
 
         # Intrinsic functions in value of Alias property are not supported, yet
         'AutoPublishAlias': PropertyType(False, one_of(is_str())),
-        'VersionDescription': PropertyType(False, is_str())
+        'VersionDescription': PropertyType(False, is_str()),
+        'ProvisionedConcurrencyConfig': PropertyType(False, is_type(dict)),
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.eventsources, samtranslator.model.eventsources.pull,
                                           samtranslator.model.eventsources.push,
@@ -95,6 +96,11 @@ class SamFunction(SamResourceMacro):
 
         lambda_function = self._construct_lambda_function()
         resources.append(lambda_function)
+
+        if self.ProvisionedConcurrencyConfig:
+            if not self.AutoPublishAlias:
+                raise InvalidResourceException(self.logical_id, "To set ProvisionedConcurrencyConfig "
+                                               "AutoPublishALias must be defined on the function")
 
         lambda_alias = None
         if self.AutoPublishAlias:
@@ -415,6 +421,8 @@ class SamFunction(SamResourceMacro):
         alias.Name = name
         alias.FunctionName = function.get_runtime_attr('name')
         alias.FunctionVersion = version.get_runtime_attr("version")
+        if self.ProvisionedConcurrencyConfig:
+            alias.ProvisionedConcurrencyConfig = self.ProvisionedConcurrencyConfig
 
         return alias
 

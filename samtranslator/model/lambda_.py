@@ -50,7 +50,8 @@ class LambdaAlias(Resource):
             'Description': PropertyType(False, is_str()),
             'Name': PropertyType(False, is_str()),
             'FunctionName': PropertyType(True, one_of(is_str(), is_type(dict))),
-            'FunctionVersion': PropertyType(True, one_of(is_str(), is_type(dict)))
+            'FunctionVersion': PropertyType(True, one_of(is_str(), is_type(dict))),
+            'ProvisionedConcurrencyConfig': PropertyType(False, is_type(dict))
     }
 
     runtime_attrs = {
