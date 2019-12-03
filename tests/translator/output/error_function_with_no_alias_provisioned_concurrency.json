@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MinimalFunction] is invalid. To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function"
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MinimalFunction] is invalid. To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function"
+}
