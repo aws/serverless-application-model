@@ -12,7 +12,8 @@ Parameters:
       - true
       - false
     Default: true
-
+Conditions:
+  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency, true]
 Globals:
 
   Function:
