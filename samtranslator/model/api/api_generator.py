@@ -443,6 +443,9 @@ class ApiGenerator(object):
 
         if authorizers:
             swagger_editor.add_authorizers_security_definitions(authorizers)
+            if auth_properties.DefaultAuthorizer is not None \
+                and not isinstance(auth_properties.DefaultAuthorizer, str):
+                raise InvalidResourceException(self.logical_id, "'DefaultAuthorizer' must be a string")
             self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer,
                                          auth_properties.AddDefaultAuthorizerToCorsPreflight)
 
