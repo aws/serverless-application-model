@@ -65,8 +65,41 @@ AutoPublishAlias             Ref of a CloudFormation Parameter  Alias resources 
 ReservedConcurrentExecutions       All
 ============================ ================================== ========================
 
+
+AWS::Serverless::FunctionReference
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+============================ ================================== ========================
+     Property Name           Intrinsic(s) Supported            Reasons
+============================ ================================== ========================
+FunctionName                       All
+Events                             All
+============================ ================================== ========================
+
+
+AWS::Serverless::Application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+================================== ======================== ========================
+     Property Name                 Intrinsic(s) Supported          Reasons
+================================== ======================== ========================
+Location                            None                     SAM expects exact values for the Location property
+Parameters                          All
+NotificationARNs                    All
+Tags                                All
+TimeoutInMinutes                    All
+Events                              All
+================================== ======================== ========================
+
+
 Events Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The property Events can appear in three different SAM resources:
+- AWS::Serverless::Function
+- AWS::Serverless::FunctionReference
+- AWS::Serverless::Application
+
 
 Cognito
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -185,20 +218,6 @@ Cors                                All
 TracingEnabled                      All
 OpenApiVersion                      None
 Domain                              All
-================================== ======================== ========================
-
-
-AWS::Serverless::Application
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-================================== ======================== ========================
-     Property Name                 Intrinsic(s) Supported          Reasons
-================================== ======================== ========================
-Location                            None                     SAM expects exact values for the Location property
-Parameters                          All
-NotificationARNs                    All
-Tags                                All
-TimeoutInMinutes                    All
 ================================== ======================== ========================
 
 

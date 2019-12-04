@@ -1,0 +1,19 @@
+Resources:
+  ThumbnailFunction:
+    Type: AWS::Serverless::FunctionReference
+    Properties:
+      FunctionName: 
+        Fn::Join:
+          - ''
+          - - FirstPart
+            - -LastPart      
+      Events:
+        ImageBucket:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*          
+
+  Images:
+    Type: AWS::S3::Bucket

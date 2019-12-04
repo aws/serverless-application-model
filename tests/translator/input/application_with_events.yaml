@@ -1,0 +1,17 @@
+Resources:
+  BasicApplication:
+    Type: 'AWS::Serverless::Application'
+    Properties:
+      Location:
+        ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
+        SemanticVersion: 1.0.2
+      Events:
+        FunctionInsideApplication:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*          
+
+  Images:
+    Type: AWS::S3::Bucket          
