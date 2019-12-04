@@ -3,6 +3,7 @@ do_not_verify = {
     'AWS::Lambda::Function': 'AWS::Serverless::Function',
     'AWS::Lambda::LayerVersion': 'AWS::Serverless::LayerVersion',
     'AWS::ApiGateway::RestApi': 'AWS::Serverless::Api',
+    'AWS::ApiGatewayV2::Api': 'AWS::Serverless::HttpApi',
     'AWS::S3::Bucket': 'AWS::S3::Bucket',
     'AWS::SNS::Topic': 'AWS::SNS::Topic',
     'AWS::DynamoDB::Table': 'AWS::Serverless::SimpleTable',

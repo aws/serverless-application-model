@@ -6,11 +6,11 @@ from samtranslator.model.intrinsics import ref, fnGetAtt
 class IAMRole(Resource):
     resource_type = 'AWS::IAM::Role'
     property_types = {
-            'AssumeRolePolicyDocument': PropertyType(True, is_type(dict)),
-            'ManagedPolicyArns': PropertyType(False, is_type(list)),
-            'Path': PropertyType(False, is_str()),
-            'Policies': PropertyType(False, is_type(list)),
-            'PermissionsBoundary': PropertyType(False, is_str())
+        'AssumeRolePolicyDocument': PropertyType(True, is_type(dict)),
+        'ManagedPolicyArns': PropertyType(False, is_type(list)),
+        'Path': PropertyType(False, is_str()),
+        'Policies': PropertyType(False, is_type(list)),
+        'PermissionsBoundary': PropertyType(False, is_str())
     }
 
     runtime_attrs = {

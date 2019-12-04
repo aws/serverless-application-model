@@ -6,7 +6,7 @@ from samtranslator.model.intrinsics import ref, fnGetAtt
 class IotTopicRule(Resource):
     resource_type = 'AWS::IoT::TopicRule'
     property_types = {
-            'TopicRulePayload': PropertyType(False, is_type(dict))
+        'TopicRulePayload': PropertyType(False, is_type(dict))
     }
 
     runtime_attrs = {

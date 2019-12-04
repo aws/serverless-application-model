@@ -18,6 +18,7 @@ from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.open_api.open_api import OpenApiEditor
 
 CONDITION = 'Condition'
 
@@ -84,11 +85,11 @@ class Schedule(PushEventSource):
     resource_type = 'Schedule'
     principal = 'events.amazonaws.com'
     property_types = {
-            'Schedule': PropertyType(True, is_str()),
-            'Input': PropertyType(False, is_str()),
-            'Enabled': PropertyType(False, is_type(bool)),
-            'Name': PropertyType(False, is_str()),
-            'Description': PropertyType(False, is_str())
+        'Schedule': PropertyType(True, is_str()),
+        'Input': PropertyType(False, is_str()),
+        'Enabled': PropertyType(False, is_type(bool)),
+        'Name': PropertyType(False, is_str()),
+        'Description': PropertyType(False, is_str())
     }
 
     def to_cloudformation(self, **kwargs):
@@ -129,8 +130,8 @@ class Schedule(PushEventSource):
         :rtype: dict
         """
         target = {
-                'Arn': function.get_runtime_attr("arn"),
-                'Id': self.logical_id + 'LambdaTarget'
+            'Arn': function.get_runtime_attr("arn"),
+            'Id': self.logical_id + 'LambdaTarget'
         }
         if self.Input is not None:
             target['Input'] = self.Input
@@ -185,8 +186,8 @@ class CloudWatchEvent(PushEventSource):
         :rtype: dict
         """
         target = {
-                'Arn': function.get_runtime_attr("arn"),
-                'Id': self.logical_id + 'LambdaTarget'
+            'Arn': function.get_runtime_attr("arn"),
+            'Id': self.logical_id + 'LambdaTarget'
         }
         if self.Input is not None:
             target['Input'] = self.Input
@@ -201,9 +202,9 @@ class S3(PushEventSource):
     resource_type = 'S3'
     principal = 's3.amazonaws.com'
     property_types = {
-            'Bucket': PropertyType(True, is_str()),
-            'Events': PropertyType(True, one_of(is_str(), list_of(is_str()))),
-            'Filter': PropertyType(False, dict_of(is_str(), is_str()))
+        'Bucket': PropertyType(True, is_str()),
+        'Events': PropertyType(True, one_of(is_str(), list_of(is_str()))),
+        'Filter': PropertyType(False, dict_of(is_str(), is_str()))
     }
 
     def resources_to_link(self, resources):
@@ -365,10 +366,10 @@ class SNS(PushEventSource):
     resource_type = 'SNS'
     principal = 'sns.amazonaws.com'
     property_types = {
-            'Topic': PropertyType(True, is_str()),
-            'Region': PropertyType(False, is_str()),
-            'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
-            'SqsSubscription': PropertyType(False, is_type(bool))
+        'Topic': PropertyType(True, is_str()),
+        'Region': PropertyType(False, is_str()),
+        'FilterPolicy': PropertyType(False, dict_of(is_str(), list_of(one_of(is_str(), is_type(dict))))),
+        'SqsSubscription': PropertyType(False, is_type(bool))
     }
 
     def to_cloudformation(self, **kwargs):
@@ -446,15 +447,15 @@ class Api(PushEventSource):
     resource_type = 'Api'
     principal = 'apigateway.amazonaws.com'
     property_types = {
-            'Path': PropertyType(True, is_str()),
-            'Method': PropertyType(True, is_str()),
+        'Path': PropertyType(True, is_str()),
+        'Method': PropertyType(True, is_str()),
 
-            # Api Event sources must "always" be paired with a Serverless::Api
-            'RestApiId': PropertyType(True, is_str()),
-            'Stage': PropertyType(False, is_str()),
-            'Auth': PropertyType(False, is_type(dict)),
-            'RequestModel': PropertyType(False, is_type(dict)),
-            'RequestParameters': PropertyType(False, is_type(list))
+        # Api Event sources must "always" be paired with a Serverless::Api
+        'RestApiId': PropertyType(True, is_str()),
+        'Stage': PropertyType(False, is_str()),
+        'Auth': PropertyType(False, is_type(dict)),
+        'RequestModel': PropertyType(False, is_type(dict)),
+        'RequestParameters': PropertyType(False, is_type(list))
     }
 
     def resources_to_link(self, resources):
@@ -872,3 +873,186 @@ class Cognito(PushEventSource):
                     'Cognito trigger "{trigger}" defined multiple times.'.format(
                         trigger=self.Trigger))
         return userpool
+
+
+class HttpApi(PushEventSource):
+    """Api method event source for SAM Functions."""
+    resource_type = 'HttpApi'
+    principal = 'apigateway.amazonaws.com'
+    property_types = {
+        'Path': PropertyType(False, is_str()),
+        'Method': PropertyType(False, is_str()),
+        'ApiId': PropertyType(False, is_str()),
+        'Stage': PropertyType(False, is_str()),
+        'Auth': PropertyType(False, is_type(dict))
+    }
+
+    def resources_to_link(self, resources):
+        """
+        If this API Event Source refers to an explicit API resource, resolve the reference and grab
+        necessary data from the explicit API
+        """
+
+        api_id = self.ApiId
+        if isinstance(api_id, dict) and "Ref" in api_id:
+            api_id = api_id["Ref"]
+
+        explicit_api = resources[api_id].get("Properties")
+
+        return {
+            'explicit_api': explicit_api
+        }
+
+    def to_cloudformation(self, **kwargs):
+        """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
+        API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the
+        x-amazon-apigateway-integration into the OpenApi body for a provided implicit API.
+
+        :param dict kwargs: a dict containing the implicit RestApi to be modified, should no explicit RestApi \
+                be provided.
+        :returns: a list of vanilla CloudFormation Resources, to which this Api event expands
+        :rtype: list
+        """
+        resources = []
+
+        function = kwargs.get('function')
+
+        if self.Method is not None:
+            # Convert to lower case so that user can specify either GET or get
+            self.Method = self.Method.lower()
+
+        resources.extend(self._get_permissions(kwargs))
+
+        explicit_api = kwargs['explicit_api']
+        self._add_openapi_integration(explicit_api, function, explicit_api.get("__MANAGE_SWAGGER"))
+
+        return resources
+
+    def _get_permissions(self, resources_to_link):
+        permissions = []
+
+        # Give permission to all stages by default
+        permitted_stage = "*"
+
+        permission = self._get_permission(resources_to_link, permitted_stage)
+        if permission:
+            permissions.append(permission)
+        return permissions
+
+    def _get_permission(self, resources_to_link, stage):
+        # It turns out that APIGW doesn't like trailing slashes in paths (#665)
+        # and removes as a part of their behaviour, but this isn't documented.
+        # The regex removes the tailing slash to ensure the permission works as intended
+        path = re.sub(r'^(.+)/$', r'\1', self.Path)
+
+        editor = None
+        if resources_to_link["explicit_api"].get("DefinitionBody"):
+            try:
+                editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))
+            except ValueError as e:
+                api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId
+                raise InvalidResourceException(api_logical_id, e)
+
+        # If this is using the new $default path, keep path blank and add a * permission
+        if path == OpenApiEditor._DEFAULT_PATH:
+            path = ''
+        elif (editor and resources_to_link.get("function").logical_id ==
+              editor.get_integration_function_logical_id(OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD)):
+            # Case where default exists for this function, and so the permissions for that will apply here as well
+            # This can save us several CFN resources (not duplicating permissions)
+            return
+        else:
+            path = OpenApiEditor.get_path_without_trailing_slash(path)
+
+        # Handle case where Method is already the ANY ApiGateway extension
+        if self.Method.lower() == 'any' or self.Method.lower() == OpenApiEditor._X_ANY_METHOD:
+            method = '*'
+        else:
+            method = self.Method.upper()
+
+        api_id = self.ApiId
+
+        # ApiId can be a simple string or intrinsic function like !Ref. Using Fn::Sub will handle both cases
+        resource = '${__ApiId__}/' + '${__Stage__}/' + method + path
+        source_arn = fnSub(ArnGenerator.generate_arn(partition="${AWS::Partition}", service='execute-api',
+                           resource=resource), {"__ApiId__": api_id, "__Stage__": stage})
+
+        return self._construct_permission(resources_to_link['function'], source_arn=source_arn)
+
+    def _add_openapi_integration(self, api, function, manage_swagger=False):
+        """Adds the path and method for this Api event source to the OpenApi body for the provided RestApi.
+
+        :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
+        """
+        open_api_body = api.get("DefinitionBody")
+        if open_api_body is None:
+            return
+
+        function_arn = function.get_runtime_attr('arn')
+        uri = fnSub('arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/' +
+                    make_shorthand(function_arn) + '/invocations')
+
+        editor = OpenApiEditor(open_api_body)
+
+        if manage_swagger and editor.has_integration(self.Path, self.Method):
+            # Cannot add the Lambda Integration, if it is already present
+            raise InvalidEventException(
+                self.relative_id,
+                "API method '{method}' defined multiple times for path '{path}'.".format(
+                    method=self.Method, path=self.Path))
+
+        condition = None
+        if CONDITION in function.resource_attributes:
+            condition = function.resource_attributes[CONDITION]
+
+        editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get('Auth'), condition=condition)
+        if self.Auth:
+            self._add_auth_to_openapi_integration(api, editor)
+        api["DefinitionBody"] = editor.openapi
+
+    def _add_auth_to_openapi_integration(self, api, editor):
+        """Adds authorization to the lambda integration
+        :param api: api object
+        :param editor: OpenApiEditor object that contains the OpenApi definition
+        """
+        method_authorizer = self.Auth.get('Authorizer')
+        api_auth = api.get('Auth')
+        if not method_authorizer:
+            if api_auth.get("DefaultAuthorizer"):
+                self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")
+            else:
+                # currently, we require either a default auth or auth in the method
+                raise InvalidEventException(self.relative_id, "'Auth' section requires either "
+                                            "an explicit 'Authorizer' set or a 'DefaultAuthorizer' "
+                                            "configured on the HttpApi.")
+
+        # Default auth should already be applied, so apply any other auth here or scope override to default
+        api_authorizers = api_auth and api_auth.get('Authorizers')
+
+        if method_authorizer != 'NONE' and not api_authorizers:
+            raise InvalidEventException(
+                self.relative_id,
+                'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
+                'because the related API does not define any Authorizers.'.format(
+                    authorizer=method_authorizer, method=self.Method, path=self.Path))
+
+        if method_authorizer != 'NONE' and not api_authorizers.get(method_authorizer):
+            raise InvalidEventException(
+                self.relative_id,
+                'Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] '
+                'because it wasn\'t defined in the API\'s Authorizers.'.format(
+                    authorizer=method_authorizer, method=self.Method, path=self.Path))
+
+        if method_authorizer == 'NONE' and not api_auth.get('DefaultAuthorizer'):
+            raise InvalidEventException(
+                self.relative_id,
+                'Unable to set Authorizer on API method [{method}] for path [{path}] because \'NONE\' '
+                'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
+                    method=self.Method, path=self.Path))
+        if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
+            raise InvalidEventException(
+                self.relative_id,
+                'Unable to set Authorizer on API method [{method}] for path [{path}] because '
+                '\'AuthorizationScopes\' must be a list of strings.'.format(method=self.Method,
+                                                                            path=self.Path))
+        editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
