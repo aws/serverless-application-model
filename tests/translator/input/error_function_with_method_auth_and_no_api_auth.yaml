@@ -1,0 +1,15 @@
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: index.handler
+      Runtime: python3.7
+      Events:
+        HttpGetUserGroupIdUserId:
+          Type: Api
+          Properties:
+            Path: '/users/{groupId}/{userId}'
+            Method: GET
+            Auth:
+              Authorizer: "NONE"

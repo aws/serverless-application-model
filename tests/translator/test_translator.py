@@ -549,7 +549,8 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_with_invalid_open_api_version_type',
     'error_api_with_custom_domains_invalid',
     'error_api_with_custom_domains_route53_invalid',
-    'error_api_event_import_vaule_reference'
+    'error_api_event_import_vaule_reference',
+    'error_function_with_method_auth_and_no_api_auth'
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)

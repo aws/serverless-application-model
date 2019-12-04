@@ -621,12 +621,13 @@ class Api(PushEventSource):
                             'because it wasn\'t defined in the API\'s Authorizers.'.format(
                                 authorizer=method_authorizer, method=self.Method, path=self.Path))
 
-                    if method_authorizer == 'NONE' and not api_auth.get('DefaultAuthorizer'):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            'Unable to set Authorizer on API method [{method}] for path [{path}] because \'NONE\' '
-                            'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
-                                method=self.Method, path=self.Path))
+                    if method_authorizer == 'NONE':
+                        if not api_auth or not api_auth.get('DefaultAuthorizer'):
+                            raise InvalidEventException(
+                                self.relative_id,
+                                'Unable to set Authorizer on API method [{method}] for path [{path}] because \'NONE\' '
+                                'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
+                                    method=self.Method, path=self.Path))
 
             apikey_required_setting = self.Auth.get('ApiKeyRequired')
             apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
