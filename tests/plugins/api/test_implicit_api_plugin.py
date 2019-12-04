@@ -3,12 +3,12 @@ from mock import Mock, patch, call
 
 from samtranslator.public.sdk.resource import SamResource, SamResourceType
 from samtranslator.public.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
-from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin, ImplicitApiResource
+from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin, ImplicitApiResource
 from samtranslator.public.plugins import BasePlugin
 
 IMPLICIT_API_LOGICAL_ID = "ServerlessRestApi"
 
-class TestImplicitApiPluginEndtoEnd(TestCase):
+class TestImplicitRestApiPluginEndtoEnd(TestCase):
 
     def test_must_work_for_single_function(self):
         """
@@ -44,14 +44,14 @@ class TestImplicitApiPluginEndtoEnd(TestCase):
         pass
 
 
-class TestImplicitApiPlugin_init(TestCase):
+class TestImplicitRestApiPlugin_init(TestCase):
 
     def setUp(self):
-        self.plugin = ImplicitApiPlugin()
+        self.plugin = ImplicitRestApiPlugin()
 
     def test_plugin_must_setup_correct_name(self):
         # Name is the class name
-        expected_name = "ImplicitApiPlugin"
+        expected_name = "ImplicitRestApiPlugin"
 
         self.assertEqual(self.plugin.name, expected_name)
 
@@ -59,10 +59,10 @@ class TestImplicitApiPlugin_init(TestCase):
         self.assertTrue(isinstance(self.plugin, BasePlugin))
 
 
-class TestImplicitApiPlugin_on_before_transform_template(TestCase):
+class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
     def setUp(self):
-        self.plugin = ImplicitApiPlugin()
+        self.plugin = ImplicitRestApiPlugin()
 
         # Mock all methods but the one we are testing
         self.plugin._get_api_events = Mock()
@@ -190,10 +190,10 @@ class TestImplicitApiPlugin_on_before_transform_template(TestCase):
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
 
 
-class TestImplicitApiPlugin_get_api_events(TestCase):
+class TestImplicitRestApiPlugin_get_api_events(TestCase):
 
     def setUp(self):
-        self.plugin = ImplicitApiPlugin()
+        self.plugin = ImplicitRestApiPlugin()
 
     def test_must_get_all_api_events_in_function(self):
 
@@ -349,10 +349,10 @@ class TestImplicitApiPlugin_get_api_events(TestCase):
         self.assertEqual(expected, result)
 
 
-class TestImplicitApiPlugin_process_api_events(TestCase):
+class TestImplicitRestApiPlugin_process_api_events(TestCase):
 
     def setUp(self):
-        self.plugin = ImplicitApiPlugin()
+        self.plugin = ImplicitRestApiPlugin()
         self.plugin._add_api_to_swagger = Mock()
         self.plugin._add_implicit_api_id_if_necessary = Mock()
 
@@ -568,10 +568,10 @@ class TestImplicitApiPlugin_process_api_events(TestCase):
         ])
 
 
-class TestImplicitApiPlugin_add_implicit_api_id_if_necessary(TestCase):
+class TestImplicitRestApiPlugin_add_implicit_api_id_if_necessary(TestCase):
 
     def setUp(self):
-        self.plugin = ImplicitApiPlugin()
+        self.plugin = ImplicitRestApiPlugin()
 
     def test_must_add_if_not_present(self):
 
@@ -604,12 +604,12 @@ class TestImplicitApiPlugin_add_implicit_api_id_if_necessary(TestCase):
         self.assertEqual(input, expected)
 
 
-class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
+class TestImplicitRestApiPlugin_add_api_to_swagger(TestCase):
 
     def setUp(self):
-        self.plugin = ImplicitApiPlugin()
+        self.plugin = ImplicitRestApiPlugin()
 
-    @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
+    @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_add_path_method_to_swagger_of_api_resource(self, SwaggerEditorMock):
         event_id = "id"
         properties = {
@@ -633,6 +633,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         editor_mock = Mock()
         SwaggerEditorMock.return_value = editor_mock
         editor_mock.swagger = updated_swagger
+        self.plugin.editor = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -647,7 +648,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         template_mock.set.assert_called_with("restid", mock_api)
         self.assertEqual(mock_api.properties["DefinitionBody"], updated_swagger)
 
-    @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
+    @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_work_with_rest_api_id_as_string(self, SwaggerEditorMock):
         event_id = "id"
         properties = {
@@ -672,6 +673,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         editor_mock = Mock()
         SwaggerEditorMock.return_value = editor_mock
         editor_mock.swagger = updated_swagger
+        self.plugin.editor = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -720,7 +722,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
 
         self.assertEqual(event_id, context.exception._event_id)
 
-    @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
+    @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_invalid_swagger(self, SwaggerEditorMock):
 
         event_id = "id"
@@ -740,6 +742,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
 
         SwaggerEditorMock.is_valid = Mock()
         SwaggerEditorMock.is_valid.return_value = False
+        self.plugin.editor = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -753,7 +756,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         SwaggerEditorMock.assert_not_called()
         template_mock.set.assert_not_called()
 
-    @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
+    @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_if_definition_body_is_not_present(self, SwaggerEditorMock):
 
         event_id = "id"
@@ -771,6 +774,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
 
         SwaggerEditorMock.is_valid = Mock()
         SwaggerEditorMock.is_valid.return_value = False
+        self.plugin.editor = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -784,7 +788,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         SwaggerEditorMock.assert_not_called()
         template_mock.set.assert_not_called()
 
-    @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
+    @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_resource_properties_are_invalid(self, SwaggerEditorMock):
 
         event_id = "id"
@@ -799,6 +803,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         })
 
         SwaggerEditorMock.is_valid = Mock()
+        self.plugin.editor = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -812,7 +817,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         SwaggerEditorMock.assert_not_called()
         template_mock.set.assert_not_called()
 
-    @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
+    @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_manage_swagger_flag_is_false(self, SwaggerEditorMock):
 
         event_id = "id"
@@ -834,6 +839,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         })
 
         SwaggerEditorMock.is_valid = Mock()
+        self.plugin.editor = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -847,7 +853,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         SwaggerEditorMock.assert_not_called()
         template_mock.set.assert_not_called()
 
-    @patch("samtranslator.plugins.api.implicit_api_plugin.SwaggerEditor")
+    @patch("samtranslator.plugins.api.implicit_rest_api_plugin.SwaggerEditor")
     def test_must_skip_if_api_manage_swagger_flag_is_not_present(self, SwaggerEditorMock):
 
         event_id = "id"
@@ -868,6 +874,7 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         })
 
         SwaggerEditorMock.is_valid = Mock()
+        self.plugin.editor = SwaggerEditorMock
 
         template_mock = Mock()
         template_mock.get = Mock()
@@ -881,10 +888,10 @@ class TestImplicitApiPlugin_add_api_to_swagger(TestCase):
         SwaggerEditorMock.assert_not_called()
         template_mock.set.assert_not_called()
 
-class TestImplicitApiPlugin_maybe_remove_implicit_api(TestCase):
+class TestImplicitRestApiPlugin_maybe_remove_implicit_api(TestCase):
 
     def setUp(self):
-        self.plugin = ImplicitApiPlugin()
+        self.plugin = ImplicitRestApiPlugin()
 
     def test_must_remove_if_no_path_present(self):
         resource = SamResource({

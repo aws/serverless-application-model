@@ -1,0 +1,12 @@
+Resources:
+  Api:
+    Type: AWS::Serverless::HttpApi
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Runtime: python3.7
+      Events:
+        Api:
+          Type: HttpApi

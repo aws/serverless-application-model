@@ -1,0 +1,69 @@
+Resources:
+  RestApiFunction: 
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: nodejs4.3
+      Policies: AmazonDynamoDBFullAccess
+      Events:
+        DefaultAuth:
+          Type: HttpApi
+          Properties:
+            Path: /defaultauth
+            Method: post
+        NoneAuth:
+          Type: HttpApi
+          Properties:
+            Path: /noneauth
+            Method: post
+            Auth:
+              Authorizer: NONE
+        ScopeOverride:
+          Type: HttpApi
+          Properties:
+            Path: /scope3
+            Method: post
+            Auth:
+              AuthorizationScopes:
+                - scope3
+        SomeAuth:
+          Type: HttpApi
+          Properties:
+            Path: /someauth
+            Method: post
+            Auth:
+              Authorizer: OpenIdAuth
+        oauth2Path:
+          Type: HttpApi
+          Properties:
+            Path: /oauth2
+            Method: post
+            Auth:
+              Authorizer: oauth2Auth
+        SimpleCase:
+          Type: HttpApi
+
+Globals:
+  HttpApi:
+    Auth:
+      Authorizers:
+        OpenIdAuth:
+          AuthorizationScopes:
+            - scope1
+            - scope2
+          OpenIdConnectUrl: "https://www.example.com/v1/connect"
+          JwtConfiguration:
+            issuer: "https://www.example.com/v1/connect/oidc"
+            audience:
+              - MyApi
+          IdentitySource: "$request.querystring.param"
+        oauth2Auth:
+          AuthorizationScopes:
+            - scope4
+          JwtConfiguration:
+            issuer: "https://www.example.com/v1/connect/oidc"
+            audience:
+              - MyApi
+          IdentitySource: "$request.querystring.param"
+      DefaultAuthorizer: OpenIdAuth

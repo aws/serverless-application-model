@@ -155,7 +155,7 @@ class Translator:
                 continue
             elif resource["Type"] == "AWS::Serverless::Function":
                 functions.append(data)
-            elif resource["Type"] == "AWS::Serverless::Api":
+            elif resource["Type"] == "AWS::Serverless::Api" or resource["Type"] == "AWS::Serverless::HttpApi":
                 apis.append(data)
             else:
                 others.append(data)
@@ -175,7 +175,8 @@ def prepare_plugins(plugins, parameters={}):
 
     required_plugins = [
         DefaultDefinitionBodyPlugin(),
-        make_implicit_api_plugin(),
+        make_implicit_rest_api_plugin(),
+        make_implicit_http_api_plugin(),
         GlobalsPlugin(),
         make_policy_template_for_function_plugin(),
     ]
@@ -191,10 +192,16 @@ def prepare_plugins(plugins, parameters={}):
     return SamPlugins(plugins + required_plugins)
 
 
-def make_implicit_api_plugin():
+def make_implicit_rest_api_plugin():
     # This is necessary to prevent a circular dependency on imports when loading package
-    from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
-    return ImplicitApiPlugin()
+    from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
+    return ImplicitRestApiPlugin()
+
+
+def make_implicit_http_api_plugin():
+    # This is necessary to prevent a circular dependency on imports when loading package
+    from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin
+    return ImplicitHttpApiPlugin()
 
 
 def make_policy_template_for_function_plugin():

@@ -63,6 +63,13 @@ class Globals(object):
             "OpenApiVersion"
         ],
 
+        SamResourceType.HttpApi.value: [
+            "Auth",
+            "AccessLogSettings",
+            "StageVariables",
+            "Tags"
+        ],
+
         SamResourceType.SimpleTable.value: [
             "SSESpecification"
         ]
@@ -157,7 +164,6 @@ class Globals(object):
         """
 
         globals = {}
-
         if not isinstance(globals_dict, dict):
             raise InvalidGlobalsSectionException(self._KEYWORD,
                                                  "It must be a non-empty dictionary".format(self._KEYWORD))
