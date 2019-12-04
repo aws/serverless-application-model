@@ -1,3 +1,17 @@
+Parameters:
+  FnName:
+    Type: String
+  ProvisionedConcurrency:
+    Type: String
+    Default: 10
+  EnableAliasProvisionedConcurrency:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+Conditions:
+  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency, true]
 Resources:
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
@@ -8,3 +22,5 @@ Resources:
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: !If [AliasProvisionedConcurrencyEnabled, !Ref ProvisionedConcurrency, !Ref 'AWS::NoValue']

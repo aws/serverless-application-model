@@ -153,8 +153,8 @@ class Resource(object):
         if resource_dict['Type'] != cls.resource_type:
             raise InvalidResourceException(logical_id, "Resource has incorrect Type; expected '{expected}', "
                                                        "got '{actual}'".format(
-                                                            expected=cls.resource_type,
-                                                            actual=resource_dict['Type']))
+                                                           expected=cls.resource_type,
+                                                           actual=resource_dict['Type']))
 
         if 'Properties' in resource_dict and not isinstance(resource_dict['Properties'], dict):
             raise InvalidResourceException(logical_id, "Properties of a resource must be an object.")
@@ -475,7 +475,7 @@ class ResourceTypeResolver(object):
         """
         if not self.can_resolve(resource_dict):
             raise TypeError("Resource dict has missing or invalid value for key Type. Event Type is: {}.".format(
-                    resource_dict.get('Type')))
+                            resource_dict.get('Type')))
         if resource_dict['Type'] not in self.resource_types:
             raise TypeError("Invalid resource type {resource_type}".format(resource_type=resource_dict['Type']))
         return self.resource_types[resource_dict['Type']]

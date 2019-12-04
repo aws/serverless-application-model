@@ -128,6 +128,40 @@ AWS::Lambda::Permission            MyFunction\ **ThumbnailApi**\ Permission\ **P
 
   NOTE: ``ServerlessRestApi*`` resources are generated one per stack.
 
+HTTP API
+^^^
+This is called an "Implicit HTTP API". There can be many functions in the template that define these APIs. Behind the 
+scenes, SAM will collect all implicit HTTP APIs from all Functions in the template, generate an OpenApi doc, and create an 
+implicit ``AWS::Serverless::HttpApi`` using this OpenApi. This API defaults to a StageName called "$default" that cannot be
+configured.
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        ThumbnailApi:
+          Type: HttpApi
+          Properties:
+            Path: /thumbnail
+            Method: GET
+      ...
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID 
+================================== ================================
+AWS::ApiGatewayV2::Api             *ServerlessHttpApi* 
+AWS::ApiGatewayV2::Stage           *ServerlessHttpApiApiGatewayDefaultStage*
+AWS::Lambda::Permission            MyFunction\ **ThumbnailApi**\ Permission
+================================== ================================
+
+
+  NOTE: ``ServerlessHttpApi*`` resources are generated one per stack.
+
 Cognito
 ^^^
 

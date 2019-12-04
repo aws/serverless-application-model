@@ -1,4 +1,31 @@
 {
+  "Conditions": {
+    "AliasProvisionedConcurrencyEnabled": {
+      "Fn::Equals": [
+        {
+          "Ref": "EnableAliasProvisionedConcurrency"
+        }, 
+        true
+      ]
+    }
+  }, 
+  "Parameters": {
+    "EnableAliasProvisionedConcurrency": {
+      "Default": true, 
+      "Type": "String", 
+      "AllowedValues": [
+        true, 
+        false
+      ]
+    }, 
+    "FnName": {
+      "Type": "String"
+    }, 
+    "ProvisionedConcurrency": {
+      "Default": 10, 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "MinimalFunctionDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup", 
@@ -67,11 +94,11 @@
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Handler": "hello.handler", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "hello.zip"
         }, 
-        "Handler": "hello.handler", 
         "Role": {
           "Fn::GetAtt": [
             "MinimalFunctionRole", 
@@ -139,16 +166,29 @@
         }
       }, 
       "Properties": {
+        "Name": "live", 
         "FunctionVersion": {
           "Fn::GetAtt": [
             "MinimalFunctionVersion640128d35d", 
             "Version"
           ]
         }, 
+        "ProvisionedConcurrencyConfig": {
+          "ProvisionedConcurrentExecutions": {
+            "Fn::If": [
+              "AliasProvisionedConcurrencyEnabled", 
+              {
+                "Ref": "ProvisionedConcurrency"
+              }, 
+              {
+                "Ref": "AWS::NoValue"
+              }
+            ]
+          }
+        }, 
         "FunctionName": {
           "Ref": "MinimalFunction"
-        }, 
-        "Name": "live"
+        }
       }
     }
   }
