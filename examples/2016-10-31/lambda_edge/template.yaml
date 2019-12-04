@@ -17,8 +17,10 @@ Conditions:
 Globals:
 
   Function:
-    ProvisionedConcurrencyConfig:
-      ProvisionedConcurrentExecutions: !If [AliasProvisionedConcurrencyEnabled, !Ref ProvisionedConcurrency, !Ref 'AWS::NoValue']
+    ProvisionedConcurrencyConfig: !If
+        - AliasProvisionedConcurrencyEnabled
+        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+        - !Ref 'AWS::NoValue'
 
 Resources:
 
