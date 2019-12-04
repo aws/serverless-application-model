@@ -1,0 +1,94 @@
+Resources:
+  HttpApiFunction: 
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: nodejs4.3
+      Policies: AmazonDynamoDBFullAccess
+      Events:
+        Basic: # integration exists
+          Type: HttpApi
+          Properties:
+            Path: /basic
+            Method: post
+            ApiId: !Ref MyApi
+        SimpleCase: # path exists, integration doesn't
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        info:
+          version: '1.0'
+          title:
+            Ref: AWS::StackName
+        paths:
+          "/basic":
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations
+                payloadFormatVersion: '1.0'
+              security:
+              - OpenIdAuth:
+                - scope3
+              responses: {}
+          "/integration":
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations
+                payloadFormatVersion: '1.0'
+              security:
+              - OpenIdAuth:
+                - scope1
+                - scope2
+              responses: {}
+          "$default":
+            x-amazon-apigateway-any-method:
+              isDefaultRoute: true
+              security:
+              - OpenIdAuth:
+                - scope1
+                - scope2
+              responses: {}
+          "/oauth2":
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations
+                payloadFormatVersion: '1.0'
+              security:
+              - oauth2Auth:
+                - scope4
+              responses: {}
+        openapi: 3.0.1
+        securitySchemes:
+          oauth2Auth:
+            type: oauth2
+            x-amazon-apigateway-authorizer:
+              identitySource: "$request.querystring.param"
+              type: jwt
+              jwtConfiguration:
+                audience:
+                - MyApi
+                issuer: https://www.example.com/v1/connect/oidc
+          OpenIdAuth:
+            type: openIdConnect
+            x-amazon-apigateway-authorizer:
+              identitySource: "$request.querystring.param"
+              type: jwt
+              jwtConfiguration:
+                audience:
+                - MyApi
+                issuer: https://www.example.com/v1/connect/oidc
+              openIdConnectUrl: https://www.example.com/v1/connect

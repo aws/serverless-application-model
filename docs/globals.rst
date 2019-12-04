@@ -90,6 +90,11 @@ Currently, the following resources and properties are being supported:
       TracingEnabled:
       OpenApiVersion:
 
+    HttpApi:
+      # Properties of AWS::Serverless::HttpApi
+      # Also works with Implicit APIs
+      Auth:
+
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable
       SSESpecification:
@@ -118,6 +123,12 @@ issues.
 
 * StageName
 * DefinitionBody
+
+**AWS::Serverless::HttpApi:**
+
+* StageName
+* DefinitionBody
+* DefinitionUri
 
 Overridable
 -----------

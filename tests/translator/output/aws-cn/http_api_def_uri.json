@@ -1,0 +1,162 @@
+{
+  "Resources": {
+    "Function": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python3.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "FunctionApiPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "Function"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": "MyApi"
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApiStage": {
+      "Type": "AWS::ApiGatewayV2::Stage", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        }, 
+        "AutoDeploy": true, 
+        "StageName": {
+          "Fn::Join": [
+            "", 
+            [
+              "Stage", 
+              "Name"
+            ]
+          ]
+        }, 
+        "Tags": [
+          {
+            "Value": "value", 
+            "Key": "Tag"
+          }
+        ]
+      }
+    }, 
+    "FunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApi2ApiGatewayDefaultStage": {
+      "Type": "AWS::ApiGatewayV2::Stage", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi2"
+        }, 
+        "AutoDeploy": true, 
+        "StageName": "$default", 
+        "Tags": [
+          {
+            "Value": "value", 
+            "Key": "Tag"
+          }
+        ]
+      }
+    }, 
+    "MyApi2": {
+      "Type": "AWS::ApiGatewayV2::Api", 
+      "Properties": {
+        "BodyS3Location": {
+          "Version": "version", 
+          "Bucket": "bucket", 
+          "Key": "key"
+        }, 
+        "Tags": [
+          {
+            "Value": "value", 
+            "Key": "Tag"
+          }
+        ]
+      }
+    }, 
+    "FunctionApi2Permission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "Function"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApi2"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApi": {
+      "Type": "AWS::ApiGatewayV2::Api", 
+      "Properties": {
+        "BodyS3Location": {
+          "Bucket": "bucket", 
+          "Key": "key"
+        }, 
+        "Tags": [
+          {
+            "Value": "value", 
+            "Key": "Tag"
+          }
+        ]
+      }
+    }
+  }
+}

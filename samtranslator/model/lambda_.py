@@ -6,22 +6,22 @@ from samtranslator.model.intrinsics import fnGetAtt, ref
 class LambdaFunction(Resource):
     resource_type = 'AWS::Lambda::Function'
     property_types = {
-            'Code': PropertyType(True, is_type(dict)),
-            'DeadLetterConfig': PropertyType(False, is_type(dict)),
-            'Description': PropertyType(False, is_str()),
-            'FunctionName': PropertyType(False, is_str()),
-            'Handler': PropertyType(True, is_str()),
-            'MemorySize': PropertyType(False, is_type(int)),
-            'Role': PropertyType(False, is_str()),
-            'Runtime': PropertyType(False, is_str()),
-            'Timeout': PropertyType(False, is_type(int)),
-            'VpcConfig': PropertyType(False, is_type(dict)),
-            'Environment': PropertyType(False, is_type(dict)),
-            'Tags': PropertyType(False, list_of(is_type(dict))),
-            'TracingConfig': PropertyType(False, is_type(dict)),
-            'KmsKeyArn': PropertyType(False, one_of(is_type(dict), is_str())),
-            'Layers': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-            'ReservedConcurrentExecutions': PropertyType(False, any_type())
+        'Code': PropertyType(True, is_type(dict)),
+        'DeadLetterConfig': PropertyType(False, is_type(dict)),
+        'Description': PropertyType(False, is_str()),
+        'FunctionName': PropertyType(False, is_str()),
+        'Handler': PropertyType(True, is_str()),
+        'MemorySize': PropertyType(False, is_type(int)),
+        'Role': PropertyType(False, is_str()),
+        'Runtime': PropertyType(False, is_str()),
+        'Timeout': PropertyType(False, is_type(int)),
+        'VpcConfig': PropertyType(False, is_type(dict)),
+        'Environment': PropertyType(False, is_type(dict)),
+        'Tags': PropertyType(False, list_of(is_type(dict))),
+        'TracingConfig': PropertyType(False, is_type(dict)),
+        'KmsKeyArn': PropertyType(False, one_of(is_type(dict), is_str())),
+        'Layers': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        'ReservedConcurrentExecutions': PropertyType(False, any_type())
     }
 
     runtime_attrs = {
@@ -33,9 +33,9 @@ class LambdaFunction(Resource):
 class LambdaVersion(Resource):
     resource_type = 'AWS::Lambda::Version'
     property_types = {
-            'CodeSha256': PropertyType(False, is_str()),
-            'Description': PropertyType(False, is_str()),
-            'FunctionName': PropertyType(True, one_of(is_str(), is_type(dict)))
+        'CodeSha256': PropertyType(False, is_str()),
+        'Description': PropertyType(False, is_str()),
+        'FunctionName': PropertyType(True, one_of(is_str(), is_type(dict)))
     }
 
     runtime_attrs = {
@@ -47,11 +47,11 @@ class LambdaVersion(Resource):
 class LambdaAlias(Resource):
     resource_type = 'AWS::Lambda::Alias'
     property_types = {
-            'Description': PropertyType(False, is_str()),
-            'Name': PropertyType(False, is_str()),
-            'FunctionName': PropertyType(True, one_of(is_str(), is_type(dict))),
-            'FunctionVersion': PropertyType(True, one_of(is_str(), is_type(dict))),
-            'ProvisionedConcurrencyConfig': PropertyType(False, is_type(dict))
+        'Description': PropertyType(False, is_str()),
+        'Name': PropertyType(False, is_str()),
+        'FunctionName': PropertyType(True, one_of(is_str(), is_type(dict))),
+        'FunctionVersion': PropertyType(True, one_of(is_str(), is_type(dict))),
+        'ProvisionedConcurrencyConfig': PropertyType(False, is_type(dict))
     }
 
     runtime_attrs = {
@@ -62,17 +62,17 @@ class LambdaAlias(Resource):
 class LambdaEventSourceMapping(Resource):
     resource_type = 'AWS::Lambda::EventSourceMapping'
     property_types = {
-            'BatchSize': PropertyType(False, is_type(int)),
-            'Enabled': PropertyType(False, is_type(bool)),
-            'EventSourceArn': PropertyType(True, is_str()),
-            'FunctionName': PropertyType(True, is_str()),
-            'MaximumBatchingWindowInSeconds': PropertyType(False, is_type(int)),
-            'MaximumRetryAttempts': PropertyType(False, is_type(int)),
-            'BisectBatchOnFunctionError': PropertyType(False, is_type(bool)),
-            'MaximumRecordAgeInSeconds': PropertyType(False, is_type(int)),
-            'DestinationConfig': PropertyType(False, is_type(dict)),
-            'ParallelizationFactor': PropertyType(False, is_type(int)),
-            'StartingPosition': PropertyType(False, is_str())
+        'BatchSize': PropertyType(False, is_type(int)),
+        'Enabled': PropertyType(False, is_type(bool)),
+        'EventSourceArn': PropertyType(True, is_str()),
+        'FunctionName': PropertyType(True, is_str()),
+        'MaximumBatchingWindowInSeconds': PropertyType(False, is_type(int)),
+        'MaximumRetryAttempts': PropertyType(False, is_type(int)),
+        'BisectBatchOnFunctionError': PropertyType(False, is_type(bool)),
+        'MaximumRecordAgeInSeconds': PropertyType(False, is_type(int)),
+        'DestinationConfig': PropertyType(False, is_type(dict)),
+        'ParallelizationFactor': PropertyType(False, is_type(int)),
+        'StartingPosition': PropertyType(False, is_str())
     }
 
     runtime_attrs = {
@@ -83,12 +83,12 @@ class LambdaEventSourceMapping(Resource):
 class LambdaPermission(Resource):
     resource_type = 'AWS::Lambda::Permission'
     property_types = {
-            'Action': PropertyType(True, is_str()),
-            'FunctionName': PropertyType(True, is_str()),
-            'Principal': PropertyType(True, is_str()),
-            'SourceAccount': PropertyType(False, is_str()),
-            'SourceArn': PropertyType(False, is_str()),
-            'EventSourceToken': PropertyType(False, is_str())
+        'Action': PropertyType(True, is_str()),
+        'FunctionName': PropertyType(True, is_str()),
+        'Principal': PropertyType(True, is_str()),
+        'SourceAccount': PropertyType(False, is_str()),
+        'SourceArn': PropertyType(False, is_str()),
+        'EventSourceToken': PropertyType(False, is_str())
     }
 
 
@@ -98,11 +98,11 @@ class LambdaLayerVersion(Resource):
 
     resource_type = 'AWS::Lambda::LayerVersion'
     property_types = {
-            'Content': PropertyType(True, is_type(dict)),
-            'Description': PropertyType(False, is_str()),
-            'LayerName': PropertyType(False, is_str()),
-            'CompatibleRuntimes': PropertyType(False, list_of(is_str())),
-            'LicenseInfo': PropertyType(False, is_str())
+        'Content': PropertyType(True, is_type(dict)),
+        'Description': PropertyType(False, is_str()),
+        'LayerName': PropertyType(False, is_str()),
+        'CompatibleRuntimes': PropertyType(False, list_of(is_str())),
+        'LicenseInfo': PropertyType(False, is_str())
     }
 
     runtime_attrs = {
