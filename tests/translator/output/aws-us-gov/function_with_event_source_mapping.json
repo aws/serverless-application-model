@@ -64,7 +64,33 @@
         ],
         "Policies": [
           {
-            "PolicyName": "SQSPublishPolicyMyFunctionForBatchingExampleDynamoDBStreamEvent",
+            "PolicyName": "MyFunctionForBatchingExampleRolePolicy0",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": {
+                          "Fn::GetAtt": [
+                            "MySqsQueue",
+                            "QueueName"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "MyFunctionForBatchingExampleDynamoDBStreamEventSQSPolicy",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -92,7 +118,7 @@
                       }
                   ]
               },
-              "PolicyName": "SNSPublishPolicyMyFunctionForBatchingExampleStreamEvent"
+              "PolicyName": "MyFunctionForBatchingExampleStreamEventSNSPolicy"
           }
         ],
         "Tags": [
@@ -164,7 +190,7 @@
       "Properties": {
         "Handler": "index.handler",
         "Code": {
-          "ZipFile": "\nexports.handler = async (event) => {\n    return {\n    statusCode: 200,\n    body: JSON.stringify(event),\n    headers: {}\n    }\n}\n"
+          "ZipFile": "exports.handler = async (event) => {\n    return {\n    statusCode: 200,\n    body: JSON.stringify(event),\n    headers: {}\n    }\n}\n"
         },
         "Role": {
           "Fn::GetAtt": [

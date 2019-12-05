@@ -67,7 +67,7 @@ class IAMRolePolicies():
     @classmethod
     def sqs_send_message_role_policy(cls, queue_arn, logical_id):
         document = {
-            'PolicyName': 'SQSPublishPolicy' + logical_id,
+            'PolicyName': logical_id + 'SQSPolicy',
             'PolicyDocument': {
                 'Statement': [{
                     'Action': 'sqs:SendMessage',
@@ -81,7 +81,7 @@ class IAMRolePolicies():
     @classmethod
     def sns_publish_role_policy(cls, topic_arn, logical_id):
         document = {
-            'PolicyName': 'SNSPublishPolicy' + logical_id,
+            'PolicyName': logical_id + 'SNSPolicy',
             'PolicyDocument': {
                 'Statement': [{
                     'Action': 'sns:publish',
