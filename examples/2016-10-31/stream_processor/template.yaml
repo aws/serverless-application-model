@@ -8,9 +8,6 @@ Resources:
       Handler: index.handler
       Runtime: nodejs10.x
       CodeUri: src/
-      Policies:
-        - SNSPublishMessagePolicy:
-            TopicName: !GetAtt MySnsTopic.TopicName
       Events:
         Stream:
           Type: Kinesis
