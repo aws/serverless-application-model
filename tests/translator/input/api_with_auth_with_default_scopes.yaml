@@ -77,7 +77,7 @@ Resources:
             Auth:
               Authorizer: MyDefaultCognitoAuth
               AuthorizationScopes: []
-        CognitoDefaultAuythDefaultScopesNone:
+        CognitoDefaultAuthDefaultScopesNone:
           Type: Api
           Properties:
             RestApiId: !Ref MyApiWithCognitoAuth
