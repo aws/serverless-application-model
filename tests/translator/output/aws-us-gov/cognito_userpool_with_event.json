@@ -85,8 +85,11 @@
         "FunctionName": {
           "Ref": "ImplicitApiFunction"
         },
-        "EventSourceToken": {
-          "Ref": "UserPool"
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "UserPool",
+            "Arn"
+          ]
         },
         "Principal": "cognito-idp.amazonaws.com"
       }

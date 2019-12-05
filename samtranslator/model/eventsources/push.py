@@ -3,7 +3,7 @@ import re
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
-from samtranslator.model.intrinsics import ref, fnSub, make_shorthand, make_conditional
+from samtranslator.model.intrinsics import ref, fnGetAtt, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.s3 import S3Bucket
@@ -840,9 +840,10 @@ class Cognito(PushEventSource):
         userpool_id = kwargs['userpool_id']
 
         resources = []
+        source_arn = fnGetAtt(userpool_id, 'Arn')
         resources.append(
             self._construct_permission(
-                function, event_source_token=self.UserPool, prefix=function.logical_id + "Cognito"))
+                function, source_arn=source_arn, prefix=function.logical_id + "Cognito"))
 
         self._inject_lambda_config(function, userpool)
         resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
