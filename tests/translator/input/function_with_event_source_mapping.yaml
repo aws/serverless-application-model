@@ -13,7 +13,6 @@ Resources:
     Properties:
       Handler: index.handler
       InlineCode: |
-
         exports.handler = async (event) => {
             return {
             statusCode: 200,
@@ -38,6 +37,10 @@ Resources:
             Stream: !GetAtt KinesisStream1.Arn
             MaximumBatchingWindowInSeconds: !Ref MyBatchingWindowParam
             StartingPosition: LATEST
+            DestinationConfig:
+              OnFailure:
+                Type: SNS
+                Destination: !Ref MySnsTopic
         DynamoDBStreamEvent:
           Type: DynamoDB
           Properties:
@@ -51,6 +54,7 @@ Resources:
             StartingPosition: TRIM_HORIZON
             DestinationConfig:
               OnFailure:
+                Type: SQS
                 Destination: !GetAtt MySqsQueue.Arn
 
   KinesisStream:
@@ -79,3 +83,5 @@ Resources:
 
   MySqsQueue:
     Type: AWS::SQS::Queue
+  MySnsTopic:
+    Type: AWS::SNS::Topic
