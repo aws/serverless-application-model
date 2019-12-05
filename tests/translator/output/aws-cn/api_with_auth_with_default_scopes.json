@@ -202,6 +202,27 @@
         }
       }
     }, 
+    "MyFnCognitoDefaultAuthDefaultScopesNonePermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:invokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFn"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultauthdefaultscopesnone", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApiWithCognitoAuth"
+              }
+            }
+          ]
+        }
+      }
+    }, 
     "MyFnCognitoAuthorizerWithDefaultScopesPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -213,27 +234,6 @@
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizerwithdefaultscopes", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "MyApiWithCognitoAuth"
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "MyFnCognitoDefaultAuythDefaultScopesNonePermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:invokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFn"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultauthdefaultscopesnone", 
             {
               "__Stage__": "*", 
               "__ApiId__": {

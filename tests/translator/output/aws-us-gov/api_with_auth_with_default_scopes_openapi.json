@@ -143,31 +143,33 @@
               }
             }
           }, 
-          "swagger": "2.0", 
-          "securityDefinitions": {
-            "MyCognitoAuthWithDefaultScopes": {
-              "in": "header", 
-              "type": "apiKey", 
-              "name": "Authorization", 
-              "x-amazon-apigateway-authorizer": {
-                "providerARNs": [
-                  "arn:aws:2"
-                ], 
-                "type": "cognito_user_pools"
+          "openapi": "3.0.1", 
+          "components": {
+            "securitySchemes": {
+              "MyCognitoAuthWithDefaultScopes": {
+                "in": "header", 
+                "type": "apiKey", 
+                "name": "Authorization", 
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    "arn:aws:2"
+                  ], 
+                  "type": "cognito_user_pools"
+                }, 
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
               }, 
-              "x-amazon-apigateway-authtype": "cognito_user_pools"
-            }, 
-            "MyDefaultCognitoAuth": {
-              "in": "header", 
-              "type": "apiKey", 
-              "name": "Authorization", 
-              "x-amazon-apigateway-authorizer": {
-                "providerARNs": [
-                  "arn:aws:1"
-                ], 
-                "type": "cognito_user_pools"
-              }, 
-              "x-amazon-apigateway-authtype": "cognito_user_pools"
+              "MyDefaultCognitoAuth": {
+                "in": "header", 
+                "type": "apiKey", 
+                "name": "Authorization", 
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    "arn:aws:1"
+                  ], 
+                  "type": "cognito_user_pools"
+                }, 
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
+              }
             }
           }
         }, 
@@ -244,6 +246,18 @@
         }
       }
     }, 
+    "MyApiWithCognitoAuthProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithCognitoAuthDeploymentddb4f4405b"
+        }, 
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
     "MyFnCognitoDefaultScopesDefaultAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -284,16 +298,6 @@
             }
           ]
         }
-      }
-    }, 
-    "MyApiWithCognitoAuthDeploymentba9bfa6490": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithCognitoAuth"
-        }, 
-        "Description": "RestApi deployment id: ba9bfa649000ecc8dd6b649807472d08fe19ec39", 
-        "StageName": "Stage"
       }
     }, 
     "MyFnRole": {
@@ -347,16 +351,13 @@
         }
       }
     }, 
-    "MyApiWithCognitoAuthProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "MyApiWithCognitoAuthDeploymentddb4f4405b": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeploymentba9bfa6490"
-        }, 
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
         }, 
-        "StageName": "Prod"
+        "Description": "RestApi deployment id: ddb4f4405befb5324c4f18cdc69c3dd8489bc520"
       }
     }, 
     "MyFn": {

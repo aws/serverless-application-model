@@ -17,7 +17,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -34,7 +34,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -51,7 +51,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -68,7 +68,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -88,7 +88,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -108,7 +108,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -128,7 +128,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -143,31 +143,33 @@
               }
             }
           }, 
-          "swagger": "2.0", 
-          "securityDefinitions": {
-            "MyCognitoAuthWithDefaultScopes": {
-              "in": "header", 
-              "type": "apiKey", 
-              "name": "Authorization", 
-              "x-amazon-apigateway-authorizer": {
-                "providerARNs": [
-                  "arn:aws:2"
-                ], 
-                "type": "cognito_user_pools"
+          "openapi": "3.0.1", 
+          "components": {
+            "securitySchemes": {
+              "MyCognitoAuthWithDefaultScopes": {
+                "in": "header", 
+                "type": "apiKey", 
+                "name": "Authorization", 
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    "arn:aws:2"
+                  ], 
+                  "type": "cognito_user_pools"
+                }, 
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
               }, 
-              "x-amazon-apigateway-authtype": "cognito_user_pools"
-            }, 
-            "MyDefaultCognitoAuth": {
-              "in": "header", 
-              "type": "apiKey", 
-              "name": "Authorization", 
-              "x-amazon-apigateway-authorizer": {
-                "providerARNs": [
-                  "arn:aws:1"
-                ], 
-                "type": "cognito_user_pools"
-              }, 
-              "x-amazon-apigateway-authtype": "cognito_user_pools"
+              "MyDefaultCognitoAuth": {
+                "in": "header", 
+                "type": "apiKey", 
+                "name": "Authorization", 
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    "arn:aws:1"
+                  ], 
+                  "type": "cognito_user_pools"
+                }, 
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
+              }
             }
           }
         }, 
@@ -191,7 +193,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesnone", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesnone", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -212,7 +214,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultauthdefaultscopesnone", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultauthdefaultscopesnone", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -233,7 +235,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizerwithdefaultscopes", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizerwithdefaultscopes", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -254,7 +256,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesdefaultauthorizer", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesdefaultauthorizer", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -275,7 +277,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizercopesoverwritten", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizercopesoverwritten", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -286,14 +288,13 @@
         }
       }
     }, 
-    "MyApiWithCognitoAuthDeploymentba9bfa6490": {
+    "MyApiWithCognitoAuthDeployment815f0fba0e": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
         }, 
-        "Description": "RestApi deployment id: ba9bfa649000ecc8dd6b649807472d08fe19ec39", 
-        "StageName": "Stage"
+        "Description": "RestApi deployment id: 815f0fba0e3496a1f5576f705305124b291b7c03"
       }
     }, 
     "MyFnRole": {
@@ -316,7 +317,7 @@
           ]
         }, 
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ], 
         "Tags": [
           {
@@ -336,7 +337,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitowithauthnone", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitowithauthnone", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -351,7 +352,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeploymentba9bfa6490"
+          "Ref": "MyApiWithCognitoAuthDeployment815f0fba0e"
         }, 
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
@@ -392,7 +393,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesoverwritten", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesoverwritten", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
