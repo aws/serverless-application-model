@@ -63,3 +63,31 @@ class IAMRolePolicies():
                 }]
             }
         }
+
+    @classmethod
+    def sqs_send_message_role_policy(cls, queue_arn, logical_id):
+        document = {
+            'PolicyName': 'SQSPublishPolicy' + logical_id,
+            'PolicyDocument': {
+                'Statement': [{
+                    'Action': 'sqs:SendMessage',
+                    'Effect': 'Allow',
+                    'Resource': queue_arn
+                }]
+            }
+        }
+        return document
+
+    @classmethod
+    def sns_publish_role_policy(cls, topic_arn, logical_id):
+        document = {
+            'PolicyName': 'SNSPublishPolicy' + logical_id,
+            'PolicyDocument': {
+                'Statement': [{
+                    'Action': 'sns:publish',
+                    'Effect': 'Allow',
+                    'Resource': topic_arn
+                }]
+            }
+        }
+        return document

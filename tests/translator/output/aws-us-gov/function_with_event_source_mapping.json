@@ -11,6 +11,9 @@
     "MySqsQueue": {
       "Type": "AWS::SQS::Queue"
     },
+    "MySnsTopic": {
+        "Type": "AWS::SNS::Topic"
+    },
     "MyFunctionForBatchingExampleStream": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
@@ -61,30 +64,35 @@
         ],
         "Policies": [
           {
-            "PolicyName": "MyFunctionForBatchingExampleRolePolicy0",
+            "PolicyName": "SQSPublishPolicyMyFunctionForBatchingExampleDynamoDBStreamEvent",
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Action": [
-                    "sqs:SendMessage*"
-                  ],
+                  "Action": "sqs:SendMessage",
+                  "Effect": "Allow",
                   "Resource": {
-                    "Fn::Sub": [
-                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
-                      {
-                        "queueName": {
-                          "Fn::GetAtt": [
-                            "MySqsQueue",
-                            "QueueName"
-                          ]
-                        }
-                      }
+                    "Fn::GetAtt": [
+                      "MySqsQueue",
+                      "Arn"
                     ]
-                  },
-                  "Effect": "Allow"
+                  }
                 }
               ]
             }
+          },
+          {
+              "PolicyDocument": {
+                  "Statement": [
+                      {
+                          "Action": "sns:publish",
+                          "Effect": "Allow",
+                          "Resource": {
+                              "Ref": "MySnsTopic"
+                          }
+                      }
+                  ]
+              },
+              "PolicyName": "SNSPublishPolicyMyFunctionForBatchingExampleStreamEvent"
           }
         ],
         "Tags": [
@@ -135,7 +143,8 @@
                 "MySqsQueue",
                 "Arn"
               ]
-            }
+            },
+            "Type": "SQS"
           }
         },
         "EventSourceArn": {
@@ -187,7 +196,15 @@
         "FunctionName": {
           "Ref": "MyFunctionForBatchingExample"
         },
-        "StartingPosition": "LATEST"
+        "StartingPosition": "LATEST",
+        "DestinationConfig": {
+            "OnFailure": {
+                "Destination": {
+                    "Ref": "MySnsTopic"
+                },
+                "Type": "SNS"
+            }
+        }
       }
     },
     "KinesisStream": {
