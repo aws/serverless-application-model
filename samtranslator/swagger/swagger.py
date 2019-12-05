@@ -5,6 +5,8 @@ from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional, fnSub
+from samtranslator.model.intrinsics import is_intrinsic_if
+
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
@@ -995,7 +997,12 @@ class SwaggerEditor(object):
         if custom_statements is None:
             return
 
-        if not isinstance(custom_statements, list):
+        if is_intrinsic_if(custom_statements):
+            if not isinstance(custom_statements['Fn::If'][1], list):
+                custom_statements['Fn::If'][1] = [custom_statements['Fn::If'][1]]
+            if not isinstance(custom_statements['Fn::If'][2], list):
+                custom_statements['Fn::If'][2] = [custom_statements['Fn::If'][2]]
+        elif not isinstance(custom_statements, list):
             custom_statements = [custom_statements]
 
         self.resource_policy['Version'] = '2012-10-17'
@@ -1003,7 +1010,7 @@ class SwaggerEditor(object):
             self.resource_policy['Statement'] = custom_statements
         else:
             statement = self.resource_policy['Statement']
-            if not isinstance(statement, list):
+            if not is_intrinsic_if(statement) and not isinstance(statement, list):
                 statement = [statement]
             for s in custom_statements:
                 if s not in statement:

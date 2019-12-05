@@ -1421,6 +1421,90 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
+    def test_must_add_a_custom_statement_having_intrinsic_if(self):
+        resourcePolicy = {
+            'CustomStatements': {
+                'Fn::If': [
+                    True,
+                    {
+                        'Action': 'execute-api:Invoke',
+                        'Resource': ['execute-api:/*/*/*']
+                    },
+                    {
+                        'Action': 'execute-api:blah',
+                        'Resource': ['execute-api:/*/*/*']
+                    }
+                ]
+            }
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": {
+                'Fn::If': [
+                    True,
+                    [{
+                        "Action": "execute-api:Invoke",
+                        "Resource": [
+                            "execute-api:/*/*/*"
+                        ]
+                    }],
+                    [{
+                        "Action": "execute-api:blah",
+                        "Resource": [
+                            "execute-api:/*/*/*"
+                        ]
+                    }]
+                ]
+            }
+        }
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+
+    def test_must_add_custom_statements_having_intrinsic_if(self):
+        resourcePolicy = {
+            'CustomStatements': {
+                'Fn::If': [
+                    True,
+                    [{
+                        'Action': 'execute-api:Invoke',
+                        'Resource': ['execute-api:/*/*/*']
+                    }],
+                    [{
+                        'Action': 'execute-api:blah',
+                        'Resource': ['execute-api:/*/*/*']
+                    }]
+                ]
+            }
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": {
+                'Fn::If': [
+                    True,
+                    [{
+                        "Action": "execute-api:Invoke",
+                        "Resource": [
+                            "execute-api:/*/*/*"
+                        ]
+                    }],
+                    [{
+                        "Action": "execute-api:blah",
+                        "Resource": [
+                            "execute-api:/*/*/*"
+                        ]
+                    }]
+                ]
+            }
+        }
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+
     def test_must_add_iam_allow(self):
 ## fails
         resourcePolicy = {

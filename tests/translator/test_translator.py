@@ -18,7 +18,6 @@ from samtranslator.yaml_helper import yaml_parse
 from parameterized import parameterized, param
 
 import pytest
-import yaml
 from unittest import TestCase
 from samtranslator.translator.transform import transform
 from mock import Mock, MagicMock, patch
@@ -375,6 +374,7 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
+        'api_with_conditional_resource_policy',
         'api_with_aws_account_whitelist',
         'api_with_aws_account_blacklist',
         'api_with_ip_range_whitelist',

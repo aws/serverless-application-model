@@ -1,0 +1,52 @@
+Conditions:
+  DummyCondition:
+    !Equals ["", ""]
+
+Resources:
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+            Fn::If:
+              - DummyCondition
+              - {
+                Action: 'execute-api:Invoke',
+                Resource: ['execute-api:/*/*/*']
+              }
+              - {
+                Action: 'execute-api:blah',
+                Resource: ['execute-api:/*/*/*']
+              }
+  ExplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs4.3
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /one
+            Method: get
+        PostHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /two
+            Method: post
+        PutHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /three
+            Method: put
+
+      
