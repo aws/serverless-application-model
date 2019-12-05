@@ -1,5 +1,6 @@
 from samtranslator.plugins import BasePlugin
 from samtranslator.swagger.swagger import SwaggerEditor
+from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
 
@@ -29,9 +30,18 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
         """
         template = SamTemplate(template_dict)
 
-        for logicalId, api in template.iterate(SamResourceType.Api.value):
-            if api.properties.get('DefinitionBody') or api.properties.get('DefinitionUri'):
-                continue
+        for api_type in [SamResourceType.Api.value, SamResourceType.HttpApi.value]:
+            for logicalId, api in template.iterate(api_type):
+                if api.properties.get('DefinitionBody') or api.properties.get('DefinitionUri'):
+                    continue
 
-            api.properties['DefinitionBody'] = SwaggerEditor.gen_skeleton()
-            api.properties['__MANAGE_SWAGGER'] = True
+                if api_type is SamResourceType.HttpApi.value:
+                    # If "Properties" is not set in the template, set them here
+                    if not api.properties:
+                        template.set(logicalId, api)
+                    api.properties['DefinitionBody'] = OpenApiEditor.gen_skeleton()
+
+                if api_type is SamResourceType.Api.value:
+                    api.properties['DefinitionBody'] = SwaggerEditor.gen_skeleton()
+
+                api.properties['__MANAGE_SWAGGER'] = True

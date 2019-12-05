@@ -150,8 +150,8 @@ class ServerlessAppPlugin(BasePlugin):
         :param string logical_id: the logical_id of this application resource
         """
         get_application = (lambda app_id, semver: self._sar_client.get_application(
-                                   ApplicationId=self._sanitize_sar_str_param(app_id),
-                                   SemanticVersion=self._sanitize_sar_str_param(semver)))
+                           ApplicationId=self._sanitize_sar_str_param(app_id),
+                           SemanticVersion=self._sanitize_sar_str_param(semver)))
         try:
             self._sar_service_call(get_application, logical_id, app_id, semver)
             self._applications[key] = {'Available'}
