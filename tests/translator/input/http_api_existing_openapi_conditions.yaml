@@ -1,0 +1,128 @@
+Conditions:
+  condition:
+    Fn::Equals:
+      - true
+      - true
+Resources:
+  HttpApiFunction: 
+    Condition: condition
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        Basic: # integration exists
+          Type: HttpApi
+          Properties:
+            Path: /basic
+            Method: post
+            ApiId: !Ref MyApi
+        Basic2: # integration exists, auth doesn't
+          Type: HttpApi
+          Properties:
+            Path: /basic
+            Method: get
+            ApiId: !Ref MyApi
+            Auth:
+              Authorizer: OAuth2
+              AuthorizationScopes: 
+                - basic
+        SimpleCase: # path exists, integration doesn't
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          OAuth2:
+            AuthorizationScopes:
+              - scope4
+            JwtConfiguration:
+              issuer: "https://www.example.com/v1/connect/oidc"
+              audience:
+                - MyApi
+            IdentitySource: "$request.querystring.param"
+        DefaultAuthorizer: OAuth2
+      DefinitionBody:
+        info:
+          version: '1.0'
+          title:
+            Ref: AWS::StackName
+        paths:
+          "/basic":
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations
+                payloadFormatVersion: '1.0'
+              security:
+              - OpenIdAuth:
+                - scope3
+              responses: {}
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations
+                payloadFormatVersion: '1.0'
+              responses: {}
+          "/integration":
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations
+                payloadFormatVersion: '1.0'
+              security:
+              - OpenIdAuth:
+                - scope1
+                - scope2
+              responses: {}
+          "$default":
+            x-amazon-apigateway-any-method:
+              isDefaultRoute: true
+              security:
+              - OpenIdAuth:
+                - scope1
+                - scope2
+              responses: {}
+          "/oauth2":
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations
+                payloadFormatVersion: '1.0'
+              security:
+              - oauth2Auth:
+                - scope4
+              responses: {}
+        openapi: 3.0.1
+        securitySchemes:
+          oauth2Auth:
+            type: oauth2
+            x-amazon-apigateway-authorizer:
+              identitySource: "$request.querystring.param"
+              type: jwt
+              jwtConfiguration:
+                audience:
+                - MyApi
+                issuer: https://www.example.com/v1/connect/oidc
+          OpenIdAuth:
+            type: openIdConnect
+            x-amazon-apigateway-authorizer:
+              identitySource: "$request.querystring.param"
+              type: jwt
+              jwtConfiguration:
+                audience:
+                - MyApi
+                issuer: https://www.example.com/v1/connect/oidc
+              openIdConnectUrl: https://www.example.com/v1/connect

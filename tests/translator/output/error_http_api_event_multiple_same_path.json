@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [HttpApiFunction2] is invalid. Event with id [Api2] is invalid. API method 'x-amazon-apigateway-any-method' defined multiple times for path '$default'."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [HttpApiFunction2] is invalid. Event with id [Api2] is invalid. API method 'x-amazon-apigateway-any-method' defined multiple times for path '$default'."
+}

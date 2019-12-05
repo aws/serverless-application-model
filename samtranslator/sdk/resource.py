@@ -63,6 +63,7 @@ class SamResourceType(Enum):
     SimpleTable = "AWS::Serverless::SimpleTable"
     Application = "AWS::Serverless::Application"
     LambdaLayerVersion = "AWS::Serverless::LayerVersion"
+    HttpApi = "AWS::Serverless::HttpApi"
 
     @classmethod
     def has_value(cls, value):

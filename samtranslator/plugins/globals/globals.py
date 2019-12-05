@@ -36,7 +36,8 @@ class Globals(object):
             "Layers",
             "DeploymentPreference",
             "PermissionsBoundary",
-            "ReservedConcurrentExecutions"
+            "ReservedConcurrentExecutions",
+            "ProvisionedConcurrencyConfig"
         ],
 
         # Everything except
@@ -61,6 +62,13 @@ class Globals(object):
             "TracingEnabled",
             "OpenApiVersion",
             "Domain"
+        ],
+
+        SamResourceType.HttpApi.value: [
+            "Auth",
+            "AccessLogSettings",
+            "StageVariables",
+            "Tags"
         ],
 
         SamResourceType.SimpleTable.value: [
@@ -157,7 +165,6 @@ class Globals(object):
         """
 
         globals = {}
-
         if not isinstance(globals_dict, dict):
             raise InvalidGlobalsSectionException(self._KEYWORD,
                                                  "It must be a non-empty dictionary".format(self._KEYWORD))

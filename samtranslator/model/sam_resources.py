@@ -6,11 +6,13 @@ import samtranslator.model.eventsources.pull
 import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.cloudwatchlogs
 from .api.api_generator import ApiGenerator
+from .api.http_api_generator import HttpApiGenerator
 from .s3_utils.uri_parser import construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import (PropertyType, SamResourceMacro,
                                  ResourceTypeResolver)
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage, ApiGatewayDomainName
+from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import (InvalidEventException,
@@ -55,7 +57,8 @@ class SamFunction(SamResourceMacro):
 
         # Intrinsic functions in value of Alias property are not supported, yet
         'AutoPublishAlias': PropertyType(False, one_of(is_str())),
-        'VersionDescription': PropertyType(False, is_str())
+        'VersionDescription': PropertyType(False, is_str()),
+        'ProvisionedConcurrencyConfig': PropertyType(False, is_type(dict)),
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.eventsources, samtranslator.model.eventsources.pull,
                                           samtranslator.model.eventsources.push,
@@ -95,6 +98,11 @@ class SamFunction(SamResourceMacro):
 
         lambda_function = self._construct_lambda_function()
         resources.append(lambda_function)
+
+        if self.ProvisionedConcurrencyConfig:
+            if not self.AutoPublishAlias:
+                raise InvalidResourceException(self.logical_id, "To set ProvisionedConcurrencyConfig "
+                                               "AutoPublishALias must be defined on the function")
 
         lambda_alias = None
         if self.AutoPublishAlias:
@@ -305,6 +313,21 @@ class SamFunction(SamResourceMacro):
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
 
+    @staticmethod
+    def order_events(event):
+        """
+        Helper method for sorting Function Events. Returns a key to use in sorting this event
+
+        This is mainly used for HttpApi Events, where we need to evaluate the "$default" path (if any)
+            before we evaluate any of the other paths ("/", etc), so we can make sure we don't create any
+            redundant permissions. This sort places "$" before "/" or any alphanumeric characters.
+        :param event: tuple of (logical_id, event_dictionary) that contains event information
+        """
+        logical_id, event_dict = event
+        if not isinstance(event_dict, dict):
+            return logical_id
+        return event_dict.get("Properties", {}).get("Path", logical_id)
+
     def _generate_event_resources(self, lambda_function, execution_role, event_resources, lambda_alias=None):
         """Generates and returns the resources associated with this function's events.
 
@@ -321,7 +344,7 @@ class SamFunction(SamResourceMacro):
         """
         resources = []
         if self.Events:
-            for logical_id, event_dict in self.Events.items():
+            for logical_id, event_dict in sorted(self.Events.items(), key=SamFunction.order_events):
                 try:
                     eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         lambda_function.logical_id + logical_id, event_dict, logical_id)
@@ -420,6 +443,8 @@ class SamFunction(SamResourceMacro):
         alias.Name = name
         alias.FunctionName = function.get_runtime_attr('name')
         alias.FunctionVersion = version.get_runtime_attr("version")
+        if self.ProvisionedConcurrencyConfig:
+            alias.ProvisionedConcurrencyConfig = self.ProvisionedConcurrencyConfig
 
         return alias
 
@@ -548,6 +573,65 @@ class SamApi(SamResourceMacro):
             resources.extend(basepath_mapping)
         if route53:
             resources.extend([route53])
+        return resources
+
+
+class SamHttpApi(SamResourceMacro):
+    """SAM rest API macro.
+    """
+    resource_type = 'AWS::Serverless::HttpApi'
+    property_types = {
+        # Internal property set only by Implicit HTTP API plugin. If set to True, the API Event Source code will
+        # inject Lambda Integration URI to the OpenAPI. To preserve backwards compatibility, this must be set only for
+        # Implicit APIs. For Explicit APIs, this is managed by the DefaultDefinitionBody Plugin.
+        # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
+        # Swagger.
+        '__MANAGE_SWAGGER': PropertyType(False, is_type(bool)),
+
+        'StageName': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'Tags': PropertyType(False, is_type(dict)),
+        'DefinitionBody': PropertyType(False, is_type(dict)),
+        'DefinitionUri': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'StageVariables': PropertyType(False, is_type(dict)),
+        'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
+        'AccessLogSettings': PropertyType(False, is_type(dict)),
+        'Auth': PropertyType(False, is_type(dict))
+    }
+
+    referable_properties = {
+        "Stage": ApiGatewayV2Stage.resource_type,
+    }
+
+    def to_cloudformation(self, **kwargs):
+        """Returns the API Gateway RestApi, Deployment, and Stage to which this SAM Api corresponds.
+
+        :param dict kwargs: already-converted resources that may need to be modified when converting this \
+        macro to pure CloudFormation
+        :returns: a list of vanilla CloudFormation Resources, to which this Function expands
+        :rtype: list
+        """
+        resources = []
+
+        api_generator = HttpApiGenerator(self.logical_id,
+                                         self.StageVariables,
+                                         self.depends_on,
+                                         self.DefinitionBody,
+                                         self.DefinitionUri,
+                                         self.StageName,
+                                         tags=self.Tags,
+                                         auth=self.Auth,
+                                         access_log_settings=self.AccessLogSettings,
+                                         resource_attributes=self.resource_attributes,
+                                         passthrough_resource_attributes=self.get_passthrough_resource_attributes())
+
+        http_api, stage = api_generator.to_cloudformation()
+
+        resources.append(http_api)
+
+        # Stage is now optional. Only add it if one is created.
+        if stage:
+            resources.append(stage)
+
         return resources
 
 
