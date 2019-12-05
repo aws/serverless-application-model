@@ -1,0 +1,43 @@
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        SimpleCase:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+        SimpleCase2:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi2
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          OAuth2:
+            AuthorizationScopes:
+              - scope4
+            JwtConfiguration:
+              issuer: "https://www.example.com/v1/connect/oidc"
+              audience:
+                - MyApi
+            IdentitySource: "$request.querystring.param"
+        DefaultAuthorizer: OAuth2
+
+  MyApi2:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          OAuth2:
+            JwtConfiguration:
+              issuer: "https://www.example.com/v1/connect/oidc"
+              audience:
+                - MyApi
+            IdentitySource: "$request.querystring.param"
+        DefaultAuthorizer: OAuth2

@@ -317,7 +317,16 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_apikey_required_openapi_3',
         'api_with_basic_custom_domain',
         'api_with_basic_custom_domain_intrinsics',
-        'api_with_custom_domain_route53'
+        'api_with_custom_domain_route53',
+        'implicit_http_api',
+        'explicit_http_api_minimum',
+        'implicit_http_api_auth_and_simple_case',
+        'http_api_existing_openapi',
+        'http_api_existing_openapi_conditions',
+        'implicit_http_api_with_many_conditions',
+        'http_api_explicit_stage',
+        'http_api_def_uri',
+        'explicit_http_api'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -550,7 +559,15 @@ class TestTranslatorEndToEnd(TestCase):
     'error_api_with_custom_domains_invalid',
     'error_api_with_custom_domains_route53_invalid',
     'error_api_event_import_vaule_reference',
-    'error_function_with_method_auth_and_no_api_auth'
+    'error_function_with_method_auth_and_no_api_auth',
+    'error_function_with_no_alias_provisioned_concurrency',
+    'error_http_api_def_body_uri',
+    'error_http_api_event_invalid_api',
+    'error_http_api_invalid_auth',
+    'error_http_api_invalid_openapi',
+    'error_implicit_http_api_method',
+    'error_implicit_http_api_path',
+    'error_http_api_event_multiple_same_path',
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)
@@ -852,7 +869,7 @@ class TestPluginsUsage(TestCase):
         make_policy_template_for_function_plugin_mock.return_value = plugin_instance
 
         sam_plugins = prepare_plugins([])
-        self.assertEqual(5, len(sam_plugins))
+        self.assertEqual(6, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.make_policy_template_for_function_plugin")
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
@@ -863,13 +880,13 @@ class TestPluginsUsage(TestCase):
 
         custom_plugin = BasePlugin("someplugin")
         sam_plugins = prepare_plugins([custom_plugin])
-        self.assertEqual(6, len(sam_plugins))
+        self.assertEqual(7, len(sam_plugins))
 
     @patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
     def test_prepare_plugins_must_handle_empty_input(self):
 
         sam_plugins = prepare_plugins(None)
-        self.assertEqual(5, len(sam_plugins))
+        self.assertEqual(6, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.PolicyTemplatesProcessor")
     @patch("samtranslator.translator.translator.PolicyTemplatesForFunctionPlugin")

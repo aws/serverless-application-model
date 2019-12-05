@@ -1,0 +1,22 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        info:
+          version: '1.0'
+          title:
+            Ref: AWS::StackName
+        paths:
+          "/basic":
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations
+                payloadFormatVersion: '1.0'
+              security: []
+              responses: {}
+        openapi: 3.0.1
+      DefinitionUri: s3://bucket/key
