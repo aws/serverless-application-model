@@ -24,6 +24,7 @@ Resources:
             StartingPosition: TRIM_HORIZON
             DestinationConfig:
               OnFailure:
+                Type: SNS
                 Destination: !Ref MySnsTopic
 
   Stream:
