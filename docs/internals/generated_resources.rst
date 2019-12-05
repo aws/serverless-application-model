@@ -163,7 +163,7 @@ AWS::Lambda::Permission            MyFunction\ **ThumbnailApi**\ Permission
   NOTE: ``ServerlessHttpApi*`` resources are generated one per stack.
 
 Cognito
-^^^
+^^^^^^^
 
 Example:
 
@@ -203,7 +203,7 @@ AWS::Cognito::UserPool             Existing MyUserPool resource is modified to a
   created outside of the stack, this bucket needs to be defined within the template.
 
 S3
-^^^
+^^
 
 Example:
 
@@ -304,7 +304,7 @@ AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger**
 ================================== ================================
 
 SQS
-^^^^^^^
+^^^
 
 Example:
 
