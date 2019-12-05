@@ -416,6 +416,10 @@ class SNS(PushEventSource):
         resources = []
         queue_arn = self.SqsSubscription.get('QueueArn', None)
         queue_url = self.SqsSubscription.get('QueueUrl', None)
+        if not queue_arn or not queue_url:
+            raise InvalidEventException(
+                self.relative_id, "No QueueARN or QueueURL provided.")
+
         queue_policy_logical_id = self.SqsSubscription.get('QueuePolicyLogicalId', None)
         batch_size = self.SqsSubscription.get('BatchSize', None)
         enabled = self.SqsSubscription.get('Enabled', None)

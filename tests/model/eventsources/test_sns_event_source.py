@@ -64,3 +64,10 @@ class SnsEventSource(TestCase):
 
     def test_to_cloudformation_throws_when_no_function(self):
         self.assertRaises(TypeError, self.sns_event_source.to_cloudformation)
+
+    def test_to_cloudformation_throws_when_queue_url_or_queue_arn_not_given(self):
+        sqsSubscription = {
+            'BatchSize': 5
+        }
+        self.sns_event_source.SqsSubscription = sqsSubscription
+        self.assertRaises(TypeError, self.sns_event_source.to_cloudformation)
