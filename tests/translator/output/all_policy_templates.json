@@ -508,6 +508,7 @@
                 {
                   "Action": [
                     "kinesis:DescribeStream",
+                    "kinesis:DescribeStreamSummary",
                     "kinesis:GetRecords",
                     "kinesis:GetShardIterator"
                   ],
@@ -584,6 +585,7 @@
                     "kinesis:DecreaseStreamRetentionPeriod",
                     "kinesis:DeleteStream",
                     "kinesis:DescribeStream",
+                    "kinesis:DescribeStreamSummary",
                     "kinesis:GetShardIterator",
                     "kinesis:IncreaseStreamRetentionPeriod",
                     "kinesis:ListTagsForStream",
