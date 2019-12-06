@@ -5,6 +5,10 @@ Description: >-
 Parameters: 
     IdentityNameParameter: 
       Type: String
+Outputs: 
+  InboundSESSpamFilterFunction: 
+    Description: "inboundsesspamfilter Lambda Function ARN"
+    Value: !GetAtt inboundsesspamfilter.Arn
 Resources:
   inboundsesspamfilter:
     Type: 'AWS::Serverless::Function'
