@@ -1,6 +1,6 @@
 '''
 This function uses the LogicMonitor REST API to create LogicMonitor OpsNotes
-for CloudWatch Events.
+for EventBridge Events.
 Once the Ops Notes have been created for monitored resources that have
 associated events, you'll see them on all graphs for those resources.
 Assuming you already have monitored AWS resources in LogicMonitor, you'll
@@ -40,13 +40,12 @@ steps:
        ACCOUNT_NAME environment variable and click encrypt.
 
 
-Follow these steps to configure CloudWatch Events Rules that will trigger
+Follow these steps to configure EventBridge Rules that will trigger
 the Lambda Function:
 
-    1. Create a CloudWatch Event Rule that matches the events you'd like
+    1. Create an EventBridge Rule that matches the events you'd like
        to show up in your LogicMonitor account
-       https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/
-       WhatIsCloudWatchEvents.html
+       https://docs.aws.amazon.com/eventbridge/latest/userguide/what-is-amazon-eventbridge.html
 
     2. Configure the rule to trigger this Lambda Function.
 

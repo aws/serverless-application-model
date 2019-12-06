@@ -54,7 +54,24 @@
           ]
         }
       }
-    }, 
+    },
+    "MyAwesomeFunctionEBRulePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Condition": "MyCondition",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "events.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionEBRule",
+            "Arn"
+          ]
+        }
+      }
+    },
     "MyAwesomeFunctionDDBStream": {
       "Type": "AWS::Lambda::EventSourceMapping", 
       "Condition": "MyCondition",
@@ -169,14 +186,14 @@
         }
       }
     }, 
-    "MyAwesomeFunctionCWSchedule": {
+    "MyAwesomeFunctionEBSchedule": {
       "Type": "AWS::Events::Rule", 
       "Condition": "MyCondition",
       "Properties": {
         "ScheduleExpression": "rate(1 minute)", 
         "Targets": [
           {
-            "Id": "MyAwesomeFunctionCWScheduleLambdaTarget", 
+            "Id": "MyAwesomeFunctionEBScheduleLambdaTarget",
             "Arn": {
               "Ref": "MyAwesomeFunctionAliasLive"
             }
@@ -275,7 +292,28 @@
           }
         ]
       }
-    }, 
+    },
+    "MyAwesomeFunctionEBRule": {
+      "Type": "AWS::Events::Rule",
+      "Condition": "MyCondition",
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "launched"
+            ]
+          }
+        },
+        "Targets": [
+          {
+            "Id": "MyAwesomeFunctionEBRuleLambdaTarget",
+            "Arn": {
+              "Ref": "MyAwesomeFunctionAliasLive"
+            }
+          }
+        ]
+      }
+    },
     "MyAwesomeFunctionVersion640128d35d": {
       "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
@@ -290,7 +328,7 @@
       "Condition": "MyCondition",
       "Type": "AWS::SNS::Topic"
     }, 
-    "MyAwesomeFunctionCWSchedulePermission": {
+    "MyAwesomeFunctionEBSchedulePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
@@ -301,7 +339,7 @@
         }, 
         "SourceArn": {
           "Fn::GetAtt": [
-            "MyAwesomeFunctionCWSchedule", 
+            "MyAwesomeFunctionEBSchedule",
             "Arn"
           ]
         }

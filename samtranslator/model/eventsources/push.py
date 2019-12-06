@@ -93,7 +93,7 @@ class Schedule(PushEventSource):
     }
 
     def to_cloudformation(self, **kwargs):
-        """Returns the CloudWatch Events Rule and Lambda Permission to which this Schedule event source corresponds.
+        """Returns the EventBridge Rule and Lambda Permission to which this Schedule event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
         :returns: a list of vanilla CloudFormation Resources, to which this Schedule event expands
@@ -124,7 +124,7 @@ class Schedule(PushEventSource):
         return resources
 
     def _construct_target(self, function):
-        """Constructs the Target property for the CloudWatch Events Rule.
+        """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
         :rtype: dict
@@ -140,7 +140,7 @@ class Schedule(PushEventSource):
 
 
 class CloudWatchEvent(PushEventSource):
-    """CloudWatch Events event source for SAM Functions."""
+    """CloudWatch Events/EventBridge event source for SAM Functions."""
     resource_type = 'CloudWatchEvent'
     principal = 'events.amazonaws.com'
     property_types = {
@@ -151,11 +151,11 @@ class CloudWatchEvent(PushEventSource):
     }
 
     def to_cloudformation(self, **kwargs):
-        """Returns the CloudWatch Events Rule and Lambda Permission to which this CloudWatch Events event source
-        corresponds.
+        """Returns the CloudWatch Events/EventBridge Rule and Lambda Permission to which
+        this CloudWatch Events/EventBridge event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
-        :returns: a list of vanilla CloudFormation Resources, to which this CloudWatch Events event expands
+        :returns: a list of vanilla CloudFormation Resources, to which this CloudWatch Events/EventBridge event expands
         :rtype: list
         """
         function = kwargs.get('function')
@@ -180,7 +180,7 @@ class CloudWatchEvent(PushEventSource):
         return resources
 
     def _construct_target(self, function):
-        """Constructs the Target property for the CloudWatch Events Rule.
+        """Constructs the Target property for the CloudWatch Events/EventBridge Rule.
 
         :returns: the Target property
         :rtype: dict
@@ -195,6 +195,11 @@ class CloudWatchEvent(PushEventSource):
         if self.InputPath is not None:
             target['InputPath'] = self.InputPath
         return target
+
+
+class EventBridgeRule(CloudWatchEvent):
+    """EventBridge Rule event source for SAM Functions."""
+    resource_type = 'EventBridgeRule'
 
 
 class S3(PushEventSource):

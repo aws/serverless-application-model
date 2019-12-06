@@ -33,7 +33,7 @@ Resources:
       AutoPublishAlias: Live
 
       Events:
-        CWSchedule:
+        EBSchedule:
           Type: Schedule
           Properties:
             Schedule: 'rate(1 minute)'
@@ -45,6 +45,14 @@ Resources:
               detail:
                 state:
                 - terminated
+
+        EBRule:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - launched
 
         CWLog:
           Type: CloudWatchLogs

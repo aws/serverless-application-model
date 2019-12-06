@@ -22,7 +22,7 @@ Resources:
       Runtime: python2.7
       Events:
         OnTerminate:
-          Type: CloudWatchEvent
+          Type: EventBridgeRule
           Properties:
             Pattern:
               detail:

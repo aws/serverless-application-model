@@ -9,6 +9,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, 'input')
 
 @pytest.mark.parametrize('testcase', [
     'cloudwatchevent',
+    'eventbridgerule',
     'cloudwatch_logs_with_ref',
     'cloudwatchlog',
     'streams',

@@ -71,7 +71,23 @@
           ]
         }
       }
-    }, 
+    },
+    "MyAwesomeFunctionEBRulePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "Principal": "events.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionEBRule",
+            "Arn"
+          ]
+        }
+      }
+    },
     "MyAwesomeFunctionDDBStream": {
       "Type": "AWS::Lambda::EventSourceMapping", 
       "Properties": {
@@ -218,13 +234,13 @@
         }
       }
     }, 
-    "MyAwesomeFunctionCWSchedule": {
+    "MyAwesomeFunctionEBSchedule": {
       "Type": "AWS::Events::Rule", 
       "Properties": {
         "ScheduleExpression": "rate(1 minute)", 
         "Targets": [
           {
-            "Id": "MyAwesomeFunctionCWScheduleLambdaTarget", 
+            "Id": "MyAwesomeFunctionEBScheduleLambdaTarget",
             "Arn": {
               "Ref": "MyAwesomeFunctionAliasLive"
             }
@@ -319,7 +335,27 @@
           }
         ]
       }
-    }, 
+    },
+    "MyAwesomeFunctionEBRule": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "launched"
+            ]
+          }
+        },
+        "Targets": [
+          {
+            "Id": "MyAwesomeFunctionEBRuleLambdaTarget",
+            "Arn": {
+              "Ref": "MyAwesomeFunctionAliasLive"
+            }
+          }
+        ]
+      }
+    },
     "MyAwesomeFunctionVersion640128d35d": {
       "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
@@ -368,7 +404,7 @@
     "Notifications": {
       "Type": "AWS::SNS::Topic"
     }, 
-    "MyAwesomeFunctionCWSchedulePermission": {
+    "MyAwesomeFunctionEBSchedulePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:invokeFunction", 
@@ -378,7 +414,7 @@
         }, 
         "SourceArn": {
           "Fn::GetAtt": [
-            "MyAwesomeFunctionCWSchedule", 
+            "MyAwesomeFunctionEBSchedule",
             "Arn"
           ]
         }
