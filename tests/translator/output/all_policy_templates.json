@@ -474,14 +474,27 @@
                   "Action": [
                     "dynamodb:DescribeStream",
                     "dynamodb:GetRecords",
-                    "dynamodb:GetShardIterator",
+                    "dynamodb:GetShardIterator"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/stream/${streamName}",
+                      {
+                        "streamName": "name",
+                        "tableName": "name"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
                     "dynamodb:ListStreams"
                   ],
                   "Resource": {
                     "Fn::Sub": [
-                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/${streamName}",
+                      "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/stream/*",
                       {
-                        "streamName": "name",
                         "tableName": "name"
                       }
                     ]
