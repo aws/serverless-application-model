@@ -1,0 +1,17 @@
+version: 1.0.{build}
+image: Ubuntu
+
+environment:
+  matrix:
+  - TOXENV: py27
+  - TOXENV: py36
+  - TOXENV: py37
+  - TOXENV: py38
+
+build: off
+
+install:
+- make init
+
+test_script:
+- tox
