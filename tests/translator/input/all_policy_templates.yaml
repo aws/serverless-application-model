@@ -18,8 +18,6 @@ Resources:
         - LambdaInvokePolicy:
             FunctionName: name
 
-        - CloudWatchDescribeAlarmHistoryPolicy: {}
-
         - CloudWatchPutMetricPolicy: {}
 
         - EC2DescribePolicy: {}
