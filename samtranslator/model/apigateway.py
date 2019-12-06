@@ -181,7 +181,8 @@ class ApiGatewayAuthorizer(object):
     _VALID_FUNCTION_PAYLOAD_TYPES = [None, 'TOKEN', 'REQUEST']
 
     def __init__(self, api_logical_id=None, name=None, user_pool_arn=None, function_arn=None, identity=None,
-                 function_payload_type=None, function_invoke_role=None, is_aws_iam_authorizer=False):
+                 function_payload_type=None, function_invoke_role=None, is_aws_iam_authorizer=False,
+                 authorization_scopes=[]):
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(api_logical_id, name + " Authorizer has invalid "
                                            "'FunctionPayloadType': " + function_payload_type)
@@ -198,6 +199,7 @@ class ApiGatewayAuthorizer(object):
         self.function_payload_type = function_payload_type
         self.function_invoke_role = function_invoke_role
         self.is_aws_iam_authorizer = is_aws_iam_authorizer
+        self.authorization_scopes = authorization_scopes
 
     def _is_missing_identity_source(self, identity):
         if not identity:

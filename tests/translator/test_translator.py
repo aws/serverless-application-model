@@ -160,6 +160,8 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_auth_all_maximum',
         'api_with_auth_all_minimum',
         'api_with_auth_no_default',
+        'api_with_auth_with_default_scopes',
+        'api_with_auth_with_default_scopes_openapi',
         'api_with_default_aws_iam_auth',
         'api_with_default_aws_iam_auth_and_no_auth_route',
         'api_with_method_aws_iam_auth',

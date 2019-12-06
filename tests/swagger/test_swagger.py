@@ -1791,3 +1791,69 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         }
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+class TestSwaggerEditor_add_authorization_scopes(TestCase):
+    def setUp(self):
+        self.api = api = {
+            'Auth':{
+                'Authorizers': {
+                    'MyOtherCognitoAuth':{},
+                    'MyCognitoAuth': {}
+                },
+                'DefaultAuthorizer': "MyCognitoAuth"
+            }
+        }
+        self.editor = SwaggerEditor({
+            "swagger": "2.0",
+            "paths": {
+                "/cognito": {
+                "get": {
+                    "x-amazon-apigateway-integration": {
+                    "httpMethod": "POST",
+                    "type": "aws_proxy",
+                    "uri": {
+                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    }
+                    },
+                    "security": [],
+                    "responses": {}
+                }
+                },
+            }
+        })
+
+    def test_should_include_auth_scopes_if_defined_with_authorizer(self):
+        auth = {
+            'AuthorizationScopes': ["ResourceName/method.scope"],
+            'Authorizer':"MyOtherCognitoAuth"
+        }
+        self.editor.add_auth_to_method("/cognito", "get", auth, self.api)
+        self.assertEqual([{"MyOtherCognitoAuth": ["ResourceName/method.scope"]}],
+                         self.editor.swagger["paths"]["/cognito"]["get"]["security"])
+
+    def test_should_include_auth_scopes_with_default_authorizer(self):
+        auth = {
+            'AuthorizationScopes': ["ResourceName/method.scope"],
+            'Authorizer': 'MyCognitoAuth'
+        }
+        self.editor.add_auth_to_method("/cognito", "get", auth, self.api)
+        self.assertEqual([{"MyCognitoAuth": ["ResourceName/method.scope"]}],
+                         self.editor.swagger["paths"]["/cognito"]["get"]["security"])
+
+    def test_should_include_only_specified_authorizer_auth_if_no_scopes_defined(self):
+        auth = {
+            'Authorizer':"MyOtherCognitoAuth"
+        }
+        self.editor.add_auth_to_method("/cognito", "get", auth, self.api)
+        self.assertEqual([{"MyOtherCognitoAuth": []}],
+                         self.editor.swagger["paths"]["/cognito"]["get"]["security"])
+
+    def test_should_include_none_if_default_is_overwritte(self):
+        auth = {
+            'Authorizer':"NONE"
+        }
+
+        self.editor.add_auth_to_method("/cognito", "get", auth, self.api)
+        self.assertEqual([{"NONE": []}],
+                         self.editor.swagger["paths"]["/cognito"]["get"]["security"])
+

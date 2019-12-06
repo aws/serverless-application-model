@@ -459,7 +459,7 @@ class SwaggerEditor(object):
             self.security_definitions.update(api_key_security_definition)
 
     def set_path_default_authorizer(self, path, default_authorizer, authorizers,
-                                    add_default_auth_to_preflight=True):
+                                    add_default_auth_to_preflight=True, api_authorizers=None):
         """
         Adds the default_authorizer to the security block for each method on this path unless an Authorizer
         was defined at the Function/Path/Method level. This is intended to be used to set the
@@ -531,7 +531,8 @@ class SwaggerEditor(object):
                     # No existing Authorizer found; use default
                     else:
                         security_dict = {}
-                        security_dict[default_authorizer] = []
+                        security_dict[default_authorizer] = self._get_authorization_scopes(api_authorizers,
+                                                                                           default_authorizer)
                         authorizer_security = [security_dict]
 
                     security = existing_non_authorizer_security + authorizer_security
@@ -622,14 +623,17 @@ class SwaggerEditor(object):
         :param dict api: Reference to the related Api's properties as defined in the template.
         """
         method_authorizer = auth and auth.get('Authorizer')
+        method_scopes = auth and auth.get('AuthorizationScopes')
+        api_auth = api and api.get('Auth')
+        authorizers = api_auth and api_auth.get('Authorizers')
         if method_authorizer:
-            self._set_method_authorizer(path, method_name, method_authorizer)
+            self._set_method_authorizer(path, method_name, method_authorizer, authorizers, method_scopes)
 
         method_apikey_required = auth and auth.get('ApiKeyRequired')
         if method_apikey_required is not None:
             self._set_method_apikey_handling(path, method_name, method_apikey_required)
 
-    def _set_method_authorizer(self, path, method_name, authorizer_name):
+    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers={}, method_scopes=None):
         """
         Adds the authorizer_name to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -655,6 +659,13 @@ class SwaggerEditor(object):
 
             # This assumes there are no autorizers already configured in the existing security block
             security = existing_security + authorizer_security
+
+            if authorizer_name != 'NONE' and authorizers:
+                method_auth_scopes = authorizers.get(authorizer_name, {}).get("AuthorizationScopes")
+                if method_scopes is not None:
+                    method_auth_scopes = method_scopes
+                if authorizers.get(authorizer_name) is not None and method_auth_scopes is not None:
+                    security_dict[authorizer_name] = method_auth_scopes
 
             if security:
                 method_definition['security'] = security
@@ -1099,6 +1110,19 @@ class SwaggerEditor(object):
             'paths': {
             }
         }
+
+    @staticmethod
+    def _get_authorization_scopes(authorizers, default_authorizer):
+        """
+        Returns auth scopes for an authorizer if present
+        :param authorizers: authorizer definitions
+        :param default_authorizer: name of the default authorizer
+        """
+        if authorizers is not None:
+            if authorizers.get(default_authorizer) \
+               and authorizers[default_authorizer].get("AuthorizationScopes") is not None:
+                return authorizers[default_authorizer].get("AuthorizationScopes")
+        return []
 
     @staticmethod
     def _normalize_method_name(method):

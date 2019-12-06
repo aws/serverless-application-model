@@ -444,7 +444,8 @@ class ApiGenerator(object):
         if authorizers:
             swagger_editor.add_authorizers_security_definitions(authorizers)
             self._set_default_authorizer(swagger_editor, authorizers, auth_properties.DefaultAuthorizer,
-                                         auth_properties.AddDefaultAuthorizerToCorsPreflight)
+                                         auth_properties.AddDefaultAuthorizerToCorsPreflight,
+                                         auth_properties.Authorizers)
 
         if auth_properties.ApiKeyRequired:
             swagger_editor.add_apikey_security_definition()
@@ -586,7 +587,8 @@ class ApiGenerator(object):
                 function_arn=authorizer.get('FunctionArn'),
                 identity=authorizer.get('Identity'),
                 function_payload_type=authorizer.get('FunctionPayloadType'),
-                function_invoke_role=authorizer.get('FunctionInvokeRole')
+                function_invoke_role=authorizer.get('FunctionInvokeRole'),
+                authorization_scopes=authorizer.get("AuthorizationScopes")
             )
         return authorizers
 
@@ -636,7 +638,7 @@ class ApiGenerator(object):
         return permissions
 
     def _set_default_authorizer(self, swagger_editor, authorizers, default_authorizer,
-                                add_default_auth_to_preflight=True):
+                                add_default_auth_to_preflight=True, api_authorizers=None):
         if not default_authorizer:
             return
 
@@ -646,7 +648,8 @@ class ApiGenerator(object):
 
         for path in swagger_editor.iter_on_path():
             swagger_editor.set_path_default_authorizer(path, default_authorizer, authorizers=authorizers,
-                                                       add_default_auth_to_preflight=add_default_auth_to_preflight)
+                                                       add_default_auth_to_preflight=add_default_auth_to_preflight,
+                                                       api_authorizers=api_authorizers)
 
     def _set_default_apikey_required(self, swagger_editor):
         for path in swagger_editor.iter_on_path():

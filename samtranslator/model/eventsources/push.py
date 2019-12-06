@@ -635,6 +635,13 @@ class Api(PushEventSource):
                                 'is only a valid value when a DefaultAuthorizer on the API is specified.'.format(
                                     method=self.Method, path=self.Path))
 
+            if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
+                raise InvalidEventException(
+                    self.relative_id,
+                    'Unable to set Authorizer on API method [{method}] for path [{path}] because '
+                    '\'AuthorizationScopes\' must be a list of strings.'.format(method=self.Method,
+                                                                                path=self.Path))
+
             apikey_required_setting = self.Auth.get('ApiKeyRequired')
             apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
             if apikey_required_setting_is_false and not api_auth.get('ApiKeyRequired'):
