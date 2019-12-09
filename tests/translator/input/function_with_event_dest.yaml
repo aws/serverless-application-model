@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-pc-experiment
+  Sample SAM Template for sam-pc-experiment
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 70
+        MaximumRetryAttempts: 1
+        DestinationConfig:
+          OnSuccess:
+            Type: SQS
+            Destination: https://sqs.us-west-1.amazonaws.com/551213647843/success-test-1
+          OnFailure: 
+            Type: SNS
+            Destination: arn:aws:sns:us-west-1:551213647843:failure-test-1
+      InlineCode: |
+        exports.handler = function(event, context, callback) {
+            var event_received_at = new Date().toISOString();
+            console.log('Event received at: ' + event_received_at);
+            console.log('Received event:', JSON.stringify(event, null, 2));
+
+            if (event.Success) {
+                console.log("Success");
+                context.callbackWaitsForEmptyEventLoop = false;
+                callback(null);
+            } else {
+                console.log("Failure");
+                context.callbackWaitsForEmptyEventLoop = false;
+                callback(new Error("Failure from event, Success = false, I am failing!"), 'Destination Function Error Thrown');
+            }
+        };      
+      Handler: index.handler
+      Runtime: nodejs10.x
+      MemorySize: 1024

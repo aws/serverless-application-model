@@ -377,15 +377,16 @@ class TestTranslatorEndToEnd(TestCase):
 
     @parameterized.expand(
       itertools.product([
-        'api_with_aws_account_whitelist',
-        'api_with_aws_account_blacklist',
-        'api_with_ip_range_whitelist',
-        'api_with_ip_range_blacklist',
-        'api_with_source_vpc_whitelist',
-        'api_with_source_vpc_blacklist',
-        'api_with_resource_policy',
-        'api_with_resource_policy_global',
-        'api_with_resource_policy_global_implicit'
+        # 'api_with_aws_account_whitelist',
+        # 'api_with_aws_account_blacklist',
+        # 'api_with_ip_range_whitelist',
+        # 'api_with_ip_range_blacklist',
+        # 'api_with_source_vpc_whitelist',
+        # 'api_with_source_vpc_blacklist',
+        # 'api_with_resource_policy',
+        # 'api_with_resource_policy_global',
+        # 'api_with_resource_policy_global_implicit',
+        'function_with_event_dest'
       ],
       [
         ("aws", "ap-southeast-1"),
@@ -399,7 +400,7 @@ class TestTranslatorEndToEnd(TestCase):
     def test_transform_success_resource_policy(self, testcase, partition_with_region):
         partition = partition_with_region[0]
         region = partition_with_region[1]
-
+        
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))

@@ -39,6 +39,7 @@ class Globals(object):
             "ReservedConcurrentExecutions",
             "ProvisionedConcurrencyConfig",
             "AssumeRolePolicyDocument"
+            "EventInvokeConfig"
         ],
 
         # Everything except

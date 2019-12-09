@@ -20,7 +20,7 @@ from samtranslator.model.exceptions import (InvalidEventException,
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.lambda_ import (LambdaFunction, LambdaVersion, LambdaAlias,
-                                         LambdaLayerVersion)
+                                         LambdaLayerVersion, LambdaEventInvokeConfig)
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -55,6 +55,7 @@ class SamFunction(SamResourceMacro):
         'DeploymentPreference': PropertyType(False, is_type(dict)),
         'ReservedConcurrentExecutions': PropertyType(False, any_type()),
         'Layers': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        'EventInvokeConfig': PropertyType(False, list_of(is_type(dict))),
 
         # Intrinsic functions in value of Alias property are not supported, yet
         'AutoPublishAlias': PropertyType(False, one_of(is_str())),
@@ -67,6 +68,7 @@ class SamFunction(SamResourceMacro):
 
     # DeadLetterQueue
     dead_letter_queue_policy_actions = {'SQS': 'sqs:SendMessage', 'SNS': 'sns:Publish'}
+    #
 
     # Customers can refer to the following properties of SAM function
     referable_properties = {
@@ -90,6 +92,7 @@ class SamFunction(SamResourceMacro):
         :returns: a list of vanilla CloudFormation Resources, to which this Function expands
         :rtype: list
         """
+        import pdb; pdb.set_trace()
         resources = []
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         mappings_resolver = kwargs.get("mappings_resolver", None)
@@ -119,6 +122,13 @@ class SamFunction(SamResourceMacro):
                                                                        lambda_alias, intrinsics_resolver,
                                                                        mappings_resolver)
 
+        if self.EventInvokeConfig:
+            import pdb; pdb.set_trace()
+            lambda_event_invoke_config = self._construct_event_invoke_config(lambda_function,
+                                                                             lambda_alias,
+                                                                             intrinsics_resolver=intrinsics_resolver)
+            resources.append(lambda_event_invoke_config)
+
         managed_policy_map = kwargs.get('managed_policy_map', {})
         if not managed_policy_map:
             raise Exception('Managed policy map is empty, but should not be.')
@@ -136,6 +146,35 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(self.logical_id, e.message)
 
         return resources
+
+    def _construct_event_invoke_config(self, lambda_function, lambda_alias, intrinsics_resolver):
+        """
+        Create a `AWS::Lambda::EventInvokeConfig` based on the input dict `EventInvokeConfig`
+        ALso create the necessary roles required for the function to invoke resources on success/failure
+        """
+        # Try to resolve.
+        resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
+
+        logical_id = "{id}EventInvokeConfig".format(id=self.FunctionName)
+        lambda_event_invoke_config = LambdaEventInvokeConfig(logical_id=logical_id, attributes=attributes)
+
+        dest_config = {}
+        if resolved_event_invoke_config.DestinationConfig and \
+           resolved_event_invoke_config.DestinationConfig.OnSuccess:
+            dest_config["OnSuccess"]["Destination"] = \
+                resolved_event_invoke_config.DestinationConfig.OnSuccess.Destination
+
+        if resolved_event_invoke_config.DestinationConfig and \
+           resolved_event_invoke_config.DestinationConfig.OnFailure:
+            dest_config["OnFailure"]["Destination"] = \
+                resolved_event_invoke_config.DestinationConfig.OnFailure.Destination
+
+        lambda_event_invoke_config.FunctionName = self.FunctionName
+        lambda_event_invoke_config.DestinationConfig = dest_config
+        lambda_event_invoke_config.MaximumEventAgeInSeconds = resolved_event_invoke_config.MaximumEventAgeInSeconds
+        lambda_event_invoke_config.MaximumEventAgeInSeconds = resolved_event_invoke_config.MaximumEventAgeInSeconds
+
+        return lambda_event_invoke_config
 
     def _get_resolved_alias_name(self, property_name, original_alias_value, intrinsics_resolver):
         """
@@ -225,6 +264,9 @@ class SamFunction(SamResourceMacro):
             policy_documents.append(IAMRolePolicies.dead_letter_queue_policy(
                 self.dead_letter_queue_policy_actions[self.DeadLetterQueue['Type']],
                 self.DeadLetterQueue['TargetArn']))
+        # TODOpraneep
+        # if self.EventInvokeConfig:
+        # policy_documents.append(IAMRolePolicies.)
 
         for index, policy_entry in enumerate(function_policies.get()):
 
