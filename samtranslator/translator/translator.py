@@ -32,25 +32,24 @@ class Translator:
         self.sam_parser = sam_parser
 
     def _get_function_names(self, resource_dict, parameter_values):
-        if resource_dict.get("Type", "").strip() == 'AWS::Serverless::Function':
-            if resource_dict.get('Properties', "").get('Events', ""):
-                events = list(resource_dict.get('Properties', "").get('Events', "").values())
+        if resource_dict.get("Type") and resource_dict.get("Type").strip() == 'AWS::Serverless::Function':
+            if resource_dict.get('Properties') and resource_dict.get('Properties').get('Events'):
+                events = list(resource_dict.get('Properties').get('Events').values())
                 for item in events:
                     # If the function event type is `Api`then gets the function name and
                     # adds to the function_names dict with key as the api_name and value as the function_name
-                    if item.get('Type', "") == 'Api' and item.get('Properties', None) and item.get('Properties', "")\
-                            .get('RestApiId', None):
-                        rest_api = item.get('Properties', "").get('RestApiId', "")
+                    if item.get('Type') == 'Api' and item.get('Properties') and item.get('Properties').get('RestApiId'):
+                        rest_api = item.get('Properties').get('RestApiId')
                         if type(rest_api) == dict:
-                            api_name = item.get('Properties', "").get('RestApiId', "").get('Ref', None)
+                            api_name = item.get('Properties').get('RestApiId').get('Ref')
                         else:
-                            api_name = item.get('Properties', "").get('RestApiId', None)
+                            api_name = item.get('Properties').get('RestApiId')
                         if api_name:
-                            function_name = resource_dict.get('Properties', "").get("FunctionName", None)
+                            function_name = resource_dict.get('Properties').get('FunctionName')
                             if type(function_name) == str:
                                 # All the function_names for associated functions will be concatenated
                                 self.function_names[api_name] = self.function_names.get(api_name, "") +\
-                                                            resource_dict.get('Properties', "").get('FunctionName', "")
+                                                            resource_dict.get('Properties').get('FunctionName')
                             # Resolving intrinsics and gets the function name
                             # This gets the function names only for Ref and Fn::Sub intrinsics
                             elif type(function_name) == dict:
