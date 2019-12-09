@@ -1834,7 +1834,7 @@
               "athena:GetQueryExecution",
               "athena:BatchGetNamedQuery",
               "athena:BatchGetQueryExecution",
-	      "athena:GetWorkGroup"
+              "athena:GetWorkGroup"
             ],
             "Resource": {
               "Fn::Sub": [
