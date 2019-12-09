@@ -76,7 +76,8 @@ class ApiGatewayDeployment(Resource):
         "deployment_id": lambda self: ref(self.logical_id),
     }
 
-    def make_auto_deployable(self, stage, openapi_version=None, swagger=None, domain=None, function_names=None):
+    def make_auto_deployable(self, stage, openapi_version=None, swagger=None, domain=None,
+                             redeploy_restapi_parameters=None):
         """
         Sets up the resource such that it will trigger a re-deployment when Swagger changes
         or the openapi version changes or a domain resource changes.
@@ -84,6 +85,7 @@ class ApiGatewayDeployment(Resource):
         :param swagger: Dictionary containing the Swagger definition of the API
         :param openapi_version: string containing value of OpenApiVersion flag in the template
         :param domain: Dictionary containing the custom domain configuration for the API
+        :param redeploy_restapi_parameters: Dictionary containing the properties for which rest api will be redeployed
         """
         if not swagger:
             return
@@ -99,6 +101,10 @@ class ApiGatewayDeployment(Resource):
             hash_input.append(str(openapi_version))
         if domain:
             hash_input.append(json.dumps(domain))
+        if redeploy_restapi_parameters:
+            function_names = redeploy_restapi_parameters.get('function_names')
+        else:
+            function_names = None
         if function_names and function_names.get(self.logical_id[:-10], None):
             hash_input.append(str(function_names.get(self.logical_id[:-10], "")))
         data = self._X_HASH_DELIMITER.join(hash_input)

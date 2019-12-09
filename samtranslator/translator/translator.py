@@ -31,8 +31,6 @@ class Translator:
         self.plugins = plugins
         self.sam_parser = sam_parser
 
-    function_names = dict()
-
     def _get_function_names(self, resource_dict, parameter_values):
         if resource_dict.get("Type", "").strip() == 'AWS::Serverless::Function':
             if resource_dict.get('Properties', "").get('Events', ""):
@@ -80,6 +78,7 @@ class Translator:
                 be dumped into a valid CloudFormation JSON or YAML template
         """
         self.function_names = dict()
+        self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
         sam_parameter_values.add_pseudo_parameter_values()
@@ -101,7 +100,6 @@ class Translator:
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
         document_errors = []
-
         changed_logical_ids = {}
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
@@ -116,8 +114,9 @@ class Translator:
                 kwargs['deployment_preference_collection'] = deployment_preference_collection
                 kwargs['conditions'] = template.get('Conditions')
                 # add the value of FunctionName property if the function is referenced with the api resource
-                kwargs['function_names'] = self._get_function_names(resource_dict, parameter_values)
-
+                self.redeploy_restapi_parameters['function_names'] = self._get_function_names(resource_dict,
+                                                                                              parameter_values)
+                kwargs['redeploy_restapi_parameters'] = self.redeploy_restapi_parameters
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
