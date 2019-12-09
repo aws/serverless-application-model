@@ -95,22 +95,24 @@
               }
             }
           }, 
-          "openapi": "3.0.1", 
-          "securitySchemes": {
-            "OAuth2": {
-              "type": "oauth2", 
-              "x-amazon-apigateway-authorizer": {
-                "identitySource": "$request.querystring.param", 
-                "type": "jwt", 
-                "jwtConfiguration": {
-                  "audience": [
-                    "MyApi"
-                  ], 
-                  "issuer": "https://www.example.com/v1/connect/oidc"
+          "components": {
+            "securitySchemes": {
+              "OAuth2": {
+                "type": "oauth2", 
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.querystring.param", 
+                  "type": "jwt", 
+                  "jwtConfiguration": {
+                    "audience": [
+                      "MyApi"
+                    ], 
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  }
                 }
               }
             }
-          }
+          }, 
+          "openapi": "3.0.1"
         }
       }
     }, 
@@ -198,22 +200,24 @@
               }
             }
           }, 
-          "openapi": "3.0.1", 
-          "securitySchemes": {
-            "OAuth2": {
-              "type": "oauth2", 
-              "x-amazon-apigateway-authorizer": {
-                "identitySource": "$request.querystring.param", 
-                "type": "jwt", 
-                "jwtConfiguration": {
-                  "audience": [
-                    "MyApi"
-                  ], 
-                  "issuer": "https://www.example.com/v1/connect/oidc"
+          "components": {
+            "securitySchemes": {
+              "OAuth2": {
+                "type": "oauth2", 
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.querystring.param", 
+                  "type": "jwt", 
+                  "jwtConfiguration": {
+                    "audience": [
+                      "MyApi"
+                    ], 
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  }
                 }
               }
             }
-          }
+          }, 
+          "openapi": "3.0.1"
         }
       }
     }

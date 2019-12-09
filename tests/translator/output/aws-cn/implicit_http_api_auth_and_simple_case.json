@@ -13,10 +13,6 @@
     "RestApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -33,6 +29,10 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -219,36 +219,38 @@
               }
             }
           }, 
-          "openapi": "3.0.1", 
-          "securitySchemes": {
-            "oauth2Auth": {
-              "type": "oauth2", 
-              "x-amazon-apigateway-authorizer": {
-                "identitySource": "$request.querystring.param", 
-                "type": "jwt", 
-                "jwtConfiguration": {
-                  "audience": [
-                    "MyApi"
-                  ], 
-                  "issuer": "https://www.example.com/v1/connect/oidc"
+          "components": {
+            "securitySchemes": {
+              "oauth2Auth": {
+                "type": "oauth2", 
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.querystring.param", 
+                  "type": "jwt", 
+                  "jwtConfiguration": {
+                    "audience": [
+                      "MyApi"
+                    ], 
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  }
+                }
+              }, 
+              "OpenIdAuth": {
+                "type": "openIdConnect", 
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.querystring.param", 
+                  "type": "jwt", 
+                  "jwtConfiguration": {
+                    "audience": [
+                      "MyApi"
+                    ], 
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  }, 
+                  "openIdConnectUrl": "https://www.example.com/v1/connect"
                 }
               }
-            }, 
-            "OpenIdAuth": {
-              "type": "openIdConnect", 
-              "x-amazon-apigateway-authorizer": {
-                "identitySource": "$request.querystring.param", 
-                "type": "jwt", 
-                "jwtConfiguration": {
-                  "audience": [
-                    "MyApi"
-                  ], 
-                  "issuer": "https://www.example.com/v1/connect/oidc"
-                }, 
-                "openIdConnectUrl": "https://www.example.com/v1/connect"
-              }
             }
-          }
+          }, 
+          "openapi": "3.0.1"
         }
       }
     }

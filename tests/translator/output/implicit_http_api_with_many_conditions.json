@@ -139,9 +139,6 @@
     "helloworld9Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -158,6 +155,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -653,22 +653,24 @@
               ]
             }
           }, 
-          "openapi": "3.0.1", 
-          "securitySchemes": {
-            "oauth2": {
-              "type": "oauth2", 
-              "x-amazon-apigateway-authorizer": {
-                "identitySource": "$request.querystring.param", 
-                "type": "jwt", 
-                "jwtConfiguration": {
-                  "audience": [
-                    "MyApi"
-                  ], 
-                  "issuer": "https://www.example.com/v1/connect/oidc"
+          "components": {
+            "securitySchemes": {
+              "oauth2": {
+                "type": "oauth2", 
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.querystring.param", 
+                  "type": "jwt", 
+                  "jwtConfiguration": {
+                    "audience": [
+                      "MyApi"
+                    ], 
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  }
                 }
               }
             }
-          }
+          }, 
+          "openapi": "3.0.1"
         }
       }, 
       "Condition": "ServerlessHttpApiCondition"
@@ -698,9 +700,6 @@
     "helloworld1Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -717,6 +716,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -804,9 +806,6 @@
     "helloworld1099Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -823,6 +822,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -960,9 +962,6 @@
     "helloRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -979,6 +978,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -1057,9 +1059,6 @@
     "helloworld5Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -1076,6 +1075,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -1088,9 +1090,6 @@
     "helloworld4Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -1107,6 +1106,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -1163,9 +1165,6 @@
     "helloworld7Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -1182,6 +1181,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -1194,9 +1196,6 @@
     "helloworld2Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -1213,6 +1212,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -1225,9 +1227,6 @@
     "helloworld8Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -1244,6 +1243,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -1339,9 +1341,6 @@
     "helloworld3Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -1358,6 +1357,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -1417,9 +1419,6 @@
     "helloworld6Role": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -1436,6 +1435,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
