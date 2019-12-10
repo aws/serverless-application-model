@@ -1445,11 +1445,33 @@
               "Statement": [
                 {
                   "Action": [
-                    "athena:GetWorkGroup", 
-                    "athena:GetQueryExecution", 
+                    "athena:ListWorkGroups", 
+                    "athena:GetExecutionEngine", 
+                    "athena:GetExecutionEngines", 
+                    "athena:GetNamespace", 
+                    "athena:GetCatalogs", 
+                    "athena:GetNamespaces", 
+                    "athena:GetTables", 
+                    "athena:GetTable"
+                  ], 
+                  "Resource": "*", 
+                  "Effect": "Allow"
+                }, 
+                {
+                  "Action": [
                     "athena:StartQueryExecution", 
+                    "athena:GetQueryResults", 
+                    "athena:DeleteNamedQuery", 
+                    "athena:GetNamedQuery", 
+                    "athena:ListQueryExecutions", 
                     "athena:StopQueryExecution", 
-                    "athena:GetQueryResults"
+                    "athena:GetQueryResultsStream", 
+                    "athena:ListNamedQueries", 
+                    "athena:CreateNamedQuery", 
+                    "athena:GetQueryExecution", 
+                    "athena:BatchGetNamedQuery", 
+                    "athena:BatchGetQueryExecution", 
+                    "athena:GetWorkGroup"
                   ], 
                   "Resource": {
                     "Fn::Sub": [
