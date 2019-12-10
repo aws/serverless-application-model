@@ -35,7 +35,7 @@ class OpenApiEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_schemes = self._doc.get("securitySchemes", {})
+        self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
         self.definitions = self._doc.get('definitions', {})
 
     def get_path(self, path):
@@ -346,7 +346,8 @@ class OpenApiEditor(object):
         self._doc["paths"] = self.paths
 
         if self.security_schemes:
-            self._doc["securitySchemes"] = self.security_schemes
+            self._doc.setdefault("components", {})
+            self._doc["components"]["securitySchemes"] = self.security_schemes
 
         return copy.deepcopy(self._doc)
 

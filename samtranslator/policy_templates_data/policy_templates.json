@@ -1795,6 +1795,60 @@
           }
         ]
       }
+    },
+    "AthenaQueryPolicy": {
+      "Description": "Gives permissions to execute Athena queries",
+      "Parameters": {
+        "WorkGroupName": {
+          "Description": "Name of the Athena Workgroup"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "athena:ListWorkGroups",
+              "athena:GetExecutionEngine",
+              "athena:GetExecutionEngines",
+              "athena:GetNamespace",
+              "athena:GetCatalogs",
+              "athena:GetNamespaces",
+              "athena:GetTables",
+              "athena:GetTable"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "athena:StartQueryExecution",
+              "athena:GetQueryResults",
+              "athena:DeleteNamedQuery",
+              "athena:GetNamedQuery",
+              "athena:ListQueryExecutions",
+              "athena:StopQueryExecution",
+              "athena:GetQueryResultsStream",
+              "athena:ListNamedQueries",
+              "athena:CreateNamedQuery",
+              "athena:GetQueryExecution",
+              "athena:BatchGetNamedQuery",
+              "athena:BatchGetQueryExecution",
+              "athena:GetWorkGroup"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${workgroupName}",
+                {
+                  "workgroupName": {
+                    "Ref": "WorkGroupName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
