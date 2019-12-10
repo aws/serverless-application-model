@@ -53,13 +53,13 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment5a1885dc4a": {
+    "ServerlessRestApiDeployment8cf0e33bf7": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 5a1885dc4a36fdbd8b638b37b7bd6fbd1636e07e"
+        "Description": "RestApi deployment id: 8cf0e33bf7fe55848baf118e065ff4fc2ea53143"
       }
     },
     "ImplicitApiFunctionAnyApiPermissionProd": {
@@ -261,7 +261,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5a1885dc4a"
+          "Ref": "ServerlessRestApiDeployment8cf0e33bf7"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -402,10 +402,7 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
@@ -419,10 +416,7 @@
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "x-amazon-apigateway-any-method": {
                 "x-amazon-apigateway-integration": {
@@ -462,10 +456,7 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
@@ -479,10 +470,7 @@
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "get": {
                 "x-amazon-apigateway-integration": {

@@ -391,9 +391,11 @@ class ApiGenerator(object):
                                                             "'AllowOrigin' is \"'*'\" or not set")
 
         editor = SwaggerEditor(self.definition_body)
+        openapi_flag = True if self.definition_body.get("openapi") else False
         for path in editor.iter_on_path():
             editor.add_cors(path, properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
-                            max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials)
+                            max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials,
+                            openapi_flag=openapi_flag)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger

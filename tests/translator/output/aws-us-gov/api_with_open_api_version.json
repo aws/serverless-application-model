@@ -110,7 +110,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment7af82eda48"
+          "Ref": "ServerlessRestApiDeployment3680932532"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -118,13 +118,13 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeployment7af82eda48": {
+    "ServerlessRestApiDeployment3680932532": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 7af82eda48a23d84634abd7aa0865898d3b17810"
+        "Description": "RestApi deployment id: 368093253243ae968aeb07435191df46f56a5ba7"
       }
     }, 
     "ServerlessRestApi": {
@@ -157,10 +157,7 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
@@ -174,10 +171,7 @@
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "get": {
                 "x-amazon-apigateway-integration": {

@@ -116,10 +116,10 @@
                       }
                     }
                   }
-                }, 
+                },
                 "consumes": [
                   "application/json"
-                ], 
+                ],
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
@@ -139,7 +139,7 @@
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
+                },
                 "produces": [
                   "application/json"
                 ]
@@ -166,10 +166,10 @@
                       }
                     }
                   }
-                }, 
+                },
                 "consumes": [
                   "application/json"
-                ], 
+                ],
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
@@ -189,7 +189,7 @@
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
+                },
                 "produces": [
                   "application/json"
                 ]
@@ -244,7 +244,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentf0997bcd64"
+          "Ref": "ServerlessRestApiDeployment59d52fbf45"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -324,13 +324,13 @@
         "Description": "RestApi deployment id: 8cc53ffaa59a19b69e73d5b422142c7396739b16"
       }
     }, 
-    "ServerlessRestApiDeploymentf0997bcd64": {
+    "ServerlessRestApiDeployment59d52fbf45": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: f0997bcd645ceb1529586bc2b9faf855687b46ce"
+        "Description": "RestApi deployment id: 59d52fbf45ca167e84d057727078f189a8ca21eb"
       }
     }, 
     "RestApiFunction": {
@@ -394,10 +394,7 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
@@ -411,10 +408,7 @@
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "x-amazon-apigateway-any-method": {
                 "x-amazon-apigateway-integration": {
@@ -454,27 +448,21 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
                     "headers": {
                       "Access-Control-Allow-Origin": {
                         "type": "string"
-                      }, 
+                      },
                       "Access-Control-Allow-Methods": {
                         "type": "string"
                       }
-                    }, 
+                    },
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "get": {
                 "x-amazon-apigateway-integration": {
