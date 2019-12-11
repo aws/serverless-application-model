@@ -555,7 +555,8 @@ class ApiGenerator(object):
                 components['schemas'] = definition_body['definitions']
                 definition_body['components'] = components
                 del definition_body['definitions']
-
+            # removes `consumes` and `produces` options for CORS in openapi3 and
+            # adds `schema` for the headers in responses for openapi3
             if definition_body.get("paths"):
                 for path in definition_body.get("paths"):
                     if definition_body.get("paths").get(path).get("options"):
