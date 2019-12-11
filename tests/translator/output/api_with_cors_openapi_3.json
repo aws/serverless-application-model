@@ -244,7 +244,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment59d52fbf45"
+          "Ref": "ServerlessRestApiDeploymente3fd36e910"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -324,13 +324,13 @@
         "Description": "RestApi deployment id: 8cc53ffaa59a19b69e73d5b422142c7396739b16"
       }
     }, 
-    "ServerlessRestApiDeployment59d52fbf45": {
+    "ServerlessRestApiDeploymente3fd36e910": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 59d52fbf45ca167e84d057727078f189a8ca21eb"
+        "Description": "RestApi deployment id: e3fd36e910d56cf80b1b62823277d19f9b1f1a15"
       }
     }, 
     "RestApiFunction": {
@@ -400,10 +400,14 @@
                   "200": {
                     "headers": {
                       "Access-Control-Allow-Origin": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }
                     }, 
                     "description": "Default response for CORS method"
@@ -454,10 +458,14 @@
                   "200": {
                     "headers": {
                       "Access-Control-Allow-Origin": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       },
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }
                     },
                     "description": "Default response for CORS method"

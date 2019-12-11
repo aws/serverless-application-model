@@ -223,7 +223,7 @@ class SwaggerEditor(object):
             yield path
 
     def add_cors(self, path, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None,
-                 allow_credentials=None, openapi_flag=False):
+                 allow_credentials=None):
         """
         Add CORS configuration to this path. Specifically, we will add a OPTIONS response config to the Swagger that
         will return headers required for CORS. Since SAM uses aws_proxy integration, we cannot inject the headers
@@ -271,15 +271,14 @@ class SwaggerEditor(object):
                                                                                            allowed_headers,
                                                                                            allowed_methods,
                                                                                            max_age,
-                                                                                           allow_credentials,
-                                                                                           openapi_flag)
+                                                                                           allow_credentials)
 
     def add_binary_media_types(self, binary_media_types):
         bmt = json.loads(json.dumps(binary_media_types).replace('~1', '/'))
         self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = bmt
 
     def _options_method_response_for_cors(self, allowed_origins, allowed_headers=None, allowed_methods=None,
-                                          max_age=None, allow_credentials=None, openapi_flag=False):
+                                          max_age=None, allow_credentials=None):
         """
         Returns a Swagger snippet containing configuration for OPTIONS HTTP Method to configure CORS.
 
@@ -339,31 +338,7 @@ class SwaggerEditor(object):
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
             response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = "'true'"
             response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
-        if openapi_flag:
-            return {
-                "summary": "CORS support",
-                self._X_APIGW_INTEGRATION: {
-                    "type": "mock",
-                    "requestTemplates": {
-                        "application/json": "{\n  \"statusCode\" : 200\n}\n"
-                    },
-                    "responses": {
-                        "default": {
-                            "statusCode": "200",
-                            "responseParameters": response_parameters,
-                            "responseTemplates": {
-                                "application/json": "{}\n"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Default response for CORS method",
-                        "headers": response_headers
-                    }
-                }
-            }
+
         return {
             "summary": "CORS support",
             "consumes": ["application/json"],

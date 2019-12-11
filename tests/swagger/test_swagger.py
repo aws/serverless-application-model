@@ -446,7 +446,6 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_origins = "origins"
         allowed_headers = ["headers", "2"]
         allowed_methods = {"key": "methods"}
-        openapi_flag = False
         max_age = 60
         allow_credentials = True
         options_method_response_allow_credentials = True
@@ -456,15 +455,13 @@ class TestSwaggerEditor_add_cors(TestCase):
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
 
-        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials,
-                             openapi_flag)
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials)
         self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
         self.editor._options_method_response_for_cors.assert_called_with(allowed_origins,
                                                                          allowed_headers,
                                                                          allowed_methods,
                                                                          max_age,
-                                                                         options_method_response_allow_credentials,
-                                                                         openapi_flag)
+                                                                         options_method_response_allow_credentials)
 
     def test_must_skip_existing_path(self):
         path = "/withoptions"
@@ -491,7 +488,6 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_headers = None # No Value
         allowed_methods = "methods"
         max_age = 60
-        openapi_flag = False
         allow_credentials = True
         options_method_response_allow_credentials = True
 
@@ -501,8 +497,7 @@ class TestSwaggerEditor_add_cors(TestCase):
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
 
-        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials,
-                             openapi_flag)
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials)
 
         self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
 
@@ -510,8 +505,7 @@ class TestSwaggerEditor_add_cors(TestCase):
                                                                          allowed_headers,
                                                                          allowed_methods,
                                                                          max_age,
-                                                                         options_method_response_allow_credentials,
-                                                                         openapi_flag)
+                                                                         options_method_response_allow_credentials)
 
     def test_must_make_default_value_with_optional_allowed_methods(self):
 
@@ -519,7 +513,6 @@ class TestSwaggerEditor_add_cors(TestCase):
         allowed_headers = "headers"
         allowed_methods = None  # No Value
         max_age = 60
-        openapi_flag = False
         allow_credentials = True
         options_method_response_allow_credentials = True
 
@@ -534,8 +527,7 @@ class TestSwaggerEditor_add_cors(TestCase):
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
 
-        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials,
-                             openapi_flag)
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials)
 
         self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
 
@@ -545,14 +537,12 @@ class TestSwaggerEditor_add_cors(TestCase):
                                                                          # And value must be quoted
                                                                          default_allow_methods_value_with_quotes,
                                                                          max_age,
-                                                                         options_method_response_allow_credentials,
-                                                                         openapi_flag)
+                                                                         options_method_response_allow_credentials)
 
     def test_must_accept_none_allow_credentials(self):
         allowed_origins = "origins"
         allowed_headers = ["headers", "2"]
         allowed_methods = {"key": "methods"}
-        openapi_flag = False
         max_age = 60
         allow_credentials = None
         options_method_response_allow_credentials = False
@@ -562,15 +552,13 @@ class TestSwaggerEditor_add_cors(TestCase):
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
 
-        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials,
-                             openapi_flag)
+        self.editor.add_cors(path, allowed_origins, allowed_headers, allowed_methods, max_age, allow_credentials)
         self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
         self.editor._options_method_response_for_cors.assert_called_with(allowed_origins,
                                                                          allowed_headers,
                                                                          allowed_methods,
                                                                          max_age,
-                                                                         options_method_response_allow_credentials,
-                                                                         openapi_flag)
+                                                                         options_method_response_allow_credentials)
 
 
 class TestSwaggerEditor_options_method_response_for_cors(TestCase):

@@ -391,11 +391,9 @@ class ApiGenerator(object):
                                                             "'AllowOrigin' is \"'*'\" or not set")
 
         editor = SwaggerEditor(self.definition_body)
-        openapi_flag = True if self.definition_body.get("openapi") else False
         for path in editor.iter_on_path():
             editor.add_cors(path, properties.AllowOrigin, properties.AllowHeaders, properties.AllowMethods,
-                            max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials,
-                            openapi_flag=openapi_flag)
+                            max_age=properties.MaxAge, allow_credentials=properties.AllowCredentials)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
@@ -535,7 +533,7 @@ class ApiGenerator(object):
         """
         Convert definitions to openapi 3 in definition body if OpenApiVersion flag is specified.
 
-        If the is swagger defined in the definition body, we treat it as a swagger spec and dod not
+        If the is swagger defined in the definition body, we treat it as a swagger spec and do not
         make any openapi 3 changes to it
         """
         if definition_body.get('swagger') is not None:
@@ -557,6 +555,24 @@ class ApiGenerator(object):
                 components['schemas'] = definition_body['definitions']
                 definition_body['components'] = components
                 del definition_body['definitions']
+
+            if definition_body.get("paths"):
+                for path in definition_body.get("paths"):
+                    if definition_body.get("paths").get(path).get("options"):
+                        definition_body_options = definition_body.get("paths").get(path).get("options").copy()
+                        for field in definition_body_options.keys():
+                            # remove unsupported produces and consumes in options for openapi3
+                            if field in ["produces", "consumes"]:
+                                del definition_body["paths"][path]["options"][field]
+                            # add schema for the headers in options section for openapi3
+                            if field in ["responses"]:
+                                headers = definition_body["paths"][path]["options"][field]['200']['headers']
+                                for header in headers.keys():
+                                    header_value = {"schema": definition_body["paths"][path]["options"][field]['200']
+                                                    ['headers'][header]}
+                                    definition_body["paths"][path]["options"][field]['200']['headers'][header] = \
+                                        header_value
+
         return definition_body
 
     def _get_authorizers(self, authorizers_config, default_authorizer=None):
