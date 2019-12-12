@@ -630,7 +630,7 @@ class ApiGenerator(object):
 
         lambda_permission = LambdaPermission(self.logical_id + authorizer_name + 'AuthorizerPermission',
                                              attributes=self.passthrough_resource_attributes)
-        lambda_permission.Action = 'lambda:invokeFunction'
+        lambda_permission.Action = 'lambda:InvokeFunction'
         lambda_permission.FunctionName = authorizer_lambda_function_arn
         lambda_permission.Principal = 'apigateway.amazonaws.com'
         lambda_permission.SourceArn = source_arn

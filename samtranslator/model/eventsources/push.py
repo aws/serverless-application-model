@@ -70,7 +70,7 @@ class PushEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        lambda_permission.Action = 'lambda:invokeFunction'
+        lambda_permission.Action = 'lambda:InvokeFunction'
         lambda_permission.FunctionName = function_name_or_arn
         lambda_permission.Principal = self.principal
         lambda_permission.SourceArn = source_arn
