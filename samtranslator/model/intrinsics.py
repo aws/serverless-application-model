@@ -30,6 +30,24 @@ def make_conditional(condition, data):
     }
 
 
+def make_if_conditional(condition, true_data, false_data):
+    return {
+        'Fn::If': [
+            condition,
+            true_data,
+            false_data
+        ]
+    }
+
+
+def make_not_conditional(condition):
+    return {
+        'Fn::Not': [
+            {'Condition': condition}
+        ]
+    }
+
+
 def make_condition_or_list(conditions_list):
     condition_or_list = []
     for condition in conditions_list:

@@ -80,7 +80,8 @@ class Translator:
                 kwargs['intrinsics_resolver'] = intrinsics_resolver
                 kwargs['mappings_resolver'] = mappings_resolver
                 kwargs['deployment_preference_collection'] = deployment_preference_collection
-                import pdb; pdb.set_trace()
+                kwargs['conditions'] = template.get('Conditions')
+
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
