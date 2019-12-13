@@ -533,7 +533,7 @@ class ApiGenerator(object):
         """
         Convert definitions to openapi 3 in definition body if OpenApiVersion flag is specified.
 
-        If the is swagger defined in the definition body, we treat it as a swagger spec and dod not
+        If the is swagger defined in the definition body, we treat it as a swagger spec and do not
         make any openapi 3 changes to it
         """
         if definition_body.get('swagger') is not None:
@@ -555,6 +555,28 @@ class ApiGenerator(object):
                 components['schemas'] = definition_body['definitions']
                 definition_body['components'] = components
                 del definition_body['definitions']
+            # removes `consumes` and `produces` options for CORS in openapi3 and
+            # adds `schema` for the headers in responses for openapi3
+            if definition_body.get("paths"):
+                for path in definition_body.get("paths"):
+                    if definition_body.get("paths").get(path).get("options"):
+                        definition_body_options = definition_body.get("paths").get(path).get("options").copy()
+                        for field in definition_body_options.keys():
+                            # remove unsupported produces and consumes in options for openapi3
+                            if field in ["produces", "consumes"]:
+                                del definition_body["paths"][path]["options"][field]
+                            # add schema for the headers in options section for openapi3
+                            if field in ["responses"]:
+                                options_path = definition_body["paths"][path]["options"]
+                                if options_path and options_path.get(field).get('200') and options_path.get(field).\
+                                        get('200').get('headers'):
+                                    headers = definition_body["paths"][path]["options"][field]['200']['headers']
+                                    for header in headers.keys():
+                                        header_value = {"schema": definition_body["paths"][path]["options"][field]
+                                                        ['200']['headers'][header]}
+                                        definition_body["paths"][path]["options"][field]['200']['headers'][header] = \
+                                            header_value
+
         return definition_body
 
     def _get_authorizers(self, authorizers_config, default_authorizer=None):

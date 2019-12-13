@@ -53,13 +53,13 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment5a1885dc4a": {
+    "ServerlessRestApiDeployment147347629d": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 5a1885dc4a36fdbd8b638b37b7bd6fbd1636e07e"
+        "Description": "RestApi deployment id: 147347629dc3d0f3815602132def464c995d7245"
       }
     },
     "ImplicitApiFunctionAnyApiPermissionProd": {
@@ -261,7 +261,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5a1885dc4a"
+          "Ref": "ServerlessRestApiDeployment147347629d"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -402,27 +402,25 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
                     "headers": {
                       "Access-Control-Allow-Origin": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "x-amazon-apigateway-any-method": {
                 "x-amazon-apigateway-integration": {
@@ -462,27 +460,25 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
                     "headers": {
                       "Access-Control-Allow-Origin": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "get": {
                 "x-amazon-apigateway-integration": {
