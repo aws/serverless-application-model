@@ -22,5 +22,7 @@ Resources:
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
-      ProvisionedConcurrencyConfig:
-        ProvisionedConcurrentExecutions: !If [AliasProvisionedConcurrencyEnabled, !Ref ProvisionedConcurrency, !Ref 'AWS::NoValue']
+      ProvisionedConcurrencyConfig: !If
+        - AliasProvisionedConcurrencyEnabled
+        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+        - !Ref 'AWS::NoValue'

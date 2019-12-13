@@ -21,5 +21,7 @@ Resources:
       Runtime: python2.7
       DeploymentPreference:
         Type: Linear10PercentEvery3Minutes
-      ProvisionedConcurrencyConfig:
-        ProvisionedConcurrentExecutions: !If [AliasProvisionedConcurrencyEnabled, ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency, !Ref 'AWS::NoValue']
+      ProvisionedConcurrencyConfig: !If
+        - AliasProvisionedConcurrencyEnabled
+        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+        - !Ref 'AWS::NoValue'
