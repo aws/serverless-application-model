@@ -263,7 +263,10 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_apikey_required',
         'api_with_path_parameters',
         'function_with_event_source_mapping',
-        'api_with_swagger_authorizer_none'
+        'api_with_swagger_authorizer_none',
+        'function_with_event_dest',
+        'function_with_event_dest_basic',
+        'function_with_event_dest_conditional'
       ],
       [
        ("aws", "ap-southeast-1"),
@@ -385,8 +388,7 @@ class TestTranslatorEndToEnd(TestCase):
         'api_with_source_vpc_blacklist',
         'api_with_resource_policy',
         'api_with_resource_policy_global',
-        'api_with_resource_policy_global_implicit',
-        'function_with_event_dest'
+        'api_with_resource_policy_global_implicit'
       ],
       [
         ("aws", "ap-southeast-1"),
@@ -400,7 +402,7 @@ class TestTranslatorEndToEnd(TestCase):
     def test_transform_success_resource_policy(self, testcase, partition_with_region):
         partition = partition_with_region[0]
         region = partition_with_region[1]
-        
+
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + '.yaml'), 'r'))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
         manifest = json.loads(json.dumps(manifest))
@@ -574,6 +576,9 @@ class TestTranslatorEndToEnd(TestCase):
     'error_implicit_http_api_method',
     'error_implicit_http_api_path',
     'error_http_api_event_multiple_same_path',
+    'error_function_with_event_dest_invalid',
+    'error_function_with_event_dest_type'
+
 ])
 @patch('boto3.session.Session.region_name', 'ap-southeast-1')
 @patch('samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call', mock_sar_service_call)

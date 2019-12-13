@@ -238,8 +238,13 @@ class SamFunction(SamResourceMacro):
                     resource = SQSQueue(resource_logical_id + 'Queue')
                 if dest_config.get('Type') == 'SNS':
                     resource = SNSTopic(resource_logical_id + 'Topic')
-                resource.set_resource_attribute("Condition", condition)
-                destination['Destination'] = make_if_conditional(condition, resource.get_runtime_attr('arn'), dest_arn)
+                if condition:
+                    resource.set_resource_attribute("Condition", condition)
+                    destination['Destination'] = make_if_conditional(condition,
+                                                                     resource.get_runtime_attr('arn'),
+                                                                     dest_arn)
+                else:
+                    destination['Destination'] = resource.get_runtime_attr('arn')
                 policy = self._add_event_invoke_managed_policy(dest_config, logical_id, condition,
                                                                destination['Destination'])
             else:
