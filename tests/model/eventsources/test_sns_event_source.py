@@ -64,3 +64,29 @@ class SnsEventSource(TestCase):
 
     def test_to_cloudformation_throws_when_no_function(self):
         self.assertRaises(TypeError, self.sns_event_source.to_cloudformation)
+
+    def test_to_cloudformation_throws_when_queue_url_or_queue_arn_not_given(self):
+        sqsSubscription = {
+            'BatchSize': 5
+        }
+        self.sns_event_source.SqsSubscription = sqsSubscription
+        self.assertRaises(TypeError, self.sns_event_source.to_cloudformation)
+
+    def test_to_cloudformation_when_sqs_subscription_disable(self):
+        sqsSubscription = False
+        self.sns_event_source.SqsSubscription = sqsSubscription
+
+        resources = self.sns_event_source.to_cloudformation(
+            function=self.function)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0].resource_type,
+                          'AWS::Lambda::Permission')
+        self.assertEqual(resources[1].resource_type,
+                          'AWS::SNS::Subscription')
+
+        subscription = resources[1]
+        self.assertEqual(subscription.TopicArn, 'arn:aws:sns:MyTopic')
+        self.assertEqual(subscription.Protocol, 'lambda')
+        self.assertEqual(subscription.Endpoint, 'arn:aws:lambda:mock')
+        self.assertIsNone(subscription.Region)
+        self.assertIsNone(subscription.FilterPolicy)

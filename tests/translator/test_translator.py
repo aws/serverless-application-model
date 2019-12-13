@@ -202,6 +202,8 @@ class TestTranslatorEndToEnd(TestCase):
         's3_with_dependsOn',
         'sns',
         'sns_sqs',
+        'sns_existing_sqs',
+        'sns_outside_sqs',
         'sns_existing_other_subscription',
         'sns_topic_outside_template',
         'alexa_skill',
