@@ -567,12 +567,15 @@ class ApiGenerator(object):
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                headers = definition_body["paths"][path]["options"][field]['200']['headers']
-                                for header in headers.keys():
-                                    header_value = {"schema": definition_body["paths"][path]["options"][field]['200']
-                                                    ['headers'][header]}
-                                    definition_body["paths"][path]["options"][field]['200']['headers'][header] = \
-                                        header_value
+                                options_path = definition_body["paths"][path]["options"]
+                                if options_path and options_path.get(field).get('200') and options_path.get(field).\
+                                        get('200').get('headers'):
+                                    headers = definition_body["paths"][path]["options"][field]['200']['headers']
+                                    for header in headers.keys():
+                                        header_value = {"schema": definition_body["paths"][path]["options"][field]
+                                                        ['200']['headers'][header]}
+                                        definition_body["paths"][path]["options"][field]['200']['headers'][header] = \
+                                            header_value
 
         return definition_body
 
