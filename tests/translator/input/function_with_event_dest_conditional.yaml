@@ -10,9 +10,11 @@ Parameters:
     Default: true
 Conditions:
   QueueCreationDisabled: !Equals [!Ref UseExistingQueue, true]
+  FunctionCondition: !Equals [true, false]
 Resources:
   MyTestFunction:
     Type: AWS::Serverless::Function
+    Condition: FunctionCondition
     Properties:
       EventInvokeConfig:
         MaximumEventAgeInSeconds: 70
@@ -20,6 +22,7 @@ Resources:
         DestinationConfig:
           OnSuccess:
             Type: SQS
+            Destination: !If [QueueCreationDisabled, !Ref SQSArn, !Ref 'AWS::NoValue']
           OnFailure: 
             Type: Lambda
             Destination: !If [QueueCreationDisabled, !GetAtt DestinationLambda.Arn, 'some-function-arn']

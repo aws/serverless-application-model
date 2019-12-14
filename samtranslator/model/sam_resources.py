@@ -25,7 +25,7 @@ from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of,
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.intrinsics import (is_intrinsic_if, is_intrinsic_no_value, ref,
-                                            make_not_conditional, make_if_conditional)
+                                            make_not_conditional, make_conditional, make_and_condition)
 from samtranslator.model.sqs import SQSQueue
 from samtranslator.model.sns import SNSTopic
 
@@ -134,11 +134,11 @@ class SamFunction(SamResourceMacro):
         event_invoke_policies = []
         if self.EventInvokeConfig:
             function_name = lambda_function.logical_id
-            resource, event_invoke_policies = self._construct_event_invoke_config(function_name,
-                                                                                  alias_name,
-                                                                                  intrinsics_resolver,
-                                                                                  conditions)
-            resources.extend(resource)
+            event_invoke_resources, event_invoke_policies = self._construct_event_invoke_config(function_name,
+                                                                                                alias_name,
+                                                                                                intrinsics_resolver,
+                                                                                                conditions)
+            resources.extend(event_invoke_resources)
 
         managed_policy_map = kwargs.get('managed_policy_map', {})
         if not managed_policy_map:
@@ -164,8 +164,6 @@ class SamFunction(SamResourceMacro):
         """
         resources = []
         policy_document = []
-        if self.EventInvokeConfig is None:
-            return
 
         # Try to resolve.
         resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
@@ -198,7 +196,7 @@ class SamFunction(SamResourceMacro):
                 policy_document.append(policy)
 
         lambda_event_invoke_config.FunctionName = ref(function_name)
-        if lambda_alias != '':
+        if lambda_alias:
             lambda_event_invoke_config.Qualifier = lambda_alias
         else:
             lambda_event_invoke_config.Qualifier = '$LATEST'
@@ -231,30 +229,49 @@ class SamFunction(SamResourceMacro):
                                            "'Type: {}' must be one of {}"
                                            .format(dest_config.get('Type'), ACCEPTED_TYPES))
 
-        condition, dest_arn = self._get_or_make_condition(dest_config.get('Destination'), logical_id, conditions)
-        if dest_config.get('Destination') is None or condition is not None:
+        property_condition, dest_arn = self._get_or_make_condition(dest_config.get('Destination'),
+                                                                   logical_id, conditions)
+        if dest_config.get('Destination') is None or property_condition is not None:
+            combined_condition = self._make_and_conditions(self.get_passthrough_resource_attributes(),
+                                                           property_condition, conditions)
             if dest_config.get('Type') in AUTO_INJECT:
                 if dest_config.get('Type') == 'SQS':
                     resource = SQSQueue(resource_logical_id + 'Queue')
                 if dest_config.get('Type') == 'SNS':
                     resource = SNSTopic(resource_logical_id + 'Topic')
-                if condition:
-                    resource.set_resource_attribute("Condition", condition)
-                    destination['Destination'] = make_if_conditional(condition,
-                                                                     resource.get_runtime_attr('arn'),
-                                                                     dest_arn)
+                if combined_condition:
+                    resource.set_resource_attribute('Condition', combined_condition)
+                if property_condition:
+                    destination['Destination'] = make_conditional(property_condition,
+                                                                  resource.get_runtime_attr('arn'),
+                                                                  dest_arn)
                 else:
                     destination['Destination'] = resource.get_runtime_attr('arn')
-                policy = self._add_event_invoke_managed_policy(dest_config, logical_id, condition,
+                policy = self._add_event_invoke_managed_policy(dest_config, logical_id, property_condition,
                                                                destination['Destination'])
             else:
                 raise InvalidResourceException(self.logical_id,
-                                               "Destination is required if Type is EventBridge or Lambda")
-        if dest_config.get('Destination') is not None and condition is None:
+                                               "Destination is required if Type is {}"
+                                               .format(list(set(ACCEPTED_TYPES) - set(AUTO_INJECT))))
+        if dest_config.get('Destination') is not None and property_condition is None:
             policy = self._add_event_invoke_managed_policy(dest_config, logical_id,
                                                            None, dest_config.get('Destination'))
 
         return resource, destination, policy
+
+    def _make_and_conditions(self, resource_condition, property_condition, conditions):
+        if resource_condition is None:
+            return property_condition
+
+        if property_condition is None:
+            return resource_condition['Condition']
+
+        and_condition = make_and_condition([resource_condition, {'Condition': property_condition}])
+        condition_name = self._make_gen_condition_name(resource_condition.get('Condition') + 'AND' + property_condition,
+                                                       self.logical_id)
+        conditions[condition_name] = and_condition
+
+        return condition_name
 
     def _get_or_make_condition(self, destination, logical_id, conditions):
         """
@@ -274,17 +291,24 @@ class SamFunction(SamResourceMacro):
             return None, None
         if is_intrinsic_if(destination):
             dest_list = destination.get('Fn::If')
-            if is_intrinsic_no_value(dest_list[0]):
+            if is_intrinsic_no_value(dest_list[1]) and is_intrinsic_no_value(dest_list[2]):
                 None, None
             if is_intrinsic_no_value(dest_list[1]):
                 return dest_list[0], dest_list[2]
             if is_intrinsic_no_value(dest_list[2]):
                 condition = dest_list[0]
-                hash_digest = logical_id_generator.LogicalIdGenerator("", logical_id).gen()
-                not_condition = 'Not' + condition + hash_digest
+                not_condition = self._make_gen_condition_name('NOT' + condition, logical_id)
                 conditions[not_condition] = make_not_conditional(condition)
                 return not_condition, dest_list[1]
         return None, None
+
+    def _make_gen_condition_name(self, name, hash_input):
+        # Make sure the property name is not over 255 characters (CFN limit)
+        hash_digest = logical_id_generator.LogicalIdGenerator("", hash_input).gen()
+        condition_name = name + hash_digest
+        if len(condition_name) > 255:
+            return input(condition_name)[:255]
+        return condition_name
 
     def _get_resolved_alias_name(self, property_name, original_alias_value, intrinsics_resolver):
         """

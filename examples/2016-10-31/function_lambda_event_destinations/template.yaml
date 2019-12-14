@@ -20,8 +20,28 @@ Parameters:
 Conditions:
   QueueCreationDisabled: !Equals [!Ref UseExistingQueue, true]
   TopicCreationEnabled: !Equals [!Ref CreateSNSTopic, true]
+
 Resources:
-  MyTestFunction:
+  EventDestinationLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 70
+        MaximumRetryAttempts: 1
+        DestinationConfig:
+          OnSuccess:
+            Type: Lambda
+            # If the type is Lambda/EventBridge, Destination property is required.
+            Destination: !GetAtt DestinationLambda.Arn
+          OnFailure: 
+            # SQS and SNS will get auto-created if the Destination property is not specified or is AWS::NoValue
+            Type: SQS
+      CodeUri: ./src/
+      Handler: index.handler
+      Runtime: nodejs10.x
+      MemorySize: 1024
+
+  EventDestinationSQSSNS:
     Type: AWS::Serverless::Function
     Properties:
       EventInvokeConfig:
@@ -34,54 +54,7 @@ Resources:
           OnFailure: 
             Type: SNS
             Destination: !If [TopicCreationEnabled, !Ref 'AWS::NoValue', 'SOME-SNS-ARN']
-      InlineCode: |
-        exports.handler = function(event, context, callback) {
-            var event_received_at = new Date().toISOString();
-            console.log('Event received at: ' + event_received_at);
-            console.log('Received event:', JSON.stringify(event, null, 2));
-
-            if (event.Success) {
-                console.log("Success");
-                context.callbackWaitsForEmptyEventLoop = false;
-                callback(null);
-            } else {
-                console.log("Failure");
-                context.callbackWaitsForEmptyEventLoop = false;
-                callback(new Error("Failure from event, Success = false, I am failing!"), 'Destination Function Error Thrown');
-            }
-        };      
-      Handler: index.handler
-      Runtime: nodejs10.x
-      MemorySize: 1024
-  MyTestFunction2:
-    Type: AWS::Serverless::Function
-    Properties:
-      EventInvokeConfig:
-        MaximumEventAgeInSeconds: 70
-        MaximumRetryAttempts: 1
-        DestinationConfig:
-          OnSuccess:
-            Type: Lambda
-            Destination: !GetAtt DestinationLambda.Arn
-          OnFailure: 
-            Type: EventBridge
-            Destination: event-bus-arn
-      InlineCode: |
-        exports.handler = function(event, context, callback) {
-            var event_received_at = new Date().toISOString();
-            console.log('Event received at: ' + event_received_at);
-            console.log('Received event:', JSON.stringify(event, null, 2));
-
-            if (event.Success) {
-                console.log("Success");
-                context.callbackWaitsForEmptyEventLoop = false;
-                callback(null);
-            } else {
-                console.log("Failure");
-                context.callbackWaitsForEmptyEventLoop = false;
-                callback(new Error("Failure from event, Success = false, I am failing!"), 'Destination Function Error Thrown');
-            }
-        };      
+      CodeUri: ./src/
       Handler: index.handler
       Runtime: nodejs10.x
       MemorySize: 1024
@@ -106,4 +79,5 @@ Resources:
     Properties: 
       Endpoint: example@example.com
       Protocol: email
-      TopicArn: !Ref MyTestFunction.DestinationTopic 
+      # Refer to the auto-created SNS topic using <function-logical-id>.DestinationTopic
+      TopicArn: !Ref EventDestinationSQSSNS.DestinationTopic 

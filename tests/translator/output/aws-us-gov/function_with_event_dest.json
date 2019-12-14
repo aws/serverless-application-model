@@ -1,18 +1,18 @@
 {
   "Conditions": {
-    "NotQueueCreationDisabled2da03e5b6f": {
-      "Fn::Not": [
-        {
-          "Condition": "QueueCreationDisabled"
-        }
-      ]
-    }, 
     "TopicCreationEnabled": {
       "Fn::Equals": [
         {
           "Ref": "CreateSNSTopic"
         }, 
         true
+      ]
+    }, 
+    "NOTQueueCreationDisabled2da03e5b6f": {
+      "Fn::Not": [
+        {
+          "Condition": "QueueCreationDisabled"
+        }
       ]
     }, 
     "QueueCreationDisabled": {
@@ -78,7 +78,7 @@
                   "Action": "sqs:SendMessage", 
                   "Resource": {
                     "Fn::If": [
-                      "NotQueueCreationDisabled2da03e5b6f", 
+                      "NOTQueueCreationDisabled2da03e5b6f", 
                       {
                         "Fn::GetAtt": [
                           "MyTestFunctionEventInvokeConfigOnSuccessQueue", 
@@ -125,7 +125,7 @@
     "MyTestFunctionEventInvokeConfigOnSuccessQueue": {
       "Type": "AWS::SQS::Queue", 
       "Properties": {}, 
-      "Condition": "NotQueueCreationDisabled2da03e5b6f"
+      "Condition": "NOTQueueCreationDisabled2da03e5b6f"
     }, 
     "SNSSubscription": {
       "Type": "AWS::SNS::Subscription", 
@@ -147,7 +147,7 @@
           "OnSuccess": {
             "Destination": {
               "Fn::If": [
-                "NotQueueCreationDisabled2da03e5b6f", 
+                "NOTQueueCreationDisabled2da03e5b6f", 
                 {
                   "Fn::GetAtt": [
                     "MyTestFunctionEventInvokeConfigOnSuccessQueue", 
