@@ -251,8 +251,8 @@ class SamFunction(SamResourceMacro):
                                                                destination['Destination'])
             else:
                 raise InvalidResourceException(self.logical_id,
-                                               "Destination is required if Type is {}"
-                                               .format(sorted(list(set(accepted_types_list) - set(auto_inject_list)))))
+                                               "Destination is required if Type is not {}"
+                                               .format(auto_inject_list))
         if dest_config.get('Destination') is not None and property_condition is None:
             policy = self._add_event_invoke_managed_policy(dest_config, logical_id,
                                                            None, dest_config.get('Destination'))
