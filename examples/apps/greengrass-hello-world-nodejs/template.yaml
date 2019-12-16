@@ -11,7 +11,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       CodeUri: .
       Description: >-
         Deploy this lambda to a Greengrass core where it will send a hello world
