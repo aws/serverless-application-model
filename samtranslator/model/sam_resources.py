@@ -215,8 +215,8 @@ class SamFunction(SamResourceMacro):
         ARN property, so to handle conditional ifs we have to inject if conditions in the auto created
         SQS/SNS resources as well as in the policy documents.
         """
-        ACCEPTED_TYPES = ['SQS', 'SNS', 'EventBridge', 'Lambda']
-        AUTO_INJECT = ['SQS', 'SNS']
+        accepted_types_list = ['SQS', 'SNS', 'EventBridge', 'Lambda']
+        auto_inject_list = ['SQS', 'SNS']
         resource = None
         policy = {}
         destination = {}
@@ -224,17 +224,17 @@ class SamFunction(SamResourceMacro):
 
         resource_logical_id = logical_id + event
         if dest_config.get('Type') is None or \
-           dest_config.get('Type') not in ACCEPTED_TYPES:
+           dest_config.get('Type') not in accepted_types_list:
             raise InvalidResourceException(self.logical_id,
                                            "'Type: {}' must be one of {}"
-                                           .format(dest_config.get('Type'), ACCEPTED_TYPES))
+                                           .format(dest_config.get('Type'), accepted_types_list))
 
         property_condition, dest_arn = self._get_or_make_condition(dest_config.get('Destination'),
                                                                    logical_id, conditions)
         if dest_config.get('Destination') is None or property_condition is not None:
             combined_condition = self._make_and_conditions(self.get_passthrough_resource_attributes(),
                                                            property_condition, conditions)
-            if dest_config.get('Type') in AUTO_INJECT:
+            if dest_config.get('Type') in auto_inject_list:
                 if dest_config.get('Type') == 'SQS':
                     resource = SQSQueue(resource_logical_id + 'Queue')
                 if dest_config.get('Type') == 'SNS':
@@ -252,7 +252,7 @@ class SamFunction(SamResourceMacro):
             else:
                 raise InvalidResourceException(self.logical_id,
                                                "Destination is required if Type is {}"
-                                               .format(list(set(ACCEPTED_TYPES) - set(AUTO_INJECT))))
+                                               .format(sorted(list(set(accepted_types_list) - set(auto_inject_list))))
         if dest_config.get('Destination') is not None and property_condition is None:
             policy = self._add_event_invoke_managed_policy(dest_config, logical_id,
                                                            None, dest_config.get('Destination'))
