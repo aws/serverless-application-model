@@ -38,7 +38,7 @@
     "MyFunctionWithAwsIamAuthMyApiWithNoAuthPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunctionWithAwsIamAuth"
@@ -59,7 +59,7 @@
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunctionWithAwsIamAuth"
