@@ -27,7 +27,7 @@
     "TriggeredFunctionOnTerminatePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
         "FunctionName": {
           "Ref": "TriggeredFunction"
@@ -43,7 +43,7 @@
     "ScheduledFunctionSchedulePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
         "FunctionName": {
           "Ref": "ScheduledFunction"

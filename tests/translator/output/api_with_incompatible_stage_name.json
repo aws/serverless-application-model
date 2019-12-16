@@ -107,7 +107,7 @@
     "HyphenFunctionGetHtmlPermission0c8ecc62cb": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "HyphenFunction"
@@ -161,7 +161,7 @@
     "UnderscoreFunctionGetHtmlPermissionb34d3ad84e": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "UnderscoreFunction"

@@ -118,7 +118,7 @@
     "MyFunctionCustomInvokeRoleAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionCustomInvokeRole"
@@ -139,7 +139,7 @@
     "MyFunctionMyCognitoAuthAPI1PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionMyCognitoAuth"
@@ -235,7 +235,7 @@
     "MyFunctionWithoutAuthAPI2PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionWithoutAuth"
@@ -256,7 +256,7 @@
     "MyFunctionDefaultInvokeRoleAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionDefaultInvokeRole"
@@ -347,7 +347,7 @@
     "MyFunctionNoCallerCredentialsAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionNoCallerCredentials"
@@ -416,7 +416,7 @@
     "MyFunctionCallerCredentialsOverrideAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionCallerCredentialsOverride"
@@ -483,7 +483,7 @@
     "MyFunctionNullInvokeRoleAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionNullInvokeRole"
@@ -504,7 +504,7 @@
     "MyFunctionNONEInvokeRoleAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionNONEInvokeRole"
@@ -845,7 +845,7 @@
     "MyFunctionNoneAuthAPI3PermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionNoneAuth"
