@@ -135,7 +135,8 @@ class ServerlessAppPlugin(BasePlugin):
                 isinstance(app.properties[self.LOCATION_KEY], dict) and
                 self.APPLICATION_ID_KEY in app.properties[self.LOCATION_KEY] and
                 app.properties[self.LOCATION_KEY][self.APPLICATION_ID_KEY] is not None and
-                self.SEMANTIC_VERSION_KEY in app.properties[self.LOCATION_KEY])
+                self.SEMANTIC_VERSION_KEY in app.properties[self.LOCATION_KEY] and
+                app.properties[self.LOCATION_KEY][self.SEMANTIC_VERSION_KEY] is not None)
 
     def _handle_get_application_request(self, app_id, semver, key, logical_id):
         """

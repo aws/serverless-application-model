@@ -156,7 +156,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
     def test_process_invalid_applications(self, SamTemplateMock):
         self.plugin = ServerlessAppPlugin(sar_client=boto3.client('serverlessrepo', region_name='us-east-1'))
         template_dict = {"a": "b"}
-        app_resources = [("id1", ApplicationResource(app_id = '')), ("id2", ApplicationResource(app_id=None))]
+        app_resources = [("id1", ApplicationResource(app_id = '')), ("id2", ApplicationResource(app_id=None)), ("id3", ApplicationResource(app_id='id3', semver=None))]
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
@@ -177,7 +177,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
     def test_process_invalid_applications_validate(self, SamTemplateMock):
         self.plugin = ServerlessAppPlugin(validate_only=True)
         template_dict = {"a": "b"}
-        app_resources = [("id1", ApplicationResource(app_id = '')), ("id2", ApplicationResource(app_id=None))]
+        app_resources = [("id1", ApplicationResource(app_id = '')), ("id2", ApplicationResource(app_id=None)), ("id3", ApplicationResource(app_id='id3', semver=None))]
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
