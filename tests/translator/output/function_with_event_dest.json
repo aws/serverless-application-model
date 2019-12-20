@@ -71,7 +71,7 @@
         ], 
         "Policies": [
           {
-            "PolicyName": "MyTestFunctionEventInvokeConfigSQSPolicy", 
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnSuccessSQSPolicy", 
             "PolicyDocument": {
               "Statement": [
                 {
@@ -94,7 +94,7 @@
             }
           }, 
           {
-            "PolicyName": "MyTestFunctionEventInvokeConfigSNSPolicy", 
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnFailureSNSPolicy", 
             "PolicyDocument": {
               "Statement": [
                 {
@@ -200,7 +200,7 @@
         ], 
         "Policies": [
           {
-            "PolicyName": "MyTestFunction2EventInvokeConfigLambdaPolicy", 
+            "PolicyName": "MyTestFunction2EventInvokeConfigOnSuccessLambdaPolicy", 
             "PolicyDocument": {
               "Statement": [
                 {
@@ -217,7 +217,7 @@
             }
           }, 
           {
-            "PolicyName": "MyTestFunction2EventInvokeConfigEventBridgePolicy", 
+            "PolicyName": "MyTestFunction2EventInvokeConfigOnFailureEventBridgePolicy", 
             "PolicyDocument": {
               "Statement": [
                 {

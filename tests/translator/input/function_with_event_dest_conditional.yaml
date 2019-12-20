@@ -10,6 +10,7 @@ Parameters:
     Default: true
 Conditions:
   QueueCreationDisabled: !Equals [!Ref UseExistingQueue, true]
+  FunctionInlineEnabled: !Equals [true, false]
   FunctionCondition: !Equals [true, false]
 Resources:
   MyTestFunction:
@@ -25,7 +26,7 @@ Resources:
             Destination: !If [QueueCreationDisabled, !Ref SQSArn, !Ref 'AWS::NoValue']
           OnFailure: 
             Type: Lambda
-            Destination: !If [QueueCreationDisabled, !GetAtt DestinationLambda.Arn, 'some-function-arn']
+            Destination: !If [FunctionInlineEnabled, !GetAtt DestinationLambda.Arn, 'some-function-arn']
       InlineCode: |
         exports.handler = function(event, context, callback) {
           var event_received_at = new Date().toISOString();
@@ -46,6 +47,7 @@ Resources:
       Runtime: nodejs10.x
       MemorySize: 1024
   DestinationLambda:
+    Condition: FunctionInlineEnabled
     Type: AWS::Serverless::Function
     Properties:
       InlineCode: |

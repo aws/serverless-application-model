@@ -247,14 +247,14 @@ class SamFunction(SamResourceMacro):
                                                                   dest_arn)
                 else:
                     destination['Destination'] = resource.get_runtime_attr('arn')
-                policy = self._add_event_invoke_managed_policy(dest_config, logical_id, property_condition,
+                policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id, property_condition,
                                                                destination['Destination'])
             else:
                 raise InvalidResourceException(self.logical_id,
                                                "Destination is required if Type is not {}"
                                                .format(auto_inject_list))
         if dest_config.get('Destination') is not None and property_condition is None:
-            policy = self._add_event_invoke_managed_policy(dest_config, logical_id,
+            policy = self._add_event_invoke_managed_policy(dest_config, resource_logical_id,
                                                            None, dest_config.get('Destination'))
 
         return resource, destination, policy
@@ -292,7 +292,7 @@ class SamFunction(SamResourceMacro):
         if is_intrinsic_if(destination):
             dest_list = destination.get('Fn::If')
             if is_intrinsic_no_value(dest_list[1]) and is_intrinsic_no_value(dest_list[2]):
-                None, None
+                return None, None
             if is_intrinsic_no_value(dest_list[1]):
                 return dest_list[0], dest_list[2]
             if is_intrinsic_no_value(dest_list[2]):

@@ -34,7 +34,7 @@
         ], 
         "Policies": [
           {
-            "PolicyName": "MyTestFunctionEventInvokeConfigSQSPolicy", 
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnSuccessSQSPolicy", 
             "PolicyDocument": {
               "Statement": [
                 {
@@ -51,7 +51,7 @@
             }
           }, 
           {
-            "PolicyName": "MyTestFunctionEventInvokeConfigSNSPolicy", 
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnFailureSNSPolicy", 
             "PolicyDocument": {
               "Statement": [
                 {
