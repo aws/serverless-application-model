@@ -44,6 +44,7 @@ class SamFunction(SamResourceMacro):
         'Timeout': PropertyType(False, is_type(int)),
         'VpcConfig': PropertyType(False, is_type(dict)),
         'Role': PropertyType(False, is_str()),
+        'AssumeRolePolicyDocument': PropertyType(False, is_type(dict)),
         'Policies': PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
         'PermissionsBoundary': PropertyType(False, is_str()),
         'Environment': PropertyType(False, dict_of(is_str(), is_type(dict))),
@@ -201,7 +202,11 @@ class SamFunction(SamResourceMacro):
         :rtype: model.iam.IAMRole
         """
         execution_role = IAMRole(self.logical_id + 'Role', attributes=self.get_passthrough_resource_attributes())
-        execution_role.AssumeRolePolicyDocument = IAMRolePolicies.lambda_assume_role_policy()
+
+        if self.AssumeRolePolicyDocument is not None:
+            execution_role.AssumeRolePolicyDocument = self.AssumeRolePolicyDocument
+        else:
+            execution_role.AssumeRolePolicyDocument = IAMRolePolicies.lambda_assume_role_policy()
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaBasicExecutionRole')]
         if self.Tracing:

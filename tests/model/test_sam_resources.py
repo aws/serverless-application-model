@@ -8,6 +8,7 @@ from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion
 from samtranslator.model.apigateway import ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayDeployment
 from samtranslator.model.apigateway import ApiGatewayStage
+from samtranslator.model.iam import IAMRole
 from samtranslator.model.sam_resources import SamFunction
 from samtranslator.model.sam_resources import SamApi
 
@@ -52,6 +53,70 @@ class TestCodeUri(TestCase):
         function = SamFunction("foo")
         with pytest.raises(InvalidResourceException):
             function.to_cloudformation(**self.kwargs)
+
+class TestAssumeRolePolicyDocument(TestCase):
+    kwargs = {
+        'intrinsics_resolver': IntrinsicsResolver({}),
+        'event_resources': [],
+        'managed_policy_map': {
+            "foo": "bar"
+        }
+    }
+
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    def test_with_assume_role_policy_document(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+
+        assume_role_policy_document = {
+          'Version': '2012-10-17',
+          'Statement': [
+            {
+              'Action': [
+                'sts:AssumeRole'
+              ],
+              'Effect': 'Allow',
+              'Principal': {
+                'Service': [
+                  'lambda.amazonaws.com',
+                  'edgelambda.amazonaws.com'
+                ]
+              }
+            }
+          ]
+        }
+
+        function.AssumeRolePolicyDocument = assume_role_policy_document
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generateFunctionVersion = [x for x in cfnResources if isinstance(x, IAMRole)]
+        self.assertEqual(generateFunctionVersion[0].AssumeRolePolicyDocument, assume_role_policy_document)
+
+    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    def test_without_assume_role_policy_document(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+
+        assume_role_policy_document = {
+          'Version': '2012-10-17',
+          'Statement': [
+            {
+              'Action': [
+                'sts:AssumeRole'
+              ],
+              'Effect': 'Allow',
+              'Principal': {
+                'Service': [
+                  'lambda.amazonaws.com'
+                ]
+              }
+            }
+          ]
+        }
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generateFunctionVersion = [x for x in cfnResources if isinstance(x, IAMRole)]
+        self.assertEqual(generateFunctionVersion[0].AssumeRolePolicyDocument, assume_role_policy_document)
 
 class TestVersionDescription(TestCase):
     kwargs = {
