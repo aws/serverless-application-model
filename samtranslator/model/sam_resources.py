@@ -9,18 +9,15 @@ from .api.api_generator import ApiGenerator
 from .api.http_api_generator import HttpApiGenerator
 from .s3_utils.uri_parser import construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
-from samtranslator.model import (PropertyType, SamResourceMacro,
-                                 ResourceTypeResolver)
+from samtranslator.model import PropertyType, SamResourceMacro, ResourceTypeResolver
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage, ApiGatewayDomainName
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
-from samtranslator.model.exceptions import (InvalidEventException,
-                                            InvalidResourceException)
+from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
-from samtranslator.model.lambda_ import (LambdaFunction, LambdaVersion, LambdaAlias,
-                                         LambdaLayerVersion)
+from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion, LambdaAlias, LambdaLayerVersion
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -31,54 +28,51 @@ class SamFunction(SamResourceMacro):
     """SAM function macro.
     """
 
-    resource_type = 'AWS::Serverless::Function'
+    resource_type = "AWS::Serverless::Function"
     property_types = {
-        'FunctionName': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'Handler': PropertyType(True, is_str()),
-        'Runtime': PropertyType(True, is_str()),
-        'CodeUri': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'InlineCode': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'DeadLetterQueue': PropertyType(False, is_type(dict)),
-        'Description': PropertyType(False, is_str()),
-        'MemorySize': PropertyType(False, is_type(int)),
-        'Timeout': PropertyType(False, is_type(int)),
-        'VpcConfig': PropertyType(False, is_type(dict)),
-        'Role': PropertyType(False, is_str()),
-        'AssumeRolePolicyDocument': PropertyType(False, is_type(dict)),
-        'Policies': PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
-        'PermissionsBoundary': PropertyType(False, is_str()),
-        'Environment': PropertyType(False, dict_of(is_str(), is_type(dict))),
-        'Events': PropertyType(False, dict_of(is_str(), is_type(dict))),
-        'Tags': PropertyType(False, is_type(dict)),
-        'Tracing': PropertyType(False, one_of(is_type(dict), is_str())),
-        'KmsKeyArn': PropertyType(False, one_of(is_type(dict), is_str())),
-        'DeploymentPreference': PropertyType(False, is_type(dict)),
-        'ReservedConcurrentExecutions': PropertyType(False, any_type()),
-        'Layers': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-
+        "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Handler": PropertyType(True, is_str()),
+        "Runtime": PropertyType(True, is_str()),
+        "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "DeadLetterQueue": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
+        "MemorySize": PropertyType(False, is_type(int)),
+        "Timeout": PropertyType(False, is_type(int)),
+        "VpcConfig": PropertyType(False, is_type(dict)),
+        "Role": PropertyType(False, is_str()),
+        "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
+        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "PermissionsBoundary": PropertyType(False, is_str()),
+        "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
+        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "Tracing": PropertyType(False, one_of(is_type(dict), is_str())),
+        "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
+        "DeploymentPreference": PropertyType(False, is_type(dict)),
+        "ReservedConcurrentExecutions": PropertyType(False, any_type()),
+        "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         # Intrinsic functions in value of Alias property are not supported, yet
-        'AutoPublishAlias': PropertyType(False, one_of(is_str())),
-        'VersionDescription': PropertyType(False, is_str()),
-        'ProvisionedConcurrencyConfig': PropertyType(False, is_type(dict)),
+        "AutoPublishAlias": PropertyType(False, one_of(is_str())),
+        "VersionDescription": PropertyType(False, is_str()),
+        "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
     }
-    event_resolver = ResourceTypeResolver(samtranslator.model.eventsources, samtranslator.model.eventsources.pull,
-                                          samtranslator.model.eventsources.push,
-                                          samtranslator.model.eventsources.cloudwatchlogs)
+    event_resolver = ResourceTypeResolver(
+        samtranslator.model.eventsources,
+        samtranslator.model.eventsources.pull,
+        samtranslator.model.eventsources.push,
+        samtranslator.model.eventsources.cloudwatchlogs,
+    )
 
     # DeadLetterQueue
-    dead_letter_queue_policy_actions = {'SQS': 'sqs:SendMessage', 'SNS': 'sns:Publish'}
+    dead_letter_queue_policy_actions = {"SQS": "sqs:SendMessage", "SNS": "sns:Publish"}
 
     # Customers can refer to the following properties of SAM function
-    referable_properties = {
-        "Alias": LambdaAlias.resource_type,
-        "Version": LambdaVersion.resource_type,
-    }
+    referable_properties = {"Alias": LambdaAlias.resource_type, "Version": LambdaVersion.resource_type}
 
     def resources_to_link(self, resources):
         try:
-            return {
-                'event_resources': self._event_resources_to_link(resources)
-            }
+            return {"event_resources": self._event_resources_to_link(resources)}
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
@@ -102,8 +96,10 @@ class SamFunction(SamResourceMacro):
 
         if self.ProvisionedConcurrencyConfig:
             if not self.AutoPublishAlias:
-                raise InvalidResourceException(self.logical_id, "To set ProvisionedConcurrencyConfig "
-                                               "AutoPublishALias must be defined on the function")
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "To set ProvisionedConcurrencyConfig " "AutoPublishALias must be defined on the function",
+                )
 
         lambda_alias = None
         if self.AutoPublishAlias:
@@ -114,24 +110,27 @@ class SamFunction(SamResourceMacro):
             resources.append(lambda_alias)
 
         if self.DeploymentPreference:
-            self._validate_deployment_preference_and_add_update_policy(kwargs.get('deployment_preference_collection',
-                                                                                  None),
-                                                                       lambda_alias, intrinsics_resolver,
-                                                                       mappings_resolver)
+            self._validate_deployment_preference_and_add_update_policy(
+                kwargs.get("deployment_preference_collection", None),
+                lambda_alias,
+                intrinsics_resolver,
+                mappings_resolver,
+            )
 
-        managed_policy_map = kwargs.get('managed_policy_map', {})
+        managed_policy_map = kwargs.get("managed_policy_map", {})
         if not managed_policy_map:
-            raise Exception('Managed policy map is empty, but should not be.')
+            raise Exception("Managed policy map is empty, but should not be.")
 
         execution_role = None
         if lambda_function.Role is None:
             execution_role = self._construct_role(managed_policy_map)
-            lambda_function.Role = execution_role.get_runtime_attr('arn')
+            lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
 
         try:
-            resources += self._generate_event_resources(lambda_function, execution_role, kwargs['event_resources'],
-                                                        lambda_alias=lambda_alias)
+            resources += self._generate_event_resources(
+                lambda_function, execution_role, kwargs["event_resources"], lambda_alias=lambda_alias
+            )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
@@ -155,9 +154,9 @@ class SamFunction(SamResourceMacro):
 
         if not isinstance(resolved_alias_name, string_types):
             # This is still a dictionary which means we are not able to completely resolve intrinsics
-            raise InvalidResourceException(self.logical_id,
-                                           "'{}' must be a string or a Ref to a template parameter"
-                                           .format(property_name))
+            raise InvalidResourceException(
+                self.logical_id, "'{}' must be a string or a Ref to a template parameter".format(property_name)
+            )
 
         return resolved_alias_name
 
@@ -167,8 +166,9 @@ class SamFunction(SamResourceMacro):
         :returns: a list containing the Lambda function and execution role resources
         :rtype: list
         """
-        lambda_function = LambdaFunction(self.logical_id, depends_on=self.depends_on,
-                                         attributes=self.resource_attributes)
+        lambda_function = LambdaFunction(
+            self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes
+        )
 
         if self.FunctionName:
             lambda_function.FunctionName = self.FunctionName
@@ -191,7 +191,7 @@ class SamFunction(SamResourceMacro):
             lambda_function.TracingConfig = {"Mode": self.Tracing}
 
         if self.DeadLetterQueue:
-            lambda_function.DeadLetterConfig = {"TargetArn": self.DeadLetterQueue['TargetArn']}
+            lambda_function.DeadLetterConfig = {"TargetArn": self.DeadLetterQueue["TargetArn"]}
 
         return lambda_function
 
@@ -201,30 +201,35 @@ class SamFunction(SamResourceMacro):
         :returns: the generated IAM Role
         :rtype: model.iam.IAMRole
         """
-        execution_role = IAMRole(self.logical_id + 'Role', attributes=self.get_passthrough_resource_attributes())
+        execution_role = IAMRole(self.logical_id + "Role", attributes=self.get_passthrough_resource_attributes())
 
         if self.AssumeRolePolicyDocument is not None:
             execution_role.AssumeRolePolicyDocument = self.AssumeRolePolicyDocument
         else:
             execution_role.AssumeRolePolicyDocument = IAMRolePolicies.lambda_assume_role_policy()
 
-        managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaBasicExecutionRole')]
+        managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn('AWSXrayWriteOnlyAccess'))
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXrayWriteOnlyAccess"))
         if self.VpcConfig:
             managed_policy_arns.append(
-                ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaVPCAccessExecutionRole')
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
             )
 
-        function_policies = FunctionPolicies({"Policies": self.Policies},
-                                             # No support for policy templates in the "core"
-                                             policy_template_processor=None)
+        function_policies = FunctionPolicies(
+            {"Policies": self.Policies},
+            # No support for policy templates in the "core"
+            policy_template_processor=None,
+        )
         policy_documents = []
 
         if self.DeadLetterQueue:
-            policy_documents.append(IAMRolePolicies.dead_letter_queue_policy(
-                self.dead_letter_queue_policy_actions[self.DeadLetterQueue['Type']],
-                self.DeadLetterQueue['TargetArn']))
+            policy_documents.append(
+                IAMRolePolicies.dead_letter_queue_policy(
+                    self.dead_letter_queue_policy_actions[self.DeadLetterQueue["Type"]],
+                    self.DeadLetterQueue["TargetArn"],
+                )
+            )
 
         for index, policy_entry in enumerate(function_policies.get()):
 
@@ -238,25 +243,27 @@ class SamFunction(SamResourceMacro):
 
                     if not is_intrinsic_no_value(then_statement):
                         then_statement = {
-                            'PolicyName': execution_role.logical_id + 'Policy' + str(index),
-                            'PolicyDocument': then_statement
+                            "PolicyName": execution_role.logical_id + "Policy" + str(index),
+                            "PolicyDocument": then_statement,
                         }
                         intrinsic_if["Fn::If"][1] = then_statement
 
                     if not is_intrinsic_no_value(else_statement):
                         else_statement = {
-                            'PolicyName': execution_role.logical_id + 'Policy' + str(index),
-                            'PolicyDocument': else_statement
+                            "PolicyName": execution_role.logical_id + "Policy" + str(index),
+                            "PolicyDocument": else_statement,
                         }
                         intrinsic_if["Fn::If"][2] = else_statement
 
                     policy_documents.append(intrinsic_if)
 
                 else:
-                    policy_documents.append({
-                        'PolicyName': execution_role.logical_id + 'Policy' + str(index),
-                        'PolicyDocument': policy_entry.data
-                    })
+                    policy_documents.append(
+                        {
+                            "PolicyName": execution_role.logical_id + "Policy" + str(index),
+                            "PolicyDocument": policy_entry.data,
+                        }
+                    )
 
             elif policy_entry.type is PolicyTypes.MANAGED_POLICY:
 
@@ -280,8 +287,8 @@ class SamFunction(SamResourceMacro):
             else:
                 # Policy Templates are not supported here in the "core"
                 raise InvalidResourceException(
-                    self.logical_id,
-                    "Policy at index {} in the 'Policies' property is not valid".format(index))
+                    self.logical_id, "Policy at index {} in the 'Policies' property is not valid".format(index)
+                )
 
         execution_role.ManagedPolicyArns = list(managed_policy_arns)
         execution_role.Policies = policy_documents or None
@@ -296,15 +303,17 @@ class SamFunction(SamResourceMacro):
         """
         # Validate required logical ids
         valid_dlq_types = str(list(self.dead_letter_queue_policy_actions.keys()))
-        if not self.DeadLetterQueue.get('Type') or not self.DeadLetterQueue.get('TargetArn'):
-            raise InvalidResourceException(self.logical_id,
-                                           "'DeadLetterQueue' requires Type and TargetArn properties to be specified"
-                                           .format(valid_dlq_types))
+        if not self.DeadLetterQueue.get("Type") or not self.DeadLetterQueue.get("TargetArn"):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'DeadLetterQueue' requires Type and TargetArn properties to be specified".format(valid_dlq_types),
+            )
 
         # Validate required Types
-        if not self.DeadLetterQueue['Type'] in self.dead_letter_queue_policy_actions:
-            raise InvalidResourceException(self.logical_id,
-                                           "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types))
+        if not self.DeadLetterQueue["Type"] in self.dead_letter_queue_policy_actions:
+            raise InvalidResourceException(
+                self.logical_id, "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types)
+            )
 
     def _event_resources_to_link(self, resources):
         event_resources = {}
@@ -312,7 +321,8 @@ class SamFunction(SamResourceMacro):
             for logical_id, event_dict in self.Events.items():
                 try:
                     event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
-                        self.logical_id + logical_id, event_dict, logical_id)
+                        self.logical_id + logical_id, event_dict, logical_id
+                    )
                 except (TypeError, AttributeError) as e:
                     raise InvalidEventException(logical_id, "{}".format(e))
                 event_resources[logical_id] = event_source.resources_to_link(resources)
@@ -352,14 +362,15 @@ class SamFunction(SamResourceMacro):
             for logical_id, event_dict in sorted(self.Events.items(), key=SamFunction.order_events):
                 try:
                     eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
-                        lambda_function.logical_id + logical_id, event_dict, logical_id)
+                        lambda_function.logical_id + logical_id, event_dict, logical_id
+                    )
                 except TypeError as e:
                     raise InvalidEventException(logical_id, "{}".format(e))
 
                 kwargs = {
                     # When Alias is provided, connect all event sources to the alias and *not* the function
-                    'function': lambda_alias or lambda_function,
-                    'role': execution_role,
+                    "function": lambda_alias or lambda_function,
+                    "role": execution_role,
                 }
 
                 for name, resource in event_resources[logical_id].items():
@@ -370,11 +381,9 @@ class SamFunction(SamResourceMacro):
 
     def _construct_code_dict(self):
         if self.InlineCode:
-            return {
-                "ZipFile": self.InlineCode
-            }
+            return {"ZipFile": self.InlineCode}
         elif self.CodeUri:
-            return construct_s3_location_object(self.CodeUri, self.logical_id, 'CodeUri')
+            return construct_s3_location_object(self.CodeUri, self.logical_id, "CodeUri")
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
 
@@ -425,7 +434,7 @@ class SamFunction(SamResourceMacro):
         attributes["DeletionPolicy"] = "Retain"
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
-        lambda_version.FunctionName = function.get_runtime_attr('name')
+        lambda_version.FunctionName = function.get_runtime_attr("name")
         lambda_version.Description = self.VersionDescription
 
         return lambda_version
@@ -446,86 +455,87 @@ class SamFunction(SamResourceMacro):
         logical_id = "{id}Alias{suffix}".format(id=function.logical_id, suffix=name)
         alias = LambdaAlias(logical_id=logical_id, attributes=self.get_passthrough_resource_attributes())
         alias.Name = name
-        alias.FunctionName = function.get_runtime_attr('name')
+        alias.FunctionName = function.get_runtime_attr("name")
         alias.FunctionVersion = version.get_runtime_attr("version")
         if self.ProvisionedConcurrencyConfig:
             alias.ProvisionedConcurrencyConfig = self.ProvisionedConcurrencyConfig
 
         return alias
 
-    def _validate_deployment_preference_and_add_update_policy(self, deployment_preference_collection, lambda_alias,
-                                                              intrinsics_resolver, mappings_resolver):
-        if 'Enabled' in self.DeploymentPreference:
+    def _validate_deployment_preference_and_add_update_policy(
+        self, deployment_preference_collection, lambda_alias, intrinsics_resolver, mappings_resolver
+    ):
+        if "Enabled" in self.DeploymentPreference:
             # resolve intrinsics and mappings for Type
-            enabled = self.DeploymentPreference['Enabled']
+            enabled = self.DeploymentPreference["Enabled"]
             enabled = intrinsics_resolver.resolve_parameter_refs(enabled)
             enabled = mappings_resolver.resolve_parameter_refs(enabled)
-            self.DeploymentPreference['Enabled'] = enabled
+            self.DeploymentPreference["Enabled"] = enabled
 
-        if 'Type' in self.DeploymentPreference:
+        if "Type" in self.DeploymentPreference:
             # resolve intrinsics and mappings for Type
-            preference_type = self.DeploymentPreference['Type']
+            preference_type = self.DeploymentPreference["Type"]
             preference_type = intrinsics_resolver.resolve_parameter_refs(preference_type)
             preference_type = mappings_resolver.resolve_parameter_refs(preference_type)
-            self.DeploymentPreference['Type'] = preference_type
+            self.DeploymentPreference["Type"] = preference_type
 
         if deployment_preference_collection is None:
-            raise ValueError('deployment_preference_collection required for parsing the deployment preference')
+            raise ValueError("deployment_preference_collection required for parsing the deployment preference")
 
         deployment_preference_collection.add(self.logical_id, self.DeploymentPreference)
 
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
                 raise InvalidResourceException(
-                    self.logical_id,
-                    "'DeploymentPreference' requires AutoPublishAlias property to be specified")
+                    self.logical_id, "'DeploymentPreference' requires AutoPublishAlias property to be specified"
+                )
             if lambda_alias is None:
-                raise ValueError('lambda_alias expected for updating it with the appropriate update policy')
+                raise ValueError("lambda_alias expected for updating it with the appropriate update policy")
 
-            lambda_alias.set_resource_attribute("UpdatePolicy",
-                                                deployment_preference_collection.update_policy(
-                                                    self.logical_id).to_dict())
+            lambda_alias.set_resource_attribute(
+                "UpdatePolicy", deployment_preference_collection.update_policy(self.logical_id).to_dict()
+            )
 
 
 class SamApi(SamResourceMacro):
     """SAM rest API macro.
     """
-    resource_type = 'AWS::Serverless::Api'
+
+    resource_type = "AWS::Serverless::Api"
     property_types = {
         # Internal property set only by Implicit API plugin. If set to True, the API Event Source code will inject
         # Lambda Integration URI to the Swagger. To preserve backwards compatibility, this must be set only for
         # Implicit APIs. For Explicit APIs, customer is expected to set integration URI themselves.
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
-        '__MANAGE_SWAGGER': PropertyType(False, is_type(bool)),
-
-        'Name': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'StageName': PropertyType(True, one_of(is_str(), is_type(dict))),
-        'Tags': PropertyType(False, is_type(dict)),
-        'DefinitionBody': PropertyType(False, is_type(dict)),
-        'DefinitionUri': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'CacheClusterEnabled': PropertyType(False, is_type(bool)),
-        'CacheClusterSize': PropertyType(False, is_str()),
-        'Variables': PropertyType(False, is_type(dict)),
-        'EndpointConfiguration': PropertyType(False, is_str()),
-        'MethodSettings': PropertyType(False, is_type(list)),
-        'BinaryMediaTypes': PropertyType(False, is_type(list)),
-        'MinimumCompressionSize': PropertyType(False, is_type(int)),
-        'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'Auth': PropertyType(False, is_type(dict)),
-        'GatewayResponses': PropertyType(False, is_type(dict)),
-        'AccessLogSetting': PropertyType(False, is_type(dict)),
-        'CanarySetting': PropertyType(False, is_type(dict)),
-        'TracingEnabled': PropertyType(False, is_type(bool)),
-        'OpenApiVersion': PropertyType(False, is_str()),
-        'Models': PropertyType(False, is_type(dict)),
-        'Domain': PropertyType(False, is_type(dict))
+        "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
+        "Name": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "StageName": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "DefinitionBody": PropertyType(False, is_type(dict)),
+        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "CacheClusterEnabled": PropertyType(False, is_type(bool)),
+        "CacheClusterSize": PropertyType(False, is_str()),
+        "Variables": PropertyType(False, is_type(dict)),
+        "EndpointConfiguration": PropertyType(False, is_str()),
+        "MethodSettings": PropertyType(False, is_type(list)),
+        "BinaryMediaTypes": PropertyType(False, is_type(list)),
+        "MinimumCompressionSize": PropertyType(False, is_type(int)),
+        "Cors": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Auth": PropertyType(False, is_type(dict)),
+        "GatewayResponses": PropertyType(False, is_type(dict)),
+        "AccessLogSetting": PropertyType(False, is_type(dict)),
+        "CanarySetting": PropertyType(False, is_type(dict)),
+        "TracingEnabled": PropertyType(False, is_type(bool)),
+        "OpenApiVersion": PropertyType(False, is_str()),
+        "Models": PropertyType(False, is_type(dict)),
+        "Domain": PropertyType(False, is_type(dict)),
     }
 
     referable_properties = {
         "Stage": ApiGatewayStage.resource_type,
         "Deployment": ApiGatewayDeployment.resource_type,
-        "DomainName": ApiGatewayDomainName.resource_type
+        "DomainName": ApiGatewayDomainName.resource_type,
     }
 
     def to_cloudformation(self, **kwargs):
@@ -542,31 +552,33 @@ class SamApi(SamResourceMacro):
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
 
-        api_generator = ApiGenerator(self.logical_id,
-                                     self.CacheClusterEnabled,
-                                     self.CacheClusterSize,
-                                     self.Variables,
-                                     self.depends_on,
-                                     self.DefinitionBody,
-                                     self.DefinitionUri,
-                                     self.Name,
-                                     self.StageName,
-                                     tags=self.Tags,
-                                     endpoint_configuration=self.EndpointConfiguration,
-                                     method_settings=self.MethodSettings,
-                                     binary_media=self.BinaryMediaTypes,
-                                     minimum_compression_size=self.MinimumCompressionSize,
-                                     cors=self.Cors,
-                                     auth=self.Auth,
-                                     gateway_responses=self.GatewayResponses,
-                                     access_log_setting=self.AccessLogSetting,
-                                     canary_setting=self.CanarySetting,
-                                     tracing_enabled=self.TracingEnabled,
-                                     resource_attributes=self.resource_attributes,
-                                     passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
-                                     open_api_version=self.OpenApiVersion,
-                                     models=self.Models,
-                                     domain=self.Domain)
+        api_generator = ApiGenerator(
+            self.logical_id,
+            self.CacheClusterEnabled,
+            self.CacheClusterSize,
+            self.Variables,
+            self.depends_on,
+            self.DefinitionBody,
+            self.DefinitionUri,
+            self.Name,
+            self.StageName,
+            tags=self.Tags,
+            endpoint_configuration=self.EndpointConfiguration,
+            method_settings=self.MethodSettings,
+            binary_media=self.BinaryMediaTypes,
+            minimum_compression_size=self.MinimumCompressionSize,
+            cors=self.Cors,
+            auth=self.Auth,
+            gateway_responses=self.GatewayResponses,
+            access_log_setting=self.AccessLogSetting,
+            canary_setting=self.CanarySetting,
+            tracing_enabled=self.TracingEnabled,
+            resource_attributes=self.resource_attributes,
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+            open_api_version=self.OpenApiVersion,
+            models=self.Models,
+            domain=self.Domain,
+        )
 
         rest_api, deployment, stage, permissions, domain, basepath_mapping, route53 = api_generator.to_cloudformation()
 
@@ -584,28 +596,26 @@ class SamApi(SamResourceMacro):
 class SamHttpApi(SamResourceMacro):
     """SAM rest API macro.
     """
-    resource_type = 'AWS::Serverless::HttpApi'
+
+    resource_type = "AWS::Serverless::HttpApi"
     property_types = {
         # Internal property set only by Implicit HTTP API plugin. If set to True, the API Event Source code will
         # inject Lambda Integration URI to the OpenAPI. To preserve backwards compatibility, this must be set only for
         # Implicit APIs. For Explicit APIs, this is managed by the DefaultDefinitionBody Plugin.
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
-        '__MANAGE_SWAGGER': PropertyType(False, is_type(bool)),
-
-        'StageName': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'Tags': PropertyType(False, is_type(dict)),
-        'DefinitionBody': PropertyType(False, is_type(dict)),
-        'DefinitionUri': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'StageVariables': PropertyType(False, is_type(dict)),
-        'Cors': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'AccessLogSettings': PropertyType(False, is_type(dict)),
-        'Auth': PropertyType(False, is_type(dict))
+        "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
+        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "DefinitionBody": PropertyType(False, is_type(dict)),
+        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "StageVariables": PropertyType(False, is_type(dict)),
+        "Cors": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "AccessLogSettings": PropertyType(False, is_type(dict)),
+        "Auth": PropertyType(False, is_type(dict)),
     }
 
-    referable_properties = {
-        "Stage": ApiGatewayV2Stage.resource_type,
-    }
+    referable_properties = {"Stage": ApiGatewayV2Stage.resource_type}
 
     def to_cloudformation(self, **kwargs):
         """Returns the API Gateway RestApi, Deployment, and Stage to which this SAM Api corresponds.
@@ -617,17 +627,19 @@ class SamHttpApi(SamResourceMacro):
         """
         resources = []
 
-        api_generator = HttpApiGenerator(self.logical_id,
-                                         self.StageVariables,
-                                         self.depends_on,
-                                         self.DefinitionBody,
-                                         self.DefinitionUri,
-                                         self.StageName,
-                                         tags=self.Tags,
-                                         auth=self.Auth,
-                                         access_log_settings=self.AccessLogSettings,
-                                         resource_attributes=self.resource_attributes,
-                                         passthrough_resource_attributes=self.get_passthrough_resource_attributes())
+        api_generator = HttpApiGenerator(
+            self.logical_id,
+            self.StageVariables,
+            self.depends_on,
+            self.DefinitionBody,
+            self.DefinitionUri,
+            self.StageName,
+            tags=self.Tags,
+            auth=self.Auth,
+            access_log_settings=self.AccessLogSettings,
+            resource_attributes=self.resource_attributes,
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+        )
 
         http_api, stage = api_generator.to_cloudformation()
 
@@ -643,19 +655,16 @@ class SamHttpApi(SamResourceMacro):
 class SamSimpleTable(SamResourceMacro):
     """SAM simple table macro.
     """
-    resource_type = 'AWS::Serverless::SimpleTable'
+
+    resource_type = "AWS::Serverless::SimpleTable"
     property_types = {
-        'PrimaryKey': PropertyType(False, dict_of(is_str(), is_str())),
-        'ProvisionedThroughput': PropertyType(False, dict_of(is_str(), one_of(is_type(int), is_type(dict)))),
-        'TableName': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'Tags': PropertyType(False, is_type(dict)),
-        'SSESpecification': PropertyType(False, is_type(dict))
+        "PrimaryKey": PropertyType(False, dict_of(is_str(), is_str())),
+        "ProvisionedThroughput": PropertyType(False, dict_of(is_str(), one_of(is_type(int), is_type(dict)))),
+        "TableName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "SSESpecification": PropertyType(False, is_type(dict)),
     }
-    attribute_type_conversions = {
-        'String': 'S',
-        'Number': 'N',
-        'Binary': 'B'
-    }
+    attribute_type_conversions = {"String": "S", "Number": "N", "Binary": "B"}
 
     def to_cloudformation(self, **kwargs):
         dynamodb_resources = self._construct_dynamodb_table()
@@ -666,29 +675,25 @@ class SamSimpleTable(SamResourceMacro):
         dynamodb_table = DynamoDBTable(self.logical_id, depends_on=self.depends_on, attributes=self.resource_attributes)
 
         if self.PrimaryKey:
-            if 'Name' not in self.PrimaryKey or 'Type' not in self.PrimaryKey:
+            if "Name" not in self.PrimaryKey or "Type" not in self.PrimaryKey:
                 raise InvalidResourceException(
-                    self.logical_id,
-                    '\'PrimaryKey\' is missing required Property \'Name\' or \'Type\'.'
+                    self.logical_id, "'PrimaryKey' is missing required Property 'Name' or 'Type'."
                 )
             primary_key = {
-                'AttributeName': self.PrimaryKey['Name'],
-                'AttributeType': self._convert_attribute_type(self.PrimaryKey['Type'])
+                "AttributeName": self.PrimaryKey["Name"],
+                "AttributeType": self._convert_attribute_type(self.PrimaryKey["Type"]),
             }
 
         else:
-            primary_key = {'AttributeName': 'id', 'AttributeType': 'S'}
+            primary_key = {"AttributeName": "id", "AttributeType": "S"}
 
         dynamodb_table.AttributeDefinitions = [primary_key]
-        dynamodb_table.KeySchema = [{
-            'AttributeName': primary_key['AttributeName'],
-            'KeyType': 'HASH'
-        }]
+        dynamodb_table.KeySchema = [{"AttributeName": primary_key["AttributeName"], "KeyType": "HASH"}]
 
         if self.ProvisionedThroughput:
             dynamodb_table.ProvisionedThroughput = self.ProvisionedThroughput
         else:
-            dynamodb_table.BillingMode = 'PAY_PER_REQUEST'
+            dynamodb_table.BillingMode = "PAY_PER_REQUEST"
 
         if self.SSESpecification:
             dynamodb_table.SSESpecification = self.SSESpecification
@@ -704,26 +709,26 @@ class SamSimpleTable(SamResourceMacro):
     def _convert_attribute_type(self, attribute_type):
         if attribute_type in self.attribute_type_conversions:
             return self.attribute_type_conversions[attribute_type]
-        raise InvalidResourceException(self.logical_id, 'Invalid \'Type\' "{actual}".'.format(actual=attribute_type))
+        raise InvalidResourceException(self.logical_id, "Invalid 'Type' \"{actual}\".".format(actual=attribute_type))
 
 
 class SamApplication(SamResourceMacro):
     """SAM application macro.
     """
 
-    APPLICATION_ID_KEY = 'ApplicationId'
-    SEMANTIC_VERSION_KEY = 'SemanticVersion'
+    APPLICATION_ID_KEY = "ApplicationId"
+    SEMANTIC_VERSION_KEY = "SemanticVersion"
 
-    resource_type = 'AWS::Serverless::Application'
+    resource_type = "AWS::Serverless::Application"
 
     # The plugin will always insert the TemplateUrl parameter
     property_types = {
-        'Location': PropertyType(True, one_of(is_str(), is_type(dict))),
-        'TemplateUrl': PropertyType(False, is_str()),
-        'Parameters': PropertyType(False, is_type(dict)),
-        'NotificationARNs': PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-        'Tags': PropertyType(False, is_type(dict)),
-        'TimeoutInMinutes': PropertyType(False, is_type(int))
+        "Location": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "TemplateUrl": PropertyType(False, is_str()),
+        "Parameters": PropertyType(False, is_type(dict)),
+        "NotificationARNs": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "Tags": PropertyType(False, is_type(dict)),
+        "TimeoutInMinutes": PropertyType(False, is_type(int)),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -735,8 +740,9 @@ class SamApplication(SamResourceMacro):
     def _construct_nested_stack(self):
         """Constructs a AWS::CloudFormation::Stack resource
         """
-        nested_stack = NestedStack(self.logical_id, depends_on=self.depends_on,
-                                   attributes=self.get_passthrough_resource_attributes())
+        nested_stack = NestedStack(
+            self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()
+        )
         nested_stack.Parameters = self.Parameters
         nested_stack.NotificationARNs = self.NotificationARNs
         application_tags = self._get_application_tags()
@@ -751,11 +757,12 @@ class SamApplication(SamResourceMacro):
         """
         application_tags = {}
         if isinstance(self.Location, dict):
-            if (self.APPLICATION_ID_KEY in self.Location.keys() and
-                    self.Location[self.APPLICATION_ID_KEY] is not None):
+            if self.APPLICATION_ID_KEY in self.Location.keys() and self.Location[self.APPLICATION_ID_KEY] is not None:
                 application_tags[self._SAR_APP_KEY] = self.Location[self.APPLICATION_ID_KEY]
-            if (self.SEMANTIC_VERSION_KEY in self.Location.keys() and
-                    self.Location[self.SEMANTIC_VERSION_KEY] is not None):
+            if (
+                self.SEMANTIC_VERSION_KEY in self.Location.keys()
+                and self.Location[self.SEMANTIC_VERSION_KEY] is not None
+            ):
                 application_tags[self._SAR_SEMVER_KEY] = self.Location[self.SEMANTIC_VERSION_KEY]
         return application_tags
 
@@ -763,18 +770,19 @@ class SamApplication(SamResourceMacro):
 class SamLayerVersion(SamResourceMacro):
     """ SAM Layer macro
     """
-    resource_type = 'AWS::Serverless::LayerVersion'
+
+    resource_type = "AWS::Serverless::LayerVersion"
     property_types = {
-        'LayerName': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'Description': PropertyType(False, is_str()),
-        'ContentUri': PropertyType(True, one_of(is_str(), is_type(dict))),
-        'CompatibleRuntimes': PropertyType(False, list_of(is_str())),
-        'LicenseInfo': PropertyType(False, is_str()),
-        'RetentionPolicy': PropertyType(False, is_str())
+        "LayerName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Description": PropertyType(False, is_str()),
+        "ContentUri": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "CompatibleRuntimes": PropertyType(False, list_of(is_str())),
+        "LicenseInfo": PropertyType(False, is_str()),
+        "RetentionPolicy": PropertyType(False, is_str()),
     }
 
-    RETAIN = 'Retain'
-    DELETE = 'Delete'
+    RETAIN = "Retain"
+    DELETE = "Delete"
     retention_policy_options = [RETAIN.lower(), DELETE.lower()]
 
     def to_cloudformation(self, **kwargs):
@@ -800,18 +808,19 @@ class SamLayerVersion(SamResourceMacro):
         :rtype: list
         """
         # Resolve intrinsics if applicable:
-        self.LayerName = self._resolve_string_parameter(intrinsics_resolver, self.LayerName, 'LayerName')
-        self.LicenseInfo = self._resolve_string_parameter(intrinsics_resolver, self.LicenseInfo, 'LicenseInfo')
-        self.Description = self._resolve_string_parameter(intrinsics_resolver, self.Description, 'Description')
-        self.RetentionPolicy = self._resolve_string_parameter(intrinsics_resolver, self.RetentionPolicy,
-                                                              'RetentionPolicy')
+        self.LayerName = self._resolve_string_parameter(intrinsics_resolver, self.LayerName, "LayerName")
+        self.LicenseInfo = self._resolve_string_parameter(intrinsics_resolver, self.LicenseInfo, "LicenseInfo")
+        self.Description = self._resolve_string_parameter(intrinsics_resolver, self.Description, "Description")
+        self.RetentionPolicy = self._resolve_string_parameter(
+            intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
+        )
 
         retention_policy_value = self._get_retention_policy_value()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
             attributes = {}
-        attributes['DeletionPolicy'] = retention_policy_value
+        attributes["DeletionPolicy"] = retention_policy_value
 
         old_logical_id = self.logical_id
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
@@ -833,7 +842,7 @@ class SamLayerVersion(SamResourceMacro):
 
         lambda_layer.LayerName = self.LayerName
         lambda_layer.Description = self.Description
-        lambda_layer.Content = construct_s3_location_object(self.ContentUri, self.logical_id, 'ContentUri')
+        lambda_layer.Content = construct_s3_location_object(self.ContentUri, self.logical_id, "ContentUri")
         lambda_layer.CompatibleRuntimes = self.CompatibleRuntimes
         lambda_layer.LicenseInfo = self.LicenseInfo
 
@@ -851,6 +860,7 @@ class SamLayerVersion(SamResourceMacro):
         elif self.RetentionPolicy.lower() == self.DELETE.lower():
             return self.DELETE
         elif self.RetentionPolicy.lower() not in self.retention_policy_options:
-            raise InvalidResourceException(self.logical_id,
-                                           "'{}' must be one of the following options: {}."
-                                           .format('RetentionPolicy', [self.RETAIN, self.DELETE]))
+            raise InvalidResourceException(
+                self.logical_id,
+                "'{}' must be one of the following options: {}.".format("RetentionPolicy", [self.RETAIN, self.DELETE]),
+            )

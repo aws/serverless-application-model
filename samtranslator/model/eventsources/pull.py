@@ -16,19 +16,20 @@ class PullEventSource(ResourceMacro):
 
     :cvar str policy_arn: The ARN of the AWS managed role policy corresponding to this pull event source
     """
+
     resource_type = None
     property_types = {
-        'Stream': PropertyType(False, is_str()),
-        'Queue': PropertyType(False, is_str()),
-        'BatchSize': PropertyType(False, is_type(int)),
-        'StartingPosition': PropertyType(False, is_str()),
-        'Enabled': PropertyType(False, is_type(bool)),
-        'MaximumBatchingWindowInSeconds': PropertyType(False, is_type(int)),
-        'MaximumRetryAttempts': PropertyType(False, is_type(int)),
-        'BisectBatchOnFunctionError': PropertyType(False, is_type(bool)),
-        'MaximumRecordAgeInSeconds': PropertyType(False, is_type(int)),
-        'DestinationConfig': PropertyType(False, is_type(dict)),
-        'ParallelizationFactor': PropertyType(False, is_type(int))
+        "Stream": PropertyType(False, is_str()),
+        "Queue": PropertyType(False, is_str()),
+        "BatchSize": PropertyType(False, is_type(int)),
+        "StartingPosition": PropertyType(False, is_str()),
+        "Enabled": PropertyType(False, is_type(bool)),
+        "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
+        "MaximumRetryAttempts": PropertyType(False, is_type(int)),
+        "BisectBatchOnFunctionError": PropertyType(False, is_type(bool)),
+        "MaximumRecordAgeInSeconds": PropertyType(False, is_type(int)),
+        "DestinationConfig": PropertyType(False, is_type(dict)),
+        "ParallelizationFactor": PropertyType(False, is_type(int)),
     }
 
     def get_policy_arn(self):
@@ -42,7 +43,7 @@ class PullEventSource(ResourceMacro):
         :returns: a list of vanilla CloudFormation Resources, to which this pull event expands
         :rtype: list
         """
-        function = kwargs.get('function')
+        function = kwargs.get("function")
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
@@ -60,11 +61,11 @@ class PullEventSource(ResourceMacro):
 
         if not self.Stream and not self.Queue:
             raise InvalidEventException(
-                self.relative_id, "No Queue (for SQS) or Stream (for Kinesis or DynamoDB) provided.")
+                self.relative_id, "No Queue (for SQS) or Stream (for Kinesis or DynamoDB) provided."
+            )
 
         if self.Stream and not self.StartingPosition:
-            raise InvalidEventException(
-                self.relative_id, "StartingPosition is required for Kinesis and DynamoDB.")
+            raise InvalidEventException(self.relative_id, "StartingPosition is required for Kinesis and DynamoDB.")
 
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
         lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue
@@ -80,32 +81,35 @@ class PullEventSource(ResourceMacro):
         destination_config_policy = None
         if self.DestinationConfig:
             # `Type` property is for sam to attach the right policies
-            destination_type = self.DestinationConfig.get('OnFailure').get('Type')
+            destination_type = self.DestinationConfig.get("OnFailure").get("Type")
 
             # SAM attaches the policies for SQS or SNS only if 'Type' is given
             if destination_type:
                 # the values 'SQS' and 'SNS' are allowed. No intrinsics are allowed
-                if destination_type not in ['SQS', 'SNS']:
+                if destination_type not in ["SQS", "SNS"]:
                     raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")
-                if self.DestinationConfig.get('OnFailure') is None:
-                    raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for "
-                                                                 "'DestinationConfig'")
-                if destination_type == 'SQS':
-                    queue_arn = self.DestinationConfig.get('OnFailure').get('Destination')
-                    destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(queue_arn,
-                                                                                               self.logical_id)
+                if self.DestinationConfig.get("OnFailure") is None:
+                    raise InvalidEventException(
+                        self.logical_id, "'OnFailure' is a required field for " "'DestinationConfig'"
+                    )
+                if destination_type == "SQS":
+                    queue_arn = self.DestinationConfig.get("OnFailure").get("Destination")
+                    destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(
+                        queue_arn, self.logical_id
+                    )
                 elif destination_type == "SNS":
-                    sns_topic_arn = self.DestinationConfig.get('OnFailure').get('Destination')
-                    destination_config_policy = IAMRolePolicies(). sns_publish_role_policy(sns_topic_arn,
-                                                                                           self.logical_id)
+                    sns_topic_arn = self.DestinationConfig.get("OnFailure").get("Destination")
+                    destination_config_policy = IAMRolePolicies().sns_publish_role_policy(
+                        sns_topic_arn, self.logical_id
+                    )
 
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
 
-        if 'Condition' in function.resource_attributes:
-            lambda_eventsourcemapping.set_resource_attribute('Condition', function.resource_attributes['Condition'])
+        if "Condition" in function.resource_attributes:
+            lambda_eventsourcemapping.set_resource_attribute("Condition", function.resource_attributes["Condition"])
 
-        if 'role' in kwargs:
-            self._link_policy(kwargs['role'], destination_config_policy)
+        if "role" in kwargs:
+            self._link_policy(kwargs["role"], destination_config_policy)
 
         return resources
 
@@ -125,29 +129,32 @@ class PullEventSource(ResourceMacro):
                 role.Policies.append(destination_config_policy)
             if role.Policies and destination_config_policy not in role.Policies:
                 # do not add the  policy if the same policy document is already present
-                if not destination_config_policy.get('PolicyDocument') in [d['PolicyDocument'] for d in role.Policies]:
+                if not destination_config_policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
                     role.Policies.append(destination_config_policy)
 
 
 class Kinesis(PullEventSource):
     """Kinesis event source."""
-    resource_type = 'Kinesis'
+
+    resource_type = "Kinesis"
 
     def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaKinesisExecutionRole')
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
 
 
 class DynamoDB(PullEventSource):
     """DynamoDB Streams event source."""
-    resource_type = 'DynamoDB'
+
+    resource_type = "DynamoDB"
 
     def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaDynamoDBExecutionRole')
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
 
 
 class SQS(PullEventSource):
     """SQS Queue event source."""
-    resource_type = 'SQS'
+
+    resource_type = "SQS"
 
     def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSLambdaSQSQueueExecutionRole')
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")

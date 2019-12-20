@@ -8,12 +8,10 @@ from .push import PushEventSource
 
 class CloudWatchLogs(PushEventSource):
     """CloudWatch Logs event source for SAM Functions."""
-    resource_type = 'CloudWatchLogs'
-    principal = 'logs.amazonaws.com'
-    property_types = {
-        'LogGroupName': PropertyType(True, is_str()),
-        'FilterPattern': PropertyType(True, is_str())
-    }
+
+    resource_type = "CloudWatchLogs"
+    principal = "logs.amazonaws.com"
+    property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}
 
     def to_cloudformation(self, **kwargs):
         """Returns the CloudWatch Logs Subscription Filter and Lambda Permission to which this CloudWatch Logs event source
@@ -23,7 +21,7 @@ class CloudWatchLogs(PushEventSource):
         :returns: a list of vanilla CloudFormation Resources, to which this push event expands
         :rtype: list
         """
-        function = kwargs.get('function')
+        function = kwargs.get("function")
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
@@ -39,15 +37,17 @@ class CloudWatchLogs(PushEventSource):
         resource = "log-group:${__LogGroupName__}:*"
         partition = ArnGenerator.get_partition_name()
 
-        return fnSub(ArnGenerator.generate_arn(partition=partition, service='logs', resource=resource),
-                     {'__LogGroupName__': self.LogGroupName})
+        return fnSub(
+            ArnGenerator.generate_arn(partition=partition, service="logs", resource=resource),
+            {"__LogGroupName__": self.LogGroupName},
+        )
 
     def get_subscription_filter(self, function, permission):
         subscription_filter = SubscriptionFilter(self.logical_id, depends_on=[permission.logical_id])
         subscription_filter.LogGroupName = self.LogGroupName
         subscription_filter.FilterPattern = self.FilterPattern
         subscription_filter.DestinationArn = function.get_runtime_attr("arn")
-        if 'Condition' in function.resource_attributes:
-            subscription_filter.set_resource_attribute('Condition', function.resource_attributes['Condition'])
+        if "Condition" in function.resource_attributes:
+            subscription_filter.set_resource_attribute("Condition", function.resource_attributes["Condition"])
 
         return subscription_filter

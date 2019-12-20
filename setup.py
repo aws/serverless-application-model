@@ -78,6 +78,6 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Topic :: Internet",
         "Topic :: Software Development :: Build Tools",
-        "Topic :: Utilities"
-    ]
+        "Topic :: Utilities",
+    ],
 )

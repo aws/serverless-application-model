@@ -2,37 +2,17 @@ from unittest import TestCase
 
 from samtranslator.sdk.resource import SamResource, SamResourceType
 
+
 class TestSamResource(TestCase):
-
     def setUp(self):
-        self.function_dict = {
-            "Type": "AWS::Serverless::Function",
-            "Properties": {
-                "a": "b"
-            }
-        }
+        self.function_dict = {"Type": "AWS::Serverless::Function", "Properties": {"a": "b"}}
 
-        self.api_dict = {
-            "Type": "AWS::Serverless::Api",
-            "Properties": {
-                "a": "b"
-            }
-        }
+        self.api_dict = {"Type": "AWS::Serverless::Api", "Properties": {"a": "b"}}
 
-        self.simple_table_dict = {
-            "Type": "AWS::Serverless::SimpleTable",
-            "Properties": {
-                "a": "b"
-            }
-        }
+        self.simple_table_dict = {"Type": "AWS::Serverless::SimpleTable", "Properties": {"a": "b"}}
 
     def test_init_must_extract_type_and_properties(self):
-        resource_dict = {
-            "Type": "foo",
-            "Properties": {
-                "a": "b"
-            }
-        }
+        resource_dict = {"Type": "foo", "Properties": {"a": "b"}}
 
         resource = SamResource(resource_dict)
         self.assertEqual(resource.type, "foo")
@@ -58,12 +38,7 @@ class TestSamResource(TestCase):
         self.assertFalse(SamResource({"a": "b"}).valid())
 
     def test_to_dict_must_update_type_and_properties(self):
-        resource_dict = {
-            "Type": "AWS::Serverless::Function",
-            "Properties": {
-                "a": "b"
-            }
-        }
+        resource_dict = {"Type": "AWS::Serverless::Function", "Properties": {"a": "b"}}
 
         resource = SamResource(resource_dict)
         resource.type = "AWS::Serverless::Api"
@@ -76,7 +51,6 @@ class TestSamResource(TestCase):
 
 
 class TestSamResourceTypeEnum(TestCase):
-
     def test_contains_sam_resources(self):
         self.assertEqual(SamResourceType.Function.value, "AWS::Serverless::Function")
         self.assertEqual(SamResourceType.Api.value, "AWS::Serverless::Api")

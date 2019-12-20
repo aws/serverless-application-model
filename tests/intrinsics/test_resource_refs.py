@@ -1,8 +1,8 @@
 from unittest import TestCase
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 
-class TestSupportedResourceReferences(TestCase):
 
+class TestSupportedResourceReferences(TestCase):
     def test_add_multiple_properties_to_one_logicalId(self):
 
         resource_refs = SupportedResourceReferences()
@@ -11,11 +11,7 @@ class TestSupportedResourceReferences(TestCase):
         resource_refs.add("logicalId", "property2", "value2")
         resource_refs.add("logicalId", "property3", "value3")
 
-        expected = {
-            "property1": "value1",
-            "property2": "value2",
-            "property3": "value3"
-        }
+        expected = {"property1": "value1", "property2": "value2", "property3": "value3"}
 
         self.assertEqual(expected, resource_refs.get_all("logicalId"))
 
@@ -83,7 +79,6 @@ class TestSupportedResourceReferences(TestCase):
         resource_refs.add("logicalId1", "property1", "value1")
         self.assertEqual(None, resource_refs.get("logicalId1", "SomeProperty"))
         self.assertEqual(None, resource_refs.get("SomeLogicalId", "property1"))
-
 
     def test_len_single_resource(self):
         resource_refs = SupportedResourceReferences()

@@ -8,7 +8,6 @@ IMPLICIT_API_LOGICAL_ID = "ServerlessRestApi"
 
 
 class TestDefaultDefinitionBodyPlugin_init(TestCase):
-
     def setUp(self):
         self.plugin = DefaultDefinitionBodyPlugin()
 
@@ -23,7 +22,6 @@ class TestDefaultDefinitionBodyPlugin_init(TestCase):
 
 
 class TestDefaultDefinitionBodyPlugin_on_before_transform_template(TestCase):
-
     def setUp(self):
         self.plugin = DefaultDefinitionBodyPlugin()
 

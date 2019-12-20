@@ -4,9 +4,8 @@ from samtranslator.model.intrinsics import fnGetAtt, ref
 
 
 class SQSQueue(Resource):
-    resource_type = 'AWS::SQS::Queue'
-    property_types = {
-    }
+    resource_type = "AWS::SQS::Queue"
+    property_types = {}
     runtime_attrs = {
         "queue_url": lambda self: ref(self.logical_id),
         "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),
@@ -14,31 +13,24 @@ class SQSQueue(Resource):
 
 
 class SQSQueuePolicy(Resource):
-    resource_type = 'AWS::SQS::QueuePolicy'
-    property_types = {
-        'PolicyDocument': PropertyType(True, is_type(dict)),
-        'Queues': PropertyType(True, list_of(str)),
-    }
-    runtime_attrs = {
-        "arn": lambda self: fnGetAtt(self.logical_id, "Arn")
-    }
+    resource_type = "AWS::SQS::QueuePolicy"
+    property_types = {"PolicyDocument": PropertyType(True, is_type(dict)), "Queues": PropertyType(True, list_of(str))}
+    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
 
 class SQSQueuePolicies:
     @classmethod
     def sns_topic_send_message_role_policy(cls, topic_arn, queue_arn):
         document = {
-            'Version': '2012-10-17',
-            'Statement': [{
-                'Action': 'sqs:SendMessage',
-                'Effect': 'Allow',
-                'Principal': '*',
-                'Resource': queue_arn,
-                'Condition': {
-                    'ArnEquals': {
-                        'aws:SourceArn': topic_arn
-                    }
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "sqs:SendMessage",
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Resource": queue_arn,
+                    "Condition": {"ArnEquals": {"aws:SourceArn": topic_arn}},
                 }
-            }]
+            ],
         }
         return document

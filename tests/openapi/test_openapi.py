@@ -7,7 +7,7 @@ from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.model.exceptions import InvalidDocumentException
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
-_X_ANY_METHOD = 'x-amazon-apigateway-any-method'
+_X_ANY_METHOD = "x-amazon-apigateway-any-method"
 
 
 # TODO: add a case for swagger and make sure it fails
@@ -18,10 +18,7 @@ class TestOpenApiEditor_init(TestCase):
 
         valid_swagger = {
             "swagger": "2.0",  # "openapi": "2.1.0"
-            "paths": {
-                "/foo": {},
-                "/bar": {}
-            }
+            "paths": {"/foo": {}, "/bar": {}},
         }  # missing openapi key word
         with self.assertRaises(ValueError):
             OpenApiEditor(valid_swagger)
@@ -33,13 +30,7 @@ class TestOpenApiEditor_init(TestCase):
             OpenApiEditor(invalid_openapi)
 
     def test_must_succeed_on_valid_openapi(self):
-        valid_openapi = {
-            "openapi": "3.0.1",
-            "paths": {
-                "/foo": {},
-                "/bar": {}
-            }
-        }
+        valid_openapi = {"openapi": "3.0.1", "paths": {"/foo": {}, "/bar": {}}}
 
         editor = OpenApiEditor(valid_openapi)
         self.assertIsNotNone(editor)
@@ -47,37 +38,19 @@ class TestOpenApiEditor_init(TestCase):
         self.assertEqual(editor.paths, {"/foo": {}, "/bar": {}})
 
     def test_must_fail_on_invalid_openapi_version(self):
-        invalid_openapi = {
-            "openapi": "2.3.0",
-            "paths": {
-                "/foo": {},
-                "/bar": {}
-            }
-        }
+        invalid_openapi = {"openapi": "2.3.0", "paths": {"/foo": {}, "/bar": {}}}
 
         with self.assertRaises(ValueError):
             OpenApiEditor(invalid_openapi)
 
     def test_must_fail_on_invalid_openapi_version_2(self):
-        invalid_openapi = {
-            "openapi": "3.1.1.1",
-            "paths": {
-                "/foo": {},
-                "/bar": {}
-            }
-        }
+        invalid_openapi = {"openapi": "3.1.1.1", "paths": {"/foo": {}, "/bar": {}}}
 
         with self.assertRaises(ValueError):
             OpenApiEditor(invalid_openapi)
 
     def test_must_succeed_on_valid_openapi3(self):
-        valid_openapi = {
-            "openapi": "3.0.1",
-            "paths": {
-                "/foo": {},
-                "/bar": {}
-            }
-        }
+        valid_openapi = {"openapi": "3.0.1", "paths": {"/foo": {}, "/bar": {}}}
 
         editor = OpenApiEditor(valid_openapi)
         self.assertIsNotNone(editor)
@@ -86,21 +59,14 @@ class TestOpenApiEditor_init(TestCase):
 
 
 class TestOpenApiEditor_has_path(TestCase):
-
     def setUp(self):
         self.openapi = {
             "openapi": "3.0.1",
             "paths": {
-                "/foo": {
-                    "get": {},
-                    "somemethod": {}
-                },
-                "/bar": {
-                    "post": {},
-                    _X_ANY_METHOD: {}
-                },
-                "badpath": "string value"
-            }
+                "/foo": {"get": {}, "somemethod": {}},
+                "/bar": {"post": {}, _X_ANY_METHOD: {}},
+                "badpath": "string value",
+            },
         }
 
         self.editor = OpenApiEditor(self.openapi)
@@ -146,48 +112,19 @@ class TestOpenApiEditor_has_path(TestCase):
 
 
 class TestOpenApiEditor_has_integration(TestCase):
-
     def setUp(self):
         self.openapi = {
             "openapi": "3.0.1",
             "paths": {
                 "/foo": {
-                    "get": {
-                        _X_INTEGRATION: {
-                            "a": "b"
-                        }
-                    },
-                    "post": {
-                        "Fn::If": [
-                            "Condition",
-                            {
-                                _X_INTEGRATION: {
-                                    "a": "b"
-                                }
-                            },
-                            {"Ref": "AWS::NoValue"}
-                        ]
-                    },
-                    "delete": {
-                        "Fn::If": [
-                            "Condition",
-                            {"Ref": "AWS::NoValue"},
-                            {
-                                _X_INTEGRATION: {
-                                    "a": "b"
-                                }
-                            }
-                        ]
-                    },
-                    "somemethod": {
-                        "foo": "value",
-                    },
-                    "emptyintegration": {
-                        _X_INTEGRATION: {}
-                    },
-                    "badmethod": "string value"
-                },
-            }
+                    "get": {_X_INTEGRATION: {"a": "b"}},
+                    "post": {"Fn::If": ["Condition", {_X_INTEGRATION: {"a": "b"}}, {"Ref": "AWS::NoValue"}]},
+                    "delete": {"Fn::If": ["Condition", {"Ref": "AWS::NoValue"}, {_X_INTEGRATION: {"a": "b"}}]},
+                    "somemethod": {"foo": "value"},
+                    "emptyintegration": {_X_INTEGRATION: {}},
+                    "badmethod": "string value",
+                }
+            },
         }
 
         self.editor = OpenApiEditor(self.openapi)
@@ -212,32 +149,27 @@ class TestOpenApiEditor_has_integration(TestCase):
 
 
 class TestOpenApiEditor_add_path(TestCase):
-
     def setUp(self):
 
         self.original_openapi = {
             "openapi": "3.0.1",
-            "paths": {
-                "/foo": {
-                    "get": {"a": "b"}
-                },
-                "/bar": {},
-                "/badpath": "string value"
-            }
+            "paths": {"/foo": {"get": {"a": "b"}}, "/bar": {}, "/badpath": "string value"},
         }
 
         self.editor = OpenApiEditor(self.original_openapi)
 
-    @parameterized.expand([
-        param("/new", "get", "new path, new method"),
-        param("/foo", "new method", "existing path, new method"),
-        param("/bar", "get", "existing path, new method"),
-    ])
+    @parameterized.expand(
+        [
+            param("/new", "get", "new path, new method"),
+            param("/foo", "new method", "existing path, new method"),
+            param("/bar", "get", "existing path, new method"),
+        ]
+    )
     def test_must_add_new_path_and_method(self, path, method, case):
 
         self.assertFalse(self.editor.has_path(path, method))
         self.editor.add_path(path, method)
-        self.assertTrue(self.editor.has_path(path, method), "must add for "+case)
+        self.assertTrue(self.editor.has_path(path, method), "must add for " + case)
         self.assertEqual(self.editor.openapi["paths"][path][method], {})
 
     def test_must_raise_non_dict_path_values(self):
@@ -264,28 +196,14 @@ class TestOpenApiEditor_add_path(TestCase):
 
 
 class TestOpenApiEditor_add_lambda_integration(TestCase):
-
     def setUp(self):
 
         self.original_openapi = {
             "openapi": "3.0.1",
             "paths": {
-                "/foo": {
-                    "post": {
-                        "a": [1, 2, "b"],
-                        "responses": {
-                            "something": "is already here"
-                        }
-                    }
-                },
-                "/bar": {
-                    "get": {
-                        _X_INTEGRATION: {
-                            "a": "b"
-                        }
-                    }
-                },
-            }
+                "/foo": {"post": {"a": [1, 2, "b"], "responses": {"something": "is already here"}}},
+                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
+            },
         }
 
         self.editor = OpenApiEditor(self.original_openapi)
@@ -300,8 +218,8 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
                 "type": "aws_proxy",
                 "httpMethod": "POST",
                 "payloadFormatVersion": "1.0",
-                "uri": integration_uri
-            }
+                "uri": integration_uri,
+            },
         }
 
         self.editor.add_lambda_integration(path, method, integration_uri)
@@ -324,20 +242,10 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
                         "type": "aws_proxy",
                         "httpMethod": "POST",
                         "payloadFormatVersion": "1.0",
-                        "uri": {
-                            "Fn::If": [
-                                "condition",
-                                integration_uri,
-                                {
-                                    "Ref": "AWS::NoValue"
-                                }
-                            ]
-                        }
-                    }
+                        "uri": {"Fn::If": ["condition", integration_uri, {"Ref": "AWS::NoValue"}]},
+                    },
                 },
-                {
-                    "Ref": "AWS::NoValue"
-                }
+                {"Ref": "AWS::NoValue"},
             ]
         }
 
@@ -354,19 +262,15 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
         expected = {
             # Current values present in the dictionary *MUST* be preserved
             "a": [1, 2, "b"],
-
             # Responses key must be untouched
-            "responses": {
-                "something": "is already here"
-            },
-
+            "responses": {"something": "is already here"},
             # New values must be added
             _X_INTEGRATION: {
                 "type": "aws_proxy",
                 "httpMethod": "POST",
                 "payloadFormatVersion": "1.0",
-                "uri": integration_uri
-            }
+                "uri": integration_uri,
+            },
         }
 
         # Just make sure test is working on an existing path
@@ -379,17 +283,9 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
 
 
 class TestOpenApiEditor_iter_on_path(TestCase):
-
     def setUp(self):
 
-        self.original_openapi = {
-            "openapi": "3.0.1",
-            "paths": {
-                "/foo": {},
-                "/bar": {},
-                "/baz": "some value"
-            }
-        }
+        self.original_openapi = {"openapi": "3.0.1", "paths": {"/foo": {}, "/bar": {}, "/baz": "some value"}}
 
         self.editor = OpenApiEditor(self.original_openapi)
 
@@ -402,27 +298,24 @@ class TestOpenApiEditor_iter_on_path(TestCase):
 
 
 class TestOpenApiEditor_normalize_method_name(TestCase):
-
-    @parameterized.expand([
-        param("GET", "get", "must lowercase"),
-        param("PoST", "post", "must lowercase"),
-        param("ANY", _X_ANY_METHOD, "must convert any method"),
-        param(None, None, "must skip empty values"),
-        param({"a": "b"}, {"a": "b"}, "must skip non-string values"),
-        param([1, 2], [1, 2], "must skip non-string values"),
-    ])
+    @parameterized.expand(
+        [
+            param("GET", "get", "must lowercase"),
+            param("PoST", "post", "must lowercase"),
+            param("ANY", _X_ANY_METHOD, "must convert any method"),
+            param(None, None, "must skip empty values"),
+            param({"a": "b"}, {"a": "b"}, "must skip non-string values"),
+            param([1, 2], [1, 2], "must skip non-string values"),
+        ]
+    )
     def test_must_normalize(self, input, expected, msg):
         self.assertEqual(expected, OpenApiEditor._normalize_method_name(input), msg)
 
 
 class TestOpenApiEditor_openapi_property(TestCase):
-
     def test_must_return_copy_of_openapi(self):
 
-        input = {
-            "openapi": "3.0.1",
-            "paths": {}
-        }
+        input = {"openapi": "3.0.1", "paths": {}}
 
         editor = OpenApiEditor(input)
         self.assertEqual(input, editor.openapi)  # They are equal in content
@@ -435,63 +328,47 @@ class TestOpenApiEditor_openapi_property(TestCase):
 
 
 class TestOpenApiEditor_is_valid(TestCase):
-
-    @parameterized.expand([
-        param(OpenApiEditor.gen_skeleton()),
-
-        # Dict can contain any other unrecognized properties
-        param({"openapi": "3.1.1", "paths": {}, "foo": "bar", "baz": "bar"})
-        # TODO check and update the regex accordingly
-        # Fails for this: param({"openapi": "3.1.10", "paths": {}, "foo": "bar", "baz": "bar"})
-    ])
+    @parameterized.expand(
+        [
+            param(OpenApiEditor.gen_skeleton()),
+            # Dict can contain any other unrecognized properties
+            param({"openapi": "3.1.1", "paths": {}, "foo": "bar", "baz": "bar"})
+            # TODO check and update the regex accordingly
+            # Fails for this: param({"openapi": "3.1.10", "paths": {}, "foo": "bar", "baz": "bar"})
+        ]
+    )
     def test_must_work_on_valid_values(self, openapi):
         self.assertTrue(OpenApiEditor.is_valid(openapi))
 
-    @parameterized.expand([
-        ({}, "empty dictionary"),
-        ([1, 2, 3], "array data type"),
-        ({"paths": {}}, "missing openapi property"),
-        ({"openapi": "hello"}, "missing paths property"),
-        ({"openapi": "hello", "paths": [1, 2, 3]}, "array value for paths property"),
-    ])
+    @parameterized.expand(
+        [
+            ({}, "empty dictionary"),
+            ([1, 2, 3], "array data type"),
+            ({"paths": {}}, "missing openapi property"),
+            ({"openapi": "hello"}, "missing paths property"),
+            ({"openapi": "hello", "paths": [1, 2, 3]}, "array value for paths property"),
+        ]
+    )
     def test_must_fail_for_invalid_values(self, data, case):
         self.assertFalse(OpenApiEditor.is_valid(data), "openapi dictionary with {} must not be valid".format(case))
 
 
 # TODO this needs to be updated with OIDC auth - authorization scopes and anything else that needs testing the swagger
 class TestOpenApiEditor_add_auth(TestCase):
-
     def setUp(self):
 
         self.original_openapi = {
             "openapi": "3.0.1",
             "paths": {
-                "/foo": {
-                    "get": {
-                        _X_INTEGRATION: {
-                            "a": "b"
-                        }
-                    },
-                    "post":{
-                        _X_INTEGRATION: {
-                            "a": "b"
-                        }
-                    }
-                },
-                "/bar": {
-                    "get": {
-                        _X_INTEGRATION: {
-                            "a": "b"
-                        }
-                    }
-                },
-            }
+                "/foo": {"get": {_X_INTEGRATION: {"a": "b"}}, "post": {_X_INTEGRATION: {"a": "b"}}},
+                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
+            },
         }
 
         self.editor = OpenApiEditor(self.original_openapi)
 
-class TestOpenApiEditor_get_integration_function(TestCase):
 
+class TestOpenApiEditor_get_integration_function(TestCase):
     def setUp(self):
 
         self.original_openapi = {
@@ -500,43 +377,41 @@ class TestOpenApiEditor_get_integration_function(TestCase):
                 "$default": {
                     "x-amazon-apigateway-any-method": {
                         "Fn::If": [
-                        "condition", 
-                        {
-                            "security": [
+                            "condition",
                             {
-                                "OpenIdAuth": [
-                                "scope1", 
-                                "scope2"
-                                ]
+                                "security": [{"OpenIdAuth": ["scope1", "scope2"]}],
+                                "isDefaultRoute": True,
+                                "x-amazon-apigateway-integration": {
+                                    "httpMethod": "POST",
+                                    "type": "aws_proxy",
+                                    "uri": {
+                                        "Fn::If": [
+                                            "condition",
+                                            {
+                                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
+                                            },
+                                            {"Ref": "AWS::NoValue"},
+                                        ]
+                                    },
+                                    "payloadFormatVersion": "1.0",
+                                },
+                                "responses": {},
                             },
-                            ], 
-                            "isDefaultRoute": True, 
-                            "x-amazon-apigateway-integration": {
-                                "httpMethod": "POST", 
-                                "type": "aws_proxy", 
-                                "uri": {
-                                    "Fn::If": [
-                                    "condition", 
-                                    {"Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"}, 
-                                    {"Ref": "AWS::NoValue"}
-                                    ]
-                                }, 
-                                "payloadFormatVersion": "1.0"
-                            }, 
-                            "responses": {}
-                        }, 
-                        {"Ref": "AWS::NoValue"}
+                            {"Ref": "AWS::NoValue"},
                         ]
                     }
-                    },
+                },
                 "/bar": {},
-                "/badpath": "string value"
-            }
+                "/badpath": "string value",
+            },
         }
 
         self.editor = OpenApiEditor(self.original_openapi)
 
     def test_must_get_integration_function_if_exists(self):
 
-        self.assertEqual(self.editor.get_integration_function_logical_id(OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD), "HttpApiFunction")
+        self.assertEqual(
+            self.editor.get_integration_function_logical_id(OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD),
+            "HttpApiFunction",
+        )
         self.assertFalse(self.editor.get_integration_function_logical_id("/bar", "get"))
