@@ -106,23 +106,24 @@ Resources:
                 - scope4
               responses: {}
         openapi: 3.0.1
-        securitySchemes:
-          oauth2Auth:
-            type: oauth2
-            x-amazon-apigateway-authorizer:
-              identitySource: "$request.querystring.param"
-              type: jwt
-              jwtConfiguration:
-                audience:
-                - MyApi
-                issuer: https://www.example.com/v1/connect/oidc
-          OpenIdAuth:
-            type: openIdConnect
-            x-amazon-apigateway-authorizer:
-              identitySource: "$request.querystring.param"
-              type: jwt
-              jwtConfiguration:
-                audience:
-                - MyApi
-                issuer: https://www.example.com/v1/connect/oidc
-              openIdConnectUrl: https://www.example.com/v1/connect
+        components:
+          securitySchemes:
+            oauth2Auth:
+              type: oauth2
+              x-amazon-apigateway-authorizer:
+                identitySource: "$request.querystring.param"
+                type: jwt
+                jwtConfiguration:
+                  audience:
+                  - MyApi
+                  issuer: https://www.example.com/v1/connect/oidc
+            OpenIdAuth:
+              type: openIdConnect
+              x-amazon-apigateway-authorizer:
+                identitySource: "$request.querystring.param"
+                type: jwt
+                jwtConfiguration:
+                  audience:
+                  - MyApi
+                  issuer: https://www.example.com/v1/connect/oidc
+                openIdConnectUrl: https://www.example.com/v1/connect
