@@ -59,7 +59,7 @@
       "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "events.amazonaws.com",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
