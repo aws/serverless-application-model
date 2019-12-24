@@ -31,12 +31,18 @@ class Translator:
         self.plugins = plugins
         self.sam_parser = sam_parser
 
-    def _get_function_names(self, resource_dict, parameter_values, intrinsics_resolver):
+    def _get_function_names(self, resource_dict, intrinsics_resolver):
+        """
+        :param resource_dict: AWS::Serverless::Function resource is provided as input
+        :param intrinsics_resolver: to resolve intrinsics for function_name
+        :return: a dictionary containing api_logical_id as the key and concatenated String of all function_names
+                 associated with this api as the value
+        """
         if resource_dict.get("Type") and resource_dict.get("Type").strip() == 'AWS::Serverless::Function':
             if resource_dict.get('Properties') and resource_dict.get('Properties').get('Events'):
                 events = list(resource_dict.get('Properties').get('Events').values())
                 for item in events:
-                    # If the function event type is `Api`then gets the function name and
+                    # If the function event type is `Api` then gets the function name and
                     # adds to the function_names dict with key as the api_name and value as the function_name
                     if item.get('Type') == 'Api' and item.get('Properties') and item.get('Properties').get('RestApiId'):
                         rest_api = item.get('Properties').get('RestApiId')
@@ -45,21 +51,11 @@ class Translator:
                         else:
                             api_name = item.get('Properties').get('RestApiId')
                         if api_name:
-                            function_name = resource_dict.get('Properties').get('FunctionName')
-                            # if type(function_name) == str:
-                                # All the function_names for associated functions will be concatenated
-                            print("init value....", resource_dict.get('Properties').get('FunctionName'))
-                            print("resolvedd......", intrinsics_resolver.resolve_parameter_refs(resource_dict.get('Properties').get('FunctionName')))
-                            self.function_names[api_name] = self.function_names.get(api_name, "") + intrinsics_resolver.resolve_parameter_refs(resource_dict.get('Properties').get('FunctionName'))
-                            # Resolving intrinsics and gets the function name
-                            # This gets the function names only for Ref and Fn::Sub intrinsics
-                            # elif type(function_name) == dict:
-                                # if function_name.get('Ref'):
-                                    # self.function_names[api_name] = self.function_names.get(api_name, "") + \
-                                        # parameter_values.get(function_name.get('Ref'))
-                                # if function_name.get('Fn::Sub'):
-                                    # self.function_names[api_name] = self.function_names.get(api_name, "") + \
-                                        # parameter_values.get(function_name.get('Fn::Sub'))
+                            function_name = intrinsics_resolver.resolve_parameter_refs(resource_dict.get('Properties')
+                                                                                       .get('FunctionName'))
+                            if function_name:
+                                self.function_names[api_name] = self.function_names.get(api_name, "") + \
+                                                                str(function_name)
         return self.function_names
 
     def translate(self, sam_template, parameter_values):
@@ -115,7 +111,7 @@ class Translator:
                 kwargs['conditions'] = template.get('Conditions')
                 # add the value of FunctionName property if the function is referenced with the api resource
                 self.redeploy_restapi_parameters['function_names'] = self._get_function_names(resource_dict,
-                                                                                              parameter_values, intrinsics_resolver)
+                                                                                              intrinsics_resolver)
                 kwargs['redeploy_restapi_parameters'] = self.redeploy_restapi_parameters
                 translated = macro.to_cloudformation(**kwargs)
 

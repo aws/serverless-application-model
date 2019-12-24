@@ -105,8 +105,10 @@ class ApiGatewayDeployment(Resource):
             function_names = redeploy_restapi_parameters.get('function_names')
         else:
             function_names = None
+        # The deployment logical id is <api logicalId> + "Deployment"
+        # The keyword "Deployment" is removed and all the function names associated with api is obtained
         if function_names and function_names.get(self.logical_id[:-10], None):
-            hash_input.append(str(function_names.get(self.logical_id[:-10], "")))
+            hash_input.append(function_names.get(self.logical_id[:-10], ""))
         data = self._X_HASH_DELIMITER.join(hash_input)
         generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
         self.logical_id = generator.gen()
