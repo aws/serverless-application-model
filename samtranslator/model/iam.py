@@ -91,3 +91,31 @@ class IAMRolePolicies():
             }
         }
         return document
+
+    @classmethod
+    def event_bus_put_events_role_policy(cls, event_bus_arn, logical_id):
+        document = {
+            'PolicyName': logical_id + 'EventBridgePolicy',
+            'PolicyDocument': {
+                'Statement': [{
+                    'Action': 'events:PutEvents',
+                    'Effect': 'Allow',
+                    'Resource': event_bus_arn
+                }]
+            }
+        }
+        return document
+
+    @classmethod
+    def lambda_invoke_function_role_policy(cls, function_arn, logical_id):
+        document = {
+            'PolicyName': logical_id + 'LambdaPolicy',
+            'PolicyDocument': {
+                'Statement': [{
+                    'Action': 'lambda:InvokeFunction',
+                    'Effect': 'Allow',
+                    'Resource': function_arn
+                }]
+            }
+        }
+        return document

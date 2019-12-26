@@ -69,6 +69,7 @@ Currently, the following resources and properties are being supported:
       DeploymentPreference:
       PermissionsBoundary:
       ReservedConcurrentExecutions:
+      EventInvokeConfig:
 
     Api:
       # Properties of AWS::Serverless::Api

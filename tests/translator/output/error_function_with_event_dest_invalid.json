@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyTestFunction] is invalid. Destination is required if Type is not ['SQS', 'SNS']"
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyTestFunction] is invalid. Destination is required if Type is not ['SQS', 'SNS']"
+}
