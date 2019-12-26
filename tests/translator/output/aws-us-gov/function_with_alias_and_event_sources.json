@@ -24,7 +24,7 @@
     "MyAwesomeFunctionNotificationTopicPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "sns.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -59,7 +59,7 @@
     "MyAwesomeFunctionCWEventPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -75,7 +75,7 @@
     "MyAwesomeFunctionEBRulePermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "events.amazonaws.com",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -132,7 +132,7 @@
     "MyAwesomeFunctionImplicitApiPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -163,7 +163,7 @@
     "MyAwesomeFunctionIoTRulePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Fn::Sub": "${AWS::AccountId}"
         }, 
@@ -198,7 +198,7 @@
     "MyAwesomeFunctionS3TriggerPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         }, 
@@ -229,7 +229,7 @@
     "MyAwesomeFunctionCWLogPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "logs.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -417,7 +417,7 @@
     "MyAwesomeFunctionEBSchedulePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -470,7 +470,7 @@
     "MyAwesomeFunctionExplicitApiPermissionStage": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"

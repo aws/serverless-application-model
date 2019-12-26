@@ -28,7 +28,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "sns.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -42,7 +42,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -59,7 +59,7 @@
       "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "events.amazonaws.com",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -120,7 +120,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Fn::Sub": "${AWS::AccountId}"
         }, 
@@ -157,7 +157,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         }, 
@@ -171,7 +171,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "logs.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -332,7 +332,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -348,7 +348,7 @@
     "FunctionOneImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         },
