@@ -38,7 +38,7 @@ class Globals(object):
             "PermissionsBoundary",
             "ReservedConcurrentExecutions",
             "ProvisionedConcurrencyConfig",
-            "AssumeRolePolicyDocument"
+            "AssumeRolePolicyDocument",
             "EventInvokeConfig"
         ],
 
