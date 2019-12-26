@@ -37,7 +37,9 @@ class Globals(object):
             "DeploymentPreference",
             "PermissionsBoundary",
             "ReservedConcurrentExecutions",
-            "ProvisionedConcurrencyConfig"
+            "ProvisionedConcurrencyConfig",
+            "AssumeRolePolicyDocument",
+            "EventInvokeConfig"
         ],
 
         # Everything except
