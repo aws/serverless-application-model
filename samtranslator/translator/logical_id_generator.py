@@ -62,10 +62,10 @@ class LogicalIdGenerator(object):
         if sys.version_info.major == 2:
             # In Py2, only unicode needs to be encoded.
             if isinstance(self.data_str, unicode):
-                encoded_data_str = self.data_str.encode('utf-8')
+                encoded_data_str = self.data_str.encode("utf-8")
         else:
             # data_str should always be unicode on python 3
-            encoded_data_str = self.data_str.encode('utf-8')
+            encoded_data_str = self.data_str.encode("utf-8")
 
         data_hash = hashlib.sha1(encoded_data_str).hexdigest()
 
@@ -87,4 +87,4 @@ class LogicalIdGenerator(object):
             return data
 
         # Get the most compact dictionary (separators) and sort the keys recursively to get a stable output
-        return json.dumps(data, separators=(',', ':'), sort_keys=True)
+        return json.dumps(data, separators=(",", ":"), sort_keys=True)

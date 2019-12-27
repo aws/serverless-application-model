@@ -1,0 +1,7 @@
+repos:
+  - repo: https://github.com/python/black
+    rev: 19.3b0
+    hooks:
+      - id: black
+        language_version: python3.7
+        exclude_types: ['markdown', 'ini', 'toml', 'rst']

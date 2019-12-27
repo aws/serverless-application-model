@@ -78,9 +78,8 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
                 raise InvalidEventException(logicalId, "Api Event must have a String specified for '{}'.".format(key))
 
             # !Ref is resolved by this time. If it is still a dict, we can't parse/use this Api.
-            if (isinstance(api_id, dict)):
-                raise InvalidEventException(logicalId,
-                                            "Api Event must reference an Api in the same template.")
+            if isinstance(api_id, dict):
+                raise InvalidEventException(logicalId, "Api Event must reference an Api in the same template.")
 
             api_dict = self.api_conditions.setdefault(api_id, {})
             method_conditions = api_dict.setdefault(path, {})
@@ -133,8 +132,8 @@ class ImplicitHttpApiResource(SamResource):
                 "DefinitionBody": open_api,
                 # Internal property that means Event source code can add Events. Used only for implicit APIs, to
                 # prevent back compatibility issues for explicit APIs
-                "__MANAGE_SWAGGER": True
-            }
+                "__MANAGE_SWAGGER": True,
+            },
         }
 
         super(ImplicitHttpApiResource, self).__init__(resource)

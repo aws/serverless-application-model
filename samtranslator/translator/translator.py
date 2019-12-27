@@ -2,8 +2,12 @@ import copy
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
-from samtranslator.model.exceptions import (InvalidDocumentException, InvalidResourceException,
-                                            DuplicateLogicalIdException, InvalidEventException)
+from samtranslator.model.exceptions import (
+    InvalidDocumentException,
+    InvalidResourceException,
+    DuplicateLogicalIdException,
+    InvalidEventException,
+)
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
@@ -20,6 +24,7 @@ from samtranslator.sdk.parameter import SamParameterValues
 class Translator:
     """Translates SAM templates into CloudFormation templates
     """
+
     def __init__(self, managed_policy_map, sam_parser, plugins=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
@@ -53,17 +58,14 @@ class Translator:
         # Create & Install plugins
         sam_plugins = prepare_plugins(self.plugins, parameter_values)
 
-        self.sam_parser.parse(
-            sam_template=sam_template,
-            parameter_values=parameter_values,
-            sam_plugins=sam_plugins
-        )
+        self.sam_parser.parse(sam_template=sam_template, parameter_values=parameter_values, sam_plugins=sam_plugins)
 
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)
         intrinsics_resolver = IntrinsicsResolver(parameter_values)
-        mappings_resolver = IntrinsicsResolver(template.get('Mappings', {}),
-                                               {FindInMapAction.intrinsic_name: FindInMapAction()})
+        mappings_resolver = IntrinsicsResolver(
+            template.get("Mappings", {}), {FindInMapAction.intrinsic_name: FindInMapAction()}
+        )
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
         document_errors = []
@@ -71,16 +73,16 @@ class Translator:
 
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
-                macro = macro_resolver\
-                    .resolve_resource_type(resource_dict)\
-                    .from_dict(logical_id, resource_dict, sam_plugins=sam_plugins)
+                macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(
+                    logical_id, resource_dict, sam_plugins=sam_plugins
+                )
 
-                kwargs = macro.resources_to_link(sam_template['Resources'])
-                kwargs['managed_policy_map'] = self.managed_policy_map
-                kwargs['intrinsics_resolver'] = intrinsics_resolver
-                kwargs['mappings_resolver'] = mappings_resolver
-                kwargs['deployment_preference_collection'] = deployment_preference_collection
-                kwargs['conditions'] = template.get('Conditions')
+                kwargs = macro.resources_to_link(sam_template["Resources"])
+                kwargs["managed_policy_map"] = self.managed_policy_map
+                kwargs["intrinsics_resolver"] = intrinsics_resolver
+                kwargs["mappings_resolver"] = mappings_resolver
+                kwargs["deployment_preference_collection"] = deployment_preference_collection
+                kwargs["conditions"] = template.get("Conditions")
 
                 translated = macro.to_cloudformation(**kwargs)
 
@@ -90,24 +92,25 @@ class Translator:
                 if logical_id != macro.logical_id:
                     changed_logical_ids[logical_id] = macro.logical_id
 
-                del template['Resources'][logical_id]
+                del template["Resources"][logical_id]
                 for resource in translated:
-                    if verify_unique_logical_id(resource, sam_template['Resources']):
-                        template['Resources'].update(resource.to_dict())
+                    if verify_unique_logical_id(resource, sam_template["Resources"]):
+                        template["Resources"].update(resource.to_dict())
                     else:
-                        document_errors.append(DuplicateLogicalIdException(
-                            logical_id, resource.logical_id, resource.resource_type))
+                        document_errors.append(
+                            DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)
+                        )
             except (InvalidResourceException, InvalidEventException) as e:
                 document_errors.append(e)
 
         if deployment_preference_collection.any_enabled():
-            template['Resources'].update(deployment_preference_collection.codedeploy_application.to_dict())
+            template["Resources"].update(deployment_preference_collection.codedeploy_application.to_dict())
 
             if not deployment_preference_collection.can_skip_service_role():
-                template['Resources'].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
+                template["Resources"].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
-                template['Resources'].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
+                template["Resources"].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
 
         # Run the after-transform plugin target
         try:
@@ -116,8 +119,8 @@ class Translator:
             document_errors.append(e)
 
         # Cleanup
-        if 'Transform' in template:
-            del template['Transform']
+        if "Transform" in template:
+            del template["Transform"]
 
         if len(document_errors) == 0:
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
@@ -197,12 +200,14 @@ def prepare_plugins(plugins, parameters={}):
 def make_implicit_rest_api_plugin():
     # This is necessary to prevent a circular dependency on imports when loading package
     from samtranslator.plugins.api.implicit_rest_api_plugin import ImplicitRestApiPlugin
+
     return ImplicitRestApiPlugin()
 
 
 def make_implicit_http_api_plugin():
     # This is necessary to prevent a circular dependency on imports when loading package
     from samtranslator.plugins.api.implicit_http_api_plugin import ImplicitHttpApiPlugin
+
     return ImplicitHttpApiPlugin()
 
 

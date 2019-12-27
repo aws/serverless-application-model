@@ -7,7 +7,6 @@ DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [R
 
 
 class IntrinsicsResolver(object):
-
     def __init__(self, parameters, supported_intrinsics=DEFAULT_SUPPORTED_INTRINSICS):
         """
         Instantiate the resolver
@@ -20,8 +19,9 @@ class IntrinsicsResolver(object):
         if parameters is None or not isinstance(parameters, dict):
             raise TypeError("parameters must be a valid dictionary")
 
-        if not isinstance(supported_intrinsics, dict) \
-                or not all([isinstance(value, Action) for value in supported_intrinsics.values()]):
+        if not isinstance(supported_intrinsics, dict) or not all(
+            [isinstance(value, Action) for value in supported_intrinsics.values()]
+        ):
             raise TypeError("supported_intrinsics argument must be intrinsic names to corresponding Action classes")
 
         self.supported_intrinsics = supported_intrinsics
@@ -217,6 +217,4 @@ class IntrinsicsResolver(object):
         :return: True, if the input contains a supported intrinsic function.  False otherwise
         """
         # All intrinsic functions are dictionaries with just one key
-        return isinstance(input, dict) \
-            and len(input) == 1 \
-            and list(input.keys())[0] in self.supported_intrinsics
+        return isinstance(input, dict) and len(input) == 1 and list(input.keys())[0] in self.supported_intrinsics

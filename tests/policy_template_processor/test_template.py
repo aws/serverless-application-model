@@ -4,8 +4,8 @@ from mock import Mock, patch, ANY
 from samtranslator.policy_template_processor.template import Template
 from samtranslator.policy_template_processor.exceptions import InvalidParameterValues, InsufficientParameterValues
 
-class TestTemplateObject(TestCase):
 
+class TestTemplateObject(TestCase):
     @patch.object(Template, "check_parameters_exist")
     def test_init_must_check_for_existence_of_all_parameters(self, check_parameters_exist_mock):
 
@@ -26,10 +26,7 @@ class TestTemplateObject(TestCase):
         parameters = {"A": "B"}
         template_definition = {"key": "value"}
 
-        template_dict = {
-            "Parameters": parameters,
-            "Definition": template_definition
-        }
+        template_dict = {"Parameters": parameters, "Definition": template_definition}
 
         template = Template.from_dict(template_name, template_dict)
 
@@ -43,13 +40,11 @@ class TestTemplateObject(TestCase):
         template_name = "template_name"
         template_definition = {"key": "value"}
 
-        template_dict = {
-            "Definition": template_definition
-        }
+        template_dict = {"Definition": template_definition}
 
         template = Template.from_dict(template_name, template_dict)
 
-        self.assertEqual(template.parameters, {}) # Defaults to {}
+        self.assertEqual(template.parameters, {})  # Defaults to {}
         self.assertEqual(template.definition, template_definition)
 
     @patch.object(Template, "check_parameters_exist")
@@ -57,23 +52,16 @@ class TestTemplateObject(TestCase):
         template_name = "template_name"
         parameters = {"key": "value"}
 
-        template_dict = {
-            "Parameters": parameters
-        }
+        template_dict = {"Parameters": parameters}
 
         template = Template.from_dict(template_name, template_dict)
 
         self.assertEqual(template.parameters, parameters)
-        self.assertEqual(template.definition, {}) # Defaults to {}
+        self.assertEqual(template.definition, {})  # Defaults to {}
 
     def test_missing_parameter_values_must_work_when_input_has_less_keys(self):
-        template_parameters = {
-            "param1": {"Description": "foo"},
-            "param2": {"Description": "bar"}
-        }
-        parameter_values = {
-            "param1": "value1"
-        }
+        template_parameters = {"param1": {"Description": "foo"}, "param2": {"Description": "bar"}}
+        parameter_values = {"param1": "value1"}
         expected = ["param2"]
 
         template = Template("name", template_parameters, {})
@@ -82,14 +70,8 @@ class TestTemplateObject(TestCase):
         self.assertEqual(expected, result)
 
     def test_missing_parameter_values_must_work_when_input_has_all_keys(self):
-        template_parameters = {
-            "param1": {"Description": "foo"},
-            "param2": {"Description": "bar"}
-        }
-        parameter_values = {
-            "param1": "value1",
-            "param2": "value3"
-        }
+        template_parameters = {"param1": {"Description": "foo"}, "param2": {"Description": "bar"}}
+        parameter_values = {"param1": "value1", "param2": "value3"}
         expected = []
 
         template = Template("name", template_parameters, {})
@@ -98,16 +80,9 @@ class TestTemplateObject(TestCase):
         self.assertEqual(expected, result)
 
     def test_missing_parameter_values_must_work_when_input_has_more_keys(self):
-        template_parameters = {
-            "param1": {"Description": "foo"},
-            "param2": {"Description": "bar"}
-        }
-        parameter_values = {
-            "param1": "value1",
-            "param2": "value2",
-            "newparam": "new value"
-        }
-        expected = [] # We do a set-difference. So new keys won't make it here
+        template_parameters = {"param1": {"Description": "foo"}, "param2": {"Description": "bar"}}
+        parameter_values = {"param1": "value1", "param2": "value2", "newparam": "new value"}
+        expected = []  # We do a set-difference. So new keys won't make it here
 
         template = Template("name", template_parameters, {})
         result = template.missing_parameter_values(parameter_values)
@@ -115,11 +90,8 @@ class TestTemplateObject(TestCase):
         self.assertEqual(expected, result)
 
     def test_missing_parameter_values_must_raise_on_invalid_input(self):
-        template_parameters = {
-            "param1": {"Description": "foo"},
-            "param2": {"Description": "bar"}
-        }
-        parameter_values = [1,2,3]
+        template_parameters = {"param1": {"Description": "foo"}, "param2": {"Description": "bar"}}
+        parameter_values = [1, 2, 3]
 
         template = Template("name", template_parameters, {})
 
@@ -138,7 +110,7 @@ class TestTemplateObject(TestCase):
 
     def test_is_valid_parameter_values_must_fail_for_non_dict(self):
 
-        parameter_values = [1,2,3]
+        parameter_values = [1, 2, 3]
         self.assertFalse(Template._is_valid_parameter_values(parameter_values))
 
     @patch("samtranslator.policy_template_processor.template.IntrinsicsResolver")
