@@ -52,6 +52,7 @@ def test_redeploy_implicit_api():
             "FirstLambdaFunction": {
                 "Type": "AWS::Serverless::Function",
                 "Properties": {
+                    "FunctionName": "InitialFunction",
                     "CodeUri": "s3://bucket/code.zip",
                     "Handler": "index.handler",
                     "Runtime": "nodejs4.3",
@@ -85,6 +86,10 @@ def test_redeploy_implicit_api():
     # Now, update an unrelated property. This should NOT generate a new deploymentId
     manifest["Resources"]["SecondLambdaFunction"]["Properties"]["Runtime"] = "java"
     assert second_updated_deployment_ids == translate_and_find_deployment_ids(manifest)
+
+    manifest["Resources"]["FirstLambdaFunction"]["Properties"]["FunctionName"] = "ChangedFunctionName"
+    fourth_updated_deployment_ids = translate_and_find_deployment_ids(manifest)
+    assert fourth_updated_deployment_ids != second_updated_deployment_ids
 
 
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

@@ -760,6 +760,7 @@ class SamApi(SamResourceMacro):
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
+        redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
 
         api_generator = ApiGenerator(
             self.logical_id,
@@ -789,7 +790,9 @@ class SamApi(SamResourceMacro):
             domain=self.Domain,
         )
 
-        rest_api, deployment, stage, permissions, domain, basepath_mapping, route53 = api_generator.to_cloudformation()
+        rest_api, deployment, stage, permissions, domain, basepath_mapping, route53 = api_generator.to_cloudformation(
+            redeploy_restapi_parameters
+        )
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)

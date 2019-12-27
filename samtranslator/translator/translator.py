@@ -36,6 +36,35 @@ class Translator:
         self.plugins = plugins
         self.sam_parser = sam_parser
 
+    def _get_function_names(self, resource_dict, intrinsics_resolver):
+        """
+        :param resource_dict: AWS::Serverless::Function resource is provided as input
+        :param intrinsics_resolver: to resolve intrinsics for function_name
+        :return: a dictionary containing api_logical_id as the key and concatenated String of all function_names
+                 associated with this api as the value
+        """
+        if resource_dict.get("Type") and resource_dict.get("Type").strip() == "AWS::Serverless::Function":
+            if resource_dict.get("Properties") and resource_dict.get("Properties").get("Events"):
+                events = list(resource_dict.get("Properties").get("Events").values())
+                for item in events:
+                    # If the function event type is `Api` then gets the function name and
+                    # adds to the function_names dict with key as the api_name and value as the function_name
+                    if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
+                        rest_api = item.get("Properties").get("RestApiId")
+                        if type(rest_api) == dict:
+                            api_name = item.get("Properties").get("RestApiId").get("Ref")
+                        else:
+                            api_name = item.get("Properties").get("RestApiId")
+                        if api_name:
+                            function_name = intrinsics_resolver.resolve_parameter_refs(
+                                resource_dict.get("Properties").get("FunctionName")
+                            )
+                            if function_name:
+                                self.function_names[api_name] = self.function_names.get(api_name, "") + str(
+                                    function_name
+                                )
+        return self.function_names
+
     def translate(self, sam_template, parameter_values):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
@@ -51,6 +80,8 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
+        self.function_names = dict()
+        self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
         sam_parameter_values.add_pseudo_parameter_values()
@@ -70,7 +101,6 @@ class Translator:
         supported_resource_refs = SupportedResourceReferences()
         document_errors = []
         changed_logical_ids = {}
-
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
                 macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(
@@ -83,7 +113,11 @@ class Translator:
                 kwargs["mappings_resolver"] = mappings_resolver
                 kwargs["deployment_preference_collection"] = deployment_preference_collection
                 kwargs["conditions"] = template.get("Conditions")
-
+                # add the value of FunctionName property if the function is referenced with the api resource
+                self.redeploy_restapi_parameters["function_names"] = self._get_function_names(
+                    resource_dict, intrinsics_resolver
+                )
+                kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
