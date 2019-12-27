@@ -35,7 +35,7 @@
     "RestApiFunctionAddItemPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "RestApiFunction"
@@ -56,7 +56,7 @@
     "GetHtmlFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "GetHtmlFunction"
@@ -177,7 +177,7 @@
     "RestApiFunctionGetListPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "RestApiFunction"
@@ -262,7 +262,7 @@
     "RestApiFunctionCompleteItemPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "RestApiFunction"

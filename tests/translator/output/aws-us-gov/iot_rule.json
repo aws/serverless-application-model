@@ -48,7 +48,7 @@
     "IoTRuleFuncMyIoTRulePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Fn::Sub": "${AWS::AccountId}"
         }, 
@@ -71,7 +71,7 @@
     "IoTRuleFuncMyOtherIoTRulePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Fn::Sub": "${AWS::AccountId}"
         }, 

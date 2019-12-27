@@ -36,7 +36,7 @@
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunctionWithAwsIamAuth"
@@ -81,7 +81,7 @@
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthAndDefaultInvokeRolePermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunctionWithAwsIamAuth"
@@ -284,7 +284,7 @@
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthAndCustomInvokeRolePermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunctionWithAwsIamAuth"

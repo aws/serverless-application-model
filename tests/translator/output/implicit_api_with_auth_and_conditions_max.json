@@ -130,7 +130,7 @@
     "MyFunction2WithCognitoMultipleUserPoolsAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction2"
@@ -372,7 +372,7 @@
     "ServerlessRestApiMyLambdaTokenAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": "arn:aws",
         "SourceArn": {
@@ -391,7 +391,7 @@
     "MyFunctionWithNoAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction"
@@ -468,7 +468,7 @@
     "MyFunction4WithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction4"
@@ -490,7 +490,7 @@
     "ServerlessRestApiMyLambdaRequestAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": "arn:aws",
         "SourceArn": {
@@ -509,7 +509,7 @@
     "MyFunction5WithLambdaRequestAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction5"
@@ -531,7 +531,7 @@
     "ServerlessRestApiMyLambdaTokenAuthNoneFunctionInvokeRoleAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": "arn:aws",
         "SourceArn": {
@@ -581,7 +581,7 @@
     "MyFunction3WithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction3"
@@ -603,7 +603,7 @@
     "MyFunction6WithDefaultAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction6"
