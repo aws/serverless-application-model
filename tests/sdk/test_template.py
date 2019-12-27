@@ -4,36 +4,20 @@ from six import assertCountEqual
 from samtranslator.sdk.template import SamTemplate
 from samtranslator.sdk.resource import SamResource
 
-class TestSamTemplate(TestCase):
 
+class TestSamTemplate(TestCase):
     def setUp(self):
 
         self.template_dict = {
-          "Properties": {
-              "c": "d"
-          },
-          "Metadata": {
-              "a": "b"
-          },
-          "Resources": {
-             "Function1": {
-                "Type": "AWS::Serverless::Function",
-                 "DependsOn": "SomeOtherResource"
-             },
-             "Function2": {
-                "Type": "AWS::Serverless::Function",
-                 "a": "b"
-             },
-             "Api": {
-                "Type": "AWS::Serverless::Api"
-             },
-             "Layer": {
-                 "Type": "AWS::Serverless::LayerVersion"
-             },
-             "NonSam": {
-                "Type": "AWS::Lambda::Function"
-             }
-          }
+            "Properties": {"c": "d"},
+            "Metadata": {"a": "b"},
+            "Resources": {
+                "Function1": {"Type": "AWS::Serverless::Function", "DependsOn": "SomeOtherResource"},
+                "Function2": {"Type": "AWS::Serverless::Function", "a": "b"},
+                "Api": {"Type": "AWS::Serverless::Api"},
+                "Layer": {"Type": "AWS::Serverless::LayerVersion"},
+                "NonSam": {"Type": "AWS::Lambda::Function"},
+            },
         }
 
     def test_iterate_must_yield_sam_resources_only(self):
@@ -66,9 +50,7 @@ class TestSamTemplate(TestCase):
         template = SamTemplate(self.template_dict)
 
         type = "AWS::Serverless::LayerVersion"
-        expected = [
-            ("Layer", {"Type": "AWS::Serverless::LayerVersion", "Properties": {}}),
-        ]
+        expected = [("Layer", {"Type": "AWS::Serverless::LayerVersion", "Properties": {}})]
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
         self.assertEqual(expected, actual)
@@ -106,11 +88,7 @@ class TestSamTemplate(TestCase):
         self.assertEqual(self.template_dict["Resources"].get("NewResource"), {"Type": "something"})
 
     def test_get_must_return_resource(self):
-        expected = {
-            "Type": "AWS::Serverless::Function",
-             "DependsOn": "SomeOtherResource",
-            "Properties": {}
-         }
+        expected = {"Type": "AWS::Serverless::Function", "DependsOn": "SomeOtherResource", "Properties": {}}
 
         template = SamTemplate(self.template_dict)
 

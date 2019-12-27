@@ -9,6 +9,7 @@ class SamResource(object):
     Any mutating methods also touch only "Properties" and "Type" attributes of the resource. This allows compatibility
     with any CloudFormation constructs, like DependsOn, Conditions etc.
     """
+
     type = None
     properties = {}
 
@@ -38,8 +39,7 @@ class SamResource(object):
         if self.condition:
 
             if not is_str()(self.condition, should_raise=False):
-                raise InvalidDocumentException([
-                    InvalidTemplateException("Every Condition member must be a string.")])
+                raise InvalidDocumentException([InvalidTemplateException("Every Condition member must be a string.")])
 
         return SamResourceType.has_value(self.type)
 
@@ -58,6 +58,7 @@ class SamResourceType(Enum):
     """
     Enum of supported SAM types
     """
+
     Api = "AWS::Serverless::Api"
     Function = "AWS::Serverless::Function"
     SimpleTable = "AWS::Serverless::SimpleTable"

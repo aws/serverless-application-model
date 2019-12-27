@@ -1,4 +1,3 @@
-
 from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.exceptions import InvalidDocumentException

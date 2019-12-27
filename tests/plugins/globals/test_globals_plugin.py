@@ -6,6 +6,7 @@ from samtranslator.public.plugins import BasePlugin
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.globals.globals import InvalidGlobalsSectionException
 
+
 class TestGlobalsPlugin(TestCase):
     """
     Unit testing Globals Plugin
