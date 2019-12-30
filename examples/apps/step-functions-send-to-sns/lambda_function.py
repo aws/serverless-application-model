@@ -17,7 +17,7 @@ def send_to_sns(message, context):
     #   {
     #       "topic": "arn:aws:sns:REGION:123456789012:MySNSTopic",
     #       "subject": "This is the subject of the message.",
-    #       "message": "This is the body of the message."
+    #       "body": "This is the body of the message."
     #   }
 
     sns = boto3.client('sns')
