@@ -33,7 +33,7 @@
     "FunctionTwoImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         },
@@ -113,7 +113,7 @@
     "FunctionOneImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         },

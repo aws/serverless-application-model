@@ -23,9 +23,10 @@ from samtranslator.model.exceptions import InvalidResourceException
 :param trigger_configurations: Information about triggers associated with the deployment group. Duplicates are
     not allowed.
 """
-DeploymentPreferenceTuple = namedtuple('DeploymentPreferenceTuple',
-                                       ['deployment_type', 'pre_traffic_hook', 'post_traffic_hook', 'alarms',
-                                        'enabled', 'role', 'trigger_configurations'])
+DeploymentPreferenceTuple = namedtuple(
+    "DeploymentPreferenceTuple",
+    ["deployment_type", "pre_traffic_hook", "post_traffic_hook", "alarms", "enabled", "role", "trigger_configurations"],
+)
 
 
 class DeploymentPreference(DeploymentPreferenceTuple):
@@ -42,23 +43,25 @@ class DeploymentPreference(DeploymentPreferenceTuple):
         :param deployment_preference_dict: the dict object taken from the SAM template
         :return:
         """
-        enabled = deployment_preference_dict.get('Enabled', True)
+        enabled = deployment_preference_dict.get("Enabled", True)
         if not enabled:
             return DeploymentPreference(None, None, None, None, False, None, None)
 
-        if 'Type' not in deployment_preference_dict:
+        if "Type" not in deployment_preference_dict:
             raise InvalidResourceException(logical_id, "'DeploymentPreference' is missing required Property 'Type'")
 
-        deployment_type = deployment_preference_dict['Type']
-        hooks = deployment_preference_dict.get('Hooks', dict())
+        deployment_type = deployment_preference_dict["Type"]
+        hooks = deployment_preference_dict.get("Hooks", dict())
         if not isinstance(hooks, dict):
-            raise InvalidResourceException(logical_id,
-                                           "'Hooks' property of 'DeploymentPreference' must be a dictionary")
+            raise InvalidResourceException(
+                logical_id, "'Hooks' property of 'DeploymentPreference' must be a dictionary"
+            )
 
-        pre_traffic_hook = hooks.get('PreTraffic', None)
-        post_traffic_hook = hooks.get('PostTraffic', None)
-        alarms = deployment_preference_dict.get('Alarms', None)
-        role = deployment_preference_dict.get('Role', None)
-        trigger_configurations = deployment_preference_dict.get('TriggerConfigurations', None)
-        return DeploymentPreference(deployment_type, pre_traffic_hook, post_traffic_hook, alarms, enabled, role,
-                                    trigger_configurations)
+        pre_traffic_hook = hooks.get("PreTraffic", None)
+        post_traffic_hook = hooks.get("PostTraffic", None)
+        alarms = deployment_preference_dict.get("Alarms", None)
+        role = deployment_preference_dict.get("Role", None)
+        trigger_configurations = deployment_preference_dict.get("TriggerConfigurations", None)
+        return DeploymentPreference(
+            deployment_type, pre_traffic_hook, post_traffic_hook, alarms, enabled, role, trigger_configurations
+        )

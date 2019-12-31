@@ -2,18 +2,17 @@ import boto3
 
 
 class ArnGenerator(object):
-
     @classmethod
     def generate_arn(cls, partition, service, resource, include_account_id=True):
         if not service or not resource:
             raise RuntimeError("Could not construct ARN for resource.")
 
-        arn = 'arn:{0}:{1}:${{AWS::Region}}:'
+        arn = "arn:{0}:{1}:${{AWS::Region}}:"
 
         if include_account_id:
-            arn += '${{AWS::AccountId}}:'
+            arn += "${{AWS::AccountId}}:"
 
-        arn += '{2}'
+        arn += "{2}"
 
         return arn.format(partition, service, resource)
 
@@ -26,8 +25,7 @@ class ArnGenerator(object):
         :param policy_name: Name of the policy
         :return: ARN Of the managed policy
         """
-        return 'arn:{}:iam::aws:policy/{}'.format(ArnGenerator.get_partition_name(),
-                                                  policy_name)
+        return "arn:{}:iam::aws:policy/{}".format(ArnGenerator.get_partition_name(), policy_name)
 
     @classmethod
     def get_partition_name(cls, region=None):

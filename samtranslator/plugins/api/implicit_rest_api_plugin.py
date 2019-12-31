@@ -72,17 +72,14 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
             except KeyError as e:
                 raise InvalidEventException(logicalId, "Event is missing key {}.".format(e))
 
-            if (not isinstance(path, six.string_types)):
-                raise InvalidEventException(logicalId,
-                                            "Api Event must have a String specified for 'Path'.")
-            if (not isinstance(method, six.string_types)):
-                raise InvalidEventException(logicalId,
-                                            "Api Event must have a String specified for 'Method'.")
+            if not isinstance(path, six.string_types):
+                raise InvalidEventException(logicalId, "Api Event must have a String specified for 'Path'.")
+            if not isinstance(method, six.string_types):
+                raise InvalidEventException(logicalId, "Api Event must have a String specified for 'Method'.")
 
             # !Ref is resolved by this time. If it is still a dict, we can't parse/use this Api.
-            if (isinstance(api_id, dict)):
-                raise InvalidEventException(logicalId,
-                                            "Api Event must reference an Api in the same template.")
+            if isinstance(api_id, dict):
+                raise InvalidEventException(logicalId, "Api Event must reference an Api in the same template.")
 
             api_dict = self.api_conditions.setdefault(api_id, {})
             method_conditions = api_dict.setdefault(path, {})
@@ -131,17 +128,15 @@ class ImplicitApiResource(SamResource):
         resource = {
             "Type": SamResourceType.Api.value,
             "Properties": {
-
                 # Because we set the StageName to be constant value here, customers cannot override StageName with
                 # Globals. This is because, if a property is specified in both Globals and the resource, the resource
                 # one takes precedence.
                 "StageName": "Prod",
-
                 "DefinitionBody": swagger,
                 # Internal property that means Event source code can add Events. Used only for implicit APIs, to
                 # prevent back compatibility issues for explicit APIs
-                "__MANAGE_SWAGGER": True
-            }
+                "__MANAGE_SWAGGER": True,
+            },
         }
 
         super(ImplicitApiResource, self).__init__(resource)

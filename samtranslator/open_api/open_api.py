@@ -15,9 +15,9 @@ class OpenApiEditor(object):
     empty skeleton.
     """
 
-    _X_APIGW_INTEGRATION = 'x-amazon-apigateway-integration'
+    _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
     _CONDITIONAL_IF = "Fn::If"
-    _X_ANY_METHOD = 'x-amazon-apigateway-any-method'
+    _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
     _DEFAULT_PATH = "$default"
 
@@ -30,13 +30,15 @@ class OpenApiEditor(object):
         :raises ValueError: If the input Swagger document does not meet the basic Swagger requirements.
         """
         if not OpenApiEditor.is_valid(doc):
-            raise ValueError("Invalid OpenApi document. "
-                             "Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'.")
+            raise ValueError(
+                "Invalid OpenApi document. "
+                "Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
+            )
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
         self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
-        self.definitions = self._doc.get('definitions', {})
+        self.definitions = self._doc.get("definitions", {})
 
     def get_path(self, path):
         """
@@ -141,9 +143,11 @@ class OpenApiEditor(object):
         method = self._normalize_method_name(method)
 
         path_dict = self.get_path(path)
-        return self.has_path(path, method) and \
-            isinstance(path_dict[method], dict) and \
-            self.method_has_integration(path_dict[method])  # Integration present and non-empty
+        return (
+            self.has_path(path, method)
+            and isinstance(path_dict[method], dict)
+            and self.method_has_integration(path_dict[method])
+        )  # Integration present and non-empty
 
     def add_path(self, path, method=None):
         """
@@ -160,16 +164,21 @@ class OpenApiEditor(object):
         if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
             raise InvalidDocumentException(
-                [InvalidTemplateException("Value of '{}' path must be a dictionary according to Swagger spec."
-                                          .format(path))])
+                [
+                    InvalidTemplateException(
+                        "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
+                    )
+                ]
+            )
 
         if self._CONDITIONAL_IF in path_dict:
             path_dict = path_dict[self._CONDITIONAL_IF][1]
 
         path_dict.setdefault(method, {})
 
-    def add_lambda_integration(self, path, method, integration_uri,
-                               method_auth_config=None, api_auth_config=None, condition=None):
+    def add_lambda_integration(
+        self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
+    ):
         """
         Adds aws_proxy APIGW integration to the given path+method.
 
@@ -192,17 +201,17 @@ class OpenApiEditor(object):
 
         path_dict = self.get_path(path)
         path_dict[method][self._X_APIGW_INTEGRATION] = {
-            'type': 'aws_proxy',
-            'httpMethod': 'POST',
-            'payloadFormatVersion': '1.0',
-            'uri': integration_uri
+            "type": "aws_proxy",
+            "httpMethod": "POST",
+            "payloadFormatVersion": "1.0",
+            "uri": integration_uri,
         }
 
         if path == self._DEFAULT_PATH and method == self._X_ANY_METHOD:
             path_dict[method]["isDefaultRoute"] = True
 
         # If 'responses' key is *not* present, add it with an empty dict as value
-        path_dict[method].setdefault('responses', {})
+        path_dict[method].setdefault("responses", {})
 
         # If a condition is present, wrap all method contents up into the condition
         if condition:
@@ -262,21 +271,22 @@ class OpenApiEditor(object):
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                     if not self.method_definition_has_integration(method_definition):
                         continue
-                    existing_security = method_definition.get('security', [])
+                    existing_security = method_definition.get("security", [])
                     if existing_security:
                         return
                     authorizer_list = []
                     if authorizers:
                         authorizer_list.extend(authorizers.keys())
                     security_dict = dict()
-                    security_dict[default_authorizer] = self._get_authorization_scopes(api_authorizers,
-                                                                                       default_authorizer)
+                    security_dict[default_authorizer] = self._get_authorization_scopes(
+                        api_authorizers, default_authorizer
+                    )
                     authorizer_security = [security_dict]
 
                     security = authorizer_security
 
                     if security:
-                        method_definition['security'] = security
+                        method_definition["security"] = security
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
@@ -315,12 +325,12 @@ class OpenApiEditor(object):
             if not self.method_definition_has_integration(method_definition):
                 continue
 
-            existing_security = method_definition.get('security', [])
+            existing_security = method_definition.get("security", [])
 
             security_dict = dict()
             security_dict[authorizer_name] = []
 
-            if authorizer_name != 'NONE':
+            if authorizer_name != "NONE":
                 method_authorization_scopes = authorizers[authorizer_name].get("AuthorizationScopes")
                 if authorization_scopes:
                     method_authorization_scopes = authorization_scopes
@@ -332,7 +342,7 @@ class OpenApiEditor(object):
             # This assumes there are no authorizers already configured in the existing security block
             security = existing_security + authorizer_security
             if security:
-                method_definition['security'] = security
+                method_definition["security"] = security
 
     @property
     def openapi(self):
@@ -360,10 +370,11 @@ class OpenApiEditor(object):
         :return: True, if data is valid OpenApi
         """
 
-        if bool(data) and isinstance(data, dict) and isinstance(data.get('paths'), dict):
+        if bool(data) and isinstance(data, dict) and isinstance(data.get("paths"), dict):
             if bool(data.get("openapi")):
                 return OpenApiEditor.safe_compare_regex_with_string(
-                    OpenApiEditor.get_openapi_version_3_regex(), data["openapi"])
+                    OpenApiEditor.get_openapi_version_3_regex(), data["openapi"]
+                )
         return False
 
     @staticmethod
@@ -373,15 +384,7 @@ class OpenApiEditor(object):
 
         :return dict: Dictionary of a skeleton swagger document
         """
-        return {
-            'openapi': '3.0.1',
-            'info': {
-                'version': '1.0',
-                'title': ref('AWS::StackName')
-            },
-            'paths': {
-            }
-        }
+        return {"openapi": "3.0.1", "info": {"version": "1.0", "title": ref("AWS::StackName")}, "paths": {}}
 
     @staticmethod
     def _get_authorization_scopes(authorizers, default_authorizer):
@@ -391,8 +394,10 @@ class OpenApiEditor(object):
         :param default_authorizer: name of the default authorizer
         """
         if authorizers is not None:
-            if authorizers[default_authorizer] \
-               and authorizers[default_authorizer].get("AuthorizationScopes") is not None:
+            if (
+                authorizers[default_authorizer]
+                and authorizers[default_authorizer].get("AuthorizationScopes") is not None
+            ):
                 return authorizers[default_authorizer].get("AuthorizationScopes")
         return []
 
@@ -411,7 +416,7 @@ class OpenApiEditor(object):
             return method
 
         method = method.lower()
-        if method == 'any':
+        if method == "any":
             return OpenApiEditor._X_ANY_METHOD
         else:
             return method
@@ -427,4 +432,4 @@ class OpenApiEditor(object):
 
     @staticmethod
     def get_path_without_trailing_slash(path):
-        return re.sub(r'{([a-zA-Z0-9._-]+|proxy\+)}', '*', path)
+        return re.sub(r"{([a-zA-Z0-9._-]+|proxy\+)}", "*", path)

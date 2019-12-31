@@ -125,8 +125,9 @@ class SamPlugins(object):
         for plugin in self._plugins:
 
             if not hasattr(plugin, method_name):
-                raise NameError("'{}' method is not found in the plugin with name '{}'"
-                                .format(method_name, plugin.name))
+                raise NameError(
+                    "'{}' method is not found in the plugin with name '{}'".format(method_name, plugin.name)
+                )
 
             try:
                 getattr(plugin, method_name)(*args, **kwargs)
@@ -150,6 +151,7 @@ class LifeCycleEvents(Enum):
     """
     Enum of LifeCycleEvents
     """
+
     before_transform_template = "before_transform_template"
     before_transform_resource = "before_transform_resource"
     after_transform_template = "after_transform_template"
