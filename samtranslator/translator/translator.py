@@ -56,8 +56,9 @@ class Translator:
                         else:
                             api_name = item.get("Properties").get("RestApiId")
                         if api_name:
+                            resource_dict_copy = copy.deepcopy(resource_dict)
                             function_name = intrinsics_resolver.resolve_parameter_refs(
-                                resource_dict.get("Properties").get("FunctionName")
+                                resource_dict_copy.get("Properties").get("FunctionName")
                             )
                             if function_name:
                                 self.function_names[api_name] = self.function_names.get(api_name, "") + str(
