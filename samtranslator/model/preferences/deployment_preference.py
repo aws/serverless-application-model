@@ -44,7 +44,7 @@ class DeploymentPreference(DeploymentPreferenceTuple):
         :return:
         """
         enabled = deployment_preference_dict.get("Enabled", True)
-        enabled = False if enabled in ['false', 'False'] else enabled
+        enabled = False if enabled in ["false", "False"] else enabled
 
         if not enabled:
             return DeploymentPreference(None, None, None, None, False, None, None)

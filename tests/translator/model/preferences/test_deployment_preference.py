@@ -85,7 +85,7 @@ class TestDeploymentPreference(TestCase):
         expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None)
 
         deployment_preference_yaml_dict = dict()
-        deployment_preference_yaml_dict["Enabled"] = 'False'
+        deployment_preference_yaml_dict["Enabled"] = "False"
         deployment_preference_from_yaml_dict = DeploymentPreference.from_dict(
             "logical_id", deployment_preference_yaml_dict
         )
@@ -96,7 +96,7 @@ class TestDeploymentPreference(TestCase):
         expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None)
 
         deployment_preference_yaml_dict = dict()
-        deployment_preference_yaml_dict["Enabled"] = 'false'
+        deployment_preference_yaml_dict["Enabled"] = "false"
         deployment_preference_from_yaml_dict = DeploymentPreference.from_dict(
             "logical_id", deployment_preference_yaml_dict
         )
