@@ -46,10 +46,12 @@ class Action(object):
         :return: True if it matches expected structure, False otherwise
         """
 
-        return input_dict is not None \
-            and isinstance(input_dict, dict) \
-            and len(input_dict) == 1 \
+        return (
+            input_dict is not None
+            and isinstance(input_dict, dict)
+            and len(input_dict) == 1
             and self.intrinsic_name in input_dict
+        )
 
     @classmethod
     def _parse_resource_reference(cls, ref_value):
@@ -132,9 +134,7 @@ class RefAction(Action):
         if not resolved_value:
             return input_dict
 
-        return {
-            self.intrinsic_name: resolved_value
-        }
+        return {self.intrinsic_name: resolved_value}
 
     def resolve_resource_id_refs(self, input_dict, supported_resource_id_refs):
         """
@@ -161,9 +161,7 @@ class RefAction(Action):
         if not resolved_value:
             return input_dict
 
-        return {
-            self.intrinsic_name: resolved_value
-        }
+        return {self.intrinsic_name: resolved_value}
 
 
 class SubAction(Action):
@@ -372,16 +370,18 @@ class SubAction(Action):
         """
 
         # RegExp to find pattern "${logicalId.property}" and return the word inside bracket
-        logical_id_regex = '[A-Za-z0-9\.]+|AWS::[A-Z][A-Za-z]*'
-        ref_pattern = re.compile(r'\$\{(' + logical_id_regex + ')\}')
+        logical_id_regex = "[A-Za-z0-9\.]+|AWS::[A-Z][A-Za-z]*"
+        ref_pattern = re.compile(r"\$\{(" + logical_id_regex + ")\}")
 
         # Find all the pattern, and call the handler to decide how to substitute them.
         # Do the substitution and return the final text
-        return re.sub(ref_pattern,
-                      # Pass the handler entire string ${logicalId.property} as first parameter and "logicalId.property"
-                      # as second parameter. Return value will be substituted
-                      lambda match: handler_method(match.group(0), match.group(1)),
-                      text)
+        return re.sub(
+            ref_pattern,
+            # Pass the handler entire string ${logicalId.property} as first parameter and "logicalId.property"
+            # as second parameter. Return value will be substituted
+            lambda match: handler_method(match.group(0), match.group(1)),
+            text,
+        )
 
 
 class GetAttAction(Action):
@@ -427,10 +427,14 @@ class GetAttAction(Action):
         if not isinstance(value, list) or len(value) < 2:
             return input_dict
 
-        if (not all(isinstance(entry, string_types) for entry in value)):
+        if not all(isinstance(entry, string_types) for entry in value):
             raise InvalidDocumentException(
-                [InvalidTemplateException('Invalid GetAtt value {}. GetAtt expects an array with 2 strings.'
-                                          .format(value))])
+                [
+                    InvalidTemplateException(
+                        "Invalid GetAtt value {}. GetAtt expects an array with 2 strings.".format(value)
+                    )
+                ]
+            )
 
         # Value of GetAtt is an array. It can contain any number of elements, with first being the LogicalId of
         # resource and rest being the attributes. In a SAM template, a reference to a resource can be used in the
@@ -515,6 +519,7 @@ class FindInMapAction(Action):
     """
     This action can't be used along with other actions.
     """
+
     intrinsic_name = "Fn::FindInMap"
 
     def resolve_parameter_refs(self, input_dict, parameters):
@@ -535,21 +540,29 @@ class FindInMapAction(Action):
         # FindInMap expects an array with 3 values
         if not isinstance(value, list) or len(value) != 3:
             raise InvalidDocumentException(
-                [InvalidTemplateException('Invalid FindInMap value {}. FindInMap expects an array with 3 values.'
-                                          .format(value))])
+                [
+                    InvalidTemplateException(
+                        "Invalid FindInMap value {}. FindInMap expects an array with 3 values.".format(value)
+                    )
+                ]
+            )
 
         map_name = self.resolve_parameter_refs(value[0], parameters)
         top_level_key = self.resolve_parameter_refs(value[1], parameters)
         second_level_key = self.resolve_parameter_refs(value[2], parameters)
 
-        if not isinstance(map_name, string_types) or \
-                not isinstance(top_level_key, string_types) or \
-                not isinstance(second_level_key, string_types):
+        if (
+            not isinstance(map_name, string_types)
+            or not isinstance(top_level_key, string_types)
+            or not isinstance(second_level_key, string_types)
+        ):
             return input_dict
 
-        if map_name not in parameters or \
-                top_level_key not in parameters[map_name] or \
-                second_level_key not in parameters[map_name][top_level_key]:
+        if (
+            map_name not in parameters
+            or top_level_key not in parameters[map_name]
+            or second_level_key not in parameters[map_name][top_level_key]
+        ):
             return input_dict
 
         return parameters[map_name][top_level_key][second_level_key]

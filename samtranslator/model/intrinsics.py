@@ -1,51 +1,41 @@
 def fnGetAtt(logical_name, attribute_name):
-    return {'Fn::GetAtt': [logical_name, attribute_name]}
+    return {"Fn::GetAtt": [logical_name, attribute_name]}
 
 
 def ref(logical_name):
-    return {'Ref': logical_name}
+    return {"Ref": logical_name}
 
 
 def fnJoin(delimiter, values):
-    return {'Fn::Join': [delimiter, values]}
+    return {"Fn::Join": [delimiter, values]}
 
 
 def fnSub(string, variables=None):
     if variables:
-        return {'Fn::Sub': [string, variables]}
-    return {'Fn::Sub': string}
+        return {"Fn::Sub": [string, variables]}
+    return {"Fn::Sub": string}
 
 
 def fnOr(argument_list):
-    return {'Fn::Or': argument_list}
+    return {"Fn::Or": argument_list}
 
 
 def fnAnd(argument_list):
-    return {'Fn::And': argument_list}
+    return {"Fn::And": argument_list}
 
 
-def make_conditional(condition, true_data, false_data={'Ref': 'AWS::NoValue'}):
-    return {
-        'Fn::If': [
-            condition,
-            true_data,
-            false_data
-        ]
-    }
+def make_conditional(condition, true_data, false_data={"Ref": "AWS::NoValue"}):
+    return {"Fn::If": [condition, true_data, false_data]}
 
 
 def make_not_conditional(condition):
-    return {
-        'Fn::Not': [
-            {'Condition': condition}
-        ]
-    }
+    return {"Fn::Not": [{"Condition": condition}]}
 
 
 def make_condition_or_list(conditions_list):
     condition_or_list = []
     for condition in conditions_list:
-        c = {'Condition': condition}
+        c = {"Condition": condition}
         condition_or_list.append(c)
     return condition_or_list
 
@@ -108,7 +98,7 @@ def make_combined_condition(conditions_list, condition_name):
         new_condition_name = condition_name
         # If more than 1 new condition is needed, add a number to the end of the name
         if zero_based_num_conditions > 0:
-            new_condition_name = '{}{}'.format(condition_name, zero_based_num_conditions)
+            new_condition_name = "{}{}".format(condition_name, zero_based_num_conditions)
             zero_based_num_conditions -= 1
         new_condition_content = make_or_condition(conditions_list[:max_conditions])
         conditions_list = conditions_list[max_conditions:]
@@ -132,7 +122,7 @@ def make_shorthand(intrinsic_dict):
     :raises NotImplementedError: For intrinsic functions that don't support shorthands.
     """
     if "Ref" in intrinsic_dict:
-        return "${%s}" % intrinsic_dict['Ref']
+        return "${%s}" % intrinsic_dict["Ref"]
     elif "Fn::GetAtt" in intrinsic_dict:
         return "${%s}" % ".".join(intrinsic_dict["Fn::GetAtt"])
     else:
@@ -148,9 +138,7 @@ def is_instrinsic(input):
     :return: True, if yes
     """
 
-    if input is not None \
-            and isinstance(input, dict) \
-            and len(input) == 1:
+    if input is not None and isinstance(input, dict) and len(input) == 1:
 
         key = list(input.keys())[0]
         return key == "Ref" or key == "Condition" or key.startswith("Fn::")

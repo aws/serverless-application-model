@@ -101,9 +101,11 @@ class FunctionPolicies(object):
         :param dict resource_properties: Properties of the resource
         :return: True if we can process this resource. False, otherwise
         """
-        return resource_properties is not None \
-            and isinstance(resource_properties, dict) \
+        return (
+            resource_properties is not None
+            and isinstance(resource_properties, dict)
             and self.POLICIES_PROPERTY_NAME in resource_properties
+        )
 
     def _get_type(self, policy):
         """
@@ -147,10 +149,12 @@ class FunctionPolicies(object):
         :return: True, if this is a policy template. False if it is not
         """
 
-        return self._policy_template_processor is not None and \
-            isinstance(policy, dict) and \
-            len(policy) == 1 and \
-            self._policy_template_processor.has(list(policy.keys())[0]) is True
+        return (
+            self._policy_template_processor is not None
+            and isinstance(policy, dict)
+            and len(policy) == 1
+            and self._policy_template_processor.has(list(policy.keys())[0]) is True
+        )
 
     def _get_type_from_intrinsic_if(self, policy):
         """
@@ -179,14 +183,17 @@ class FunctionPolicies(object):
         if is_intrinsic_no_value(else_data):
             return if_data_type
 
-        raise InvalidTemplateException("Different policy types within the same Fn::If statement is unsupported. "
-                                       "Separate different policy types into different Fn::If statements")
+        raise InvalidTemplateException(
+            "Different policy types within the same Fn::If statement is unsupported. "
+            "Separate different policy types into different Fn::If statements"
+        )
 
 
 class PolicyTypes(Enum):
     """
     Enum of different policy types supported by SAM & this plugin
     """
+
     MANAGED_POLICY = "managed_policy"
     POLICY_STATEMENT = "policy_statement"
     POLICY_TEMPLATE = "policy_template"

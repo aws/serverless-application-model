@@ -9,8 +9,6 @@ from samtranslator.model.preferences.deployment_preference import DeploymentPref
 
 
 class TestVersionsAndAliases(TestCase):
-
-
     def setUp(self):
 
         self.intrinsics_resolver_mock = Mock()
@@ -21,17 +19,13 @@ class TestVersionsAndAliases(TestCase):
         self.code_uri = "s3://bucket/key?versionId=version"
         self.func_dict = {
             "Type": "AWS::Serverless::Function",
-            "Properties": {
-                "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
-                "Handler": "index.handler"
-            }
+            "Properties": {"CodeUri": self.code_uri, "Runtime": "nodejs4.3", "Handler": "index.handler"},
         }
         self.sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=self.func_dict)
         self.lambda_func = self._make_lambda_function(self.sam_func.logical_id)
         self.lambda_version = self._make_lambda_version("VersionLogicalId", self.sam_func)
 
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_alias(self, get_resolved_alias_name_mock):
         alias_name = "AliasName"
@@ -41,8 +35,8 @@ class TestVersionsAndAliases(TestCase):
                 "CodeUri": self.code_uri,
                 "Runtime": "nodejs4.3",
                 "Handler": "index.handler",
-                "AutoPublishAlias": alias_name
-            }
+                "AutoPublishAlias": alias_name,
+            },
         }
 
         sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -51,7 +45,11 @@ class TestVersionsAndAliases(TestCase):
         kwargs["managed_policy_map"] = {"a": "b"}
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
-        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"S3Bucket": "bucket", "S3Key": "key", "S3ObjectVersion": "version"}
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
+            "S3Bucket": "bucket",
+            "S3Key": "key",
+            "S3ObjectVersion": "version",
+        }
         get_resolved_alias_name_mock.return_value = alias_name
 
         resources = sam_func.to_cloudformation(**kwargs)
@@ -69,7 +67,9 @@ class TestVersionsAndAliases(TestCase):
         # We don't need to do any deeper validation here because there is a separate SAM template -> CFN template conversion test
         # that will care of validating all properties & connections
 
-        sam_func._get_resolved_alias_name.assert_called_once_with("AutoPublishAlias", alias_name, self.intrinsics_resolver_mock)
+        sam_func._get_resolved_alias_name.assert_called_once_with(
+            "AutoPublishAlias", alias_name, self.intrinsics_resolver_mock
+        )
 
     def test_sam_function_with_alias_cannot_be_list(self):
 
@@ -78,7 +78,7 @@ class TestVersionsAndAliases(TestCase):
             self.func_dict["Properties"]["AutoPublishAlias"] = ["a", "b"]
             SamFunction.from_dict(logical_id="foo", resource_dict=self.func_dict)
 
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_deployment_preference(self, get_resolved_alias_name_mock):
         deploy_preference_dict = {"Type": "LINEAR"}
@@ -90,8 +90,8 @@ class TestVersionsAndAliases(TestCase):
                 "Runtime": "nodejs4.3",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
-                "DeploymentPreference": deploy_preference_dict
-            }
+                "DeploymentPreference": deploy_preference_dict,
+            },
         }
 
         sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -102,16 +102,18 @@ class TestVersionsAndAliases(TestCase):
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
-        kwargs['deployment_preference_collection'] = deployment_preference_collection
+        kwargs["deployment_preference_collection"] = deployment_preference_collection
         get_resolved_alias_name_mock.return_value = alias_name
 
-        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"S3Bucket": "bucket", "S3Key": "key",
-                                                                             "S3ObjectVersion": "version"}
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
+            "S3Bucket": "bucket",
+            "S3Key": "key",
+            "S3ObjectVersion": "version",
+        }
         resources = sam_func.to_cloudformation(**kwargs)
 
         deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
-        deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id,
-                                                                     deploy_preference_dict)
+        deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id, deploy_preference_dict)
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
@@ -119,7 +121,9 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
 
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_missing_collection_raises_error(self, get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_missing_collection_raises_error(
+        self, get_resolved_alias_name_mock
+    ):
         alias_name = "AliasName"
         deploy_preference_dict = {"Type": "LINEAR"}
         func = {
@@ -129,8 +133,8 @@ class TestVersionsAndAliases(TestCase):
                 "Runtime": "nodejs4.3",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
-                "DeploymentPreference": deploy_preference_dict
-            }
+                "DeploymentPreference": deploy_preference_dict,
+            },
         }
 
         sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -140,16 +144,21 @@ class TestVersionsAndAliases(TestCase):
         kwargs["event_resources"] = []
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
-        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"S3Bucket": "bucket", "S3Key": "key",
-                                                                             "S3ObjectVersion": "version"}
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
+            "S3Bucket": "bucket",
+            "S3Key": "key",
+            "S3ObjectVersion": "version",
+        }
         get_resolved_alias_name_mock.return_value = alias_name
 
         with self.assertRaises(ValueError):
             sam_func.to_cloudformation(**kwargs)
 
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_disabled_deployment_preference_does_not_add_update_policy(self, get_resolved_alias_name_mock):
+    def test_sam_function_with_disabled_deployment_preference_does_not_add_update_policy(
+        self, get_resolved_alias_name_mock
+    ):
         alias_name = "AliasName"
         enabled = False
         deploy_preference_dict = {"Enabled": enabled}
@@ -160,8 +169,8 @@ class TestVersionsAndAliases(TestCase):
                 "Runtime": "nodejs4.3",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
-                "DeploymentPreference": deploy_preference_dict
-            }
+                "DeploymentPreference": deploy_preference_dict,
+            },
         }
 
         sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -172,10 +181,11 @@ class TestVersionsAndAliases(TestCase):
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
         preference_collection = self._make_deployment_preference_collection()
-        preference_collection.get.return_value = DeploymentPreference.from_dict(sam_func.logical_id,
-                                                                                deploy_preference_dict)
+        preference_collection.get.return_value = DeploymentPreference.from_dict(
+            sam_func.logical_id, deploy_preference_dict
+        )
 
-        kwargs['deployment_preference_collection'] = preference_collection
+        kwargs["deployment_preference_collection"] = preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = enabled
         get_resolved_alias_name_mock.return_value = alias_name
 
@@ -196,8 +206,8 @@ class TestVersionsAndAliases(TestCase):
                     "CodeUri": self.code_uri,
                     "Runtime": "nodejs4.3",
                     "Handler": "index.handler",
-                    "DeploymentPreference": {"Type": "LINEAR"}
-                }
+                    "DeploymentPreference": {"Type": "LINEAR"},
+                },
             }
 
             sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -205,10 +215,10 @@ class TestVersionsAndAliases(TestCase):
             kwargs = dict()
             kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
             kwargs["mappings_resolver"] = self.mappings_resolver_mock
-            kwargs['deployment_preference_collection'] = self._make_deployment_preference_collection()
+            kwargs["deployment_preference_collection"] = self._make_deployment_preference_collection()
             sam_func.to_cloudformation(**kwargs)
 
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_sam_function_without_alias_allows_disabled_deployment_preference(self):
         enabled = False
         deploy_preference_dict = {"Enabled": enabled}
@@ -218,8 +228,8 @@ class TestVersionsAndAliases(TestCase):
                 "CodeUri": self.code_uri,
                 "Runtime": "nodejs4.3",
                 "Handler": "index.handler",
-                "DeploymentPreference": deploy_preference_dict
-            }
+                "DeploymentPreference": deploy_preference_dict,
+            },
         }
 
         sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -231,10 +241,11 @@ class TestVersionsAndAliases(TestCase):
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
 
         preference_collection = self._make_deployment_preference_collection()
-        preference_collection.get.return_value = DeploymentPreference.from_dict(sam_func.logical_id,
-                                                                                deploy_preference_dict)
+        preference_collection.get.return_value = DeploymentPreference.from_dict(
+            sam_func.logical_id, deploy_preference_dict
+        )
 
-        kwargs['deployment_preference_collection'] = preference_collection
+        kwargs["deployment_preference_collection"] = preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = enabled
         resources = sam_func.to_cloudformation(**kwargs)
 
@@ -242,9 +253,11 @@ class TestVersionsAndAliases(TestCase):
         # Function, IAM Role
         self.assertEqual(len(resources), 2)
 
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_intrinsic_ref_enabled_boolean_parameter(self, get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_intrinsic_ref_enabled_boolean_parameter(
+        self, get_resolved_alias_name_mock
+    ):
         alias_name = "AliasName"
         enabled = {"Ref": "MyEnabledFlag"}
         deploy_preference_dict = {"Type": "LINEAR", "Enabled": enabled}
@@ -255,8 +268,8 @@ class TestVersionsAndAliases(TestCase):
                 "Runtime": "nodejs4.3",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
-                "DeploymentPreference": deploy_preference_dict
-            }
+                "DeploymentPreference": deploy_preference_dict,
+            },
         }
 
         sam = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -267,15 +280,14 @@ class TestVersionsAndAliases(TestCase):
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
-        kwargs['deployment_preference_collection'] = deployment_preference_collection
+        kwargs["deployment_preference_collection"] = deployment_preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = True
         get_resolved_alias_name_mock.return_value = alias_name
 
         resources = sam.to_cloudformation(**kwargs)
 
         deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
-        deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id,
-                                                                     deploy_preference_dict)
+        deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id, deploy_preference_dict)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_any_call(enabled)
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
@@ -283,9 +295,11 @@ class TestVersionsAndAliases(TestCase):
         self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
         self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
 
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_intrinsic_ref_enabled_dict_parameter(self, get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_intrinsic_ref_enabled_dict_parameter(
+        self, get_resolved_alias_name_mock
+    ):
         alias_name = "AliasName"
         enabled = {"Ref": "MyEnabledFlag"}
         deploy_preference_dict = {"Type": "LINEAR", "Enabled": enabled}
@@ -296,8 +310,8 @@ class TestVersionsAndAliases(TestCase):
                 "Runtime": "nodejs4.3",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
-                "DeploymentPreference": deploy_preference_dict
-            }
+                "DeploymentPreference": deploy_preference_dict,
+            },
         }
 
         sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -308,16 +322,18 @@ class TestVersionsAndAliases(TestCase):
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
-        kwargs['deployment_preference_collection'] = deployment_preference_collection
+        kwargs["deployment_preference_collection"] = deployment_preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"MyEnabledFlag": True}
         get_resolved_alias_name_mock.return_value = alias_name
 
         sam_func.to_cloudformation(**kwargs)
-        self.assertTrue(sam_func.DeploymentPreference['Enabled'])
+        self.assertTrue(sam_func.DeploymentPreference["Enabled"])
 
-    @patch('boto3.session.Session.region_name', 'ap-southeast-1')
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
-    def test_sam_function_with_deployment_preference_intrinsic_findinmap_enabled_dict_parameter(self, get_resolved_alias_name_mock):
+    def test_sam_function_with_deployment_preference_intrinsic_findinmap_enabled_dict_parameter(
+        self, get_resolved_alias_name_mock
+    ):
         alias_name = "AliasName"
         enabled = {"Fn::FindInMap": ["FooMap", "FooKey", "Enabled"]}
         deploy_preference_dict = {"Type": "LINEAR", "Enabled": enabled}
@@ -328,8 +344,8 @@ class TestVersionsAndAliases(TestCase):
                 "Runtime": "nodejs4.3",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
-                "DeploymentPreference": deploy_preference_dict
-            }
+                "DeploymentPreference": deploy_preference_dict,
+            },
         }
 
         sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
@@ -340,13 +356,13 @@ class TestVersionsAndAliases(TestCase):
         kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
         kwargs["mappings_resolver"] = self.mappings_resolver_mock
         deployment_preference_collection = self._make_deployment_preference_collection()
-        kwargs['deployment_preference_collection'] = deployment_preference_collection
+        kwargs["deployment_preference_collection"] = deployment_preference_collection
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {"MyEnabledFlag": True}
         self.mappings_resolver_mock.resolve_parameter_refs.return_value = True
         get_resolved_alias_name_mock.return_value = alias_name
 
         sam_func.to_cloudformation(**kwargs)
-        self.assertTrue(sam_func.DeploymentPreference['Enabled'])
+        self.assertTrue(sam_func.DeploymentPreference["Enabled"])
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_version_creation(self, LogicalIdGeneratorMock):
@@ -398,11 +414,7 @@ class TestVersionsAndAliases(TestCase):
         id_val = "SomeLogicalId"
         generator_mock.gen.return_value = id_val
 
-        self.lambda_func.Code = {
-            "S3Bucket": "bucket",
-            "S3Key": {"Ref": "keyparameter"},
-            "S3ObjectVersion": "version"
-        }
+        self.lambda_func.Code = {"S3Bucket": "bucket", "S3Key": {"Ref": "keyparameter"}, "S3ObjectVersion": "version"}
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
 
         version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
@@ -418,11 +430,7 @@ class TestVersionsAndAliases(TestCase):
         id_val = "SomeLogicalId"
         generator_mock.gen.return_value = id_val
 
-        self.lambda_func.Code = {
-            "S3Bucket": {"Ref": "bucketparameter"},
-            "S3Key": "key",
-            "S3ObjectVersion": "version"
-        }
+        self.lambda_func.Code = {"S3Bucket": {"Ref": "bucketparameter"}, "S3Key": "key", "S3ObjectVersion": "version"}
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
 
         version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
@@ -438,11 +446,7 @@ class TestVersionsAndAliases(TestCase):
         id_val = "SomeLogicalId"
         generator_mock.gen.return_value = id_val
 
-        self.lambda_func.Code = {
-            "S3Bucket": "bucket",
-            "S3Key": "key",
-            "S3ObjectVersion": {"Ref": "versionparameter"}
-        }
+        self.lambda_func.Code = {"S3Bucket": "bucket", "S3Key": "key", "S3ObjectVersion": {"Ref": "versionparameter"}}
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
 
         version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
@@ -481,12 +485,7 @@ class TestVersionsAndAliases(TestCase):
         generator_mock.gen.return_value = id_val
         prefix = self.sam_func.logical_id + "Version"
 
-        self.lambda_func.Code = {
-            "S3Bucket": "bucket",
-            "S3Key": {
-                "Ref": "someparam"
-            }
-        }
+        self.lambda_func.Code = {"S3Bucket": "bucket", "S3Key": {"Ref": "someparam"}}
 
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
         self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
@@ -512,7 +511,6 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(alias.FunctionName, {"Ref": self.lambda_func.logical_id})
         self.assertEqual(alias.FunctionVersion, {"Fn::GetAtt": [self.lambda_version.logical_id, "Version"]})
 
-
     def test_alias_creation_error(self):
         with self.assertRaises(InvalidResourceException):
             self.sam_func._construct_alias(None, self.lambda_func, self.lambda_version)
@@ -530,8 +528,9 @@ class TestVersionsAndAliases(TestCase):
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved(self):
 
         property_name = "something"
-        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter"\
-            .format(self.sam_func.logical_id, property_name)
+        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
+            self.sam_func.logical_id, property_name
+        )
 
         alias_value = {"Ref": "param1"}
         # Unresolved
@@ -546,8 +545,9 @@ class TestVersionsAndAliases(TestCase):
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved_with_list(self):
 
         property_name = "something"
-        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter"\
-            .format(self.sam_func.logical_id, property_name)
+        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
+            self.sam_func.logical_id, property_name
+        )
 
         alias_value = ["Ref", "param1"]
         # Unresolved
@@ -561,11 +561,7 @@ class TestVersionsAndAliases(TestCase):
 
     def _make_lambda_function(self, logical_id):
         func = LambdaFunction(logical_id)
-        func.Code = {
-            "S3Bucket": "bucket",
-            "S3Key": "key",
-            "S3ObjectVersion": "version"
-        }
+        func.Code = {"S3Bucket": "bucket", "S3Key": "key", "S3ObjectVersion": "version"}
         return func
 
     def _make_lambda_version(self, logical_id, func):
@@ -584,7 +580,6 @@ class TestVersionsAndAliases(TestCase):
 
 
 class TestSupportedResourceReferences(TestCase):
-
     def test_must_not_break_support(self):
 
         func = SamFunction("LogicalId")

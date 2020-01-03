@@ -10,28 +10,26 @@ from tests.plugins.application.test_serverless_app_plugin import mock_get_region
 
 mock_policy_loader = MagicMock()
 mock_policy_loader.load.return_value = {
-    'AmazonDynamoDBFullAccess': 'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
-    'AmazonDynamoDBReadOnlyAccess': 'arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess',
-    'AWSLambdaRole': 'arn:aws:iam::aws:policy/service-role/AWSLambdaRole',
+    "AmazonDynamoDBFullAccess": "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+    "AmazonDynamoDBReadOnlyAccess": "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess",
+    "AWSLambdaRole": "arn:aws:iam::aws:policy/service-role/AWSLambdaRole",
 }
 
-@patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+
+@patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
 def test_redeploy_explicit_api():
     """
     Test to verify that we will redeploy an API when Swagger document changes
     :return:
     """
     manifest = {
-        'Transform': 'AWS::Serverless-2016-10-31',
-        'Resources': {
-            'ExplicitApi': {
-                'Type': "AWS::Serverless::Api",
-                "Properties": {
-                    "StageName": "prod",
-                    "DefinitionUri": "s3://mybucket/swagger.json?versionId=123"
-                }
+        "Transform": "AWS::Serverless-2016-10-31",
+        "Resources": {
+            "ExplicitApi": {
+                "Type": "AWS::Serverless::Api",
+                "Properties": {"StageName": "prod", "DefinitionUri": "s3://mybucket/swagger.json?versionId=123"},
             }
-        }
+        },
     }
     original_deployment_ids = translate_and_find_deployment_ids(manifest)
 
@@ -46,46 +44,31 @@ def test_redeploy_explicit_api():
     assert updated_deployment_ids == translate_and_find_deployment_ids(manifest)
 
 
-@patch('botocore.client.ClientEndpointBridge._check_default_region', mock_get_region)
+@patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
 def test_redeploy_implicit_api():
     manifest = {
-        'Transform': 'AWS::Serverless-2016-10-31',
-        'Resources': {
-            'FirstLambdaFunction': {
-                'Type': "AWS::Serverless::Function",
+        "Transform": "AWS::Serverless-2016-10-31",
+        "Resources": {
+            "FirstLambdaFunction": {
+                "Type": "AWS::Serverless::Function",
                 "Properties": {
+                    "FunctionName": "InitialFunction",
                     "CodeUri": "s3://bucket/code.zip",
                     "Handler": "index.handler",
                     "Runtime": "nodejs4.3",
-                    "Events": {
-                        "MyApi": {
-                            "Type": "Api",
-                            "Properties": {
-                                "Path": "/first",
-                                "Method": "get"
-                            }
-                        }
-                    }
-                }
+                    "Events": {"MyApi": {"Type": "Api", "Properties": {"Path": "/first", "Method": "get"}}},
+                },
             },
-            'SecondLambdaFunction': {
-                'Type': "AWS::Serverless::Function",
+            "SecondLambdaFunction": {
+                "Type": "AWS::Serverless::Function",
                 "Properties": {
                     "CodeUri": "s3://bucket/code.zip",
                     "Handler": "index.handler",
                     "Runtime": "nodejs4.3",
-                    "Events": {
-                        "MyApi": {
-                            "Type": "Api",
-                            "Properties": {
-                                "Path": "/second",
-                                "Method": "get"
-                            }
-                        }
-                    }
-                }
-            }
-        }
+                    "Events": {"MyApi": {"Type": "Api", "Properties": {"Path": "/second", "Method": "get"}}},
+                },
+            },
+        },
     }
 
     original_deployment_ids = translate_and_find_deployment_ids(manifest)
@@ -104,12 +87,16 @@ def test_redeploy_implicit_api():
     manifest["Resources"]["SecondLambdaFunction"]["Properties"]["Runtime"] = "java"
     assert second_updated_deployment_ids == translate_and_find_deployment_ids(manifest)
 
+    manifest["Resources"]["FirstLambdaFunction"]["Properties"]["FunctionName"] = "ChangedFunctionName"
+    fourth_updated_deployment_ids = translate_and_find_deployment_ids(manifest)
+    assert fourth_updated_deployment_ids != second_updated_deployment_ids
 
-@patch('boto3.session.Session.region_name', 'ap-southeast-1')
+
+@patch("boto3.session.Session.region_name", "ap-southeast-1")
 def translate_and_find_deployment_ids(manifest):
     parameter_values = get_template_parameter_values()
     output_fragment = transform(manifest, parameter_values, mock_policy_loader)
-    print(json.dumps(output_fragment, indent=2))
+    print (json.dumps(output_fragment, indent=2))
 
     deployment_ids = set()
     for key, value in output_fragment["Resources"].items():
@@ -120,7 +107,6 @@ def translate_and_find_deployment_ids(manifest):
 
 
 class TestApiGatewayDeploymentResource(TestCase):
-
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_make_auto_deployable_with_swagger_dict(self, LogicalIdGeneratorMock):
         prefix = "prefix"
@@ -140,7 +126,7 @@ class TestApiGatewayDeploymentResource(TestCase):
 
         LogicalIdGeneratorMock.assert_called_once_with(prefix, str(swagger))
         generator_mock.gen.assert_called_once_with()
-        generator_mock.get_hash.assert_called_once_with(length=40) # getting full SHA
+        generator_mock.get_hash.assert_called_once_with(length=40)  # getting full SHA
         stage.update_deployment_ref.assert_called_once_with(id_val)
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")

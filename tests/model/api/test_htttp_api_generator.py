@@ -9,24 +9,24 @@ from samtranslator.open_api.open_api import OpenApiEditor
 
 class TestHttpApiGenerator(TestCase):
     kwargs = {
-        'logical_id': "HttpApiId",
-        'stage_variables': None,
-        'depends_on': None,
-        'definition_body': None,
-        'definition_uri': None,
-        'stage_name': None,
-        'tags': None,
-        'auth': None,
-        'access_log_settings': None,
-        'resource_attributes': None,
-        'passthrough_resource_attributes': None
+        "logical_id": "HttpApiId",
+        "stage_variables": None,
+        "depends_on": None,
+        "definition_body": None,
+        "definition_uri": None,
+        "stage_name": None,
+        "tags": None,
+        "auth": None,
+        "access_log_settings": None,
+        "resource_attributes": None,
+        "passthrough_resource_attributes": None,
     }
     authorizers = {
         "Authorizers": {
             "OAuth2": {
                 "AuthorizationScopes": ["scope"],
                 "JwtConfiguration": {"config": "value"},
-                "IdentitySource": "https://example.com"
+                "IdentitySource": "https://example.com",
             }
         }
     }

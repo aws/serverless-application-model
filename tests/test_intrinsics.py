@@ -3,20 +3,12 @@ from unittest import TestCase
 
 from samtranslator.model.intrinsics import is_instrinsic, make_shorthand
 
-class TestIntrinsics(TestCase):
 
-    @parameterized.expand([
-        "Ref",
-        "Condition",
-        "Fn::foo",
-        "Fn::sub",
-        "Fn::something"
-    ])
+class TestIntrinsics(TestCase):
+    @parameterized.expand(["Ref", "Condition", "Fn::foo", "Fn::sub", "Fn::something"])
     def test_is_intrinsic_must_detect_intrinsics(self, intrinsic_name):
 
-        input = {
-            intrinsic_name: ["some value"]
-        }
+        input = {intrinsic_name: ["some value"]}
 
         self.assertTrue(is_instrinsic(input))
 
@@ -24,23 +16,17 @@ class TestIntrinsics(TestCase):
         self.assertFalse(is_instrinsic(None))
 
     def test_is_intrinsic_on_non_dict_input(self):
-        self.assertFalse(is_instrinsic([1,2,3]))
+        self.assertFalse(is_instrinsic([1, 2, 3]))
 
     def test_is_intrinsic_on_intrinsic_like_dict_input(self):
-        self.assertFalse(is_instrinsic({
-            "Ref": "foo",
-            "key": "bar"
-        }))
+        self.assertFalse(is_instrinsic({"Ref": "foo", "key": "bar"}))
 
-    @parameterized.expand([
-        ({"Ref": "foo"}, "${foo}"),
-        ({"Fn::GetAtt": ["foo", "Arn"]}, "${foo.Arn}")
-    ])
+    @parameterized.expand([({"Ref": "foo"}, "${foo}"), ({"Fn::GetAtt": ["foo", "Arn"]}, "${foo.Arn}")])
     def test_make_shorthand_success(self, input, expected):
         self.assertEqual(make_shorthand(input), expected)
 
     def test_make_short_hand_failure(self):
-        input = { "Fn::Sub": "something" }
+        input = {"Fn::Sub": "something"}
 
         with self.assertRaises(NotImplementedError):
             make_shorthand(input)

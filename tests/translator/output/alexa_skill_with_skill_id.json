@@ -35,7 +35,7 @@
       "AlexaSkillFuncAlexaSkillEventPermission": {
         "Type": "AWS::Lambda::Permission", 
         "Properties": {
-          "Action": "lambda:invokeFunction", 
+          "Action": "lambda:InvokeFunction", 
           "FunctionName": {
             "Ref": "AlexaSkillFunc"
           }, 

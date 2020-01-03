@@ -82,7 +82,7 @@
     "ThumbnailFunctionImageBucketPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         }, 
