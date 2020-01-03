@@ -100,7 +100,9 @@
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
         "BasePath": "one", 
-        "DomainName": "example.com", 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName0caaf24ab1"
+        }, 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
@@ -124,15 +126,6 @@
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -148,7 +141,16 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "ApiGatewayDomainName0caaf24ab1": {
