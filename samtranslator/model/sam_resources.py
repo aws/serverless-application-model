@@ -183,12 +183,13 @@ class SamFunction(SamResourceMacro):
 
         logical_id = "{id}EventInvokeConfig".format(id=function_name)
         if lambda_alias:
-            lambda_event_invoke_config = LambdaEventInvokeConfig(logical_id=logical_id,
-                                                                 depends_on=[lambda_alias.logical_id],
-                                                                 attributes=self.resource_attributes)
+            lambda_event_invoke_config = LambdaEventInvokeConfig(
+                logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes
+            )
         else:
-            lambda_event_invoke_config = LambdaEventInvokeConfig(logical_id=logical_id,
-                                                                 attributes=self.resource_attributes)
+            lambda_event_invoke_config = LambdaEventInvokeConfig(
+                logical_id=logical_id, attributes=self.resource_attributes
+            )
 
         dest_config = {}
         input_dest_config = resolved_event_invoke_config.get("DestinationConfig")

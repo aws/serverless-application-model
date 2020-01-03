@@ -44,6 +44,7 @@ test:
 	@pytest --cov samtranslator --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests
 
 black:
+	rm -f tests/*.pyc samtranslator/*.pyc
 	black setup.py samtranslator/* tests/* bin/*
 
 black-check:
