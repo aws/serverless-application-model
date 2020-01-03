@@ -268,7 +268,6 @@ class TestTranslatorEndToEnd(TestCase):
                 "api_with_apikey_required",
                 "api_with_path_parameters",
                 "function_with_event_source_mapping",
-                "api_with_swagger_authorizer_none",
                 "function_with_event_dest",
                 "function_with_event_dest_basic",
                 "function_with_event_dest_conditional",
