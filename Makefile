@@ -48,6 +48,7 @@ black:
 	black setup.py samtranslator/* tests/* bin/*
 
 black-check:
+	rm -f tests/*.pyc samtranslator/*.pyc
 	black --check setup.py samtranslator/* tests/* bin/*
 
 # Command to run everytime you make changes to verify everything works
