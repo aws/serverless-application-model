@@ -81,13 +81,13 @@
         }
       }
     },
-    "MyApiWithLambdaRequestAuthDeploymentbad519dbd8": {
+    "MyApiWithLambdaRequestAuthDeployment6706fbf5d4": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
         },
-        "Description": "RestApi deployment id: bad519dbd801b0e2c63dc6f2011f43bce33c262a",
+        "Description": "RestApi deployment id: 6706fbf5d4c3ac3ec0cfe430c0fffcb766c76449",
         "StageName": "Stage"
       }
     },
@@ -247,7 +247,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaRequestAuthDeploymentbad519dbd8"
+          "Ref": "MyApiWithLambdaRequestAuthDeployment6706fbf5d4"
         },
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
@@ -309,14 +309,33 @@
             }
           },
           "paths": {
+            "/apipath": {
+                "get": {
+                    "responses": {
+                    },
+                    "security": [
+                        {
+                            "MyLambdaRequestAuth": [
+                            ]
+                        }
+                    ],
+                    "x-amazon-apigateway-integration": {
+                        "httpMethod": "POST",
+                        "passthroughBehavior": "when_no_match",
+                        "uri": {
+                          "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                        },
+                        "type": "aws_proxy"
+                    }
+                }
+            },
             "/lambda-request": {
               "get": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",
-                  "passthroughBehavior": "when_no_match",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 },
                 "security": [

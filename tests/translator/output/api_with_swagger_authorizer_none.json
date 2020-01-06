@@ -100,7 +100,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaRequestAuthDeploymentfeb40d0e71"
+          "Ref": "MyApiWithLambdaRequestAuthDeployment6b73b91cab"
         },
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
@@ -242,13 +242,13 @@
         "StageName": "Prod"
       }
     },
-    "MyApiWithLambdaRequestAuthDeploymentfeb40d0e71": {
+    "MyApiWithLambdaRequestAuthDeployment6b73b91cab": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
         },
-        "Description": "RestApi deployment id: feb40d0e712dce07ba2392d6bb86eff0c5b22b7b",
+        "Description": "RestApi deployment id: 6b73b91cab97baa8669264d78bc8053286eba995",
         "StageName": "Stage"
       }
     },
@@ -310,7 +310,6 @@
               "get": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST",
-                  "passthroughBehavior": "when_no_match",
                   "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
@@ -322,6 +321,26 @@
                   }
                 ],
                 "responses": {}
+              }
+            },
+          "/apipath": {
+              "get": {
+                  "responses": {
+                  },
+                  "security": [
+                      {
+                          "MyLambdaRequestAuth": [
+                          ]
+                      }
+                  ],
+                  "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "passthroughBehavior": "when_no_match",
+                      "uri": {
+                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                      },
+                      "type": "aws_proxy"
+                  }
               }
             }
           },

@@ -31,12 +31,13 @@ Resources:
         schemes:
           - https
         paths:
-          "/lambda-request":
+          "/apipath":
             get:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations
+                uri:
+                  Fn::Sub: "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                 passthroughBehavior: when_no_match
               responses: {}
       Auth:

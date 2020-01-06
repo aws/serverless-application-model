@@ -638,6 +638,8 @@ class SwaggerEditor(object):
             authorizers param.
         """
         normalized_method_name = self._normalize_method_name(method_name)
+        if not self.get_path(path).get(normalized_method_name):
+            return
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
