@@ -257,7 +257,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs10.x"
+        "Runtime": "nodejs12.x"
       }
     }, 
     "MyTestFunction2EventInvokeConfig": {
@@ -334,7 +334,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs10.x"
+        "Runtime": "nodejs12.x"
       }
     }, 
     "MyTestFunction": {
@@ -357,7 +357,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs10.x"
+        "Runtime": "nodejs12.x"
       }
     }, 
     "MyTestFunctionEventInvokeConfigOnFailureTopic": {

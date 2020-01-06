@@ -7,7 +7,7 @@ Resources:
     Properties:
       CodeUri: ./index.js
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       Events:
         LogsProcessor:
           Type: CloudWatchLogs

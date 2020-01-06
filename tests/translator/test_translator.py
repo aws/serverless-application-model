@@ -636,7 +636,7 @@ def test_transform_unhandled_failure_empty_managed_policy_map():
                 "Properties": {
                     "CodeUri": "s3://bucket/key",
                     "Handler": "index.handler",
-                    "Runtime": "nodejs4.3",
+                    "Runtime": "nodejs12.x",
                     "Policies": "AmazonS3FullAccess",
                 },
             }
@@ -767,7 +767,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
                 "MyFunction": {
                     "Type": "AWS::Serverless::Function",
                     "Properties": {
-                        "Runtime": "nodejs4.3",
+                        "Runtime": "nodejs12.x",
                         "Handler": "index.handler",
                         "CodeUri": {"Bucket": {"Ref": "SomeBucket"}, "Key": {"Ref": "CodeKeyParam"}},
                         "AutoPublishAlias": "live",

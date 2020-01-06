@@ -7,7 +7,7 @@ Resources:
     Properties:
       CodeUri: ./src
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       FunctionName: sam-example-lambda-sns-filter-policy-notification-logger
       Events:
         NotificationTopic:

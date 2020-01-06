@@ -29,7 +29,7 @@ Resources:
       CodeUri: ./src
       Handler: lambda.handler
       MemorySize: 1024
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Environment:
         Variables:
           COGNITO_USER_POOL_CLIENT_ID: !Ref MyCognitoUserPoolClient
@@ -120,7 +120,7 @@ Resources:
         }
       Handler: index.handler
       MemorySize: 128
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Timeout: 3
       Events:
         CognitoUserPoolPreSignup:

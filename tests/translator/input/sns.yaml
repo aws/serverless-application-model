@@ -4,7 +4,7 @@ Resources:
     Properties:
       CodeUri: s3://sam-demo-bucket/notifications.zip
       Handler: index.save_notification
-      Runtime: nodejs4.3
+      Runtime: nodejs12.x
       Events:
         NotificationTopic:
           Type: SNS

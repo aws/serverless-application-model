@@ -15,7 +15,7 @@ Resources:
     Properties:
       CodeUri: .
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         GetRoot:
           Type: Api

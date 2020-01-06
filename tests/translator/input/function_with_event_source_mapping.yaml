@@ -20,7 +20,7 @@ Resources:
             headers: {}
             }
         }
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Policies:
         - SQSSendMessagePolicy:
             QueueName: !GetAtt MySqsQueue.QueueName
