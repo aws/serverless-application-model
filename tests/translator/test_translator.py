@@ -231,6 +231,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_disabled_deployment_preference",
                 "function_with_deployment_preference",
                 "function_with_deployment_preference_all_parameters",
+                "function_with_deployment_preference_from_parameters",
                 "function_with_deployment_preference_multiple_combinations",
                 "function_with_alias_and_event_sources",
                 "function_with_resource_refs",
