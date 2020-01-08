@@ -680,7 +680,7 @@ class Api(PushEventSource):
 
             apikey_required_setting = self.Auth.get("ApiKeyRequired")
             apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
-            if apikey_required_setting_is_false and not api_auth.get("ApiKeyRequired"):
+            if apikey_required_setting_is_false and (not api_auth or not api_auth.get("ApiKeyRequired")):
                 raise InvalidEventException(
                     self.relative_id,
                     "Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "

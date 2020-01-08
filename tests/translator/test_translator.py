@@ -603,6 +603,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_http_api_event_multiple_same_path",
         "error_function_with_event_dest_invalid",
         "error_function_with_event_dest_type",
+        "error_function_with_api_key_false",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
