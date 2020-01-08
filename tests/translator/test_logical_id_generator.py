@@ -44,6 +44,33 @@ class TestLogicalIdGenerator(TestCase):
 
         self.assertEqual(generator.gen(), generator.gen())
 
+    @patch.object(LogicalIdGenerator, "_stringify")
+    def test_gen_hash_data_override(self, stringify_mock):
+        data = {"foo": "bar"}
+        stringified_data = "stringified data"
+        hash_value = "6b86b273ff"
+        stringify_mock.return_value = stringified_data
+
+        generator = LogicalIdGenerator(self.prefix, data_obj=data, data_hash=hash_value)
+
+        expected = "{}{}".format(self.prefix, hash_value)
+        self.assertEqual(expected, generator.gen())
+        stringify_mock.assert_called_once_with(data)
+
+        self.assertEqual(generator.gen(), generator.gen())
+
+    @patch.object(LogicalIdGenerator, "_stringify")
+    def test_gen_hash_data_empty(self, stringify_mock):
+        data = {"foo": "bar"}
+        stringified_data = "stringified data"
+        hash_value = ""
+        stringify_mock.return_value = stringified_data
+
+        generator = LogicalIdGenerator(self.prefix, data_obj=data, data_hash=hash_value)
+
+        stringify_mock.assert_called_once_with(data)
+        self.assertEqual(generator.gen(), generator.gen())
+
     def test_gen_stability_with_copy(self):
         data = {"foo": "bar", "a": "b"}
         generator = LogicalIdGenerator(self.prefix, data_obj=data)
