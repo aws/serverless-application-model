@@ -61,7 +61,7 @@ Resources:
            }
          }
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
 
   MyFn:
     Type: AWS::Serverless::Function
@@ -75,7 +75,7 @@ Resources:
            }
          }
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         Cognito:
           Type: Api

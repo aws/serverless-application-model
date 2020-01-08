@@ -19,7 +19,7 @@ class TestVersionsAndAliases(TestCase):
         self.code_uri = "s3://bucket/key?versionId=version"
         self.func_dict = {
             "Type": "AWS::Serverless::Function",
-            "Properties": {"CodeUri": self.code_uri, "Runtime": "nodejs4.3", "Handler": "index.handler"},
+            "Properties": {"CodeUri": self.code_uri, "Runtime": "nodejs12.x", "Handler": "index.handler"},
         }
         self.sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=self.func_dict)
         self.lambda_func = self._make_lambda_function(self.sam_func.logical_id)
@@ -33,7 +33,7 @@ class TestVersionsAndAliases(TestCase):
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
             },
@@ -87,7 +87,7 @@ class TestVersionsAndAliases(TestCase):
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
                 "DeploymentPreference": deploy_preference_dict,
@@ -130,7 +130,7 @@ class TestVersionsAndAliases(TestCase):
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
                 "DeploymentPreference": deploy_preference_dict,
@@ -166,7 +166,7 @@ class TestVersionsAndAliases(TestCase):
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
                 "DeploymentPreference": deploy_preference_dict,
@@ -204,7 +204,7 @@ class TestVersionsAndAliases(TestCase):
                 "Type": "AWS::Serverless::Function",
                 "Properties": {
                     "CodeUri": self.code_uri,
-                    "Runtime": "nodejs4.3",
+                    "Runtime": "nodejs12.x",
                     "Handler": "index.handler",
                     "DeploymentPreference": {"Type": "LINEAR"},
                 },
@@ -226,7 +226,7 @@ class TestVersionsAndAliases(TestCase):
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Handler": "index.handler",
                 "DeploymentPreference": deploy_preference_dict,
             },
@@ -265,7 +265,7 @@ class TestVersionsAndAliases(TestCase):
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
                 "DeploymentPreference": deploy_preference_dict,
@@ -307,7 +307,7 @@ class TestVersionsAndAliases(TestCase):
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
                 "DeploymentPreference": deploy_preference_dict,
@@ -341,7 +341,7 @@ class TestVersionsAndAliases(TestCase):
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "CodeUri": self.code_uri,
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs12.x",
                 "Handler": "index.handler",
                 "AutoPublishAlias": alias_name,
                 "DeploymentPreference": deploy_preference_dict,

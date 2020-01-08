@@ -55,7 +55,7 @@ def test_redeploy_implicit_api():
                     "FunctionName": "InitialFunction",
                     "CodeUri": "s3://bucket/code.zip",
                     "Handler": "index.handler",
-                    "Runtime": "nodejs4.3",
+                    "Runtime": "nodejs12.x",
                     "Events": {"MyApi": {"Type": "Api", "Properties": {"Path": "/first", "Method": "get"}}},
                 },
             },
@@ -64,7 +64,7 @@ def test_redeploy_implicit_api():
                 "Properties": {
                     "CodeUri": "s3://bucket/code.zip",
                     "Handler": "index.handler",
-                    "Runtime": "nodejs4.3",
+                    "Runtime": "nodejs12.x",
                     "Events": {"MyApi": {"Type": "Api", "Properties": {"Path": "/second", "Method": "get"}}},
                 },
             },

@@ -115,7 +115,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs10.x"
+        "Runtime": "nodejs12.x"
       }
     }, 
     "MyTestFunctionVersion948f7f815d": {

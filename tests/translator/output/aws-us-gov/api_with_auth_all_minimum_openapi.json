@@ -138,7 +138,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs8.10", 
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
             "Value": "SAM", 
@@ -377,7 +377,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs8.10", 
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
             "Value": "SAM", 

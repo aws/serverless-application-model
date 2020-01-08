@@ -210,7 +210,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond7"
     },
@@ -235,7 +235,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond6"
     },
@@ -291,7 +291,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond4"
     },
@@ -316,7 +316,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond3"
     },
@@ -341,7 +341,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond2"
     },
@@ -366,7 +366,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond1"
     },
@@ -391,7 +391,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond9"
     },
@@ -504,7 +504,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond8"
     },
@@ -741,7 +741,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond"
     },
@@ -797,7 +797,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "MyCondition"
     },
@@ -833,7 +833,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond5"
     },

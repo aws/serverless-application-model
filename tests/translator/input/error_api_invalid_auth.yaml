@@ -9,7 +9,7 @@ Resources:
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         GetRoot:
           Type: Api
@@ -32,7 +32,7 @@ Resources:
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         GetRoot:
           Type: Api
@@ -57,7 +57,7 @@ Resources:
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         GetRoot:
           Type: Api
@@ -82,7 +82,7 @@ Resources:
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         GetRoot:
           Type: Api
@@ -144,7 +144,7 @@ Resources:
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         GetRoot:
           Type: Api

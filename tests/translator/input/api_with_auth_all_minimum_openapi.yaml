@@ -40,13 +40,13 @@ Resources:
     Properties:
       CodeUri: s3://bucketname/thumbnails.zip
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
   MyFn:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://bucketname/thumbnails.zip
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         Cognito:
           Type: Api
