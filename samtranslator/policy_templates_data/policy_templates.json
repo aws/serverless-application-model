@@ -217,7 +217,6 @@
           {
             "Effect": "Allow",
             "Action": [
-              "dynamodb:DeleteItem",
               "dynamodb:PutItem",
               "dynamodb:UpdateItem",
               "dynamodb:BatchWriteItem"
@@ -391,8 +390,7 @@
             "Action": [
               "s3:PutObject",
               "s3:PutObjectAcl",
-              "s3:PutLifecycleConfiguration",
-              "s3:DeleteObject"
+              "s3:PutLifecycleConfiguration"
             ],
             "Resource": [
               {
