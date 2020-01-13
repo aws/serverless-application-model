@@ -97,7 +97,12 @@
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
+          "x-amazon-apigateway-cors": {
+            "allowOrigins": [
+              "'*'"
+            ]
+          },
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {

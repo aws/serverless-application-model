@@ -26,11 +26,18 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
       DefinitionBody:
         info:
           version: '1.0'
           title:
             Ref: AWS::StackName
+        # when this is specified `CorsConfiguration` property is ignored
+        x-amazon-apigateway-cors:
+          allowOrigins:
+            - "https://www.example.com"
         paths:
           "/basic":
             post:

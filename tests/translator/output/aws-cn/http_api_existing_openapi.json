@@ -100,7 +100,12 @@
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
+          "x-amazon-apigateway-cors": {
+            "allowOrigins": [
+              "https://www.example.com"
+            ]
+          },
           "paths": {
             "/basic": {
               "post": {

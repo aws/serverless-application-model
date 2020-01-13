@@ -7,6 +7,15 @@ from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.model.intrinsics import is_instrinsic
+
+_CORS_WILDCARD = "'*'"
+CorsProperties = namedtuple(
+    "_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigins", "MaxAge", "ExposeHeaders", "AllowCredentials"]
+)
+# Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
+# _CORS_WILDCARD needs to be wrapped in a list
+CorsProperties.__new__.__defaults__ = (None, None, [_CORS_WILDCARD], None, None, False)
 
 AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
 AuthProperties.__new__.__defaults__ = (None, None)
@@ -24,6 +33,7 @@ class HttpApiGenerator(object):
         stage_name,
         tags=None,
         auth=None,
+        cors_configuration=None,
         access_log_settings=None,
         resource_attributes=None,
         passthrough_resource_attributes=None,
@@ -51,6 +61,7 @@ class HttpApiGenerator(object):
         if not self.stage_name:
             self.stage_name = DefaultStageName
         self.auth = auth
+        self.cors_configuration = cors_configuration
         self.tags = tags
         self.access_log_settings = access_log_settings
         self.resource_attributes = resource_attributes
@@ -68,6 +79,9 @@ class HttpApiGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both"
             )
+        if self.cors_configuration:
+            # call this method to add cors in open api
+            self._add_cors()
 
         self._add_auth()
 
@@ -87,6 +101,74 @@ class HttpApiGenerator(object):
             http_api.Tags = get_tag_list(self.tags)
 
         return http_api
+
+    def _add_cors(self):
+        """
+        Add CORS configuration if CORSConfiguration property is set in SAM.
+        Adds CORS configuration only if DefinitionBody is present and
+        APIGW extension for CORS is not present in the DefinitionBody
+        """
+
+        if not self.cors_configuration:
+            return
+
+        if self.cors_configuration and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "Cors works only with inline OpenApi specified in " "'DefinitionBody' property"
+            )
+
+        # If cors configuration is set to true add * to the allow origins
+        if isinstance(self.cors_configuration, bool):
+            # if cors config is true add Origins as "'*'"
+            properties = CorsProperties()
+
+        elif is_instrinsic(self.cors_configuration):
+            # Just set Origin property. Others will be defaults
+            properties = CorsProperties(AllowOrigins=self.cors_configuration)
+
+        elif isinstance(self.cors_configuration, dict):
+            # Make sure keys in the dict are recognized
+            if not all(key in CorsProperties._fields for key in self.cors_configuration.keys()):
+                raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property")
+
+            properties = CorsProperties(**self.cors_configuration)
+
+        else:
+            raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property")
+
+        if not OpenApiEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to add Cors configuration because "
+                "'DefinitionBody' does not contain a valid "
+                "openapi definition",
+            )
+
+        if properties.AllowCredentials is True and properties.AllowOrigins == [_CORS_WILDCARD]:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to add Cors configuration because "
+                "'AllowCredentials' can not be true when "
+                "'AllowOrigin' is \"'*'\" or not set",
+            )
+
+        editor = OpenApiEditor(self.definition_body)
+        # if CORS is set in both definition_body and as a CORSConfiguration property,
+        # the definition_body is not modified by SAM
+        if editor.has_api_gateway_cors():
+            return
+
+        editor.add_cors(
+            properties.AllowOrigins,
+            properties.AllowHeaders,
+            properties.AllowMethods,
+            properties.ExposeHeaders,
+            properties.MaxAge,
+            properties.AllowCredentials,
+        )
+
+        # Assign the Swagger back to template
+        self.definition_body = editor.openapi
 
     def _add_auth(self):
         """

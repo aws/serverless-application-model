@@ -17,3 +17,4 @@ Resources:
       AccessLogSettings:
         DestinationArn: arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName
         Format: $context.requestId
+      CorsConfiguration: true
