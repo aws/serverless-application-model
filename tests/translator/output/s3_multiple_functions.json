@@ -6,6 +6,12 @@
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -27,7 +33,7 @@
     "FunctionTwoImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         },
@@ -80,6 +86,12 @@
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -101,7 +113,7 @@
     "FunctionOneImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         },

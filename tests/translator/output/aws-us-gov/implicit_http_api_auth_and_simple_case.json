@@ -13,10 +13,6 @@
     "RestApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-us-gov:iam::aws:policy/AmazonDynamoDBFullAccess"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -32,7 +28,17 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
+          "arn:aws-us-gov:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "RestApiFunction": {
@@ -61,7 +67,7 @@
     "RestApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "RestApiFunction"

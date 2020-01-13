@@ -63,5 +63,16 @@ class SamParameterValues(object):
         Add pseudo parameter values
         :return: parameter values that have pseudo parameter in it
         """
-        if 'AWS::Region' not in self.parameter_values:
-            self.parameter_values['AWS::Region'] = boto3.session.Session().region_name
+        if "AWS::Region" not in self.parameter_values:
+            self.parameter_values["AWS::Region"] = boto3.session.Session().region_name
+
+        if "AWS::Partition" not in self.parameter_values:
+            region = boto3.session.Session().region_name
+
+            # neither boto nor botocore has any way of returning the partition value yet
+            if region.startswith("cn-"):
+                self.parameter_values["AWS::Partition"] = "aws-cn"
+            elif region.startswith("us-gov-"):
+                self.parameter_values["AWS::Partition"] = "aws-us-gov"
+            else:
+                self.parameter_values["AWS::Partition"] = "aws"

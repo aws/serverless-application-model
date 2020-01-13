@@ -7,13 +7,19 @@ Resources:
       Runtime: python2.7
       AutoPublishAlias: live
       DeploymentPreference:
-        Enabled: true
+        Enabled: True
         Type: Linear10PercentEvery1Minute
         Hooks:
           PreTraffic: !Ref MySanityTestFunction
           PostTraffic: !Ref MyValidationTestFunction
         Alarms:
           - !Ref MyCloudWatchAlarm
+        TriggerConfigurations:
+          - TriggerEvents:
+              - DeploymentSuccess
+              - DeploymentFailure
+            TriggerName: TestTrigger
+            TriggerTargetArn: !Ref MySNSTopic
 
   MySanityTestFunction:
     Type: 'AWS::Serverless::Function'
@@ -22,7 +28,7 @@ Resources:
       Runtime: python2.7
       CodeUri: s3://my-bucket/mySanityTestFunction.zip
       DeploymentPreference:
-        Enabled: false
+        Enabled: False
 
   MyValidationTestFunction:
     Type: 'AWS::Serverless::Function'
@@ -31,7 +37,7 @@ Resources:
       Runtime: python2.7
       CodeUri: s3://my-bucket/myValidationTestFunction.zip
       DeploymentPreference:
-        Enabled: false
+        Enabled: False
 
   MyCloudWatchAlarm:
     Type: AWS::CloudWatch::Alarm
@@ -42,3 +48,6 @@ Resources:
      Namespace: AWS/EC2
      Period: 300
      Threshold: 10
+
+  MySNSTopic:
+      Type: AWS::SNS::Topic

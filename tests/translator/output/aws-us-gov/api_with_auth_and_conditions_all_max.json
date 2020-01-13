@@ -11,7 +11,7 @@
     "MyFunctionWithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunction"
@@ -32,7 +32,7 @@
     "MyApiMyLambdaRequestAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": "arn:aws", 
         "SourceArn": {
@@ -315,7 +315,7 @@
     "MyApiMyLambdaTokenAuthNoneFunctionInvokeRoleAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": "arn:aws", 
         "SourceArn": {
@@ -333,7 +333,7 @@
     "MyFunctionWithNoAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunction"
@@ -377,7 +377,7 @@
     "MyFunctionWithCognitoMultipleUserPoolsAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunction"
@@ -410,7 +410,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -432,7 +438,7 @@
     "MyFunctionWithConditionalWithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionWithConditional"
@@ -454,7 +460,7 @@
     "MyFunctionWithConditionalWithLambdaRequestAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionWithConditional"
@@ -476,7 +482,7 @@
     "MyApiMyLambdaTokenAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": "arn:aws", 
         "SourceArn": {
@@ -494,7 +500,7 @@
     "MyFunctionWithConditionalWithDefaultAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunctionWithConditional"
@@ -518,7 +524,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [

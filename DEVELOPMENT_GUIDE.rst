@@ -17,7 +17,7 @@ steps manually.
 
 1. Install Python Versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Our officially supported Python versions are 2.7, 3.6, and 3.7. Follow the idioms from this `excellent cheatsheet`_ to
+Our officially supported Python versions are 2.7, 3.6, 3.7 and 3.8. Follow the idioms from this `excellent cheatsheet`_ to
 make sure your code is compatible with both Python 2.7 and 3 versions.
 
 Setup Python locally using `pyenv`_
@@ -26,8 +26,23 @@ Setup Python locally using `pyenv`_
 #. ``pyenv install 2.7.14``
 #. Make the Python version available in the project: ``pyenv local 2.7.14``
 
+2. Install Additional Tooling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. Black
+~~~~~~~~
+We format our code using [Black](https://github.com/python/black) and verify the source code is black compliant
+in Appveyor during PRs. You can find installation instructions on [Black's docs](https://black.readthedocs.io/en/stable/installation_and_usage.html).
 
-2. Activate Virtualenv
+After installing, you can run our formatting through our Makefile by `make black-format` or integrating Black directly in your favorite IDE (instructions
+can be found [here](https://black.readthedocs.io/en/stable/editor_integration.html))
+
+Pre-commit
+~~~~~~~~~~
+If you don't wish to manually run black on each pr or install black manually, we have integrated black into git hooks through [pre-commit](https://pre-commit.com/).
+After installing pre-commit, run `pre-commit install` in the root of the project. This will install black for you and run the black formatting on
+commit.
+
+3. Activate Virtualenv
 ~~~~~~~~~~~~~~~~~~~~~~
 Virtualenv allows you to install required libraries outside of the Python installation. A good practice is to setup
 a different virtualenv for each project. `pyenv`_ comes with a handy plugin that can create virtualenv.
@@ -37,7 +52,7 @@ a different virtualenv for each project. `pyenv`_ comes with a handy plugin that
 #. [Optional] Automatically activate the virtualenv in for this folder: ``pyenv local samtranslator27``
 
 
-3. Install dependencies
+4. Install dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~
 Install dependencies by running the following command. Make sure the Virtualenv you created above is active.
 

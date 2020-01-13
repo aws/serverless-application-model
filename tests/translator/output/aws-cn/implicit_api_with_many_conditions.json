@@ -126,7 +126,7 @@
     "helloworld7ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld7"
@@ -163,6 +163,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -238,6 +244,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -386,7 +398,7 @@
     "helloApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "hello"
@@ -408,7 +420,7 @@
     "helloworld2ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld2"
@@ -430,7 +442,7 @@
     "helloworld3ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld3"
@@ -452,7 +464,7 @@
     "helloworld1ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld1"
@@ -499,7 +511,7 @@
     "helloworld6ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld6"
@@ -535,6 +547,12 @@
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -557,7 +575,7 @@
     "helloworldApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld"
@@ -582,6 +600,12 @@
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -604,7 +628,7 @@
     "helloworld5ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld5"
@@ -626,7 +650,7 @@
     "helloworld8ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld8"
@@ -650,6 +674,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -675,6 +705,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -725,6 +761,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -798,7 +840,7 @@
     "helloworld9ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld9"
@@ -822,6 +864,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -848,6 +896,12 @@
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -872,6 +926,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -898,6 +958,12 @@
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -920,7 +986,7 @@
     "helloworld4ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld4"

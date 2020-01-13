@@ -5,6 +5,9 @@ language: python
 
 matrix:
   include:
+    - python: 3.8
+      env:
+        - TOXENV=py38
     - python: 3.7
       env:
         - TOXENV=py37
@@ -18,6 +21,12 @@ matrix:
 
 install:
 # Install the code requirements
+- mkdir $HOME/bin-black
+- wget -O $HOME/bin-black/black https://github.com/python/black/releases/download/19.3b0/black
+- chmod +x $HOME/bin-black/black
+- export PATH=$PATH:$HOME/bin-black
+- black --version
+
 - make init
 
 # Install Docs requirements

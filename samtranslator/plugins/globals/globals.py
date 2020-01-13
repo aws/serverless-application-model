@@ -37,9 +37,10 @@ class Globals(object):
             "DeploymentPreference",
             "PermissionsBoundary",
             "ReservedConcurrentExecutions",
-            "ProvisionedConcurrencyConfig"
+            "ProvisionedConcurrencyConfig",
+            "AssumeRolePolicyDocument",
+            "EventInvokeConfig",
         ],
-
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
         #   StageName: Because StageName cannot be overridden for Implicit APIs because of the current plugin
@@ -60,19 +61,11 @@ class Globals(object):
             "AccessLogSetting",
             "CanarySetting",
             "TracingEnabled",
-            "OpenApiVersion"
+            "OpenApiVersion",
+            "Domain",
         ],
-
-        SamResourceType.HttpApi.value: [
-            "Auth",
-            "AccessLogSettings",
-            "StageVariables",
-            "Tags"
-        ],
-
-        SamResourceType.SimpleTable.value: [
-            "SSESpecification"
-        ]
+        SamResourceType.HttpApi.value: ["Auth", "AccessLogSettings", "StageVariables", "Tags"],
+        SamResourceType.SimpleTable.value: ["SSESpecification"],
     }
 
     def __init__(self, template):
@@ -81,8 +74,9 @@ class Globals(object):
 
         :param dict template: SAM template to be parsed
         """
-        self.supported_resource_section_names = ([x.replace(self._RESOURCE_PREFIX, "")
-                                                  for x in self.supported_properties.keys()])
+        self.supported_resource_section_names = [
+            x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties.keys()
+        ]
         # Sort the names for stability in list ordering
         self.supported_resource_section_names.sort()
 
@@ -142,17 +136,21 @@ class Globals(object):
         for _, resource in resources.items():
             if ("Type" in resource) and (resource["Type"] == cls._API_TYPE):
                 properties = resource["Properties"]
-                if (cls._OPENAPIVERSION in properties) and (cls._MANAGE_SWAGGER in properties) and \
-                    SwaggerEditor.safe_compare_regex_with_string(
-                        SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]):
+                if (
+                    (cls._OPENAPIVERSION in properties)
+                    and (cls._MANAGE_SWAGGER in properties)
+                    and SwaggerEditor.safe_compare_regex_with_string(
+                        SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]
+                    )
+                ):
                     if not isinstance(properties[cls._OPENAPIVERSION], string_types):
                         properties[cls._OPENAPIVERSION] = str(properties[cls._OPENAPIVERSION])
                         resource["Properties"] = properties
                     if "DefinitionBody" in properties:
-                        definition_body = properties['DefinitionBody']
-                        definition_body['openapi'] = properties[cls._OPENAPIVERSION]
-                        if definition_body.get('swagger'):
-                            del definition_body['swagger']
+                        definition_body = properties["DefinitionBody"]
+                        definition_body["openapi"] = properties[cls._OPENAPIVERSION]
+                        if definition_body.get("swagger"):
+                            del definition_body["swagger"]
 
     def _parse(self, globals_dict):
         """
@@ -165,18 +163,21 @@ class Globals(object):
 
         globals = {}
         if not isinstance(globals_dict, dict):
-            raise InvalidGlobalsSectionException(self._KEYWORD,
-                                                 "It must be a non-empty dictionary".format(self._KEYWORD))
+            raise InvalidGlobalsSectionException(
+                self._KEYWORD, "It must be a non-empty dictionary".format(self._KEYWORD)
+            )
 
         for section_name, properties in globals_dict.items():
             resource_type = self._make_resource_type(section_name)
 
             if resource_type not in self.supported_properties:
-                raise InvalidGlobalsSectionException(self._KEYWORD,
-                                                     "'{section}' is not supported. "
-                                                     "Must be one of the following values - {supported}"
-                                                     .format(section=section_name,
-                                                             supported=self.supported_resource_section_names))
+                raise InvalidGlobalsSectionException(
+                    self._KEYWORD,
+                    "'{section}' is not supported. "
+                    "Must be one of the following values - {supported}".format(
+                        section=section_name, supported=self.supported_resource_section_names
+                    ),
+                )
 
             if not isinstance(properties, dict):
                 raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")
@@ -184,10 +185,13 @@ class Globals(object):
             for key, value in properties.items():
                 supported = self.supported_properties[resource_type]
                 if key not in supported:
-                    raise InvalidGlobalsSectionException(self._KEYWORD,
-                                                         "'{key}' is not a supported property of '{section}'. "
-                                                         "Must be one of the following values - {supported}"
-                                                         .format(key=key, section=section_name, supported=supported))
+                    raise InvalidGlobalsSectionException(
+                        self._KEYWORD,
+                        "'{key}' is not a supported property of '{section}'. "
+                        "Must be one of the following values - {supported}".format(
+                            key=key, section=section_name, supported=supported
+                        ),
+                    )
 
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type
             globals[resource_type] = GlobalProperties(properties)
@@ -357,7 +361,8 @@ class GlobalProperties(object):
 
         else:
             raise TypeError(
-                "Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local))
+                "Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local)
+            )
 
     def _merge_lists(self, global_list, local_list):
         """
@@ -433,6 +438,7 @@ class GlobalProperties(object):
         """
         Enum of tokens used in the merging
         """
+
         PRIMITIVE = "primitive"
         DICT = "dict"
         LIST = "list"

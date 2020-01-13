@@ -128,7 +128,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -150,7 +156,7 @@
     "ApiFunctionPostHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "ApiFunction"
@@ -183,7 +189,7 @@
     "ApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "ApiFunction"
@@ -252,7 +258,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -274,7 +286,7 @@
     "ServerlessApiMyLambdaRequestAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Fn::GetAtt": [

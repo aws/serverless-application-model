@@ -15,13 +15,10 @@ def parse_s3_uri(uri):
     url = urlparse(uri)
     query = parse_qs(url.query)
 
-    if url.scheme == 's3' and url.netloc and url.path:
-        s3_pointer = {
-            'Bucket': url.netloc,
-            'Key': url.path.lstrip('/')
-        }
-        if 'versionId' in query and len(query['versionId']) == 1:
-            s3_pointer['Version'] = query['versionId'][0]
+    if url.scheme == "s3" and url.netloc and url.path:
+        s3_pointer = {"Bucket": url.netloc, "Key": url.path.lstrip("/")}
+        if "versionId" in query and len(query["versionId"]) == 1:
+            s3_pointer["Version"] = query["versionId"][0]
         return s3_pointer
     else:
         return None
@@ -61,9 +58,9 @@ def construct_s3_location_object(location_uri, logical_id, property_name):
     if isinstance(location_uri, dict):
         if not location_uri.get("Bucket") or not location_uri.get("Key"):
             # location_uri is a dictionary but does not contain Bucket or Key property
-            raise InvalidResourceException(logical_id,
-                                           "'{}' requires Bucket and Key properties to be "
-                                           "specified".format(property_name))
+            raise InvalidResourceException(
+                logical_id, "'{}' requires Bucket and Key properties to be " "specified".format(property_name)
+            )
 
         s3_pointer = location_uri
 
@@ -72,15 +69,14 @@ def construct_s3_location_object(location_uri, logical_id, property_name):
         s3_pointer = parse_s3_uri(location_uri)
 
         if s3_pointer is None:
-            raise InvalidResourceException(logical_id,
-                                           '\'{}\' is not a valid S3 Uri of the form '
-                                           '"s3://bucket/key" with optional versionId query '
-                                           'parameter.'.format(property_name))
+            raise InvalidResourceException(
+                logical_id,
+                "'{}' is not a valid S3 Uri of the form "
+                '"s3://bucket/key" with optional versionId query '
+                "parameter.".format(property_name),
+            )
 
-    code = {
-        'S3Bucket': s3_pointer['Bucket'],
-        'S3Key': s3_pointer['Key']
-    }
-    if 'Version' in s3_pointer:
-        code['S3ObjectVersion'] = s3_pointer['Version']
+    code = {"S3Bucket": s3_pointer["Bucket"], "S3Key": s3_pointer["Key"]}
+    if "Version" in s3_pointer:
+        code["S3ObjectVersion"] = s3_pointer["Version"]
     return code

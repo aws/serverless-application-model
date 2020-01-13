@@ -13,7 +13,7 @@
     "MyFunctionWithApiKeyRequiredTrueMyApiWithApiKeyRequiredTruePermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunctionWithApiKeyRequiredTrue"
@@ -34,7 +34,7 @@
     "MyFunctionWithApiKeyRequiredFalseMyApiWithApiKeyRequiredFalsePermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunctionWithApiKeyRequiredFalse"
@@ -113,7 +113,7 @@
     "MyFunctionWithApiKeyRequiredDefaultMyApiWithApiKeyRequiredDefaultPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunctionWithApiKeyRequiredDefault"
@@ -160,6 +160,12 @@
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -184,6 +190,12 @@
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -207,6 +219,12 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",

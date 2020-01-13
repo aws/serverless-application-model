@@ -62,6 +62,21 @@
         ]
       }
     },
+    "CloudWatchDescribeAlarmHistoryPolicy": {
+      "Description": "Gives permissions to describe CloudWatch alarm history",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "cloudwatch:DescribeAlarmHistory"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
     "CloudWatchPutMetricPolicy": {
       "Description": "Gives permissions to put metrics to CloudWatch",
       "Parameters": {
@@ -117,7 +132,8 @@
               "dynamodb:UpdateItem",
               "dynamodb:BatchWriteItem",
               "dynamodb:BatchGetItem",
-              "dynamodb:DescribeTable"
+              "dynamodb:DescribeTable",
+              "dynamodb:ConditionCheckItem"
             ],
             "Resource": [
               {
@@ -608,18 +624,33 @@
             "Action": [
               "dynamodb:DescribeStream",
               "dynamodb:GetRecords",
-              "dynamodb:GetShardIterator",
-              "dynamodb:ListStreams"
+              "dynamodb:GetShardIterator"
             ],
             "Resource": {
               "Fn::Sub": [
-                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/${streamName}",
+                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/stream/${streamName}",
                 {
                   "tableName": {
                     "Ref": "TableName"
                   },
                   "streamName": {
                     "Ref": "StreamName"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:ListStreams"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/stream/*",
+                {
+                  "tableName": {
+                    "Ref": "TableName"
                   }
                 }
               ]
@@ -651,6 +682,7 @@
             "Effect": "Allow",
             "Action": [
               "kinesis:DescribeStream",
+              "kinesis:DescribeStreamSummary",
               "kinesis:GetRecords",
               "kinesis:GetShardIterator"
             ],
@@ -748,6 +780,7 @@
               "kinesis:DecreaseStreamRetentionPeriod",
               "kinesis:DeleteStream",
               "kinesis:DescribeStream",
+              "kinesis:DescribeStreamSummary",
               "kinesis:GetShardIterator",
               "kinesis:IncreaseStreamRetentionPeriod",
               "kinesis:ListTagsForStream",
@@ -782,6 +815,32 @@
         "Statement": [
           {
             "Action": "kms:Decrypt",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                {
+                  "keyId": {
+                    "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "KMSEncryptPolicy": {
+      "Description": "Gives permission to encrypt with KMS Key",
+      "Parameters": {
+        "KeyId": {
+          "Description": "ID of the KMS Key"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "kms:Encrypt",
             "Effect": "Allow",
             "Resource": {
               "Fn::Sub": [
@@ -1729,6 +1788,60 @@
                 {
                   "repositoryName": {
                     "Ref": "RepositoryName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AthenaQueryPolicy": {
+      "Description": "Gives permissions to execute Athena queries",
+      "Parameters": {
+        "WorkGroupName": {
+          "Description": "Name of the Athena Workgroup"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "athena:ListWorkGroups",
+              "athena:GetExecutionEngine",
+              "athena:GetExecutionEngines",
+              "athena:GetNamespace",
+              "athena:GetCatalogs",
+              "athena:GetNamespaces",
+              "athena:GetTables",
+              "athena:GetTable"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "athena:StartQueryExecution",
+              "athena:GetQueryResults",
+              "athena:DeleteNamedQuery",
+              "athena:GetNamedQuery",
+              "athena:ListQueryExecutions",
+              "athena:StopQueryExecution",
+              "athena:GetQueryResultsStream",
+              "athena:ListNamedQueries",
+              "athena:CreateNamedQuery",
+              "athena:GetQueryExecution",
+              "athena:BatchGetNamedQuery",
+              "athena:BatchGetQueryExecution",
+              "athena:GetWorkGroup"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:athena:${AWS::Region}:${AWS::AccountId}:workgroup/${workgroupName}",
+                {
+                  "workgroupName": {
+                    "Ref": "WorkGroupName"
                   }
                 }
               ]

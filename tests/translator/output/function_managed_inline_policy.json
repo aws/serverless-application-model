@@ -40,7 +40,13 @@
             "Ref": "SomeManagedPolicyArn"
           }, 
           "arn:aws:iam::123456789012:policy/CustomerCreatedManagedPolicy"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
         "Policies": [
           {
             "PolicyName": "FunctionRolePolicy0", 

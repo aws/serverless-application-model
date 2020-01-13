@@ -28,7 +28,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName:
-        Ref: FunctionName
+        Fn::Sub: ${FunctionName}
       CodeUri:
         Bucket:
           Ref: CodeBucket

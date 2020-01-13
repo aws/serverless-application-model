@@ -1,0 +1,185 @@
+{
+  "Resources": {
+    "ScheduledFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "TriggeredFunctionOnTerminatePermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "TriggeredFunction"
+        }, 
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "TriggeredFunctionOnTerminate", 
+            "Arn"
+          ]
+        }
+      }
+    }, 
+    "ScheduledFunctionSchedulePermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ScheduledFunction"
+        }, 
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "ScheduledFunctionSchedule", 
+            "Arn"
+          ]
+        }
+      }
+    }, 
+    "ScheduledFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip", 
+          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "ScheduledFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "TriggeredFunctionOnTerminate": {
+      "Type": "AWS::Events::Rule", 
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        }, 
+        "EventBusName": "ExternalEventBridge",
+        "Targets": [
+          {
+            "Id": "TriggeredFunctionOnTerminateLambdaTarget", 
+            "Arn": {
+              "Fn::GetAtt": [
+                "TriggeredFunction", 
+                "Arn"
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "TriggeredFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip", 
+          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "TriggeredFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "TriggeredFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ScheduledFunctionSchedule": {
+      "Type": "AWS::Events::Rule", 
+      "Properties": {
+        "ScheduleExpression": "rate(1 minute)",
+        "Targets": [
+          {
+            "Id": "ScheduledFunctionScheduleLambdaTarget", 
+            "Arn": {
+              "Fn::GetAtt": [
+                "ScheduledFunction", 
+                "Arn"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

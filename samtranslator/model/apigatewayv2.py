@@ -5,44 +5,47 @@ from samtranslator.model.exceptions import InvalidResourceException
 
 
 class ApiGatewayV2HttpApi(Resource):
-    resource_type = 'AWS::ApiGatewayV2::Api'
+    resource_type = "AWS::ApiGatewayV2::Api"
     property_types = {
-        'Body': PropertyType(False, is_type(dict)),
-        'BodyS3Location': PropertyType(False, is_type(dict)),
-        'Description': PropertyType(False, is_str()),
-        'FailOnWarnings': PropertyType(False, is_type(bool)),
-        'BasePath': PropertyType(False, is_str()),
-        'Tags': PropertyType(False, list_of(is_type(dict))),
-        'CorsConfiguration': PropertyType(False, is_type(dict))
+        "Body": PropertyType(False, is_type(dict)),
+        "BodyS3Location": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "BasePath": PropertyType(False, is_str()),
+        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "CorsConfiguration": PropertyType(False, is_type(dict)),
     }
 
-    runtime_attrs = {
-        "http_api_id": lambda self: ref(self.logical_id),
-    }
+    runtime_attrs = {"http_api_id": lambda self: ref(self.logical_id)}
 
 
 class ApiGatewayV2Stage(Resource):
-    resource_type = 'AWS::ApiGatewayV2::Stage'
+    resource_type = "AWS::ApiGatewayV2::Stage"
     property_types = {
-        'AccessLogSettings': PropertyType(False, is_type(dict)),
-        'DefaultRouteSettings': PropertyType(False, is_type(dict)),
-        'ClientCertificateId': PropertyType(False, is_str()),
-        'Description': PropertyType(False, is_str()),
-        'ApiId': PropertyType(True, is_str()),
-        'StageName': PropertyType(False, one_of(is_str(), is_type(dict))),
-        'Tags': PropertyType(False, list_of(is_type(dict))),
-        'StageVariables': PropertyType(False, is_type(dict)),
-        'AutoDeploy': PropertyType(False, is_type(bool))
+        "AccessLogSettings": PropertyType(False, is_type(dict)),
+        "DefaultRouteSettings": PropertyType(False, is_type(dict)),
+        "ClientCertificateId": PropertyType(False, is_str()),
+        "Description": PropertyType(False, is_str()),
+        "ApiId": PropertyType(True, is_str()),
+        "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "StageVariables": PropertyType(False, is_type(dict)),
+        "AutoDeploy": PropertyType(False, is_type(bool)),
     }
 
-    runtime_attrs = {
-        "stage_name": lambda self: ref(self.logical_id),
-    }
+    runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
 
 
 class ApiGatewayV2Authorizer(object):
-    def __init__(self, api_logical_id=None, name=None, open_id_connect_url=None,
-                 authorization_scopes=[], jwt_configuration={}, id_source=None):
+    def __init__(
+        self,
+        api_logical_id=None,
+        name=None,
+        open_id_connect_url=None,
+        authorization_scopes=[],
+        jwt_configuration={},
+        id_source=None,
+    ):
         """
         Creates an authorizer for use in V2 Http Apis
         """
@@ -73,8 +76,8 @@ class ApiGatewayV2Authorizer(object):
             "x-amazon-apigateway-authorizer": {
                 "jwtConfiguration": self.jwt_configuration,
                 "identitySource": self.id_source,
-                "type": "jwt"
-            }
+                "type": "jwt",
+            },
         }
         if self.open_id_connect_url:
             openapi["x-amazon-apigateway-authorizer"]["openIdConnectUrl"] = self.open_id_connect_url

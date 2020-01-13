@@ -30,8 +30,10 @@ LambdaEdgeFunctionSample:
         Timeout: 5
         # More info at https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
         AutoPublishAlias: live 
-        ProvisionedConcurrencyConfig:
-          ProvisionedConcurrentExecutions: !If [AliasProvisionedConcurrencyEnabled, !Ref ProvisionedConcurrency, !Ref 'AWS::NoValue']
+        ProvisionedConcurrencyConfig: !If
+            - AliasProvisionedConcurrencyEnabled
+            - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+            - !Ref 'AWS::NoValue'
 ```
 
 We must also create a custom IAM Role which allows `lambda.amazonaws.com` and `edgelambda.amazonaws.com` services to assume the role and execute the function.

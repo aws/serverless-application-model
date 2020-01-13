@@ -1,0 +1,30 @@
+Resources:
+  ScheduledFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+            Name: test-schedule
+            Description: Test Schedule
+            Enabled: True
+
+  TriggeredFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        OnTerminate:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - terminated

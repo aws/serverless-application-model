@@ -7,7 +7,6 @@ from . import sam_schema
 
 
 class SamTemplateValidator(object):
-
     @staticmethod
     def validate(template_dict, schema=None):
         """

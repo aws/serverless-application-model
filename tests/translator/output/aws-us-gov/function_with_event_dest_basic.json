@@ -1,0 +1,149 @@
+{
+  "Parameters": {
+    "SNSArn": {
+      "Default": "my-sns-arn", 
+      "Type": "String"
+    }
+  }, 
+  "Resources": {
+    "MyTestFunctionEventInvokeConfigOnSuccessQueue": {
+      "Type": "AWS::SQS::Queue", 
+      "Properties": {}
+    }, 
+    "MyTestFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Policies": [
+          {
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnSuccessSQSPolicy", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "sqs:SendMessage", 
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "MyTestFunctionEventInvokeConfigOnSuccessQueue", 
+                      "Arn"
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnFailureSNSPolicy", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "sns:publish", 
+                  "Resource": "my-sns-arn", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyTestFunctionEventInvokeConfig": {
+      "Type": "AWS::Lambda::EventInvokeConfig", 
+      "Properties": {
+        "MaximumEventAgeInSeconds": 70, 
+        "MaximumRetryAttempts": 1, 
+        "DestinationConfig": {
+          "OnSuccess": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "MyTestFunctionEventInvokeConfigOnSuccessQueue", 
+                "Arn"
+              ]
+            }
+          }, 
+          "OnFailure": {
+            "Destination": "my-sns-arn"
+          }
+        }, 
+        "FunctionName": {
+          "Ref": "MyTestFunction"
+        }, 
+        "Qualifier": "live"
+      }, 
+      "DependsOn": [
+        "MyTestFunctionAliaslive"
+      ]
+    }, 
+    "MyTestFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = function(event, context, callback) {\n    var event_received_at = new Date().toISOString();\n    console.log('Event received at: ' + event_received_at);\n    console.log('Received event:', JSON.stringify(event, null, 2));\n\n    if (event.Success) {\n        console.log(\"Success\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(null);\n    } else {\n        console.log(\"Failure\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(new Error(\"Failure from event, Success = false, I am failing!\"), 'Destination Function Error Thrown');\n    }\n};      \n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 1024, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyTestFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs10.x"
+      }
+    }, 
+    "MyTestFunctionVersion948f7f815d": {
+      "DeletionPolicy": "Retain", 
+      "Type": "AWS::Lambda::Version", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyTestFunction"
+        }
+      }
+    }, 
+    "MyTestFunctionAliaslive": {
+      "Type": "AWS::Lambda::Alias", 
+      "Properties": {
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MyTestFunctionVersion948f7f815d", 
+            "Version"
+          ]
+        }, 
+        "FunctionName": {
+          "Ref": "MyTestFunction"
+        }, 
+        "Name": "live"
+      }
+    }
+  }
+}

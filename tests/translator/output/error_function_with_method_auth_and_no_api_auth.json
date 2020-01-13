@@ -1,0 +1,4 @@
+{
+  "errors": [{"errorMessage": "Resource with id [HelloWorldFunction] is invalid. Event with id [HttpGetUserGroupIdUserId] is invalid. Unable to set Authorizer on API method [get] for path [/users/{groupId}/{userId}] because 'NONE' is only a valid value when a DefaultAuthorizer on the API is specified."}],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [HelloWorldFunction] is invalid. Event with id [HttpGetUserGroupIdUserId] is invalid. Unable to set Authorizer on API method [get] for path [/users/{groupId}/{userId}] because 'NONE' is only a valid value when a DefaultAuthorizer on the API is specified."
+}

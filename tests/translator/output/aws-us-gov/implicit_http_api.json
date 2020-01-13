@@ -32,7 +32,13 @@
               }
             }
           ]
-        }
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "HttpApiFunction2Role": {
@@ -57,7 +63,13 @@
               }
             }
           ]
-        }
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "ServerlessHttpApi": {
@@ -119,7 +131,7 @@
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "HttpApiFunction"
@@ -186,7 +198,7 @@
     "HttpApiFunction2Basic2Permission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "HttpApiFunction2"

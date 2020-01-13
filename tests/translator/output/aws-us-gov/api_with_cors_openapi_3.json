@@ -28,7 +28,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -50,7 +56,7 @@
     "ImplicitApiFunctionAnyApiPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "ImplicitApiFunction"
@@ -217,7 +223,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -240,7 +252,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5e7d1b38bf"
+          "Ref": "ServerlessRestApiDeployment8493e7adfe"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -265,7 +277,13 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -287,7 +305,7 @@
     "ImplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "ImplicitApiFunction"
@@ -337,13 +355,13 @@
         ]
       }
     }, 
-    "ServerlessRestApiDeployment5e7d1b38bf": {
+    "ServerlessRestApiDeployment8493e7adfe": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: 5e7d1b38bf567c46a1fc95b97a22d3cbf171216c"
+        "Description": "RestApi deployment id: 8493e7adfe1ae5a1112328c0633eea5cdce0633c"
       }
     }, 
     "ServerlessRestApi": {
@@ -384,27 +402,25 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
                     "headers": {
                       "Access-Control-Allow-Origin": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "x-amazon-apigateway-any-method": {
                 "x-amazon-apigateway-integration": {
@@ -444,27 +460,25 @@
                       }
                     }
                   }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
+                },
                 "summary": "CORS support", 
                 "responses": {
                   "200": {
                     "headers": {
                       "Access-Control-Allow-Origin": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }, 
                       "Access-Control-Allow-Methods": {
-                        "type": "string"
+                        "schema": {
+                          "type": "string"
+                        }
                       }
                     }, 
                     "description": "Default response for CORS method"
                   }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
+                }
               }, 
               "get": {
                 "x-amazon-apigateway-integration": {

@@ -11,6 +11,9 @@
     "MySqsQueue": {
       "Type": "AWS::SQS::Queue"
     },
+    "MySnsTopic": {
+        "Type": "AWS::SNS::Topic"
+    },
     "MyFunctionForBatchingExampleStream": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
@@ -85,6 +88,43 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "MyFunctionForBatchingExampleDynamoDBStreamEventSQSPolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "sqs:SendMessage",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "MySqsQueue",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+              "PolicyDocument": {
+                  "Statement": [
+                      {
+                          "Action": "sns:publish",
+                          "Effect": "Allow",
+                          "Resource": {
+                              "Ref": "MySnsTopic"
+                          }
+                      }
+                  ]
+              },
+              "PolicyName": "MyFunctionForBatchingExampleStreamEventSNSPolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
           }
         ],
         "AssumeRolePolicyDocument": {
@@ -129,7 +169,8 @@
                 "MySqsQueue",
                 "Arn"
               ]
-            }
+            },
+            "Type": "SQS"
           }
         },
         "EventSourceArn": {
@@ -149,7 +190,7 @@
       "Properties": {
         "Handler": "index.handler",
         "Code": {
-          "ZipFile": "\nexports.handler = async (event) => {\n    return {\n    statusCode: 200,\n    body: JSON.stringify(event),\n    headers: {}\n    }\n}\n"
+          "ZipFile": "exports.handler = async (event) => {\n    return {\n    statusCode: 200,\n    body: JSON.stringify(event),\n    headers: {}\n    }\n}\n"
         },
         "Role": {
           "Fn::GetAtt": [
@@ -181,7 +222,15 @@
         "FunctionName": {
           "Ref": "MyFunctionForBatchingExample"
         },
-        "StartingPosition": "LATEST"
+        "StartingPosition": "LATEST",
+        "DestinationConfig": {
+            "OnFailure": {
+                "Destination": {
+                    "Ref": "MySnsTopic"
+                },
+                "Type": "SNS"
+            }
+        }
       }
     },
     "KinesisStream": {

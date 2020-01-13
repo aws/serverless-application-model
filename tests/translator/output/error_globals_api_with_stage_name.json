@@ -1,8 +1,8 @@
 {
   "errors": [
     {
-      "errorMessage": "'Globals' section is invalid. 'StageName' is not a supported property of 'Api'. Must be one of the following values - ['Auth', 'Name', 'DefinitionUri', 'CacheClusterEnabled', 'CacheClusterSize', 'Variables', 'EndpointConfiguration', 'MethodSettings', 'BinaryMediaTypes', 'Cors', 'GatewayResponses', 'AccessLogSetting', 'CanarySetting', 'OpenApiVersion']"
+      "errorMessage": "'Globals' section is invalid. 'StageName' is not a supported property of 'Api'. Must be one of the following values - ['Auth', 'Name', 'DefinitionUri', 'CacheClusterEnabled', 'CacheClusterSize', 'Variables', 'EndpointConfiguration', 'MethodSettings', 'BinaryMediaTypes', 'Cors', 'GatewayResponses', 'AccessLogSetting', 'CanarySetting', 'OpenApiVersion', 'Domain']"
     }
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. 'Globals' section is invalid. 'StageName' is not a supported property of 'Api'. Must be one of the following values - ['Auth', 'Name', 'DefinitionUri', 'CacheClusterEnabled', 'CacheClusterSize', 'Variables', 'EndpointConfiguration', 'MethodSettings', 'BinaryMediaTypes', 'MinimumCompressionSize', 'Cors', 'GatewayResponses', 'AccessLogSetting', 'CanarySetting', 'TracingEnabled', 'OpenApiVersion']"
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. 'Globals' section is invalid. 'StageName' is not a supported property of 'Api'. Must be one of the following values - ['Auth', 'Name', 'DefinitionUri', 'CacheClusterEnabled', 'CacheClusterSize', 'Variables', 'EndpointConfiguration', 'MethodSettings', 'BinaryMediaTypes', 'MinimumCompressionSize', 'Cors', 'GatewayResponses', 'AccessLogSetting', 'CanarySetting', 'TracingEnabled', 'OpenApiVersion', 'Domain']"
 }

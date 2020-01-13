@@ -8,8 +8,7 @@ from six import string_types
 
 def yaml_parse(yamlstr):
     """Parse a yaml string"""
-    yaml.SafeLoader.add_multi_constructor(
-        "!", intrinsics_multi_constructor)
+    yaml.SafeLoader.add_multi_constructor("!", intrinsics_multi_constructor)
     return yaml.safe_load(yamlstr)
 
 

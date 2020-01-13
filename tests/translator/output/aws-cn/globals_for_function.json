@@ -4,9 +4,24 @@
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess"
-        ], 
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          },
+          {
+            "Value": "newvalue1",
+            "Key": "newtag1"
+          },
+          {
+            "Value": "value1",
+            "Key": "tag1"
+          }
+        ],
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary", 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -91,9 +106,20 @@
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess"
-        ], 
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          },
+          {
+            "Value": "value1",
+            "Key": "tag1"
+          }
+        ],
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary", 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 

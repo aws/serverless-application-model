@@ -14,6 +14,8 @@ Resources:
         - LambdaInvokePolicy:
             FunctionName: name
 
+        - CloudWatchDescribeAlarmHistoryPolicy: {}
+
         - CloudWatchPutMetricPolicy: {}
 
         - EC2DescribePolicy: {}
@@ -78,6 +80,9 @@ Resources:
             StreamName: name
 
         - KMSDecryptPolicy:
+            KeyId: keyId
+
+        - KMSEncryptPolicy:
             KeyId: keyId
 
         - SESBulkTemplatedCrudPolicy:

@@ -1,0 +1,3 @@
+CloudWatch Events has been re-launched as Amazon EventBridge with full backwards compatibility
+
+Please see ../eventbridge-event-to-msteams/ for the migrated code

@@ -12,12 +12,15 @@ Parameters:
       - true
       - false
     Default: true
-
+Conditions:
+  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency, true]
 Globals:
 
   Function:
-    ProvisionedConcurrencyConfig:
-      ProvisionedConcurrentExecutions: !If [AliasProvisionedConcurrencyEnabled, !Ref ProvisionedConcurrency, !Ref 'AWS::NoValue']
+    ProvisionedConcurrencyConfig: !If
+        - AliasProvisionedConcurrencyEnabled
+        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+        - !Ref 'AWS::NoValue'
 
 Resources:
 
@@ -61,24 +64,14 @@ Resources:
           Handler: index.handler
           Timeout: 5
           # More info at https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
-          AutoPublishAlias: live 
-
-    LambdaEdgeFunctionRole:
-      Type: "AWS::IAM::Role"
-      Properties:
-          Path: "/"
-          ManagedPolicyArns:
-              - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          AutoPublishAlias: live
           AssumeRolePolicyDocument:
             Version: "2012-10-17"
             Statement:
-              -
-                Sid: "AllowLambdaServiceToAssumeRole"
-                Effect: "Allow"
-                Action: 
-                  - "sts:AssumeRole"
+              - Effect: "Allow"
+                Action: "sts:AssumeRole"
                 Principal:
-                  Service: 
+                  Service:
                     - "lambda.amazonaws.com"
                     - "edgelambda.amazonaws.com"
 
