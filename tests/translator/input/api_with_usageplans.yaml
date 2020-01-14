@@ -20,30 +20,27 @@ Resources:
        StageName: Prod
        Auth:
          UsagePlan:
-           CreateUsagePlan: SINGLE
-           UsagePlanId: !Ref MyApiTwoUsagePlan
+           CreateUsagePlan: PER_API
+           UsagePlanName: SomeRandomName
+           Description: "Description for usage plan"
+           Throttle:
+             BurstLimit: 1000
+             RateLimit: 1000
+           Tags:
+             - Key: key1
+               Value: value1
+             - Key: key2
+               Value: value2
+           Quota:
+             Limit: 10
+             Offset: 10
+             Period: MONTH
+
 
    MyApiThree:
      Type: AWS::Serverless::Api
      Properties:
        StageName: Prod
-       Auth:
-         UsagePlan:
-          CreateUsagePlan: SINGLE
-
-   MyApiFour:
-     Type: AWS::Serverless::Api
-     Properties:
-       StageName: Prod
-
-   MyApiTwoUsagePlan:
-      Type: AWS::ApiGateway::UsagePlan
-      DependsOn:
-        - MyApiTwo
-      Properties:
-        ApiStages:
-          - ApiId: !Ref MyApiTwo
-            Stage: !Ref MyApiTwo.Stage
 
    MyFunctionOne:
      Type: AWS::Serverless::Function
@@ -88,6 +85,11 @@ Resources:
                Ref: MyApiTwo
              Method: get
              Path: /path/two
+         ImplicitApiEvent:
+           Type: Api
+           Properties:
+             Method: get
+             Path: /path/event
 
    MyFunctionThree:
      Type: AWS::Serverless::Function
@@ -111,28 +113,6 @@ Resources:
              Method: get
              Path: /path/three
 
-   MyFunctionFour:
-     Type: AWS::Serverless::Function
-     Properties:
-       Handler: index.handler
-       Runtime: nodejs12.x
-       InlineCode: |
-         exports.handler = async (event) => {
-           return {
-           statusCode: 200,
-           body: JSON.stringify(event),
-           headers: {}
-           }
-         }
-       Events:
-         ApiKey:
-           Type: Api
-           Properties:
-             RestApiId:
-               Ref: MyApiFour
-             Method: get
-             Path: /path/four
-
 Outputs:
     ApiOneUrl:
       Description: "API endpoint URL for Prod environment"
@@ -146,7 +126,3 @@ Outputs:
       Description: "API endpoint URL for Prod environment"
       Value:
         Fn::Sub: 'https://${MyApiThree}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
-    ApiFourUrl:
-      Description: "API endpoint URL for Prod environment"
-      Value:
-        Fn::Sub: 'https://${MyApiFour}.execute-api.${AWS::Region}.amazonaws.com/Prod/'

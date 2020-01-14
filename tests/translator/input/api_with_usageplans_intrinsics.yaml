@@ -7,7 +7,7 @@ Conditions:
 Parameters:
   UsagePlanType:
     Type: String
-    Default: SINGLE
+    Default: PER_API
 
 Globals:
     Api:

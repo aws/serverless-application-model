@@ -23,7 +23,7 @@
   },
   "Parameters": {
     "UsagePlanType": {
-      "Default": "SINGLE",
+      "Default": "PER_API",
       "Type": "String"
     }
   },

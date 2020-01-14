@@ -181,7 +181,14 @@ class ApiGatewayBasePathMapping(Resource):
 
 class ApiGatewayUsagePlan(Resource):
     resource_type = "AWS::ApiGateway::UsagePlan"
-    property_types = {"ApiStages": PropertyType(False, is_type(list))}
+    property_types = {
+        "ApiStages": PropertyType(False, is_type(list)),
+        "Description": PropertyType(False, is_str()),
+        "Quota": PropertyType(False, is_type(dict)),
+        "Tags": PropertyType(False, list_of(dict)),
+        "Throttle": PropertyType(False, is_type(dict)),
+        "UsagePlanName": PropertyType(False, is_str()),
+    }
     runtime_attrs = {"usage_plan_id": lambda self: ref(self.logical_id)}
 
 

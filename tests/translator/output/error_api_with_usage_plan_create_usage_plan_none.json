@@ -1,8 +1,0 @@
-{
-  "errors": [
-    {
-      "errorMessage": "'Resource with id [MyApiOne] is invalid. Invalid property \"UsagePlanId\". This field can be given only when \"CreateUsagePlan\" is SINGLE'"
-    }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApiOne] is invalid. Invalid property \"UsagePlanId\". This field can be given only when \"CreateUsagePlan\" is SINGLE"
-}

@@ -811,6 +811,7 @@ class SamApi(SamResourceMacro):
             resources.extend(basepath_mapping)
         if route53:
             resources.extend([route53])
+        # contains usage plan, api key and usageplan key resources
         if usage_plan_resources:
             resources.extend(usage_plan_resources)
         return resources
