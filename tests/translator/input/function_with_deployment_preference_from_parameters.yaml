@@ -1,0 +1,64 @@
+Parameters:
+  MyTrueParameter:
+    Default: 'True'
+    Type: String
+  MyLowerFalseParameter:
+    Default: 'false'
+    Type: String
+  MyUpperFalseParameter:
+    Default: 'False'
+    Type: String
+
+Resources:
+  MinimalFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Enabled: !Ref MyTrueParameter
+        Type: Linear10PercentEvery1Minute
+        Hooks:
+          PreTraffic: !Ref MySanityTestFunction
+          PostTraffic: !Ref MyValidationTestFunction
+        Alarms:
+          - !Ref MyCloudWatchAlarm
+        TriggerConfigurations:
+          - TriggerEvents:
+              - DeploymentSuccess
+              - DeploymentFailure
+            TriggerName: TestTrigger
+            TriggerTargetArn: !Ref MySNSTopic
+
+  MySanityTestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://my-bucket/mySanityTestFunction.zip
+      DeploymentPreference:
+        Enabled: !Ref MyLowerFalseParameter
+
+  MyValidationTestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://my-bucket/myValidationTestFunction.zip
+      DeploymentPreference:
+        Enabled: !Ref MyUpperFalseParameter
+
+  MyCloudWatchAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+     ComparisonOperator: GreaterThanThreshold
+     EvaluationPeriods: 1
+     MetricName: MyMetric
+     Namespace: AWS/EC2
+     Period: 300
+     Threshold: 10
+
+  MySNSTopic:
+      Type: AWS::SNS::Topic

@@ -130,7 +130,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Handler: index.handler
-            Runtime: nodejs4.3
+            Runtime: nodejs12.x
             CodeUri:
                 # !Ref function allows you to fetch value 
                 # of parameters and other resources at runtime
@@ -158,7 +158,7 @@ Resources:
             FunctionName: !Sub "mylambda-${FunctionNameSuffix}"
 
             Handler: index.handler
-            Runtime: nodejs4.3
+            Runtime: nodejs12.x
             CodeUri: s3://bucket/key
 ```
 

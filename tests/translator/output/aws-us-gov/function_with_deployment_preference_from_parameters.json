@@ -1,0 +1,317 @@
+{
+  "Parameters": {
+    "MyTrueParameter": {
+      "Default": "True",
+      "Type": "String"
+    },
+    "MyLowerFalseParameter": {
+      "Default": "false",
+      "Type": "String"
+    },
+    "MyUpperFalseParameter": {
+      "Default": "False",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "MinimalFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip"
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MinimalFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MinimalFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MySanityTestFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyCloudWatchAlarm": {
+      "Type": "AWS::CloudWatch::Alarm", 
+      "Properties": {
+        "EvaluationPeriods": 1, 
+        "Namespace": "AWS/EC2", 
+        "Period": 300, 
+        "ComparisonOperator": "GreaterThanThreshold", 
+        "Threshold": 10, 
+        "MetricName": "MyMetric"
+      }
+    }, 
+    "MinimalFunctionDeploymentGroup": {
+      "Type": "AWS::CodeDeploy::DeploymentGroup", 
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "ServerlessDeploymentApplication"
+        }, 
+        "AutoRollbackConfiguration": {
+          "Enabled": true, 
+          "Events": [
+            "DEPLOYMENT_FAILURE", 
+            "DEPLOYMENT_STOP_ON_ALARM", 
+            "DEPLOYMENT_STOP_ON_REQUEST"
+          ]
+        }, 
+        "DeploymentConfigName": {
+          "Fn::Sub": [
+            "CodeDeployDefault.Lambda${ConfigName}", 
+            {
+              "ConfigName": "Linear10PercentEvery1Minute"
+            }
+          ]
+        }, 
+        "AlarmConfiguration": {
+          "Alarms": [
+            {
+              "Name": {
+                "Ref": "MyCloudWatchAlarm"
+              }
+            }
+          ], 
+          "Enabled": true
+        }, 
+        "DeploymentStyle": {
+          "DeploymentType": "BLUE_GREEN", 
+          "DeploymentOption": "WITH_TRAFFIC_CONTROL"
+        }, 
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "CodeDeployServiceRole", 
+            "Arn"
+          ]
+        },
+        "TriggerConfigurations": [
+          {
+            "TriggerEvents": [
+              "DeploymentSuccess",
+              "DeploymentFailure"
+            ],
+            "TriggerTargetArn": {
+              "Ref": "MySNSTopic"
+            },
+            "TriggerName": "TestTrigger"
+          }
+        ]
+      }
+    }, 
+    "MySanityTestFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "my-bucket", 
+          "S3Key": "mySanityTestFunction.zip"
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MySanityTestFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "CodeDeployServiceRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "codedeploy.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ServerlessDeploymentApplication": {
+      "Type": "AWS::CodeDeploy::Application", 
+      "Properties": {
+        "ComputePlatform": "Lambda"
+      }
+    }, 
+    "MinimalFunctionVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
+      "Type": "AWS::Lambda::Version", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        }
+      }
+    }, 
+    "MyValidationTestFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "my-bucket", 
+          "S3Key": "myValidationTestFunction.zip"
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyValidationTestFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MinimalFunctionAliaslive": {
+      "Type": "AWS::Lambda::Alias", 
+      "UpdatePolicy": {
+        "CodeDeployLambdaAliasUpdate": {
+          "ApplicationName": {
+            "Ref": "ServerlessDeploymentApplication"
+          }, 
+          "BeforeAllowTrafficHook": {
+            "Ref": "MySanityTestFunction"
+          }, 
+          "DeploymentGroupName": {
+            "Ref": "MinimalFunctionDeploymentGroup"
+          }, 
+          "AfterAllowTrafficHook": {
+            "Ref": "MyValidationTestFunction"
+          }
+        }
+      }, 
+      "Properties": {
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MinimalFunctionVersion640128d35d", 
+            "Version"
+          ]
+        }, 
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        }, 
+        "Name": "live"
+      }
+    }, 
+    "MyValidationTestFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
+    }
+  }
+}

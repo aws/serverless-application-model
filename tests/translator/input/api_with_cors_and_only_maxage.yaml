@@ -10,7 +10,7 @@ Resources:
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
   ExplicitApi:
     Type: AWS::Serverless::Api
     Properties:

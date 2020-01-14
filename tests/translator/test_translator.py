@@ -231,6 +231,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_disabled_deployment_preference",
                 "function_with_deployment_preference",
                 "function_with_deployment_preference_all_parameters",
+                "function_with_deployment_preference_from_parameters",
                 "function_with_deployment_preference_multiple_combinations",
                 "function_with_alias_and_event_sources",
                 "function_with_resource_refs",
@@ -601,6 +602,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_http_api_event_multiple_same_path",
         "error_function_with_event_dest_invalid",
         "error_function_with_event_dest_type",
+        "error_function_with_api_key_false",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -635,7 +637,7 @@ def test_transform_unhandled_failure_empty_managed_policy_map():
                 "Properties": {
                     "CodeUri": "s3://bucket/key",
                     "Handler": "index.handler",
-                    "Runtime": "nodejs4.3",
+                    "Runtime": "nodejs12.x",
                     "Policies": "AmazonS3FullAccess",
                 },
             }
@@ -766,7 +768,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
                 "MyFunction": {
                     "Type": "AWS::Serverless::Function",
                     "Properties": {
-                        "Runtime": "nodejs4.3",
+                        "Runtime": "nodejs12.x",
                         "Handler": "index.handler",
                         "CodeUri": {"Bucket": {"Ref": "SomeBucket"}, "Key": {"Ref": "CodeKeyParam"}},
                         "AutoPublishAlias": "live",

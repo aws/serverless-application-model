@@ -106,7 +106,7 @@
           ]
         }, 
         "Timeout": 3, 
-        "Runtime": "nodejs4.3"
+        "Runtime": "nodejs12.x"
       }
     }
   }

@@ -18,7 +18,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.get
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       InlineCode: module.exports = async () => throw new Error('Check out the response headers!')
       Events:
         GetResource:

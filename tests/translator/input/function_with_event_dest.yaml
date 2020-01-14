@@ -48,7 +48,7 @@ Resources:
             }
         };      
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       MemorySize: 1024
   MyTestFunction2:
     Type: AWS::Serverless::Function
@@ -80,7 +80,7 @@ Resources:
             }
         };      
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       MemorySize: 1024
 
   DestinationLambda:
@@ -95,7 +95,7 @@ Resources:
           return response;
         };
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       MemorySize: 1024
   SNSSubscription:
     Type: AWS::SNS::Subscription
