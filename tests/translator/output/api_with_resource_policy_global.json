@@ -52,8 +52,21 @@
     "ExplicitApiDeploymenta5a5c4e3ff": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
         }, 
         "Description": "RestApi deployment id: a5a5c4e3ff6901cf27436628359ed20300d34aa4", 
         "StageName": "Stage"
@@ -127,8 +140,8 @@
         ]
       }
     }, 
-    "ExplicitApiFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+    "ExplicitApiDeployment08db9038c8": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -197,8 +210,8 @@
           }, 
           "swagger": 2.0, 
           "x-amazon-apigateway-policy": {
-            "Version": "2012-10-17", 
-            "Statement": [
+            "Fn::If": [
+              "C1", 
               {
                 "Action": "sts:AssumeRole", 
                 "Effect": "Allow", 
