@@ -535,6 +535,8 @@ class ApiGenerator(object):
                 swagger_editor.add_resource_policy(
                     auth_properties.ResourcePolicy, path, self.logical_id, self.stage_name
                 )
+            if auth_properties.ResourcePolicy.get("CustomStatements"):
+                swagger_editor.add_custom_statements(auth_properties.ResourcePolicy.get("CustomStatements"))
 
         self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 

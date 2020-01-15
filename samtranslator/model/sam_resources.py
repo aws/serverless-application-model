@@ -168,7 +168,11 @@ class SamFunction(SamResourceMacro):
 
         try:
             resources += self._generate_event_resources(
-                lambda_function, execution_role, kwargs["event_resources"], lambda_alias=lambda_alias
+                lambda_function,
+                execution_role,
+                kwargs["event_resources"],
+                intrinsics_resolver,
+                lambda_alias=lambda_alias,
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
@@ -563,7 +567,9 @@ class SamFunction(SamResourceMacro):
             return logical_id
         return event_dict.get("Properties", {}).get("Path", logical_id)
 
-    def _generate_event_resources(self, lambda_function, execution_role, event_resources, lambda_alias=None):
+    def _generate_event_resources(
+        self, lambda_function, execution_role, event_resources, intrinsics_resolver, lambda_alias=None
+    ):
         """Generates and returns the resources associated with this function's events.
 
         :param model.lambda_.LambdaFunction lambda_function: generated Lambda function
@@ -591,6 +597,7 @@ class SamFunction(SamResourceMacro):
                     # When Alias is provided, connect all event sources to the alias and *not* the function
                     "function": lambda_alias or lambda_function,
                     "role": execution_role,
+                    "intrinsics_resolver": intrinsics_resolver,
                 }
 
                 for name, resource in event_resources[logical_id].items():
@@ -773,7 +780,6 @@ class SamApi(SamResourceMacro):
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
         self.Auth = intrinsics_resolver.resolve_parameter_refs(self.Auth)
-
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
 
         api_generator = ApiGenerator(

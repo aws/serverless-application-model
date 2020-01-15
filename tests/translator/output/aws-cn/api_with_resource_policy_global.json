@@ -1,4 +1,12 @@
 {
+  "Conditions": {
+    "C1": {
+      "Fn::Equals": [
+        true, 
+        true
+      ]
+    }
+  }, 
   "Parameters": {
     "StageName": {
       "Default": "MyOwnStage", 
@@ -6,14 +14,34 @@
     }
   }, 
   "Resources": {
-    "ExplicitApiDeploymente173c8c5c6": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ExplicitApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
         }, 
-        "Description": "RestApi deployment id: e173c8c5c6055492b897fc85a73484cfdba2742f", 
-        "StageName": "Stage"
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "ExplicitApiFunctionGetHtmlPermissionStage": {
@@ -41,7 +69,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymente173c8c5c6"
+          "Ref": "ExplicitApiDeployment08db9038c8"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -65,7 +93,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs12.x", 
         "Tags": [
           {
             "Value": "SAM", 
@@ -74,34 +102,14 @@
         ]
       }
     }, 
-    "ExplicitApiFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+    "ExplicitApiDeployment08db9038c8": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 08db9038c899b2b03f89217255d1770dfad44fdf", 
+        "StageName": "Stage"
       }
     }, 
     "ExplicitApi": {
@@ -130,66 +138,42 @@
           }, 
           "swagger": 2.0, 
           "x-amazon-apigateway-policy": {
-            "Version": "2012-10-17", 
-            "Statement": [
+            "Fn::If": [
+              "C1", 
               {
-                "Action": "sts:AssumeRole", 
-                "Effect": "Allow", 
-                "Principal": {
-                  "Service": "lambda.amazonaws.com"
-                }
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
+                "Version": "2012-10-17", 
+                "Statement": [
                   {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/GET/", 
-                      {
-                        "__Stage__": {
-                          "Ref": "StageName"
-                        }
-                      }
-                    ]
-                  }
-                ], 
-                "Effect": "Allow", 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
+                    "Action": "sts:AssumeRole", 
+                    "Effect": "Allow", 
+                    "Principal": {
+                      "Service": "lambda.amazonaws.com"
+                    }
+                  }, 
                   {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/GET/", 
-                      {
-                        "__Stage__": {
-                          "Ref": "StageName"
-                        }
-                      }
+                    "Action": "execute-api:Invoke", 
+                    "Resource": [
+                      "execute-api:/*/*/*"
                     ]
                   }
-                ], 
-                "Effect": "Deny", 
-                "Condition": {
-                  "NotIpAddress": {
-                    "aws:SourceIp": [
-                      "1.2.3.4"
-                    ]
-                  }
-                }, 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  "execute-api:/*/*/*"
                 ]
               }, 
               {
-                "Action": "execute-api:blah", 
-                "Resource": [
-                  "execute-api:/*/*/*"
+                "Version": "2012-10-17", 
+                "Statement": [
+                  {
+                    "Action": "sts:AssumeRole", 
+                    "Effect": "Allow", 
+                    "Principal": {
+                      "Service": "lambda.amazonaws.com"
+                    }
+                  }, 
+                  {
+                    "Action": "execute-api:Blah", 
+                    "Resource": [
+                      "execute-api:/*/*/*"
+                    ]
+                  }
                 ]
               }
             ]

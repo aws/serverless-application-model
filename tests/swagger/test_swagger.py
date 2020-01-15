@@ -995,7 +995,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ]
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_custom_statements(resourcePolicy.get("CustomStatements"))
 
         expected = {
             "Version": "2012-10-17",
@@ -1003,6 +1003,36 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                 {"Action": "execute-api:Invoke", "Resource": ["execute-api:/*/*/*"]},
                 {"Action": "execute-api:blah", "Resource": ["execute-api:/*/*/*"]},
             ],
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    def test_must_add_fn_if_custom_statements(self):
+
+        resourcePolicy = {
+            "CustomStatements": {
+                "Fn::If": [
+                    "condition",
+                    {"Action": "execute-api:Invoke", "Resource": ["execute-api:/*/*/*"]},
+                    {"Action": "execute-api:blah", "Resource": ["execute-api:/*/*/*"]},
+                ],
+            }
+        }
+
+        self.editor.add_custom_statements(resourcePolicy.get("CustomStatements"))
+
+        expected = {
+            "Fn::If": [
+                "condition",
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [{"Action": "execute-api:Invoke", "Resource": ["execute-api:/*/*/*"]},],
+                },
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [{"Action": "execute-api:blah", "Resource": ["execute-api:/*/*/*"]},],
+                },
+            ]
         }
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
@@ -1140,17 +1170,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
                     ],
                     "Effect": "Deny",
-                    "Condition": {"StringNotEquals": {"aws:SourceVpc": "vpc-123"}},
-                    "Principal": "*",
-                },
-                {
-                    "Action": "execute-api:Invoke",
-                    "Resource": [
-                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
-                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
-                    ],
-                    "Effect": "Deny",
-                    "Condition": {"StringNotEquals": {"aws:SourceVpce": "vpce-345"}},
+                    "Condition": {"StringNotEquals": {"aws:SourceVpc": ["vpc-123"], "aws:SourceVpce": ["vpce-345"]}},
                     "Principal": "*",
                 },
             ],
@@ -1183,7 +1203,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
                     ],
                     "Effect": "Deny",
-                    "Condition": {"StringEquals": {"aws:SourceVpc": "vpc-123"}},
+                    "Condition": {"StringEquals": {"aws:SourceVpc": ["vpc-123"]}},
                     "Principal": "*",
                 },
             ],
@@ -1201,6 +1221,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         }
 
         self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_custom_statements(resourcePolicy.get("CustomStatements"))
 
         expected = {
             "Version": "2012-10-17",

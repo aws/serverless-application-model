@@ -4,17 +4,22 @@ Globals:
   Api:
     Auth:
       ResourcePolicy:
-        CustomStatements: [{
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "execute-api:Invoke",
-            "Resource": "execute-api:/Prod/PUT/get",
-            "Condition": {
-                "IpAddress": {
-                    "aws:SourceIp": "1.2.3.4"
-                }
-            }
-        }]
+        Fn::If:
+        - IsProd
+        - CustomStatements:
+          - - Principal: '*'
+              Action: execute-api:Invoke
+              Resource: execute-api:/Prod/PUT/get
+              Condition: 
+                IpAddress:
+                  aws:SourceIp: 1.2.3.4
+        - CustomStatements:
+          - - Principal: '*'
+              Action: execute-api:Invoke
+              Resource: execute-api:/Prod/PUT/get
+              Condition: 
+                IpAddress:
+                  aws:SourceIp: 5.6.7.8
         # OR you can use the following, they both do the same thing
         IpRangeBlacklist: ['1.2.3.4']
 Resources:
