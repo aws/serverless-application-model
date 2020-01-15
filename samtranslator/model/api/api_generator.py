@@ -304,7 +304,7 @@ class ApiGenerator(object):
             basepath_mapping = ApiGatewayBasePathMapping(
                 self.logical_id + "BasePathMapping", attributes=self.passthrough_resource_attributes
             )
-            basepath_mapping.DomainName = self.domain.get("DomainName")
+            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
             basepath_mapping.RestApiId = ref(rest_api.logical_id)
             basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
             basepath_resource_list.extend([basepath_mapping])
@@ -315,7 +315,7 @@ class ApiGenerator(object):
                 basepath_mapping = ApiGatewayBasePathMapping(
                     logical_id, attributes=self.passthrough_resource_attributes
                 )
-                basepath_mapping.DomainName = self.domain.get("DomainName")
+                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
                 basepath_mapping.RestApiId = ref(rest_api.logical_id)
                 basepath_mapping.Stage = ref(rest_api.logical_id + ".Stage")
                 basepath_mapping.BasePath = path

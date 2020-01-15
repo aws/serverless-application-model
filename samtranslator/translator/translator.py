@@ -1,5 +1,6 @@
 import copy
 from samtranslator.model import ResourceTypeResolver, sam_resources
+from collections import OrderedDict
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.model.exceptions import (
@@ -51,16 +52,17 @@ class Translator:
                     # adds to the function_names dict with key as the api_name and value as the function_name
                     if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
                         rest_api = item.get("Properties").get("RestApiId")
-                        if type(rest_api) == dict:
+                        if type(rest_api) == dict or isinstance(rest_api, OrderedDict):
                             api_name = item.get("Properties").get("RestApiId").get("Ref")
                         else:
                             api_name = item.get("Properties").get("RestApiId")
                         if api_name:
+                            resource_dict_copy = copy.deepcopy(resource_dict)
                             function_name = intrinsics_resolver.resolve_parameter_refs(
-                                resource_dict.get("Properties").get("FunctionName")
+                                resource_dict_copy.get("Properties").get("FunctionName")
                             )
                             if function_name:
-                                self.function_names[api_name] = self.function_names.get(api_name, "") + str(
+                                self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
                                     function_name
                                 )
         return self.function_names

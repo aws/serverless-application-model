@@ -93,7 +93,10 @@
           "Ref": "MyTestFunction"
         }, 
         "Qualifier": "live"
-      }
+      }, 
+      "DependsOn": [
+        "MyTestFunctionAliaslive"
+      ]
     }, 
     "MyTestFunction": {
       "Type": "AWS::Lambda::Function", 

@@ -148,7 +148,7 @@ class SamFunction(SamResourceMacro):
         if self.EventInvokeConfig:
             function_name = lambda_function.logical_id
             event_invoke_resources, event_invoke_policies = self._construct_event_invoke_config(
-                function_name, alias_name, intrinsics_resolver, conditions
+                function_name, alias_name, lambda_alias, intrinsics_resolver, conditions
             )
             resources.extend(event_invoke_resources)
 
@@ -171,7 +171,7 @@ class SamFunction(SamResourceMacro):
 
         return resources
 
-    def _construct_event_invoke_config(self, function_name, lambda_alias, intrinsics_resolver, conditions):
+    def _construct_event_invoke_config(self, function_name, alias_name, lambda_alias, intrinsics_resolver, conditions):
         """
         Create a `AWS::Lambda::EventInvokeConfig` based on the input dict `EventInvokeConfig`
         """
@@ -182,7 +182,14 @@ class SamFunction(SamResourceMacro):
         resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
 
         logical_id = "{id}EventInvokeConfig".format(id=function_name)
-        lambda_event_invoke_config = LambdaEventInvokeConfig(logical_id=logical_id, attributes=self.resource_attributes)
+        if lambda_alias:
+            lambda_event_invoke_config = LambdaEventInvokeConfig(
+                logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes
+            )
+        else:
+            lambda_event_invoke_config = LambdaEventInvokeConfig(
+                logical_id=logical_id, attributes=self.resource_attributes
+            )
 
         dest_config = {}
         input_dest_config = resolved_event_invoke_config.get("DestinationConfig")
@@ -209,8 +216,8 @@ class SamFunction(SamResourceMacro):
                 policy_document.append(policy)
 
         lambda_event_invoke_config.FunctionName = ref(function_name)
-        if lambda_alias:
-            lambda_event_invoke_config.Qualifier = lambda_alias
+        if alias_name:
+            lambda_event_invoke_config.Qualifier = alias_name
         else:
             lambda_event_invoke_config.Qualifier = "$LATEST"
         lambda_event_invoke_config.DestinationConfig = dest_config

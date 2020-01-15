@@ -96,7 +96,7 @@
       "Properties": {
         "BasePath": "fetch", 
         "DomainName": {
-          "Fn::Sub": "example-ap-southeast-1.com"
+          "Ref": "ApiGatewayDomainNamec0ed6fae34"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -110,15 +110,6 @@
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -134,7 +125,16 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }, 
       "Condition": "C1"
     }, 
@@ -143,7 +143,7 @@
       "Properties": {
         "BasePath": "get", 
         "DomainName": {
-          "Fn::Sub": "example-ap-southeast-1.com"
+          "Ref": "ApiGatewayDomainNamec0ed6fae34"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
