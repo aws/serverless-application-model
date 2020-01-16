@@ -146,23 +146,6 @@ def is_instrinsic(input):
     return False
 
 
-def is_instrinsic_fn(input):
-    """
-    Checks if the given input is an intrinsic function dictionary. Intrinsic function is a dictionary with single
-    key that is the name of the intrinsics.
-
-    :param input: Input value to check if it is an intrinsic (all except Ref)
-    :return: True, if yes
-    """
-
-    if input is not None and isinstance(input, dict) and len(input) == 1:
-
-        key = list(input.keys())[0]
-        return key == "Condition" or key.startswith("Fn::")
-
-    return False
-
-
 def is_intrinsic_if(input):
     """
     Is the given input an intrinsic if? Intrinsic function 'if' is a dictionary with single
