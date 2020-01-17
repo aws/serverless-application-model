@@ -104,7 +104,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         deployment_preference_collection.add(self.function_logical_id, {"Type": deployment_type})
         deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
 
-        print (deployment_group.DeploymentConfigName)
+        print(deployment_group.DeploymentConfigName)
         self.assertEqual(expected_deployment_config_name, deployment_group.DeploymentConfigName)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -133,7 +133,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         deployment_preference_collection = DeploymentPreferenceCollection()
         deployment_preference_collection.add(self.function_logical_id, {"Type": deployment_type})
         deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
-        print (deployment_group.DeploymentConfigName)
+        print(deployment_group.DeploymentConfigName)
         self.assertEqual(expected_deployment_config_name, deployment_group.DeploymentConfigName)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
