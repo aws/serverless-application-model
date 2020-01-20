@@ -33,7 +33,7 @@ Setup Python locally using `pyenv`_
 We format our code using [Black](https://github.com/python/black) and verify the source code is black compliant
 in Appveyor during PRs. You can find installation instructions on [Black's docs](https://black.readthedocs.io/en/stable/installation_and_usage.html).
 
-After installing, you can run our formatting through our Makefile by `make black-format` or integrating Black directly in your favorite IDE (instructions
+After installing, you can check your formatting through our Makefile by running `make black-check`. To automatically update your code to match our formatting, please run `make black`. You can also integrate Black directly in your favorite IDE (instructions
 can be found [here](https://black.readthedocs.io/en/stable/editor_integration.html))
 
 Pre-commit
