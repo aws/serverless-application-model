@@ -540,6 +540,7 @@ class ApiGenerator(object):
         :rtype: model.apigateway.ApiGatewayUsagePlan, model.apigateway.ApiGatewayUsagePlanKey,
                 model.apigateway.ApiGatewayApiKey
         """
+        create_usage_plans_accepted_values = ["SHARED", "PER_API", "NONE"]
         if not self.auth:
             return []
         auth_properties = AuthProperties(**self.auth)
@@ -557,9 +558,9 @@ class ApiGenerator(object):
 
         if create_usage_plan is None:
             raise InvalidResourceException(self.logical_id, "'CreateUsagePlan' is a required field for UsagePlan")
-        if create_usage_plan not in ["SHARED", "PER_API", "NONE"]:
+        if create_usage_plan not in create_usage_plans_accepted_values:
             raise InvalidResourceException(
-                self.logical_id, "'CreateUsagePlan' accepts only NONE, PER_API and SHARED values"
+                self.logical_id, "'CreateUsagePlan' accepts one of {}".format(create_usage_plans_accepted_values)
             )
 
         if create_usage_plan == "NONE":
