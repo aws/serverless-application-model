@@ -272,6 +272,8 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_event_dest",
                 "function_with_event_dest_basic",
                 "function_with_event_dest_conditional",
+                "api_with_usageplans",
+                "api_with_usageplans_intrinsics",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -603,6 +605,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_with_event_dest_invalid",
         "error_function_with_event_dest_type",
         "error_function_with_api_key_false",
+        "error_api_with_usage_plan_invalid_parameter",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
