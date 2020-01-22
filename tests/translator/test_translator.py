@@ -338,6 +338,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "api_with_basic_custom_domain",
                 "api_with_basic_custom_domain_intrinsics",
                 "api_with_custom_domain_route53",
+                "api_with_custom_domain_route53_hosted_zone_name",
                 "implicit_http_api",
                 "explicit_http_api_minimum",
                 "implicit_http_api_auth_and_simple_case",
@@ -355,6 +356,7 @@ class TestTranslatorEndToEnd(TestCase):
             ],  # Run all the above tests against each of the list of partitions to test against
         )
     )
+    @pytest.mark.slow
     @patch(
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,

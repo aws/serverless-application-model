@@ -42,7 +42,7 @@
         },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch",
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/fetch",
             {
               "__Stage__": "*",
               "__ApiId__": {
@@ -53,19 +53,22 @@
         }
       }
     },
-    "MyApiDeployment1deeaff693": {
-      "Type": "AWS::ApiGateway::Deployment",
+    "ApiGatewayDomainName0caaf24ab1": {
+      "Type": "AWS::ApiGateway::DomainName",
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
+        "CertificateArn": "cert-arn-in-us-east-1",
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
         },
-        "Description": "RestApi deployment id: 1deeaff6933b892391de7a35e4cf92e79a47aea9"
+        "DomainName": "example.com"
       }
     },
-    "RecordSetGroupbd00d962a4": {
+    "RecordSetGroup456ebaf280": {
       "Type": "AWS::Route53::RecordSetGroup",
       "Properties": {
-        "HostedZoneId": "ZQ1UAL4EFZVME",
+        "HostedZoneName": "www.my-domain.com.",
         "RecordSets": [
           {
             "AliasTarget": {
@@ -111,11 +114,20 @@
         }
       }
     },
+    "MyApiDeploymentfb330328f1": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Description": "RestApi deployment id: fb330328f152e4bb4b7d68e8b976b009e0558035"
+      }
+    },
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment1deeaff693"
+          "Ref": "MyApiDeploymentfb330328f1"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -143,7 +155,7 @@
           ]
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {
@@ -151,18 +163,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    },
-    "ApiGatewayDomainName0caaf24ab1": {
-      "Type": "AWS::ApiGateway::DomainName",
-      "Properties": {
-        "CertificateArn": "cert-arn-in-us-east-1",
-        "EndpointConfiguration": {
-          "Types": [
-            "EDGE"
-          ]
-        },
-        "DomainName": "example.com"
       }
     },
     "MyApi": {
@@ -182,7 +182,7 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 },
                 "responses": {}
