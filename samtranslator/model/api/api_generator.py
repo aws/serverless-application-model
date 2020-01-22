@@ -340,7 +340,7 @@ class ApiGenerator(object):
             route53 = self.domain.get("Route53")
             if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
                 raise InvalidResourceException(
-                    self.logical_id, "HostedZoneId is required to enable Route53 support on Custom Domains."
+                     self.logical_id, "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains."
                 )
             logical_id = logical_id_generator.LogicalIdGenerator("", route53.get("HostedZoneId")).gen()
             record_set_group = Route53RecordSetGroup(
