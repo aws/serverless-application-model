@@ -312,7 +312,7 @@ class TestTranslatorEndToEnd(TestCase):
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
-        print (json.dumps(output_fragment, indent=2))
+        print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
@@ -387,7 +387,7 @@ class TestTranslatorEndToEnd(TestCase):
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
-        print (json.dumps(output_fragment, indent=2))
+        print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
@@ -445,7 +445,7 @@ class TestTranslatorEndToEnd(TestCase):
             }
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
-        print (json.dumps(output_fragment, indent=2))
+        print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
@@ -708,7 +708,7 @@ def test_swagger_body_sha_gets_recomputed():
 
     output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-    print (json.dumps(output_fragment, indent=2))
+    print(json.dumps(output_fragment, indent=2))
     deployment_key = get_deployment_key(output_fragment)
     assert deployment_key
 
@@ -744,7 +744,7 @@ def test_swagger_definitionuri_sha_gets_recomputed():
 
     output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-    print (json.dumps(output_fragment, indent=2))
+    print(json.dumps(output_fragment, indent=2))
     deployment_key = get_deployment_key(output_fragment)
     assert deployment_key
 
@@ -826,7 +826,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
         mock_policy_loader = get_policy_mock()
         output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-        print (json.dumps(output_fragment, indent=2))
+        print(json.dumps(output_fragment, indent=2))
 
         return output_fragment
 
