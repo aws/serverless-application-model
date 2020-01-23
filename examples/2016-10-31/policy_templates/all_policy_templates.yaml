@@ -107,3 +107,6 @@ Resources:
         - TextractDetectAnalyzePolicy: {}
 
         - TextractGetResultPolicy: {}
+
+        - EventBridgePutEventsPolicy:
+            EventBusName: name

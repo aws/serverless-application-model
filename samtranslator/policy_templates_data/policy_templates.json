@@ -1904,6 +1904,32 @@
           }
         ]
       }
+    },
+    "EventBridgePutEventsPolicy": {
+      "Description": "Gives permissions to send events to EventBridge",
+      "Parameters": {
+        "EventBusName": {
+          "Description": "Name of the EventBridge EventBus"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "events:PutEvents",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/${eventBusName}",
+                {
+                  "eventBusName": {
+                    "Ref": "EventBusName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
