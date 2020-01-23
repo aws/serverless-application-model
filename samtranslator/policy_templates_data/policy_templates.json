@@ -1849,6 +1849,61 @@
           }
         ]
       }
+    },
+    "TextractPolicy": {
+      "Description": "Gives full access to Textract",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "textract:*"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    "TextractDetectAnalyzePolicy": {
+      "Description": "Gives access to detect and analyze documents with Textract",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "textract:DetectDocumentText",
+              "textract:StartDocumentTextDetection",
+              "textract:StartDocumentAnalysis",
+              "textract:AnalyzeDocument"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    },
+    "TextractGetResultPolicy": {
+      "Description": "Gives access to get detected and analyzed documents from Textract",
+      "Parameters": {
+
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "textract:GetDocumentTextDetection",
+              "textract:GetDocumentAnalysis"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
     }
   }
 }
