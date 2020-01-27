@@ -12,17 +12,14 @@ Globals:
     Auth:
       ResourcePolicy:
           CustomStatements: 
-            Fn::If: [
-              C1,
-              {
-                Action: 'execute-api:Invoke', 
-                Resource: ['execute-api:/*/*/*']
-              },
-              {
-                Action: 'execute-api:Blah', 
-                Resource: ['execute-api:/*/*/*']
-              }
-            ]
+            Fn::If:
+              - C1
+              - Action: execute-api:Invoke
+                Resource: 
+                  - execute-api:/*/*/*
+              - Action: execute-api:Blah
+                Resource: 
+                  - execute-api:/*/*/*
 Resources:
   ExplicitApiFunction:
     Type: AWS::Serverless::Function
