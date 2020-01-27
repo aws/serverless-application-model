@@ -804,9 +804,16 @@ class SamApi(SamResourceMacro):
             domain=self.Domain,
         )
 
-        rest_api, deployment, stage, permissions, domain, basepath_mapping, route53, usage_plan_resources = api_generator.to_cloudformation(
-            redeploy_restapi_parameters
-        )
+        (
+            rest_api,
+            deployment,
+            stage,
+            permissions,
+            domain,
+            basepath_mapping,
+            route53,
+            usage_plan_resources,
+        ) = api_generator.to_cloudformation(redeploy_restapi_parameters)
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
