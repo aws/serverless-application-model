@@ -70,6 +70,7 @@ class SamFunction(SamResourceMacro):
         "EventInvokeConfig": PropertyType(False, is_type(dict)),
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(is_str())),
+        "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
         "VersionDescription": PropertyType(False, is_str()),
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
     }
@@ -132,7 +133,10 @@ class SamFunction(SamResourceMacro):
         alias_name = ""
         if self.AutoPublishAlias:
             alias_name = self._get_resolved_alias_name("AutoPublishAlias", self.AutoPublishAlias, intrinsics_resolver)
-            lambda_version = self._construct_version(lambda_function, intrinsics_resolver=intrinsics_resolver)
+            code_sha256 = self.AutoPublishCodeSha256
+            lambda_version = self._construct_version(
+                lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
+            )
             lambda_alias = self._construct_alias(alias_name, lambda_function, lambda_version)
             resources.append(lambda_version)
             resources.append(lambda_alias)
@@ -603,7 +607,7 @@ class SamFunction(SamResourceMacro):
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
 
-    def _construct_version(self, function, intrinsics_resolver):
+    def _construct_version(self, function, intrinsics_resolver, code_sha256=None):
         """Constructs a Lambda Version resource that will be auto-published when CodeUri of the function changes.
         Old versions will not be deleted without a direct reference from the CloudFormation template.
 
@@ -611,6 +615,7 @@ class SamFunction(SamResourceMacro):
         :param model.intrinsics.resolver.IntrinsicsResolver intrinsics_resolver: Class that can help resolve
             references to parameters present in CodeUri. It is a common usecase to set S3Key of Code to be a
             template parameter. Need to resolve the values otherwise we will never detect a change in Code dict
+        :param str code_sha256: User predefined hash of the Lambda function code
         :return: Lambda function Version resource
         """
         code_dict = function.Code
@@ -642,7 +647,7 @@ class SamFunction(SamResourceMacro):
         # SHA Collisions: For purposes of triggering a new update, we are concerned about just the difference previous
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
         prefix = "{id}Version".format(id=self.logical_id)
-        logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict).gen()
+        logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
