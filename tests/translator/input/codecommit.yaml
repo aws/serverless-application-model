@@ -1,0 +1,12 @@
+Resources:
+  TriggeredFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      Events:
+        CodeCommitTrigger:
+          Type: CodeCommit
+          Properties:
+            RepositoryName: my-repository

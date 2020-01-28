@@ -1,0 +1,100 @@
+{
+  "Resources": {
+    "TriggeredFunctionCodeCommitTriggerPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "events.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "TriggeredFunction"
+        }, 
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "TriggeredFunctionCodeCommitTrigger", 
+            "Arn"
+          ]
+        }
+      }
+    }, 
+    "TriggeredFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "lambda_function.lambda_handler", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip", 
+          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "TriggeredFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python3.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "TriggeredFunctionCodeCommitTrigger": {
+      "Type": "AWS::Events::Rule", 
+      "Properties": {
+        "EventPattern": {
+          "source": [
+            "aws.codecommit"
+          ], 
+          "resources": [
+            {
+              "Fn::Sub": "arn:aws-us-gov:codecommit:${AWS::Region}:${AWS::AccountId}:my-repository"
+            }
+          ]
+        }, 
+        "Targets": [
+          {
+            "Id": "TriggeredFunctionCodeCommitTriggerLambdaTarget", 
+            "Arn": {
+              "Fn::GetAtt": [
+                "TriggeredFunction", 
+                "Arn"
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "TriggeredFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

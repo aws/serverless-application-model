@@ -469,6 +469,63 @@ class SNS(PushEventSource):
         return policy
 
 
+class CodeCommit(PushEventSource):
+    """CodeCommit event source for SAM Functions."""
+
+    resource_type = "CodeCommit"
+    principal = "events.amazonaws.com"
+    property_types = {"RepositoryName": PropertyType(True, is_str())}
+
+    def to_cloudformation(self, **kwargs):
+        """
+        Returns the CloudWatch Events/EventBridge Rule and Lambda Permission allowing
+        CodeCommit to invoke the function.
+
+        :param dict kwargs: no existing resources need to be modified
+        :returns: a list of vanilla CloudFormation Resources, to which this CodeCommit event expands
+        :rtype: list
+        """
+        function = kwargs.get("function")
+
+        if not function:
+            raise TypeError("Missing required keyword argument: function")
+
+        resources = []
+
+        events_rule = EventsRule(self.logical_id)
+        events_rule.EventPattern = self._construct_pattern()
+        events_rule.Targets = [self._construct_target(function)]
+        if CONDITION in function.resource_attributes:
+            events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
+
+        resources.append(events_rule)
+
+        source_arn = events_rule.get_runtime_attr("arn")
+        resources.append(self._construct_permission(function, source_arn=source_arn))
+
+        return resources
+
+    def _construct_pattern(self):
+        partition = ArnGenerator.get_partition_name()
+        resource = fnSub(
+            ArnGenerator.generate_arn(partition=partition, service="codecommit", resource=self.RepositoryName)
+        )
+
+        pattern = {"source": ["aws.codecommit"], "resources": [resource]}
+
+        return pattern
+
+    def _construct_target(self, function):
+        """Constructs the Target property for the CodeCommit Rule.
+
+        :returns: the Target property
+        :rtype: dict
+        """
+        target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
+
+        return target
+
+
 class Api(PushEventSource):
     """Api method event source for SAM Functions."""
 

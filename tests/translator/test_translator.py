@@ -155,6 +155,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "eventbridgerule_schedule_properties",
                 "cloudwatch_logs_with_ref",
                 "cloudwatchlog",
+                "codecommit",
                 "streams",
                 "sqs",
                 "simpletable",

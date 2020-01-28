@@ -496,6 +496,9 @@
               "$ref": "#/definitions/AWS::Serverless::Function.LogEvent"
             },
             {
+              "$ref": "#/definitions/AWS::Serverless::Function.CodeCommitEvent"
+            },
+            {
               "$ref": "#/definitions/AWS::Serverless::Function.IoTRuleEvent"
             },
             {
@@ -546,6 +549,18 @@
       },
       "required": [
         "Statement"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Function.CodeCommitEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "RepositoryName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "RepositoryName"
       ],
       "type": "object"
     },

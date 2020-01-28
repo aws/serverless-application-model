@@ -15,6 +15,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input")
         "eventbridgerule",
         "cloudwatch_logs_with_ref",
         "cloudwatchlog",
+        "codecommit",
         "streams",
         "sqs",
         "simpletable",
