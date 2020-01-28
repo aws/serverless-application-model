@@ -101,3 +101,9 @@ Resources:
 
         - CodeCommitReadPolicy:
             RepositoryName: name
+
+        - TextractPolicy: {}
+
+        - TextractDetectAnalyzePolicy: {}
+
+        - TextractGetResultPolicy: {}

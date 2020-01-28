@@ -62,6 +62,7 @@ DeadLetterQueue                    All
 DeploymentPreference               All
 Layers                             All
 AutoPublishAlias             Ref of a CloudFormation Parameter  Alias resources created by SAM uses a LocicalId <FunctionLogicalId+AliasName>. So SAM either needs a string for alias name, or a Ref to template Parameter that SAM can resolve into a string.
+AutoPublishCodeSha256              All
 ReservedConcurrentExecutions       All
 EventInvokeConfig                  All
 ============================ ================================== ========================

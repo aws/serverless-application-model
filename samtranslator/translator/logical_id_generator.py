@@ -10,7 +10,7 @@ class LogicalIdGenerator(object):
     #       given by this class
     HASH_LENGTH = 10
 
-    def __init__(self, prefix, data_obj=None):
+    def __init__(self, prefix, data_obj=None, data_hash=None):
         """
         Generate logical IDs for resources that are stable, deterministic and platform independent
 
@@ -24,6 +24,7 @@ class LogicalIdGenerator(object):
 
         self._prefix = prefix
         self.data_str = data_str
+        self.data_hash = data_hash
 
     def gen(self):
         """
@@ -53,6 +54,9 @@ class LogicalIdGenerator(object):
         :return: Hash of data if it was present
         :rtype string
         """
+
+        if self.data_hash:
+            return self.data_hash[:length]
 
         data_hash = ""
         if not self.data_str:

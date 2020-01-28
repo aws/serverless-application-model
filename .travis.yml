@@ -22,7 +22,7 @@ matrix:
 install:
 # Install the code requirements
 - mkdir $HOME/bin-black
-- wget -O $HOME/bin-black/black https://github.com/python/black/releases/download/19.3b0/black
+- wget -O $HOME/bin-black/black https://github.com/python/black/releases/download/19.10b0/black
 - chmod +x $HOME/bin-black/black
 - export PATH=$PATH:$HOME/bin-black
 - black --version
