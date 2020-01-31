@@ -656,7 +656,7 @@ class SamFunction(SamResourceMacro):
             if function.Environment:
                 logical_dict.update(function.Environment)
             if function.MemorySize:
-                logical_dict.update({'MemorySize': function.MemorySize})
+                logical_dict.update({"MemorySize": function.MemorySize})
         logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
