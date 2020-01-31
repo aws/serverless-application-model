@@ -9,7 +9,7 @@ LambdaEdgeFunctionSample:
     Type: AWS::Serverless::Function
     Properties:
         CodeUri: src/
-        Runtime: nodejs6.10
+        Runtime: nodejs10.x
         Handler: index.handler
         Role: !GetAtt LambdaEdgeFunctionRole.Arn
         Timeout: 5
@@ -24,14 +24,16 @@ LambdaEdgeFunctionSample:
     Type: AWS::Serverless::Function
     Properties:
         CodeUri: src/
-        Runtime: nodejs6.10
+        Runtime: nodejs10.x
         Handler: index.handler
         Role: !GetAtt LambdaEdgeFunctionRole.Arn
         Timeout: 5
         # More info at https://github.com/awslabs/serverless-application-model/blob/master/docs/safe_lambda_deployments.rst
         AutoPublishAlias: live 
-        ProvisionedConcurrencyConfig:
-          ProvisionedConcurrentExecutions: !If [AliasProvisionedConcurrencyEnabled, !Ref ProvisionedConcurrency, !Ref 'AWS::NoValue']
+        ProvisionedConcurrencyConfig: !If
+            - AliasProvisionedConcurrencyEnabled
+            - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+            - !Ref 'AWS::NoValue'
 ```
 
 We must also create a custom IAM Role which allows `lambda.amazonaws.com` and `edgelambda.amazonaws.com` services to assume the role and execute the function.

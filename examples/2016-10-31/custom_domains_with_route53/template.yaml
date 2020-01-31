@@ -18,7 +18,7 @@ Resources:
           return response;
         };
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         Fetch:
           Type: Api

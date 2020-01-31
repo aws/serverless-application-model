@@ -1,0 +1,28 @@
+Resources:
+  SaveNotificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/notifications.zip
+      Handler: index.save_notification
+      Runtime: nodejs12.x
+      Events:
+        NotificationTopic:
+          Type: SNS
+          Properties:
+            Topic: !Ref Notifications
+            SqsSubscription:
+              QueueUrl: https://sqs.us-east-1.amazonaws.com/123456789012/MyQueue
+              QueueArn: arn:aws:sqs:us-east-1:123456789012:MyQueue
+              QueuePolicyLogicalId: NotificationB
+              BatchSize: 8
+              Enabled: true
+            FilterPolicy:
+              store:
+                - example_corp
+              price_usd:
+                - numeric:
+                    - ">="
+                    - 100
+
+  Notifications:
+    Type: AWS::SNS::Topic

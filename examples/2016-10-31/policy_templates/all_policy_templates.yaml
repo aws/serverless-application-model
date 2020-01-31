@@ -5,7 +5,7 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs4.3
+      Runtime: nodejs12.x
       Policies:
 
         - SQSPollerPolicy:
@@ -101,3 +101,9 @@ Resources:
 
         - CodeCommitReadPolicy:
             RepositoryName: name
+
+        - TextractPolicy: {}
+
+        - TextractDetectAnalyzePolicy: {}
+
+        - TextractGetResultPolicy: {}

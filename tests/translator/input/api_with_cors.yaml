@@ -10,7 +10,7 @@ Resources:
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
-      Runtime: nodejs4.3
+      Runtime: nodejs12.x
       Events:
         GetHtml:
           Type: Api
@@ -27,13 +27,13 @@ Resources:
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
   GetHtmlFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
   ExplicitApi:
     Type: AWS::Serverless::Api
     Properties:

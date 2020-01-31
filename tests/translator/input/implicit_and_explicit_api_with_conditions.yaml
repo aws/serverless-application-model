@@ -25,7 +25,7 @@ Resources:
     Condition: implicithello1condition
     Properties:
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 3
       InlineCode: |
@@ -41,7 +41,7 @@ Resources:
     Condition: implicithello2condition
     Properties:
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 3
       InlineCode: |
@@ -62,7 +62,7 @@ Resources:
     Condition: explicithello1condition
     Properties:
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 3
       InlineCode: |
@@ -79,7 +79,7 @@ Resources:
     Condition: explicithello2condition
     Properties:
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 3
       InlineCode: |

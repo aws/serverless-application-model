@@ -258,7 +258,12 @@ Example:
           Type: SNS
           Properties:
             Topic: arn:aws:sns:us-east-1:123456789012:my_topic
-            SqsSubscription: true
+            SqsSubscription:
+              QueuePolicyLogicalId: CustomQueuePolicyLogicalId
+              QueueArn: !GetAtt MyCustomQueue.Arn
+              QueueUrl: !Ref MyCustomQueue
+              BatchSize: 5
+              Enabled: true
       ...
 
 Additional generated resources:
@@ -274,6 +279,24 @@ AWS::SQS::QueuePolicy              MyFunction\ **MyTrigger**\ QueuePolicy
 ================================== ================================
 
   NOTE: ``AWS::Lambda::Permission`` resources are only generated if SqsSubscription is ``false``. ``AWS::Lambda::EventSourceMapping``, ``AWS::SQS::Queue``, ``AWS::SQS::QueuePolicy`` resources are only generated if SqsSubscription is ``true``.
+
+  ``AWS::SQS::Queue`` resources are only generated if SqsSubscription is ``true``.
+
+  Example:
+
+  .. code:: yaml
+
+    MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        MyTrigger:
+          Type: SNS
+          Properties:
+            Topic: arn:aws:sns:us-east-1:123456789012:my_topic
+            SqsSubscription: true
+      ...
 
 Kinesis
 ^^^^^^^
@@ -481,9 +504,9 @@ AWS::ApiGateway::Stage             MyApi\ **dev**\ Stage
 AWS::ApiGateway::Deployment        MyApi\ Deployment\ *SHA* (10 Digits of SHA256 of DefinitionUri or DefinitionBody value)
 ================================== ================================
 
-  NOTE: By just specifying AWS::Serverless::Api resource, SAM will *not* add permission for API Gateway to invoke the 
+  NOTE: By just specifying AWS::Serverless::Api resource, SAM will *not* add permission for API Gateway to invoke the
   the Lambda Function backing the APIs. You should explicitly re-define all APIs under ``Events`` section of the
-  AWS::Serverless::Function resource but include a `RestApiId` property that references the AWS::Serverless::Api 
+  AWS::Serverless::Function resource but include a `RestApiId` property that references the AWS::Serverless::Api
   resource. SAM will add permission for these APIs to invoke the function.
 
   Example:

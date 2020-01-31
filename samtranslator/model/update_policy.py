@@ -2,9 +2,10 @@ from collections import namedtuple
 
 from samtranslator.model.intrinsics import ref
 
-CodeDeployLambdaAliasUpdate = namedtuple('CodeDeployLambdaAliasUpdate',
-                                         ['ApplicationName', 'DeploymentGroupName', 'BeforeAllowTrafficHook',
-                                          'AfterAllowTrafficHook'])
+CodeDeployLambdaAliasUpdate = namedtuple(
+    "CodeDeployLambdaAliasUpdate",
+    ["ApplicationName", "DeploymentGroupName", "BeforeAllowTrafficHook", "AfterAllowTrafficHook"],
+)
 
 """
 This class is a model for the update policy which becomes present on any function alias for which there is an enabled
@@ -25,6 +26,7 @@ class UpdatePolicy(CodeDeployLambdaAliasUpdate):
         :return: a dict that can be used as part of a cloudformation template
         """
         dict_with_nones = self._asdict()
-        codedeploy_lambda_alias_update_dict = dict((k, v) for k, v in dict_with_nones.items()
-                                                   if v != ref(None) and v is not None)
-        return {'CodeDeployLambdaAliasUpdate': codedeploy_lambda_alias_update_dict}
+        codedeploy_lambda_alias_update_dict = dict(
+            (k, v) for k, v in dict_with_nones.items() if v != ref(None) and v is not None
+        )
+        return {"CodeDeployLambdaAliasUpdate": codedeploy_lambda_alias_update_dict}

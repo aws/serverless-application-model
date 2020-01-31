@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyTestFunction] is invalid. 'Type: blah' must be one of ['SQS', 'SNS', 'EventBridge', 'Lambda']"
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyTestFunction] is invalid. 'Type: blah' must be one of ['SQS', 'SNS', 'EventBridge', 'Lambda']"
+}

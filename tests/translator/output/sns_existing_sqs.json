@@ -1,0 +1,141 @@
+{
+  "Resources": {
+    "Queue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "Notifications": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "NotificationA": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "Queue"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "Queue",
+                  "Arn"
+                ]
+              },
+              "Effect": "Allow",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "Notifications"
+                  }
+                }
+              },
+              "Principal": "*"
+            }
+          ]
+        }
+      }
+    },
+    "SaveNotificationFunctionNotificationTopic": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "FilterPolicy": {
+          "price_usd": [
+            {
+              "numeric": [
+                ">=",
+                100
+              ]
+            }
+          ],
+          "store": [
+            "example_corp"
+          ]
+        },
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "Queue",
+            "Arn"
+          ]
+        },
+        "Protocol": "sqs",
+        "TopicArn": {
+          "Ref": "Notifications"
+        }
+      }
+    },
+    "SaveNotificationFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "SaveNotificationFunctionNotificationTopicEventSourceMapping": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "BatchSize": 8,
+        "Enabled": true,
+        "FunctionName": {
+          "Ref": "SaveNotificationFunction"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "Queue",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "SaveNotificationFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.save_notification",
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "notifications.zip"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "SaveNotificationFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

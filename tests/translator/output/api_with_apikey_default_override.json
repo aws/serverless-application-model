@@ -15,7 +15,7 @@
       "MyFunctionWithApiKeyRequiredTrueMyApiWithApiKeyRequiredTruePermissionProd": {
         "Type": "AWS::Lambda::Permission", 
         "Properties": {
-          "Action": "lambda:invokeFunction", 
+          "Action": "lambda:InvokeFunction", 
           "Principal": "apigateway.amazonaws.com", 
           "FunctionName": {
             "Ref": "MyFunctionWithApiKeyRequiredTrue"
@@ -36,7 +36,7 @@
       "MyFunctionWithApiKeyRequiredFalseMyApiWithApiKeyRequiredFalsePermissionProd": {
         "Type": "AWS::Lambda::Permission", 
         "Properties": {
-          "Action": "lambda:invokeFunction", 
+          "Action": "lambda:InvokeFunction", 
           "Principal": "apigateway.amazonaws.com", 
           "FunctionName": {
             "Ref": "MyFunctionWithApiKeyRequiredFalse"
@@ -68,7 +68,7 @@
               "Arn"
             ]
           }, 
-          "Runtime": "nodejs8.10", 
+          "Runtime": "nodejs12.x",
           "Tags": [
             {
               "Value": "SAM", 
@@ -91,7 +91,7 @@
               "Arn"
             ]
           }, 
-          "Runtime": "nodejs8.10", 
+          "Runtime": "nodejs12.x",
           "Tags": [
             {
               "Value": "SAM", 
@@ -103,7 +103,7 @@
       "MyFunctionWithApiKeyRequiredDefaultMyApiWithApiKeyRequiredDefaultPermissionProd": {
         "Type": "AWS::Lambda::Permission", 
         "Properties": {
-          "Action": "lambda:invokeFunction", 
+          "Action": "lambda:InvokeFunction", 
           "Principal": "apigateway.amazonaws.com", 
           "FunctionName": {
             "Ref": "MyFunctionWithApiKeyRequiredDefault"
@@ -145,7 +145,7 @@
               "Arn"
             ]
           }, 
-          "Runtime": "nodejs8.10", 
+          "Runtime": "nodejs12.x",
           "Tags": [
             {
               "Value": "SAM", 

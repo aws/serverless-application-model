@@ -25,7 +25,7 @@ Resources:
       # Replace <bucket> with your bucket name
       CodeUri: s3://<bucket>/api_swagger_cors.zip
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       Events:
         ProxyApiRoot:
           Type: Api
