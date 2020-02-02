@@ -17,6 +17,7 @@ class PropertyType(object):
     :ivar supports_intrinsics True to allow intrinsic function support on this property. Setting this to False will
         raise an error when intrinsic function dictionary is supplied as value
     """
+
     def __init__(self, required, validate=lambda value: True, supports_intrinsics=True):
         self.required = required
         self.validate = validate
@@ -37,9 +38,10 @@ class Resource(object):
     which indicate whether the property is required and the property's type. Properties that are not in this dict will \
     be considered invalid.
     """
+
     resource_type = None
     property_types = None
-    _keywords = ['logical_id', 'relative_id', "depends_on", "resource_attributes"]
+    _keywords = ["logical_id", "relative_id", "depends_on", "resource_attributes"]
 
     _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition"]
 
@@ -113,8 +115,8 @@ class Resource(object):
         for name, value in properties.items():
             setattr(resource, name, value)
 
-        if 'DependsOn' in resource_dict:
-            resource.depends_on = resource_dict['DependsOn']
+        if "DependsOn" in resource_dict:
+            resource.depends_on = resource_dict["DependsOn"]
 
         # Parse only well known properties. This is consistent with earlier behavior where we used to ignore resource
         # all resource attributes ie. all attributes were unsupported before
@@ -134,7 +136,7 @@ class Resource(object):
         :rtype: bool
         :raises TypeError: if the logical id is invalid
         """
-        pattern = re.compile(r'^[A-Za-z0-9]+$')
+        pattern = re.compile(r"^[A-Za-z0-9]+$")
         if logical_id is not None and pattern.match(logical_id):
             return True
         raise InvalidResourceException(logical_id, "Logical ids must be alphanumeric.")
@@ -148,15 +150,16 @@ class Resource(object):
         :rtype: bool
         :raises InvalidResourceException: if the resource dict has an invalid format
         """
-        if 'Type' not in resource_dict:
+        if "Type" not in resource_dict:
             raise InvalidResourceException(logical_id, "Resource dict missing key 'Type'.")
-        if resource_dict['Type'] != cls.resource_type:
-            raise InvalidResourceException(logical_id, "Resource has incorrect Type; expected '{expected}', "
-                                                       "got '{actual}'".format(
-                                                            expected=cls.resource_type,
-                                                            actual=resource_dict['Type']))
+        if resource_dict["Type"] != cls.resource_type:
+            raise InvalidResourceException(
+                logical_id,
+                "Resource has incorrect Type; expected '{expected}', "
+                "got '{actual}'".format(expected=cls.resource_type, actual=resource_dict["Type"]),
+            )
 
-        if 'Properties' in resource_dict and not isinstance(resource_dict['Properties'], dict):
+        if "Properties" in resource_dict and not isinstance(resource_dict["Properties"], dict):
             raise InvalidResourceException(logical_id, "Properties of a resource must be an object.")
 
     def to_dict(self):
@@ -195,10 +198,10 @@ class Resource(object):
         """
         resource_dict = {}
 
-        resource_dict['Type'] = self.resource_type
+        resource_dict["Type"] = self.resource_type
 
         if self.depends_on:
-            resource_dict['DependsOn'] = self.depends_on
+            resource_dict["DependsOn"] = self.depends_on
 
         resource_dict.update(self.resource_attributes)
 
@@ -208,7 +211,7 @@ class Resource(object):
             if value is not None:
                 properties_dict[name] = value
 
-        resource_dict['Properties'] = properties_dict
+        resource_dict["Properties"] = properties_dict
 
         return resource_dict
 
@@ -223,9 +226,12 @@ class Resource(object):
         if name in self._keywords or name in self.property_types:
             return super(Resource, self).__setattr__(name, value)
 
-        raise InvalidResourceException(self.logical_id,
-                                       "property {property_name} not defined for resource of type {resource_type}"
-                                       .format(resource_type=self.resource_type, property_name=name))
+        raise InvalidResourceException(
+            self.logical_id,
+            "property {property_name} not defined for resource of type {resource_type}".format(
+                resource_type=self.resource_type, property_name=name
+            ),
+        )
 
     def validate_properties(self):
         """Validates that the required properties for this Resource have been populated, and that all properties have
@@ -246,13 +252,13 @@ class Resource(object):
             if value is None:
                 if property_type.required:
                     raise InvalidResourceException(
-                        self.logical_id,
-                        "Missing required property '{property_name}'.".format(property_name=name))
+                        self.logical_id, "Missing required property '{property_name}'.".format(property_name=name)
+                    )
             # Otherwise, validate the value of the property.
             elif not property_type.validate(value, should_raise=False):
                 raise InvalidResourceException(
-                    self.logical_id,
-                    "Type of property '{property_name}' is invalid.".format(property_name=name))
+                    self.logical_id, "Type of property '{property_name}' is invalid.".format(property_name=name)
+                )
 
     def set_resource_attribute(self, attr, value):
         """Sets attributes on resource. Resource attributes are top-level entries of a CloudFormation resource
@@ -313,8 +319,8 @@ class Resource(object):
         :return: Dictionary of resource attributes.
         """
         attributes = None
-        if 'Condition' in self.resource_attributes:
-            attributes = {'Condition': self.resource_attributes['Condition']}
+        if "Condition" in self.resource_attributes:
+            attributes = {"Condition": self.resource_attributes["Condition"]}
         return attributes
 
 
@@ -366,19 +372,15 @@ class SamResourceMacro(ResourceMacro):
     referable_properties = {}
 
     # Each resource can optionally override this tag:
-    _SAM_KEY = 'lambda:createdBy'
-    _SAM_VALUE = 'SAM'
+    _SAM_KEY = "lambda:createdBy"
+    _SAM_VALUE = "SAM"
 
     # Tags reserved by the serverless application repo
-    _SAR_APP_KEY = 'serverlessrepo:applicationId'
-    _SAR_SEMVER_KEY = 'serverlessrepo:semanticVersion'
+    _SAR_APP_KEY = "serverlessrepo:applicationId"
+    _SAR_SEMVER_KEY = "serverlessrepo:semanticVersion"
 
     # Aggregate list of all reserved tags
-    _RESERVED_TAGS = [
-        _SAM_KEY,
-        _SAR_APP_KEY,
-        _SAR_SEMVER_KEY
-    ]
+    _RESERVED_TAGS = [_SAM_KEY, _SAR_APP_KEY, _SAR_SEMVER_KEY]
 
     def get_resource_references(self, generated_cfn_resources, supported_resource_refs):
         """
@@ -425,10 +427,13 @@ class SamResourceMacro(ResourceMacro):
 
     def _check_tag(self, reserved_tag_name, tags):
         if reserved_tag_name in tags:
-            raise InvalidResourceException(self.logical_id, reserved_tag_name + " is a reserved Tag key name and "
-                                                                                "cannot be set on your resource. "
-                                                                                "Please change the tag key in the "
-                                                                                "input.")
+            raise InvalidResourceException(
+                self.logical_id,
+                reserved_tag_name + " is a reserved Tag key name and "
+                "cannot be set on your resource. "
+                "Please change the tag key in the "
+                "input.",
+            )
 
     def _resolve_string_parameter(self, intrinsics_resolver, parameter_value, parameter_name):
         if not parameter_value:
@@ -436,9 +441,10 @@ class SamResourceMacro(ResourceMacro):
         value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
 
         if not isinstance(value, string_types) and not isinstance(value, dict):
-            raise InvalidResourceException(self.logical_id,
-                                           "Could not resolve parameter for '{}' or parameter is not a String."
-                                           .format(parameter_name))
+            raise InvalidResourceException(
+                self.logical_id,
+                "Could not resolve parameter for '{}' or parameter is not a String.".format(parameter_name),
+            )
         return value
 
 
@@ -454,17 +460,19 @@ class ResourceTypeResolver(object):
         self.resource_types = {}
         for module in modules:
             # Get all classes in the specified module which have a class variable resource_type.
-            for _, resource_class in inspect.getmembers(module,
-                                                        lambda cls: inspect.isclass(cls) and
-                                                        cls.__module__ == module.__name__ and
-                                                        hasattr(cls, 'resource_type')):
+            for _, resource_class in inspect.getmembers(
+                module,
+                lambda cls: inspect.isclass(cls)
+                and cls.__module__ == module.__name__
+                and hasattr(cls, "resource_type"),
+            ):
                 self.resource_types[resource_class.resource_type] = resource_class
 
     def can_resolve(self, resource_dict):
-        if not isinstance(resource_dict, dict) or 'Type' not in resource_dict:
+        if not isinstance(resource_dict, dict) or "Type" not in resource_dict:
             return False
 
-        return resource_dict['Type'] in self.resource_types
+        return resource_dict["Type"] in self.resource_types
 
     def resolve_resource_type(self, resource_dict):
         """Returns the Resource class corresponding to the 'Type' key in the given resource dict.
@@ -474,8 +482,11 @@ class ResourceTypeResolver(object):
         :rtype: class
         """
         if not self.can_resolve(resource_dict):
-            raise TypeError("Resource dict has missing or invalid value for key Type. Event Type is: {}.".format(
-                    resource_dict.get('Type')))
-        if resource_dict['Type'] not in self.resource_types:
-            raise TypeError("Invalid resource type {resource_type}".format(resource_type=resource_dict['Type']))
-        return self.resource_types[resource_dict['Type']]
+            raise TypeError(
+                "Resource dict has missing or invalid value for key Type. Event Type is: {}.".format(
+                    resource_dict.get("Type")
+                )
+            )
+        if resource_dict["Type"] not in self.resource_types:
+            raise TypeError("Invalid resource type {resource_type}".format(resource_type=resource_dict["Type"]))
+        return self.resource_types[resource_dict["Type"]]

@@ -12,7 +12,7 @@ Resources:
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
       Handler: index.generate_thumbails
-      Runtime: nodejs4.3
+      Runtime: nodejs12.x
       Events:
         ImageBucket:
           Type: S3
@@ -33,7 +33,7 @@ Resources:
       AutoPublishAlias: Live
 
       Events:
-        CWSchedule:
+        EBSchedule:
           Type: Schedule
           Properties:
             Schedule: 'rate(1 minute)'
@@ -45,6 +45,14 @@ Resources:
               detail:
                 state:
                 - terminated
+
+        EBRule:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - launched
 
         CWLog:
           Type: CloudWatchLogs

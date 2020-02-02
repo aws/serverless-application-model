@@ -14,13 +14,13 @@ Resources:
           Type: AlexaSkill
       Handler: index.handler
       MemorySize: 1024
-      Runtime: nodejs4.3
+      Runtime: nodejs12.x
       Timeout: 3
 
   AlexaSkillFuncAlexaSkillEventPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      Action: lambda:invokeFunction
+      Action: lambda:InvokeFunction
       FunctionName:
         Ref: AlexaSkillFunc
       Principal: alexa-appkit.amazon.com

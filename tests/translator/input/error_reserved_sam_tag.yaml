@@ -14,7 +14,7 @@ Resources:
           Type: AlexaSkill
       Handler: index.handler
       MemorySize: 1024
-      Runtime: nodejs4.3
+      Runtime: nodejs12.x
       Timeout: 3
       Tags:
         lambda:createdBy: "blah"

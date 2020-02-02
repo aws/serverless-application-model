@@ -1,0 +1,369 @@
+{
+  "Conditions": {
+    "TopicCreationEnabled": {
+      "Fn::Equals": [
+        {
+          "Ref": "CreateSNSTopic"
+        }, 
+        true
+      ]
+    }, 
+    "NOTQueueCreationDisabled2da03e5b6f": {
+      "Fn::Not": [
+        {
+          "Condition": "QueueCreationDisabled"
+        }
+      ]
+    }, 
+    "QueueCreationDisabled": {
+      "Fn::Equals": [
+        {
+          "Ref": "UseExistingQueue"
+        }, 
+        true
+      ]
+    }
+  }, 
+  "Parameters": {
+    "UseExistingQueue": {
+      "Default": true, 
+      "Type": "String", 
+      "AllowedValues": [
+        true, 
+        false
+      ]
+    }, 
+    "CreateSNSTopic": {
+      "Default": true, 
+      "Type": "String", 
+      "AllowedValues": [
+        true, 
+        false
+      ]
+    }, 
+    "SQSArn": {
+      "Default": "my-sqs-arn", 
+      "Type": "String"
+    }
+  }, 
+  "Resources": {
+    "MyTestFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Policies": [
+          {
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnSuccessSQSPolicy", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "sqs:SendMessage", 
+                  "Resource": {
+                    "Fn::If": [
+                      "NOTQueueCreationDisabled2da03e5b6f", 
+                      {
+                        "Fn::GetAtt": [
+                          "MyTestFunctionEventInvokeConfigOnSuccessQueue", 
+                          "Arn"
+                        ]
+                      }, 
+                      "my-sqs-arn"
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "MyTestFunctionEventInvokeConfigOnFailureSNSPolicy", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "sns:publish", 
+                  "Resource": {
+                    "Fn::If": [
+                      "TopicCreationEnabled", 
+                      {
+                        "Ref": "MyTestFunctionEventInvokeConfigOnFailureTopic"
+                      }, 
+                      "SOME-SNS-ARN"
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyTestFunctionEventInvokeConfigOnSuccessQueue": {
+      "Type": "AWS::SQS::Queue", 
+      "Properties": {}, 
+      "Condition": "NOTQueueCreationDisabled2da03e5b6f"
+    }, 
+    "SNSSubscription": {
+      "Type": "AWS::SNS::Subscription", 
+      "Properties": {
+        "Endpoint": "example@example.com", 
+        "Protocol": "email", 
+        "TopicArn": {
+          "Ref": "MyTestFunctionEventInvokeConfigOnFailureTopic"
+        }
+      }, 
+      "Condition": "TopicCreationEnabled"
+    }, 
+    "MyTestFunctionEventInvokeConfig": {
+      "Type": "AWS::Lambda::EventInvokeConfig", 
+      "Properties": {
+        "MaximumEventAgeInSeconds": 70, 
+        "MaximumRetryAttempts": 1, 
+        "DestinationConfig": {
+          "OnSuccess": {
+            "Destination": {
+              "Fn::If": [
+                "NOTQueueCreationDisabled2da03e5b6f", 
+                {
+                  "Fn::GetAtt": [
+                    "MyTestFunctionEventInvokeConfigOnSuccessQueue", 
+                    "Arn"
+                  ]
+                }, 
+                "my-sqs-arn"
+              ]
+            }
+          }, 
+          "OnFailure": {
+            "Destination": {
+              "Fn::If": [
+                "TopicCreationEnabled", 
+                {
+                  "Ref": "MyTestFunctionEventInvokeConfigOnFailureTopic"
+                }, 
+                "SOME-SNS-ARN"
+              ]
+            }
+          }
+        }, 
+        "FunctionName": {
+          "Ref": "MyTestFunction"
+        }, 
+        "Qualifier": "$LATEST"
+      }
+    }, 
+    "MyTestFunction2Role": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Policies": [
+          {
+            "PolicyName": "MyTestFunction2EventInvokeConfigOnSuccessLambdaPolicy", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "lambda:InvokeFunction", 
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "DestinationLambda", 
+                      "Arn"
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }, 
+          {
+            "PolicyName": "MyTestFunction2EventInvokeConfigOnFailureEventBridgePolicy", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "events:PutEvents", 
+                  "Resource": "event-bus-arn", 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "DestinationLambda": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 1024, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "DestinationLambdaRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x"
+      }
+    }, 
+    "MyTestFunction2EventInvokeConfig": {
+      "Type": "AWS::Lambda::EventInvokeConfig", 
+      "Properties": {
+        "MaximumEventAgeInSeconds": 70, 
+        "MaximumRetryAttempts": 1, 
+        "DestinationConfig": {
+          "OnSuccess": {
+            "Destination": {
+              "Fn::GetAtt": [
+                "DestinationLambda", 
+                "Arn"
+              ]
+            }
+          }, 
+          "OnFailure": {
+            "Destination": "event-bus-arn"
+          }
+        }, 
+        "FunctionName": {
+          "Ref": "MyTestFunction2"
+        }, 
+        "Qualifier": "$LATEST"
+      }
+    }, 
+    "DestinationLambdaRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MyTestFunction2": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = function(event, context, callback) {\n    var event_received_at = new Date().toISOString();\n    console.log('Event received at: ' + event_received_at);\n    console.log('Received event:', JSON.stringify(event, null, 2));\n\n    if (event.Success) {\n        console.log(\"Success\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(null);\n    } else {\n        console.log(\"Failure\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(new Error(\"Failure from event, Success = false, I am failing!\"), 'Destination Function Error Thrown');\n    }\n};      \n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 1024, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyTestFunction2Role", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x"
+      }
+    }, 
+    "MyTestFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "ZipFile": "exports.handler = function(event, context, callback) {\n    var event_received_at = new Date().toISOString();\n    console.log('Event received at: ' + event_received_at);\n    console.log('Received event:', JSON.stringify(event, null, 2));\n\n    if (event.Success) {\n        console.log(\"Success\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(null);\n    } else {\n        console.log(\"Failure\");\n        context.callbackWaitsForEmptyEventLoop = false;\n        callback(new Error(\"Failure from event, Success = false, I am failing!\"), 'Destination Function Error Thrown');\n    }\n};      \n"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "MemorySize": 1024, 
+        "Handler": "index.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyTestFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x"
+      }
+    }, 
+    "MyTestFunctionEventInvokeConfigOnFailureTopic": {
+      "Type": "AWS::SNS::Topic", 
+      "Properties": {}, 
+      "Condition": "TopicCreationEnabled"
+    }
+  }
+}

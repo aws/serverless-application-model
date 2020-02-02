@@ -69,6 +69,7 @@ Currently, the following resources and properties are being supported:
       DeploymentPreference:
       PermissionsBoundary:
       ReservedConcurrentExecutions:
+      EventInvokeConfig:
 
     Api:
       # Properties of AWS::Serverless::Api
@@ -90,6 +91,11 @@ Currently, the following resources and properties are being supported:
       TracingEnabled:
       OpenApiVersion:
       Domain:
+
+    HttpApi:
+      # Properties of AWS::Serverless::HttpApi
+      # Also works with Implicit APIs
+      Auth:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable
@@ -119,6 +125,12 @@ issues.
 
 * StageName
 * DefinitionBody
+
+**AWS::Serverless::HttpApi:**
+
+* StageName
+* DefinitionBody
+* DefinitionUri
 
 Overridable
 -----------

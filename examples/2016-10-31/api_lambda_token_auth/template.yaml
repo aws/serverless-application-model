@@ -23,7 +23,7 @@ Resources:
     Properties:
       CodeUri: ./src
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         GetRoot:
           Type: Api
@@ -46,7 +46,7 @@ Resources:
     Properties:
       CodeUri: ./src
       Handler: authorizer.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
 
 Outputs:
   ApiURL:

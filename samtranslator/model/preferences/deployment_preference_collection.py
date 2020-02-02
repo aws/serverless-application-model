@@ -7,18 +7,19 @@ from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 import copy
 
-CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = 'CodeDeployServiceRole'
-CODEDEPLOY_APPLICATION_LOGICAL_ID = 'ServerlessDeploymentApplication'
-CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST = ["Canary10Percent5Minutes",
-                                             "Canary10Percent10Minutes",
-                                             "Canary10Percent15Minutes",
-                                             "Canary10Percent30Minutes",
-                                             "Linear10PercentEvery1Minute",
-                                             "Linear10PercentEvery2Minutes",
-                                             "Linear10PercentEvery3Minutes",
-                                             "Linear10PercentEvery10Minutes",
-                                             "AllAtOnce"
-                                             ]
+CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID = "CodeDeployServiceRole"
+CODEDEPLOY_APPLICATION_LOGICAL_ID = "ServerlessDeploymentApplication"
+CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST = [
+    "Canary10Percent5Minutes",
+    "Canary10Percent10Minutes",
+    "Canary10Percent15Minutes",
+    "Canary10Percent30Minutes",
+    "Linear10PercentEvery1Minute",
+    "Linear10PercentEvery2Minutes",
+    "Linear10PercentEvery3Minutes",
+    "Linear10PercentEvery10Minutes",
+    "AllAtOnce",
+]
 
 
 class DeploymentPreferenceCollection(object):
@@ -49,8 +50,11 @@ class DeploymentPreferenceCollection(object):
         :param deployment_preference_dict: the input SAM template deployment preference mapping
         """
         if logical_id in self._resource_preferences:
-            raise ValueError("logical_id {logical_id} previously added to this deployment_preference_collection".format(
-                logical_id=logical_id))
+            raise ValueError(
+                "logical_id {logical_id} previously added to this deployment_preference_collection".format(
+                    logical_id=logical_id
+                )
+            )
 
         self._resource_preferences[logical_id] = DeploymentPreference.from_dict(logical_id, deployment_preference_dict)
 
@@ -82,21 +86,23 @@ class DeploymentPreferenceCollection(object):
 
     def _codedeploy_application(self):
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
-        codedeploy_application_resource.ComputePlatform = 'Lambda'
+        codedeploy_application_resource.ComputePlatform = "Lambda"
         return codedeploy_application_resource
 
     def _codedeploy_iam_role(self):
         iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)
         iam_role.AssumeRolePolicyDocument = {
-            'Version': '2012-10-17',
-            'Statement': [{
-                'Action': ['sts:AssumeRole'],
-                'Effect': 'Allow',
-                'Principal': {'Service': ['codedeploy.amazonaws.com']}
-            }]
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": ["sts:AssumeRole"],
+                    "Effect": "Allow",
+                    "Principal": {"Service": ["codedeploy.amazonaws.com"]},
+                }
+            ],
         }
         iam_role.ManagedPolicyArns = [
-            ArnGenerator.generate_aws_managed_policy_arn('service-role/AWSCodeDeployRoleForLambda')
+            ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")
         ]
 
         return iam_role
@@ -112,21 +118,22 @@ class DeploymentPreferenceCollection(object):
         deployment_group = CodeDeployDeploymentGroup(self.deployment_group_logical_id(function_logical_id))
 
         if deployment_preference.alarms is not None:
-            deployment_group.AlarmConfiguration = {'Enabled': True,
-                                                   'Alarms': [{'Name': alarm} for alarm in
-                                                              deployment_preference.alarms]}
+            deployment_group.AlarmConfiguration = {
+                "Enabled": True,
+                "Alarms": [{"Name": alarm} for alarm in deployment_preference.alarms],
+            }
 
-        deployment_group.ApplicationName = self.codedeploy_application.get_runtime_attr('name')
-        deployment_group.AutoRollbackConfiguration = {'Enabled': True,
-                                                      'Events': ['DEPLOYMENT_FAILURE',
-                                                                 'DEPLOYMENT_STOP_ON_ALARM',
-                                                                 'DEPLOYMENT_STOP_ON_REQUEST']}
+        deployment_group.ApplicationName = self.codedeploy_application.get_runtime_attr("name")
+        deployment_group.AutoRollbackConfiguration = {
+            "Enabled": True,
+            "Events": ["DEPLOYMENT_FAILURE", "DEPLOYMENT_STOP_ON_ALARM", "DEPLOYMENT_STOP_ON_REQUEST"],
+        }
 
-        deployment_group.DeploymentConfigName = self._replace_deployment_types(copy.deepcopy(
-            deployment_preference.deployment_type))
+        deployment_group.DeploymentConfigName = self._replace_deployment_types(
+            copy.deepcopy(deployment_preference.deployment_type)
+        )
 
-        deployment_group.DeploymentStyle = {'DeploymentType': 'BLUE_GREEN',
-                                            'DeploymentOption': 'WITH_TRAFFIC_CONTROL'}
+        deployment_group.DeploymentStyle = {"DeploymentType": "BLUE_GREEN", "DeploymentOption": "WITH_TRAFFIC_CONTROL"}
 
         deployment_group.ServiceRoleArn = self.codedeploy_iam_role.get_runtime_attr("arn")
         if deployment_preference.role:
@@ -157,14 +164,14 @@ class DeploymentPreferenceCollection(object):
         deployment_preference = self.get(function_logical_id)
 
         return UpdatePolicy(
-            self.codedeploy_application.get_runtime_attr('name'),
-            self.deployment_group(function_logical_id).get_runtime_attr('name'),
+            self.codedeploy_application.get_runtime_attr("name"),
+            self.deployment_group(function_logical_id).get_runtime_attr("name"),
             deployment_preference.pre_traffic_hook,
             deployment_preference.post_traffic_hook,
         )
 
     def deployment_group_logical_id(self, function_logical_id):
-        return function_logical_id + 'DeploymentGroup'
+        return function_logical_id + "DeploymentGroup"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

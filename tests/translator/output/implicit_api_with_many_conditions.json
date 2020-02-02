@@ -126,7 +126,7 @@
     "helloworld7ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld7"
@@ -210,7 +210,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond7"
     },
@@ -235,7 +235,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond6"
     },
@@ -291,7 +291,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond4"
     },
@@ -316,7 +316,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond3"
     },
@@ -341,7 +341,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond2"
     },
@@ -366,7 +366,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond1"
     },
@@ -391,14 +391,14 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond9"
     },
     "helloApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "hello"
@@ -420,7 +420,7 @@
     "helloworld2ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld2"
@@ -453,7 +453,7 @@
     "helloworld3ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld3"
@@ -475,7 +475,7 @@
     "helloworld1ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld1"
@@ -515,14 +515,14 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond8"
     },
     "helloworld6ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld6"
@@ -575,7 +575,7 @@
     "helloworldApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld"
@@ -628,7 +628,7 @@
     "helloworld5ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld5"
@@ -650,7 +650,7 @@
     "helloworld8ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld8"
@@ -752,7 +752,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond"
     },
@@ -808,7 +808,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "MyCondition"
     },
@@ -833,14 +833,14 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "Cond5"
     },
     "helloworld9ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld9"
@@ -986,7 +986,7 @@
     "helloworld4ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "helloworld4"

@@ -1,0 +1,27 @@
+Parameters:
+  FnName:
+    Type: String
+  ProvisionedConcurrency:
+    Type: String
+    Default: 10
+  EnableAliasProvisionedConcurrency:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+Conditions:
+  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency, true]
+Resources:
+  MinimalFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      DeploymentPreference:
+        Type: Linear10PercentEvery3Minutes
+      ProvisionedConcurrencyConfig: !If
+        - AliasProvisionedConcurrencyEnabled
+        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+        - !Ref 'AWS::NoValue'

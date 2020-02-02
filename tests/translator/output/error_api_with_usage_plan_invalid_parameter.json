@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "\"Resource with id [MyApiOne] is invalid. Invalid property for 'UsagePlan'\""
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApiOne] is invalid. Invalid property for 'UsagePlan'"
+}

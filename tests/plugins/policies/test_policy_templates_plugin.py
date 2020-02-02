@@ -9,7 +9,6 @@ from samtranslator.policy_template_processor.exceptions import InsufficientParam
 
 
 class TestPolicyTemplatesForFunctionPlugin(TestCase):
-
     def setUp(self):
         self._policy_template_processor_mock = Mock()
         self.plugin = PolicyTemplatesForFunctionPlugin(self._policy_template_processor_mock)
@@ -41,19 +40,9 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         function_policies_class_mock.return_value = function_policies_obj_mock
         function_policies_class_mock.POLICIES_PROPERTY_NAME = "Policies"
 
-        template1 = {
-            "MyTemplate1": {
-                "Param1": "value1"
-            }
-        }
-        template2 = {
-            "MyTemplate2": {
-                "Param2": "value2"
-            }
-        }
-        resource_properties = {
-            "Policies": [template1, template2]
-        }
+        template1 = {"MyTemplate1": {"Param1": "value1"}}
+        template2 = {"MyTemplate2": {"Param2": "value2"}}
+        resource_properties = {"Policies": [template1, template2]}
 
         policies = [
             PolicyEntry(data=template1, type=PolicyTypes.POLICY_TEMPLATE),
@@ -76,10 +65,9 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         # This will overwrite the resource_properties input array
         self.assertEqual(expected, resource_properties["Policies"])
         function_policies_obj_mock.get.assert_called_once_with()
-        self._policy_template_processor_mock.convert.assert_has_calls([
-            call("MyTemplate1", {"Param1": "value1"}),
-            call("MyTemplate2", {"Param2": "value2"})
-        ])
+        self._policy_template_processor_mock.convert.assert_has_calls(
+            [call("MyTemplate1", {"Param1": "value1"}), call("MyTemplate2", {"Param2": "value2"})]
+        )
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_resource_must_skip_non_policy_templates(self, function_policies_class_mock):
@@ -91,20 +79,10 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         function_policies_class_mock.return_value = function_policies_obj_mock
         function_policies_class_mock.POLICIES_PROPERTY_NAME = "Policies"
 
-        template1 = {
-            "MyTemplate1": {
-                "Param1": "value1"
-            }
-        }
-        template2 = {
-            "MyTemplate2": {
-                "Param2": "value2"
-            }
-        }
+        template1 = {"MyTemplate1": {"Param1": "value1"}}
+        template2 = {"MyTemplate2": {"Param2": "value2"}}
         regular_policy = {"regular policy": "something"}
-        resource_properties = {
-            "Policies": [template1, regular_policy, template2]
-        }
+        resource_properties = {"Policies": [template1, regular_policy, template2]}
 
         policies = [
             PolicyEntry(data=template1, type=PolicyTypes.POLICY_TEMPLATE),
@@ -122,17 +100,19 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             {"Statement2": {"key2": "value2"}},
         ]
 
-        expected = [{"Statement1": {"key1": "value1"}}, {"regular policy": "something"}, {"Statement2": {"key2": "value2"}}]
+        expected = [
+            {"Statement1": {"key1": "value1"}},
+            {"regular policy": "something"},
+            {"Statement2": {"key2": "value2"}},
+        ]
         self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # This will overwrite the resource_properties input array
         self.assertEqual(expected, resource_properties["Policies"])
         function_policies_obj_mock.get.assert_called_once_with()
-        self._policy_template_processor_mock.convert.assert_has_calls([
-            call("MyTemplate1", {"Param1": "value1"}),
-            call("MyTemplate2", {"Param2": "value2"})
-        ])
-
+        self._policy_template_processor_mock.convert.assert_has_calls(
+            [call("MyTemplate1", {"Param1": "value1"}), call("MyTemplate2", {"Param2": "value2"})]
+        )
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_must_raise_on_insufficient_parameter_values(self, function_policies_class_mock):
@@ -143,18 +123,10 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         function_policies_obj_mock = MagicMock()
         function_policies_class_mock.return_value = function_policies_obj_mock
 
-        template1 = {
-            "MyTemplate1": {
-                "Param1": "value1"
-            }
-        }
-        resource_properties = {
-            "Policies": template1
-        }
+        template1 = {"MyTemplate1": {"Param1": "value1"}}
+        resource_properties = {"Policies": template1}
 
-        policies = [
-            PolicyEntry(data=template1, type=PolicyTypes.POLICY_TEMPLATE)
-        ]
+        policies = [PolicyEntry(data=template1, type=PolicyTypes.POLICY_TEMPLATE)]
 
         # Setup to return all the policies
         function_policies_obj_mock.__len__.return_value = 1
@@ -167,7 +139,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
+        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_must_raise_on_invalid_parameter_values(self, function_policies_class_mock):
@@ -178,18 +150,10 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         function_policies_obj_mock = MagicMock()
         function_policies_class_mock.return_value = function_policies_obj_mock
 
-        template1 = {
-            "MyTemplate1": {
-                "Param1": "value1"
-            }
-        }
-        resource_properties = {
-            "Policies": template1
-        }
+        template1 = {"MyTemplate1": {"Param1": "value1"}}
+        resource_properties = {"Policies": template1}
 
-        policies = [
-            PolicyEntry(data=template1, type=PolicyTypes.POLICY_TEMPLATE)
-        ]
+        policies = [PolicyEntry(data=template1, type=PolicyTypes.POLICY_TEMPLATE)]
 
         # Setup to return all the policies
         function_policies_obj_mock.__len__.return_value = 1
@@ -201,7 +165,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
+        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
 
     @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
     def test_on_before_transform_must_bubble_exception(self, function_policies_class_mock):
@@ -212,30 +176,22 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         function_policies_obj_mock = MagicMock()
         function_policies_class_mock.return_value = function_policies_obj_mock
 
-        template1 = {
-            "MyTemplate1": {
-                "Param1": "value1"
-            }
-        }
-        resource_properties = {
-            "Policies": template1
-        }
+        template1 = {"MyTemplate1": {"Param1": "value1"}}
+        resource_properties = {"Policies": template1}
 
-        policies = [
-            PolicyEntry(data=template1, type=PolicyTypes.POLICY_TEMPLATE)
-        ]
+        policies = [PolicyEntry(data=template1, type=PolicyTypes.POLICY_TEMPLATE)]
 
         # Setup to return all the policies
         function_policies_obj_mock.__len__.return_value = 1
         function_policies_obj_mock.get.return_value = iter(policies)
 
-        self._policy_template_processor_mock.convert.side_effect = TypeError('message')
+        self._policy_template_processor_mock.convert.side_effect = TypeError("message")
 
         with self.assertRaises(TypeError):
             self.plugin.on_before_transform_resource("logicalId", "resource_type", resource_properties)
 
         # Make sure the input was not changed
-        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": { "Param1": "value1"}}})
+        self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
 
     def test_on_before_transform_resource_must_skip_unsupported_resources(self):
 

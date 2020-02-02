@@ -1,0 +1,63 @@
+Parameters:
+  SQSArn:
+    Type: String
+    Default: my-sqs-arn
+  UseExistingQueue:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+Conditions:
+  QueueCreationDisabled: !Equals [!Ref UseExistingQueue, true]
+  FunctionInlineEnabled: !Equals [true, false]
+  FunctionCondition: !Equals [true, false]
+Resources:
+  MyTestFunction:
+    Type: AWS::Serverless::Function
+    Condition: FunctionCondition
+    Properties:
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 70
+        MaximumRetryAttempts: 1
+        DestinationConfig:
+          OnSuccess:
+            Type: SQS
+            Destination: !If [QueueCreationDisabled, !Ref SQSArn, !Ref 'AWS::NoValue']
+          OnFailure: 
+            Type: Lambda
+            Destination: !If [FunctionInlineEnabled, !GetAtt DestinationLambda.Arn, 'some-function-arn']
+      InlineCode: |
+        exports.handler = function(event, context, callback) {
+          var event_received_at = new Date().toISOString();
+          console.log('Event received at: ' + event_received_at);
+          console.log('Received event:', JSON.stringify(event, null, 2));
+
+          if (event.Success) {
+              console.log("Success");
+              context.callbackWaitsForEmptyEventLoop = false;
+              callback(null);
+          } else {
+              console.log("Failure");
+              context.callbackWaitsForEmptyEventLoop = false;
+              callback(new Error("Failure from event, Success = false, I am failing!"), 'Destination Function Error Thrown');
+          }
+        };      
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 1024
+  DestinationLambda:
+    Condition: FunctionInlineEnabled
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 1024

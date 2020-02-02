@@ -22,17 +22,21 @@ class Parser:
         if parameter_values is None:
             raise ValueError("`parameter_values` argument is required")
 
-        if ("Resources" not in sam_template or not isinstance(sam_template["Resources"], dict) or not
-                sam_template["Resources"]):
-            raise InvalidDocumentException(
-                [InvalidTemplateException("'Resources' section is required")])
+        if (
+            "Resources" not in sam_template
+            or not isinstance(sam_template["Resources"], dict)
+            or not sam_template["Resources"]
+        ):
+            raise InvalidDocumentException([InvalidTemplateException("'Resources' section is required")])
 
-        if (not all(isinstance(sam_resource, dict) for sam_resource in sam_template["Resources"].values())):
+        if not all(isinstance(sam_resource, dict) for sam_resource in sam_template["Resources"].values()):
             raise InvalidDocumentException(
-                [InvalidTemplateException(
-                    "All 'Resources' must be Objects. If you're using YAML, this may be an "
-                    "indentation issue."
-                )])
+                [
+                    InvalidTemplateException(
+                        "All 'Resources' must be Objects. If you're using YAML, this may be an " "indentation issue."
+                    )
+                ]
+            )
 
         sam_template_instance = SamTemplate(sam_template)
 
@@ -40,11 +44,15 @@ class Parser:
             # NOTE: Properties isn't required for SimpleTable, so we can't check
             # `not isinstance(sam_resources.get("Properties"), dict)` as this would be a breaking change.
             # sam_resource.properties defaults to {} in SamTemplate init
-            if (not isinstance(sam_resource.properties, dict)):
+            if not isinstance(sam_resource.properties, dict):
                 raise InvalidDocumentException(
-                    [InvalidResourceException(resource_logical_id,
-                                              "All 'Resources' must be Objects and have a 'Properties' Object. If "
-                                              "you're using YAML, this may be an indentation issue."
-                                              )])
+                    [
+                        InvalidResourceException(
+                            resource_logical_id,
+                            "All 'Resources' must be Objects and have a 'Properties' Object. If "
+                            "you're using YAML, this may be an indentation issue.",
+                        )
+                    ]
+                )
 
         SamTemplateValidator.validate(sam_template)

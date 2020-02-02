@@ -1,0 +1,8 @@
+ {
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyFunctionWithApiKeyRequired] is invalid. Event with id [MyApiWithApiKeyRequired] is invalid. Unable to set ApiKeyRequired [False] on API method [get] for path [/ApiKeyRequiredTrue] because the related API does not specify any ApiKeyRequired."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyFunctionWithApiKeyRequired] is invalid. Event with id [MyApiWithApiKeyRequired] is invalid. Unable to set ApiKeyRequired [False] on API method [get] for path [/ApiKeyRequiredTrue] because the related API does not specify any ApiKeyRequired."
+}

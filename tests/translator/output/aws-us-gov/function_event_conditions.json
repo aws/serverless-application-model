@@ -28,7 +28,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "sns.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -42,7 +42,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -54,7 +54,24 @@
           ]
         }
       }
-    }, 
+    },
+    "MyAwesomeFunctionEBRulePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Condition": "MyCondition",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionEBRule",
+            "Arn"
+          ]
+        }
+      }
+    },
     "MyAwesomeFunctionDDBStream": {
       "Type": "AWS::Lambda::EventSourceMapping", 
       "Condition": "MyCondition",
@@ -103,7 +120,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Fn::Sub": "${AWS::AccountId}"
         }, 
@@ -140,7 +157,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         }, 
@@ -154,7 +171,7 @@
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "logs.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -169,14 +186,14 @@
         }
       }
     }, 
-    "MyAwesomeFunctionCWSchedule": {
+    "MyAwesomeFunctionEBSchedule": {
       "Type": "AWS::Events::Rule", 
       "Condition": "MyCondition",
       "Properties": {
         "ScheduleExpression": "rate(1 minute)", 
         "Targets": [
           {
-            "Id": "MyAwesomeFunctionCWScheduleLambdaTarget", 
+            "Id": "MyAwesomeFunctionEBScheduleLambdaTarget",
             "Arn": {
               "Ref": "MyAwesomeFunctionAliasLive"
             }
@@ -275,7 +292,28 @@
           }
         ]
       }
-    }, 
+    },
+    "MyAwesomeFunctionEBRule": {
+      "Type": "AWS::Events::Rule",
+      "Condition": "MyCondition",
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "launched"
+            ]
+          }
+        },
+        "Targets": [
+          {
+            "Id": "MyAwesomeFunctionEBRuleLambdaTarget",
+            "Arn": {
+              "Ref": "MyAwesomeFunctionAliasLive"
+            }
+          }
+        ]
+      }
+    },
     "MyAwesomeFunctionVersion640128d35d": {
       "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
@@ -290,18 +328,18 @@
       "Condition": "MyCondition",
       "Type": "AWS::SNS::Topic"
     }, 
-    "MyAwesomeFunctionCWSchedulePermission": {
+    "MyAwesomeFunctionEBSchedulePermission": {
       "Type": "AWS::Lambda::Permission", 
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
         }, 
         "SourceArn": {
           "Fn::GetAtt": [
-            "MyAwesomeFunctionCWSchedule", 
+            "MyAwesomeFunctionEBSchedule",
             "Arn"
           ]
         }
@@ -310,7 +348,7 @@
     "FunctionOneImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:invokeFunction",
+        "Action": "lambda:InvokeFunction",
         "SourceAccount": {
           "Ref": "AWS::AccountId"
         },
@@ -364,7 +402,7 @@
             "Arn"
           ]
         },
-        "Runtime": "nodejs4.3",
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
             "Value": "SAM",

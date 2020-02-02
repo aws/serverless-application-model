@@ -128,8 +128,42 @@ AWS::Lambda::Permission            MyFunction\ **ThumbnailApi**\ Permission\ **P
 
   NOTE: ``ServerlessRestApi*`` resources are generated one per stack.
 
-Cognito
+HTTP API
 ^^^
+This is called an "Implicit HTTP API". There can be many functions in the template that define these APIs. Behind the 
+scenes, SAM will collect all implicit HTTP APIs from all Functions in the template, generate an OpenApi doc, and create an 
+implicit ``AWS::Serverless::HttpApi`` using this OpenApi. This API defaults to a StageName called "$default" that cannot be
+configured.
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        ThumbnailApi:
+          Type: HttpApi
+          Properties:
+            Path: /thumbnail
+            Method: GET
+      ...
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID 
+================================== ================================
+AWS::ApiGatewayV2::Api             *ServerlessHttpApi* 
+AWS::ApiGatewayV2::Stage           *ServerlessHttpApiApiGatewayDefaultStage*
+AWS::Lambda::Permission            MyFunction\ **ThumbnailApi**\ Permission
+================================== ================================
+
+
+  NOTE: ``ServerlessHttpApi*`` resources are generated one per stack.
+
+Cognito
+^^^^^^^
 
 Example:
 
@@ -169,7 +203,7 @@ AWS::Cognito::UserPool             Existing MyUserPool resource is modified to a
   created outside of the stack, this bucket needs to be defined within the template.
 
 S3
-^^^
+^^
 
 Example:
 
@@ -224,7 +258,12 @@ Example:
           Type: SNS
           Properties:
             Topic: arn:aws:sns:us-east-1:123456789012:my_topic
-            SqsSubscription: true
+            SqsSubscription:
+              QueuePolicyLogicalId: CustomQueuePolicyLogicalId
+              QueueArn: !GetAtt MyCustomQueue.Arn
+              QueueUrl: !Ref MyCustomQueue
+              BatchSize: 5
+              Enabled: true
       ...
 
 Additional generated resources:
@@ -240,6 +279,24 @@ AWS::SQS::QueuePolicy              MyFunction\ **MyTrigger**\ QueuePolicy
 ================================== ================================
 
   NOTE: ``AWS::Lambda::Permission`` resources are only generated if SqsSubscription is ``false``. ``AWS::Lambda::EventSourceMapping``, ``AWS::SQS::Queue``, ``AWS::SQS::QueuePolicy`` resources are only generated if SqsSubscription is ``true``.
+
+  ``AWS::SQS::Queue`` resources are only generated if SqsSubscription is ``true``.
+
+  Example:
+
+  .. code:: yaml
+
+    MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        MyTrigger:
+          Type: SNS
+          Properties:
+            Topic: arn:aws:sns:us-east-1:123456789012:my_topic
+            SqsSubscription: true
+      ...
 
 Kinesis
 ^^^^^^^
@@ -270,7 +327,7 @@ AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger**
 ================================== ================================
 
 SQS
-^^^^^^^
+^^^
 
 Example:
 
@@ -351,7 +408,7 @@ AWS::Lambda::Permission            MyFunction\ **MyTimer**\ Permission
 AWS::Events::Rule                  MyFunction\ **MyTimer** 
 ================================== ================================
 
-CloudWatchEvent
+CloudWatchEvent (superseded by EventBridgeRule, see below)
 ^^^^^^^^^^^^^^^
 
 Example:
@@ -367,9 +424,13 @@ Example:
           Type: CloudWatchEvent
           Properties:
             Pattern:
+              source:
+                - aws.ec2
+              detail-type:
+                - EC2 Instance State-change Notification
               detail:
                 state:
-                  - terminated   
+                  - terminated
       ...
 
 Additional generated resources:
@@ -381,6 +442,39 @@ AWS::Lambda::Permission            MyFunction\ **OnTerminate**\ Permission
 AWS::Events::Rule                  MyFunction\ **OnTerminate** 
 ================================== ================================
 
+EventBridgeRule
+^^^^^^^^^^^^^^^
+
+Example:
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        OnTerminate:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - aws.ec2
+              detail-type:
+                - EC2 Instance State-change Notification
+              detail:
+                state:
+                  - terminated
+      ...
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID
+================================== ================================
+AWS::Lambda::Permission            MyFunction\ **OnTerminate**\ Permission
+AWS::Events::Rule                  MyFunction\ **OnTerminate**
+================================== ================================
 
 AWS::Serverless::Api
 --------------------
@@ -410,9 +504,9 @@ AWS::ApiGateway::Stage             MyApi\ **dev**\ Stage
 AWS::ApiGateway::Deployment        MyApi\ Deployment\ *SHA* (10 Digits of SHA256 of DefinitionUri or DefinitionBody value)
 ================================== ================================
 
-  NOTE: By just specifying AWS::Serverless::Api resource, SAM will *not* add permission for API Gateway to invoke the 
+  NOTE: By just specifying AWS::Serverless::Api resource, SAM will *not* add permission for API Gateway to invoke the
   the Lambda Function backing the APIs. You should explicitly re-define all APIs under ``Events`` section of the
-  AWS::Serverless::Function resource but include a `RestApiId` property that references the AWS::Serverless::Api 
+  AWS::Serverless::Function resource but include a `RestApiId` property that references the AWS::Serverless::Api
   resource. SAM will add permission for these APIs to invoke the function.
 
   Example:

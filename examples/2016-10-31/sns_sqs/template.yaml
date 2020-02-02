@@ -9,7 +9,7 @@ Resources:
     Properties:
       CodeUri: ./index.js
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         MySQSEvent:
           Type: SNS

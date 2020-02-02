@@ -1,8 +1,0 @@
-{
-  "name": "algorithmia-blueprint",
-  "version": "1.0.0",
-  "private": true,
-  "dependencies": {
-    "algorithmia": "^0.3.9"
-  }
-}

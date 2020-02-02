@@ -44,7 +44,7 @@
     "SaveNotificationFunctionNotificationTopicPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:invokeFunction", 
+        "Action": "lambda:InvokeFunction", 
         "Principal": "sns.amazonaws.com", 
         "FunctionName": {
           "Ref": "SaveNotificationFunction"
@@ -68,7 +68,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs4.3", 
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
             "Value": "SAM", 

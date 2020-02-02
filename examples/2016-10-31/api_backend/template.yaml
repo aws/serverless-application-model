@@ -6,7 +6,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.get
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       CodeUri: src/
       Policies:
         - DynamoDBReadPolicy:
@@ -25,7 +25,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.put
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       CodeUri: src/
       Policies:
         - DynamoDBCrudPolicy:
@@ -44,7 +44,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.delete
-      Runtime: nodejs6.10
+      Runtime: nodejs12.x
       CodeUri: src/
       Policies:
         - DynamoDBCrudPolicy:

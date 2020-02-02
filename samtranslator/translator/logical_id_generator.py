@@ -10,7 +10,7 @@ class LogicalIdGenerator(object):
     #       given by this class
     HASH_LENGTH = 10
 
-    def __init__(self, prefix, data_obj=None):
+    def __init__(self, prefix, data_obj=None, data_hash=None):
         """
         Generate logical IDs for resources that are stable, deterministic and platform independent
 
@@ -24,6 +24,7 @@ class LogicalIdGenerator(object):
 
         self._prefix = prefix
         self.data_str = data_str
+        self.data_hash = data_hash
 
     def gen(self):
         """
@@ -54,6 +55,9 @@ class LogicalIdGenerator(object):
         :rtype string
         """
 
+        if self.data_hash:
+            return self.data_hash[:length]
+
         data_hash = ""
         if not self.data_str:
             return data_hash
@@ -62,10 +66,10 @@ class LogicalIdGenerator(object):
         if sys.version_info.major == 2:
             # In Py2, only unicode needs to be encoded.
             if isinstance(self.data_str, unicode):
-                encoded_data_str = self.data_str.encode('utf-8')
+                encoded_data_str = self.data_str.encode("utf-8")
         else:
             # data_str should always be unicode on python 3
-            encoded_data_str = self.data_str.encode('utf-8')
+            encoded_data_str = self.data_str.encode("utf-8")
 
         data_hash = hashlib.sha1(encoded_data_str).hexdigest()
 
@@ -87,4 +91,4 @@ class LogicalIdGenerator(object):
             return data
 
         # Get the most compact dictionary (separators) and sort the keys recursively to get a stable output
-        return json.dumps(data, separators=(',', ':'), sort_keys=True)
+        return json.dumps(data, separators=(",", ":"), sort_keys=True)
