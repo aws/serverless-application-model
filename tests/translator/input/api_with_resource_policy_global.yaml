@@ -60,4 +60,18 @@ Resources:
             Effect: Allow
             Principal: 
               Service: 'lambda.amazonaws.com'
-
+  AnotherApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref StageName
+      Auth:
+        ResourcePolicy:
+          CustomStatements: 
+            Fn::If:
+              - C1
+              - Action: execute-api:Invoke
+                Resource: 
+                  - execute-api:/*/*/*
+              - Action: execute-api:Another
+                Resource: 
+                  - execute-api:/*/*/*

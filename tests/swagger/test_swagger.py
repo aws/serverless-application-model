@@ -1022,17 +1022,14 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.editor.add_custom_statements(resourcePolicy.get("CustomStatements"))
 
         expected = {
-            "Fn::If": [
-                "condition",
-                {
-                    "Version": "2012-10-17",
-                    "Statement": [{"Action": "execute-api:Invoke", "Resource": ["execute-api:/*/*/*"]},],
-                },
-                {
-                    "Version": "2012-10-17",
-                    "Statement": [{"Action": "execute-api:blah", "Resource": ["execute-api:/*/*/*"]},],
-                },
-            ]
+            "Version": "2012-10-17",
+            "Statement": {
+                "Fn::If": [
+                    "condition",
+                    {"Action": "execute-api:Invoke", "Resource": ["execute-api:/*/*/*"]},
+                    {"Action": "execute-api:blah", "Resource": ["execute-api:/*/*/*"]},
+                ]
+            },
         }
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))

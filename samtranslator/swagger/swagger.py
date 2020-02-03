@@ -832,23 +832,7 @@ class SwaggerEditor(object):
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
     def add_custom_statements(self, custom_statements):
-        if custom_statements is not None:
-            if is_intrinsic_if(custom_statements):
-                if_list = custom_statements.get("Fn::If")
-                ## copy the statement created so far
-                original = self.resource_policy.copy()
-                if_true = if_list[1]
-                if_false = if_list[2]
-                if not is_intrinsic_no_value(if_list[1]):
-                    self._add_custom_statement(if_list[1])
-                    if_true = self.resource_policy
-                self.resource_policy = original
-                if not is_intrinsic_no_value(if_list[2]):
-                    self._add_custom_statement(if_list[2])
-                    if_false = self.resource_policy
-                self.resource_policy = make_conditional(if_list[0], if_true, if_false)
-            else:
-                self._add_custom_statement(custom_statements)
+        self._add_custom_statement(custom_statements)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -1004,16 +988,17 @@ class SwaggerEditor(object):
         if custom_statements is None:
             return
 
-        if not isinstance(custom_statements, list):
-            custom_statements = [custom_statements]
-
         self.resource_policy["Version"] = "2012-10-17"
         if self.resource_policy.get("Statement") is None:
             self.resource_policy["Statement"] = custom_statements
         else:
+            if not isinstance(custom_statements, list):
+                custom_statements = [custom_statements]
+
             statement = self.resource_policy["Statement"]
             if not isinstance(statement, list):
                 statement = [statement]
+
             for s in custom_statements:
                 if s not in statement:
                     statement.append(s)
