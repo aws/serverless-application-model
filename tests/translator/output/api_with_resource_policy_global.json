@@ -52,19 +52,33 @@
     "ExplicitApiDeploymenta5a5c4e3ff": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {}, 
+          "swagger": "2.0", 
+          "x-amazon-apigateway-policy": {
+            "Version": "2012-10-17", 
+            "Statement": {
+              "Fn::If": [
+                "C1", 
+                {
+                  "Action": "execute-api:Invoke", 
+                  "Resource": [
+                    "execute-api:/*/*/*"
+                  ]
+                }, 
+                {
+                  "Action": "execute-api:Another", 
+                  "Resource": [
+                    "execute-api:/*/*/*"
+                  ]
+                }
+              ]
             }
           ]
         }, 
@@ -140,8 +154,8 @@
         ]
       }
     }, 
-    "ExplicitApiDeployment08db9038c8": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ExplicitApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -210,8 +224,8 @@
           }, 
           "swagger": 2.0, 
           "x-amazon-apigateway-policy": {
-            "Fn::If": [
-              "C1", 
+            "Version": "2012-10-17", 
+            "Statement": [
               {
                 "Action": "sts:AssumeRole", 
                 "Effect": "Allow", 
