@@ -591,7 +591,8 @@ class ApiGenerator(object):
         # create a usage plan for all the Apis
         elif create_usage_plan == "SHARED":
             usage_plan_logical_id = "ServerlessUsagePlan"
-            ApiGenerator.depends_on_shared.append(self.logical_id)
+            if self.logical_id not in ApiGenerator.depends_on_shared:
+                ApiGenerator.depends_on_shared.append(self.logical_id)
             usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id, depends_on=ApiGenerator.depends_on_shared
             )
