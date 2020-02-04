@@ -154,7 +154,7 @@ class ApiGenerator(object):
 
         if self.definition_uri and self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both"
+                self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
             )
 
         if self.open_api_version:
@@ -162,7 +162,7 @@ class ApiGenerator(object):
                 SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
             ):
                 raise InvalidResourceException(
-                    self.logical_id, 'The OpenApiVersion value must be of the format "3.0.0"'
+                    self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'."
                 )
 
         self._add_cors()
@@ -193,7 +193,7 @@ class ApiGenerator(object):
             if not self.definition_uri.get("Bucket", None) or not self.definition_uri.get("Key", None):
                 # DefinitionUri is a dictionary but does not contain Bucket or Key property
                 raise InvalidResourceException(
-                    self.logical_id, "'DefinitionUri' requires Bucket and Key properties to be specified"
+                    self.logical_id, "'DefinitionUri' requires Bucket and Key properties to be specified."
                 )
             s3_pointer = self.definition_uri
 
@@ -205,7 +205,7 @@ class ApiGenerator(object):
                 raise InvalidResourceException(
                     self.logical_id,
                     "'DefinitionUri' is not a valid S3 Uri of the form "
-                    '"s3://bucket/key" with optional versionId query parameter.',
+                    "'s3://bucket/key' with optional versionId query parameter.",
                 )
 
         body_s3 = {"Bucket": s3_pointer["Bucket"], "Key": s3_pointer["Key"]}
@@ -276,7 +276,7 @@ class ApiGenerator(object):
 
         if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
             raise InvalidResourceException(
-                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn" " are provided"
+                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn" " are provided."
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
@@ -293,7 +293,7 @@ class ApiGenerator(object):
         elif endpoint not in ["EDGE", "REGIONAL"]:
             raise InvalidResourceException(
                 self.logical_id,
-                "EndpointConfiguration for Custom Domains must be" " one of {}".format(["EDGE", "REGIONAL"]),
+                "EndpointConfiguration for Custom Domains must be" " one of {}.".format(["EDGE", "REGIONAL"]),
             )
 
         if endpoint == "REGIONAL":
@@ -427,7 +427,7 @@ class ApiGenerator(object):
 
         if self.cors and not self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Cors works only with inline Swagger specified in " "'DefinitionBody' property"
+                self.logical_id, "Cors works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
         if isinstance(self.cors, string_types) or is_instrinsic(self.cors):
@@ -447,7 +447,8 @@ class ApiGenerator(object):
         if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
-                "Unable to add Cors configuration because " "'DefinitionBody' does not contain a valid Swagger",
+                "Unable to add Cors configuration because "
+                "'DefinitionBody' does not contain a valid Swagger definition.",
             )
 
         if properties.AllowCredentials is True and properties.AllowOrigin == _CORS_WILDCARD:
@@ -500,7 +501,7 @@ class ApiGenerator(object):
 
         if self.auth and not self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Auth works only with inline Swagger specified in " "'DefinitionBody' property"
+                self.logical_id, "Auth works only with inline Swagger specified in " "'DefinitionBody' property."
             )
 
         # Make sure keys in the dict are recognized
@@ -510,7 +511,8 @@ class ApiGenerator(object):
         if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
-                "Unable to add Auth configuration because " "'DefinitionBody' does not contain a valid Swagger",
+                "Unable to add Auth configuration because "
+                "'DefinitionBody' does not contain a valid Swagger definition.",
             )
         swagger_editor = SwaggerEditor(self.definition_body)
         auth_properties = AuthProperties(**self.auth)
@@ -565,10 +567,10 @@ class ApiGenerator(object):
         usage_plan_key = None
 
         if create_usage_plan is None:
-            raise InvalidResourceException(self.logical_id, "'CreateUsagePlan' is a required field for UsagePlan")
+            raise InvalidResourceException(self.logical_id, "'CreateUsagePlan' is a required field for UsagePlan.")
         if create_usage_plan not in create_usage_plans_accepted_values:
             raise InvalidResourceException(
-                self.logical_id, "'CreateUsagePlan' accepts one of {}".format(create_usage_plans_accepted_values)
+                self.logical_id, "'CreateUsagePlan' accepts one of {}.".format(create_usage_plans_accepted_values)
             )
 
         if create_usage_plan == "NONE":
@@ -680,7 +682,7 @@ class ApiGenerator(object):
         if self.gateway_responses and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id,
-                "GatewayResponses works only with inline Swagger specified in " "'DefinitionBody' property",
+                "GatewayResponses works only with inline Swagger specified in " "'DefinitionBody' property.",
             )
 
         # Make sure keys in the dict are recognized
@@ -689,13 +691,16 @@ class ApiGenerator(object):
                 if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(
                         self.logical_id,
-                        "Invalid property '{}' in 'GatewayResponses' property '{}'".format(response_key, responses_key),
+                        "Invalid property '{}' in 'GatewayResponses' property '{}'.".format(
+                            response_key, responses_key
+                        ),
                     )
 
         if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
-                "Unable to add Auth configuration because " "'DefinitionBody' does not contain a valid Swagger",
+                "Unable to add Auth configuration because "
+                "'DefinitionBody' does not contain a valid Swagger definition.",
             )
 
         swagger_editor = SwaggerEditor(self.definition_body)
@@ -726,13 +731,14 @@ class ApiGenerator(object):
 
         if self.models and not self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Models works only with inline Swagger specified in " "'DefinitionBody' property"
+                self.logical_id, "Models works only with inline Swagger specified in " "'DefinitionBody' property."
             )
 
         if not SwaggerEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
-                "Unable to add Models definitions because " "'DefinitionBody' does not contain a valid Swagger",
+                "Unable to add Models definitions because "
+                "'DefinitionBody' does not contain a valid Swagger definition.",
             )
 
         if not all(isinstance(model, dict) for model in self.models.values()):
@@ -815,7 +821,7 @@ class ApiGenerator(object):
             return None
 
         if not isinstance(authorizers_config, dict):
-            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary")
+            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
 
         for authorizer_name, authorizer in authorizers_config.items():
             if not isinstance(authorizer, dict):
@@ -892,7 +898,9 @@ class ApiGenerator(object):
         if not authorizers.get(default_authorizer) and default_authorizer != "AWS_IAM":
             raise InvalidResourceException(
                 self.logical_id,
-                "Unable to set DefaultAuthorizer because '" + default_authorizer + "' was not defined in 'Authorizers'",
+                "Unable to set DefaultAuthorizer because '"
+                + default_authorizer
+                + "' was not defined in 'Authorizers'.",
             )
 
         for path in swagger_editor.iter_on_path():

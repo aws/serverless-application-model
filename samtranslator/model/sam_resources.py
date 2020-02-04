@@ -530,7 +530,7 @@ class SamFunction(SamResourceMacro):
         if not self.DeadLetterQueue.get("Type") or not self.DeadLetterQueue.get("TargetArn"):
             raise InvalidResourceException(
                 self.logical_id,
-                "'DeadLetterQueue' requires Type and TargetArn properties to be specified".format(valid_dlq_types),
+                "'DeadLetterQueue' requires Type and TargetArn properties to be specified.".format(valid_dlq_types),
             )
 
         # Validate required Types
@@ -715,7 +715,7 @@ class SamFunction(SamResourceMacro):
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
                 raise InvalidResourceException(
-                    self.logical_id, "'DeploymentPreference' requires AutoPublishAlias property to be specified"
+                    self.logical_id, "'DeploymentPreference' requires AutoPublishAlias property to be specified."
                 )
             if lambda_alias is None:
                 raise ValueError("lambda_alias expected for updating it with the appropriate update policy")
