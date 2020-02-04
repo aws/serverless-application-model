@@ -408,6 +408,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "api_with_resource_policy",
                 "api_with_resource_policy_global",
                 "api_with_resource_policy_global_implicit",
+                "api_with_if_conditional_with_resource_policy",
             ],
             [
                 ("aws", "ap-southeast-1"),

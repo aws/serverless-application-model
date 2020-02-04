@@ -545,6 +545,7 @@ class Api(PushEventSource):
         resources = []
 
         function = kwargs.get("function")
+        intrinsics_resolver = kwargs.get("intrinsics_resolver")
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
@@ -557,7 +558,7 @@ class Api(PushEventSource):
 
         explicit_api = kwargs["explicit_api"]
         if explicit_api.get("__MANAGE_SWAGGER"):
-            self._add_swagger_integration(explicit_api, function)
+            self._add_swagger_integration(explicit_api, function, intrinsics_resolver)
 
         return resources
 
@@ -600,7 +601,7 @@ class Api(PushEventSource):
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)
 
-    def _add_swagger_integration(self, api, function):
+    def _add_swagger_integration(self, api, function, intrinsics_resolver):
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -639,6 +640,7 @@ class Api(PushEventSource):
         if self.Auth:
             method_authorizer = self.Auth.get("Authorizer")
             api_auth = api.get("Auth")
+            api_auth = intrinsics_resolver.resolve_parameter_refs(api_auth)
 
             if method_authorizer:
                 api_authorizers = api_auth and api_auth.get("Authorizers")

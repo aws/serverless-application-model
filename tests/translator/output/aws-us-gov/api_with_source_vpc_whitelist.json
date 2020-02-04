@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "Vpc1": {
+      "Default": "vpc-1234", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -43,16 +49,6 @@
         }
       }
     }, 
-    "ServerlessRestApiDeployment48156fe851": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: 48156fe85100710f74059d13d889812a9defa259", 
-        "StageName": "Stage"
-      }
-    }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
@@ -75,11 +71,21 @@
         "StageName": "Stage"
       }
     }, 
+    "ServerlessRestApiDeploymente6268e43cf": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: e6268e43cf1f64034297b37a261d5d5a0cc7375b", 
+        "StageName": "Stage"
+      }
+    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment48156fe851"
+          "Ref": "ServerlessRestApiDeploymente6268e43cf"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -87,41 +93,30 @@
         "StageName": "Prod"
       }
     }, 
-    "MyApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
+    "MyFunctionApiPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0", 
-            "title": {
-              "Ref": "AWS::StackName"
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
             }
-          }, 
-          "paths": {}, 
-          "swagger": "2.0"
-        }, 
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
           ]
-        }, 
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -137,7 +132,16 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "ServerlessRestApi": {
@@ -210,27 +214,10 @@
                 "Effect": "Deny", 
                 "Condition": {
                   "StringNotEquals": {
-                    "aws:SourceVpc": "vpc-1234"
-                  }
-                }, 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/PUT/get", 
-                      {
-                        "__Stage__": "Prod"
-                      }
+                    "aws:SourceVpc": [
+                      "vpc-1234", 
+                      "vpc-5678"
                     ]
-                  }
-                ], 
-                "Effect": "Deny", 
-                "Condition": {
-                  "StringEquals": {
-                    "aws:SourceVpce": "vpce-5678"
                   }
                 }, 
                 "Principal": "*"
@@ -265,27 +252,10 @@
                 "Effect": "Deny", 
                 "Condition": {
                   "StringNotEquals": {
-                    "aws:SourceVpc": "vpc-1234"
-                  }
-                }, 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/POST/fetch", 
-                      {
-                        "__Stage__": "Prod"
-                      }
+                    "aws:SourceVpc": [
+                      "vpc-1234", 
+                      "vpc-5678"
                     ]
-                  }
-                ], 
-                "Effect": "Deny", 
-                "Condition": {
-                  "StringEquals": {
-                    "aws:SourceVpce": "vpce-5678"
                   }
                 }, 
                 "Principal": "*"
@@ -303,24 +273,26 @@
         }
       }
     }, 
-    "MyFunctionApiPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+    "MyApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
             }
+          }, 
+          "paths": {}, 
+          "swagger": "2.0"
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
           ]
+        }, 
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     }

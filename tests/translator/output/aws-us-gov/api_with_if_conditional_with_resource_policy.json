@@ -1,4 +1,12 @@
 {
+  "Conditions": {
+    "C1": {
+      "Fn::Equals": [
+        true, 
+        true
+      ]
+    }
+  }, 
   "Resources": {
     "ExplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -42,6 +50,16 @@
             }
           ]
         }
+      }
+    }, 
+    "ExplicitApiDeploymente252ad8b51": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: e252ad8b5121d1fcb94bf7ef489dbbd46a3dd461", 
+        "StageName": "Stage"
       }
     }, 
     "ExplicitApi": {
@@ -96,9 +114,17 @@
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
             "Statement": {
-              "Action": "execute-api:Invoke", 
-              "Resource": [
-                "execute-api:/*/*/*"
+              "Fn::If": [
+                "C1", 
+                {
+                  "Action": "execute-api:Invoke", 
+                  "Resource": [
+                    "execute-api:/*/*/*"
+                  ]
+                }, 
+                {
+                  "Ref": "AWS::NoValue"
+                }
               ]
             }
           }
@@ -117,7 +143,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentb5a112ecdf"
+          "Ref": "ExplicitApiDeploymente252ad8b51"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -174,16 +200,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "ExplicitApiDeploymentb5a112ecdf": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: b5a112ecdfe9f71fbad3f114ad9aeddc73ce44e5", 
-        "StageName": "Stage"
       }
     }, 
     "ExplicitApiFunctionGetHtmlPermissionProd": {

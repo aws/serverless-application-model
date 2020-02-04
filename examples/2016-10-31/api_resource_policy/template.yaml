@@ -1,22 +1,33 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+Conditions:
+  C1:
+    Fn::Equals:
+      - true
+      - true
 Globals:
   Api:
     Auth:
       ResourcePolicy:
-        CustomStatements: [{
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "execute-api:Invoke",
-            "Resource": "execute-api:/Prod/PUT/get",
-            "Condition": {
-                "IpAddress": {
-                    "aws:SourceIp": "1.2.3.4"
-                }
-            }
-        }]
-        # OR you can use the following, they both do the same thing
-        IpRangeBlacklist: ['1.2.3.4']
+        CustomStatements:
+          Fn::If:
+            - C1
+            - Principal: '*'
+              Action: execute-api:Invoke
+              Resource: 
+                - execute-api:/Prod/PUT/get
+              Condition: 
+                IpAddress:
+                  aws:SourceIp: 1.2.3.4
+            - Principal: '*'
+              Action: execute-api:Invoke
+              Resource: 
+                - execute-api:/Prod/PUT/get
+              Condition: 
+                IpAddress:
+                  aws:SourceIp: 5.6.7.8
+        # OR you can use the following
+        # IpRangeBlacklist: ['1.2.3.4']
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
