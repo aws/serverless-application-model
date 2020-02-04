@@ -190,7 +190,7 @@ class HttpApiGenerator(object):
                 raise InvalidResourceException(
                     self.logical_id,
                     "'DefinitionUri' is not a valid S3 Uri of the form "
-                    '"s3://bucket/key" with optional versionId query parameter.',
+                    "'s3://bucket/key' with optional versionId query parameter.",
                 )
 
         body_s3 = {"Bucket": s3_pointer["Bucket"], "Key": s3_pointer["Key"]}
