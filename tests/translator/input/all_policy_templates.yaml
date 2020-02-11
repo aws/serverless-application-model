@@ -159,3 +159,6 @@ Resources:
 
         - AthenaQueryPolicy:
             WorkGroupName: name
+
+        - EventBridgePutEventsPolicy:
+            EventBusName: name
