@@ -1,3 +1,7 @@
+Parameters:
+  Timeout:
+    Default: 15000
+    Type: Number
 Resources:
   HttpApiFunction: 
     Type: AWS::Serverless::Function
@@ -13,10 +17,12 @@ Resources:
             Path: /basic
             Method: post
             ApiId: !Ref MyApi
+            TimeoutInMillis: 10000
         SimpleCase: # path exists, integration doesn't
           Type: HttpApi
           Properties:
             ApiId: !Ref MyApi
+            TimeoutInMillis: !Ref Timeout
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
