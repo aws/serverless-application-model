@@ -268,7 +268,17 @@
               }
             }
           }, 
-          "openapi": "3.0.1"
+          "openapi": "3.0.1", 
+          "tags": [
+            {
+              "name": "Tag1", 
+              "x-amazon-apigateway-tag-value": "value1"
+            }, 
+            {
+              "name": "Tag2", 
+              "x-amazon-apigateway-tag-value": "value2"
+            }
+          ]
         }
       }
     }

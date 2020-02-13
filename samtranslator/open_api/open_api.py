@@ -16,6 +16,7 @@ class OpenApiEditor(object):
     """
 
     _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
+    _X_APIGW_TAG_VALUE = "x-amazon-apigateway-tag-value"
     _CONDITIONAL_IF = "Fn::If"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -39,6 +40,7 @@ class OpenApiEditor(object):
         self.paths = self._doc["paths"]
         self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
         self.definitions = self._doc.get("definitions", {})
+        self.tags = self._doc.get("tags", [])
 
     def get_path(self, path):
         """
@@ -344,6 +346,17 @@ class OpenApiEditor(object):
             if security:
                 method_definition["security"] = security
 
+    def add_tags(self, tags):
+        for name, value in tags.items():
+            # find an existing tag with this name if it exists
+            existing_tag = next(existing_tag for existing_tag in self.tags if existing_tag.get("name") == name)
+            if existing_tag:
+                # overwrite tag value for an existing tag
+                existing_tag[self._X_APIGW_TAG_VALUE] = value
+            else:
+                tag = {"name": name, self._X_APIGW_TAG_VALUE: value}
+                self.tags.append(tag)
+
     @property
     def openapi(self):
         """
@@ -354,6 +367,9 @@ class OpenApiEditor(object):
 
         # Make sure any changes to the paths are reflected back in output
         self._doc["paths"] = self.paths
+
+        if self.tags:
+            self._doc["tags"] = self.tags
 
         if self.security_schemes:
             self._doc.setdefault("components", {})
