@@ -120,6 +120,9 @@ class HttpApiGenerator(object):
         self.definition_body = open_api_editor.openapi
 
     def _add_tags(self):
+        """
+        Adds tags to the Http Api, including a default SAM tag.
+        """
         if self.tags and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "Tags works only with inline OpenApi specified in the 'DefinitionBody' property."

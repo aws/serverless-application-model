@@ -347,6 +347,11 @@ class OpenApiEditor(object):
                 method_definition["security"] = security
 
     def add_tags(self, tags):
+        """
+        Adds tags to the OpenApi definition using an ApiGateway extension for tag values.
+
+        :param dict tags: dictionary of tagName:tagValue pairs.
+        """
         for name, value in tags.items():
             # find an existing tag with this name if it exists
             existing_tag = next(existing_tag for existing_tag in self.tags if existing_tag.get("name") == name)
