@@ -51,7 +51,7 @@ class Translator:
                     # adds to the function_names dict with key as the api_name and value as the function_name
                     if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
                         rest_api = item.get("Properties").get("RestApiId")
-                        if type(rest_api) == dict or isinstance(rest_api, dict):
+                        if isinstance(rest_api, dict):
                             api_name = item.get("Properties").get("RestApiId").get("Ref")
                         else:
                             api_name = item.get("Properties").get("RestApiId")
