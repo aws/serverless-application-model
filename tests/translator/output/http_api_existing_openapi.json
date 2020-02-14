@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "Timeout": {
+      "Default": 15000,
+      "Type": "Number"
+    }
+  },
   "Resources": {
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
@@ -99,7 +105,8 @@
             "/basic": {
               "post": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
+                  "httpMethod": "POST",
+                  "timeoutInMillis": 10000,
                   "type": "aws_proxy", 
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations"
@@ -147,9 +154,12 @@
                     ]
                   }
                 ], 
-                "isDefaultRoute": true, 
+                "isDefaultRoute": true,
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
+                  "httpMethod": "POST",
+                  "timeoutInMillis": {
+                    "Ref": "Timeout"
+                  }, 
                   "type": "aws_proxy", 
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"

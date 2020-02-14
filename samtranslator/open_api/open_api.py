@@ -236,6 +236,20 @@ class OpenApiEditor(object):
         for path, value in self.paths.items():
             yield path
 
+    def add_timeout_to_method(self, api, path, method_name, timeout):
+        """
+        Adds a timeout to this path/method.
+        
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        :param string path: Path name
+        :param string method_name: Method name
+        :param int timeout: Timeout amount, in milliseconds
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            if self.method_definition_has_integration(method_definition):
+                method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
+
     def add_authorizers_security_definitions(self, authorizers):
         """
         Add Authorizer definitions to the securityDefinitions part of Swagger.

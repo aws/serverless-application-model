@@ -935,6 +935,7 @@ class HttpApi(PushEventSource):
         "ApiId": PropertyType(False, is_str()),
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
+        "TimeoutInMillis": PropertyType(False, is_type(int)),
     }
 
     def resources_to_link(self, resources):
@@ -1064,6 +1065,8 @@ class HttpApi(PushEventSource):
         editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)
         if self.Auth:
             self._add_auth_to_openapi_integration(api, editor)
+        if self.TimeoutInMillis:
+            editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
         api["DefinitionBody"] = editor.openapi
 
     def _add_auth_to_openapi_integration(self, api, editor):
