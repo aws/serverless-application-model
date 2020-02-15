@@ -110,3 +110,5 @@ Resources:
 
         - EventBridgePutEventsPolicy:
             EventBusName: name
+
+        - ApiGatewayFullPolicy: {}
