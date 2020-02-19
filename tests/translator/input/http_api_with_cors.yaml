@@ -1,16 +1,14 @@
 Globals:
   HttpApi:
     CorsConfiguration:
-      AllowCredentials: false
       AllowHeaders:
-        - "*"
+        - x-apigateway-header
       AllowMethods:
-        - "GET"
+        - GET
       AllowOrigins:
-        - "https://www.example.com"
+        - https://foo.com
       ExposeHeaders:
-        - "*"
-      MaxAge: 10
+        - x-amzm-header
 
 Resources:
   HttpApiFunction:
@@ -26,7 +24,7 @@ Resources:
            }
          }
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Events:
         SimpleCase:
           Type: HttpApi
