@@ -354,7 +354,7 @@ class OpenApiEditor(object):
         """
         for name, value in tags.items():
             # find an existing tag with this name if it exists
-            existing_tag = next(existing_tag for existing_tag in self.tags if existing_tag.get("name") == name)
+            existing_tag = next((existing_tag for existing_tag in self.tags if existing_tag.get("name") == name), None)
             if existing_tag:
                 # overwrite tag value for an existing tag
                 existing_tag[self._X_APIGW_TAG_VALUE] = value

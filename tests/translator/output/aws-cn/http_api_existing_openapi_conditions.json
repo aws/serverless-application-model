@@ -105,6 +105,12 @@
               "Ref": "AWS::StackName"
             }
           }, 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ], 
           "paths": {
             "/basic": {
               "post": {
@@ -270,6 +276,10 @@
           }, 
           "openapi": "3.0.1", 
           "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            },
             {
               "name": "Tag1", 
               "x-amazon-apigateway-tag-value": "value1"
