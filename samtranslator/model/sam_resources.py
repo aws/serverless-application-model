@@ -10,7 +10,14 @@ from .api.http_api_generator import HttpApiGenerator
 from .s3_utils.uri_parser import construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import PropertyType, SamResourceMacro, ResourceTypeResolver
-from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage, ApiGatewayDomainName
+from samtranslator.model.apigateway import (
+    ApiGatewayDeployment,
+    ApiGatewayStage,
+    ApiGatewayDomainName,
+    ApiGatewayUsagePlan,
+    ApiGatewayUsagePlanKey,
+    ApiGatewayApiKey,
+)
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
@@ -764,6 +771,9 @@ class SamApi(SamResourceMacro):
         "Stage": ApiGatewayStage.resource_type,
         "Deployment": ApiGatewayDeployment.resource_type,
         "DomainName": ApiGatewayDomainName.resource_type,
+        "UsagePlan": ApiGatewayUsagePlan.resource_type,
+        "UsagePlanKey": ApiGatewayUsagePlanKey.resource_type,
+        "ApiKey": ApiGatewayApiKey.resource_type,
     }
 
     def to_cloudformation(self, **kwargs):
