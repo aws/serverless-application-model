@@ -30,15 +30,15 @@ Setup Python locally using `pyenv`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 1. Black
 ~~~~~~~~
-We format our code using [Black](https://github.com/python/black) and verify the source code is black compliant
-in Appveyor during PRs. You can find installation instructions on [Black's docs](https://black.readthedocs.io/en/stable/installation_and_usage.html).
+We format our code using `Black`_ and verify the source code is black compliant
+in Appveyor during PRs. You can find installation instructions on `Black's docs`_.
 
 After installing, you can check your formatting through our Makefile by running `make black-check`. To automatically update your code to match our formatting, please run `make black`. You can also integrate Black directly in your favorite IDE (instructions
-can be found [here](https://black.readthedocs.io/en/stable/editor_integration.html))
+can be found `here`_)
 
 Pre-commit
 ~~~~~~~~~~
-If you don't wish to manually run black on each pr or install black manually, we have integrated black into git hooks through [pre-commit](https://pre-commit.com/).
+If you don't wish to manually run black on each pr or install black manually, we have integrated black into git hooks through `pre-commit`_.
 After installing pre-commit, run `pre-commit install` in the root of the project. This will install black for you and run the black formatting on
 commit.
 
@@ -85,6 +85,10 @@ Tests are also a documentation of the success and failure cases, which is crucia
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: http://tox.readthedocs.io/en/latest/
 .. _installation instructions: https://github.com/pyenv/pyenv#installation
+.. _Black: https://github.com/python/black
+.. _Black's docs: https://black.readthedocs.io/en/stable/installation_and_usage.html
+.. _here: https://black.readthedocs.io/en/stable/editor_integration.html
+.. _pre-commit: https://pre-commit.com/
 
 Profiling
 ---------
