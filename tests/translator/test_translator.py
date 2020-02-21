@@ -602,6 +602,8 @@ class TestTranslatorEndToEnd(TestCase):
         "error_http_api_event_invalid_api",
         "error_http_api_invalid_auth",
         "error_http_api_invalid_openapi",
+        "error_http_api_tags",
+        "error_http_api_tags_def_uri",
         "error_implicit_http_api_method",
         "error_implicit_http_api_path",
         "error_http_api_event_multiple_same_path",
