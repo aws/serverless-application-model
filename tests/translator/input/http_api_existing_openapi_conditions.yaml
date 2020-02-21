@@ -109,6 +109,9 @@ Resources:
                 - scope4
               responses: {}
         openapi: 3.0.1
+        tags:
+          - name: Tag1
+            description: this tag exists, but doesn't have an amazon extension value
         components:
           securitySchemes:
             oauth2Auth:

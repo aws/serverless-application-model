@@ -276,7 +276,8 @@
             },
             {
               "name": "Tag1", 
-              "x-amazon-apigateway-tag-value": "value1"
+              "x-amazon-apigateway-tag-value": "value1",
+              "description": "this tag exists, but doesn't have an amazon extension value"
             }, 
             {
               "name": "Tag2", 
