@@ -109,7 +109,7 @@
           ],
           "x-amazon-apigateway-cors": {
             "allowOrigins": [
-              "https://www.example.com"
+              "https://foo.com"
             ]
           },
           "paths": {

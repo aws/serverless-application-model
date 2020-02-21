@@ -415,7 +415,7 @@ class OpenApiEditor(object):
         EXPOSE_HEADERS = "exposeHeaders"
         MAX_AGE = "maxAge"
         ALLOW_CREDENTIALS = "allowCredentials"
-
+        cors_configuration = self._doc.get(self._X_APIGW_CORS, dict())
         if allowed_origins:
             cors_configuration[ALLOW_ORIGINS] = allowed_origins
         if allowed_headers:

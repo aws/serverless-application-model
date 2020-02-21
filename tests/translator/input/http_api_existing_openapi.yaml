@@ -28,7 +28,7 @@ Resources:
     Properties:
       CorsConfiguration:
         AllowOrigins:
-          - "*"
+          - "https://foo.com"
       DefinitionBody:
         info:
           version: '1.0'
