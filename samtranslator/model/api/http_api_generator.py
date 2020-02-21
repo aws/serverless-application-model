@@ -154,10 +154,7 @@ class HttpApiGenerator(object):
 
         editor = OpenApiEditor(self.definition_body)
         # if CORS is set in both definition_body and as a CORSConfiguration property,
-        # the definition_body is not modified by SAM
-        if editor.has_api_gateway_cors():
-            return
-
+        # SAM merges and overrides the cors headers in definition_body with headers of CORSConfiguration
         editor.add_cors(
             properties.AllowOrigins,
             properties.AllowHeaders,
