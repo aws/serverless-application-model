@@ -38,6 +38,9 @@ Resources:
         x-amazon-apigateway-cors:
           allowOrigins:
             - "https://www.example.com"
+          allowMethods:
+            - "GET"
+            - "POST"
         paths:
           "/basic":
             post:
