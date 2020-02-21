@@ -11,6 +11,7 @@ from samtranslator.model.tags.resource_tagging import get_tag_list
 AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
 AuthProperties.__new__.__defaults__ = (None, None)
 DefaultStageName = "$default"
+HttpApiTagName = "httpapi:createdBy"
 
 
 class HttpApiGenerator(object):
@@ -70,6 +71,7 @@ class HttpApiGenerator(object):
             )
 
         self._add_auth()
+        self._add_tags()
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
@@ -83,9 +85,6 @@ class HttpApiGenerator(object):
                 "add a 'HttpApi' event to an 'AWS::Serverless::Function'",
             )
 
-        if self.tags is not None:
-            http_api.Tags = get_tag_list(self.tags)
-
         return http_api
 
     def _add_auth(self):
@@ -97,7 +96,7 @@ class HttpApiGenerator(object):
 
         if self.auth and not self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Auth works only with inline Swagger specified in " "'DefinitionBody' property"
+                self.logical_id, "Auth works only with inline OpenApi specified in the 'DefinitionBody' property."
             )
 
         # Make sure keys in the dict are recognized
@@ -107,7 +106,7 @@ class HttpApiGenerator(object):
         if not OpenApiEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
-                "Unable to add Auth configuration because " "'DefinitionBody' does not contain a valid Swagger",
+                "Unable to add Auth configuration because 'DefinitionBody' does not contain a valid OpenApi definition.",
             )
         open_api_editor = OpenApiEditor(self.definition_body)
         auth_properties = AuthProperties(**self.auth)
@@ -118,6 +117,36 @@ class HttpApiGenerator(object):
         self._set_default_authorizer(
             open_api_editor, authorizers, auth_properties.DefaultAuthorizer, auth_properties.Authorizers
         )
+        self.definition_body = open_api_editor.openapi
+
+    def _add_tags(self):
+        """
+        Adds tags to the Http Api, including a default SAM tag.
+        """
+        if self.tags and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "Tags works only with inline OpenApi specified in the 'DefinitionBody' property."
+            )
+
+        if not self.definition_body:
+            return
+
+        if self.tags and not OpenApiEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to add `Tags` because 'DefinitionBody' does not contain a valid OpenApi definition.",
+            )
+        elif not OpenApiEditor.is_valid(self.definition_body):
+            return
+
+        if not self.tags:
+            self.tags = {}
+        self.tags[HttpApiTagName] = "SAM"
+
+        open_api_editor = OpenApiEditor(self.definition_body)
+
+        # authorizers is guaranteed to return a value or raise an exception
+        open_api_editor.add_tags(self.tags)
         self.definition_body = open_api_editor.openapi
 
     def _set_default_authorizer(self, open_api_editor, authorizers, default_authorizer, api_authorizers):
@@ -134,7 +163,9 @@ class HttpApiGenerator(object):
         if not authorizers.get(default_authorizer):
             raise InvalidResourceException(
                 self.logical_id,
-                "Unable to set DefaultAuthorizer because '" + default_authorizer + "' was not defined in 'Authorizers'",
+                "Unable to set DefaultAuthorizer because '"
+                + default_authorizer
+                + "' was not defined in 'Authorizers'.",
             )
 
         for path in open_api_editor.iter_on_path():
@@ -151,7 +182,7 @@ class HttpApiGenerator(object):
         authorizers = {}
 
         if not isinstance(authorizers_config, dict):
-            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary")
+            raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
 
         for authorizer_name, authorizer in authorizers_config.items():
             if not isinstance(authorizer, dict):
@@ -179,7 +210,7 @@ class HttpApiGenerator(object):
             if not self.definition_uri.get("Bucket", None) or not self.definition_uri.get("Key", None):
                 # DefinitionUri is a dictionary but does not contain Bucket or Key property
                 raise InvalidResourceException(
-                    self.logical_id, "'DefinitionUri' requires Bucket and Key properties to be specified"
+                    self.logical_id, "'DefinitionUri' requires Bucket and Key properties to be specified."
                 )
             s3_pointer = self.definition_uri
 
@@ -225,9 +256,6 @@ class HttpApiGenerator(object):
         stage.StageVariables = self.stage_variables
         stage.AccessLogSettings = self.access_log_settings
         stage.AutoDeploy = True
-
-        if self.tags is not None:
-            stage.Tags = get_tag_list(self.tags)
 
         return stage
 
