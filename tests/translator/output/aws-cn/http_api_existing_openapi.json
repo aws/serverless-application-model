@@ -110,6 +110,10 @@
           "x-amazon-apigateway-cors": {
             "allowOrigins": [
               "https://foo.com"
+            ],
+            "allowMethods": [
+              "GET",
+              "POST"
             ]
           },
           "paths": {
