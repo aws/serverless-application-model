@@ -208,7 +208,12 @@ class HttpApiGenerator(object):
         """
 
         # If there are no special configurations, don't create a stage and use the default
-        if not self.stage_name and not self.stage_variables and not self.access_log_settings and not self.default_route_settings:
+        if (
+            not self.stage_name
+            and not self.stage_variables
+            and not self.access_log_settings
+            and not self.default_route_settings
+        ):
             return
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
