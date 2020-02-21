@@ -27,8 +27,8 @@ class OpenApiEditor(object):
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
         modifications on this copy.
 
-        :param dict doc: Swagger document as a dictionary
-        :raises ValueError: If the input Swagger document does not meet the basic Swagger requirements.
+        :param dict doc: OpenApi document as a dictionary
+        :raises ValueError: If the input OpenApi document does not meet the basic OpenApi requirements.
         """
         if not OpenApiEditor.is_valid(doc):
             raise ValueError(
