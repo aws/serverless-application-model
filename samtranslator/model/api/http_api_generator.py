@@ -25,6 +25,7 @@ class HttpApiGenerator(object):
         tags=None,
         auth=None,
         access_log_settings=None,
+        default_route_settings=None,
         resource_attributes=None,
         passthrough_resource_attributes=None,
     ):
@@ -53,6 +54,7 @@ class HttpApiGenerator(object):
         self.auth = auth
         self.tags = tags
         self.access_log_settings = access_log_settings
+        self.default_route_settings = default_route_settings
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
 
@@ -206,7 +208,7 @@ class HttpApiGenerator(object):
         """
 
         # If there are no special configurations, don't create a stage and use the default
-        if not self.stage_name and not self.stage_variables and not self.access_log_settings:
+        if not self.stage_name and not self.stage_variables and not self.access_log_settings and not self.default_route_settings:
             return
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
@@ -224,6 +226,7 @@ class HttpApiGenerator(object):
         stage.StageName = self.stage_name
         stage.StageVariables = self.stage_variables
         stage.AccessLogSettings = self.access_log_settings
+        stage.DefaultRouteSettings = self.default_route_settings
         stage.AutoDeploy = True
 
         if self.tags is not None:
