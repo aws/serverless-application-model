@@ -231,6 +231,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_disabled_deployment_preference",
                 "function_with_deployment_preference",
                 "function_with_deployment_preference_all_parameters",
+                "function_with_deployment_preference_from_parameters",
                 "function_with_deployment_preference_multiple_combinations",
                 "function_with_alias_and_event_sources",
                 "function_with_resource_refs",
@@ -271,6 +272,8 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_event_dest",
                 "function_with_event_dest_basic",
                 "function_with_event_dest_conditional",
+                "api_with_usageplans",
+                "api_with_usageplans_intrinsics",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -309,7 +312,7 @@ class TestTranslatorEndToEnd(TestCase):
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
-        print (json.dumps(output_fragment, indent=2))
+        print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
@@ -335,6 +338,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "api_with_basic_custom_domain",
                 "api_with_basic_custom_domain_intrinsics",
                 "api_with_custom_domain_route53",
+                "api_with_custom_domain_route53_hosted_zone_name",
                 "implicit_http_api",
                 "explicit_http_api_minimum",
                 "implicit_http_api_auth_and_simple_case",
@@ -352,6 +356,7 @@ class TestTranslatorEndToEnd(TestCase):
             ],  # Run all the above tests against each of the list of partitions to test against
         )
     )
+    @pytest.mark.slow
     @patch(
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
@@ -382,7 +387,7 @@ class TestTranslatorEndToEnd(TestCase):
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
-        print (json.dumps(output_fragment, indent=2))
+        print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
@@ -403,6 +408,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "api_with_resource_policy",
                 "api_with_resource_policy_global",
                 "api_with_resource_policy_global_implicit",
+                "api_with_if_conditional_with_resource_policy",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -440,7 +446,7 @@ class TestTranslatorEndToEnd(TestCase):
             }
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
-        print (json.dumps(output_fragment, indent=2))
+        print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
         if sys.version_info.major >= 3:
@@ -601,6 +607,8 @@ class TestTranslatorEndToEnd(TestCase):
         "error_http_api_event_multiple_same_path",
         "error_function_with_event_dest_invalid",
         "error_function_with_event_dest_type",
+        "error_function_with_api_key_false",
+        "error_api_with_usage_plan_invalid_parameter",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -635,7 +643,7 @@ def test_transform_unhandled_failure_empty_managed_policy_map():
                 "Properties": {
                     "CodeUri": "s3://bucket/key",
                     "Handler": "index.handler",
-                    "Runtime": "nodejs4.3",
+                    "Runtime": "nodejs12.x",
                     "Policies": "AmazonS3FullAccess",
                 },
             }
@@ -701,7 +709,7 @@ def test_swagger_body_sha_gets_recomputed():
 
     output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-    print (json.dumps(output_fragment, indent=2))
+    print(json.dumps(output_fragment, indent=2))
     deployment_key = get_deployment_key(output_fragment)
     assert deployment_key
 
@@ -737,7 +745,7 @@ def test_swagger_definitionuri_sha_gets_recomputed():
 
     output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-    print (json.dumps(output_fragment, indent=2))
+    print(json.dumps(output_fragment, indent=2))
     deployment_key = get_deployment_key(output_fragment)
     assert deployment_key
 
@@ -766,7 +774,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
                 "MyFunction": {
                     "Type": "AWS::Serverless::Function",
                     "Properties": {
-                        "Runtime": "nodejs4.3",
+                        "Runtime": "nodejs12.x",
                         "Handler": "index.handler",
                         "CodeUri": {"Bucket": {"Ref": "SomeBucket"}, "Key": {"Ref": "CodeKeyParam"}},
                         "AutoPublishAlias": "live",
@@ -819,7 +827,7 @@ class TestFunctionVersionWithParameterReferences(TestCase):
         mock_policy_loader = get_policy_mock()
         output_fragment = transform(document, parameter_values, mock_policy_loader)
 
-        print (json.dumps(output_fragment, indent=2))
+        print(json.dumps(output_fragment, indent=2))
 
         return output_fragment
 

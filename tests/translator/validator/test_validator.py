@@ -56,6 +56,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input")
         "function_with_disabled_deployment_preference",
         "function_with_deployment_preference",
         "function_with_deployment_preference_all_parameters",
+        "function_with_deployment_preference_from_parameters",
         "function_with_deployment_preference_multiple_combinations",
         "function_with_alias_and_event_sources",
         "function_with_resource_refs",
@@ -98,6 +99,7 @@ def test_validate_template_success(testcase):
         "function_with_disabled_deployment_preference",
         "function_with_deployment_preference",
         "function_with_deployment_preference_all_parameters",
+        "function_with_deployment_preference_from_parameters",
         "function_with_deployment_preference_multiple_combinations",
         "function_with_alias_and_event_sources",
         "function_with_resource_refs",
@@ -115,6 +117,6 @@ def test_validate_template_success(testcase):
     validation_errors = SamTemplateValidator.validate(manifest)
     has_errors = len(validation_errors)
     if has_errors:
-        print ("\nFailing template: {0}\n".format(testcase))
-        print (validation_errors)
+        print("\nFailing template: {0}\n".format(testcase))
+        print(validation_errors)
     assert len(validation_errors) == 0

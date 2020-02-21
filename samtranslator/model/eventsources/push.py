@@ -545,6 +545,7 @@ class Api(PushEventSource):
         resources = []
 
         function = kwargs.get("function")
+        intrinsics_resolver = kwargs.get("intrinsics_resolver")
 
         if not function:
             raise TypeError("Missing required keyword argument: function")
@@ -557,7 +558,7 @@ class Api(PushEventSource):
 
         explicit_api = kwargs["explicit_api"]
         if explicit_api.get("__MANAGE_SWAGGER"):
-            self._add_swagger_integration(explicit_api, function)
+            self._add_swagger_integration(explicit_api, function, intrinsics_resolver)
 
         return resources
 
@@ -600,7 +601,7 @@ class Api(PushEventSource):
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)
 
-    def _add_swagger_integration(self, api, function):
+    def _add_swagger_integration(self, api, function, intrinsics_resolver):
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -639,6 +640,7 @@ class Api(PushEventSource):
         if self.Auth:
             method_authorizer = self.Auth.get("Authorizer")
             api_auth = api.get("Auth")
+            api_auth = intrinsics_resolver.resolve_parameter_refs(api_auth)
 
             if method_authorizer:
                 api_authorizers = api_auth and api_auth.get("Authorizers")
@@ -681,7 +683,7 @@ class Api(PushEventSource):
 
             apikey_required_setting = self.Auth.get("ApiKeyRequired")
             apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
-            if apikey_required_setting_is_false and not api_auth.get("ApiKeyRequired"):
+            if apikey_required_setting_is_false and (not api_auth or not api_auth.get("ApiKeyRequired")):
                 raise InvalidEventException(
                     self.relative_id,
                     "Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "
@@ -698,6 +700,8 @@ class Api(PushEventSource):
                 editor.add_resource_policy(
                     resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
                 )
+                if resource_policy.get("CustomStatements"):
+                    editor.add_custom_statements(resource_policy.get("CustomStatements"))
 
         if self.RequestModel:
             method_model = self.RequestModel.get("Model")

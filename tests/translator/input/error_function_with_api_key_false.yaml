@@ -1,0 +1,22 @@
+Resources:
+  MyApiWithoutAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      OpenApiVersion: '3.0.1'
+
+  MyFunctionWithApiKeyRequired:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        MyApiWithApiKeyRequired:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithoutAuth
+            Path: /ApiKeyRequiredTrue
+            Method: get
+            Auth:
+              ApiKeyRequired: false

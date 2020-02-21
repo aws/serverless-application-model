@@ -1,9 +1,15 @@
+Parameters:
+  Vpc1:
+    Type: String
+    Default: vpc-1234
+
 Globals:
   Api:
     Auth:
       ResourcePolicy:
-        SourceVpcWhitelist: ['vpc-1234']
-        SourceVpcBlacklist: ['vpce-5678']
+        SourceVpcWhitelist: 
+          - !Ref Vpc1
+          - vpc-5678
 
 Resources:
   MyFunction:
@@ -18,7 +24,7 @@ Resources:
           return response;
         };
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         Api:
           Type: Api

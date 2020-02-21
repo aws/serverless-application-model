@@ -11,7 +11,7 @@ Resources:
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
       Handler: index.restapi
-      Runtime: nodejs4.3
+      Runtime: nodejs12.x
       Events:
         AddApi:
           Type: Api

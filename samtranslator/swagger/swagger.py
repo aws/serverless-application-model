@@ -3,8 +3,8 @@ import json
 import re
 from six import string_types
 
-from samtranslator.model.intrinsics import ref
-from samtranslator.model.intrinsics import make_conditional, fnSub
+from samtranslator.model.intrinsics import ref, is_intrinsic_no_value
+from samtranslator.model.intrinsics import make_conditional, fnSub, is_intrinsic_if
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
@@ -804,7 +804,6 @@ class SwaggerEditor(object):
         ip_range_blacklist = resource_policy.get("IpRangeBlacklist")
         source_vpc_whitelist = resource_policy.get("SourceVpcWhitelist")
         source_vpc_blacklist = resource_policy.get("SourceVpcBlacklist")
-        custom_statements = resource_policy.get("CustomStatements")
 
         if aws_account_whitelist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
@@ -824,16 +823,16 @@ class SwaggerEditor(object):
 
         if source_vpc_whitelist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            for endpoint in source_vpc_whitelist:
-                self._add_vpc_resource_policy_for_method(endpoint, "StringNotEquals", resource_list)
+            self._add_vpc_resource_policy_for_method(source_vpc_whitelist, "StringNotEquals", resource_list)
 
         if source_vpc_blacklist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            for endpoint in source_vpc_blacklist:
-                self._add_vpc_resource_policy_for_method(endpoint, "StringEquals", resource_list)
+            self._add_vpc_resource_policy_for_method(source_vpc_blacklist, "StringEquals", resource_list)
 
-        if custom_statements is not None:
-            self._add_custom_statement(custom_statements)
+        self._doc[self._X_APIGW_POLICY] = self.resource_policy
+
+    def add_custom_statements(self, custom_statements):
+        self._add_custom_statement(custom_statements)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -932,24 +931,33 @@ class SwaggerEditor(object):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(self, vpc, conditional, resource_list):
+    def _add_vpc_resource_policy_for_method(self, endpoint_list, conditional, resource_list):
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
         :raises ValueError: If the conditional passed in does not match the allowed values.
         """
-        if not vpc:
+        if not endpoint_list:
             return
 
         if conditional not in ["StringNotEquals", "StringEquals"]:
             raise ValueError("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))
 
         vpce_regex = r"^vpce-"
-        if not re.match(vpce_regex, vpc):
-            endpoint = "aws:SourceVpc"
-        else:
-            endpoint = "aws:SourceVpce"
+        vpc_regex = r"^vpc-"
+        vpc_list = []
+        vpce_list = []
+        for endpoint in endpoint_list:
+            if re.match(vpce_regex, endpoint):
+                vpce_list.append(endpoint)
+            if re.match(vpc_regex, endpoint):
+                vpc_list.append(endpoint)
 
+        condition = {}
+        if vpc_list:
+            condition["aws:SourceVpc"] = vpc_list
+        if vpce_list:
+            condition["aws:SourceVpce"] = vpce_list
         self.resource_policy["Version"] = "2012-10-17"
         allow_statement = {}
         allow_statement["Effect"] = "Allow"
@@ -962,7 +970,7 @@ class SwaggerEditor(object):
         deny_statement["Action"] = "execute-api:Invoke"
         deny_statement["Resource"] = resource_list
         deny_statement["Principal"] = "*"
-        deny_statement["Condition"] = {conditional: {endpoint: vpc}}
+        deny_statement["Condition"] = {conditional: condition}
 
         if self.resource_policy.get("Statement") is None:
             self.resource_policy["Statement"] = [allow_statement, deny_statement]
@@ -980,16 +988,17 @@ class SwaggerEditor(object):
         if custom_statements is None:
             return
 
-        if not isinstance(custom_statements, list):
-            custom_statements = [custom_statements]
-
         self.resource_policy["Version"] = "2012-10-17"
         if self.resource_policy.get("Statement") is None:
             self.resource_policy["Statement"] = custom_statements
         else:
+            if not isinstance(custom_statements, list):
+                custom_statements = [custom_statements]
+
             statement = self.resource_policy["Statement"]
             if not isinstance(statement, list):
                 statement = [statement]
+
             for s in custom_statements:
                 if s not in statement:
                     statement.append(s)

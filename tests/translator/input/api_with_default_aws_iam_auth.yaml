@@ -25,7 +25,7 @@ Resources:
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         MyApiWithAwsIamAuth:
           Type: Api

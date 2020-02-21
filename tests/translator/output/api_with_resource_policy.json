@@ -14,23 +14,13 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs4.3", 
+        "Runtime": "nodejs12.x", 
         "Tags": [
           {
             "Value": "SAM", 
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "ExplicitApiDeploymentd2036decb3": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: d2036decb36ce147b7738a97c419737ea7e02555", 
-        "StageName": "Stage"
       }
     }, 
     "ExplicitApiFunctionPutHtmlPermissionProd": {
@@ -105,14 +95,12 @@
           "swagger": "2.0", 
           "x-amazon-apigateway-policy": {
             "Version": "2012-10-17", 
-            "Statement": [
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  "execute-api:/*/*/*"
-                ]
-              }
-            ]
+            "Statement": {
+              "Action": "execute-api:Invoke", 
+              "Resource": [
+                "execute-api:/*/*/*"
+              ]
+            }
           }
         }
       }
@@ -121,7 +109,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentd2036decb3"
+          "Ref": "ExplicitApiDeployment215ee6137d"
         }, 
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -153,15 +141,6 @@
     "ExplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -177,7 +156,26 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ExplicitApiDeployment215ee6137d": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: 215ee6137d74bceebd1cd5a2b8fb2d8f8604e708", 
+        "StageName": "Stage"
       }
     }, 
     "ExplicitApiFunctionGetHtmlPermissionProd": {

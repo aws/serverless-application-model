@@ -22,14 +22,14 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: authorizer.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
 
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Events:
         HelloWorld:
           Type: Api

@@ -62,7 +62,9 @@ This will:
 
 - Create an Alias with ``<alias-name>`` 
 - Create & publish a Lambda version with the latest code & configuration 
-  derived from the ``CodeUri`` property 
+  derived from the ``CodeUri`` property. Optionally it is possible to specify
+  property `AutoPublishCodeSha256` that will override the hash computed for
+  Lambda ``CodeUri`` property.
 - Point the Alias to the latest published version 
 - Point all event sources to the Alias & not to the function 
 - When the ``CodeUri`` property of ``AWS::Serverless::Function`` changes, 
@@ -93,7 +95,7 @@ resource:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery10Minutes
@@ -163,7 +165,7 @@ resource:
             Action:
               - "lambda:InvokeFunction"
             Resource: !GetAtt MyLambdaFunction.Arn
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       FunctionName: 'CodeDeployHook_preTrafficHook'
       DeploymentPreference:
         Enabled: False

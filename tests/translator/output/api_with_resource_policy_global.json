@@ -1,4 +1,12 @@
 {
+  "Conditions": {
+    "C1": {
+      "Fn::Equals": [
+        true, 
+        true
+      ]
+    }
+  }, 
   "Parameters": {
     "StageName": {
       "Default": "MyOwnStage", 
@@ -6,14 +14,63 @@
     }
   }, 
   "Resources": {
-    "ExplicitApiDeploymente173c8c5c6": {
+    "AnotherApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {}, 
+          "swagger": "2.0", 
+          "x-amazon-apigateway-policy": {
+            "Version": "2012-10-17", 
+            "Statement": {
+              "Fn::If": [
+                "C1", 
+                {
+                  "Action": "execute-api:Invoke", 
+                  "Resource": [
+                    "execute-api:/*/*/*"
+                  ]
+                }, 
+                {
+                  "Action": "execute-api:Another", 
+                  "Resource": [
+                    "execute-api:/*/*/*"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }, 
+    "ExplicitApiDeploymenta5a5c4e3ff": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         }, 
-        "Description": "RestApi deployment id: e173c8c5c6055492b897fc85a73484cfdba2742f", 
+        "Description": "RestApi deployment id: a5a5c4e3ff6901cf27436628359ed20300d34aa4", 
         "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApiStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeploymenta5a5c4e3ff"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": {
+          "Ref": "StageName"
+        }
       }
     }, 
     "ExplicitApiFunctionGetHtmlPermissionStage": {
@@ -37,18 +94,14 @@
         }
       }
     }, 
-    "ExplicitApiStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "AnotherApiDeploymentfdf1387e0a": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeploymente173c8c5c6"
-        }, 
         "RestApiId": {
-          "Ref": "ExplicitApi"
+          "Ref": "AnotherApi"
         }, 
-        "StageName": {
-          "Ref": "StageName"
-        }
+        "Description": "RestApi deployment id: fdf1387e0a89fa15996401a79284cdaaf2c43844", 
+        "StageName": "Stage"
       }
     }, 
     "ExplicitApiFunction": {
@@ -65,7 +118,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs4.3", 
+        "Runtime": "nodejs12.x", 
         "Tags": [
           {
             "Value": "SAM", 
@@ -77,15 +130,6 @@
     "ExplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -101,6 +145,29 @@
               }
             }
           ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "AnotherApiStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "AnotherApiDeploymentfdf1387e0a"
+        }, 
+        "RestApiId": {
+          "Ref": "AnotherApi"
+        }, 
+        "StageName": {
+          "Ref": "StageName"
         }
       }
     }, 
@@ -140,56 +207,20 @@
                 }
               }, 
               {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
+                "Fn::If": [
+                  "C1", 
                   {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/GET/", 
-                      {
-                        "__Stage__": {
-                          "Ref": "StageName"
-                        }
-                      }
+                    "Action": "execute-api:Invoke", 
+                    "Resource": [
+                      "execute-api:/*/*/*"
                     ]
-                  }
-                ], 
-                "Effect": "Allow", 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
+                  }, 
                   {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/GET/", 
-                      {
-                        "__Stage__": {
-                          "Ref": "StageName"
-                        }
-                      }
+                    "Action": "execute-api:Blah", 
+                    "Resource": [
+                      "execute-api:/*/*/*"
                     ]
                   }
-                ], 
-                "Effect": "Deny", 
-                "Condition": {
-                  "NotIpAddress": {
-                    "aws:SourceIp": [
-                      "1.2.3.4"
-                    ]
-                  }
-                }, 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  "execute-api:/*/*/*"
-                ]
-              }, 
-              {
-                "Action": "execute-api:blah", 
-                "Resource": [
-                  "execute-api:/*/*/*"
                 ]
               }
             ]

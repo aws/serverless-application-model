@@ -31,7 +31,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs8.10", 
+        "Runtime": "nodejs12.x", 
         "Tags": [
           {
             "Value": "SAM", 
@@ -44,7 +44,7 @@
     "MyFunctionImplicitGetPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:InvokeFunction",
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunction"
@@ -297,7 +297,7 @@
     "MyFunctionApiPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Action": "lambda:InvokeFunction",
+        "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
         "FunctionName": {
           "Ref": "MyFunction"

@@ -81,6 +81,28 @@ class TestDeploymentPreference(TestCase):
 
         self.assertEqual(expected_deployment_preference, deployment_preference_from_yaml_dict)
 
+    def test_from_dict_with_string_disabled_preference_does_not_require_other_parameters(self):
+        expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None)
+
+        deployment_preference_yaml_dict = dict()
+        deployment_preference_yaml_dict["Enabled"] = "False"
+        deployment_preference_from_yaml_dict = DeploymentPreference.from_dict(
+            "logical_id", deployment_preference_yaml_dict
+        )
+
+        self.assertEqual(expected_deployment_preference, deployment_preference_from_yaml_dict)
+
+    def test_from_dict_with_lowercase_string_disabled_preference_does_not_require_other_parameters(self):
+        expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None)
+
+        deployment_preference_yaml_dict = dict()
+        deployment_preference_yaml_dict["Enabled"] = "false"
+        deployment_preference_from_yaml_dict = DeploymentPreference.from_dict(
+            "logical_id", deployment_preference_yaml_dict
+        )
+
+        self.assertEqual(expected_deployment_preference, deployment_preference_from_yaml_dict)
+
     def test_from_dict_with_non_dict_hooks_raises_invalid_resource_exception(self):
         with self.assertRaises(InvalidResourceException):
             DeploymentPreference.from_dict("logical_id", {"Type": "Canary", "Hooks": "badhook"})

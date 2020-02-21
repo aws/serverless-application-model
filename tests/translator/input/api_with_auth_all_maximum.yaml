@@ -56,7 +56,7 @@ Resources:
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         WithNoAuthorizer:
           Type: Api

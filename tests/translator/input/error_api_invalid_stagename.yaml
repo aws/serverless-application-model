@@ -9,7 +9,7 @@ Resources:
     Properties:
       Handler: lambda.handler
       CodeUri: s3://bucket/api
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Events:
         ProxyApiRoot:
           Type: Api

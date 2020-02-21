@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "Vpc1": {
+      "Default": "vpc-1234", 
+      "Type": "String"
+    }
+  }, 
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
@@ -13,7 +19,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs8.10", 
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
             "Value": "SAM", 
@@ -55,14 +61,16 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeploymente137534328": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "ServerlessRestApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment276f3672ac"
+        }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "Description": "RestApi deployment id: e1375343284100b701b94f5b3d70cde0563eca05", 
-        "StageName": "Stage"
+        "StageName": "Prod"
       }
     }, 
     "MyApiDeployment5332c373d4": {
@@ -75,45 +83,40 @@
         "StageName": "Stage"
       }
     }, 
-    "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "ServerlessRestApiDeployment276f3672ac": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymente137534328"
-        }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 
-        "StageName": "Prod"
+        "Description": "RestApi deployment id: 276f3672acc0db05468d66e75218112e92b84253", 
+        "StageName": "Stage"
       }
     }, 
-    "MyApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
+    "MyFunctionApiPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
       "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0", 
-            "title": {
-              "Ref": "AWS::StackName"
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              }
             }
-          }, 
-          "paths": {}, 
-          "swagger": "2.0"
+          ]
         }
       }
     }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -129,7 +132,16 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "ServerlessRestApi": {
@@ -202,27 +214,10 @@
                 "Effect": "Deny", 
                 "Condition": {
                   "StringNotEquals": {
-                    "aws:SourceVpc": "vpc-1234"
-                  }
-                }, 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/PUT/get", 
-                      {
-                        "__Stage__": "Prod"
-                      }
+                    "aws:SourceVpc": [
+                      "vpc-1234", 
+                      "vpc-5678"
                     ]
-                  }
-                ], 
-                "Effect": "Deny", 
-                "Condition": {
-                  "StringEquals": {
-                    "aws:SourceVpce": "vpce-5678"
                   }
                 }, 
                 "Principal": "*"
@@ -257,27 +252,10 @@
                 "Effect": "Deny", 
                 "Condition": {
                   "StringNotEquals": {
-                    "aws:SourceVpc": "vpc-1234"
-                  }
-                }, 
-                "Principal": "*"
-              }, 
-              {
-                "Action": "execute-api:Invoke", 
-                "Resource": [
-                  {
-                    "Fn::Sub": [
-                      "execute-api:/${__Stage__}/POST/fetch", 
-                      {
-                        "__Stage__": "Prod"
-                      }
+                    "aws:SourceVpc": [
+                      "vpc-1234", 
+                      "vpc-5678"
                     ]
-                  }
-                ], 
-                "Effect": "Deny", 
-                "Condition": {
-                  "StringEquals": {
-                    "aws:SourceVpce": "vpce-5678"
                   }
                 }, 
                 "Principal": "*"
@@ -287,24 +265,18 @@
         }
       }
     }, 
-    "MyFunctionApiPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+    "MyApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "MyFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              }
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
             }
-          ]
+          }, 
+          "paths": {}, 
+          "swagger": "2.0"
         }
       }
     }

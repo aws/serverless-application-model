@@ -155,7 +155,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs10.x"
+        "Runtime": "nodejs12.x"
       }, 
       "Condition": "FunctionCondition"
     }, 
@@ -179,7 +179,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs10.x"
+        "Runtime": "nodejs12.x"
       }, 
       "Condition": "FunctionInlineEnabled"
     }, 

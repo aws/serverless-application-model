@@ -70,6 +70,7 @@ class SamFunction(SamResourceMacro):
         "EventInvokeConfig": PropertyType(False, is_type(dict)),
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(is_str())),
+        "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
         "VersionDescription": PropertyType(False, is_str()),
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
     }
@@ -132,7 +133,10 @@ class SamFunction(SamResourceMacro):
         alias_name = ""
         if self.AutoPublishAlias:
             alias_name = self._get_resolved_alias_name("AutoPublishAlias", self.AutoPublishAlias, intrinsics_resolver)
-            lambda_version = self._construct_version(lambda_function, intrinsics_resolver=intrinsics_resolver)
+            code_sha256 = self.AutoPublishCodeSha256
+            lambda_version = self._construct_version(
+                lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
+            )
             lambda_alias = self._construct_alias(alias_name, lambda_function, lambda_version)
             resources.append(lambda_version)
             resources.append(lambda_alias)
@@ -164,7 +168,11 @@ class SamFunction(SamResourceMacro):
 
         try:
             resources += self._generate_event_resources(
-                lambda_function, execution_role, kwargs["event_resources"], lambda_alias=lambda_alias
+                lambda_function,
+                execution_role,
+                kwargs["event_resources"],
+                intrinsics_resolver,
+                lambda_alias=lambda_alias,
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
@@ -559,7 +567,9 @@ class SamFunction(SamResourceMacro):
             return logical_id
         return event_dict.get("Properties", {}).get("Path", logical_id)
 
-    def _generate_event_resources(self, lambda_function, execution_role, event_resources, lambda_alias=None):
+    def _generate_event_resources(
+        self, lambda_function, execution_role, event_resources, intrinsics_resolver, lambda_alias=None
+    ):
         """Generates and returns the resources associated with this function's events.
 
         :param model.lambda_.LambdaFunction lambda_function: generated Lambda function
@@ -587,6 +597,7 @@ class SamFunction(SamResourceMacro):
                     # When Alias is provided, connect all event sources to the alias and *not* the function
                     "function": lambda_alias or lambda_function,
                     "role": execution_role,
+                    "intrinsics_resolver": intrinsics_resolver,
                 }
 
                 for name, resource in event_resources[logical_id].items():
@@ -603,7 +614,7 @@ class SamFunction(SamResourceMacro):
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
 
-    def _construct_version(self, function, intrinsics_resolver):
+    def _construct_version(self, function, intrinsics_resolver, code_sha256=None):
         """Constructs a Lambda Version resource that will be auto-published when CodeUri of the function changes.
         Old versions will not be deleted without a direct reference from the CloudFormation template.
 
@@ -611,6 +622,7 @@ class SamFunction(SamResourceMacro):
         :param model.intrinsics.resolver.IntrinsicsResolver intrinsics_resolver: Class that can help resolve
             references to parameters present in CodeUri. It is a common usecase to set S3Key of Code to be a
             template parameter. Need to resolve the values otherwise we will never detect a change in Code dict
+        :param str code_sha256: User predefined hash of the Lambda function code
         :return: Lambda function Version resource
         """
         code_dict = function.Code
@@ -642,7 +654,7 @@ class SamFunction(SamResourceMacro):
         # SHA Collisions: For purposes of triggering a new update, we are concerned about just the difference previous
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
         prefix = "{id}Version".format(id=self.logical_id)
-        logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict).gen()
+        logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
@@ -767,6 +779,7 @@ class SamApi(SamResourceMacro):
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
+        self.Auth = intrinsics_resolver.resolve_parameter_refs(self.Auth)
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
 
         api_generator = ApiGenerator(
@@ -797,9 +810,16 @@ class SamApi(SamResourceMacro):
             domain=self.Domain,
         )
 
-        rest_api, deployment, stage, permissions, domain, basepath_mapping, route53 = api_generator.to_cloudformation(
-            redeploy_restapi_parameters
-        )
+        (
+            rest_api,
+            deployment,
+            stage,
+            permissions,
+            domain,
+            basepath_mapping,
+            route53,
+            usage_plan_resources,
+        ) = api_generator.to_cloudformation(redeploy_restapi_parameters)
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
@@ -809,6 +829,9 @@ class SamApi(SamResourceMacro):
             resources.extend(basepath_mapping)
         if route53:
             resources.extend([route53])
+        # contains usage plan, api key and usageplan key resources
+        if usage_plan_resources:
+            resources.extend(usage_plan_resources)
         return resources
 
 

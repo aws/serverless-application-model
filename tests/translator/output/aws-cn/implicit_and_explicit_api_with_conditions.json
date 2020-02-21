@@ -58,7 +58,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "explicithello2condition"
     },
@@ -114,7 +114,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "explicithello1condition"
     },
@@ -228,7 +228,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "implicithello2condition"
     },
@@ -285,7 +285,7 @@
           ]
         },
         "Timeout": 3,
-        "Runtime": "nodejs8.10"
+        "Runtime": "nodejs12.x"
       },
       "Condition": "implicithello1condition"
     },

@@ -9,7 +9,7 @@ LambdaEdgeFunctionSample:
     Type: AWS::Serverless::Function
     Properties:
         CodeUri: src/
-        Runtime: nodejs6.10
+        Runtime: nodejs10.x
         Handler: index.handler
         Role: !GetAtt LambdaEdgeFunctionRole.Arn
         Timeout: 5
@@ -24,7 +24,7 @@ LambdaEdgeFunctionSample:
     Type: AWS::Serverless::Function
     Properties:
         CodeUri: src/
-        Runtime: nodejs6.10
+        Runtime: nodejs10.x
         Handler: index.handler
         Role: !GetAtt LambdaEdgeFunctionRole.Arn
         Timeout: 5
