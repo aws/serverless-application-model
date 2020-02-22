@@ -16,6 +16,7 @@ class OpenApiEditor(object):
     """
 
     _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
+    _X_APIGW_TAG_VALUE = "x-amazon-apigateway-tag-value"
     _CONDITIONAL_IF = "Fn::If"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -26,8 +27,8 @@ class OpenApiEditor(object):
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
         modifications on this copy.
 
-        :param dict doc: Swagger document as a dictionary
-        :raises ValueError: If the input Swagger document does not meet the basic Swagger requirements.
+        :param dict doc: OpenApi document as a dictionary
+        :raises ValueError: If the input OpenApi document does not meet the basic OpenApi requirements.
         """
         if not OpenApiEditor.is_valid(doc):
             raise ValueError(
@@ -39,6 +40,7 @@ class OpenApiEditor(object):
         self.paths = self._doc["paths"]
         self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
         self.definitions = self._doc.get("definitions", {})
+        self.tags = self._doc.get("tags", [])
 
     def get_path(self, path):
         """
@@ -236,6 +238,20 @@ class OpenApiEditor(object):
         for path, value in self.paths.items():
             yield path
 
+    def add_timeout_to_method(self, api, path, method_name, timeout):
+        """
+        Adds a timeout to this path/method.
+        
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        :param string path: Path name
+        :param string method_name: Method name
+        :param int timeout: Timeout amount, in milliseconds
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            if self.method_definition_has_integration(method_definition):
+                method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
+
     def add_authorizers_security_definitions(self, authorizers):
         """
         Add Authorizer definitions to the securityDefinitions part of Swagger.
@@ -344,6 +360,22 @@ class OpenApiEditor(object):
             if security:
                 method_definition["security"] = security
 
+    def add_tags(self, tags):
+        """
+        Adds tags to the OpenApi definition using an ApiGateway extension for tag values.
+
+        :param dict tags: dictionary of tagName:tagValue pairs.
+        """
+        for name, value in tags.items():
+            # find an existing tag with this name if it exists
+            existing_tag = next((existing_tag for existing_tag in self.tags if existing_tag.get("name") == name), None)
+            if existing_tag:
+                # overwrite tag value for an existing tag
+                existing_tag[self._X_APIGW_TAG_VALUE] = value
+            else:
+                tag = {"name": name, self._X_APIGW_TAG_VALUE: value}
+                self.tags.append(tag)
+
     @property
     def openapi(self):
         """
@@ -354,6 +386,9 @@ class OpenApiEditor(object):
 
         # Make sure any changes to the paths are reflected back in output
         self._doc["paths"] = self.paths
+
+        if self.tags:
+            self._doc["tags"] = self.tags
 
         if self.security_schemes:
             self._doc.setdefault("components", {})

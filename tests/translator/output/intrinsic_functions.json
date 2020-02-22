@@ -221,7 +221,7 @@
           }
         },
         "FunctionName": {
-          "Fn::Sub": "MySuperFunctionName"
+          "Fn::Sub": "${FunctionName}"
         },
         "Tags": [
           {

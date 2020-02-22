@@ -1,0 +1,41 @@
+Globals:
+    Api:
+      OpenApiVersion: 3.0.0
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUP: NONE
+
+Resources:
+   MyApiOne:
+     Type: AWS::Serverless::Api
+     Properties:
+       StageName: Prod
+
+   MyFunctionOne:
+     Type: AWS::Serverless::Function
+     Properties:
+       Handler: index.handler
+       Runtime: nodejs8.10
+       InlineCode: |
+         exports.handler = async (event) => {
+           return {
+           statusCode: 200,
+           body: JSON.stringify(event),
+           headers: {}
+           }
+         }
+       Events:
+         ApiKey:
+           Type: Api
+           Properties:
+             RestApiId:
+               Ref: MyApiOne
+             Method: get
+             Path: /path/one
+
+Outputs:
+    ApiOneUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/'

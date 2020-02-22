@@ -22,11 +22,21 @@
         ]
       }
     }, 
+    "ServerlessRestApiDeployment0e25d06cd3": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        }, 
+        "Description": "RestApi deployment id: 0e25d06cd3bcb2adf9b3cd988ce86aa2d9370cb3", 
+        "StageName": "Stage"
+      }
+    }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment68fcd6e127"
+          "Ref": "ServerlessRestApiDeployment0e25d06cd3"
         }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -34,28 +44,9 @@
         "StageName": "Prod"
       }
     }, 
-    "ServerlessRestApiDeployment68fcd6e127": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: 68fcd6e127ad767b7bafd3b7a4552a56cb5ea19d", 
-        "StageName": "Stage"
-      }
-    }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -71,7 +62,16 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "ServerlessRestApi": {
@@ -132,7 +132,9 @@
                 "Effect": "Deny", 
                 "Condition": {
                   "StringEquals": {
-                    "aws:SourceVpce": "vpce-3456"
+                    "aws:SourceVpce": [
+                      "vpce-3456"
+                    ]
                   }
                 }, 
                 "Principal": "*"

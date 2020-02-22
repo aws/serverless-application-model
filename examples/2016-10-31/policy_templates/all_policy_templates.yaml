@@ -107,3 +107,12 @@ Resources:
 
         - CodeCommitReadPolicy:
             RepositoryName: name
+
+        - TextractPolicy: {}
+
+        - TextractDetectAnalyzePolicy: {}
+
+        - TextractGetResultPolicy: {}
+
+        - EventBridgePutEventsPolicy:
+            EventBusName: name

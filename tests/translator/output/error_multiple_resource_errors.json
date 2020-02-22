@@ -1,7 +1,7 @@
 {
   "errors": [
     {
-      "errorMessage": "Resource with id [BadCodeUriTypeFunction] is invalid. 'CodeUri' requires Bucket and Key properties to be specified"
+      "errorMessage": "Resource with id [BadCodeUriTypeFunction] is invalid. 'CodeUri' requires Bucket and Key properties to be specified."
     },
     {
       "errorMessage": "Resource with id [ExternalS3Function] is invalid. Event with id [S3Event] is invalid. S3 events must reference an S3 bucket in the same template."
@@ -13,8 +13,8 @@
       "errorMessage": "Resource with id [BadDefinitionUriApi] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form \"s3://bucket/key\" with optional versionId query parameter."
     },
     {
-      "errorMessage": "Resource with id [BadDefinitionUriTypeApi] is invalid. 'DefinitionUri' requires Bucket and Key properties to be specified"
+      "errorMessage": "Resource with id [BadDefinitionUriTypeApi] is invalid. 'DefinitionUri' requires Bucket and Key properties to be specified."
     }
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 5. Resource with id [BadCodeUriFunction] is invalid. 'CodeUri' is not a valid S3 Uri of the form \"s3://bucket/key\" with optional versionId query parameter. Resource with id [BadCodeUriTypeFunction] is invalid. 'CodeUri' requires Bucket and Key properties to be specified Resource with id [BadDefinitionUriApi] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form \"s3://bucket/key\" with optional versionId query parameter. Resource with id [BadDefinitionUriTypeApi] is invalid. 'DefinitionUri' requires Bucket and Key properties to be specified Resource with id [ExternalS3Function] is invalid. Event with id [S3Event] is invalid. S3 events must reference an S3 bucket in the same template."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 5. Resource with id [BadCodeUriFunction] is invalid. 'CodeUri' is not a valid S3 Uri of the form 's3://bucket/key' with optional versionId query parameter. Resource with id [BadCodeUriTypeFunction] is invalid. 'CodeUri' requires Bucket and Key properties to be specified. Resource with id [BadDefinitionUriApi] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form 's3://bucket/key' with optional versionId query parameter. Resource with id [BadDefinitionUriTypeApi] is invalid. 'DefinitionUri' requires Bucket and Key properties to be specified. Resource with id [ExternalS3Function] is invalid. Event with id [S3Event] is invalid. S3 events must reference an S3 bucket in the same template."
 }

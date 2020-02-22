@@ -3,8 +3,6 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       DefinitionUri: s3://bucket/key
-      Tags:
-        Tag: value
       StageName: !Join ["", ["Stage", "Name"]]
 
   MyApi2:
@@ -14,8 +12,6 @@ Resources:
         Bucket: bucket
         Key: key
         Version: version
-      Tags:
-        Tag: value
 
   Function:
     Type: AWS::Serverless::Function

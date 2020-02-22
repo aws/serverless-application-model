@@ -1,8 +1,8 @@
 {
   "errors": [
     {
-      "errorMessage": "Resource with id [MyApi] is invalid. EndpointConfiguration for Custom Domains must be one of ['EDGE', 'REGIONAL'] Resource with id [ServerlessRestApi] is invalid. Custom Domains only works if both DomainName and CertificateArn are provided"
+      "errorMessage": "Resource with id [MyApi] is invalid. EndpointConfiguration for Custom Domains must be one of ['EDGE', 'REGIONAL']. Resource with id [ServerlessRestApi] is invalid. Custom Domains only works if both DomainName and CertificateArn are provided."
     }
   ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [MyApi] is invalid. EndpointConfiguration for Custom Domains must be one of ['EDGE', 'REGIONAL'] Resource with id [ServerlessRestApi] is invalid. Custom Domains only works if both DomainName and CertificateArn are provided"
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [MyApi] is invalid. EndpointConfiguration for Custom Domains must be one of ['EDGE', 'REGIONAL']. Resource with id [ServerlessRestApi] is invalid. Custom Domains only works if both DomainName and CertificateArn are provided."
 }

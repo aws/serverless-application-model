@@ -1551,6 +1551,25 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy57",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "events:PutEvents",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/${eventBusName}",
+                      {
+                        "eventBusName": "name"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "Tags": [

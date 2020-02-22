@@ -379,7 +379,29 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(version.get_resource_attribute("DeletionPolicy"), "Retain")
 
         expected_prefix = self.sam_func.logical_id + "Version"
-        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code)
+        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code, None)
+        generator_mock.gen.assert_called_once_with()
+        self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_once_with(self.lambda_func.Code)
+
+    @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
+    def test_version_creation_with_code_sha(self, LogicalIdGeneratorMock):
+        generator_mock = LogicalIdGeneratorMock.return_value
+        prefix = "SomeLogicalId"
+        hash_code = "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+        id_val = "{}{}".format(prefix, hash_code[:10])
+        generator_mock.gen.return_value = id_val
+
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
+        self.sam_func.AutoPublishCodeSha256 = hash_code
+        version = self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock, hash_code)
+
+        self.assertEqual(version.logical_id, id_val)
+        self.assertEqual(version.Description, None)
+        self.assertEqual(version.FunctionName, {"Ref": self.lambda_func.logical_id})
+        self.assertEqual(version.get_resource_attribute("DeletionPolicy"), "Retain")
+
+        expected_prefix = self.sam_func.logical_id + "Version"
+        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code, hash_code)
         generator_mock.gen.assert_called_once_with()
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_once_with(self.lambda_func.Code)
 
@@ -397,7 +419,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(version.logical_id, id_val)
 
         expected_prefix = self.sam_func.logical_id + "Version"
-        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code)
+        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code, None)
         generator_mock.gen.assert_called_once_with()
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_once_with(self.lambda_func.Code)
 
@@ -421,7 +443,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(version.logical_id, id_val)
 
         expected_prefix = self.sam_func.logical_id + "Version"
-        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code)
+        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_once_with(self.lambda_func.Code)
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
@@ -437,7 +459,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(version.logical_id, id_val)
 
         expected_prefix = self.sam_func.logical_id + "Version"
-        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code)
+        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_once_with(self.lambda_func.Code)
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
@@ -453,7 +475,7 @@ class TestVersionsAndAliases(TestCase):
         self.assertEqual(version.logical_id, id_val)
 
         expected_prefix = self.sam_func.logical_id + "Version"
-        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code)
+        LogicalIdGeneratorMock.assert_called_once_with(expected_prefix, self.lambda_func.Code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_once_with(self.lambda_func.Code)
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
@@ -467,7 +489,7 @@ class TestVersionsAndAliases(TestCase):
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
         self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
 
-        LogicalIdGeneratorMock.assert_called_once_with(prefix, self.lambda_func.Code)
+        LogicalIdGeneratorMock.assert_called_once_with(prefix, self.lambda_func.Code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(self.lambda_func.Code)
 
         # Modify Code of the lambda function
@@ -475,7 +497,7 @@ class TestVersionsAndAliases(TestCase):
         new_code = self.lambda_func.Code.copy()
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = new_code
         self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
-        LogicalIdGeneratorMock.assert_called_with(prefix, new_code)
+        LogicalIdGeneratorMock.assert_called_with(prefix, new_code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(new_code)
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
@@ -490,14 +512,14 @@ class TestVersionsAndAliases(TestCase):
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = self.lambda_func.Code
         self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
 
-        LogicalIdGeneratorMock.assert_called_once_with(prefix, self.lambda_func.Code)
+        LogicalIdGeneratorMock.assert_called_once_with(prefix, self.lambda_func.Code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(self.lambda_func.Code)
 
         # Now, just let the intrinsics resolver return a different value. Let's make sure the new value gets wired up properly
         new_code = {"S3Bucket": "bucket", "S3Key": "some new value"}
         self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = new_code
         self.sam_func._construct_version(self.lambda_func, self.intrinsics_resolver_mock)
-        LogicalIdGeneratorMock.assert_called_with(prefix, new_code)
+        LogicalIdGeneratorMock.assert_called_with(prefix, new_code, None)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(self.lambda_func.Code)
 
     def test_alias_creation(self):

@@ -151,7 +151,9 @@
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
         "BasePath": "fetch", 
-        "DomainName": "api-example.com", 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName23cdccdf9c"
+        }, 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
@@ -163,15 +165,6 @@
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -187,14 +180,25 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "MyApigetBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
         "BasePath": "get", 
-        "DomainName": "api-example.com", 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainName23cdccdf9c"
+        }, 
         "RestApiId": {
           "Ref": "MyApi"
         }, 
@@ -246,7 +250,9 @@
     "MyAnotherApiBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
-        "DomainName": "another-example.com", 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNameeab65c1531"
+        }, 
         "RestApiId": {
           "Ref": "MyAnotherApi"
         }, 
@@ -301,7 +307,9 @@
     "ServerlessRestApiBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
       "Properties": {
-        "DomainName": "another-example.com", 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNameeab65c1531"
+        }, 
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }, 

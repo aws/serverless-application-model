@@ -2,20 +2,24 @@ Parameters:
   StageName:
     Type: String
     Default: MyOwnStage
+Conditions:
+  C1:
+    Fn::Equals:
+      - true
+      - true
 Globals:
   Api:
     Auth:
       ResourcePolicy:
-        CustomStatements: [{
-            Action: 'execute-api:Invoke', 
-            Resource: ['execute-api:/*/*/*']
-          },
-          {
-            Action: 'execute-api:blah',
-            Resource: ['execute-api:/*/*/*']
-          }
-        ]
-        IpRangeWhitelist: [ '1.2.3.4' ]
+          CustomStatements: 
+            Fn::If:
+              - C1
+              - Action: execute-api:Invoke
+                Resource: 
+                  - execute-api:/*/*/*
+              - Action: execute-api:Blah
+                Resource: 
+                  - execute-api:/*/*/*
 Resources:
   ExplicitApiFunction:
     Type: AWS::Serverless::Function
@@ -56,4 +60,18 @@ Resources:
             Effect: Allow
             Principal: 
               Service: 'lambda.amazonaws.com'
-
+  AnotherApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref StageName
+      Auth:
+        ResourcePolicy:
+          CustomStatements: 
+            Fn::If:
+              - C1
+              - Action: execute-api:Invoke
+                Resource: 
+                  - execute-api:/*/*/*
+              - Action: execute-api:Another
+                Resource: 
+                  - execute-api:/*/*/*

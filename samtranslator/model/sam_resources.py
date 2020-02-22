@@ -70,6 +70,7 @@ class SamFunction(SamResourceMacro):
         "EventInvokeConfig": PropertyType(False, is_type(dict)),
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(is_str())),
+        "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
         "VersionDescription": PropertyType(False, is_str()),
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
     }
@@ -132,7 +133,10 @@ class SamFunction(SamResourceMacro):
         alias_name = ""
         if self.AutoPublishAlias:
             alias_name = self._get_resolved_alias_name("AutoPublishAlias", self.AutoPublishAlias, intrinsics_resolver)
-            lambda_version = self._construct_version(lambda_function, intrinsics_resolver=intrinsics_resolver)
+            code_sha256 = self.AutoPublishCodeSha256
+            lambda_version = self._construct_version(
+                lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
+            )
             lambda_alias = self._construct_alias(alias_name, lambda_function, lambda_version)
             resources.append(lambda_version)
             resources.append(lambda_alias)
@@ -148,7 +152,7 @@ class SamFunction(SamResourceMacro):
         if self.EventInvokeConfig:
             function_name = lambda_function.logical_id
             event_invoke_resources, event_invoke_policies = self._construct_event_invoke_config(
-                function_name, alias_name, intrinsics_resolver, conditions
+                function_name, alias_name, lambda_alias, intrinsics_resolver, conditions
             )
             resources.extend(event_invoke_resources)
 
@@ -164,14 +168,18 @@ class SamFunction(SamResourceMacro):
 
         try:
             resources += self._generate_event_resources(
-                lambda_function, execution_role, kwargs["event_resources"], lambda_alias=lambda_alias
+                lambda_function,
+                execution_role,
+                kwargs["event_resources"],
+                intrinsics_resolver,
+                lambda_alias=lambda_alias,
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
         return resources
 
-    def _construct_event_invoke_config(self, function_name, lambda_alias, intrinsics_resolver, conditions):
+    def _construct_event_invoke_config(self, function_name, alias_name, lambda_alias, intrinsics_resolver, conditions):
         """
         Create a `AWS::Lambda::EventInvokeConfig` based on the input dict `EventInvokeConfig`
         """
@@ -182,7 +190,14 @@ class SamFunction(SamResourceMacro):
         resolved_event_invoke_config = intrinsics_resolver.resolve_parameter_refs(self.EventInvokeConfig)
 
         logical_id = "{id}EventInvokeConfig".format(id=function_name)
-        lambda_event_invoke_config = LambdaEventInvokeConfig(logical_id=logical_id, attributes=self.resource_attributes)
+        if lambda_alias:
+            lambda_event_invoke_config = LambdaEventInvokeConfig(
+                logical_id=logical_id, depends_on=[lambda_alias.logical_id], attributes=self.resource_attributes
+            )
+        else:
+            lambda_event_invoke_config = LambdaEventInvokeConfig(
+                logical_id=logical_id, attributes=self.resource_attributes
+            )
 
         dest_config = {}
         input_dest_config = resolved_event_invoke_config.get("DestinationConfig")
@@ -209,8 +224,8 @@ class SamFunction(SamResourceMacro):
                 policy_document.append(policy)
 
         lambda_event_invoke_config.FunctionName = ref(function_name)
-        if lambda_alias:
-            lambda_event_invoke_config.Qualifier = lambda_alias
+        if alias_name:
+            lambda_event_invoke_config.Qualifier = alias_name
         else:
             lambda_event_invoke_config.Qualifier = "$LATEST"
         lambda_event_invoke_config.DestinationConfig = dest_config
@@ -416,7 +431,7 @@ class SamFunction(SamResourceMacro):
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXrayWriteOnlyAccess"))
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXRayDaemonWriteAccess"))
         if self.VpcConfig:
             managed_policy_arns.append(
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
@@ -515,7 +530,7 @@ class SamFunction(SamResourceMacro):
         if not self.DeadLetterQueue.get("Type") or not self.DeadLetterQueue.get("TargetArn"):
             raise InvalidResourceException(
                 self.logical_id,
-                "'DeadLetterQueue' requires Type and TargetArn properties to be specified".format(valid_dlq_types),
+                "'DeadLetterQueue' requires Type and TargetArn properties to be specified.".format(valid_dlq_types),
             )
 
         # Validate required Types
@@ -552,7 +567,9 @@ class SamFunction(SamResourceMacro):
             return logical_id
         return event_dict.get("Properties", {}).get("Path", logical_id)
 
-    def _generate_event_resources(self, lambda_function, execution_role, event_resources, lambda_alias=None):
+    def _generate_event_resources(
+        self, lambda_function, execution_role, event_resources, intrinsics_resolver, lambda_alias=None
+    ):
         """Generates and returns the resources associated with this function's events.
 
         :param model.lambda_.LambdaFunction lambda_function: generated Lambda function
@@ -580,6 +597,7 @@ class SamFunction(SamResourceMacro):
                     # When Alias is provided, connect all event sources to the alias and *not* the function
                     "function": lambda_alias or lambda_function,
                     "role": execution_role,
+                    "intrinsics_resolver": intrinsics_resolver,
                 }
 
                 for name, resource in event_resources[logical_id].items():
@@ -596,7 +614,7 @@ class SamFunction(SamResourceMacro):
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
 
-    def _construct_version(self, function, intrinsics_resolver):
+    def _construct_version(self, function, intrinsics_resolver, code_sha256=None):
         """Constructs a Lambda Version resource that will be auto-published when CodeUri of the function changes.
         Old versions will not be deleted without a direct reference from the CloudFormation template.
 
@@ -604,6 +622,7 @@ class SamFunction(SamResourceMacro):
         :param model.intrinsics.resolver.IntrinsicsResolver intrinsics_resolver: Class that can help resolve
             references to parameters present in CodeUri. It is a common usecase to set S3Key of Code to be a
             template parameter. Need to resolve the values otherwise we will never detect a change in Code dict
+        :param str code_sha256: User predefined hash of the Lambda function code
         :return: Lambda function Version resource
         """
         code_dict = function.Code
@@ -635,7 +654,7 @@ class SamFunction(SamResourceMacro):
         # SHA Collisions: For purposes of triggering a new update, we are concerned about just the difference previous
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
         prefix = "{id}Version".format(id=self.logical_id)
-        logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict).gen()
+        logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
@@ -696,7 +715,7 @@ class SamFunction(SamResourceMacro):
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
                 raise InvalidResourceException(
-                    self.logical_id, "'DeploymentPreference' requires AutoPublishAlias property to be specified"
+                    self.logical_id, "'DeploymentPreference' requires AutoPublishAlias property to be specified."
                 )
             if lambda_alias is None:
                 raise ValueError("lambda_alias expected for updating it with the appropriate update policy")
@@ -760,6 +779,7 @@ class SamApi(SamResourceMacro):
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.BinaryMediaTypes = intrinsics_resolver.resolve_parameter_refs(self.BinaryMediaTypes)
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
+        self.Auth = intrinsics_resolver.resolve_parameter_refs(self.Auth)
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
 
         api_generator = ApiGenerator(
@@ -790,9 +810,16 @@ class SamApi(SamResourceMacro):
             domain=self.Domain,
         )
 
-        rest_api, deployment, stage, permissions, domain, basepath_mapping, route53 = api_generator.to_cloudformation(
-            redeploy_restapi_parameters
-        )
+        (
+            rest_api,
+            deployment,
+            stage,
+            permissions,
+            domain,
+            basepath_mapping,
+            route53,
+            usage_plan_resources,
+        ) = api_generator.to_cloudformation(redeploy_restapi_parameters)
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
@@ -802,6 +829,9 @@ class SamApi(SamResourceMacro):
             resources.extend(basepath_mapping)
         if route53:
             resources.extend([route53])
+        # contains usage plan, api key and usageplan key resources
+        if usage_plan_resources:
+            resources.extend(usage_plan_resources)
         return resources
 
 

@@ -51,7 +51,11 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "Prod"
+        "StageName": "Prod",
+        "AccessLogSettings": {
+          "DestinationArn": "arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName",
+          "Format": "$context.requestId"
+        }
       }
     }, 
     "HttpApiFunctionRole": {
@@ -110,7 +114,13 @@
               }
             }
           }, 
-          "openapi": "3.0.1"
+          "openapi": "3.0.1", 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
         }
       }
     }

@@ -199,6 +199,12 @@
               "Ref": "AWS::StackName"
             }
           }, 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ], 
           "paths": {
             "/hello/again": {
               "Fn::If": [

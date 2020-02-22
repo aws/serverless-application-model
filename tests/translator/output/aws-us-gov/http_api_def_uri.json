@@ -57,13 +57,7 @@
               "Name"
             ]
           ]
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }, 
     "FunctionRole": {
@@ -103,13 +97,7 @@
           "Ref": "MyApi2"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default", 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        "StageName": "$default"
       }
     }, 
     "MyApi2": {
@@ -119,13 +107,7 @@
           "Version": "version", 
           "Bucket": "bucket", 
           "Key": "key"
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }, 
     "FunctionApi2Permission": {
@@ -155,13 +137,7 @@
         "BodyS3Location": {
           "Bucket": "bucket", 
           "Key": "key"
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }
   }

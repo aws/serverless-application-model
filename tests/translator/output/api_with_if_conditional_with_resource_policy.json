@@ -1,0 +1,219 @@
+{
+  "Conditions": {
+    "C1": {
+      "Fn::Equals": [
+        true, 
+        true
+      ]
+    }
+  }, 
+  "Resources": {
+    "ExplicitApiFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ExplicitApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ExplicitApiFunctionPutHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/three", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApiDeploymenta1d4cfbf94": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "Description": "RestApi deployment id: a1d4cfbf94fc1b83780825310ec70e2a1c5e42b4", 
+        "StageName": "Stage"
+      }
+    }, 
+    "ExplicitApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/one": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }, 
+            "/three": {
+              "put": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }, 
+            "/two": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExplicitApiFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}
+              }
+            }
+          }, 
+          "swagger": "2.0", 
+          "x-amazon-apigateway-policy": {
+            "Version": "2012-10-17", 
+            "Statement": {
+              "Fn::If": [
+                "C1", 
+                {
+                  "Action": "execute-api:Invoke", 
+                  "Resource": [
+                    "execute-api:/*/*/*"
+                  ]
+                }, 
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }, 
+    "ExplicitApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeploymenta1d4cfbf94"
+        }, 
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "ExplicitApiFunctionPostHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/two", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "ExplicitApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ExplicitApiFunctionGetHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ExplicitApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/one", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

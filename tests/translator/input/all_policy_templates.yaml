@@ -165,3 +165,6 @@ Resources:
 
         - DynamoDBWritePolicy:
             TableName: name
+
+        - EventBridgePutEventsPolicy:
+            EventBusName: name
