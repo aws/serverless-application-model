@@ -1931,7 +1931,7 @@
         ]
       }
     },
-    "ApiGatewayFullPolicy": {
+    "ApiGatewayFullAccessPolicy": {
       "Description": "Gives full access permissions to any resource in the API Gateway",
       "Parameters": {
 
