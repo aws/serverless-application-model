@@ -162,3 +162,5 @@ Resources:
 
         - EventBridgePutEventsPolicy:
             EventBusName: name
+
+        - ApiGatewayFullAccessPolicy:  {}
