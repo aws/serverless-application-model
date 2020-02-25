@@ -1,7 +1,7 @@
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyFunction:
-    Type: "AWS::Serverless::Function"
+    Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: src/
       Handler: index.handler
