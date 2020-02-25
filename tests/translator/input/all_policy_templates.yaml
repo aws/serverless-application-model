@@ -5,13 +5,12 @@
 
 Resources:
   KitchenSinkFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
       Policies:
-
         - SQSPollerPolicy:
             QueueName: name
 
@@ -119,6 +118,8 @@ Resources:
 
         - PinpointEndpointAccessPolicy:
             PinpointApplicationId: id
+
+        - PinpointValidatePhoneNumberPolicy: {}
 
         - RekognitionDetectOnlyPolicy: {}
 
