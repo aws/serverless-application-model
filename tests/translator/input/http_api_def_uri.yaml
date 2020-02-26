@@ -1,3 +1,8 @@
+Globals:
+  HttpApi:
+    DefaultRouteSettings:
+      ThrottlingRateLimit: 100.0
+
 Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi

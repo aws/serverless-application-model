@@ -64,7 +64,7 @@ class Globals(object):
             "OpenApiVersion",
             "Domain",
         ],
-        SamResourceType.HttpApi.value: ["Auth", "AccessLogSettings", "StageVariables", "Tags"],
+        SamResourceType.HttpApi.value: ["Auth", "AccessLogSettings", "StageVariables", "Tags", "DefaultRouteSettings"],
         SamResourceType.SimpleTable.value: ["SSESpecification"],
     }
 
