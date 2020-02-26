@@ -104,13 +104,7 @@
         "DefaultRouteSettings": {
             "ThrottlingRateLimit": 100
         },
-        "StageName": "$default", 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        "StageName": "$default"
       }
     }, 
     "MyApi2": {
