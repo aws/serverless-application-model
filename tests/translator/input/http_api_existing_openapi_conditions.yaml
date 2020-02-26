@@ -35,6 +35,9 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
       Auth:
         Authorizers:
           OAuth2:
@@ -106,6 +109,9 @@ Resources:
                 - scope4
               responses: {}
         openapi: 3.0.1
+        tags:
+          - name: Tag1
+            description: this tag exists, but doesn't have an amazon extension value
         components:
           securitySchemes:
             oauth2Auth:

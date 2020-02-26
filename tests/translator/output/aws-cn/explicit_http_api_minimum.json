@@ -54,6 +54,12 @@
               "Ref": "AWS::StackName"
             }
           }, 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ], 
           "paths": {}, 
           "openapi": "3.0.1"
         }
@@ -99,6 +105,12 @@
               "Ref": "AWS::StackName"
             }
           }, 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ], 
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {

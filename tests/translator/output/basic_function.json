@@ -303,7 +303,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+          "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
         ],
         "Tags": [
           {
@@ -334,7 +334,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+          "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
         ],
         "Tags": [
           {

@@ -13,6 +13,7 @@ Globals:
           Fn::If:
             - C1
             - Principal: '*'
+              Effect: Allow
               Action: execute-api:Invoke
               Resource: 
                 - execute-api:/Prod/PUT/get
@@ -20,6 +21,7 @@ Globals:
                 IpAddress:
                   aws:SourceIp: 1.2.3.4
             - Principal: '*'
+              Effect: Allow
               Action: execute-api:Invoke
               Resource: 
                 - execute-api:/Prod/PUT/get
