@@ -4,7 +4,7 @@ from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
-from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_if
+from samtranslator.model.intrinsics import is_intrinsic
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 import json
 
@@ -406,7 +406,6 @@ class OpenApiEditor(object):
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
         :param bool/None allowed_credentials: Flags whether request is allowed to contain credentials.
-        :raises ValueError: When values for one of the allowed_* variables is empty
         """
         ALLOW_ORIGINS = "allowOrigins"
         ALLOW_HEADERS = "allowHeaders"
@@ -428,8 +427,9 @@ class OpenApiEditor(object):
             cors_configuration_dict = json.loads(cors_configuration_string)
             cors_configuration.update(cors_configuration_dict)
 
-        elif allowed_origins:
-            cors_configuration[ALLOW_ORIGINS] = allowed_origins
+        else:
+            if allowed_origins:
+                cors_configuration[ALLOW_ORIGINS] = allowed_origins
             if allowed_headers:
                 cors_configuration[ALLOW_HEADERS] = allowed_headers
             if allowed_methods:

@@ -870,7 +870,7 @@ class SamHttpApi(SamResourceMacro):
     referable_properties = {"Stage": ApiGatewayV2Stage.resource_type}
 
     def to_cloudformation(self, **kwargs):
-        """Returns the API Gatewayv2 Api, Deployment, and Stage to which this SAM Api corresponds.
+        """Returns the API GatewayV2 Api, Deployment, and Stage to which this SAM Api corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
         macro to pure CloudFormation
