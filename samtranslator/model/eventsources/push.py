@@ -385,7 +385,7 @@ class SNS(PushEventSource):
         if not function:
             raise TypeError("Missing required keyword argument: function")
 
-        if self.RedrivePolicy != None and "deadLetterTargetArn" not in self.RedrivePolicy:
+        if self.RedrivePolicy is not None and "deadLetterTargetArn" not in self.RedrivePolicy:
             raise TypeError("RedrivePolicy must have a deadLetterTargetArn")
 
         # SNS -> Lambda
