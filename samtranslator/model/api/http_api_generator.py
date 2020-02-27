@@ -234,8 +234,6 @@ class HttpApiGenerator(object):
                 invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
                 if re.search(invalid_regex, path) is not None:
                     raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
-                if re.match(r"^\/*[a-z0-9]+[\-\_]?[a-z0-9]+", path) is None:
-                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
                 m = re.search(r"[a-z0-9]+[\-\_]?[a-z0-9]+", path)
                 path = m.string[m.start(0) : m.end(0)]
                 if path is None:
