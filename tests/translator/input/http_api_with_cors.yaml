@@ -1,14 +1,23 @@
+Conditions:
+  C1:
+    Fn::Equals:
+      - true
+      - true
+
 Globals:
   HttpApi:
     CorsConfiguration:
-      AllowHeaders:
-        - x-apigateway-header
-      AllowMethods:
-        - GET
-      AllowOrigins:
-        - https://foo.com
-      ExposeHeaders:
-        - x-amzm-header
+      Fn::If:
+        - C1
+        - AllowHeaders:
+            - x-apigateway-header
+          AllowMethods:
+            - GET
+          AllowOrigins:
+            - https://foo.com
+          ExposeHeaders:
+            - x-amzn-header
+        - AWS::NoValue
 
 Resources:
   HttpApiFunction:

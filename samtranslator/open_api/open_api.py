@@ -4,7 +4,9 @@ from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
+from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_if
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+import json
 
 
 class OpenApiEditor(object):
@@ -390,8 +392,8 @@ class OpenApiEditor(object):
         Add CORS configuration to this Api to _X_APIGW_CORS header in open api definition
 
         Following this guide:
-        https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html#enable-cors-for-resource-using-swagger-importer-tool
-        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-cors-configuration.html
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-cors.html
 
         :param list/dict allowed_origins: Comma separate list of allowed origins.
             Value can also be an intrinsic function dict.
@@ -406,28 +408,38 @@ class OpenApiEditor(object):
         :param bool/None allowed_credentials: Flags whether request is allowed to contain credentials.
         :raises ValueError: When values for one of the allowed_* variables is empty
         """
-
-        cors_configuration = dict()
-
         ALLOW_ORIGINS = "allowOrigins"
         ALLOW_HEADERS = "allowHeaders"
         ALLOW_METHODS = "allowMethods"
         EXPOSE_HEADERS = "exposeHeaders"
         MAX_AGE = "maxAge"
         ALLOW_CREDENTIALS = "allowCredentials"
+        cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
         cors_configuration = self._doc.get(self._X_APIGW_CORS, dict())
-        if allowed_origins:
+
+        # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
+        if allowed_origins and is_intrinsic(allowed_origins):
+            cors_configuration_string = json.dumps(allowed_origins)
+            for header in cors_headers:
+                keyword = header[0].upper() + header[1:]
+                count = cors_configuration_string.count(keyword)
+                cors_configuration_string = cors_configuration_string.replace(keyword, header, count)
+
+            cors_configuration_dict = json.loads(cors_configuration_string)
+            cors_configuration.update(cors_configuration_dict)
+
+        elif allowed_origins:
             cors_configuration[ALLOW_ORIGINS] = allowed_origins
-        if allowed_headers:
-            cors_configuration[ALLOW_HEADERS] = allowed_headers
-        if allowed_methods:
-            cors_configuration[ALLOW_METHODS] = allowed_methods
-        if expose_headers:
-            cors_configuration[EXPOSE_HEADERS] = expose_headers
-        if max_age is not None:
-            cors_configuration[MAX_AGE] = max_age
-        if allowed_credentials is True:
-            cors_configuration[ALLOW_CREDENTIALS] = allowed_credentials
+            if allowed_headers:
+                cors_configuration[ALLOW_HEADERS] = allowed_headers
+            if allowed_methods:
+                cors_configuration[ALLOW_METHODS] = allowed_methods
+            if expose_headers:
+                cors_configuration[EXPOSE_HEADERS] = expose_headers
+            if max_age is not None:
+                cors_configuration[MAX_AGE] = max_age
+            if allowed_credentials is True:
+                cors_configuration[ALLOW_CREDENTIALS] = allowed_credentials
 
         self._doc[self._X_APIGW_CORS] = cors_configuration
 

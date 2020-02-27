@@ -1,4 +1,12 @@
 {
+  "Conditions": {
+    "C1": {
+      "Fn::Equals": [
+        true,
+        true
+      ]
+    }
+  },
   "Resources": {
     "MyApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage",
@@ -46,18 +54,30 @@
               }
             }
           },
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ],
           "x-amazon-apigateway-cors": {
-            "allowHeaders": [
-              "x-apigateway-header"
-            ],
-            "allowMethods": [
-              "GET"
-            ],
-            "allowOrigins": [
-              "https://foo.com"
-            ],
-            "exposeHeaders": [
-              "x-amzm-header"
+            "Fn::If": [
+              "C1",
+              {
+                "allowHeaders": [
+                  "x-apigateway-header"
+                ],
+                "allowMethods": [
+                  "GET"
+                ],
+                "allowOrigins": [
+                  "https://foo.com"
+                ],
+                "exposeHeaders": [
+                  "x-amzn-header"
+                ]
+              },
+              "AWS::NoValue"
             ]
           },
           "openapi": "3.0.1"
@@ -184,18 +204,30 @@
               }
             }
           },
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ],
           "x-amazon-apigateway-cors": {
-            "allowHeaders": [
-              "x-apigateway-header"
-            ],
-            "allowMethods": [
-              "GET"
-            ],
-            "allowOrigins": [
-              "https://foo.com"
-            ],
-            "exposeHeaders": [
-              "x-amzm-header"
+            "Fn::If": [
+              "C1",
+              {
+                "allowHeaders": [
+                  "x-apigateway-header"
+                ],
+                "allowMethods": [
+                  "GET"
+                ],
+                "allowOrigins": [
+                  "https://foo.com"
+                ],
+                "exposeHeaders": [
+                  "x-amzn-header"
+                ]
+              },
+              "AWS::NoValue"
             ]
           },
           "openapi": "3.0.1"

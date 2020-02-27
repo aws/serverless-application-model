@@ -34,7 +34,7 @@ Resources:
         AllowOrigins:
           - https://foo.com
         ExposeHeaders:
-          - x-amzm-header
+          - x-amzn-header
       DefinitionBody:
         info:
           version: '1.0'

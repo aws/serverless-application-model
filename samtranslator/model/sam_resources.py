@@ -878,6 +878,8 @@ class SamHttpApi(SamResourceMacro):
         :rtype: list
         """
         resources = []
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)
 
         api_generator = HttpApiGenerator(
             self.logical_id,
