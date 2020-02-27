@@ -36,6 +36,25 @@ class ApiGatewayV2Stage(Resource):
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
 
 
+class ApiGatewayV2DomainName(Resource):
+    resource_type = "AWS::ApiGatewayV2::DomainName"
+    property_types = {
+        "DomainName": PropertyType(True, is_str()),
+        "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),
+        "Tags": PropertyType(False, list_of(is_type(dict))),
+    }
+
+
+class ApiGatewayV2ApiMapping(Resource):
+    resource_type = "AWS::ApiGatewayV2::ApiMapping"
+    property_types = {
+        "ApiId": PropertyType(True, is_str()),
+        "ApiMappingKey": PropertyType(False, is_str()),
+        "DomainName": PropertyType(True, is_str()),
+        "Stage": PropertyType(True, is_str()),
+    }
+
+
 class ApiGatewayV2Authorizer(object):
     def __init__(
         self,
