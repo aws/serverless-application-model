@@ -6,7 +6,7 @@ Example SAM template to configure CORS for HttpApi
 
 ```bash
 $ sam deploy \
-    --template-file /path_to_template/packaged-template.yaml \
+    --template-file template.yaml \
     --stack-name my-stack-name \
     --capabilities CAPABILITY_IAM
 ```

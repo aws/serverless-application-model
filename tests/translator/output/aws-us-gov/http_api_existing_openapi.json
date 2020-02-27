@@ -108,13 +108,17 @@
             }
           ],
           "x-amazon-apigateway-cors": {
-            "allowOrigins": [
-              "https://foo.com"
+            "allowHeaders": [
+              "x-apigateway-header"
             ],
             "allowMethods": [
-              "GET",
-              "POST"
-            ]
+              "GET"
+            ],
+            "allowOrigins": [
+              "https://global.com",
+              "https://local.com"
+            ],
+            "maxAge": 6000
           },
           "paths": {
             "/basic": {

@@ -381,12 +381,12 @@ class OpenApiEditor(object):
 
     def add_cors(
         self,
-        allowed_origins,
-        allowed_headers=None,
-        allowed_methods=None,
+        allow_origins,
+        allow_headers=None,
+        allow_methods=None,
         expose_headers=None,
         max_age=None,
-        allowed_credentials=None,
+        allow_credentials=None,
     ):
         """
         Add CORS configuration to this Api to _X_APIGW_CORS header in open api definition
@@ -417,29 +417,28 @@ class OpenApiEditor(object):
         cors_configuration = self._doc.get(self._X_APIGW_CORS, dict())
 
         # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
-        if allowed_origins and is_intrinsic(allowed_origins):
-            cors_configuration_string = json.dumps(allowed_origins)
+        if allow_origins and is_intrinsic(allow_origins):
+            cors_configuration_string = json.dumps(allow_origins)
             for header in cors_headers:
+                # example: allowOrigins to AllowOrigins
                 keyword = header[0].upper() + header[1:]
-                count = cors_configuration_string.count(keyword)
-                cors_configuration_string = cors_configuration_string.replace(keyword, header, count)
-
+                cors_configuration_string = cors_configuration_string.replace(keyword, header)
             cors_configuration_dict = json.loads(cors_configuration_string)
             cors_configuration.update(cors_configuration_dict)
 
         else:
-            if allowed_origins:
-                cors_configuration[ALLOW_ORIGINS] = allowed_origins
-            if allowed_headers:
-                cors_configuration[ALLOW_HEADERS] = allowed_headers
-            if allowed_methods:
-                cors_configuration[ALLOW_METHODS] = allowed_methods
+            if allow_origins:
+                cors_configuration[ALLOW_ORIGINS] = allow_origins
+            if allow_headers:
+                cors_configuration[ALLOW_HEADERS] = allow_headers
+            if allow_methods:
+                cors_configuration[ALLOW_METHODS] = allow_methods
             if expose_headers:
                 cors_configuration[EXPOSE_HEADERS] = expose_headers
             if max_age is not None:
                 cors_configuration[MAX_AGE] = max_age
-            if allowed_credentials is True:
-                cors_configuration[ALLOW_CREDENTIALS] = allowed_credentials
+            if allow_credentials is True:
+                cors_configuration[ALLOW_CREDENTIALS] = allow_credentials
 
         self._doc[self._X_APIGW_CORS] = cors_configuration
 
