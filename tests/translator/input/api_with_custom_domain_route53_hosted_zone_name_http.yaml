@@ -5,6 +5,17 @@ Parameters:
   ACMCertificateArn:
     Type: String
     Default: 'cert-arn-in-us-east-1'
+Globals:
+  HttpApi:
+    Domain:
+      DomainName: !Ref DomainName
+      CertificateArn: !Ref ACMCertificateArn
+      EndpointConfiguration: EDGE
+      BasePath:
+        - /one
+      Route53:
+        HostedZoneName: www.my-domain.com.
+        IpV6: false
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -31,12 +42,3 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
-      Domain:
-        DomainName: !Ref DomainName
-        CertificateArn: !Ref ACMCertificateArn
-        EndpointConfiguration: EDGE
-        BasePath:
-          - /one
-        Route53:
-         HostedZoneName: www.my-domain.com.
-         IpV6: false
