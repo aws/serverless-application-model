@@ -46,7 +46,6 @@ Resources:
           version: '1.0'
           title:
             Ref: AWS::StackName
-        # when this is specified `CorsConfiguration` property is ignored
         x-amazon-apigateway-cors:
           allowOrigins:
             - "https://www.overriden.com"

@@ -148,8 +148,8 @@ class HttpApiGenerator(object):
             )
 
         editor = OpenApiEditor(self.definition_body)
-        # if CORS is set in both definition_body and as a CORSConfiguration property,
-        # SAM merges and overrides the cors headers in definition_body with headers of CORSConfiguration
+        # if CORS is set in both definition_body and as a CorsConfiguration property,
+        # SAM merges and overrides the cors headers in definition_body with headers of CorsConfiguration
         editor.add_cors(
             properties.AllowOrigins,
             properties.AllowHeaders,
@@ -159,7 +159,7 @@ class HttpApiGenerator(object):
             properties.AllowCredentials,
         )
 
-        # Assign the Swagger back to template
+        # Assign the OpenApi back to template
         self.definition_body = editor.openapi
 
     def _add_auth(self):
