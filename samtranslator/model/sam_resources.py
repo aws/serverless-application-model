@@ -872,7 +872,7 @@ class SamHttpApi(SamResourceMacro):
         "DefinitionBody": PropertyType(False, is_type(dict)),
         "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
         "StageVariables": PropertyType(False, is_type(dict)),
-        "Cors": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "CorsConfiguration": PropertyType(False, one_of(is_type(bool), is_type(dict))),
         "AccessLogSettings": PropertyType(False, is_type(dict)),
         "DefaultRouteSettings": PropertyType(False, is_type(dict)),
         "Auth": PropertyType(False, is_type(dict)),
@@ -881,7 +881,7 @@ class SamHttpApi(SamResourceMacro):
     referable_properties = {"Stage": ApiGatewayV2Stage.resource_type}
 
     def to_cloudformation(self, **kwargs):
-        """Returns the API Gateway RestApi, Deployment, and Stage to which this SAM Api corresponds.
+        """Returns the API GatewayV2 Api, Deployment, and Stage to which this SAM Api corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
         macro to pure CloudFormation
@@ -889,6 +889,8 @@ class SamHttpApi(SamResourceMacro):
         :rtype: list
         """
         resources = []
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)
 
         api_generator = HttpApiGenerator(
             self.logical_id,
@@ -899,6 +901,7 @@ class SamHttpApi(SamResourceMacro):
             self.StageName,
             tags=self.Tags,
             auth=self.Auth,
+            cors_configuration=self.CorsConfiguration,
             access_log_settings=self.AccessLogSettings,
             default_route_settings=self.DefaultRouteSettings,
             resource_attributes=self.resource_attributes,

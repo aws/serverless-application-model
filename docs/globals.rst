@@ -96,6 +96,7 @@ Currently, the following resources and properties are being supported:
       # Properties of AWS::Serverless::HttpApi
       # Also works with Implicit APIs
       Auth:
+      CorsConfiguration:
       AccessLogSettings:
       Tags:
       DefaultRouteSettings:
