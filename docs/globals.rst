@@ -96,6 +96,9 @@ Currently, the following resources and properties are being supported:
       # Properties of AWS::Serverless::HttpApi
       # Also works with Implicit APIs
       Auth:
+      AccessLogSettings:
+      Tags:
+      DefaultRouteSettings:
 
     SimpleTable:
       # Properties of AWS::Serverless::SimpleTable
