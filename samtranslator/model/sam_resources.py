@@ -661,7 +661,17 @@ class SamFunction(SamResourceMacro):
         # SHA Collisions: For purposes of triggering a new update, we are concerned about just the difference previous
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
         prefix = "{id}Version".format(id=self.logical_id)
-        logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict, code_sha256).gen()
+        logical_dict = {}
+        try:
+            logical_dict = code_dict.copy()
+        except (AttributeError, UnboundLocalError):
+            pass
+        else:
+            if function.Environment:
+                logical_dict.update(function.Environment)
+            if function.MemorySize:
+                logical_dict.update({"MemorySize": function.MemorySize})
+        logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
