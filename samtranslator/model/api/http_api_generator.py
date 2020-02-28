@@ -204,7 +204,7 @@ class HttpApiGenerator(object):
         elif endpoint not in ["EDGE", "REGIONAL"]:
             raise InvalidResourceException(
                 self.logical_id,
-                "EndpointConfiguration for Custom Domains must be" " one of {}.".format(["EDGE", "REGIONAL"]),
+                "EndpointConfiguration for Custom Domains must be one of {}.".format(["EDGE", "REGIONAL"]),
             )
         domain_config["EndpointType"] = endpoint
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
@@ -280,7 +280,7 @@ class HttpApiGenerator(object):
         recordset_list.extend([recordset])
 
         recordset_ipv6 = {}
-        if route53.get("IpV6") is not None and route53.get("IpV6") is True:
+        if route53.get("IpV6"):
             recordset_ipv6["Name"] = domain.get("DomainName")
             recordset_ipv6["Type"] = "AAAA"
             recordset_ipv6["AliasTarget"] = self._construct_alias_target(self.domain)
