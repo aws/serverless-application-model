@@ -221,6 +221,11 @@ class HttpApiGenerator(object):
         basepath_resource_list = self._construct_basepath_mappings(basepaths, http_api)
 
         # Create the Route53 RecordSetGroup resource
+        record_set_group = self._construct_route53_recordsetgroup()
+
+        return domain, basepath_resource_list, record_set_group
+
+    def _construct_route53_recordsetgroup(self):
         record_set_group = None
         if self.domain.get("Route53") is not None:
             route53 = self.domain.get("Route53")
@@ -237,11 +242,11 @@ class HttpApiGenerator(object):
             )
             if "HostedZoneId" in route53:
                 record_set_group.HostedZoneId = route53.get("HostedZoneId")
-            if "HostedZoneName" in route53 and "HostedZoneId" not in route53:
+            elif "HostedZoneName" in route53:
                 record_set_group.HostedZoneName = route53.get("HostedZoneName")
             record_set_group.RecordSets = self._construct_record_sets_for_domain(self.domain)
 
-        return domain, basepath_resource_list, record_set_group
+        return record_set_group
 
     def _construct_basepath_mappings(self, basepaths, http_api):
         basepath_resource_list = []
