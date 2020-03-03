@@ -106,7 +106,20 @@
               "name": "httpapi:createdBy", 
               "x-amazon-apigateway-tag-value": "SAM"
             }
-          ], 
+          ],
+          "x-amazon-apigateway-cors": {
+            "allowHeaders": [
+              "x-apigateway-header"
+            ],
+            "allowMethods": [
+              "GET"
+            ],
+            "allowOrigins": [
+              "https://global.com",
+              "https://local.com"
+            ],
+            "maxAge": 6000
+          },
           "paths": {
             "/basic": {
               "post": {

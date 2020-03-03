@@ -1015,7 +1015,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     "condition",
                     {"Action": "execute-api:Invoke", "Resource": ["execute-api:/*/*/*"]},
                     {"Action": "execute-api:blah", "Resource": ["execute-api:/*/*/*"]},
-                ],
+                ]
             }
         }
 

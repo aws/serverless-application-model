@@ -1,4 +1,11 @@
 {
+  "Parameters": {
+    "CorsParam": {
+      "Default": true,
+      "Type": "String"
+    }
+  },
+
   "Resources": {
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
@@ -103,7 +110,12 @@
               "name": "httpapi:createdBy", 
               "x-amazon-apigateway-tag-value": "SAM"
             }
-          ], 
+          ],
+          "x-amazon-apigateway-cors": {
+            "allowOrigins": [
+              "*"
+            ]
+          },
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {

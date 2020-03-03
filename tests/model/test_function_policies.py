@@ -85,7 +85,7 @@ class TestFunctionPolicies(TestCase):
         result = self.function_policies._get_type(policy)
         self.assertEqual(result, expected)
 
-    @patch("samtranslator.model.function_policies.is_instrinsic")
+    @patch("samtranslator.model.function_policies.is_intrinsic")
     def test_get_type_must_work_for_managed_policy_with_intrinsics(self, is_intrinsic_mock):
         policy = {"Ref": "somevalue"}
         expected = PolicyTypes.MANAGED_POLICY

@@ -1,4 +1,10 @@
 {
+  "Parameters": {
+    "CorsParam": {
+      "Default": true,
+      "Type": "String"
+    }
+  },
   "Resources": {
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
@@ -97,7 +103,12 @@
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
+          "x-amazon-apigateway-cors": {
+            "allowOrigins": [
+              "*"
+            ]
+          },
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {

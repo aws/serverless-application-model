@@ -348,6 +348,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "http_api_explicit_stage",
                 "http_api_def_uri",
                 "explicit_http_api",
+                "http_api_with_cors",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -611,6 +612,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_with_event_dest_type",
         "error_function_with_api_key_false",
         "error_api_with_usage_plan_invalid_parameter",
+        "error_http_api_with_cors_def_uri",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

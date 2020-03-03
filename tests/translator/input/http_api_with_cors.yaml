@@ -1,0 +1,57 @@
+Conditions:
+  C1:
+    Fn::Equals:
+      - true
+      - true
+
+Globals:
+  HttpApi:
+    CorsConfiguration:
+      Fn::If:
+        - C1
+        - AllowHeaders:
+            - x-apigateway-header
+          AllowMethods:
+            - GET
+          AllowOrigins:
+            - https://foo.com
+          ExposeHeaders:
+            - x-amzn-header
+        - AWS::NoValue
+
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+         exports.handler = async (event) => {
+          console.log("Hello from MyAuthFunction")
+           return {
+           statusCode: 200,
+           body: JSON.stringify(event),
+           headers: {}
+           }
+         }
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        SimpleCase:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+        ImplicitApi:
+          Type: HttpApi
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        info:
+          version: '1.0'
+          title:
+            Ref: AWS::StackName
+        paths:
+          "$default":
+            x-amazon-apigateway-any-method:
+              isDefaultRoute: true
+        openapi: 3.0.1
