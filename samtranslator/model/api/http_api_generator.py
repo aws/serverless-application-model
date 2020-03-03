@@ -218,33 +218,7 @@ class HttpApiGenerator(object):
             basepaths = self.domain.get("BasePath")
         else:
             basepaths = None
-
-        basepath_resource_list = []
-
-        if basepaths is None:
-            basepath_mapping = ApiGatewayV2ApiMapping(
-                self.logical_id + "ApiMapping", attributes=self.passthrough_resource_attributes
-            )
-            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
-            basepath_mapping.ApiId = ref(http_api.logical_id)
-            basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
-            basepath_resource_list.extend([basepath_mapping])
-        else:
-            for path in basepaths:
-                invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
-                if re.search(invalid_regex, path) is not None:
-                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
-                m = re.search(r"[a-z0-9]+[\-\_]?[a-z0-9]+", path)
-                path = m.string[m.start(0) : m.end(0)]
-                if path is None:
-                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided")
-                logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-\_]+", "", path), "ApiMapping")
-                basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
-                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
-                basepath_mapping.ApiId = ref(http_api.logical_id)
-                basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
-                basepath_mapping.ApiMappingKey = path
-                basepath_resource_list.extend([basepath_mapping])
+        basepath_resource_list = self._construct_basepath_mappings(basepaths, http_api)
 
         # Create the Route53 RecordSetGroup resource
         record_set_group = None
@@ -268,6 +242,37 @@ class HttpApiGenerator(object):
             record_set_group.RecordSets = self._construct_record_sets_for_domain(self.domain)
 
         return domain, basepath_resource_list, record_set_group
+
+    def _construct_basepath_mappings(self, basepaths, http_api):
+        basepath_resource_list = []
+
+        if basepaths is None:
+            basepath_mapping = ApiGatewayV2ApiMapping(
+                self.logical_id + "ApiMapping", attributes=self.passthrough_resource_attributes
+            )
+            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+            basepath_mapping.ApiId = ref(http_api.logical_id)
+            basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
+            basepath_resource_list.extend([basepath_mapping])
+        else:
+            for path in basepaths:
+                # search for invalid characters in the path and raise error if there are
+                invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
+                if re.search(invalid_regex, path) is not None:
+                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+                # ignore leading and trailing `/` in the path name
+                m = re.search(r"[a-zA-Z0-9]+[\-\_]?[a-zA-Z0-9]+", path)
+                path = m.string[m.start(0) : m.end(0)]
+                if path is None:
+                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+                logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-\_]+", "", path), "ApiMapping")
+                basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
+                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+                basepath_mapping.ApiId = ref(http_api.logical_id)
+                basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
+                basepath_mapping.ApiMappingKey = path
+                basepath_resource_list.extend([basepath_mapping])
+        return basepath_resource_list
 
     def _construct_record_sets_for_domain(self, domain):
         recordset_list = []
