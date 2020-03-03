@@ -48,7 +48,11 @@
         "ApiId": {
           "Ref": "MyApi"
         }, 
-        "AutoDeploy": true, 
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+          "ThrottlingBurstLimit": 50,
+          "ThrottlingRateLimit": 100.0
+        }, 
         "StageName": {
           "Fn::Join": [
             "", 
@@ -96,7 +100,10 @@
         "ApiId": {
           "Ref": "MyApi2"
         }, 
-        "AutoDeploy": true, 
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+            "ThrottlingRateLimit": 100
+        },
         "StageName": "$default"
       }
     }, 

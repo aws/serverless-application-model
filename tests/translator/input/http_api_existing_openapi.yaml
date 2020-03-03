@@ -2,8 +2,20 @@ Parameters:
   Timeout:
     Default: 15000
     Type: Number
+
+Globals:
+  HttpApi:
+    CorsConfiguration:
+      AllowHeaders:
+        - x-apigateway-header
+      AllowMethods:
+        - GET
+      AllowOrigins:
+        - https://global.com
+      MaxAge: 6000
+
 Resources:
-  HttpApiFunction: 
+  HttpApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
@@ -26,11 +38,20 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - "https://local.com"
       DefinitionBody:
         info:
           version: '1.0'
           title:
             Ref: AWS::StackName
+        x-amazon-apigateway-cors:
+          allowOrigins:
+            - "https://www.overriden.com"
+          allowMethods:
+            - "POST"
+          maxAge: 3600
         paths:
           "/basic":
             post:

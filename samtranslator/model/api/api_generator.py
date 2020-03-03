@@ -18,7 +18,7 @@ from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.model.intrinsics import is_instrinsic, fnSub
+from samtranslator.model.intrinsics import is_intrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -430,7 +430,7 @@ class ApiGenerator(object):
                 self.logical_id, "Cors works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
-        if isinstance(self.cors, string_types) or is_instrinsic(self.cors):
+        if isinstance(self.cors, string_types) or is_intrinsic(self.cors):
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)
         elif isinstance(self.cors, dict):

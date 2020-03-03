@@ -2,7 +2,7 @@ from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.intrinsics import fnSub, is_instrinsic
+from samtranslator.model.intrinsics import fnSub, is_intrinsic
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 import copy
@@ -149,7 +149,7 @@ class DeploymentPreferenceCollection(object):
             for i in range(len(value)):
                 value[i] = self._replace_deployment_types(value[i])
             return value
-        elif is_instrinsic(value):
+        elif is_intrinsic(value):
             for (k, v) in value.items():
                 value[k] = self._replace_deployment_types(v, k)
             return value

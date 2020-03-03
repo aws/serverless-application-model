@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from six import string_types
 
-from samtranslator.model.intrinsics import is_instrinsic, is_intrinsic_if, is_intrinsic_no_value
+from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidTemplateException
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
@@ -126,7 +126,7 @@ class FunctionPolicies(object):
             return self._get_type_from_intrinsic_if(policy)
 
         # Intrinsic functions are treated as managed policies by default
-        if is_instrinsic(policy):
+        if is_intrinsic(policy):
             return PolicyTypes.MANAGED_POLICY
 
         # Policy statement is a dictionary with the key "Statement" in it
