@@ -18,7 +18,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayUsagePlanKey,
     ApiGatewayApiKey,
 )
-from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage
+from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
@@ -879,7 +879,10 @@ class SamHttpApi(SamResourceMacro):
         "Domain": PropertyType(False, is_type(dict)),
     }
 
-    referable_properties = {"Stage": ApiGatewayV2Stage.resource_type}
+    referable_properties = {
+        "Stage": ApiGatewayV2Stage.resource_type,
+        "DomainName": ApiGatewayV2DomainName.resource_type,
+    }
 
     def to_cloudformation(self, **kwargs):
         """Returns the API GatewayV2 Api, Deployment, and Stage to which this SAM Api corresponds.
