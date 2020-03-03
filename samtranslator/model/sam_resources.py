@@ -18,7 +18,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayUsagePlanKey,
     ApiGatewayApiKey,
 )
-from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage
+from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
@@ -876,9 +876,13 @@ class SamHttpApi(SamResourceMacro):
         "AccessLogSettings": PropertyType(False, is_type(dict)),
         "DefaultRouteSettings": PropertyType(False, is_type(dict)),
         "Auth": PropertyType(False, is_type(dict)),
+        "Domain": PropertyType(False, is_type(dict)),
     }
 
-    referable_properties = {"Stage": ApiGatewayV2Stage.resource_type}
+    referable_properties = {
+        "Stage": ApiGatewayV2Stage.resource_type,
+        "DomainName": ApiGatewayV2DomainName.resource_type,
+    }
 
     def to_cloudformation(self, **kwargs):
         """Returns the API GatewayV2 Api, Deployment, and Stage to which this SAM Api corresponds.
@@ -891,6 +895,9 @@ class SamHttpApi(SamResourceMacro):
         resources = []
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)
+
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
 
         api_generator = HttpApiGenerator(
             self.logical_id,
@@ -906,11 +913,18 @@ class SamHttpApi(SamResourceMacro):
             default_route_settings=self.DefaultRouteSettings,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+            domain=self.Domain,
         )
 
-        http_api, stage = api_generator.to_cloudformation()
+        (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()
 
         resources.append(http_api)
+        if domain:
+            resources.append(domain)
+        if basepath_mapping:
+            resources.extend(basepath_mapping)
+        if route53:
+            resources.append(route53)
 
         # Stage is now optional. Only add it if one is created.
         if stage:

@@ -71,6 +71,7 @@ class Globals(object):
             "Tags",
             "CorsConfiguration",
             "DefaultRouteSettings",
+            "Domain",
         ],
         SamResourceType.SimpleTable.value: ["SSESpecification"],
     }

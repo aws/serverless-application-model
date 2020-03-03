@@ -1,13 +1,21 @@
+import re
 from collections import namedtuple
 from six import string_types
-from samtranslator.model.intrinsics import ref
-from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi, ApiGatewayV2Stage, ApiGatewayV2Authorizer
+from samtranslator.model.intrinsics import ref, fnGetAtt
+from samtranslator.model.apigatewayv2 import (
+    ApiGatewayV2HttpApi,
+    ApiGatewayV2Stage,
+    ApiGatewayV2Authorizer,
+    ApiGatewayV2DomainName,
+    ApiGatewayV2ApiMapping,
+)
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.route53 import Route53RecordSetGroup
 
 _CORS_WILDCARD = "*"
 CorsProperties = namedtuple(
@@ -37,6 +45,7 @@ class HttpApiGenerator(object):
         default_route_settings=None,
         resource_attributes=None,
         passthrough_resource_attributes=None,
+        domain=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -67,6 +76,7 @@ class HttpApiGenerator(object):
         self.default_route_settings = default_route_settings
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
+        self.domain = domain
 
     def _construct_http_api(self):
         """Constructs and returns the ApiGatewayV2 HttpApi.
@@ -163,6 +173,147 @@ class HttpApiGenerator(object):
 
         # Assign the OpenApi back to template
         self.definition_body = editor.openapi
+
+    def _construct_api_domain(self, http_api):
+        """
+        Constructs and returns the ApiGateway Domain and BasepathMapping
+        """
+        if self.domain is None:
+            return None, None, None
+
+        if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
+            raise InvalidResourceException(
+                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn" " are provided."
+            )
+
+        self.domain["ApiDomainName"] = "{}{}".format(
+            "ApiGatewayDomainNameV2", logical_id_generator.LogicalIdGenerator("", self.domain.get("DomainName")).gen()
+        )
+
+        domain = ApiGatewayV2DomainName(
+            self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes
+        )
+        domain_config = dict()
+        domain.DomainName = self.domain.get("DomainName")
+        endpoint = self.domain.get("EndpointConfiguration")
+
+        if endpoint is None:
+            endpoint = "REGIONAL"
+            # to make sure that default is always REGIONAL
+            self.domain["EndpointConfiguration"] = "REGIONAL"
+        elif endpoint not in ["EDGE", "REGIONAL"]:
+            raise InvalidResourceException(
+                self.logical_id,
+                "EndpointConfiguration for Custom Domains must be one of {}.".format(["EDGE", "REGIONAL"]),
+            )
+        domain_config["EndpointType"] = endpoint
+        domain_config["CertificateArn"] = self.domain.get("CertificateArn")
+
+        domain.DomainNameConfigurations = [domain_config]
+
+        # Create BasepathMappings
+        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
+            basepaths = [self.domain.get("BasePath")]
+        elif self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), list):
+            basepaths = self.domain.get("BasePath")
+        else:
+            basepaths = None
+        basepath_resource_list = self._construct_basepath_mappings(basepaths, http_api)
+
+        # Create the Route53 RecordSetGroup resource
+        record_set_group = self._construct_route53_recordsetgroup()
+
+        return domain, basepath_resource_list, record_set_group
+
+    def _construct_route53_recordsetgroup(self):
+        record_set_group = None
+        if self.domain.get("Route53") is not None:
+            route53 = self.domain.get("Route53")
+            if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
+                )
+            logical_id = logical_id_generator.LogicalIdGenerator(
+                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
+            ).gen()
+            record_set_group = Route53RecordSetGroup(
+                "RecordSetGroup" + logical_id, attributes=self.passthrough_resource_attributes
+            )
+            if "HostedZoneId" in route53:
+                record_set_group.HostedZoneId = route53.get("HostedZoneId")
+            elif "HostedZoneName" in route53:
+                record_set_group.HostedZoneName = route53.get("HostedZoneName")
+            record_set_group.RecordSets = self._construct_record_sets_for_domain(self.domain)
+
+        return record_set_group
+
+    def _construct_basepath_mappings(self, basepaths, http_api):
+        basepath_resource_list = []
+
+        if basepaths is None:
+            basepath_mapping = ApiGatewayV2ApiMapping(
+                self.logical_id + "ApiMapping", attributes=self.passthrough_resource_attributes
+            )
+            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+            basepath_mapping.ApiId = ref(http_api.logical_id)
+            basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
+            basepath_resource_list.extend([basepath_mapping])
+        else:
+            for path in basepaths:
+                # search for invalid characters in the path and raise error if there are
+                invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
+                if re.search(invalid_regex, path) is not None:
+                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+                # ignore leading and trailing `/` in the path name
+                m = re.search(r"[a-zA-Z0-9]+[\-\_]?[a-zA-Z0-9]+", path)
+                path = m.string[m.start(0) : m.end(0)]
+                if path is None:
+                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+                logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-\_]+", "", path), "ApiMapping")
+                basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
+                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+                basepath_mapping.ApiId = ref(http_api.logical_id)
+                basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
+                basepath_mapping.ApiMappingKey = path
+                basepath_resource_list.extend([basepath_mapping])
+        return basepath_resource_list
+
+    def _construct_record_sets_for_domain(self, domain):
+        recordset_list = []
+        recordset = {}
+        route53 = domain.get("Route53")
+
+        recordset["Name"] = domain.get("DomainName")
+        recordset["Type"] = "A"
+        recordset["AliasTarget"] = self._construct_alias_target(self.domain)
+        recordset_list.extend([recordset])
+
+        recordset_ipv6 = {}
+        if route53.get("IpV6"):
+            recordset_ipv6["Name"] = domain.get("DomainName")
+            recordset_ipv6["Type"] = "AAAA"
+            recordset_ipv6["AliasTarget"] = self._construct_alias_target(self.domain)
+            recordset_list.extend([recordset_ipv6])
+
+        return recordset_list
+
+    def _construct_alias_target(self, domain):
+        alias_target = {}
+        route53 = domain.get("Route53")
+        target_health = route53.get("EvaluateTargetHealth")
+
+        if target_health is not None:
+            alias_target["EvaluateTargetHealth"] = target_health
+        if domain.get("EndpointConfiguration") == "REGIONAL":
+            alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")
+            alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
+        else:
+            if route53.get("DistributionDomainName") is None:
+                route53["DistributionDomainName"] = fnGetAtt(self.domain.get("ApiDomainName"), "DistributionDomainName")
+            alias_target["HostedZoneId"] = "Z2FDTNDATAQYW2"
+            alias_target["DNSName"] = route53.get("DistributionDomainName")
+        return alias_target
 
     def _add_auth(self):
         """
@@ -349,7 +500,7 @@ class HttpApiGenerator(object):
         :rtype: tuple
         """
         http_api = self._construct_http_api()
-
+        domain, basepath_mapping, route53 = self._construct_api_domain(http_api)
         stage = self._construct_stage()
 
-        return http_api, stage
+        return http_api, stage, domain, basepath_mapping, route53
