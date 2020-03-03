@@ -855,6 +855,7 @@ class SamHttpApi(SamResourceMacro):
         "Cors": PropertyType(False, one_of(is_str(), is_type(dict))),
         "AccessLogSettings": PropertyType(False, is_type(dict)),
         "Auth": PropertyType(False, is_type(dict)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
     }
 
     referable_properties = {"Stage": ApiGatewayV2Stage.resource_type}
@@ -879,6 +880,7 @@ class SamHttpApi(SamResourceMacro):
             tags=self.Tags,
             auth=self.Auth,
             access_log_settings=self.AccessLogSettings,
+            route_settings=self.RouteSettings,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
         )

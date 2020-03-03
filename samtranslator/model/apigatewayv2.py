@@ -24,6 +24,7 @@ class ApiGatewayV2Stage(Resource):
     property_types = {
         "AccessLogSettings": PropertyType(False, is_type(dict)),
         "DefaultRouteSettings": PropertyType(False, is_type(dict)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
         "ClientCertificateId": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
         "ApiId": PropertyType(True, is_str()),

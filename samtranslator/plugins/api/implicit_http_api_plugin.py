@@ -1,5 +1,6 @@
 import six
 
+from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
 from samtranslator.public.open_api import OpenApiEditor
@@ -88,6 +89,8 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
                 method_conditions[method] = condition
 
             self._add_api_to_swagger(logicalId, event_properties, template)
+            if "RouteSettings" in event_properties:
+                self._add_route_settings_to_api(logicalId, event_properties, template, condition)
             api_events[logicalId] = event
 
         # We could have made changes to the Events structure. Write it back to function
@@ -115,6 +118,41 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         Helper function to return the OAS definition from the editor
         """
         return editor.openapi
+
+    def _get_api_resource_type_name(self):
+        """
+        Returns the type of API resource
+        """
+        return "AWS::Serverless::HttpApi"
+
+    def _add_route_settings_to_api(self, event_id, event_properties, template, condition):
+        """
+        Adds the API path/method from the given event to the Swagger JSON of Serverless::Api resource this event
+        refers to.
+
+        :param string event_id: LogicalId of the event
+        :param dict event_properties: Properties of the event
+        :param SamTemplate template: SAM Template to search for Serverless::Api resources
+        """
+
+        # Need to grab the AWS::Serverless::Api resource for this API event and update its Swagger definition
+        api_id = self._get_api_id(event_properties)
+
+        # Make sure Swagger is valid
+        resource = template.get(api_id)
+
+        path = event_properties["Path"]
+        method = event_properties["Method"]
+
+        # CONDITIONS!!!!!!!!!!!!!!!!
+        api_route_settings = resource.properties.get("RouteSettings", {})
+        if condition:
+            event_route_settings = {path: make_conditional(condition, event_properties.get("RouteSettings", {}))}
+        else:
+            event_route_settings = {path: event_properties.get("RouteSettings", {})}
+        api_route_settings.update(event_route_settings)
+        resource.set("RouteSettings", api_route_settings)
+        template.set(api_id, resource)
 
 
 class ImplicitHttpApiResource(SamResource):
