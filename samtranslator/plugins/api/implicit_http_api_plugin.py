@@ -127,31 +127,35 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
 
     def _add_route_settings_to_api(self, event_id, event_properties, template, condition):
         """
-        Adds the API path/method from the given event to the Swagger JSON of Serverless::Api resource this event
-        refers to.
+        Adds the RouteSettings for this path/method from the given event to the RouteSettings configuration
+        on the AWS::Serverless::HttpApi that this refers to.
 
         :param string event_id: LogicalId of the event
         :param dict event_properties: Properties of the event
-        :param SamTemplate template: SAM Template to search for Serverless::Api resources
+        :param SamTemplate template: SAM Template to search for Serverless::HttpApi resources
+        :param string condition: Condition on this HttpApi event (if any)
         """
 
-        # Need to grab the AWS::Serverless::Api resource for this API event and update its Swagger definition
         api_id = self._get_api_id(event_properties)
-
-        # Make sure Swagger is valid
         resource = template.get(api_id)
 
         path = event_properties["Path"]
         method = event_properties["Method"]
 
-        # CONDITIONS!!!!!!!!!!!!!!!!
+        # Route should be in format "METHOD /path" or just "/path" if the ANY method is used
+        route = "{} {}".format(method.upper(), path)
+        if method == OpenApiEditor._X_ANY_METHOD:
+            route = path
+
+        # Handle Resource-level conditions if necessary
         api_route_settings = resource.properties.get("RouteSettings", {})
+        event_route_settings = event_properties.get("RouteSettings", {})
         if condition:
-            event_route_settings = {path: make_conditional(condition, event_properties.get("RouteSettings", {}))}
-        else:
-            event_route_settings = {path: event_properties.get("RouteSettings", {})}
-        api_route_settings.update(event_route_settings)
-        resource.set("RouteSettings", api_route_settings)
+            event_route_settings = make_conditional(condition, event_properties.get("RouteSettings", {}))
+
+        # Merge event-level and api-level RouteSettings properties
+        api_route_settings.setdefault(route, {})
+        api_route_settings[route].update(event_route_settings)
         template.set(api_id, resource)
 
 
