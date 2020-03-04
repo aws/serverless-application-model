@@ -26,6 +26,9 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: name
 
+        - DynamoDBWritePolicy:
+            TableName: name
+
         - SESSendBouncePolicy:
             IdentityName: name
 
@@ -36,6 +39,9 @@ Resources:
             BucketName: name
 
         - S3CrudPolicy:
+            BucketName: name
+
+        - S3WritePolicy:
             BucketName: name
 
         - AMIDescribePolicy: {}
