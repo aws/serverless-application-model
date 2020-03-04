@@ -199,12 +199,6 @@
               "Ref": "AWS::StackName"
             }
           }, 
-          "tags": [
-            {
-              "name": "httpapi:createdBy", 
-              "x-amazon-apigateway-tag-value": "SAM"
-            }
-          ], 
           "paths": {
             "/hello/again": {
               "Fn::If": [
@@ -659,6 +653,7 @@
               ]
             }
           }, 
+          "openapi": "3.0.1", 
           "components": {
             "securitySchemes": {
               "oauth2": {
@@ -676,7 +671,12 @@
               }
             }
           }, 
-          "openapi": "3.0.1"
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
         }
       }, 
       "Condition": "ServerlessHttpApiCondition"
@@ -1336,10 +1336,34 @@
     "ServerlessHttpApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
+        "AutoDeploy": true, 
         "ApiId": {
           "Ref": "ServerlessHttpApi"
         }, 
-        "AutoDeploy": true, 
+        "RouteSettings": {
+          "GET /sub": {
+            "Fn::If": [
+              "MyCondition", 
+              {
+                "ThrottlingBurstLimit": 200
+              }, 
+              {
+                "Ref": "AWS::NoValue"
+              }
+            ]
+          }, 
+          "$default": {
+            "Fn::If": [
+              "Cond", 
+              {
+                "ThrottlingBurstLimit": 200
+              }, 
+              {
+                "Ref": "AWS::NoValue"
+              }
+            ]
+          }
+        }, 
         "StageName": "$default"
       }, 
       "Condition": "ServerlessHttpApiCondition"

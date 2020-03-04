@@ -156,6 +156,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         # Merge event-level and api-level RouteSettings properties
         api_route_settings.setdefault(route, {})
         api_route_settings[route].update(event_route_settings)
+        resource.properties["RouteSettings"] = api_route_settings
         template.set(api_id, resource)
 
 
