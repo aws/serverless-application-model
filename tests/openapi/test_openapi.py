@@ -353,7 +353,6 @@ class TestOpenApiEditor_is_valid(TestCase):
         self.assertFalse(OpenApiEditor.is_valid(data), "openapi dictionary with {} must not be valid".format(case))
 
 
-# TODO this needs to be updated with OIDC auth - authorization scopes and anything else that needs testing the swagger
 class TestOpenApiEditor_add_auth(TestCase):
     def setUp(self):
 

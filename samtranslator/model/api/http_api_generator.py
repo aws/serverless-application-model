@@ -421,7 +421,6 @@ class HttpApiGenerator(object):
             authorizers[authorizer_name] = ApiGatewayV2Authorizer(
                 api_logical_id=self.logical_id,
                 name=authorizer_name,
-                open_id_connect_url=authorizer.get("OpenIdConnectUrl"),
                 authorization_scopes=authorizer.get("AuthorizationScopes"),
                 jwt_configuration=authorizer.get("JwtConfiguration"),
                 id_source=authorizer.get("IdentitySource"),

@@ -57,33 +57,24 @@ class ApiGatewayV2ApiMapping(Resource):
 
 class ApiGatewayV2Authorizer(object):
     def __init__(
-        self,
-        api_logical_id=None,
-        name=None,
-        open_id_connect_url=None,
-        authorization_scopes=[],
-        jwt_configuration={},
-        id_source=None,
+        self, api_logical_id=None, name=None, authorization_scopes=[], jwt_configuration={}, id_source=None,
     ):
         """
         Creates an authorizer for use in V2 Http Apis
         """
-        # OIDC uses a connect url, oauth2 doesn't
-        self.auth_type = "openIdConnect"
-        if open_id_connect_url is None:
-            self.auth_type = "oauth2"
+        # Currently only one type of auth
+        self.auth_type = "oauth2"
 
         self.api_logical_id = api_logical_id
         self.name = name
-        self.open_id_connect_url = open_id_connect_url
         self.authorization_scopes = authorization_scopes
 
         # Validate necessary parameters exist
         if not jwt_configuration:
-            raise InvalidResourceException(api_logical_id, name + " Authorizer must define 'JwtConfiguration'")
+            raise InvalidResourceException(api_logical_id, name + " Authorizer must define 'JwtConfiguration'.")
         self.jwt_configuration = jwt_configuration
         if not id_source:
-            raise InvalidResourceException(api_logical_id, name + " Authorizer must define 'IdentitySource'")
+            raise InvalidResourceException(api_logical_id, name + " Authorizer must define 'IdentitySource'.")
         self.id_source = id_source
 
     def generate_openapi(self):
@@ -98,6 +89,4 @@ class ApiGatewayV2Authorizer(object):
                 "type": "jwt",
             },
         }
-        if self.open_id_connect_url:
-            openapi["x-amazon-apigateway-authorizer"]["openIdConnectUrl"] = self.open_id_connect_url
         return openapi
