@@ -32,7 +32,10 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "Prod"
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "HttpApiFunction": {
@@ -158,7 +161,10 @@
             "EndpointType": "REGIONAL"
           }
         ], 
-        "DomainName": "sam-v2-regional-test.com"
+        "DomainName": "sam-v2-regional-test.com", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "MyApi": {

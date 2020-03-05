@@ -1364,7 +1364,10 @@
             ]
           }
         }, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }, 
       "Condition": "ServerlessHttpApiCondition"
     }, 
