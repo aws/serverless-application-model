@@ -62,8 +62,13 @@
           "DestinationArn": "arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName", 
           "Format": "$context.requestId"
         }, 
-        "Tags": {
-          "httpapi:createdBy": "SAM"
+        "RouteSettings": {
+          "$default": {
+            "ThrottlingRateLimit": 0.7, 
+            "DataTraceEnabled": true, 
+            "ThrottlingBurstLimit": 300, 
+            "LoggingLevel": "INFO"
+          }
         }
       }
     }, 

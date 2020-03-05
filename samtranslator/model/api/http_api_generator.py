@@ -42,6 +42,7 @@ class HttpApiGenerator(object):
         auth=None,
         cors_configuration=None,
         access_log_settings=None,
+        route_settings=None,
         default_route_settings=None,
         resource_attributes=None,
         passthrough_resource_attributes=None,
@@ -73,6 +74,7 @@ class HttpApiGenerator(object):
         self.cors_configuration = cors_configuration
         self.tags = tags
         self.access_log_settings = access_log_settings
+        self.route_settings = route_settings
         self.default_route_settings = default_route_settings
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
@@ -471,6 +473,7 @@ class HttpApiGenerator(object):
             and not self.stage_variables
             and not self.access_log_settings
             and not self.default_route_settings
+            and not self.route_settings
         ):
             return
 
@@ -492,6 +495,7 @@ class HttpApiGenerator(object):
         stage.DefaultRouteSettings = self.default_route_settings
         stage.Tags = self.tags
         stage.AutoDeploy = True
+        stage.RouteSettings = self.route_settings
 
         return stage
 

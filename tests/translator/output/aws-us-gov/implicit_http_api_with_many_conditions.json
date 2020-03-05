@@ -1336,14 +1336,35 @@
     "ServerlessHttpApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
+        "AutoDeploy": true, 
         "ApiId": {
           "Ref": "ServerlessHttpApi"
         }, 
-        "AutoDeploy": true, 
-        "StageName": "$default", 
-        "Tags": {
-          "httpapi:createdBy": "SAM"
-        }
+        "RouteSettings": {
+          "GET /sub": {
+            "Fn::If": [
+              "MyCondition", 
+              {
+                "ThrottlingBurstLimit": 200
+              }, 
+              {
+                "Ref": "AWS::NoValue"
+              }
+            ]
+          }, 
+          "$default": {
+            "Fn::If": [
+              "Cond", 
+              {
+                "ThrottlingBurstLimit": 200
+              }, 
+              {
+                "Ref": "AWS::NoValue"
+              }
+            ]
+          }
+        }, 
+        "StageName": "$default"
       }, 
       "Condition": "ServerlessHttpApiCondition"
     }, 

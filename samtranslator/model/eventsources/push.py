@@ -938,6 +938,7 @@ class HttpApi(PushEventSource):
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
         "TimeoutInMillis": PropertyType(False, is_type(int)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
     }
 
     def resources_to_link(self, resources):
