@@ -53,6 +53,9 @@
     "MyApiProdStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
+        "StageVariables": {
+          "VarName": "VarValue"
+        },
         "AccessLogSettings": {
           "DestinationArn": "arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName", 
           "Format": "$context.requestId"
