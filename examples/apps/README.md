@@ -1,1 +1,1 @@
-All example applications have been moved to [aws-samples/serverless-app-examples](https://github.com/aws-samples/serverless-app-examples).
+All example applications have been moved to [aws-samples/serverless-app-examples](https://github.com/aws-samples/serverless-app-examples). See also [feature examples](https://github.com/awslabs/serverless-application-model/tree/develop/examples/2016-10-31) in this repository.
