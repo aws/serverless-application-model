@@ -48,6 +48,9 @@ Conditions:
       - false
 Globals:
   HttpApi:
+    RouteSettings:
+      "GET /sub":
+        ThrottlingBurstLimit: 100
     Auth:
       Authorizers:
         oauth2:
@@ -73,6 +76,8 @@ Resources:
         HttpApiEvent:
           Type: HttpApi
           Properties:
+            RouteSettings:
+              ThrottlingBurstLimit: 200
             Path: /sub
             Method: get
   helloworld1099:
@@ -89,6 +94,8 @@ Resources:
         HttpApiEvent:
           Type: HttpApi
           Properties:
+            RouteSettings:
+              ThrottlingBurstLimit: 200
             Auth:
               Authorizer: oauth2
         HttpApiEvent2:

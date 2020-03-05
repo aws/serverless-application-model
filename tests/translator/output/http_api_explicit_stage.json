@@ -1,10 +1,10 @@
 {
   "Parameters": {
     "CorsParam": {
-      "Default": true,
+      "Default": true, 
       "Type": "String"
     }
-  },
+  }, 
   "Resources": {
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
@@ -41,7 +41,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs12.x", 
         "Tags": [
           {
             "Value": "SAM", 
@@ -53,23 +53,28 @@
     "MyApiProdStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
+        "AutoDeploy": true, 
         "ApiId": {
           "Ref": "MyApi"
         }, 
-        "AutoDeploy": true, 
-        "StageName": "Prod",
+        "StageName": "Prod", 
         "AccessLogSettings": {
-          "DestinationArn": "arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName",
+          "DestinationArn": "arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName", 
           "Format": "$context.requestId"
+        }, 
+        "RouteSettings": {
+          "$default": {
+            "ThrottlingRateLimit": 0.7, 
+            "DataTraceEnabled": true, 
+            "ThrottlingBurstLimit": 300, 
+            "LoggingLevel": "INFO"
+          }
         }
       }
     }, 
     "HttpApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -86,6 +91,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -104,17 +112,6 @@
               "Ref": "AWS::StackName"
             }
           }, 
-          "tags": [
-            {
-              "name": "httpapi:createdBy", 
-              "x-amazon-apigateway-tag-value": "SAM"
-            }
-          ],
-          "x-amazon-apigateway-cors": {
-            "allowOrigins": [
-              "*"
-            ]
-          },
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {
@@ -131,7 +128,18 @@
               }
             }
           }, 
-          "openapi": "3.0.1"
+          "x-amazon-apigateway-cors": {
+            "allowOrigins": [
+              "*"
+            ]
+          }, 
+          "openapi": "3.0.1", 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
         }
       }
     }

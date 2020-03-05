@@ -115,6 +115,12 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
         """
         return editor.swagger
 
+    def _get_api_resource_type_name(self):
+        """
+        Returns the type of API resource
+        """
+        return "AWS::Serverless::Api"
+
 
 class ImplicitApiResource(SamResource):
     """

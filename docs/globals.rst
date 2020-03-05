@@ -100,6 +100,7 @@ Currently, the following resources and properties are being supported:
       AccessLogSettings:
       Tags:
       DefaultRouteSettings:
+      RouteSettings:
       Domain:
 
     SimpleTable:
