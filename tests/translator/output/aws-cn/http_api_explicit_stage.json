@@ -53,7 +53,10 @@
     "MyApiProdStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
-        "AutoDeploy": true, 
+        "AutoDeploy": true,
+        "StageVariables": {
+          "VarName": "VarValue"
+        },
         "ApiId": {
           "Ref": "MyApi"
         }, 
