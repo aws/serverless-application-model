@@ -27,6 +27,8 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
+      StageVariables:
+        VarName: VarValue
       RouteSettings:
         "$default":
           ThrottlingBurstLimit: 200
