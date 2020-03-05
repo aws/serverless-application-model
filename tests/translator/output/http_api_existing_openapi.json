@@ -1,10 +1,10 @@
 {
   "Parameters": {
     "Timeout": {
-      "Default": 15000,
+      "Default": 15000, 
       "Type": "Number"
     }
-  },
+  }, 
   "Resources": {
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
@@ -34,7 +34,10 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "HttpApiFunction": {
@@ -51,7 +54,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs12.x", 
         "Tags": [
           {
             "Value": "SAM", 
@@ -101,36 +104,17 @@
               "Ref": "AWS::StackName"
             }
           }, 
-          "tags": [
-            {
-              "name": "httpapi:createdBy", 
-              "x-amazon-apigateway-tag-value": "SAM"
-            }
-          ],
-          "x-amazon-apigateway-cors": {
-            "allowHeaders": [
-              "x-apigateway-header"
-            ],
-            "allowMethods": [
-              "GET"
-            ],
-            "allowOrigins": [
-              "https://global.com",
-              "https://local.com"
-            ],
-            "maxAge": 6000
-          },
           "paths": {
             "/basic": {
               "post": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "timeoutInMillis": 10000,
+                  "payloadFormatVersion": "1.0", 
                   "type": "aws_proxy", 
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DifferentFunction.Arn}/invocations"
                   }, 
-                  "payloadFormatVersion": "1.0"
+                  "httpMethod": "POST", 
+                  "timeoutInMillis": 10000
                 }, 
                 "security": [
                   {
@@ -173,17 +157,17 @@
                     ]
                   }
                 ], 
-                "isDefaultRoute": true,
+                "isDefaultRoute": true, 
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "timeoutInMillis": {
-                    "Ref": "Timeout"
-                  }, 
+                  "payloadFormatVersion": "1.0", 
                   "type": "aws_proxy", 
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
                   }, 
-                  "payloadFormatVersion": "1.0"
+                  "httpMethod": "POST", 
+                  "timeoutInMillis": {
+                    "Ref": "Timeout"
+                  }
                 }, 
                 "responses": {}
               }
@@ -209,6 +193,26 @@
               }
             }
           }, 
+          "x-amazon-apigateway-cors": {
+            "allowMethods": [
+              "GET"
+            ], 
+            "allowHeaders": [
+              "x-apigateway-header"
+            ], 
+            "allowOrigins": [
+              "https://global.com", 
+              "https://local.com"
+            ], 
+            "maxAge": 6000
+          }, 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ], 
+          "openapi": "3.0.1", 
           "components": {
             "securitySchemes": {
               "oauth2Auth": {
@@ -239,8 +243,7 @@
                 }
               }
             }
-          }, 
-          "openapi": "3.0.1"
+          }
         }
       }
     }

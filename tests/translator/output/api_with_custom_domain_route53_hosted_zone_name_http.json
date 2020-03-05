@@ -39,7 +39,10 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "Prod"
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "MyApioneApiMapping": {
@@ -60,13 +63,16 @@
     "ApiGatewayDomainNameV20caaf24ab1": {
       "Type": "AWS::ApiGatewayV2::DomainName", 
       "Properties": {
+        "DomainName": "example.com", 
         "DomainNameConfigurations": [
           {
             "CertificateArn": "cert-arn-in-us-east-1", 
             "EndpointType": "EDGE"
           }
         ], 
-        "DomainName": "example.com"
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "RecordSetGroup456ebaf280": {

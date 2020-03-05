@@ -12,7 +12,6 @@ class ApiGatewayV2HttpApi(Resource):
         "Description": PropertyType(False, is_str()),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
         "BasePath": PropertyType(False, is_str()),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
         "CorsConfiguration": PropertyType(False, is_type(dict)),
     }
 
@@ -29,7 +28,7 @@ class ApiGatewayV2Stage(Resource):
         "Description": PropertyType(False, is_str()),
         "ApiId": PropertyType(True, is_str()),
         "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
         "StageVariables": PropertyType(False, is_type(dict)),
         "AutoDeploy": PropertyType(False, is_type(bool)),
     }
@@ -42,7 +41,7 @@ class ApiGatewayV2DomainName(Resource):
     property_types = {
         "DomainName": PropertyType(True, is_str()),
         "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
     }
 
 

@@ -72,6 +72,9 @@
             "ThrottlingBurstLimit": 300, 
             "LoggingLevel": "INFO"
           }
+        }, 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
         }
       }
     }, 

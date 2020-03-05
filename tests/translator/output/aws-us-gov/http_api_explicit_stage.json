@@ -53,18 +53,21 @@
     "MyApiProdStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
-        "AutoDeploy": true,
         "StageVariables": {
           "VarName": "VarValue"
         },
-        "ApiId": {
-          "Ref": "MyApi"
-        }, 
-        "StageName": "Prod", 
         "AccessLogSettings": {
           "DestinationArn": "arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName", 
           "Format": "$context.requestId"
         }, 
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }, 
+        "ApiId": {
+          "Ref": "MyApi"
+        }, 
+        "AutoDeploy": true, 
         "RouteSettings": {
           "$default": {
             "ThrottlingRateLimit": 0.7, 

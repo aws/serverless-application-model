@@ -48,7 +48,10 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "Prod"
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }, 
       "Condition": "C1"
     }, 
@@ -168,14 +171,17 @@
     "ApiGatewayDomainNameV29c93aac102": {
       "Type": "AWS::ApiGatewayV2::DomainName", 
       "Properties": {
+        "DomainName": {
+          "Fn::Sub": "example-us-gov-west-1.com"
+        }, 
         "DomainNameConfigurations": [
           {
             "CertificateArn": "another-api-arn", 
             "EndpointType": "REGIONAL"
           }
         ], 
-        "DomainName": {
-          "Fn::Sub": "example-us-gov-west-1.com"
+        "Tags": {
+          "httpapi:createdBy": "SAM"
         }
       }, 
       "Condition": "C1"
@@ -225,7 +231,10 @@
           "Ref": "ServerlessHttpApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }, 
       "Condition": "C1"
     }, 

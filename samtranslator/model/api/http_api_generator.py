@@ -197,6 +197,7 @@ class HttpApiGenerator(object):
         )
         domain_config = dict()
         domain.DomainName = self.domain.get("DomainName")
+        domain.Tags = self.tags
         endpoint = self.domain.get("EndpointConfiguration")
 
         if endpoint is None:
@@ -492,13 +493,14 @@ class HttpApiGenerator(object):
         stage.StageVariables = self.stage_variables
         stage.AccessLogSettings = self.access_log_settings
         stage.DefaultRouteSettings = self.default_route_settings
+        stage.Tags = self.tags
         stage.AutoDeploy = True
         stage.RouteSettings = self.route_settings
 
         return stage
 
     def to_cloudformation(self):
-        """Generates CloudFormation resources from a SAM API resource
+        """Generates CloudFormation resources from a SAM HTTP API resource
 
         :returns: a tuple containing the HttpApi and Stage for an empty Api.
         :rtype: tuple
