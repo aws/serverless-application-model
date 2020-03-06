@@ -205,6 +205,48 @@
         ]
       }
     },
+    "DynamoDBWritePolicy": {
+      "Description": "Gives write only access to a DynamoDB Table",
+      "Parameters": {
+        "TableName": {
+          "Description": "Name of the DynamoDB Table"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:BatchWriteItem"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                  {
+                    "tableName": {
+                      "Ref": "TableName"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                  {
+                    "tableName": {
+                      "Ref": "TableName"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
     "DynamoDBReconfigurePolicy": {
       "Description": "Gives access reconfigure to a DynamoDB Table",
       "Parameters": {
@@ -307,6 +349,48 @@
               "s3:GetBucketLocation",
               "s3:GetObjectVersion",
               "s3:GetLifecycleConfiguration"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:s3:::${bucketName}",
+                  {
+                    "bucketName": {
+                      "Ref": "BucketName"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:s3:::${bucketName}/*",
+                  {
+                    "bucketName": {
+                      "Ref": "BucketName"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "S3WritePolicy": {
+      "Description": "Gives write permissions to objects in the S3 Bucket",
+      "Parameters": {
+        "BucketName": {
+          "Description": "Name of the Bucket"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:PutLifecycleConfiguration"
             ],
             "Resource": [
               {

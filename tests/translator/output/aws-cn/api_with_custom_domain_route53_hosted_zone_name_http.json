@@ -39,7 +39,10 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "Prod"
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "MyApioneApiMapping": {
@@ -66,7 +69,10 @@
             "EndpointType": "EDGE"
           }
         ], 
-        "DomainName": "example.com"
+        "DomainName": "example.com", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "RecordSetGroup456ebaf280": {

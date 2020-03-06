@@ -48,7 +48,10 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "Prod"
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }, 
       "Condition": "C1"
     }, 
@@ -176,6 +179,9 @@
         ], 
         "DomainName": {
           "Fn::Sub": "example-cn-north-1.com"
+        }, 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
         }
       }, 
       "Condition": "C1"
@@ -225,7 +231,10 @@
           "Ref": "ServerlessHttpApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }, 
       "Condition": "C1"
     }, 

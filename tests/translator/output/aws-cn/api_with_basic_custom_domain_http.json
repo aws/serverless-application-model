@@ -32,7 +32,10 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "Prod"
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "HttpApiFunction": {
@@ -152,13 +155,16 @@
     "ApiGatewayDomainNameV2ab8e63947d": {
       "Type": "AWS::ApiGatewayV2::DomainName", 
       "Properties": {
+        "DomainName": "sam-v2-regional-test.com", 
         "DomainNameConfigurations": [
           {
             "CertificateArn": "arn:aws:acm:us-east-1:551213647843:certificate/6c911401-620d-4d41-b89e-366c238bb2f3", 
             "EndpointType": "REGIONAL"
           }
         ], 
-        "DomainName": "sam-v2-regional-test.com"
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "MyApi": {

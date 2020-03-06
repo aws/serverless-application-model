@@ -2,6 +2,12 @@ Parameters:
   CorsParam:
     Type: String
     Default: True
+Globals:
+  HttpApi:
+    RouteSettings:
+      "$default":
+        DataTraceEnabled: True
+        ThrottlingBurstLimit: 100
 Resources:
   HttpApiFunction: 
     Type: AWS::Serverless::Function
@@ -14,10 +20,19 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref MyApi
+            RouteSettings:
+              ThrottlingBurstLimit: 300
+              LoggingLevel: INFO
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
+      StageVariables:
+        VarName: VarValue
+      RouteSettings:
+        "$default":
+          ThrottlingBurstLimit: 200
+          ThrottlingRateLimit: 0.7
       AccessLogSettings:
         DestinationArn: arn:aws:logs:us-east-1:123456789012:log-group:LogGroupName
         Format: $context.requestId

@@ -876,6 +876,7 @@ class SamHttpApi(SamResourceMacro):
         "AccessLogSettings": PropertyType(False, is_type(dict)),
         "DefaultRouteSettings": PropertyType(False, is_type(dict)),
         "Auth": PropertyType(False, is_type(dict)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
     }
 
@@ -910,6 +911,7 @@ class SamHttpApi(SamResourceMacro):
             auth=self.Auth,
             cors_configuration=self.CorsConfiguration,
             access_log_settings=self.AccessLogSettings,
+            route_settings=self.RouteSettings,
             default_route_settings=self.DefaultRouteSettings,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
