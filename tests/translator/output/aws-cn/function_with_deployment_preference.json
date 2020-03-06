@@ -146,6 +146,7 @@
     }, 
     "MinimalFunctionVersion640128d35d": {
       "DeletionPolicy": "Retain", 
+      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
