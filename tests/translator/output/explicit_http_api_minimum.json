@@ -138,7 +138,10 @@
           "Ref": "ServerlessHttpApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "ApiApiGatewayDefaultStage": {
@@ -148,7 +151,10 @@
           "Ref": "Api"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }
   }

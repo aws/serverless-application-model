@@ -162,7 +162,10 @@ class ImplicitApiPlugin(BasePlugin):
         if isinstance(api_id, dict) or not template.get(api_id):
             raise InvalidEventException(
                 event_id,
-                "RestApiId must be a valid reference to an 'AWS::Serverless::Api' resource " "in same template",
+                self.api_id_property
+                + " must be a valid reference to an '"
+                + self._get_api_resource_type_name()
+                + "' resource in same template.",
             )
 
         # Make sure Swagger is valid
@@ -339,6 +342,14 @@ class ImplicitApiPlugin(BasePlugin):
     def _generate_implicit_api_resource(self):
         """
         Helper function implemented by child classes that create a new implicit API resource
+        """
+        raise NotImplementedError(
+            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+        )
+
+    def _get_api_resource_type_name(self):
+        """
+        Returns the type of API resource
         """
         raise NotImplementedError(
             "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"

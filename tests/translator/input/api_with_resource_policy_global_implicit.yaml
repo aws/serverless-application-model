@@ -1,15 +1,3 @@
-Globals:
-  Api:
-    Auth:
-      ResourcePolicy:
-        CustomStatements: [{
-            Action: 'execute-api:Invoke', 
-            Resource: ['execute-api:/*/*/*']
-          },
-          {
-            Action: 'execute-api:blah', 
-            Resource: ['execute-api:/*/*/*']
-          }]
 Resources:
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
@@ -23,4 +11,13 @@ Resources:
           Properties:
             Path: /add
             Method: post
-
+            Auth:
+              ResourcePolicy:
+                CustomStatements: [{
+                    Action: 'execute-api:Invoke', 
+                    Resource: ['execute-api:/*/*/*']
+                  },
+                  {
+                    Action: 'execute-api:blah', 
+                    Resource: ['execute-api:/*/*/*']
+                  }]

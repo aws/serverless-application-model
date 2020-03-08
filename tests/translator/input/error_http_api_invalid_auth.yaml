@@ -53,6 +53,20 @@ Resources:
               Authorizer: OAuth2
               AuthorizationScopes: "scope"
 
+  Function5:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.7
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Events:
+        Api4:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi5
+            Auth:
+              Authorizer: OIDC
+
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -113,6 +127,28 @@ Resources:
       Auth:
         Authorizers:
           OAuth2:
+            AuthorizationScopes:
+              - scope4
+            JwtConfiguration:
+              issuer: "https://www.example.com/v1/connect/oidc"
+              audience:
+                - MyApi
+            IdentitySource: "$request.querystring.param"
+      DefinitionBody:
+        info:
+          version: '1.0'
+          title:
+            Ref: AWS::StackName
+        paths: {}
+        openapi: 3.0.1
+
+  MyApi5:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          OIDC:
+            OpenIdConnectUrl: "https://example.com/url"
             AuthorizationScopes:
               - scope4
             JwtConfiguration:

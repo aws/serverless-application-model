@@ -37,7 +37,12 @@
           "Ref": "MyApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM", 
+          "Tag1": "value1", 
+          "Tag2": "value2"
+        }
       }
     }, 
     "HttpApiFunction": {

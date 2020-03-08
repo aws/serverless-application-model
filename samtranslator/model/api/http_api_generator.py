@@ -1,12 +1,27 @@
+import re
 from collections import namedtuple
 from six import string_types
-from samtranslator.model.intrinsics import ref
-from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi, ApiGatewayV2Stage, ApiGatewayV2Authorizer
+from samtranslator.model.intrinsics import ref, fnGetAtt
+from samtranslator.model.apigatewayv2 import (
+    ApiGatewayV2HttpApi,
+    ApiGatewayV2Stage,
+    ApiGatewayV2Authorizer,
+    ApiGatewayV2DomainName,
+    ApiGatewayV2ApiMapping,
+)
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.route53 import Route53RecordSetGroup
+
+_CORS_WILDCARD = "*"
+CorsProperties = namedtuple(
+    "_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigins", "MaxAge", "ExposeHeaders", "AllowCredentials"]
+)
+CorsProperties.__new__.__defaults__ = (None, None, None, None, None, False)
 
 AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
 AuthProperties.__new__.__defaults__ = (None, None)
@@ -25,9 +40,13 @@ class HttpApiGenerator(object):
         stage_name,
         tags=None,
         auth=None,
+        cors_configuration=None,
         access_log_settings=None,
+        route_settings=None,
+        default_route_settings=None,
         resource_attributes=None,
         passthrough_resource_attributes=None,
+        domain=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -52,10 +71,14 @@ class HttpApiGenerator(object):
         if not self.stage_name:
             self.stage_name = DefaultStageName
         self.auth = auth
+        self.cors_configuration = cors_configuration
         self.tags = tags
         self.access_log_settings = access_log_settings
+        self.route_settings = route_settings
+        self.default_route_settings = default_route_settings
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
+        self.domain = domain
 
     def _construct_http_api(self):
         """Constructs and returns the ApiGatewayV2 HttpApi.
@@ -67,8 +90,11 @@ class HttpApiGenerator(object):
 
         if self.definition_uri and self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both"
+                self.logical_id, "Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
             )
+        if self.cors_configuration:
+            # call this method to add cors in open api
+            self._add_cors()
 
         self._add_auth()
         self._add_tags()
@@ -82,10 +108,215 @@ class HttpApiGenerator(object):
                 self.logical_id,
                 "'DefinitionUri' or 'DefinitionBody' are required properties of an "
                 "'AWS::Serverless::HttpApi'. Add a value for one of these properties or "
-                "add a 'HttpApi' event to an 'AWS::Serverless::Function'",
+                "add a 'HttpApi' event to an 'AWS::Serverless::Function'.",
             )
 
         return http_api
+
+    def _add_cors(self):
+        """
+        Add CORS configuration if CORSConfiguration property is set in SAM.
+        Adds CORS configuration only if DefinitionBody is present and
+        APIGW extension for CORS is not present in the DefinitionBody
+        """
+
+        if self.cors_configuration and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "Cors works only with inline OpenApi specified in 'DefinitionBody' property."
+            )
+
+        # If cors configuration is set to true add * to the allow origins.
+        # This also support referencing the value as a parameter
+        if isinstance(self.cors_configuration, bool):
+            # if cors config is true add Origins as "'*'"
+            properties = CorsProperties(AllowOrigins=[_CORS_WILDCARD])
+
+        elif is_intrinsic(self.cors_configuration):
+            # Just set Origin property. Intrinsics will be handledOthers will be defaults
+            properties = CorsProperties(AllowOrigins=self.cors_configuration)
+
+        elif isinstance(self.cors_configuration, dict):
+            # Make sure keys in the dict are recognized
+            if not all(key in CorsProperties._fields for key in self.cors_configuration.keys()):
+                raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
+
+            properties = CorsProperties(**self.cors_configuration)
+
+        else:
+            raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
+
+        if not OpenApiEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to add Cors configuration because "
+                "'DefinitionBody' does not contain a valid "
+                "OpenApi definition.",
+            )
+
+        if properties.AllowCredentials is True and properties.AllowOrigins == [_CORS_WILDCARD]:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to add Cors configuration because "
+                "'AllowCredentials' can not be true when "
+                "'AllowOrigin' is \"'*'\" or not set.",
+            )
+
+        editor = OpenApiEditor(self.definition_body)
+        # if CORS is set in both definition_body and as a CorsConfiguration property,
+        # SAM merges and overrides the cors headers in definition_body with headers of CorsConfiguration
+        editor.add_cors(
+            properties.AllowOrigins,
+            properties.AllowHeaders,
+            properties.AllowMethods,
+            properties.ExposeHeaders,
+            properties.MaxAge,
+            properties.AllowCredentials,
+        )
+
+        # Assign the OpenApi back to template
+        self.definition_body = editor.openapi
+
+    def _construct_api_domain(self, http_api):
+        """
+        Constructs and returns the ApiGateway Domain and BasepathMapping
+        """
+        if self.domain is None:
+            return None, None, None
+
+        if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
+            raise InvalidResourceException(
+                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn" " are provided."
+            )
+
+        self.domain["ApiDomainName"] = "{}{}".format(
+            "ApiGatewayDomainNameV2", logical_id_generator.LogicalIdGenerator("", self.domain.get("DomainName")).gen()
+        )
+
+        domain = ApiGatewayV2DomainName(
+            self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes
+        )
+        domain_config = dict()
+        domain.DomainName = self.domain.get("DomainName")
+        domain.Tags = self.tags
+        endpoint = self.domain.get("EndpointConfiguration")
+
+        if endpoint is None:
+            endpoint = "REGIONAL"
+            # to make sure that default is always REGIONAL
+            self.domain["EndpointConfiguration"] = "REGIONAL"
+        elif endpoint not in ["EDGE", "REGIONAL"]:
+            raise InvalidResourceException(
+                self.logical_id,
+                "EndpointConfiguration for Custom Domains must be one of {}.".format(["EDGE", "REGIONAL"]),
+            )
+        domain_config["EndpointType"] = endpoint
+        domain_config["CertificateArn"] = self.domain.get("CertificateArn")
+
+        domain.DomainNameConfigurations = [domain_config]
+
+        # Create BasepathMappings
+        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
+            basepaths = [self.domain.get("BasePath")]
+        elif self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), list):
+            basepaths = self.domain.get("BasePath")
+        else:
+            basepaths = None
+        basepath_resource_list = self._construct_basepath_mappings(basepaths, http_api)
+
+        # Create the Route53 RecordSetGroup resource
+        record_set_group = self._construct_route53_recordsetgroup()
+
+        return domain, basepath_resource_list, record_set_group
+
+    def _construct_route53_recordsetgroup(self):
+        record_set_group = None
+        if self.domain.get("Route53") is not None:
+            route53 = self.domain.get("Route53")
+            if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
+                )
+            logical_id = logical_id_generator.LogicalIdGenerator(
+                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
+            ).gen()
+            record_set_group = Route53RecordSetGroup(
+                "RecordSetGroup" + logical_id, attributes=self.passthrough_resource_attributes
+            )
+            if "HostedZoneId" in route53:
+                record_set_group.HostedZoneId = route53.get("HostedZoneId")
+            elif "HostedZoneName" in route53:
+                record_set_group.HostedZoneName = route53.get("HostedZoneName")
+            record_set_group.RecordSets = self._construct_record_sets_for_domain(self.domain)
+
+        return record_set_group
+
+    def _construct_basepath_mappings(self, basepaths, http_api):
+        basepath_resource_list = []
+
+        if basepaths is None:
+            basepath_mapping = ApiGatewayV2ApiMapping(
+                self.logical_id + "ApiMapping", attributes=self.passthrough_resource_attributes
+            )
+            basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+            basepath_mapping.ApiId = ref(http_api.logical_id)
+            basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
+            basepath_resource_list.extend([basepath_mapping])
+        else:
+            for path in basepaths:
+                # search for invalid characters in the path and raise error if there are
+                invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
+                if re.search(invalid_regex, path) is not None:
+                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+                # ignore leading and trailing `/` in the path name
+                m = re.search(r"[a-zA-Z0-9]+[\-\_]?[a-zA-Z0-9]+", path)
+                path = m.string[m.start(0) : m.end(0)]
+                if path is None:
+                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+                logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-\_]+", "", path), "ApiMapping")
+                basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
+                basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
+                basepath_mapping.ApiId = ref(http_api.logical_id)
+                basepath_mapping.Stage = ref(http_api.logical_id + ".Stage")
+                basepath_mapping.ApiMappingKey = path
+                basepath_resource_list.extend([basepath_mapping])
+        return basepath_resource_list
+
+    def _construct_record_sets_for_domain(self, domain):
+        recordset_list = []
+        recordset = {}
+        route53 = domain.get("Route53")
+
+        recordset["Name"] = domain.get("DomainName")
+        recordset["Type"] = "A"
+        recordset["AliasTarget"] = self._construct_alias_target(self.domain)
+        recordset_list.extend([recordset])
+
+        recordset_ipv6 = {}
+        if route53.get("IpV6"):
+            recordset_ipv6["Name"] = domain.get("DomainName")
+            recordset_ipv6["Type"] = "AAAA"
+            recordset_ipv6["AliasTarget"] = self._construct_alias_target(self.domain)
+            recordset_list.extend([recordset_ipv6])
+
+        return recordset_list
+
+    def _construct_alias_target(self, domain):
+        alias_target = {}
+        route53 = domain.get("Route53")
+        target_health = route53.get("EvaluateTargetHealth")
+
+        if target_health is not None:
+            alias_target["EvaluateTargetHealth"] = target_health
+        if domain.get("EndpointConfiguration") == "REGIONAL":
+            alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")
+            alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
+        else:
+            if route53.get("DistributionDomainName") is None:
+                route53["DistributionDomainName"] = fnGetAtt(self.domain.get("ApiDomainName"), "DistributionDomainName")
+            alias_target["HostedZoneId"] = "Z2FDTNDATAQYW2"
+            alias_target["DNSName"] = route53.get("DistributionDomainName")
+        return alias_target
 
     def _add_auth(self):
         """
@@ -190,10 +421,15 @@ class HttpApiGenerator(object):
                     self.logical_id, "Authorizer %s must be a dictionary." % (authorizer_name)
                 )
 
+            if "OpenIdConnectUrl" in authorizer:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "'OpenIdConnectUrl' is no longer a supported property for authorizer '%s'. Please refer to the AWS SAM documentation."
+                    % (authorizer_name),
+                )
             authorizers[authorizer_name] = ApiGatewayV2Authorizer(
                 api_logical_id=self.logical_id,
                 name=authorizer_name,
-                open_id_connect_url=authorizer.get("OpenIdConnectUrl"),
                 authorization_scopes=authorizer.get("AuthorizationScopes"),
                 jwt_configuration=authorizer.get("JwtConfiguration"),
                 id_source=authorizer.get("IdentitySource"),
@@ -237,7 +473,13 @@ class HttpApiGenerator(object):
         """
 
         # If there are no special configurations, don't create a stage and use the default
-        if not self.stage_name and not self.stage_variables and not self.access_log_settings:
+        if (
+            not self.stage_name
+            and not self.stage_variables
+            and not self.access_log_settings
+            and not self.default_route_settings
+            and not self.route_settings
+        ):
             return
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
@@ -255,18 +497,21 @@ class HttpApiGenerator(object):
         stage.StageName = self.stage_name
         stage.StageVariables = self.stage_variables
         stage.AccessLogSettings = self.access_log_settings
+        stage.DefaultRouteSettings = self.default_route_settings
+        stage.Tags = self.tags
         stage.AutoDeploy = True
+        stage.RouteSettings = self.route_settings
 
         return stage
 
     def to_cloudformation(self):
-        """Generates CloudFormation resources from a SAM API resource
+        """Generates CloudFormation resources from a SAM HTTP API resource
 
         :returns: a tuple containing the HttpApi and Stage for an empty Api.
         :rtype: tuple
         """
         http_api = self._construct_http_api()
-
+        domain, basepath_mapping, route53 = self._construct_api_domain(http_api)
         stage = self._construct_stage()
 
-        return http_api, stage
+        return http_api, stage, domain, basepath_mapping, route53

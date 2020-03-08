@@ -45,10 +45,14 @@
     "MyApiStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
+        "AutoDeploy": true, 
         "ApiId": {
           "Ref": "MyApi"
         }, 
-        "AutoDeploy": true, 
+        "DefaultRouteSettings": {
+          "ThrottlingBurstLimit": 50, 
+          "ThrottlingRateLimit": 100.0
+        }, 
         "StageName": {
           "Fn::Join": [
             "", 
@@ -63,9 +67,6 @@
     "FunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -82,6 +83,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -93,10 +97,13 @@
     "MyApi2ApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
+        "AutoDeploy": true, 
         "ApiId": {
           "Ref": "MyApi2"
         }, 
-        "AutoDeploy": true, 
+        "DefaultRouteSettings": {
+          "ThrottlingRateLimit": 100.0
+        }, 
         "StageName": "$default"
       }
     }, 

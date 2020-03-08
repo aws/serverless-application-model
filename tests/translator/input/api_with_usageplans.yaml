@@ -126,3 +126,15 @@ Outputs:
       Description: "API endpoint URL for Prod environment"
       Value:
         Fn::Sub: 'https://${MyApiThree}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
+    UsagePlan:
+      Description: "Usage Plan physical Id"
+      Value:
+        !Ref MyApiTwo.UsagePlan
+    UsagePlanKey:
+      Description: "Usage Plan Key"
+      Value:
+        !Ref MyApiTwo.UsagePlanKey
+    ApiKey:
+      Description: "Api Key"
+      Value:
+        !Ref MyApiThree.ApiKey

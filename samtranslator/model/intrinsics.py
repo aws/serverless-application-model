@@ -129,7 +129,7 @@ def make_shorthand(intrinsic_dict):
         raise NotImplementedError("Shorthanding is only supported for Ref and Fn::GetAtt")
 
 
-def is_instrinsic(input):
+def is_intrinsic(input):
     """
     Checks if the given input is an intrinsic function dictionary. Intrinsic function is a dictionary with single
     key that is the name of the intrinsics.
@@ -155,7 +155,7 @@ def is_intrinsic_if(input):
     :return: True, if yes
     """
 
-    if not is_instrinsic(input):
+    if not is_intrinsic(input):
         return False
 
     key = list(input.keys())[0]
@@ -171,7 +171,7 @@ def is_intrinsic_no_value(input):
     :return: True, if yes
     """
 
-    if not is_instrinsic(input):
+    if not is_intrinsic(input):
         return False
 
     key = list(input.keys())[0]

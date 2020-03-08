@@ -4,7 +4,9 @@ from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
+from samtranslator.model.intrinsics import is_intrinsic
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+import json
 
 
 class OpenApiEditor(object):
@@ -17,6 +19,7 @@ class OpenApiEditor(object):
 
     _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
     _X_APIGW_TAG_VALUE = "x-amazon-apigateway-tag-value"
+    _X_APIGW_CORS = "x-amazon-apigateway-cors"
     _CONDITIONAL_IF = "Fn::If"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -375,6 +378,74 @@ class OpenApiEditor(object):
             else:
                 tag = {"name": name, self._X_APIGW_TAG_VALUE: value}
                 self.tags.append(tag)
+
+    def add_cors(
+        self,
+        allow_origins,
+        allow_headers=None,
+        allow_methods=None,
+        expose_headers=None,
+        max_age=None,
+        allow_credentials=None,
+    ):
+        """
+        Add CORS configuration to this Api to _X_APIGW_CORS header in open api definition
+
+        Following this guide:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-cors.html
+
+        :param list/dict allowed_origins: Comma separate list of allowed origins.
+            Value can also be an intrinsic function dict.
+        :param list/dict allowed_headers: Comma separated list of allowed headers.
+            Value can also be an intrinsic function dict.
+        :param list/dict allowed_methods: Comma separated list of allowed methods.
+            Value can also be an intrinsic function dict.
+        :param list/dict expose_headers: Comma separated list of allowed methods.
+            Value can also be an intrinsic function dict.
+        :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
+            Access-Control-Max-Age header. Value can also be an intrinsic function dict.
+        :param bool/None allowed_credentials: Flags whether request is allowed to contain credentials.
+        """
+        ALLOW_ORIGINS = "allowOrigins"
+        ALLOW_HEADERS = "allowHeaders"
+        ALLOW_METHODS = "allowMethods"
+        EXPOSE_HEADERS = "exposeHeaders"
+        MAX_AGE = "maxAge"
+        ALLOW_CREDENTIALS = "allowCredentials"
+        cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
+        cors_configuration = self._doc.get(self._X_APIGW_CORS, dict())
+
+        # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
+        if allow_origins and is_intrinsic(allow_origins):
+            cors_configuration_string = json.dumps(allow_origins)
+            for header in cors_headers:
+                # example: allowOrigins to AllowOrigins
+                keyword = header[0].upper() + header[1:]
+                cors_configuration_string = cors_configuration_string.replace(keyword, header)
+            cors_configuration_dict = json.loads(cors_configuration_string)
+            cors_configuration.update(cors_configuration_dict)
+
+        else:
+            if allow_origins:
+                cors_configuration[ALLOW_ORIGINS] = allow_origins
+            if allow_headers:
+                cors_configuration[ALLOW_HEADERS] = allow_headers
+            if allow_methods:
+                cors_configuration[ALLOW_METHODS] = allow_methods
+            if expose_headers:
+                cors_configuration[EXPOSE_HEADERS] = expose_headers
+            if max_age is not None:
+                cors_configuration[MAX_AGE] = max_age
+            if allow_credentials is True:
+                cors_configuration[ALLOW_CREDENTIALS] = allow_credentials
+
+        self._doc[self._X_APIGW_CORS] = cors_configuration
+
+    def has_api_gateway_cors(self):
+        if self._doc.get(self._X_APIGW_CORS):
+            return True
+        return False
 
     @property
     def openapi(self):
