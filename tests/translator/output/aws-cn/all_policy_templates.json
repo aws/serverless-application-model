@@ -1511,7 +1511,9 @@
               "Statement": [
                 {
                   "Effect": "Allow",
-                  "Action": "mobiletargeting:PhoneNumberValidate",
+                  "Action": [
+                    "mobiletargeting:PhoneNumberValidate"
+                  ],
                   "Resource": "*"
                 }
               ]

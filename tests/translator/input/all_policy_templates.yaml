@@ -119,8 +119,6 @@ Resources:
         - PinpointEndpointAccessPolicy:
             PinpointApplicationId: id
 
-        - PinpointValidatePhoneNumberPolicy: {}
-
         - RekognitionDetectOnlyPolicy: {}
 
         - RekognitionFacesManagementPolicy:
@@ -163,3 +161,5 @@ Resources:
 
         - EventBridgePutEventsPolicy:
             EventBusName: name
+
+        - PinpointValidatePhoneNumberPolicy: {}
