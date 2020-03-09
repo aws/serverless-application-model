@@ -100,7 +100,6 @@ class OpenApiEditor(object):
         # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
         regex = "([A-Za-z0-9]+\.Arn)"
         match = re.findall(regex, arn)[0].split(".Arn")[0]
-        print(match)
         return match
 
     def method_has_integration(self, method):
