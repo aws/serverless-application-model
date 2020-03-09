@@ -27,13 +27,6 @@ Resources:
             Auth:
               AuthorizationScopes:
                 - scope3
-        SomeAuth:
-          Type: HttpApi
-          Properties:
-            Path: /someauth
-            Method: post
-            Auth:
-              Authorizer: OpenIdAuth
         oauth2Path:
           Type: HttpApi
           Properties:
@@ -48,16 +41,6 @@ Globals:
   HttpApi:
     Auth:
       Authorizers:
-        OpenIdAuth:
-          AuthorizationScopes:
-            - scope1
-            - scope2
-          OpenIdConnectUrl: "https://www.example.com/v1/connect"
-          JwtConfiguration:
-            issuer: "https://www.example.com/v1/connect/oidc"
-            audience:
-              - MyApi
-          IdentitySource: "$request.querystring.param"
         oauth2Auth:
           AuthorizationScopes:
             - scope4
@@ -66,4 +49,4 @@ Globals:
             audience:
               - MyApi
           IdentitySource: "$request.querystring.param"
-      DefaultAuthorizer: OpenIdAuth
+      DefaultAuthorizer: oauth2Auth

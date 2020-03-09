@@ -421,10 +421,15 @@ class HttpApiGenerator(object):
                     self.logical_id, "Authorizer %s must be a dictionary." % (authorizer_name)
                 )
 
+            if "OpenIdConnectUrl" in authorizer:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "'OpenIdConnectUrl' is no longer a supported property for authorizer '%s'. Please refer to the AWS SAM documentation."
+                    % (authorizer_name),
+                )
             authorizers[authorizer_name] = ApiGatewayV2Authorizer(
                 api_logical_id=self.logical_id,
                 name=authorizer_name,
-                open_id_connect_url=authorizer.get("OpenIdConnectUrl"),
                 authorization_scopes=authorizer.get("AuthorizationScopes"),
                 jwt_configuration=authorizer.get("JwtConfiguration"),
                 id_source=authorizer.get("IdentitySource"),
