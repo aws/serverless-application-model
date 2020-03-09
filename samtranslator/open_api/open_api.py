@@ -90,14 +90,17 @@ class OpenApiEditor(object):
 
         # Extract the integration uri out of a conditional if necessary
         uri = integration.get("uri")
+        if not isinstance(uri, dict):
+            return ""
         if self._CONDITIONAL_IF in uri:
             arn = uri[self._CONDITIONAL_IF][1].get("Fn::Sub")
         else:
-            arn = uri.get("Fn::Sub")
+            arn = uri.get("Fn::Sub", "")
 
         # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
         regex = "([A-Za-z0-9]+\.Arn)"
         match = re.findall(regex, arn)[0].split(".Arn")[0]
+        print(match)
         return match
 
     def method_has_integration(self, method):
