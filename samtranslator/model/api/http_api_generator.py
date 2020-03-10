@@ -204,10 +204,9 @@ class HttpApiGenerator(object):
             endpoint = "REGIONAL"
             # to make sure that default is always REGIONAL
             self.domain["EndpointConfiguration"] = "REGIONAL"
-        elif endpoint not in ["EDGE", "REGIONAL"]:
+        elif endpoint not in ["REGIONAL"]:
             raise InvalidResourceException(
-                self.logical_id,
-                "EndpointConfiguration for Custom Domains must be one of {}.".format(["EDGE", "REGIONAL"]),
+                self.logical_id, "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
             )
         domain_config["EndpointType"] = endpoint
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
@@ -312,10 +311,9 @@ class HttpApiGenerator(object):
             alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")
             alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
         else:
-            if route53.get("DistributionDomainName") is None:
-                route53["DistributionDomainName"] = fnGetAtt(self.domain.get("ApiDomainName"), "DistributionDomainName")
-            alias_target["HostedZoneId"] = "Z2FDTNDATAQYW2"
-            alias_target["DNSName"] = route53.get("DistributionDomainName")
+            raise InvalidResourceException(
+                self.logical_id, "Only REGIONAL endpoint is supported on HTTP APIs.",
+            )
         return alias_target
 
     def _add_auth(self):
