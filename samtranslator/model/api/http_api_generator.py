@@ -47,6 +47,7 @@ class HttpApiGenerator(object):
         resource_attributes=None,
         passthrough_resource_attributes=None,
         domain=None,
+        fail_on_warnings=False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -79,6 +80,7 @@ class HttpApiGenerator(object):
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.domain = domain
+        self.fail_on_warnings = fail_on_warnings
 
     def _construct_http_api(self):
         """Constructs and returns the ApiGatewayV2 HttpApi.
@@ -98,6 +100,9 @@ class HttpApiGenerator(object):
 
         self._add_auth()
         self._add_tags()
+
+        if self.fail_on_warnings:
+            http_api.FailOnWarnings = self.fail_on_warnings
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
