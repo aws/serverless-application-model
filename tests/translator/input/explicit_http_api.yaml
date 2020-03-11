@@ -19,6 +19,7 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      FailOnWarnings: True
       Auth:
         Authorizers:
           OAuth2:

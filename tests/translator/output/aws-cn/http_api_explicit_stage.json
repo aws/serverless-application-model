@@ -111,6 +111,7 @@
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
       "Properties": {
+        "FailOnWarnings": true,
         "Body": {
           "info": {
             "version": "1.0", 
