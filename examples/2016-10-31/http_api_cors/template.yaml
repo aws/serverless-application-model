@@ -26,6 +26,7 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      FailOnWarnings: true
       CorsConfiguration:
         AllowHeaders:
           - x-apigateway-header

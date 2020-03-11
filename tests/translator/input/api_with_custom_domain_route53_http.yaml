@@ -34,7 +34,6 @@ Resources:
       Domain:
         DomainName: !Ref DomainName
         CertificateArn: !Ref ACMCertificateArn
-        EndpointConfiguration: EDGE
         BasePath:
           - /one
         Route53:

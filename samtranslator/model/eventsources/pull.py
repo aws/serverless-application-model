@@ -85,6 +85,8 @@ class PullEventSource(ResourceMacro):
 
             # SAM attaches the policies for SQS or SNS only if 'Type' is given
             if destination_type:
+                # delete this field as its used internally for SAM to determine the policy
+                del self.DestinationConfig["OnFailure"]["Type"]
                 # the values 'SQS' and 'SNS' are allowed. No intrinsics are allowed
                 if destination_type not in ["SQS", "SNS"]:
                     raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")
@@ -102,7 +104,6 @@ class PullEventSource(ResourceMacro):
                     destination_config_policy = IAMRolePolicies().sns_publish_role_policy(
                         sns_topic_arn, self.logical_id
                     )
-
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
 
         if "Condition" in function.resource_attributes:

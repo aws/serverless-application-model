@@ -120,7 +120,7 @@ class TestCustomDomains(TestCase):
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
             HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
-        self.assertEquals(
+        self.assertEqual(
             e.value.message,
             "Resource with id [HttpApiId] is invalid. "
             + "Custom Domains only works if both DomainName and CertificateArn are provided.",
@@ -131,7 +131,7 @@ class TestCustomDomains(TestCase):
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
             HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
-        self.assertEquals(
+        self.assertEqual(
             e.value.message,
             "Resource with id [HttpApiId] is invalid. "
             + "Custom Domains only works if both DomainName and CertificateArn are provided.",
@@ -145,7 +145,7 @@ class TestCustomDomains(TestCase):
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 1)
         self.assertIsNone(route, None)
-        self.assertEquals(domain.DomainNameConfigurations[0].get("EndpointType"), "REGIONAL")
+        self.assertEqual(domain.DomainNameConfigurations[0].get("EndpointType"), "REGIONAL")
 
     def test_basic_domain_regional_endpoint(self):
         self.kwargs["domain"] = {
@@ -159,7 +159,7 @@ class TestCustomDomains(TestCase):
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 1)
         self.assertIsNone(route, None)
-        self.assertEquals(domain.DomainNameConfigurations[0].get("EndpointType"), "REGIONAL")
+        self.assertEqual(domain.DomainNameConfigurations[0].get("EndpointType"), "REGIONAL")
 
     def test_basic_domain_edge_endpoint(self):
         self.kwargs["domain"] = {
@@ -168,12 +168,12 @@ class TestCustomDomains(TestCase):
             "EndpointConfiguration": "EDGE",
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
-        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
-        self.assertIsNotNone(domain, None)
-        self.assertIsNotNone(basepath, None)
-        self.assertEqual(len(basepath), 1)
-        self.assertIsNone(route, None)
-        self.assertEquals(domain.DomainNameConfigurations[0].get("EndpointType"), "EDGE")
+        with pytest.raises(InvalidResourceException) as e:
+            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+        self.assertEqual(
+            e.value.message,
+            "Resource with id [HttpApiId] is invalid. EndpointConfiguration for Custom Domains must be one of ['REGIONAL'].",
+        )
 
     def test_bad_endpoint(self):
         self.kwargs["domain"] = {
@@ -184,10 +184,10 @@ class TestCustomDomains(TestCase):
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
             HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
-        self.assertEquals(
+        self.assertEqual(
             e.value.message,
             "Resource with id [HttpApiId] is invalid. "
-            + "EndpointConfiguration for Custom Domains must be one of ['EDGE', 'REGIONAL'].",
+            + "EndpointConfiguration for Custom Domains must be one of ['REGIONAL'].",
         )
 
     def test_basic_route53(self):
@@ -202,7 +202,7 @@ class TestCustomDomains(TestCase):
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 1)
         self.assertIsNotNone(route, None)
-        self.assertEquals(domain.DomainNameConfigurations[0].get("EndpointType"), "REGIONAL")
+        self.assertEqual(domain.DomainNameConfigurations[0].get("EndpointType"), "REGIONAL")
 
     def test_basepaths(self):
         self.kwargs["domain"] = {
@@ -217,7 +217,7 @@ class TestCustomDomains(TestCase):
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 3)
         self.assertIsNotNone(route, None)
-        self.assertEquals(domain.DomainNameConfigurations[0].get("EndpointType"), "REGIONAL")
+        self.assertEqual(domain.DomainNameConfigurations[0].get("EndpointType"), "REGIONAL")
 
     def test_invalid_basepaths(self):
         self.kwargs["domain"] = {
@@ -229,7 +229,7 @@ class TestCustomDomains(TestCase):
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
             HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
-        self.assertEquals(
+        self.assertEqual(
             e.value.message, "Resource with id [HttpApiId] is invalid. " + "Invalid Basepath name provided."
         )
 
@@ -246,6 +246,6 @@ class TestCustomDomains(TestCase):
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 3)
         self.assertIsNotNone(route, None)
-        self.assertEquals(route.HostedZoneName, None)
-        self.assertEquals(route.HostedZoneId, "xyz")
-        self.assertEquals(len(route.RecordSets), 2)
+        self.assertEqual(route.HostedZoneName, None)
+        self.assertEqual(route.HostedZoneId, "xyz")
+        self.assertEqual(len(route.RecordSets), 2)

@@ -63,13 +63,13 @@
     "ApiGatewayDomainNameV20caaf24ab1": {
       "Type": "AWS::ApiGatewayV2::DomainName", 
       "Properties": {
+        "DomainName": "example.com", 
         "DomainNameConfigurations": [
           {
             "CertificateArn": "cert-arn-in-us-east-1", 
-            "EndpointType": "EDGE"
+            "EndpointType": "REGIONAL"
           }
         ], 
-        "DomainName": "example.com", 
         "Tags": {
           "httpapi:createdBy": "SAM"
         }
@@ -82,11 +82,16 @@
         "RecordSets": [
           {
             "AliasTarget": {
-              "HostedZoneId": "Z2FDTNDATAQYW2", 
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV20caaf24ab1", 
+                  "RegionalHostedZoneId"
+                ]
+              }, 
               "DNSName": {
                 "Fn::GetAtt": [
                   "ApiGatewayDomainNameV20caaf24ab1", 
-                  "DistributionDomainName"
+                  "RegionalDomainName"
                 ]
               }
             }, 

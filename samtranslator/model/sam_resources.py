@@ -878,6 +878,7 @@ class SamHttpApi(SamResourceMacro):
         "Auth": PropertyType(False, is_type(dict)),
         "RouteSettings": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
     }
 
     referable_properties = {
@@ -916,6 +917,7 @@ class SamHttpApi(SamResourceMacro):
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
+            fail_on_warnings=self.FailOnWarnings,
         )
 
         (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()

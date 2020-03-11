@@ -1,11 +1,11 @@
 Parameters:
   MyDomainName: 
     Type: String
-    Default: sam-v2-regional-test.com
+    Default: sam-example.com
 
   MyDomainCert: 
     Type: String
-    Default: arn:aws:acm:us-east-1:551213647843:certificate/6c911401-620d-4d41-b89e-366c238bb2f3
+    Default: arn:aws:acm:us-east-1:123455353535:certificate/6c911401-620d-4d41-b89e-366c238bb2f3
 
 Globals:
   HttpApi:
@@ -15,7 +15,7 @@ Globals:
       EndpointConfiguration: REGIONAL
       BasePath: ["/basic", "/begin-here"]
       Route53:
-        HostedZoneName: sam-v2-regional-test.com.
+        HostedZoneName: sam-example.com.
 
 
 Resources:

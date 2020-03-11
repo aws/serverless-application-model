@@ -75,14 +75,29 @@
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
             "title": {
-              "Ref": "AWS::StackName"
+              "Fn::Sub": "${AWS::StackName}-Apiv2"
             }
           }, 
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "ANY", 
+                  "type": "http_proxy", 
+                  "uri": "https://www.alphavantage.co/", 
+                  "payloadFormatVersion": "1.0"
+                }, 
+                "isDefaultRoute": true, 
+                "security": [
+                  {
+                    "OAuth2": []
+                  }
+                ]
+              }
+            }, 
+            "/": {
+              "get": {
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
@@ -91,7 +106,6 @@
                   }, 
                   "payloadFormatVersion": "1.0"
                 }, 
-                "isDefaultRoute": true, 
                 "security": [
                   {
                     "OAuth2": []
@@ -101,7 +115,7 @@
               }
             }
           }, 
-          "openapi": "3.0.1", 
+          "openapi": "3.0", 
           "components": {
             "securitySchemes": {
               "OAuth2": {
@@ -158,7 +172,7 @@
         ]
       }
     }, 
-    "HttpApiFunctionSimpleCase2Permission": {
+    "HttpApiFunctionBasePathPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:InvokeFunction", 
@@ -168,7 +182,7 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*", 
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
               "__Stage__": "*", 
               "__ApiId__": {
@@ -182,6 +196,7 @@
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
       "Properties": {
+        "FailOnWarnings": true,
         "Body": {
           "info": {
             "version": "1.0", 

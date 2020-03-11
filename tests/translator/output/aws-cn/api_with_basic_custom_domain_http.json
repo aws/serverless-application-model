@@ -1,11 +1,11 @@
 {
   "Parameters": {
     "MyDomainName": {
-      "Default": "sam-v2-regional-test.com", 
+      "Default": "sam-example.com", 
       "Type": "String"
     }, 
     "MyDomainCert": {
-      "Default": "arn:aws:acm:us-east-1:551213647843:certificate/6c911401-620d-4d41-b89e-366c238bb2f3", 
+      "Default": "arn:aws:acm:us-east-1:123455353535:certificate/6c911401-620d-4d41-b89e-366c238bb2f3", 
       "Type": "String"
     }
   }, 
@@ -17,11 +17,26 @@
           "Ref": "MyApi"
         }, 
         "DomainName": {
-          "Ref": "ApiGatewayDomainNameV2ab8e63947d"
+          "Ref": "ApiGatewayDomainNameV22dbf35af54"
         }, 
         "ApiMappingKey": "basic", 
         "Stage": {
           "Ref": "MyApiProdStage"
+        }
+      }
+    }, 
+    "ApiGatewayDomainNameV22dbf35af54": {
+      "Type": "AWS::ApiGatewayV2::DomainName", 
+      "Properties": {
+        "DomainName": "sam-example.com", 
+        "DomainNameConfigurations": [
+          {
+            "CertificateArn": "arn:aws:acm:us-east-1:123455353535:certificate/6c911401-620d-4d41-b89e-366c238bb2f3", 
+            "EndpointType": "REGIONAL"
+          }
+        ], 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
         }
       }
     }, 
@@ -88,38 +103,12 @@
           "Ref": "MyApi"
         }, 
         "DomainName": {
-          "Ref": "ApiGatewayDomainNameV2ab8e63947d"
+          "Ref": "ApiGatewayDomainNameV22dbf35af54"
         }, 
         "ApiMappingKey": "begin-here", 
         "Stage": {
           "Ref": "MyApiProdStage"
         }
-      }
-    }, 
-    "RecordSetGroup9616db1511": {
-      "Type": "AWS::Route53::RecordSetGroup", 
-      "Properties": {
-        "HostedZoneName": "sam-v2-regional-test.com.", 
-        "RecordSets": [
-          {
-            "AliasTarget": {
-              "HostedZoneId": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainNameV2ab8e63947d", 
-                  "RegionalHostedZoneId"
-                ]
-              }, 
-              "DNSName": {
-                "Fn::GetAtt": [
-                  "ApiGatewayDomainNameV2ab8e63947d", 
-                  "RegionalDomainName"
-                ]
-              }
-            }, 
-            "Type": "A", 
-            "Name": "sam-v2-regional-test.com"
-          }
-        ]
       }
     }, 
     "HttpApiFunctionRole": {
@@ -152,19 +141,30 @@
         ]
       }
     }, 
-    "ApiGatewayDomainNameV2ab8e63947d": {
-      "Type": "AWS::ApiGatewayV2::DomainName", 
+    "RecordSetGroup1f4f569a7e": {
+      "Type": "AWS::Route53::RecordSetGroup", 
       "Properties": {
-        "DomainName": "sam-v2-regional-test.com", 
-        "DomainNameConfigurations": [
+        "HostedZoneName": "sam-example.com.", 
+        "RecordSets": [
           {
-            "CertificateArn": "arn:aws:acm:us-east-1:551213647843:certificate/6c911401-620d-4d41-b89e-366c238bb2f3", 
-            "EndpointType": "REGIONAL"
+            "AliasTarget": {
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV22dbf35af54", 
+                  "RegionalHostedZoneId"
+                ]
+              }, 
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV22dbf35af54", 
+                  "RegionalDomainName"
+                ]
+              }
+            }, 
+            "Type": "A", 
+            "Name": "sam-example.com"
           }
-        ], 
-        "Tags": {
-          "httpapi:createdBy": "SAM"
-        }
+        ]
       }
     }, 
     "MyApi": {

@@ -8,6 +8,7 @@ Globals:
       "$default":
         DataTraceEnabled: True
         ThrottlingBurstLimit: 100
+    FailOnWarnings: true
 Resources:
   HttpApiFunction: 
     Type: AWS::Serverless::Function
