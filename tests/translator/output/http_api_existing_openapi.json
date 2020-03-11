@@ -105,6 +105,31 @@
             }
           }, 
           "paths": {
+            "/get/{something}/with/{params}": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
+                  }, 
+                  "payloadFormatVersion": "1.0"
+                }, 
+                "responses": {}, 
+                "parameters": [
+                  {
+                    "required": true, 
+                    "name": "something", 
+                    "in": "path"
+                  }, 
+                  {
+                    "required": true, 
+                    "name": "params", 
+                    "in": "path"
+                  }
+                ]
+              }
+            }, 
             "/basic": {
               "post": {
                 "x-amazon-apigateway-integration": {

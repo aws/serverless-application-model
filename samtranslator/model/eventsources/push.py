@@ -1072,8 +1072,10 @@ class HttpApi(PushEventSource):
             editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
         path_parameters = re.findall("{(.*?)}", self.Path)
         if path_parameters:
-            editor.add_path_parameters_to_method(api=api, path=self.Path, method_name=self.Method, path_parameters=path_parameters)
-        
+            editor.add_path_parameters_to_method(
+                api=api, path=self.Path, method_name=self.Method, path_parameters=path_parameters
+            )
+
         api["DefinitionBody"] = editor.openapi
 
     def _add_auth_to_openapi_integration(self, api, editor):

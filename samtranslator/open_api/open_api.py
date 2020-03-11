@@ -273,7 +273,14 @@ class OpenApiEditor(object):
             method_definition.setdefault("parameters", [])
             for param in path_parameters:
                 # find an existing parameter with this name if it exists
-                existing_parameter = next((existing_parameter for existing_parameter in method_definition.get("parameters", []) if existing_parameter.get("name") == param), None)
+                existing_parameter = next(
+                    (
+                        existing_parameter
+                        for existing_parameter in method_definition.get("parameters", [])
+                        if existing_parameter.get("name") == param
+                    ),
+                    None,
+                )
                 if existing_parameter:
                     # overwrite parameter values for existing path parameter
                     existing_parameter["in"] = "path"
