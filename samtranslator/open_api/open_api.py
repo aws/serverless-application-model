@@ -257,6 +257,38 @@ class OpenApiEditor(object):
             if self.method_definition_has_integration(method_definition):
                 method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
 
+    def add_path_parameters_to_method(self, api, path, method_name, path_parameters):
+        """
+        Adds path parameters to this path + method
+        
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        :param string path: Path name
+        :param string method_name: Method name
+        :param list path_parameters: list of strings of path parameters
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            # create path parameter list
+            # add it here if it doesn't exist, merge with existing otherwise.
+            method_definition.setdefault("parameters", [])
+            for param in path_parameters:
+                # find an existing parameter with this name if it exists
+                existing_parameter = next(
+                    (
+                        existing_parameter
+                        for existing_parameter in method_definition.get("parameters", [])
+                        if existing_parameter.get("name") == param
+                    ),
+                    None,
+                )
+                if existing_parameter:
+                    # overwrite parameter values for existing path parameter
+                    existing_parameter["in"] = "path"
+                    existing_parameter["required"] = True
+                else:
+                    parameter = {"name": param, "in": "path", "required": True}
+                    method_definition.get("parameters").append(parameter)
+
     def add_authorizers_security_definitions(self, authorizers):
         """
         Add Authorizer definitions to the securityDefinitions part of Swagger.
