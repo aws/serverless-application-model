@@ -54,11 +54,16 @@
         "RecordSets": [
           {
             "AliasTarget": {
-              "HostedZoneId": "Z2FDTNDATAQYW2", 
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV20caaf24ab1", 
+                  "RegionalHostedZoneId"
+                ]
+              }, 
               "DNSName": {
                 "Fn::GetAtt": [
                   "ApiGatewayDomainNameV20caaf24ab1", 
-                  "DistributionDomainName"
+                  "RegionalDomainName"
                 ]
               }
             }, 
@@ -67,11 +72,16 @@
           }, 
           {
             "AliasTarget": {
-              "HostedZoneId": "Z2FDTNDATAQYW2", 
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV20caaf24ab1", 
+                  "RegionalHostedZoneId"
+                ]
+              }, 
               "DNSName": {
                 "Fn::GetAtt": [
                   "ApiGatewayDomainNameV20caaf24ab1", 
-                  "DistributionDomainName"
+                  "RegionalDomainName"
                 ]
               }
             }, 
@@ -88,7 +98,7 @@
         "DomainNameConfigurations": [
           {
             "CertificateArn": "cert-arn-in-us-east-1", 
-            "EndpointType": "EDGE"
+            "EndpointType": "REGIONAL"
           }
         ], 
         "Tags": {
