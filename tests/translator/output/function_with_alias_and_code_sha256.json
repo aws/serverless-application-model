@@ -2,6 +2,7 @@
   "Resources": {
     "MinimalFunctionVersion6b86b273ff": {
       "DeletionPolicy": "Retain", 
+      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "Description": "sam-testing",

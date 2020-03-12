@@ -677,6 +677,7 @@ class SamFunction(SamResourceMacro):
         if attributes is None:
             attributes = {}
         attributes["DeletionPolicy"] = "Retain"
+        attributes["UpdateReplacePolicy"] = "Delete"
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
@@ -1106,6 +1107,7 @@ class SamLayerVersion(SamResourceMacro):
         if attributes is None:
             attributes = {}
         attributes["DeletionPolicy"] = retention_policy_value
+        attributes["UpdateReplacePolicy"] = "Delete"
 
         old_logical_id = self.logical_id
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
