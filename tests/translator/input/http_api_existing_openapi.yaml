@@ -35,6 +35,7 @@ Resources:
           Properties:
             ApiId: !Ref MyApi
             TimeoutInMillis: !Ref Timeout
+            PayloadFormatVersion: '1.0'
         PathParametersExisting:
           Type: HttpApi
           Properties:

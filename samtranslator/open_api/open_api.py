@@ -210,7 +210,7 @@ class OpenApiEditor(object):
         path_dict[method][self._X_APIGW_INTEGRATION] = {
             "type": "aws_proxy",
             "httpMethod": "POST",
-            "payloadFormatVersion": "1.0",
+            "payloadFormatVersion": "2.0",
             "uri": integration_uri,
         }
 
@@ -288,6 +288,20 @@ class OpenApiEditor(object):
                 else:
                     parameter = {"name": param, "in": "path", "required": True}
                     method_definition.get("parameters").append(parameter)
+
+    def add_payload_format_version_to_method(self, api, path, method_name, payload_format_version="2.0"):
+        """
+        Adds a payload format version to this path/method.
+
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        :param string path: Path name
+        :param string method_name: Method name
+        :param string payload_format_version: payload format version sent to the integration
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            if self.method_definition_has_integration(method_definition):
+                method_definition[self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = payload_format_version
 
     def add_authorizers_security_definitions(self, authorizers):
         """
