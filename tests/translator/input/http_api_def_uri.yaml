@@ -1,11 +1,16 @@
+Globals:
+  HttpApi:
+    DefaultRouteSettings:
+      ThrottlingRateLimit: 100.0
+
 Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       DefinitionUri: s3://bucket/key
-      Tags:
-        Tag: value
       StageName: !Join ["", ["Stage", "Name"]]
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 50
 
   MyApi2:
     Type: AWS::Serverless::HttpApi
@@ -14,8 +19,6 @@ Resources:
         Bucket: bucket
         Key: key
         Version: version
-      Tags:
-        Tag: value
 
   Function:
     Type: AWS::Serverless::Function

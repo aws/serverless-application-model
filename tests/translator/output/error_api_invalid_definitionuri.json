@@ -1,11 +1,11 @@
 {
   "errors": [
     {
-      "errorMessage": "Resource with id [Api] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form \"s3://bucket/key\" with optional versionId query parameter."
+      "errorMessage": "Resource with id [Api] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form 's3://bucket/key' with optional versionId query parameter."
     },
     {
-      "errorMessage": "Resource with id [ApiWithBodyAndDefinitionUri] is invalid. Specify either 'DefinitionUri' or 'DefinitionBody' property and not both"
+      "errorMessage": "Resource with id [ApiWithBodyAndDefinitionUri] is invalid. Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
     }
   ], 
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [Api] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form \"s3://bucket/key\" with optional versionId query parameter. Resource with id [ApiWithBodyAndDefinitionUri] is invalid. Specify either 'DefinitionUri' or 'DefinitionBody' property and not both"
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [Api] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form 's3://bucket/key' with optional versionId query parameter. Resource with id [ApiWithBodyAndDefinitionUri] is invalid. Specify either 'DefinitionUri' or 'DefinitionBody' property and not both."
 }

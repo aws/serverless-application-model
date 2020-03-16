@@ -1,0 +1,22 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowCredentials: false
+      DefinitionUri: s3://bucket/key
+      Tags:
+        Tag: value
+      StageName: !Join ["", ["Stage", "Name"]]
+
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.7
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: MyApi

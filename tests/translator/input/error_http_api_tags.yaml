@@ -1,0 +1,8 @@
+Resources:
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        invalid: def_body
+      Tags:
+        Tag: value

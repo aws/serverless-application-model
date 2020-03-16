@@ -1,0 +1,53 @@
+Conditions:
+  C1:
+    Fn::Equals:
+      - true
+      - true  
+Parameters:
+  MyDomainCert: 
+    Type: String
+    Default: another-api-arn
+
+  EndpointConf: 
+    Type: String
+    Default: REGIONAL
+
+Resources:
+  MyFunction:
+    Condition: C1
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+            Method: Put
+            Path: /get
+        ImplicitGet:
+          Type: HttpApi
+          Properties:
+            Method: Post
+            Path: /implicit
+
+  MyApi:
+    Condition: C1
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod
+      Domain:
+        DomainName: !Sub 'example-${AWS::Region}.com'
+        CertificateArn: !Ref MyDomainCert
+        EndpointConfiguration: !Ref EndpointConf
+        BasePath: [ "/get", "/fetch" ]
+

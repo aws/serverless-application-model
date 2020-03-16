@@ -4,7 +4,9 @@ from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
+from samtranslator.model.intrinsics import is_intrinsic
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+import json
 
 
 class OpenApiEditor(object):
@@ -16,6 +18,8 @@ class OpenApiEditor(object):
     """
 
     _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
+    _X_APIGW_TAG_VALUE = "x-amazon-apigateway-tag-value"
+    _X_APIGW_CORS = "x-amazon-apigateway-cors"
     _CONDITIONAL_IF = "Fn::If"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -26,8 +30,8 @@ class OpenApiEditor(object):
         Initialize the class with a swagger dictionary. This class creates a copy of the Swagger and performs all
         modifications on this copy.
 
-        :param dict doc: Swagger document as a dictionary
-        :raises ValueError: If the input Swagger document does not meet the basic Swagger requirements.
+        :param dict doc: OpenApi document as a dictionary
+        :raises ValueError: If the input OpenApi document does not meet the basic OpenApi requirements.
         """
         if not OpenApiEditor.is_valid(doc):
             raise ValueError(
@@ -39,6 +43,7 @@ class OpenApiEditor(object):
         self.paths = self._doc["paths"]
         self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
         self.definitions = self._doc.get("definitions", {})
+        self.tags = self._doc.get("tags", [])
 
     def get_path(self, path):
         """
@@ -85,10 +90,12 @@ class OpenApiEditor(object):
 
         # Extract the integration uri out of a conditional if necessary
         uri = integration.get("uri")
+        if not isinstance(uri, dict):
+            return ""
         if self._CONDITIONAL_IF in uri:
             arn = uri[self._CONDITIONAL_IF][1].get("Fn::Sub")
         else:
-            arn = uri.get("Fn::Sub")
+            arn = uri.get("Fn::Sub", "")
 
         # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
         regex = "([A-Za-z0-9]+\.Arn)"
@@ -203,7 +210,7 @@ class OpenApiEditor(object):
         path_dict[method][self._X_APIGW_INTEGRATION] = {
             "type": "aws_proxy",
             "httpMethod": "POST",
-            "payloadFormatVersion": "1.0",
+            "payloadFormatVersion": "2.0",
             "uri": integration_uri,
         }
 
@@ -235,6 +242,66 @@ class OpenApiEditor(object):
 
         for path, value in self.paths.items():
             yield path
+
+    def add_timeout_to_method(self, api, path, method_name, timeout):
+        """
+        Adds a timeout to this path/method.
+        
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        :param string path: Path name
+        :param string method_name: Method name
+        :param int timeout: Timeout amount, in milliseconds
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            if self.method_definition_has_integration(method_definition):
+                method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
+
+    def add_path_parameters_to_method(self, api, path, method_name, path_parameters):
+        """
+        Adds path parameters to this path + method
+        
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        :param string path: Path name
+        :param string method_name: Method name
+        :param list path_parameters: list of strings of path parameters
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            # create path parameter list
+            # add it here if it doesn't exist, merge with existing otherwise.
+            method_definition.setdefault("parameters", [])
+            for param in path_parameters:
+                # find an existing parameter with this name if it exists
+                existing_parameter = next(
+                    (
+                        existing_parameter
+                        for existing_parameter in method_definition.get("parameters", [])
+                        if existing_parameter.get("name") == param
+                    ),
+                    None,
+                )
+                if existing_parameter:
+                    # overwrite parameter values for existing path parameter
+                    existing_parameter["in"] = "path"
+                    existing_parameter["required"] = True
+                else:
+                    parameter = {"name": param, "in": "path", "required": True}
+                    method_definition.get("parameters").append(parameter)
+
+    def add_payload_format_version_to_method(self, api, path, method_name, payload_format_version="2.0"):
+        """
+        Adds a payload format version to this path/method.
+
+        :param dict api: Reference to the related Api's properties as defined in the template.
+        :param string path: Path name
+        :param string method_name: Method name
+        :param string payload_format_version: payload format version sent to the integration
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            if self.method_definition_has_integration(method_definition):
+                method_definition[self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = payload_format_version
 
     def add_authorizers_security_definitions(self, authorizers):
         """
@@ -344,6 +411,90 @@ class OpenApiEditor(object):
             if security:
                 method_definition["security"] = security
 
+    def add_tags(self, tags):
+        """
+        Adds tags to the OpenApi definition using an ApiGateway extension for tag values.
+
+        :param dict tags: dictionary of tagName:tagValue pairs.
+        """
+        for name, value in tags.items():
+            # find an existing tag with this name if it exists
+            existing_tag = next((existing_tag for existing_tag in self.tags if existing_tag.get("name") == name), None)
+            if existing_tag:
+                # overwrite tag value for an existing tag
+                existing_tag[self._X_APIGW_TAG_VALUE] = value
+            else:
+                tag = {"name": name, self._X_APIGW_TAG_VALUE: value}
+                self.tags.append(tag)
+
+    def add_cors(
+        self,
+        allow_origins,
+        allow_headers=None,
+        allow_methods=None,
+        expose_headers=None,
+        max_age=None,
+        allow_credentials=None,
+    ):
+        """
+        Add CORS configuration to this Api to _X_APIGW_CORS header in open api definition
+
+        Following this guide:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-cors.html
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigatewayv2-api-cors.html
+
+        :param list/dict allowed_origins: Comma separate list of allowed origins.
+            Value can also be an intrinsic function dict.
+        :param list/dict allowed_headers: Comma separated list of allowed headers.
+            Value can also be an intrinsic function dict.
+        :param list/dict allowed_methods: Comma separated list of allowed methods.
+            Value can also be an intrinsic function dict.
+        :param list/dict expose_headers: Comma separated list of allowed methods.
+            Value can also be an intrinsic function dict.
+        :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
+            Access-Control-Max-Age header. Value can also be an intrinsic function dict.
+        :param bool/None allowed_credentials: Flags whether request is allowed to contain credentials.
+        """
+        ALLOW_ORIGINS = "allowOrigins"
+        ALLOW_HEADERS = "allowHeaders"
+        ALLOW_METHODS = "allowMethods"
+        EXPOSE_HEADERS = "exposeHeaders"
+        MAX_AGE = "maxAge"
+        ALLOW_CREDENTIALS = "allowCredentials"
+        cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
+        cors_configuration = self._doc.get(self._X_APIGW_CORS, dict())
+
+        # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
+        if allow_origins and is_intrinsic(allow_origins):
+            cors_configuration_string = json.dumps(allow_origins)
+            for header in cors_headers:
+                # example: allowOrigins to AllowOrigins
+                keyword = header[0].upper() + header[1:]
+                cors_configuration_string = cors_configuration_string.replace(keyword, header)
+            cors_configuration_dict = json.loads(cors_configuration_string)
+            cors_configuration.update(cors_configuration_dict)
+
+        else:
+            if allow_origins:
+                cors_configuration[ALLOW_ORIGINS] = allow_origins
+            if allow_headers:
+                cors_configuration[ALLOW_HEADERS] = allow_headers
+            if allow_methods:
+                cors_configuration[ALLOW_METHODS] = allow_methods
+            if expose_headers:
+                cors_configuration[EXPOSE_HEADERS] = expose_headers
+            if max_age is not None:
+                cors_configuration[MAX_AGE] = max_age
+            if allow_credentials is True:
+                cors_configuration[ALLOW_CREDENTIALS] = allow_credentials
+
+        self._doc[self._X_APIGW_CORS] = cors_configuration
+
+    def has_api_gateway_cors(self):
+        if self._doc.get(self._X_APIGW_CORS):
+            return True
+        return False
+
     @property
     def openapi(self):
         """
@@ -354,6 +505,9 @@ class OpenApiEditor(object):
 
         # Make sure any changes to the paths are reflected back in output
         self._doc["paths"] = self.paths
+
+        if self.tags:
+            self._doc["tags"] = self.tags
 
         if self.security_schemes:
             self._doc.setdefault("components", {})

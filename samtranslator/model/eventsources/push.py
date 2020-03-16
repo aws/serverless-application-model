@@ -937,6 +937,9 @@ class HttpApi(PushEventSource):
         "ApiId": PropertyType(False, is_str()),
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
+        "TimeoutInMillis": PropertyType(False, is_type(int)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
+        "PayloadFormatVersion": PropertyType(False, is_str()),
     }
 
     def resources_to_link(self, resources):
@@ -1066,6 +1069,18 @@ class HttpApi(PushEventSource):
         editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)
         if self.Auth:
             self._add_auth_to_openapi_integration(api, editor)
+        if self.TimeoutInMillis:
+            editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
+        path_parameters = re.findall("{(.*?)}", self.Path)
+        if path_parameters:
+            editor.add_path_parameters_to_method(
+                api=api, path=self.Path, method_name=self.Method, path_parameters=path_parameters
+            )
+
+        if self.PayloadFormatVersion:
+            editor.add_payload_format_version_to_method(
+                api=api, path=self.Path, method_name=self.Method, payload_format_version=self.PayloadFormatVersion
+            )
         api["DefinitionBody"] = editor.openapi
 
     def _add_auth_to_openapi_integration(self, api, editor):

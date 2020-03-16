@@ -233,7 +233,8 @@ class ApiGatewayAuthorizer(object):
     ):
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(
-                api_logical_id, name + " Authorizer has invalid " "'FunctionPayloadType': " + function_payload_type
+                api_logical_id,
+                name + " Authorizer has invalid " "'FunctionPayloadType': " + function_payload_type + ".",
             )
 
         if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):

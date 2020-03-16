@@ -28,3 +28,8 @@ Resources:
           Properties:
             Path: /basic2
             Method: post
+        PathParameters:
+          Type: HttpApi
+          Properties:
+            Path: /get/{something}/with/{params}
+            Method: POST

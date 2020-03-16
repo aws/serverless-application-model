@@ -1,0 +1,50 @@
+Parameters:
+  MyDomainName: 
+    Type: String
+    Default: sam-example.com
+
+  MyDomainCert: 
+    Type: String
+    Default: arn:aws:acm:us-east-1:123455353535:certificate/6c911401-620d-4d41-b89e-366c238bb2f3
+
+Globals:
+  HttpApi:
+    Domain:
+      DomainName: !Ref MyDomainName
+      CertificateArn: !Ref MyDomainCert
+      EndpointConfiguration: REGIONAL
+      BasePath: ["/basic", "/begin-here"]
+      Route53:
+        HostedZoneName: sam-example.com.
+
+
+Resources:
+  HttpApiFunction: 
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        Basic:
+          Type: HttpApi
+          Properties:
+            Path: /basic
+            Method: post
+            ApiId: !Ref MyApi
+        SimpleCase:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+  
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod

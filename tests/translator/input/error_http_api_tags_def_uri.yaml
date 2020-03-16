@@ -1,0 +1,7 @@
+Resources:
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionUri: s3://bucket/key
+      Tags:
+        Tag: value

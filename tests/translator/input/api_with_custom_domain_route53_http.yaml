@@ -1,0 +1,41 @@
+Parameters:
+  DomainName:
+    Type: String
+    Default: 'example.com'
+  ACMCertificateArn:
+    Type: String
+    Default: 'cert-arn-in-us-east-1'
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        Fetch:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+            Method: Post
+            Path: /fetch
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod
+      Domain:
+        DomainName: !Ref DomainName
+        CertificateArn: !Ref ACMCertificateArn
+        BasePath:
+          - /one
+        Route53:
+         HostedZoneId: ZQ1UAL4EFZVME
+         IpV6: true

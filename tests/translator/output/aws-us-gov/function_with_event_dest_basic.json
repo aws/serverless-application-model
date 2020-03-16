@@ -121,21 +121,12 @@
         "Runtime": "nodejs12.x"
       }
     }, 
-    "MyTestFunctionVersion948f7f815d": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::Version", 
-      "Properties": {
-        "FunctionName": {
-          "Ref": "MyTestFunction"
-        }
-      }
-    }, 
     "MyTestFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
       "Properties": {
         "FunctionVersion": {
           "Fn::GetAtt": [
-            "MyTestFunctionVersion948f7f815d", 
+            "MyTestFunctionVersiondaf9da458d", 
             "Version"
           ]
         }, 
@@ -143,6 +134,15 @@
           "Ref": "MyTestFunction"
         }, 
         "Name": "live"
+      }
+    }, 
+    "MyTestFunctionVersiondaf9da458d": {
+      "DeletionPolicy": "Retain", 
+      "Type": "AWS::Lambda::Version", 
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyTestFunction"
+        }
       }
     }
   }

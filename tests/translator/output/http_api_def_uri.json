@@ -45,10 +45,14 @@
     "MyApiStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
+        "AutoDeploy": true, 
         "ApiId": {
           "Ref": "MyApi"
         }, 
-        "AutoDeploy": true, 
+        "DefaultRouteSettings": {
+          "ThrottlingBurstLimit": 50, 
+          "ThrottlingRateLimit": 100.0
+        }, 
         "StageName": {
           "Fn::Join": [
             "", 
@@ -57,21 +61,12 @@
               "Name"
             ]
           ]
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }, 
     "FunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -88,6 +83,9 @@
             }
           ]
         }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
@@ -99,17 +97,14 @@
     "MyApi2ApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
+        "AutoDeploy": true, 
         "ApiId": {
           "Ref": "MyApi2"
         }, 
-        "AutoDeploy": true, 
-        "StageName": "$default", 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        "DefaultRouteSettings": {
+          "ThrottlingRateLimit": 100.0
+        }, 
+        "StageName": "$default"
       }
     }, 
     "MyApi2": {
@@ -119,13 +114,7 @@
           "Version": "version", 
           "Bucket": "bucket", 
           "Key": "key"
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }, 
     "FunctionApi2Permission": {
@@ -155,13 +144,7 @@
         "BodyS3Location": {
           "Bucket": "bucket", 
           "Key": "key"
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }
   }

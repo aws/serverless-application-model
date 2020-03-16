@@ -48,7 +48,11 @@
         "ApiId": {
           "Ref": "MyApi"
         }, 
-        "AutoDeploy": true, 
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+          "ThrottlingBurstLimit": 50,
+          "ThrottlingRateLimit": 100.0
+        }, 
         "StageName": {
           "Fn::Join": [
             "", 
@@ -57,13 +61,7 @@
               "Name"
             ]
           ]
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }, 
     "FunctionRole": {
@@ -102,14 +100,11 @@
         "ApiId": {
           "Ref": "MyApi2"
         }, 
-        "AutoDeploy": true, 
-        "StageName": "$default", 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+            "ThrottlingRateLimit": 100
+        },
+        "StageName": "$default"
       }
     }, 
     "MyApi2": {
@@ -119,13 +114,7 @@
           "Version": "version", 
           "Bucket": "bucket", 
           "Key": "key"
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }, 
     "FunctionApi2Permission": {
@@ -155,13 +144,7 @@
         "BodyS3Location": {
           "Bucket": "bucket", 
           "Key": "key"
-        }, 
-        "Tags": [
-          {
-            "Value": "value", 
-            "Key": "Tag"
-          }
-        ]
+        }
       }
     }
   }
