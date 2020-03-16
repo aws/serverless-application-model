@@ -3,6 +3,10 @@
     "CorsParam": {
       "Default": true, 
       "Type": "String"
+    },
+    "PayloadFormatVersion": {
+        "Default": "1.0",
+        "Type": "String"
     }
   }, 
   "Resources": {
@@ -128,7 +132,9 @@
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
                   }, 
-                  "payloadFormatVersion": "1.0"
+                  "payloadFormatVersion": {
+                    "Ref": "PayloadFormatVersion"
+                  }
                 }, 
                 "isDefaultRoute": true, 
                 "responses": {}

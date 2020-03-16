@@ -217,7 +217,7 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
             _X_INTEGRATION: {
                 "type": "aws_proxy",
                 "httpMethod": "POST",
-                "payloadFormatVersion": "1.0",
+                "payloadFormatVersion": "2.0",
                 "uri": integration_uri,
             },
         }
@@ -241,7 +241,7 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
                     _X_INTEGRATION: {
                         "type": "aws_proxy",
                         "httpMethod": "POST",
-                        "payloadFormatVersion": "1.0",
+                        "payloadFormatVersion": "2.0",
                         "uri": {"Fn::If": ["condition", integration_uri, {"Ref": "AWS::NoValue"}]},
                     },
                 },
@@ -268,7 +268,7 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
             _X_INTEGRATION: {
                 "type": "aws_proxy",
                 "httpMethod": "POST",
-                "payloadFormatVersion": "1.0",
+                "payloadFormatVersion": "2.0",
                 "uri": integration_uri,
             },
         }
