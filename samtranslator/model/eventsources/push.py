@@ -939,6 +939,7 @@ class HttpApi(PushEventSource):
         "Auth": PropertyType(False, is_type(dict)),
         "TimeoutInMillis": PropertyType(False, is_type(int)),
         "RouteSettings": PropertyType(False, is_type(dict)),
+        "PayloadFormatVersion": PropertyType(False, is_str()),
     }
 
     def resources_to_link(self, resources):
@@ -1076,6 +1077,10 @@ class HttpApi(PushEventSource):
                 api=api, path=self.Path, method_name=self.Method, path_parameters=path_parameters
             )
 
+        if self.PayloadFormatVersion:
+            editor.add_payload_format_version_to_method(
+                api=api, path=self.Path, method_name=self.Method, payload_format_version=self.PayloadFormatVersion
+            )
         api["DefinitionBody"] = editor.openapi
 
     def _add_auth_to_openapi_integration(self, api, editor):
