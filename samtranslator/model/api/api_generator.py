@@ -293,7 +293,8 @@ class ApiGenerator(object):
         elif endpoint not in ["EDGE", "REGIONAL", "PRIVATE"]:
             raise InvalidResourceException(
                 self.logical_id,
-                "EndpointConfiguration for Custom Domains must be" " one of {}.".format(["EDGE", "REGIONAL", "PRIVATE"]),
+                "EndpointConfiguration for Custom Domains must be"
+                " one of {}.".format(["EDGE", "REGIONAL", "PRIVATE"]),
             )
 
         if endpoint == "REGIONAL":
@@ -933,4 +934,3 @@ class ApiGenerator(object):
         else:
             rest_api.EndpointConfiguration = {"Types": [value]}
             rest_api.Parameters = {"endpointConfigurationTypes": value}
-
