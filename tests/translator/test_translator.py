@@ -162,6 +162,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "implicit_api",
                 "explicit_api",
                 "api_endpoint_configuration",
+                "api_endpoint_configuration_with_vpcendpoint",
                 "api_with_auth_all_maximum",
                 "api_with_auth_all_minimum",
                 "api_with_auth_no_default",

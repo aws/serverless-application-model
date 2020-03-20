@@ -290,10 +290,10 @@ class ApiGenerator(object):
         if endpoint is None:
             endpoint = "REGIONAL"
             self.domain["EndpointConfiguration"] = "REGIONAL"
-        elif endpoint not in ["EDGE", "REGIONAL"]:
+        elif endpoint not in ["EDGE", "REGIONAL", "PRIVATE"]:
             raise InvalidResourceException(
                 self.logical_id,
-                "EndpointConfiguration for Custom Domains must be" " one of {}.".format(["EDGE", "REGIONAL"]),
+                "EndpointConfiguration for Custom Domains must be" " one of {}.".format(["EDGE", "REGIONAL", "PRIVATE"]),
             )
 
         if endpoint == "REGIONAL":
@@ -925,6 +925,12 @@ class ApiGenerator(object):
         :param rest_api: RestApi resource
         :param string/dict value: Value to be set
         """
+        if isinstance(value, dict):
+            rest_api.EndpointConfiguration = {"Types": [value.get("Types", value)]}
+            rest_api.Parameters = {"endpointConfigurationTypes": value.get("Types", value)}
+            if "VPCEndpointIds" in value.keys():
+                rest_api.EndpointConfiguration["VpcEndpointIds"] = value.get("VPCEndpointIds")
+        else:
+            rest_api.EndpointConfiguration = {"Types": [value]}
+            rest_api.Parameters = {"endpointConfigurationTypes": value}
 
-        rest_api.EndpointConfiguration = {"Types": [value]}
-        rest_api.Parameters = {"endpointConfigurationTypes": value}
