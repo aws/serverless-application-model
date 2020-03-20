@@ -927,8 +927,11 @@ class ApiGenerator(object):
         :param string/dict value: Value to be set
         """
         if isinstance(value, dict):
-            rest_api.EndpointConfiguration = {"Types": [value.get("Types", value)]}
             rest_api.Parameters = {"endpointConfigurationTypes": value.get("Types", value)}
+            if isinstance(value.get("Types"), list):
+                rest_api.EndpointConfiguration = {"Types": value.get("Types", value)}
+            else:
+                rest_api.EndpointConfiguration = {"Types": [value.get("Types", value)]}
             if "VPCEndpointIds" in value.keys():
                 rest_api.EndpointConfiguration["VpcEndpointIds"] = value.get("VPCEndpointIds")
         else:

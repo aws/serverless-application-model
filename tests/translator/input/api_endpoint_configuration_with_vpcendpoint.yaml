@@ -1,5 +1,7 @@
 Parameters:
-  EndpointConfig:
+  EndpointConfigType:
+    Type: String
+  VpcEndpointId:
     Type: String
 
 Globals:
@@ -7,11 +9,9 @@ Globals:
     # Overriding this property for Implicit API
     EndpointConfiguration:
       Types:
-        - PRIVATE
+        - "Ref": "EndpointConfigType"
       VPCEndpointIds:
-        - VPCEndpoint1
-        - VPCEndpoint2
-
+        - "Ref": "VpcEndpointId"
 Resources:
   ImplicitApiFunction:
     Type: AWS::Serverless::Function

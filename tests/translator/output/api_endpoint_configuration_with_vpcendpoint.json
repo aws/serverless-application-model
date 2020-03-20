@@ -1,6 +1,9 @@
 {
   "Parameters": {
-    "EndpointConfig": {
+    "VpcEndpointId": {
+      "Type": "String"
+    },
+    "EndpointConfigType": {
       "Type": "String"
     }
   }, 
@@ -165,21 +168,24 @@
             }
           }, 
           "swagger": "2.0"
-        }, 
+        },
         "EndpointConfiguration": {
           "VpcEndpointIds": [
-            "VPCEndpoint1",
-            "VPCEndpoint2"
+            {
+              "Ref": "VpcEndpointId"
+            }
           ],
           "Types": [
-            [
-              "PRIVATE"
-            ]
+            {
+              "Ref": "EndpointConfigType"
+            }
           ]
-        }, 
+        },
         "Parameters": {
           "endpointConfigurationTypes": [
-            "PRIVATE"
+            {
+              "Ref": "EndpointConfigType"
+            }
           ]
         }
       }
