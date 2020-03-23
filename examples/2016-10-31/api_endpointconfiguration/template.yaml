@@ -16,7 +16,7 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration:
-        Types:
+        Type:
           - !Ref EndpointConfigType
         VPCEndpointIds:
           - !Ref VpcEndpointId

@@ -182,11 +182,9 @@
           ]
         },
         "Parameters": {
-          "endpointConfigurationTypes": [
-            {
-              "Ref": "EndpointConfigType"
-            }
-          ]
+          "endpointConfigurationTypes": {
+            "Ref": "EndpointConfigType"
+          }
         }
       }
     }
