@@ -124,11 +124,19 @@ class HttpApiGenerator(object):
         Adds CORS configuration only if DefinitionBody is present and
         APIGW extension for CORS is not present in the DefinitionBody
         """
-
         if self.cors_configuration and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "Cors works only with inline OpenApi specified in 'DefinitionBody' property."
             )
+
+        if not OpenApiEditor.is_valid(self.definition_body):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to add Cors configuration because "
+                "'DefinitionBody' does not contain a valid "
+                "OpenApi definition.",
+            )
+        editor = OpenApiEditor(self.definition_body)
 
         # If cors configuration is set to true add * to the allow origins.
         # This also support referencing the value as a parameter
@@ -137,8 +145,10 @@ class HttpApiGenerator(object):
             properties = CorsProperties(AllowOrigins=[_CORS_WILDCARD])
 
         elif is_intrinsic(self.cors_configuration):
-            # Just set Origin property. Intrinsics will be handledOthers will be defaults
-            properties = CorsProperties(AllowOrigins=self.cors_configuration)
+            # This will override OpenApi cors configuration
+            editor.add_cors_intrinsics(self.cors_configuration)
+            self.definition_body = editor.openapi
+            return
 
         elif isinstance(self.cors_configuration, dict):
             # Make sure keys in the dict are recognized
@@ -150,14 +160,6 @@ class HttpApiGenerator(object):
         else:
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Cors' property.")
 
-        if not OpenApiEditor.is_valid(self.definition_body):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Unable to add Cors configuration because "
-                "'DefinitionBody' does not contain a valid "
-                "OpenApi definition.",
-            )
-
         if properties.AllowCredentials is True and properties.AllowOrigins == [_CORS_WILDCARD]:
             raise InvalidResourceException(
                 self.logical_id,
@@ -166,7 +168,6 @@ class HttpApiGenerator(object):
                 "'AllowOrigin' is \"'*'\" or not set.",
             )
 
-        editor = OpenApiEditor(self.definition_body)
         # if CORS is set in both definition_body and as a CorsConfiguration property,
         # SAM merges and overrides the cors headers in definition_body with headers of CorsConfiguration
         editor.add_cors(

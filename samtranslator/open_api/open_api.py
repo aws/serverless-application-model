@@ -461,12 +461,46 @@ class OpenApiEditor(object):
         EXPOSE_HEADERS = "exposeHeaders"
         MAX_AGE = "maxAge"
         ALLOW_CREDENTIALS = "allowCredentials"
-        cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
+
+        # overrides and merges the cors configuration present in OpenApi
         cors_configuration = self._doc.get(self._X_APIGW_CORS, dict())
 
+        if allow_origins:
+            cors_configuration[ALLOW_ORIGINS] = allow_origins
+        if allow_headers:
+            cors_configuration[ALLOW_HEADERS] = allow_headers
+        if allow_methods:
+            cors_configuration[ALLOW_METHODS] = allow_methods
+        if expose_headers:
+            cors_configuration[EXPOSE_HEADERS] = expose_headers
+        if max_age is not None:
+            cors_configuration[MAX_AGE] = max_age
+        if allow_credentials is True:
+            cors_configuration[ALLOW_CREDENTIALS] = allow_credentials
+
+        self._doc[self._X_APIGW_CORS] = cors_configuration
+
+    def add_cors_intrinsics(
+        self, cors_properties,
+    ):
+        """
+        Add CORS configuration to this Api to _X_APIGW_CORS header in open api definition
+
+        :param dict cors_properties: cors properties enclosed in instrinsic functions
+        """
+
+        ALLOW_ORIGINS = "allowOrigins"
+        ALLOW_HEADERS = "allowHeaders"
+        ALLOW_METHODS = "allowMethods"
+        EXPOSE_HEADERS = "exposeHeaders"
+        MAX_AGE = "maxAge"
+        ALLOW_CREDENTIALS = "allowCredentials"
+        cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
+        cors_configuration = dict()
+
         # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
-        if allow_origins and is_intrinsic(allow_origins):
-            cors_configuration_string = json.dumps(allow_origins)
+        if cors_properties and is_intrinsic(cors_properties):
+            cors_configuration_string = json.dumps(cors_properties)
             for header in cors_headers:
                 # example: allowOrigins to AllowOrigins
                 keyword = header[0].upper() + header[1:]
@@ -474,20 +508,7 @@ class OpenApiEditor(object):
             cors_configuration_dict = json.loads(cors_configuration_string)
             cors_configuration.update(cors_configuration_dict)
 
-        else:
-            if allow_origins:
-                cors_configuration[ALLOW_ORIGINS] = allow_origins
-            if allow_headers:
-                cors_configuration[ALLOW_HEADERS] = allow_headers
-            if allow_methods:
-                cors_configuration[ALLOW_METHODS] = allow_methods
-            if expose_headers:
-                cors_configuration[EXPOSE_HEADERS] = expose_headers
-            if max_age is not None:
-                cors_configuration[MAX_AGE] = max_age
-            if allow_credentials is True:
-                cors_configuration[ALLOW_CREDENTIALS] = allow_credentials
-
+        # overrides the cors configuration present in OpenApi
         self._doc[self._X_APIGW_CORS] = cors_configuration
 
     def has_api_gateway_cors(self):
