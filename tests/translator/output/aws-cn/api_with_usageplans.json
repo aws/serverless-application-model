@@ -100,10 +100,7 @@
         "UsagePlanId": {
           "Ref": "MyApiTwoUsagePlan"
         }
-      },
-      "DependsOn": [
-        "MyApiTwoApiKey"
-      ]
+      }
     },
     "MyApiThree": {
       "Type": "AWS::ApiGateway::RestApi",
@@ -399,11 +396,7 @@
             }
           }
         ]
-      },
-      "DependsOn": [
-        "MyApiThree",
-        "ServerlessRestApi"
-      ]
+      }
     },
     "MyApiTwoUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
@@ -439,10 +432,7 @@
           "BurstLimit": 1000
         },
         "UsagePlanName": "SomeRandomName"
-      },
-      "DependsOn": [
-        "MyApiTwo"
-      ]
+      }
     },
     "MyFunctionTwoImplicitApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
@@ -543,10 +533,7 @@
         "UsagePlanId": {
           "Ref": "ServerlessUsagePlan"
         }
-      },
-      "DependsOn": [
-        "ServerlessApiKey"
-      ]
+      }
     },
     "MyApiOne": {
       "Type": "AWS::ApiGateway::RestApi",
