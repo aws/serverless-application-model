@@ -274,6 +274,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_event_dest_conditional",
                 "api_with_usageplans",
                 "api_with_usageplans_intrinsics",
+                "cognito_userpool_with_username_configuration",
             ],
             [
                 ("aws", "ap-southeast-1"),
