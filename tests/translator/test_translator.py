@@ -274,6 +274,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_event_dest_conditional",
                 "api_with_usageplans",
                 "api_with_usageplans_intrinsics",
+                "api_with_basic_custom_domain_security_policy",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -353,6 +354,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "http_api_def_uri",
                 "explicit_http_api",
                 "http_api_with_cors",
+                "api_with_basic_custom_domain_security_policy",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -617,6 +619,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_with_api_key_false",
         "error_api_with_usage_plan_invalid_parameter",
         "error_http_api_with_cors_def_uri",
+        "error_api_with_custom_domains_security_policy_invalid",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

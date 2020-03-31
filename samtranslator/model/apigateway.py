@@ -166,6 +166,7 @@ class ApiGatewayDomainName(Resource):
         "DomainName": PropertyType(True, is_str()),
         "EndpointConfiguration": PropertyType(False, is_type(dict)),
         "CertificateArn": PropertyType(False, is_str()),
+        "SecurityPolicy": PropertyType(False, is_str()),
     }
 
 
