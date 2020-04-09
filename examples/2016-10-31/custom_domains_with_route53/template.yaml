@@ -1,3 +1,6 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
 Parameters:
   DomainName:
     Type: String
@@ -36,6 +39,7 @@ Resources:
         DomainName: !Ref DomainName
         CertificateArn: !Ref ACMCertificateArn
         EndpointConfiguration: EDGE
+        SecurityPolicy: 'TLS_1_2'
         BasePath:
           - /home
         Route53:
