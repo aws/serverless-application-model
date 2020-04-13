@@ -73,8 +73,7 @@ drops below 95%.
 End to end tests
 ~~~~~~~~~~~~~~~~
 
-``make e2e tests`` command will run all end to end tests. This command is configured to fail when code coverage for package
-drops below 95%.
+``make e2e tests`` command will run all end to end tests. This command is configured to fail when code coverage for package drops below 95%.
 
 ``pytest end-to-end-tests/tst/test.py`` command will run the integration test `test.py`
 
