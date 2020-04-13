@@ -3,6 +3,7 @@ from resource_status import ResourceStatus
 
 import re
 
+
 class Resources:
 
     LOGICALID_WITH_HASH_PATTERN = "^(.+)([a-fA-F0-9]{10})$"

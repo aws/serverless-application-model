@@ -42,30 +42,60 @@ class RestApiWithAuthorizersTest(BaseTest):
         rest_api_id = self.get_stack_resource_with_resource_type(ResourceTypes.APIGW_RESTAPI).get("PhysicalResourceId")
         api_gateway_client = boto3.client("apigateway")
         authorizers = api_gateway_client.get_authorizers(restApiId=rest_api_id).get("items")
-        lambda_authorizer_uri = "arn:aws:apigateway:" + boto3.session.Session().region_name + \
-                                ":lambda:path/2015-03-31/functions/" + stack_outputs.get("AuthorizerFunctionArn")\
-                                + "/invocations"
+        lambda_authorizer_uri = (
+            "arn:aws:apigateway:"
+            + boto3.session.Session().region_name
+            + ":lambda:path/2015-03-31/functions/"
+            + stack_outputs.get("AuthorizerFunctionArn")
+            + "/invocations"
+        )
         lambda_token_authorizer = self.get_authorizer_by_name(authorizers, "MyLambdaTokenAuth")
         self.assertEquals(lambda_token_authorizer.get("type"), "TOKEN", "lambdaTokenAuthorizer: Type must be TOKEN")
-        self.assertEquals(lambda_token_authorizer.get("identitySource"), "method.request.header.Authorization", "lambdaTokenAuthorizer: identity source must be method.request.header.Authorization")
-        self.assertEquals(lambda_token_authorizer.get("authorizerCredentials"), None, "lambdaTokenAuthorizer: authorizer credentials must not be set")
-        self.assertEquals(lambda_token_authorizer.get("identityValidationExpression"), None, "lambdaTokenAuthorizer: validation expression must not be set")
-        self.assertEquals(lambda_token_authorizer.get("authorizerUri"), lambda_authorizer_uri, "lambdaTokenAuthorizer: authorizer URI must be the Lambda Function Authorizer's URI")
-        self.assertEquals(lambda_token_authorizer.get("authorizerResultTtlInSeconds"), None, "lambdaTokenAuthorizer: TTL must be None")
+        self.assertEquals(
+            lambda_token_authorizer.get("identitySource"),
+            "method.request.header.Authorization",
+            "lambdaTokenAuthorizer: identity source must be method.request.header.Authorization",
+        )
+        self.assertEquals(
+            lambda_token_authorizer.get("authorizerCredentials"),
+            None,
+            "lambdaTokenAuthorizer: authorizer credentials must not be set",
+        )
+        self.assertEquals(
+            lambda_token_authorizer.get("identityValidationExpression"),
+            None,
+            "lambdaTokenAuthorizer: validation expression must not be set",
+        )
+        self.assertEquals(
+            lambda_token_authorizer.get("authorizerUri"),
+            lambda_authorizer_uri,
+            "lambdaTokenAuthorizer: authorizer URI must be the Lambda Function Authorizer's URI",
+        )
+        self.assertEquals(
+            lambda_token_authorizer.get("authorizerResultTtlInSeconds"), None, "lambdaTokenAuthorizer: TTL must be None"
+        )
 
         resources = api_gateway_client.get_resources(restApiId=rest_api_id).get("items")
         lambda_token_method_result = self.get_method(resources, "/lambda-token", rest_api_id, api_gateway_client)
 
-        self.assertEquals(lambda_token_method_result.get("authorizerId"), lambda_token_authorizer.get("id"), "lambdaTokenAuthorizer: GET method must be configured to use the Lambda Token Authorizer");
+        self.assertEquals(
+            lambda_token_method_result.get("authorizerId"),
+            lambda_token_authorizer.get("id"),
+            "lambdaTokenAuthorizer: GET method must be configured to use the Lambda Token Authorizer",
+        )
         base_url = stack_outputs.get("ApiUrl")
 
         self.assertTrue(RestApiWithAuthorizersTest.verify_authorized_request(base_url + "none", 200, "", ""))
         self.assertTrue(RestApiWithAuthorizersTest.verify_authorized_request(base_url + "lambda-token", 401, "", ""))
-        self.assertTrue(RestApiWithAuthorizersTest.verify_authorized_request(base_url + "lambda-token", 200, "Authorization", "allow"))
+        self.assertTrue(
+            RestApiWithAuthorizersTest.verify_authorized_request(
+                base_url + "lambda-token", 200, "Authorization", "allow"
+            )
+        )
 
     @staticmethod
     def get_authorizer_by_name(authorizers, authorizer_name):
-        authorizer = list(filter(lambda d: d['name'] == authorizer_name, authorizers))
+        authorizer = list(filter(lambda d: d["name"] == authorizer_name, authorizers))
         if len(authorizer) == 1:
             return authorizer[0]
         else:
@@ -78,7 +108,7 @@ class RestApiWithAuthorizersTest(BaseTest):
 
     @staticmethod
     def get_resource_by_path(resources, path):
-        return list(filter(lambda d: d['path'] == path, resources))
+        return list(filter(lambda d: d["path"] == path, resources))
 
     @staticmethod
     def verify_authorized_request(url, expected_status_code, auth_header_key, auth_header_value):

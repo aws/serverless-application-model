@@ -30,19 +30,23 @@ class BaseTest(unittest.TestCase):
     def get_stack_resource_with_resource_type(self, resource_type):
         # stack will be its own data type if needed
         stack_resources = self.get_stack_resources()
-        stack_resource = list(filter(lambda d: d['ResourceType'] == resource_type.value, stack_resources))
+        stack_resource = list(filter(lambda d: d["ResourceType"] == resource_type.value, stack_resources))
         if len(stack_resource) == 1:
             return stack_resource[0]
         elif len(stack_resource) == 0:
             raise ValueError("No resources found with resource type {}".format(resource_type.value))
         else:
-            raise ValueError("Mutliple resources found with resource type {}. Please get the resource by using the logical id".format(resource_type.value))
+            raise ValueError(
+                "Mutliple resources found with resource type {}. Please get the resource by using the logical id".format(
+                    resource_type.value
+                )
+            )
 
     def get_stack_resource_with_logical_id(self, resource_logical_id):
         # stack will be its own data type if needed
         stack_resources = self.get_stack_resources()
         try:
-            stack_resource = list(filter(lambda d: d['LogicalResourceId'] == resource_logical_id, stack_resources))
+            stack_resource = list(filter(lambda d: d["LogicalResourceId"] == resource_logical_id, stack_resources))
             # one resource per logical id
             return stack_resource[0]
         except:
@@ -73,11 +77,13 @@ class BaseTest(unittest.TestCase):
     def get_sam_transformed_template(self, template_path):
         try:
             # template_body = open(template_path).read()
-            subprocess.call(["bin/sam-translate.py", "--template-file", template_path, "--o", self.stack_name+".json"])
-            template_body = open(self.stack_name+".json").read()
+            subprocess.call(
+                ["bin/sam-translate.py", "--template-file", template_path, "--o", self.stack_name + ".json"]
+            )
+            template_body = open(self.stack_name + ".json").read()
             # delete the file directly
-            if os.path.exists(self.stack_name+".json"):
-                os.remove(self.stack_name+".json")
+            if os.path.exists(self.stack_name + ".json"):
+                os.remove(self.stack_name + ".json")
             return template_body
         except IOError:
             raise IOError("The input template path: {} is not correct.".format(template_path))
