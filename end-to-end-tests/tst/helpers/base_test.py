@@ -52,13 +52,11 @@ class BaseTest(unittest.TestCase):
         except:
             raise ValueError("There is no resource in the stack with given logical id: {}".format(resource_logical_id))
 
-    # add expected_resources instead of count
     def make_and_verify_stack(self, template_path, capabilities, expected_resources):
         self.make_stack(capabilities, template_path)
         stack_resources = self.get_stack_resources()
         list_stack_resources = Resources().from_list(resources_list=stack_resources)
         self.assertEquals(list_stack_resources, expected_resources)
-        # return stack
         return self.stack_name
 
     def get_outputs(self):
@@ -76,12 +74,11 @@ class BaseTest(unittest.TestCase):
 
     def get_sam_transformed_template(self, template_path):
         try:
-            # template_body = open(template_path).read()
             subprocess.call(
                 ["bin/sam-translate.py", "--template-file", template_path, "--o", self.stack_name + ".json"]
             )
             template_body = open(self.stack_name + ".json").read()
-            # delete the file directly
+            # delete the temporary file created
             if os.path.exists(self.stack_name + ".json"):
                 os.remove(self.stack_name + ".json")
             return template_body

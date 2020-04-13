@@ -68,7 +68,7 @@ class Resources:
             # remove the resource if its same in generated resources and expected resources
             expected_resources.resources.pop(key, None)
 
-        if expected_resources.resources is not None:  # empty
+        if expected_resources.resources is not None:
             diff_resources.update(expected_resources.resources)
 
         return diff_resources
