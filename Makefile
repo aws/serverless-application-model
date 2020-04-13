@@ -43,9 +43,13 @@ test:
 	$(info [*] Run the unit test with minimum code coverage of $(CODE_COVERAGE)%...)
 	@pytest --cov samtranslator --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests
 
+e2e-tests:
+	$(info [*] Run the integration tests with minimum code coverage of $(CODE_COVERAGE)%...)
+	@pytest --cov samtranslator end-to-end-tests/tst --ignore=end-to-end-tests/tst/helpers
+
 black:
 	rm -f tests/*.pyc samtranslator/*.pyc
-	black setup.py samtranslator/* tests/* bin/*
+	black setup.py samtranslator/* tests/* bin/* end-to-end-tests/*
 
 black-check:
 	rm -f tests/*.pyc samtranslator/*.pyc
@@ -69,5 +73,5 @@ TARGETS
 	test        Run the Unit tests.
 	dev         Run all development tests after a change.
 	pr          Perform all checks before submitting a Pull Request.
-
+    e2e-tests   Run all the end-to-end tests
 endef

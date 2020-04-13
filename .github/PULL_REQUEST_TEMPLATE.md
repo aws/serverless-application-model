@@ -6,8 +6,10 @@
 
 *Checklist:*
 
-- [ ] Write/update tests
+- [ ] Write/update unit tests
+- [ ] Write/update end to end tests
 - [ ] `make pr` passes
+- [ ] `make e2e-tests` passes
 - [ ] Update documentation
 - [ ] Verify transformed template deploys and application functions as expected
 - [ ] Add/update example to `examples/2016-10-31`

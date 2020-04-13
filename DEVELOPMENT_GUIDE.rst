@@ -70,6 +70,14 @@ drops below 95%.
 
 ``pytest -k "TestMyClass"`` command will run all unit tests within the `TestMyClass` class.
 
+End to end tests
+~~~~~~~~~~~~~~~~
+
+``make e2e tests`` command will run all end to end tests. This command is configured to fail when code coverage for package
+drops below 95%.
+
+``pytest end-to-end-tests/tst/test.py`` command will run the integration test `test.py`
+
 Pull Requests
 -------------
 Before sending pull requests make sure to run ``make pr`` command. This will run unit tests, linters, and static
