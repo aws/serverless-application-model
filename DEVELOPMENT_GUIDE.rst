@@ -73,14 +73,14 @@ drops below 95%.
 End to end tests
 ~~~~~~~~~~~~~~~~
 
-``make e2e tests`` command will run all end to end tests. This command is configured to fail when code coverage for package drops below 95%.
+``make e2e-tests`` command will run all end to end tests.
 
 ``pytest end-to-end-tests/tst/test.py`` command will run the integration test `test.py`
 
 Pull Requests
 -------------
-Before sending pull requests make sure to run ``make pr`` command. This will run unit tests, linters, and static
-analysis tools to verify that your code changes follow the coding standards required by this package.
+Before sending pull requests make sure to run ``make pr`` and ``make e2e-tests`` commands. This will run unit tests, linters, static
+analysis tools and integration tests to verify that your code changes follow the coding standards required by this package.
 
 It will also fail if unit test coverage drops below 95%. All new code that you write must have 100% unit test coverage.
 This might sound over-ambitious, especially if you come from Java world, but with Python this is actually realistic.
