@@ -1,9 +1,11 @@
 from enum import Enum
 
-# contains all the the cloudformation stack resource status
+
 class ResourceStatus(Enum):
-    CREATE_COMPLETE = "AWS::ApiGateway::RestApi"
-    APIGW_STAGE = "AWS::ApiGateway::Stage"
+    """
+    Contains all the resource statuses of CloudFormation stack resources
+    """
+
     CREATE_COMPLETE = "CREATE_COMPLETE"
     CREATE_FAILED = "CREATE_FAILED"
     CREATE_IN_PROGRESS = "CREATE_IN_PROGRESS"

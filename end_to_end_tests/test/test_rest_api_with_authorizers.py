@@ -1,12 +1,32 @@
 import boto3
 import os
-from helpers.base_test import BaseTest
-from helpers.resources import Resources
-from helpers.resource_types import ResourceTypes
-import urllib2
+from .helpers.base_test import BaseTest
+from .helpers.resources import Resources
+from .helpers.resource_types import ResourceTypes
+import urllib3
+import certifi
 
 
 class RestApiWithAuthorizersTest(BaseTest):
+    """
+    contains methods to test authorizer for AWS::Serverless::RestApi
+
+    Methods
+    -------
+    :method test_authorizers(self)
+        test lambdaTokenAuthorizer for AWS::Serverless::RestApi
+    :method get_authorizer_by_name(authorizers, authorizer_name)
+        returns the authorizer by name
+    :method get_method(resources, path, rest_api_id, api_gateway_client)
+        returns the method containing methodIntegrations, AuthorizationScopes
+    :method get_resource_by_path(resources, path)
+        returns the resource for given path
+    :method verify_authorized_request(url, expected_status_code, auth_header_key, auth_header_value)
+        verifies if the request is valid
+    :method make_authorized_request(url, auth_header_key, auth_header_value)
+        returns the status of the api call
+    """
+
     rest_api_with_authorizers_resources = (
         Resources()
         .created("MyApi", ResourceTypes.APIGW_RESTAPI)
@@ -30,17 +50,20 @@ class RestApiWithAuthorizersTest(BaseTest):
     def tearDown(self):
         self.delete_stack()
 
-    def test_authorizeres_min(self):
+    def test_authorizers(self):
+        """
+        test lambdaTokenAuthorizer for AWS::Serverless::RestApi
+        """
         input_template = os.path.join(
-            os.getcwd(), "end-to-end-tests/input", "rest_api_with_authorizers", "template.yaml"
+            os.getcwd(), "end_to_end_tests/input", "rest_api_with_authorizers", "template.yaml"
         )
         capabilities = ["CAPABILITY_IAM"]
-        stack_name = self.make_and_verify_stack(input_template, capabilities, self.rest_api_with_authorizers_resources)
-        stack_resources_list = self.get_stack_resources()
+        self.make_and_verify_stack(input_template, capabilities, self.rest_api_with_authorizers_resources)
         stack_outputs = self.get_outputs()
 
         rest_api_id = self.get_stack_resource_with_resource_type(ResourceTypes.APIGW_RESTAPI).get("PhysicalResourceId")
         api_gateway_client = boto3.client("apigateway")
+        # list of authorizers associated with the Api
         authorizers = api_gateway_client.get_authorizers(restApiId=rest_api_id).get("items")
         lambda_authorizer_uri = (
             "arn:aws:apigateway:"
@@ -50,35 +73,35 @@ class RestApiWithAuthorizersTest(BaseTest):
             + "/invocations"
         )
         lambda_token_authorizer = self.get_authorizer_by_name(authorizers, "MyLambdaTokenAuth")
-        self.assertEquals(lambda_token_authorizer.get("type"), "TOKEN", "lambdaTokenAuthorizer: Type must be TOKEN")
-        self.assertEquals(
+        self.assertEqual(lambda_token_authorizer.get("type"), "TOKEN", "lambdaTokenAuthorizer: Type must be TOKEN")
+        self.assertEqual(
             lambda_token_authorizer.get("identitySource"),
             "method.request.header.Authorization",
             "lambdaTokenAuthorizer: identity source must be method.request.header.Authorization",
         )
-        self.assertEquals(
+        self.assertEqual(
             lambda_token_authorizer.get("authorizerCredentials"),
             None,
             "lambdaTokenAuthorizer: authorizer credentials must not be set",
         )
-        self.assertEquals(
+        self.assertEqual(
             lambda_token_authorizer.get("identityValidationExpression"),
             None,
             "lambdaTokenAuthorizer: validation expression must not be set",
         )
-        self.assertEquals(
+        self.assertEqual(
             lambda_token_authorizer.get("authorizerUri"),
             lambda_authorizer_uri,
             "lambdaTokenAuthorizer: authorizer URI must be the Lambda Function Authorizer's URI",
         )
-        self.assertEquals(
+        self.assertEqual(
             lambda_token_authorizer.get("authorizerResultTtlInSeconds"), None, "lambdaTokenAuthorizer: TTL must be None"
         )
 
         resources = api_gateway_client.get_resources(restApiId=rest_api_id).get("items")
         lambda_token_method_result = self.get_method(resources, "/lambda-token", rest_api_id, api_gateway_client)
 
-        self.assertEquals(
+        self.assertEqual(
             lambda_token_method_result.get("authorizerId"),
             lambda_token_authorizer.get("id"),
             "lambdaTokenAuthorizer: GET method must be configured to use the Lambda Token Authorizer",
@@ -95,6 +118,14 @@ class RestApiWithAuthorizersTest(BaseTest):
 
     @staticmethod
     def get_authorizer_by_name(authorizers, authorizer_name):
+        """
+        returns the authorizer by name
+        :param list authorizers: list of authorizers of the api
+        :param str authorizer_name: name of the authorizer
+        :raise: ValueError if authorizer is not found with the given name
+        :return: returns the authorizer object with the given authorizer name
+        :rtype: dict
+        """
         authorizer = list(filter(lambda d: d["name"] == authorizer_name, authorizers))
         if len(authorizer) == 1:
             return authorizer[0]
@@ -103,29 +134,66 @@ class RestApiWithAuthorizersTest(BaseTest):
 
     @staticmethod
     def get_method(resources, path, rest_api_id, api_gateway_client):
+        """
+        returns the method containing methodIntegrations, AuthorizationScopes
+        :param list resources: list of resources of the api
+        :param str path: path of the rest api
+        :param str rest_api_id: rest api id of the api resource
+        :param str api_gateway_client: apigateway client
+        :raise: ValueError if resource is not found for the given path
+        :return: returns the method object for the given path
+        :rtype: dict
+        """
         resource = RestApiWithAuthorizersTest.get_resource_by_path(resources, path)[0]
-        return api_gateway_client.get_method(restApiId=rest_api_id, resourceId=resource.get("id"), httpMethod="GET")
+        if len(resource) == 0:
+            raise ValueError("No resource found for path: {}".format(path))
+        else:
+            return api_gateway_client.get_method(restApiId=rest_api_id, resourceId=resource.get("id"), httpMethod="GET")
 
     @staticmethod
     def get_resource_by_path(resources, path):
+        """
+        returns the resource for given path
+        :param list resources: list of resources of the api
+        :param str path: path of the rest api
+        :return: returns the resource object for the given path
+        :rtype: list
+        """
         return list(filter(lambda d: d["path"] == path, resources))
 
     @staticmethod
     def verify_authorized_request(url, expected_status_code, auth_header_key, auth_header_value):
+        """
+        verifies if the request is valid
+        :param str url: api url endpoint to call
+        :param str expected_status_code: expected status code of api call
+        :param str auth_header_key: authorization header key
+        :param str auth_header_value: authorization header value
+        :return: returns True if the status code of the api call is same as expected status code
+        :rtype: bool
+        """
         status = RestApiWithAuthorizersTest.make_authorized_request(url, auth_header_key, auth_header_value)
         return status == expected_status_code
 
     @staticmethod
     def make_authorized_request(url, auth_header_key, auth_header_value):
+        """
+        returns the status of the api call
+        :param str url: api url endpoint to call
+        :param str auth_header_key: authorization header key
+        :param str auth_header_value: authorization header value
+        :raise: HTTPError if the request was not successful
+        :return: returns the status code of the request
+        :rtype: dict
+        """
         print("Making request to " + url)
         try:
+            http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
             if auth_header_key is None or len(auth_header_key) == 0:
-                req = urllib2.Request(url)
+                req = http.request("GET", url)
             else:
                 headers = {auth_header_key: auth_header_value}
-                req = urllib2.Request(url, headers=headers)
-
-            response = urllib2.urlopen(req)
-            return response.getcode()
-        except urllib2.HTTPError, e:
+                req = http.request("GET", url, headers=headers)
+            return req.status
+        except urllib3.exceptions.HTTPError as e:
             return e.code

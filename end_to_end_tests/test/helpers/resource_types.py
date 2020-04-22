@@ -2,6 +2,10 @@ from enum import Enum
 
 
 class ResourceTypes(Enum):
+    """
+    resource types of CloudFormation resources
+    """
+
     APIGW_RESTAPI = "AWS::ApiGateway::RestApi"
     APIGW_STAGE = "AWS::ApiGateway::Stage"
     APIGW_DEPLOYMENT = "AWS::ApiGateway::Deployment"
