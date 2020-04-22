@@ -8,6 +8,7 @@
           "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
+        "Path": "/override/",
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary",
         "Tags": [
           {
@@ -110,6 +111,7 @@
           "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
+        "Path": "/test/",
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary",
         "Tags": [
           {

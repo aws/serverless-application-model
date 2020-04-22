@@ -22,6 +22,7 @@
             "Key": "tag1"
           }
         ],
+        "Path": "/override/",
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary", 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -120,6 +121,7 @@
             "Key": "tag1"
           }
         ],
+        "Path": "/test/",
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary", 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
