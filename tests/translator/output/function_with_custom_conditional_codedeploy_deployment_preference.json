@@ -140,7 +140,6 @@
     }, 
     "HelloWorldFunctionVersionfb53d5c2e6": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
