@@ -1,0 +1,18 @@
+Resources:
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AccountRecoverySetting:
+        RecoveryMechanisms: 
+          - Name: admin_only
+            Priority: 1
+      UserPoolName: UserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameConfiguration:
+        CaseSensitive: true
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false

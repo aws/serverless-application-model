@@ -1,0 +1,33 @@
+{
+  "Resources": {
+    "MyUserPool": {
+      "Type": "AWS::Cognito::UserPool", 
+      "Properties": {
+        "UserPoolName": "UserPoolName", 
+        "UsernameConfiguration": {
+          "CaseSensitive": true
+        }, 
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 8
+          }
+        }, 
+        "AccountRecoverySetting": {
+          "RecoveryMechanisms": [
+            {
+              "Priority": 1, 
+              "Name": "admin_only"
+            }
+          ]
+        }, 
+        "Schema": [
+          {
+            "AttributeDataType": "String", 
+            "Required": false, 
+            "Name": "email"
+          }
+        ]
+      }
+    }
+  }
+}
