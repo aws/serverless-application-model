@@ -48,13 +48,14 @@ class DeploymentPreferenceCollection(object):
         self.codedeploy_application = self._codedeploy_application()
         self.codedeploy_iam_role = self._codedeploy_iam_role()
 
-    def add(self, logical_id, deployment_preference_dict):
+    def add(self, logical_id, deployment_preference_dict, condition=None):
         """
         Add this deployment preference to the collection
 
         :raise ValueError if an existing logical id already exists in the _resource_preferences
         :param logical_id: logical id of the resource where this deployment preference applies
         :param deployment_preference_dict: the input SAM template deployment preference mapping
+        :param condition: the condition (if it exists) on the serverless function
         """
         if logical_id in self._resource_preferences:
             raise ValueError(
@@ -63,7 +64,9 @@ class DeploymentPreferenceCollection(object):
                 )
             )
 
-        self._resource_preferences[logical_id] = DeploymentPreference.from_dict(logical_id, deployment_preference_dict)
+        self._resource_preferences[logical_id] = DeploymentPreference.from_dict(
+            logical_id, deployment_preference_dict, condition
+        )
 
     def get(self, logical_id):
         """
@@ -84,6 +87,13 @@ class DeploymentPreferenceCollection(object):
         :return: True, if we can skip creating service role. False otherwise
         """
         return all(preference.role or not preference.enabled for preference in self._resource_preferences.values())
+
+    def needs_resource_condition(self):
+        """
+        If all preferences have a condition, all code deploy resources need to be conditionally created
+        :return: True, if a condition needs to be created
+        """
+        return all(preference.condition for preference in self._resource_preferences.values())
 
     def enabled_logical_ids(self):
         """
@@ -155,6 +165,9 @@ class DeploymentPreferenceCollection(object):
 
         if deployment_preference.trigger_configurations:
             deployment_group.TriggerConfigurations = deployment_preference.trigger_configurations
+
+        if deployment_preference.condition:
+            deployment_group.set_resource_attribute("Condition", deployment_preference.condition)
 
         return deployment_group
 

@@ -144,7 +144,9 @@ class TestVersionsAndAliases(TestCase):
         resources = sam_func.to_cloudformation(**kwargs)
 
         deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
-        deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id, deploy_preference_dict)
+        deployment_preference_collection.add.assert_called_once_with(
+            self.sam_func.logical_id, deploy_preference_dict, None
+        )
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
@@ -222,7 +224,7 @@ class TestVersionsAndAliases(TestCase):
 
         resources = sam_func.to_cloudformation(**kwargs)
 
-        preference_collection.add.assert_called_once_with(sam_func.logical_id, deploy_preference_dict)
+        preference_collection.add.assert_called_once_with(sam_func.logical_id, deploy_preference_dict, None)
         preference_collection.get.assert_called_once_with(sam_func.logical_id)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(enabled)
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
@@ -318,7 +320,9 @@ class TestVersionsAndAliases(TestCase):
         resources = sam.to_cloudformation(**kwargs)
 
         deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
-        deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id, deploy_preference_dict)
+        deployment_preference_collection.add.assert_called_once_with(
+            self.sam_func.logical_id, deploy_preference_dict, None
+        )
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_any_call(enabled)
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]

@@ -16,6 +16,7 @@ class TestDeploymentPreference(TestCase):
             "TriggerTargetArn": {"Ref": "MySNSTopic"},
             "TriggerName": "TestTrigger",
         }
+        self.condition = "condition"
         self.expected_deployment_preference = DeploymentPreference(
             self.deployment_type,
             self.pre_traffic_hook,
@@ -24,6 +25,7 @@ class TestDeploymentPreference(TestCase):
             True,
             self.role,
             self.trigger_configurations,
+            self.condition,
         )
 
     def test_from_dict_with_intrinsic_function_type(self):
@@ -37,6 +39,7 @@ class TestDeploymentPreference(TestCase):
             True,
             self.role,
             self.trigger_configurations,
+            self.condition,
         )
 
         deployment_preference_yaml_dict = dict()
@@ -49,7 +52,7 @@ class TestDeploymentPreference(TestCase):
         deployment_preference_yaml_dict["Role"] = self.role
         deployment_preference_yaml_dict["TriggerConfigurations"] = self.trigger_configurations
         deployment_preference_from_yaml_dict = DeploymentPreference.from_dict(
-            "logical_id", deployment_preference_yaml_dict
+            "logical_id", deployment_preference_yaml_dict, self.condition
         )
 
         self.assertEqual(expected_deployment_preference, deployment_preference_from_yaml_dict)
@@ -65,13 +68,13 @@ class TestDeploymentPreference(TestCase):
         deployment_preference_yaml_dict["Role"] = self.role
         deployment_preference_yaml_dict["TriggerConfigurations"] = self.trigger_configurations
         deployment_preference_from_yaml_dict = DeploymentPreference.from_dict(
-            "logical_id", deployment_preference_yaml_dict
+            "logical_id", deployment_preference_yaml_dict, self.condition
         )
 
         self.assertEqual(self.expected_deployment_preference, deployment_preference_from_yaml_dict)
 
     def test_from_dict_with_disabled_preference_does_not_require_other_parameters(self):
-        expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None)
+        expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None, None)
 
         deployment_preference_yaml_dict = dict()
         deployment_preference_yaml_dict["Enabled"] = False
@@ -82,7 +85,7 @@ class TestDeploymentPreference(TestCase):
         self.assertEqual(expected_deployment_preference, deployment_preference_from_yaml_dict)
 
     def test_from_dict_with_string_disabled_preference_does_not_require_other_parameters(self):
-        expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None)
+        expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None, None)
 
         deployment_preference_yaml_dict = dict()
         deployment_preference_yaml_dict["Enabled"] = "False"
@@ -93,7 +96,7 @@ class TestDeploymentPreference(TestCase):
         self.assertEqual(expected_deployment_preference, deployment_preference_from_yaml_dict)
 
     def test_from_dict_with_lowercase_string_disabled_preference_does_not_require_other_parameters(self):
-        expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None)
+        expected_deployment_preference = DeploymentPreference(None, None, None, None, False, None, None, None)
 
         deployment_preference_yaml_dict = dict()
         deployment_preference_yaml_dict["Enabled"] = "false"
