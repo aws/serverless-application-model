@@ -43,4 +43,4 @@ Outputs:
 
   ApiURL:
     Description: "API endpoint URL for Prod environment"
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/prod/get"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/prod/post"
