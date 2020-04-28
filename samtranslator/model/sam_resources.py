@@ -923,7 +923,7 @@ class SamHttpApi(SamResourceMacro):
             fail_on_warnings=self.FailOnWarnings,
         )
 
-        (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()
+        (http_api, stage, domain, basepath_mapping, route53) = api_generator.to_cloudformation()
 
         resources.append(http_api)
         if domain:

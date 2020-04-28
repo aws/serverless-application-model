@@ -56,9 +56,7 @@ class ApiGatewayV2ApiMapping(Resource):
 
 
 class ApiGatewayV2Authorizer(object):
-    def __init__(
-        self, api_logical_id=None, name=None, authorization_scopes=[], jwt_configuration={}, id_source=None,
-    ):
+    def __init__(self, api_logical_id=None, name=None, authorization_scopes=[], jwt_configuration={}, id_source=None):
         """
         Creates an authorizer for use in V2 Http Apis
         """
