@@ -238,7 +238,7 @@ class ApiGatewayAuthorizer(object):
             )
     
         if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):	
-            self.identity = {}
+            identity = {}
 
         self.api_logical_id = api_logical_id
         self.name = name
