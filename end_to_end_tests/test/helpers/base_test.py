@@ -1,7 +1,12 @@
 from .resources import Resources
 from unittest import TestCase
-from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException, \
-    MultipleResourceFoundException, BucketAlreadyExistsException, ResourceNotFoundException
+from samtranslator.model.exceptions import (
+    InvalidTemplateException,
+    InvalidDocumentException,
+    MultipleResourceFoundException,
+    BucketAlreadyExistsException,
+    ResourceNotFoundException,
+)
 from samtranslator.public.translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
@@ -55,7 +60,6 @@ class BaseTest(TestCase):
     def setUp(self):
         """
         creates a stack name and a cloudformation client for an end to end test
-        creates sam-temp-integration-test-bucket for uploading integration tests artifacts present in end_to_end_tests/test_data
         """
         print("in setup of base test")
         self.stack_name = "sam-temp-stack" + str(uuid.uuid4())
@@ -63,6 +67,9 @@ class BaseTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """
+        creates sam-temp-integration-test-bucket for uploading integration tests artifacts present in end_to_end_tests/test_data
+        """
         cls.s3_client = boto3.client("s3")
         cls.bucket_name = "sam-temp-integration-tests-bucket"
         cls.artifacts_path = "end_to_end_tests/test_data"
@@ -71,14 +78,15 @@ class BaseTest(TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        """
+        delete s3 bucket
+        """
         cls.delete_s3_bucket()
 
     def tearDown(self):
         """
-        creates a stack name and a cloudformation client for an end to end test
-        creates temp-sam-integration-test-bucket for uploading integration tests artifacts present in end_to_end_tests/test_data
+        delete stack
         """
-        print("in tear down of base tests")
         self.delete_stack()
 
     def make_stack(self, template_path, capabilities):
@@ -134,7 +142,6 @@ class BaseTest(TestCase):
         :rtype: dict
         """
 
-        # stack will be its own data type if needed
         stack_resources = self.get_stack_resources()
         stack_resource = list(filter(lambda d: d["LogicalResourceId"] == resource_logical_id, stack_resources))
         # there is only one resource per logical id
@@ -194,8 +201,9 @@ class BaseTest(TestCase):
             if region_name == "us-east-1":
                 cls.s3_client.create_bucket(Bucket=cls.bucket_name)
             else:
-                cls.s3_client.create_bucket(Bucket=cls.bucket_name,
-                                            CreateBucketConfiguration={"LocationConstraint": region_name})
+                cls.s3_client.create_bucket(
+                    Bucket=cls.bucket_name, CreateBucketConfiguration={"LocationConstraint": region_name}
+                )
         except cls.s3_client.exceptions.BucketAlreadyOwnedByYou:
             raise BucketAlreadyExistsException(cls.bucket_name)
 
@@ -203,7 +211,7 @@ class BaseTest(TestCase):
     def delete_s3_bucket(cls):
         """deletes the s3 bucket created for integration tests
         """
-        objects_list = cls.s3_client.list_objects(Bucket=cls.bucket_name).get('Contents')
+        objects_list = cls.s3_client.list_objects(Bucket=cls.bucket_name).get("Contents")
         for s3_object in objects_list:
             cls.s3_client.delete_object(Bucket=cls.bucket_name, Key=s3_object.get("Key"))
 
@@ -217,7 +225,7 @@ class BaseTest(TestCase):
         print("adding artifacts to s3")
         # for file in path upload the file with the key being file name and value being content of the file
         for file in os.listdir(cls.artifacts_path):
-            if not file.startswith('.'):
+            if not file.startswith("."):
                 with open(os.path.join(cls.artifacts_path, file), "rb") as zip_data:
                     cls.s3_client.upload_fileobj(zip_data, cls.bucket_name, file)
 
@@ -241,11 +249,15 @@ class BaseTest(TestCase):
         else:
             try:
                 iam_client = boto3.client("iam")
-                cloud_formation_template = json.dumps(transform(sam_template, {}, ManagedPolicyLoader(iam_client)), indent=2)
+                cloud_formation_template = json.dumps(
+                    transform(sam_template, {}, ManagedPolicyLoader(iam_client)), indent=2
+                )
                 if len(cloud_formation_template) == 0:
                     raise InvalidTemplateException(" Template path: ".format(template_path))
                 return cloud_formation_template
             except InvalidDocumentException as e:
-                error_message = functools.reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
+                error_message = functools.reduce(
+                    lambda message, error: message + " " + error.message, e.causes, e.message
+                )
                 errors = map(lambda cause: cause.message, e.causes)
                 raise InvalidDocumentException("The template is invalid {} {}".format(errors, error_message))

@@ -1,7 +1,12 @@
 from .resource_types import ResourceTypes
 from .resource_status import ResourceStatus
-from samtranslator.model.exceptions import InvalidResourceException, ResourceNotFoundException, \
-    LogicalIdDoesNotFollowPatternException, ResourceAlreadyExistsException, EmptyParameterException
+from samtranslator.model.exceptions import (
+    InvalidResourceException,
+    ResourceNotFoundException,
+    LogicalIdDoesNotFollowPatternException,
+    ResourceAlreadyExistsException,
+    EmptyParameterException,
+)
 
 import re
 
@@ -83,11 +88,19 @@ class Resources:
             # out this suffix here. Tests can continue to access and verify the resource using the LogicalId
             # specified in the template
             if stack_resource.get("LogicalResourceId") is None:
-                raise InvalidResourceException("", "LogicalResourceId should not be empty for stack resource {}".format(stack_resource))
+                raise InvalidResourceException(
+                    "", "LogicalResourceId should not be empty for stack resource {}".format(stack_resource)
+                )
             if stack_resource.get("ResourceType") is None:
-                raise InvalidResourceException(stack_resource.get("LogicalResourceId"), "ResourceType should not be empty for stack resource {}".format(stack_resource))
+                raise InvalidResourceException(
+                    stack_resource.get("LogicalResourceId"),
+                    "ResourceType should not be empty for stack resource {}".format(stack_resource),
+                )
             if stack_resource.get("ResourceStatus") is None:
-                raise InvalidResourceException(stack_resource.get("LogicalResourceId"), "ResourceStatus should not be empty for stack resource {}".format(stack_resource))
+                raise InvalidResourceException(
+                    stack_resource.get("LogicalResourceId"),
+                    "ResourceStatus should not be empty for stack resource {}".format(stack_resource),
+                )
             logical_id = self.clean_logical_id_if_necessary(
                 logical_id_to_clean=stack_resource.get("LogicalResourceId"),
                 resource_type=stack_resource.get("ResourceType"),
