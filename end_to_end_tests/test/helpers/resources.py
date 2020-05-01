@@ -1,6 +1,7 @@
 from .resource_types import ResourceTypes
 from .resource_status import ResourceStatus
-from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.exceptions import InvalidResourceException, ResourceNotFoundException, \
+    LogicalIdDoesNotFollowPatternException, ResourceAlreadyExistsException, EmptyParameterException
 
 import re
 
@@ -45,7 +46,7 @@ class Resources:
         """adds the given stack resource and updates the resource status to CREATE_COMPLETE
 
         :param str logical_resource_id: logical id of the stack resource
-        :param enum resource_type: type of the resource in ResourceTypes
+        :param ResourceTypes resource_type: type of the resource in ResourceTypes
         :return: returns the Resources object by adding the given resource to resources dictionary
         :rtype: Resources
         """
@@ -68,10 +69,11 @@ class Resources:
         :param str resource_type: CloudFormation resource type of the resource
         :param str resource_status: desired resource status for the resource
         :param Resource stack_resource: adds the given stack resource to the resources list
-        :raise: ValueError if stack_resource is not None and if any of LogicalResourceId, ResourceType and
+        :raise: InvalidResourceException if stack_resource is not None and if any of LogicalResourceId, ResourceType and
                 ResourceStatus keys are empty
-        :raise: ValueError if stack_resource is None and if any of logical_resource_id, resource_type and
+        :raise: EmptyParameterException if stack_resource is None and if any of logical_resource_id, resource_type and
                 resource_status params are not defined
+        :raise: ResourceAlreadyExistsException if there is already a resource with the given logical_resource_id
         :return: Resources object by adding the resource to list of resources
         :rtype: Resources
         """
@@ -81,11 +83,11 @@ class Resources:
             # out this suffix here. Tests can continue to access and verify the resource using the LogicalId
             # specified in the template
             if stack_resource.get("LogicalResourceId") is None:
-                raise ValueError("LogicalResourceId should not be empty for stack resource {}".format(stack_resource))
+                raise InvalidResourceException("", "LogicalResourceId should not be empty for stack resource {}".format(stack_resource))
             if stack_resource.get("ResourceType") is None:
-                raise ValueError("ResourceType should not be empty for stack resource {}".format(stack_resource))
+                raise InvalidResourceException(stack_resource.get("LogicalResourceId"), "ResourceType should not be empty for stack resource {}".format(stack_resource))
             if stack_resource.get("ResourceStatus") is None:
-                raise ValueError("ResourceStatus should not be empty for stack resource {}".format(stack_resource))
+                raise InvalidResourceException(stack_resource.get("LogicalResourceId"), "ResourceStatus should not be empty for stack resource {}".format(stack_resource))
             logical_id = self.clean_logical_id_if_necessary(
                 logical_id_to_clean=stack_resource.get("LogicalResourceId"),
                 resource_type=stack_resource.get("ResourceType"),
@@ -97,15 +99,15 @@ class Resources:
             )
         else:
             if logical_resource_id is None:
-                raise ValueError("logical_resource_id should not be empty to add a new resource")
+                raise EmptyParameterException("logical_resource_id")
             if resource_type is None:
-                raise ValueError("resource_type should not be empty to add a new resource")
+                raise EmptyParameterException("resource_type")
             if resource_status is None:
-                raise ValueError("resource_status should not be empty to add a new resource")
+                raise EmptyParameterException("resource_status")
 
             new_resource = Resource(logical_resource_id, resource_type, resource_status)
             if logical_resource_id in self.resources.keys():
-                raise ValueError("Resource already exists. LogicalID = {}".format(logical_resource_id))
+                raise ResourceAlreadyExistsException(logical_resource_id)
             self.resources[logical_resource_id] = new_resource
             return self
 
@@ -114,14 +116,14 @@ class Resources:
 
         :param str logical_resource_id: logical id of the stack resource
         :param str new_status: new status for the given resource
-        :raise: ValueError if logical id is not found
+        :raise: ResourceNotFoundException if logical id is not found
         :return: Resources with the updated status for the given resource
         :rtype: Resources
         """
         resource = self.resources.get(logical_resource_id)
 
         if resource is None:
-            raise ValueError("Resource with logical ID not found - {}".format(logical_resource_id))
+            raise ResourceNotFoundException("with logical ID {}".format(logical_resource_id))
         resource.status = new_status
         return self
 
@@ -129,12 +131,12 @@ class Resources:
         """removes the given resource from resources
 
         :param str logical_resource_id: logical id of the stack resource to be removed
-        :raise: ValueError if logical id is not found
+        :raise: ResourceNotFoundException if logical id is not found
         """
         try:
             self.resources.pop(logical_resource_id)
         except KeyError:
-            raise ValueError("Resource not found with logical id {}".format(logical_resource_id))
+            raise ResourceNotFoundException("with logical ID {}".format(logical_resource_id))
 
     def get_changed_resources(self, expected_resources):
         """returns the differences between expected resources and the current resources
@@ -162,7 +164,7 @@ class Resources:
 
         :param str logical_id_to_clean: logical id of the stack resource
         :param str resource_type: CloudFormation resource type of the resource
-        :raise: ValueError if the logical id doesn't contain 10 hex characters in the end
+        :raise: LogicalIdDoesNotFollowPatternException if the logical id doesn't contain 10 hex characters in the end
         :return: cleaned logical id
         :rtype: str
         """
@@ -172,10 +174,7 @@ class Resources:
             or ResourceTypes.LAMBDA_LAYER_VERSION.value == resource_type
         ):
             if not re.match(self.LOGICAL_ID_WITH_HASH_PATTERN, logical_id_to_clean):
-                raise ValueError(
-                    "{} LogicalID of {} does not follow pattern. It should end with 10 hex characters"
-                    " generated by the SHA".format(logical_id_to_clean, resource_type)
-                )
+                raise LogicalIdDoesNotFollowPatternException(logical_id_to_clean, resource_type)
             return logical_id_to_clean[:-10]  # remove last 10 digits and return
         return logical_id_to_clean
 
@@ -196,7 +195,7 @@ class Resources:
     def from_list(resources_list):
         """adds resources from a list to resources attribute by creating a new Resources object
 
-        :param str resources_list: absolute template path for stack creation
+        :param dict resources_list: absolute template path for stack creation
         :return: resources object with list of stack resources in resources attribute
         :rtype: Resources
         """

@@ -1,13 +1,19 @@
-import unittest
+from .resources import Resources
+from unittest import TestCase
+from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException, \
+    MultipleResourceFoundException, BucketAlreadyExistsException, ResourceNotFoundException
+from samtranslator.public.translator import ManagedPolicyLoader
+from samtranslator.translator.transform import transform
+from samtranslator.yaml_helper import yaml_parse
+
 import boto3
 import uuid
+import json
+import functools
 import os
-import subprocess
-from .resources import Resources
-from samtranslator.model.exceptions import InvalidTemplateException
 
 
-class BaseTest(unittest.TestCase):
+class BaseTest(TestCase):
     """
     A base test case contains commonly used methods for running end to end tests
 
@@ -36,100 +42,110 @@ class BaseTest(unittest.TestCase):
         returns the outputs of the stack as a dictionary
     :method delete_stack(self)
         deletes the stack
-    :method get_sam_transformed_template(self, template_path)
+    :method create_s3_bucket(cls)
+        creates s3 bucket for uploading artifacts for integration tests
+    :method delete_s3_bucket(cls)
+        deletes the s3 bucket created for integration tests
+    :method upload_s3_artifacts(cls)
+        Uploads all the files present in end_to_end_tests/test_data path for running integration tests
+    :method get_transformed_template(template_path)
         returns the template after applying SAM transformation
     """
 
     def setUp(self):
         """
         creates a stack name and a cloudformation client for an end to end test
+        creates sam-temp-integration-test-bucket for uploading integration tests artifacts present in end_to_end_tests/test_data
         """
+        print("in setup of base test")
         self.stack_name = "sam-temp-stack" + str(uuid.uuid4())
         self.cloud_formation_client = boto3.client("cloudformation")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.s3_client = boto3.client("s3")
+        cls.bucket_name = "sam-temp-integration-tests-bucket"
+        cls.artifacts_path = "end_to_end_tests/test_data"
+        cls.create_s3_bucket()
+        cls.upload_artifacts()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.delete_s3_bucket()
+
+    def tearDown(self):
+        """
+        creates a stack name and a cloudformation client for an end to end test
+        creates temp-sam-integration-test-bucket for uploading integration tests artifacts present in end_to_end_tests/test_data
+        """
+        print("in tear down of base tests")
+        self.delete_stack()
 
     def make_stack(self, template_path, capabilities):
         """creates a CloudFormation stack for the given template
 
         :param str template_path: absolute template path for stack creation
         :param list capabilities: required capabilities to create a stack for the given template
-        :raise: Exception if unable to create stack for the given template
         :return: id of the stack created
         :rtype: str
         """
-        template_body = self.get_sam_transformed_template(template_path=template_path)
-        try:
-            stack_id = self.cloud_formation_client.create_stack(
-                StackName=self.stack_name, TemplateBody=template_body, Capabilities=capabilities
-            )
-            waiter = self.cloud_formation_client.get_waiter("stack_create_complete")
-            waiter.wait(StackName=self.stack_name)
-            return stack_id
-        except Exception as e:
-            raise Exception("Unable to create stack for template {}. Exception: ".format(template_path, e))
+        template_body = BaseTest.get_transformed_template(template_path=template_path)
+        stack_id = self.cloud_formation_client.create_stack(
+            StackName=self.stack_name, TemplateBody=template_body, Capabilities=capabilities
+        )
+        waiter = self.cloud_formation_client.get_waiter("stack_create_complete")
+        waiter.wait(StackName=self.stack_name)
+        return stack_id
 
     def get_stack_resources(self):
         """returns stack resources for the given template
-        :raise: Exception if unable to get stack resources fof the given stack
         :return: returns a dictionary containing all the stack resources
         :rtype: dict
         """
-        try:
-            # stack will be its own data type if needed
-            stack_resources = self.cloud_formation_client.list_stack_resources(StackName=self.stack_name).get(
-                "StackResourceSummaries"
-            )
-            return stack_resources
-        except Exception as e:
-            raise Exception("Unable to list stack resources {}".format(e))
+        stack_resources = self.cloud_formation_client.list_stack_resources(StackName=self.stack_name).get(
+            "StackResourceSummaries"
+        )
+        return stack_resources
 
     def get_stack_resource_with_resource_type(self, resource_type):
         """returns a stack resource based on the resource type.
         This method returns a stack resource only when there is a single resource with the given resource type
 
-        :param enum resource_type: type of the resource in ResourceTypes
-        :raise: ValueError if there are no resources found with the given resource type
-        :raise: ValueError if more than one resource is found with the given resource type
+        :param ResourceTypes resource_type: type of the resource in ResourceTypes
+        :raise: ResourceNotFoundException if there are no resources found with the given resource type
+        :raise: MultipleResourceFoundException if more than one resource is found with the given resource type
         :return: stack resource containing "LogicalResourceId", "PhysicalResourceId", "ResourceType", "ResourceStatus   "
         :rtype: dict
         """
-        # stack will be its own data type if needed
         stack_resources = self.get_stack_resources()
         stack_resource = list(filter(lambda d: d["ResourceType"] == resource_type.value, stack_resources))
         if len(stack_resource) == 1:
             return stack_resource[0]
         elif len(stack_resource) == 0:
-            raise ValueError("No resources found with resource type {}".format(resource_type.value))
+            raise ResourceNotFoundException("with resource type {}".format(self._resource_type))
         else:
-            raise ValueError(
-                "Mutliple resources found with resource type {}. Please get the resource by using the logical id".format(
-                    resource_type.value
-                )
-            )
+            raise MultipleResourceFoundException(resource_type.value)
 
     def get_stack_resource_with_logical_id(self, resource_logical_id):
         """returns a stack resource for the given logical id
 
         :param int resource_logical_id: logical id of the resource
-        :raise: ValueError if there is no resource with the given logical id
         :return: stack resource containing "LogicalResourceId", "PhysicalResourceId", "ResourceType", "ResourceStatus   "
         :rtype: dict
         """
 
         # stack will be its own data type if needed
         stack_resources = self.get_stack_resources()
-        try:
-            stack_resource = list(filter(lambda d: d["LogicalResourceId"] == resource_logical_id, stack_resources))
-            # there is only one resource per logical id
-            return stack_resource[0]
-        except Exception:
-            raise ValueError("There is no resource in the stack with given logical id: {}".format(resource_logical_id))
+        stack_resource = list(filter(lambda d: d["LogicalResourceId"] == resource_logical_id, stack_resources))
+        # there is only one resource per logical id
+        return stack_resource[0]
 
     def make_and_verify_stack(self, template_path, capabilities, expected_resources):
         """creates a stack and verifies if the stack has same resources as expected resources
 
         :param str template_path: absolute template path for stack creation
         :param list capabilities: required capabilities to create a stack for the given template
-        :param dict expected_resources: expected resources for the given template
+        :param Resources expected_resources: expected resources for the given template
         """
 
         self.make_stack(template_path, capabilities)
@@ -138,7 +154,7 @@ class BaseTest(unittest.TestCase):
     def verify_stack(self, expected_resources):
         """verifies if the stack has created same resources as expected resources.
 
-        :param dict expected_resources: expected resources for the given template
+        :param Resources expected_resources: expected resources for the given template
         """
 
         stack_resources = self.get_stack_resources()
@@ -148,23 +164,18 @@ class BaseTest(unittest.TestCase):
     def get_outputs(self):
         """returns the outputs of the stack as a dictionary
 
-        :raise: Exception if unable to get outputs for the stack
         :return: outputs of the stack are present as key and value pairs where key id the "OutputKey" and value is "OutputValue"
         :rtype: dict
         """
 
-        try:
-            stack_outputs = (
-                self.cloud_formation_client.describe_stacks(StackName=self.stack_name).get("Stacks")[0].get("Outputs")
-            )
-        except Exception as e:
-            raise Exception("Unable to get the stack outputs {}".format(e))
-        else:
-            outputs = dict()
-            if stack_outputs is not None:
-                for output in stack_outputs:
-                    outputs[output.get("OutputKey")] = output.get("OutputValue")
-                return outputs
+        stack_outputs = (
+            self.cloud_formation_client.describe_stacks(StackName=self.stack_name).get("Stacks")[0].get("Outputs")
+        )
+        outputs = dict()
+        if stack_outputs is not None:
+            for output in stack_outputs:
+                outputs[output.get("OutputKey")] = output.get("OutputValue")
+            return outputs
 
     def delete_stack(self):
         """deletes the stack if the stack exists
@@ -172,28 +183,69 @@ class BaseTest(unittest.TestCase):
 
         self.cloud_formation_client.delete_stack(StackName=self.stack_name)
 
-    def get_sam_transformed_template(self, template_path):
+    @classmethod
+    def create_s3_bucket(cls):
+        """creates s3 bucket for uploading artifacts for integration tests
+        :raise: BucketAlreadyExistsException if the bucket already exists
+        """
+        print("inside s3 create should be run only once")
+        region_name = boto3.session.Session().region_name
+        try:
+            if region_name == "us-east-1":
+                cls.s3_client.create_bucket(Bucket=cls.bucket_name)
+            else:
+                cls.s3_client.create_bucket(Bucket=cls.bucket_name,
+                                            CreateBucketConfiguration={"LocationConstraint": region_name})
+        except cls.s3_client.exceptions.BucketAlreadyOwnedByYou:
+            raise BucketAlreadyExistsException(cls.bucket_name)
+
+    @classmethod
+    def delete_s3_bucket(cls):
+        """deletes the s3 bucket created for integration tests
+        """
+        objects_list = cls.s3_client.list_objects(Bucket=cls.bucket_name).get('Contents')
+        for s3_object in objects_list:
+            cls.s3_client.delete_object(Bucket=cls.bucket_name, Key=s3_object.get("Key"))
+
+        cls.s3_client.delete_bucket(Bucket=cls.bucket_name)
+
+    @classmethod
+    def upload_artifacts(cls):
+        """
+        Uploads all the files present in end_to_end_tests/test_data path for running integration tests
+        """
+        print("adding artifacts to s3")
+        # for file in path upload the file with the key being file name and value being content of the file
+        for file in os.listdir(cls.artifacts_path):
+            if not file.startswith('.'):
+                with open(os.path.join(cls.artifacts_path, file), "rb") as zip_data:
+                    cls.s3_client.upload_fileobj(zip_data, cls.bucket_name, file)
+
+    @staticmethod
+    def get_transformed_template(template_path):
         """returns the template after applying SAM transformation
 
         :param str template_path: absolute template path for stack creation
         :raise: IOError if the given input path is not valid
-        :raise: InvalidTemplateException if the template is not transformed successfully
+        :raise: InvalidTemplateException if the template has any errors
+        :raise: InvalidDocumentException if the template is not valid
         :return: transformed template
         :rtype: str
         """
 
         try:
-            output_file = self.stack_name + ".json"
-            with open(output_file, "w") as fp:
-                pass
-            subprocess.call(["python", "bin/sam-translate.py", "--template-file", template_path, "--o", output_file])
+            with open(template_path, "r") as f:
+                sam_template = yaml_parse(f)
         except IOError:
             raise IOError("The input template path: {} is incorrect.".format(template_path))
         else:
-            if os.path.exists(self.stack_name + ".json"):
-                template_body = open(self.stack_name + ".json").read()
-                # delete the temporary file created
-                os.remove(self.stack_name + ".json")
-            if len(template_body) == 0:
-                raise InvalidTemplateException(" Template path: ".format(template_path))
-            return template_body
+            try:
+                iam_client = boto3.client("iam")
+                cloud_formation_template = json.dumps(transform(sam_template, {}, ManagedPolicyLoader(iam_client)), indent=2)
+                if len(cloud_formation_template) == 0:
+                    raise InvalidTemplateException(" Template path: ".format(template_path))
+                return cloud_formation_template
+            except InvalidDocumentException as e:
+                error_message = functools.reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
+                errors = map(lambda cause: cause.message, e.causes)
+                raise InvalidDocumentException("The template is invalid {} {}".format(errors, error_message))

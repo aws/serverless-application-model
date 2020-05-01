@@ -10,9 +10,6 @@ pytest>=3.0.7
 mock>=2.0.0
 parameterized>=0.6.1
 
-# Requirements for integration tests
-certifi>=2020.4.5.1
-urllib3
 
 # Requirements for examples
 requests>=2.20.0

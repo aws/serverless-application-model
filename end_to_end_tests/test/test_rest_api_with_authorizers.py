@@ -3,8 +3,7 @@ import os
 from .helpers.base_test import BaseTest
 from .helpers.resources import Resources
 from .helpers.resource_types import ResourceTypes
-import urllib3
-import certifi
+import requests
 
 
 class RestApiWithAuthorizersTest(BaseTest):
@@ -188,12 +187,12 @@ class RestApiWithAuthorizersTest(BaseTest):
         """
         print("Making request to " + url)
         try:
-            http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
             if auth_header_key is None or len(auth_header_key) == 0:
-                req = http.request("GET", url)
+                request = requests.get(url)
             else:
                 headers = {auth_header_key: auth_header_value}
-                req = http.request("GET", url, headers=headers)
-            return req.status
-        except urllib3.exceptions.HTTPError as e:
-            return e.code
+                request = requests.get(url, headers=headers)
+            return request.status_code
+        except requests.exceptions.HTTPError as e:
+            print("HTTP error, while executing request: {}".format(url))
+            return e

@@ -18,14 +18,7 @@ Resources:
   HttpApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      InlineCode: |
-         exports.handler = async (event) => {
-           return {
-           statusCode: 200,
-           body: JSON.stringify(event),
-           headers: {}
-           }
-         }
+      CodeUri: s3://sam-temp-integration-tests-bucket/lambda_handler.zip
       Handler: index.handler
       Runtime: nodejs12.x
       Events:
