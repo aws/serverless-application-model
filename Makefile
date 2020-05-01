@@ -39,13 +39,17 @@ init:
 	$(info [*] Install requirements...)
 	@pip install -r requirements/dev.txt -r requirements/base.txt
 
+e2e-tests:
+	$(info [*] Run the integration tests)
+	@pytest end_to_end_tests/test --ignore=end_to_end_tests/test/helpers
+
 test:
 	$(info [*] Run the unit test with minimum code coverage of $(CODE_COVERAGE)%...)
 	@pytest --cov samtranslator --cov-report term-missing --cov-fail-under $(CODE_COVERAGE) tests
 
 black:
 	rm -f tests/*.pyc samtranslator/*.pyc
-	black setup.py samtranslator/* tests/* bin/*
+	black setup.py samtranslator/* tests/* bin/* end_to_end_tests/*
 
 black-check:
 	rm -f tests/*.pyc samtranslator/*.pyc
@@ -69,5 +73,5 @@ TARGETS
 	test        Run the Unit tests.
 	dev         Run all development tests after a change.
 	pr          Perform all checks before submitting a Pull Request.
-
+	e2e-tests   Run all the end-to-end tests
 endef

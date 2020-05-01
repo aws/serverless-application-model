@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "cors-test-100"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1ondh0y436g54"
+s3_prefix = "cors-test-100"
+region = "us-west-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+

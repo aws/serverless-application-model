@@ -1,5 +1,3 @@
-#!/usr/bin/env python2
-
 """Convert SAM templates to CloudFormation templates.
 
 Known limitations: cannot transform CodeUri pointing at local directory.
