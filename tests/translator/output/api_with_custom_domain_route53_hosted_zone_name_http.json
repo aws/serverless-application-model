@@ -67,7 +67,7 @@
         "DomainNameConfigurations": [
           {
             "CertificateArn": "cert-arn-in-us-east-1", 
-            "EndpointType": "EDGE"
+            "EndpointType": "REGIONAL"
           }
         ], 
         "Tags": {
@@ -82,11 +82,16 @@
         "RecordSets": [
           {
             "AliasTarget": {
-              "HostedZoneId": "Z2FDTNDATAQYW2", 
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV20caaf24ab1", 
+                  "RegionalHostedZoneId"
+                ]
+              }, 
               "DNSName": {
                 "Fn::GetAtt": [
                   "ApiGatewayDomainNameV20caaf24ab1", 
-                  "DistributionDomainName"
+                  "RegionalDomainName"
                 ]
               }
             }, 
@@ -166,7 +171,7 @@
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }, 
-                  "payloadFormatVersion": "1.0"
+                  "payloadFormatVersion": "2.0"
                 }, 
                 "responses": {}
               }

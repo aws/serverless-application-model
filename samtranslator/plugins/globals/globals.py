@@ -73,6 +73,7 @@ class Globals(object):
             "DefaultRouteSettings",
             "Domain",
             "RouteSettings",
+            "FailOnWarnings",
         ],
         SamResourceType.SimpleTable.value: ["SSESpecification"],
     }

@@ -66,6 +66,7 @@
     }, 
     "MyLayerd04062b365": {
       "DeletionPolicy": "Delete", 
+      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::LayerVersion", 
       "Properties": {
         "Content": {
@@ -77,6 +78,7 @@
     }, 
     "MyLayerWithANamefda8c9ec8c": {
       "DeletionPolicy": "Retain", 
+      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::LayerVersion", 
       "Properties": {
         "Content": {

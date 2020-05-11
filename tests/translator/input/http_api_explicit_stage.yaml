@@ -2,12 +2,17 @@ Parameters:
   CorsParam:
     Type: String
     Default: True
+  PayloadFormatVersion:
+    Default: '1.0'
+    Type: String
+
 Globals:
   HttpApi:
     RouteSettings:
       "$default":
         DataTraceEnabled: True
         ThrottlingBurstLimit: 100
+    FailOnWarnings: true
 Resources:
   HttpApiFunction: 
     Type: AWS::Serverless::Function
@@ -23,6 +28,8 @@ Resources:
             RouteSettings:
               ThrottlingBurstLimit: 300
               LoggingLevel: INFO
+            PayloadFormatVersion: !Ref PayloadFormatVersion
+
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:

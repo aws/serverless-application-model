@@ -140,7 +140,9 @@ class SamFunction(SamResourceMacro):
         alias_name = ""
         if self.AutoPublishAlias:
             alias_name = self._get_resolved_alias_name("AutoPublishAlias", self.AutoPublishAlias, intrinsics_resolver)
-            code_sha256 = self.AutoPublishCodeSha256
+            code_sha256 = None
+            if self.AutoPublishCodeSha256:
+                code_sha256 = intrinsics_resolver.resolve_parameter_refs(self.AutoPublishCodeSha256)
             lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )
@@ -677,6 +679,7 @@ class SamFunction(SamResourceMacro):
         if attributes is None:
             attributes = {}
         attributes["DeletionPolicy"] = "Retain"
+        attributes["UpdateReplacePolicy"] = "Delete"
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
@@ -878,6 +881,7 @@ class SamHttpApi(SamResourceMacro):
         "Auth": PropertyType(False, is_type(dict)),
         "RouteSettings": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
     }
 
     referable_properties = {
@@ -916,6 +920,7 @@ class SamHttpApi(SamResourceMacro):
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
+            fail_on_warnings=self.FailOnWarnings,
         )
 
         (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()
@@ -1104,6 +1109,7 @@ class SamLayerVersion(SamResourceMacro):
         if attributes is None:
             attributes = {}
         attributes["DeletionPolicy"] = retention_policy_value
+        attributes["UpdateReplacePolicy"] = "Delete"
 
         old_logical_id = self.logical_id
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()

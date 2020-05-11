@@ -169,8 +169,7 @@
                 "MySqsQueue",
                 "Arn"
               ]
-            },
-            "Type": "SQS"
+            }
           }
         },
         "EventSourceArn": {
@@ -227,8 +226,7 @@
             "OnFailure": {
                 "Destination": {
                     "Ref": "MySnsTopic"
-                },
-                "Type": "SNS"
+                }
             }
         }
       }

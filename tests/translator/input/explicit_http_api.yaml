@@ -10,13 +10,16 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref MyApi
-        SimpleCase2:
+        BasePath:
           Type: HttpApi
           Properties:
             ApiId: !Ref MyApi2
+            Path: /
+            Method: get
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      FailOnWarnings: True
       Auth:
         Authorizers:
           OAuth2:
@@ -41,3 +44,19 @@ Resources:
                 - MyApi
             IdentitySource: "$request.querystring.param"
         DefaultAuthorizer: OAuth2
+      DefinitionBody:
+        openapi: '3.0'
+        info:
+          title: !Sub ${AWS::StackName}-Apiv2
+        paths:
+          /:
+            get:
+              responses: {}
+          $default:
+            x-amazon-apigateway-any-method:
+              isDefaultRoute: true
+              x-amazon-apigateway-integration:
+                httpMethod: ANY
+                type: http_proxy
+                uri: https://www.alphavantage.co/
+                payloadFormatVersion: '1.0'

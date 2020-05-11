@@ -74,7 +74,7 @@
                               }
                             ]
                           }, 
-                          "payloadFormatVersion": "1.0"
+                          "payloadFormatVersion": "2.0"
                         }, 
                         "responses": {}
                       }, 
@@ -187,7 +187,7 @@
                               }
                             ]
                           }, 
-                          "payloadFormatVersion": "1.0"
+                          "payloadFormatVersion": "2.0"
                         }, 
                         "responses": {}
                       }, 

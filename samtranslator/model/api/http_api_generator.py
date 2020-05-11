@@ -47,6 +47,7 @@ class HttpApiGenerator(object):
         resource_attributes=None,
         passthrough_resource_attributes=None,
         domain=None,
+        fail_on_warnings=False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -79,6 +80,7 @@ class HttpApiGenerator(object):
         self.resource_attributes = resource_attributes
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.domain = domain
+        self.fail_on_warnings = fail_on_warnings
 
     def _construct_http_api(self):
         """Constructs and returns the ApiGatewayV2 HttpApi.
@@ -98,6 +100,9 @@ class HttpApiGenerator(object):
 
         self._add_auth()
         self._add_tags()
+
+        if self.fail_on_warnings:
+            http_api.FailOnWarnings = self.fail_on_warnings
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
@@ -204,10 +209,9 @@ class HttpApiGenerator(object):
             endpoint = "REGIONAL"
             # to make sure that default is always REGIONAL
             self.domain["EndpointConfiguration"] = "REGIONAL"
-        elif endpoint not in ["EDGE", "REGIONAL"]:
+        elif endpoint not in ["REGIONAL"]:
             raise InvalidResourceException(
-                self.logical_id,
-                "EndpointConfiguration for Custom Domains must be one of {}.".format(["EDGE", "REGIONAL"]),
+                self.logical_id, "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
             )
         domain_config["EndpointType"] = endpoint
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
@@ -312,10 +316,9 @@ class HttpApiGenerator(object):
             alias_target["HostedZoneId"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalHostedZoneId")
             alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
         else:
-            if route53.get("DistributionDomainName") is None:
-                route53["DistributionDomainName"] = fnGetAtt(self.domain.get("ApiDomainName"), "DistributionDomainName")
-            alias_target["HostedZoneId"] = "Z2FDTNDATAQYW2"
-            alias_target["DNSName"] = route53.get("DistributionDomainName")
+            raise InvalidResourceException(
+                self.logical_id, "Only REGIONAL endpoint is supported on HTTP APIs.",
+            )
         return alias_target
 
     def _add_auth(self):

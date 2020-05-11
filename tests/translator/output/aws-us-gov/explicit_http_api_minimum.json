@@ -120,7 +120,7 @@
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations"
                   }, 
-                  "payloadFormatVersion": "1.0"
+                  "payloadFormatVersion": "2.0"
                 }, 
                 "isDefaultRoute": true, 
                 "responses": {}
