@@ -17,6 +17,24 @@
       "Value": {
         "Fn::Sub": "https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
       }
+    },
+    "ApiKey": {
+      "Description": "Api Key",
+      "Value": {
+        "Ref": "ServerlessApiKey"
+      }
+    },
+    "UsagePlanKey": {
+      "Description": "Usage Plan Key",
+      "Value": {
+        "Ref": "MyApiTwoUsagePlanKey"
+      }
+    },
+    "UsagePlan": {
+      "Description": "Usage Plan physical Id",
+      "Value": {
+        "Ref": "MyApiTwoUsagePlan"
+      }
     }
   },
   "Resources": {
@@ -379,28 +397,10 @@
             "Stage": {
               "Ref": "ServerlessRestApiProdStage"
             }
-          },
-          {
-            "ApiId": {
-              "Ref": "MyApiThree"
-            },
-            "Stage": {
-              "Ref": "MyApiThreeProdStage"
-            }
-          },
-          {
-            "ApiId": {
-              "Ref": "ServerlessRestApi"
-            },
-            "Stage": {
-              "Ref": "ServerlessRestApiProdStage"
-            }
           }
         ]
       },
       "DependsOn": [
-        "MyApiThree",
-        "ServerlessRestApi",
         "MyApiThree",
         "ServerlessRestApi"
       ]
@@ -601,22 +601,6 @@
       "Properties": {
         "Enabled": true,
         "StageKeys": [
-          {
-            "RestApiId": {
-              "Ref": "MyApiThree"
-            },
-            "StageName": {
-              "Ref": "MyApiThreeProdStage"
-            }
-          },
-          {
-            "RestApiId": {
-              "Ref": "ServerlessRestApi"
-            },
-            "StageName": {
-              "Ref": "ServerlessRestApiProdStage"
-            }
-          },
           {
             "RestApiId": {
               "Ref": "MyApiThree"

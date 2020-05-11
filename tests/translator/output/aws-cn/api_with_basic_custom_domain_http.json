@@ -1,0 +1,220 @@
+{
+  "Parameters": {
+    "MyDomainName": {
+      "Default": "sam-example.com", 
+      "Type": "String"
+    }, 
+    "MyDomainCert": {
+      "Default": "arn:aws:acm:us-east-1:123455353535:certificate/6c911401-620d-4d41-b89e-366c238bb2f3", 
+      "Type": "String"
+    }
+  }, 
+  "Resources": {
+    "MyApibasicApiMapping": {
+      "Type": "AWS::ApiGatewayV2::ApiMapping", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        }, 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNameV22dbf35af54"
+        }, 
+        "ApiMappingKey": "basic", 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }
+    }, 
+    "ApiGatewayDomainNameV22dbf35af54": {
+      "Type": "AWS::ApiGatewayV2::DomainName", 
+      "Properties": {
+        "DomainName": "sam-example.com", 
+        "DomainNameConfigurations": [
+          {
+            "CertificateArn": "arn:aws:acm:us-east-1:123455353535:certificate/6c911401-620d-4d41-b89e-366c238bb2f3", 
+            "EndpointType": "REGIONAL"
+          }
+        ], 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      }
+    }, 
+    "MyApiProdStage": {
+      "Type": "AWS::ApiGatewayV2::Stage", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        }, 
+        "AutoDeploy": true, 
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      }
+    }, 
+    "HttpApiFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "HttpApiFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "HttpApiFunctionSimpleCasePermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "HttpApiFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApi"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "MyApibeginhereApiMapping": {
+      "Type": "AWS::ApiGatewayV2::ApiMapping", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        }, 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNameV22dbf35af54"
+        }, 
+        "ApiMappingKey": "begin-here", 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }
+    }, 
+    "HttpApiFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "RecordSetGroup1f4f569a7e": {
+      "Type": "AWS::Route53::RecordSetGroup", 
+      "Properties": {
+        "HostedZoneName": "sam-example.com.", 
+        "RecordSets": [
+          {
+            "AliasTarget": {
+              "HostedZoneId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV22dbf35af54", 
+                  "RegionalHostedZoneId"
+                ]
+              }, 
+              "DNSName": {
+                "Fn::GetAtt": [
+                  "ApiGatewayDomainNameV22dbf35af54", 
+                  "RegionalDomainName"
+                ]
+              }
+            }, 
+            "Type": "A", 
+            "Name": "sam-example.com"
+          }
+        ]
+      }
+    }, 
+    "MyApi": {
+      "Type": "AWS::ApiGatewayV2::Api", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/basic": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
+                  }, 
+                  "payloadFormatVersion": "2.0"
+                }, 
+                "responses": {}
+              }
+            }, 
+            "$default": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
+                  }, 
+                  "payloadFormatVersion": "2.0"
+                }, 
+                "isDefaultRoute": true, 
+                "responses": {}
+              }
+            }
+          }, 
+          "openapi": "3.0.1", 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

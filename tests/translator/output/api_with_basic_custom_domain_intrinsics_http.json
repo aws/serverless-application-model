@@ -1,0 +1,318 @@
+{
+  "Conditions": {
+    "C1": {
+      "Fn::Equals": [
+        true, 
+        true
+      ]
+    }
+  }, 
+  "Parameters": {
+    "MyDomainCert": {
+      "Default": "another-api-arn", 
+      "Type": "String"
+    }, 
+    "EndpointConf": {
+      "Default": "REGIONAL", 
+      "Type": "String"
+    }
+  }, 
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }, 
+      "Condition": "C1"
+    }, 
+    "ServerlessHttpApi": {
+      "Type": "AWS::ApiGatewayV2::Api", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/implicit": {
+              "Fn::If": [
+                "C1", 
+                {
+                  "post": {
+                    "Fn::If": [
+                      "C1", 
+                      {
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST", 
+                          "type": "aws_proxy", 
+                          "uri": {
+                            "Fn::If": [
+                              "C1", 
+                              {
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                              }, 
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }, 
+                          "payloadFormatVersion": "2.0"
+                        }, 
+                        "responses": {}
+                      }, 
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                }, 
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          }, 
+          "openapi": "3.0.1", 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyFunctionImplicitGetPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/implicit", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "ServerlessHttpApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyApi": {
+      "Type": "AWS::ApiGatewayV2::Api", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/get": {
+              "Fn::If": [
+                "C1", 
+                {
+                  "put": {
+                    "Fn::If": [
+                      "C1", 
+                      {
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST", 
+                          "type": "aws_proxy", 
+                          "uri": {
+                            "Fn::If": [
+                              "C1", 
+                              {
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                              }, 
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }, 
+                          "payloadFormatVersion": "2.0"
+                        }, 
+                        "responses": {}
+                      }, 
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                }, 
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          }, 
+          "openapi": "3.0.1", 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyFunctionApiPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/get", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": {
+                "Ref": "MyApi"
+              }
+            }
+          ]
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyApigetApiMapping": {
+      "Type": "AWS::ApiGatewayV2::ApiMapping", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        }, 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNameV2c0ed6fae34"
+        }, 
+        "ApiMappingKey": "get", 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "ApiGatewayDomainNameV2c0ed6fae34": {
+      "Type": "AWS::ApiGatewayV2::DomainName", 
+      "Properties": {
+        "DomainName": {
+          "Fn::Sub": "example-ap-southeast-1.com"
+        }, 
+        "DomainNameConfigurations": [
+          {
+            "CertificateArn": "another-api-arn", 
+            "EndpointType": "REGIONAL"
+          }
+        ], 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "ServerlessHttpApiApiGatewayDefaultStage": {
+      "Type": "AWS::ApiGatewayV2::Stage", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "ServerlessHttpApi"
+        }, 
+        "AutoDeploy": true, 
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyApiProdStage": {
+      "Type": "AWS::ApiGatewayV2::Stage", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        }, 
+        "AutoDeploy": true, 
+        "StageName": "Prod", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      }, 
+      "Condition": "C1"
+    }, 
+    "MyApifetchApiMapping": {
+      "Type": "AWS::ApiGatewayV2::ApiMapping", 
+      "Properties": {
+        "ApiId": {
+          "Ref": "MyApi"
+        }, 
+        "DomainName": {
+          "Ref": "ApiGatewayDomainNameV2c0ed6fae34"
+        }, 
+        "ApiMappingKey": "fetch", 
+        "Stage": {
+          "Ref": "MyApiProdStage"
+        }
+      }, 
+      "Condition": "C1"
+    }
+  }
+}

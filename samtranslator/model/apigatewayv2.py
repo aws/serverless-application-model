@@ -12,7 +12,6 @@ class ApiGatewayV2HttpApi(Resource):
         "Description": PropertyType(False, is_str()),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
         "BasePath": PropertyType(False, is_str()),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
         "CorsConfiguration": PropertyType(False, is_type(dict)),
     }
 
@@ -24,11 +23,12 @@ class ApiGatewayV2Stage(Resource):
     property_types = {
         "AccessLogSettings": PropertyType(False, is_type(dict)),
         "DefaultRouteSettings": PropertyType(False, is_type(dict)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
         "ClientCertificateId": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
         "ApiId": PropertyType(True, is_str()),
         "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Tags": PropertyType(False, list_of(is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
         "StageVariables": PropertyType(False, is_type(dict)),
         "AutoDeploy": PropertyType(False, is_type(bool)),
     }
@@ -36,35 +36,45 @@ class ApiGatewayV2Stage(Resource):
     runtime_attrs = {"stage_name": lambda self: ref(self.logical_id)}
 
 
+class ApiGatewayV2DomainName(Resource):
+    resource_type = "AWS::ApiGatewayV2::DomainName"
+    property_types = {
+        "DomainName": PropertyType(True, is_str()),
+        "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),
+        "Tags": PropertyType(False, is_type(dict)),
+    }
+
+
+class ApiGatewayV2ApiMapping(Resource):
+    resource_type = "AWS::ApiGatewayV2::ApiMapping"
+    property_types = {
+        "ApiId": PropertyType(True, is_str()),
+        "ApiMappingKey": PropertyType(False, is_str()),
+        "DomainName": PropertyType(True, is_str()),
+        "Stage": PropertyType(True, is_str()),
+    }
+
+
 class ApiGatewayV2Authorizer(object):
     def __init__(
-        self,
-        api_logical_id=None,
-        name=None,
-        open_id_connect_url=None,
-        authorization_scopes=[],
-        jwt_configuration={},
-        id_source=None,
+        self, api_logical_id=None, name=None, authorization_scopes=[], jwt_configuration={}, id_source=None,
     ):
         """
         Creates an authorizer for use in V2 Http Apis
         """
-        # OIDC uses a connect url, oauth2 doesn't
-        self.auth_type = "openIdConnect"
-        if open_id_connect_url is None:
-            self.auth_type = "oauth2"
+        # Currently only one type of auth
+        self.auth_type = "oauth2"
 
         self.api_logical_id = api_logical_id
         self.name = name
-        self.open_id_connect_url = open_id_connect_url
         self.authorization_scopes = authorization_scopes
 
         # Validate necessary parameters exist
         if not jwt_configuration:
-            raise InvalidResourceException(api_logical_id, name + " Authorizer must define 'JwtConfiguration'")
+            raise InvalidResourceException(api_logical_id, name + " Authorizer must define 'JwtConfiguration'.")
         self.jwt_configuration = jwt_configuration
         if not id_source:
-            raise InvalidResourceException(api_logical_id, name + " Authorizer must define 'IdentitySource'")
+            raise InvalidResourceException(api_logical_id, name + " Authorizer must define 'IdentitySource'.")
         self.id_source = id_source
 
     def generate_openapi(self):
@@ -79,6 +89,4 @@ class ApiGatewayV2Authorizer(object):
                 "type": "jwt",
             },
         }
-        if self.open_id_connect_url:
-            openapi["x-amazon-apigateway-authorizer"]["openIdConnectUrl"] = self.open_id_connect_url
         return openapi

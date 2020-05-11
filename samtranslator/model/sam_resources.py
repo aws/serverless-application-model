@@ -10,8 +10,15 @@ from .api.http_api_generator import HttpApiGenerator
 from .s3_utils.uri_parser import construct_s3_location_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import PropertyType, SamResourceMacro, ResourceTypeResolver
-from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayStage, ApiGatewayDomainName
-from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage
+from samtranslator.model.apigateway import (
+    ApiGatewayDeployment,
+    ApiGatewayStage,
+    ApiGatewayDomainName,
+    ApiGatewayUsagePlan,
+    ApiGatewayUsagePlanKey,
+    ApiGatewayApiKey,
+)
+from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
@@ -133,7 +140,9 @@ class SamFunction(SamResourceMacro):
         alias_name = ""
         if self.AutoPublishAlias:
             alias_name = self._get_resolved_alias_name("AutoPublishAlias", self.AutoPublishAlias, intrinsics_resolver)
-            code_sha256 = self.AutoPublishCodeSha256
+            code_sha256 = None
+            if self.AutoPublishCodeSha256:
+                code_sha256 = intrinsics_resolver.resolve_parameter_refs(self.AutoPublishCodeSha256)
             lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )
@@ -431,7 +440,7 @@ class SamFunction(SamResourceMacro):
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXRayDaemonWriteAccess"))
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXrayWriteOnlyAccess"))
         if self.VpcConfig:
             managed_policy_arns.append(
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
@@ -654,12 +663,23 @@ class SamFunction(SamResourceMacro):
         # SHA Collisions: For purposes of triggering a new update, we are concerned about just the difference previous
         #                 and next hashes. The chances that two subsequent hashes collide is fairly low.
         prefix = "{id}Version".format(id=self.logical_id)
-        logical_id = logical_id_generator.LogicalIdGenerator(prefix, code_dict, code_sha256).gen()
+        logical_dict = {}
+        try:
+            logical_dict = code_dict.copy()
+        except (AttributeError, UnboundLocalError):
+            pass
+        else:
+            if function.Environment:
+                logical_dict.update(function.Environment)
+            if function.MemorySize:
+                logical_dict.update({"MemorySize": function.MemorySize})
+        logical_id = logical_id_generator.LogicalIdGenerator(prefix, logical_dict, code_sha256).gen()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
             attributes = {}
         attributes["DeletionPolicy"] = "Retain"
+        attributes["UpdateReplacePolicy"] = "Delete"
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
@@ -764,6 +784,9 @@ class SamApi(SamResourceMacro):
         "Stage": ApiGatewayStage.resource_type,
         "Deployment": ApiGatewayDeployment.resource_type,
         "DomainName": ApiGatewayDomainName.resource_type,
+        "UsagePlan": ApiGatewayUsagePlan.resource_type,
+        "UsagePlanKey": ApiGatewayUsagePlanKey.resource_type,
+        "ApiKey": ApiGatewayApiKey.resource_type,
     }
 
     def to_cloudformation(self, **kwargs):
@@ -852,15 +875,22 @@ class SamHttpApi(SamResourceMacro):
         "DefinitionBody": PropertyType(False, is_type(dict)),
         "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
         "StageVariables": PropertyType(False, is_type(dict)),
-        "Cors": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "CorsConfiguration": PropertyType(False, one_of(is_type(bool), is_type(dict))),
         "AccessLogSettings": PropertyType(False, is_type(dict)),
+        "DefaultRouteSettings": PropertyType(False, is_type(dict)),
         "Auth": PropertyType(False, is_type(dict)),
+        "RouteSettings": PropertyType(False, is_type(dict)),
+        "Domain": PropertyType(False, is_type(dict)),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
     }
 
-    referable_properties = {"Stage": ApiGatewayV2Stage.resource_type}
+    referable_properties = {
+        "Stage": ApiGatewayV2Stage.resource_type,
+        "DomainName": ApiGatewayV2DomainName.resource_type,
+    }
 
     def to_cloudformation(self, **kwargs):
-        """Returns the API Gateway RestApi, Deployment, and Stage to which this SAM Api corresponds.
+        """Returns the API GatewayV2 Api, Deployment, and Stage to which this SAM Api corresponds.
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
         macro to pure CloudFormation
@@ -868,6 +898,11 @@ class SamHttpApi(SamResourceMacro):
         :rtype: list
         """
         resources = []
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)
+
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
 
         api_generator = HttpApiGenerator(
             self.logical_id,
@@ -878,14 +913,25 @@ class SamHttpApi(SamResourceMacro):
             self.StageName,
             tags=self.Tags,
             auth=self.Auth,
+            cors_configuration=self.CorsConfiguration,
             access_log_settings=self.AccessLogSettings,
+            route_settings=self.RouteSettings,
+            default_route_settings=self.DefaultRouteSettings,
             resource_attributes=self.resource_attributes,
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+            domain=self.Domain,
+            fail_on_warnings=self.FailOnWarnings,
         )
 
-        http_api, stage = api_generator.to_cloudformation()
+        (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()
 
         resources.append(http_api)
+        if domain:
+            resources.append(domain)
+        if basepath_mapping:
+            resources.extend(basepath_mapping)
+        if route53:
+            resources.append(route53)
 
         # Stage is now optional. Only add it if one is created.
         if stage:
@@ -1063,6 +1109,7 @@ class SamLayerVersion(SamResourceMacro):
         if attributes is None:
             attributes = {}
         attributes["DeletionPolicy"] = retention_policy_value
+        attributes["UpdateReplacePolicy"] = "Delete"
 
         old_logical_id = self.logical_id
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()

@@ -54,6 +54,12 @@
               "Ref": "AWS::StackName"
             }
           }, 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ], 
           "paths": {}, 
           "openapi": "3.0.1"
         }
@@ -99,6 +105,12 @@
               "Ref": "AWS::StackName"
             }
           }, 
+          "tags": [
+            {
+              "name": "httpapi:createdBy", 
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ], 
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {
@@ -108,7 +120,7 @@
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations"
                   }, 
-                  "payloadFormatVersion": "1.0"
+                  "payloadFormatVersion": "2.0"
                 }, 
                 "isDefaultRoute": true, 
                 "responses": {}
@@ -126,7 +138,10 @@
           "Ref": "ServerlessHttpApi"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }, 
     "ApiApiGatewayDefaultStage": {
@@ -136,7 +151,10 @@
           "Ref": "Api"
         }, 
         "AutoDeploy": true, 
-        "StageName": "$default"
+        "StageName": "$default", 
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
       }
     }
   }

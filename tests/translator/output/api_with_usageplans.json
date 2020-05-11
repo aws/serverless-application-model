@@ -17,6 +17,24 @@
       "Value": {
         "Fn::Sub": "https://${MyApiOne}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
       }
+    },
+    "ApiKey": {
+      "Description": "Api Key",
+      "Value": {
+        "Ref": "ServerlessApiKey"
+      }
+    },
+    "UsagePlanKey": {
+      "Description": "Usage Plan Key",
+      "Value": {
+        "Ref": "MyApiTwoUsagePlanKey"
+      }
+    },
+    "UsagePlan": {
+      "Description": "Usage Plan physical Id",
+      "Value": {
+        "Ref": "MyApiTwoUsagePlan"
+      }
     }
   },
   "Resources": {

@@ -23,7 +23,7 @@ class CognitoUserPool(Resource):
         "UsernameAttributes": PropertyType(False, list_of(is_str())),
         "UserPoolAddOns": PropertyType(False, list_of(dict)),
         "UserPoolName": PropertyType(False, is_str()),
-        "UserPoolTags": PropertyType(False, is_str()),
+        "UserPoolTags": PropertyType(False, is_type(dict)),
         "VerificationMessageTemplate": PropertyType(False, is_type(dict)),
     }
 

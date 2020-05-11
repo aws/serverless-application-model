@@ -159,3 +159,12 @@ Resources:
 
         - AthenaQueryPolicy:
             WorkGroupName: name
+
+        - S3WritePolicy:
+            BucketName: name
+
+        - DynamoDBWritePolicy:
+            TableName: name
+
+        - EventBridgePutEventsPolicy:
+            EventBusName: name

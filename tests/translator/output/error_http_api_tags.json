@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [Api] is invalid. Unable to add `Tags` because 'DefinitionBody' does not contain a valid OpenApi definition."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Api] is invalid. Unable to add `Tags` because 'DefinitionBody' does not contain a valid OpenApi definition."
+}

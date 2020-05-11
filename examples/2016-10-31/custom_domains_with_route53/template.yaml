@@ -28,7 +28,7 @@ Resources:
             Path: /fetch
 
   MyApi:
-    Type: AWS::Serverless::Api
+    Type: AWS::Serverless::Api # Also works with HTTP API
     Properties:
       OpenApiVersion: 3.0.1
       StageName: Prod
