@@ -1,0 +1,13 @@
+Resources:
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri:
+        Bucket: my-sam-demo-bucket
+        Version: 3
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+          - Effect: Deny
+            Action: "*"
+            Resource: "*"

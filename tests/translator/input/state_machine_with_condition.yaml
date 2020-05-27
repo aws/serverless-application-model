@@ -1,0 +1,16 @@
+Conditions:
+  TestCondition:
+    Fn::Equals:
+      - test
+      - test
+Resources:
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Condition: "TestCondition"
+    Properties:
+      Name: MyStateMachine
+      DefinitionUri:
+        Bucket: sam-demo-bucket
+        Key: my-state-machine.asl.json
+        Version: 3
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole

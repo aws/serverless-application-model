@@ -82,7 +82,7 @@ class ServerlessAppPlugin(BasePlugin):
             service_call = self._handle_get_application_request
         else:
             service_call = self._handle_create_cfn_template_request
-        for logical_id, app in template.iterate(SamResourceType.Application.value):
+        for logical_id, app in template.iterate({SamResourceType.Application.value}):
             if not self._can_process_application(app):
                 # Handle these cases in the on_before_transform_resource event
                 continue

@@ -207,6 +207,55 @@ class SwaggerEditor(object):
         if condition:
             path_dict[method] = make_conditional(condition, path_dict[method])
 
+    def add_state_machine_integration(
+        self, path, method, integration_uri, credentials, request_templates=None, condition=None,
+    ):
+        """
+        Adds aws APIGW integration to the given path+method.
+
+        :param string path: Path name
+        :param string method: HTTP Method
+        :param string integration_uri: URI for the integration
+        :param string credentials: Credentials for the integration
+        :param dict request_templates: A map of templates that are applied on the request payload.
+        :param bool condition: Condition for the integration
+        """
+
+        method = self._normalize_method_name(method)
+        if self.has_integration(path, method):
+            raise ValueError("Integration already exists on Path={}, Method={}".format(path, method))
+
+        self.add_path(path, method)
+
+        # Wrap the integration_uri in a Condition if one exists on that state machine
+        # This is necessary so CFN doesn't try to resolve the integration reference.
+        if condition:
+            integration_uri = make_conditional(condition, integration_uri)
+
+        path_dict = self.get_path(path)
+
+        # Responses
+        integration_responses = {"200": {"statusCode": "200"}, "400": {"statusCode": "400"}}
+        default_method_responses = {"200": {"description": "OK"}, "400": {"description": "Bad Request"}}
+
+        path_dict[method][self._X_APIGW_INTEGRATION] = {
+            "type": "aws",
+            "httpMethod": "POST",
+            "uri": integration_uri,
+            "responses": integration_responses,
+            "credentials": credentials,
+        }
+
+        # If 'responses' key is *not* present, add it with an empty dict as value
+        path_dict[method].setdefault("responses", default_method_responses)
+
+        if request_templates:
+            path_dict[method][self._X_APIGW_INTEGRATION].update({"requestTemplates": request_templates})
+
+        # If a condition is present, wrap all method contents up into the condition
+        if condition:
+            path_dict[method] = make_conditional(condition, path_dict[method])
+
     def make_path_conditional(self, path, condition):
         """
         Wrap entire API path definition in a CloudFormation if condition.

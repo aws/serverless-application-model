@@ -1,0 +1,105 @@
+Resources:
+  MyApiWithCognitoAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      OpenApiVersion: "3.0.1"
+      Auth:
+        DefaultAuthorizer: MyDefaultCognitoAuth
+        Authorizers:
+          MyDefaultCognitoAuth:
+            UserPoolArn: arn:aws:1
+            AuthorizationScopes:
+              - default.write
+              - default.read
+          MyCognitoAuthWithDefaultScopes:
+            UserPoolArn: arn:aws:2
+            AuthorizationScopes:
+              - default.delete
+              - default.update
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachine
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Deny
+              Action: "*"
+              Resource: "*"
+      Events:
+        CognitoAuthorizerWithDefaultScopes:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitoauthorizerwithdefaultscopes
+            Auth:
+              Authorizer: MyCognitoAuthWithDefaultScopes
+        CognitoDefaultScopesDefaultAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitodefaultscopesdefaultauthorizer
+        CognitoWithAuthNone:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitowithauthnone
+            Auth:
+              Authorizer: NONE
+        CognitoDefaultScopesWithOverwritten:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitodefaultscopesoverwritten
+            Auth:
+              Authorizer: MyDefaultCognitoAuth
+              AuthorizationScopes:
+                - overwritten.read
+                - overwritten.write
+        CognitoAuthorizerScopesOverwritten:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitoauthorizercopesoverwritten
+            Auth:
+              Authorizer: MyCognitoAuthWithDefaultScopes
+              AuthorizationScopes:
+                - overwritten.read
+                - overwritten.write
+        CognitoDefaultScopesNone:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitodefaultscopesnone
+            Auth:
+              Authorizer: MyDefaultCognitoAuth
+              AuthorizationScopes: []
+        CognitoDefaultAuthDefaultScopesNone:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitodefaultauthdefaultscopesnone
+            Auth:
+              Authorizer: MyCognitoAuthWithDefaultScopes
+              AuthorizationScopes: []

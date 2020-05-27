@@ -1,0 +1,155 @@
+{
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "hello.handler",
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "StateMachineRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyName": "StateMachineRolePolicy0",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": "lambda:InvokeFunction",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "MyFunction",
+                      "Arn"
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "stateMachine:createdBy"
+          }
+        ]
+      }
+    },
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "StateMachine": {
+      "Type": "AWS::StepFunctions::StateMachine",
+      "Properties": {
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Fn::GetAtt": [
+              "MyFunction",
+              "Arn"
+            ]
+          },
+          "my_state_var_1": "Pass",
+          "my_state_var_2": "Task"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineRole",
+            "Arn"
+          ]
+        },
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",",
+              "    \"StartAt\": \"Hello\",",
+              "    \"States\": {",
+              "        \"Hello\": {",
+              "            \"Next\": \"World\",",
+              "            \"Result\": \"Hello\",",
+              "            \"Type\": \"${my_state_var_1}\"",
+              "        },",
+              "        \"World\": {",
+              "            \"End\": true,",
+              "            \"Resource\": \"${definition_substitution_1}\",",
+              "            \"Type\": \"${my_state_var_2}\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "stateMachine:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

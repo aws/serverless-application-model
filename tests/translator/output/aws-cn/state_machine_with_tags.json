@@ -1,0 +1,105 @@
+{
+  "Resources": {
+    "StateMachineRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [], 
+        "Policies": [
+          {
+            "PolicyName": "StateMachineRolePolicy0", 
+            "PolicyDocument": {
+              "Version": "2012-10-17", 
+              "Statement": [
+                {
+                  "Action": "*", 
+                  "Resource": "*", 
+                  "Effect": "Deny"
+                }
+              ]
+            }
+          }
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "stateMachine:createdBy"
+          }, 
+          {
+            "Value": "ValueTwo", 
+            "Key": "TagTwo"
+          }, 
+          {
+            "Value": "ValueOne", 
+            "Key": "TagOne"
+          }
+        ]
+      }
+    }, 
+    "StateMachine": {
+      "Type": "AWS::StepFunctions::StateMachine", 
+      "Properties": {
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineRole", 
+            "Arn"
+          ]
+        }, 
+        "StateMachineName": "MyStateMachineWithTags", 
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n", 
+            [
+              "{", 
+              "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",", 
+              "    \"StartAt\": \"Hello\",", 
+              "    \"States\": {", 
+              "        \"Hello\": {", 
+              "            \"Next\": \"World\",", 
+              "            \"Result\": \"Hello\",", 
+              "            \"Type\": \"Pass\"", 
+              "        },", 
+              "        \"World\": {", 
+              "            \"End\": true,", 
+              "            \"Result\": \"World\",", 
+              "            \"Type\": \"Pass\"", 
+              "        }", 
+              "    }", 
+              "}"
+            ]
+          ]
+        }, 
+        "StateMachineType": "STANDARD", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "stateMachine:createdBy"
+          }, 
+          {
+            "Value": "ValueTwo", 
+            "Key": "TagTwo"
+          }, 
+          {
+            "Value": "ValueOne", 
+            "Key": "TagOne"
+          }
+        ]
+      }
+    }
+  }
+}
