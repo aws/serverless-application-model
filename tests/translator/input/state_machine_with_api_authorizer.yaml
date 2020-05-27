@@ -1,0 +1,55 @@
+Resources:
+  MyApi:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyLambdaTokenAuth
+        ApiKeyRequired: true
+        Authorizers:
+          MyLambdaTokenAuth:
+            FunctionPayloadType: TOKEN
+            FunctionArn: arn:aws
+            FunctionInvokeRole: arn:aws:iam::123456789012:role/S3Access
+            Identity:
+              Header: MyCustomAuthHeader
+              ValidationExpression: mycustomauthexpression
+              ReauthorizeEvery: 20
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachine
+      Type: STANDARD
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Deny
+              Action: "*"
+              Resource: "*"
+      Events:
+        WithNoAuthorizer:
+          Type: Api
+          Properties:
+            Path: /startNoAuth
+            Method: post
+        WithLambdaTokenAuth:
+          Type: Api
+          Properties:
+            Path: /startWithLambdaToken
+            Method: post
+            RestApiId: !Ref MyApi
+            Auth:
+              Authorizer: MyLambdaTokenAuth

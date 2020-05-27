@@ -1,0 +1,8 @@
+{
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Event with id [WithLambdaTokenAuth] is invalid. Unable to set Authorizer [MyUndefinedAuthorizer] on API method [post] for path [/startWithLambdaToken] because it wasn't defined in the API's Authorizers.",
+    "errors": [
+        {
+            "errorMessage": "Event with id [WithLambdaTokenAuth] is invalid. Unable to set Authorizer [MyUndefinedAuthorizer] on API method [post] for path [/startWithLambdaToken] because it wasn't defined in the API's Authorizers."
+        }
+    ]
+}

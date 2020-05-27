@@ -1,0 +1,11 @@
+Resources:
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: my-invalid-s3-uri
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+          - Effect: Deny
+            Action: "*"
+            Resource: "*"

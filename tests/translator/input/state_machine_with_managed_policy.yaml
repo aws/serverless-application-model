@@ -1,0 +1,9 @@
+Resources:
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachineWithManagedPolicy
+      Type: STANDARD
+      DefinitionUri: s3://sam-demo-bucket/my-state-machine.asl.json
+      Policies:
+        - AmazonDynamoDBFullAccess
