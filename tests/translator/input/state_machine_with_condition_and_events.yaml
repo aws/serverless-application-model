@@ -1,0 +1,34 @@
+Conditions:
+  TestCondition:
+    Fn::Equals:
+      - test
+      - test
+Resources:
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Condition: "TestCondition"
+    Properties:
+      Name: MyStateMachine
+      Events:
+        ScheduleEvent:
+          Type: Schedule
+          Properties:
+            Schedule: "rate(1 minute)"
+            Name: TestSchedule
+        CWEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                  - terminated
+        MyApiEvent:
+          Type: Api
+          Properties:
+            Path: /startMyExecution
+            Method: post
+      DefinitionUri:
+        Bucket: sam-demo-bucket
+        Key: my-state-machine.asl.json
+        Version: 3
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole

@@ -22,7 +22,7 @@ from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2Doma
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
-from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
+from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
 from samtranslator.model.lambda_ import (
     LambdaFunction,
@@ -44,6 +44,8 @@ from samtranslator.model.intrinsics import (
 )
 from samtranslator.model.sqs import SQSQueue
 from samtranslator.model.sns import SNSTopic
+from samtranslator.model.stepfunctions import StateMachineGenerator
+from samtranslator.model.role_utils import construct_role_for_resource
 
 
 class SamFunction(SamResourceMacro):
@@ -431,12 +433,12 @@ class SamFunction(SamResourceMacro):
         :returns: the generated IAM Role
         :rtype: model.iam.IAMRole
         """
-        execution_role = IAMRole(self.logical_id + "Role", attributes=self.get_passthrough_resource_attributes())
+        role_attributes = self.get_passthrough_resource_attributes()
 
         if self.AssumeRolePolicyDocument is not None:
-            execution_role.AssumeRolePolicyDocument = self.AssumeRolePolicyDocument
+            assume_role_policy_document = self.AssumeRolePolicyDocument
         else:
-            execution_role.AssumeRolePolicyDocument = IAMRolePolicies.lambda_assume_role_policy()
+            assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
@@ -446,7 +448,7 @@ class SamFunction(SamResourceMacro):
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
             )
 
-        function_policies = FunctionPolicies(
+        function_policies = ResourcePolicies(
             {"Policies": self.Policies},
             # No support for policy templates in the "core"
             policy_template_processor=None,
@@ -465,69 +467,17 @@ class SamFunction(SamResourceMacro):
             if event_invoke_policies is not None:
                 policy_documents.extend(event_invoke_policies)
 
-        for index, policy_entry in enumerate(function_policies.get()):
-            if policy_entry.type is PolicyTypes.POLICY_STATEMENT:
-
-                if is_intrinsic_if(policy_entry.data):
-
-                    intrinsic_if = policy_entry.data
-                    then_statement = intrinsic_if["Fn::If"][1]
-                    else_statement = intrinsic_if["Fn::If"][2]
-
-                    if not is_intrinsic_no_value(then_statement):
-                        then_statement = {
-                            "PolicyName": execution_role.logical_id + "Policy" + str(index),
-                            "PolicyDocument": then_statement,
-                        }
-                        intrinsic_if["Fn::If"][1] = then_statement
-
-                    if not is_intrinsic_no_value(else_statement):
-                        else_statement = {
-                            "PolicyName": execution_role.logical_id + "Policy" + str(index),
-                            "PolicyDocument": else_statement,
-                        }
-                        intrinsic_if["Fn::If"][2] = else_statement
-
-                    policy_documents.append(intrinsic_if)
-
-                else:
-                    policy_documents.append(
-                        {
-                            "PolicyName": execution_role.logical_id + "Policy" + str(index),
-                            "PolicyDocument": policy_entry.data,
-                        }
-                    )
-
-            elif policy_entry.type is PolicyTypes.MANAGED_POLICY:
-
-                # There are three options:
-                #   Managed Policy Name (string): Try to convert to Managed Policy ARN
-                #   Managed Policy Arn (string): Insert it directly into the list
-                #   Intrinsic Function (dict): Insert it directly into the list
-                #
-                # When you insert into managed_policy_arns list, de-dupe to prevent same ARN from showing up twice
-                #
-
-                policy_arn = policy_entry.data
-                if isinstance(policy_entry.data, string_types) and policy_entry.data in managed_policy_map:
-                    policy_arn = managed_policy_map[policy_entry.data]
-
-                # De-Duplicate managed policy arns before inserting. Mainly useful
-                # when customer specifies a managed policy which is already inserted
-                # by SAM, such as AWSLambdaBasicExecutionRole
-                if policy_arn not in managed_policy_arns:
-                    managed_policy_arns.append(policy_arn)
-            else:
-                # Policy Templates are not supported here in the "core"
-                raise InvalidResourceException(
-                    self.logical_id, "Policy at index {} in the 'Policies' property is not valid".format(index)
-                )
-
-        execution_role.ManagedPolicyArns = list(managed_policy_arns)
-        execution_role.Policies = policy_documents or None
-        execution_role.PermissionsBoundary = self.PermissionsBoundary
-        execution_role.Tags = self._construct_tag_list(self.Tags)
-
+        execution_role = construct_role_for_resource(
+            resource_logical_id=self.logical_id,
+            attributes=role_attributes,
+            managed_policy_map=managed_policy_map,
+            assume_role_policy_document=assume_role_policy_document,
+            resource_policies=function_policies,
+            managed_policy_arns=managed_policy_arns,
+            policy_documents=policy_documents,
+            permissions_boundary=self.PermissionsBoundary,
+            tags=self._construct_tag_list(self.Tags),
+        )
         return execution_role
 
     def _validate_dlq(self):
@@ -1151,3 +1101,71 @@ class SamLayerVersion(SamResourceMacro):
                 self.logical_id,
                 "'{}' must be one of the following options: {}.".format("RetentionPolicy", [self.RETAIN, self.DELETE]),
             )
+
+
+class SamStateMachine(SamResourceMacro):
+    """SAM state machine macro.
+    """
+
+    resource_type = "AWS::Serverless::StateMachine"
+    property_types = {
+        "Definition": PropertyType(False, is_type(dict)),
+        "DefinitionUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "Logging": PropertyType(False, is_type(dict)),
+        "Role": PropertyType(False, is_str()),
+        "DefinitionSubstitutions": PropertyType(False, is_type(dict)),
+        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
+        "Name": PropertyType(False, is_str()),
+        "Type": PropertyType(False, is_str()),
+        "Tags": PropertyType(False, is_type(dict)),
+        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+    }
+    event_resolver = ResourceTypeResolver(samtranslator.model.stepfunctions.events,)
+
+    def to_cloudformation(self, **kwargs):
+        managed_policy_map = kwargs.get("managed_policy_map", {})
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        event_resources = kwargs["event_resources"]
+
+        state_machine_generator = StateMachineGenerator(
+            logical_id=self.logical_id,
+            depends_on=self.depends_on,
+            managed_policy_map=managed_policy_map,
+            intrinsics_resolver=intrinsics_resolver,
+            definition=self.Definition,
+            definition_uri=self.DefinitionUri,
+            logging=self.Logging,
+            name=self.Name,
+            policies=self.Policies,
+            definition_substitutions=self.DefinitionSubstitutions,
+            role=self.Role,
+            state_machine_type=self.Type,
+            events=self.Events,
+            event_resources=event_resources,
+            event_resolver=self.event_resolver,
+            tags=self.Tags,
+            resource_attributes=self.resource_attributes,
+            passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
+        )
+
+        resources = state_machine_generator.to_cloudformation()
+        return resources
+
+    def resources_to_link(self, resources):
+        try:
+            return {"event_resources": self._event_resources_to_link(resources)}
+        except InvalidEventException as e:
+            raise InvalidResourceException(self.logical_id, e.message)
+
+    def _event_resources_to_link(self, resources):
+        event_resources = {}
+        if self.Events:
+            for logical_id, event_dict in self.Events.items():
+                try:
+                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        self.logical_id + logical_id, event_dict, logical_id
+                    )
+                except (TypeError, AttributeError) as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
+                event_resources[logical_id] = event_source.resources_to_link(resources)
+        return event_resources

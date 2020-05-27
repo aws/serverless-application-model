@@ -19,6 +19,36 @@ class IAMRole(Resource):
 
 class IAMRolePolicies:
     @classmethod
+    def construct_assume_role_policy_for_service_principal(cls, service_principal):
+        document = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {"Action": ["sts:AssumeRole"], "Effect": "Allow", "Principal": {"Service": [service_principal]},}
+            ],
+        }
+        return document
+
+    @classmethod
+    def step_functions_start_execution_role_policy(cls, state_machine_arn, logical_id):
+        document = {
+            "PolicyName": logical_id + "StartExecutionPolicy",
+            "PolicyDocument": {
+                "Statement": [{"Action": "states:StartExecution", "Effect": "Allow", "Resource": state_machine_arn}]
+            },
+        }
+        return document
+
+    @classmethod
+    def stepfunctions_assume_role_policy(cls):
+        document = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {"Action": ["sts:AssumeRole"], "Effect": "Allow", "Principal": {"Service": ["states.amazonaws.com"]},}
+            ],
+        }
+        return document
+
+    @classmethod
     def cloud_watch_log_assume_role_policy(cls):
         document = {
             "Version": "2012-10-17",

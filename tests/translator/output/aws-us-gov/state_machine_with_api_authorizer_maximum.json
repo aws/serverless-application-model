@@ -1,0 +1,690 @@
+{
+    "Resources": {
+        "MyApiMyLambdaRequestAuthAuthorizerPermission": {
+            "Type": "AWS::Lambda::Permission", 
+            "Properties": {
+                "Action": "lambda:InvokeFunction", 
+                "Principal": "apigateway.amazonaws.com", 
+                "FunctionName": "arn:aws", 
+                "SourceArn": {
+                    "Fn::Sub": [
+                        "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+                        {
+                            "__ApiId__": {
+                                "Ref": "MyApi"
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "StateMachineWithLambdaRequestAuthorizerRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithLambdaRequestAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }, 
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "StateMachine": {
+            "Type": "AWS::StepFunctions::StateMachine", 
+            "Properties": {
+                "RoleArn": {
+                    "Fn::GetAtt": [
+                        "StateMachineRole", 
+                        "Arn"
+                    ]
+                }, 
+                "StateMachineName": "MyStateMachine", 
+                "DefinitionString": {
+                    "Fn::Join": [
+                        "\n", 
+                        [
+                            "{", 
+                            "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",", 
+                            "    \"StartAt\": \"Hello\",", 
+                            "    \"States\": {", 
+                            "        \"Hello\": {", 
+                            "            \"Next\": \"World\",", 
+                            "            \"Result\": \"Hello\",", 
+                            "            \"Type\": \"Pass\"", 
+                            "        },", 
+                            "        \"World\": {", 
+                            "            \"End\": true,", 
+                            "            \"Result\": \"World\",", 
+                            "            \"Type\": \"Pass\"", 
+                            "        }", 
+                            "    }", 
+                            "}"
+                        ]
+                    ]
+                }, 
+                "StateMachineType": "STANDARD", 
+                "Tags": [
+                    {
+                        "Value": "SAM", 
+                        "Key": "stateMachine:createdBy"
+                    }
+                ]
+            }
+        }, 
+        "MyApiDeployment2120b73f3e": {
+            "Type": "AWS::ApiGateway::Deployment", 
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "MyApi"
+                }, 
+                "Description": "RestApi deployment id: 2120b73f3e7efc28dc4baca314ee3b30d8d8c783", 
+                "StageName": "Stage"
+            }
+        }, 
+        "StateMachineWithDefaultAuthorizerRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithDefaultAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }, 
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "MyApiMyLambdaTokenAuthAuthorizerPermission": {
+            "Type": "AWS::Lambda::Permission", 
+            "Properties": {
+                "Action": "lambda:InvokeFunction", 
+                "Principal": "apigateway.amazonaws.com", 
+                "FunctionName": "arn:aws", 
+                "SourceArn": {
+                    "Fn::Sub": [
+                        "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+                        {
+                            "__ApiId__": {
+                                "Ref": "MyApi"
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "StateMachineRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "states.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }, 
+                "ManagedPolicyArns": [], 
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineRolePolicy0", 
+                        "PolicyDocument": {
+                            "Version": "2012-10-17", 
+                            "Statement": [
+                                {
+                                    "Action": "*", 
+                                    "Resource": "*", 
+                                    "Effect": "Deny"
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Value": "SAM", 
+                        "Key": "stateMachine:createdBy"
+                    }
+                ]
+            }
+        }, 
+        "StateMachineWithLambdaTokenAuthorizerRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithLambdaTokenAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }, 
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "MyApiMyLambdaTokenAuthNoneFunctionInvokeRoleAuthorizerPermission": {
+            "Type": "AWS::Lambda::Permission", 
+            "Properties": {
+                "Action": "lambda:InvokeFunction", 
+                "Principal": "apigateway.amazonaws.com", 
+                "FunctionName": "arn:aws", 
+                "SourceArn": {
+                    "Fn::Sub": [
+                        "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+                        {
+                            "__ApiId__": {
+                                "Ref": "MyApi"
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "MyApiProdStage": {
+            "Type": "AWS::ApiGateway::Stage", 
+            "Properties": {
+                "DeploymentId": {
+                    "Ref": "MyApiDeployment2120b73f3e"
+                }, 
+                "RestApiId": {
+                    "Ref": "MyApi"
+                }, 
+                "StageName": "Prod"
+            }
+        }, 
+        "StateMachineWithCognitoMultipleUserPoolsAuthorizerRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithCognitoMultipleUserPoolsAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }, 
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "StateMachineWithNoAuthorizerRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithNoAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }, 
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "MyApi": {
+            "Type": "AWS::ApiGateway::RestApi", 
+            "Properties": {
+                "Body": {
+                    "info": {
+                        "version": "1.0", 
+                        "title": {
+                            "Ref": "AWS::StackName"
+                        }
+                    }, 
+                    "paths": {
+                        "/": {
+                            "get": {
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "200": {
+                                            "statusCode": "200"
+                                        }, 
+                                        "400": {
+                                            "statusCode": "400"
+                                        }
+                                    }, 
+                                    "uri": {
+                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                                    }, 
+                                    "httpMethod": "POST", 
+                                    "requestTemplates": {
+                                        "application/json": {
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
+                                        }
+                                    }, 
+                                    "credentials": {
+                                        "Fn::GetAtt": [
+                                            "StateMachineWithNoAuthorizerRole", 
+                                            "Arn"
+                                        ]
+                                    }, 
+                                    "type": "aws"
+                                }, 
+                                "security": [
+                                    {
+                                        "NONE": []
+                                    }, 
+                                    {
+                                        "api_key": []
+                                    }
+                                ], 
+                                "responses": {
+                                    "200": {
+                                        "description": "OK"
+                                    }, 
+                                    "400": {
+                                        "description": "Bad Request"
+                                    }
+                                }
+                            }
+                        }, 
+                        "/users": {
+                            "put": {
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "200": {
+                                            "statusCode": "200"
+                                        }, 
+                                        "400": {
+                                            "statusCode": "400"
+                                        }
+                                    }, 
+                                    "uri": {
+                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                                    }, 
+                                    "httpMethod": "POST", 
+                                    "requestTemplates": {
+                                        "application/json": {
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
+                                        }
+                                    }, 
+                                    "credentials": {
+                                        "Fn::GetAtt": [
+                                            "StateMachineWithDefaultAuthorizerRole", 
+                                            "Arn"
+                                        ]
+                                    }, 
+                                    "type": "aws"
+                                }, 
+                                "security": [
+                                    {
+                                        "MyCognitoAuth": []
+                                    }, 
+                                    {
+                                        "api_key": []
+                                    }
+                                ], 
+                                "responses": {
+                                    "200": {
+                                        "description": "OK"
+                                    }, 
+                                    "400": {
+                                        "description": "Bad Request"
+                                    }
+                                }
+                            }, 
+                            "post": {
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "200": {
+                                            "statusCode": "200"
+                                        }, 
+                                        "400": {
+                                            "statusCode": "400"
+                                        }
+                                    }, 
+                                    "uri": {
+                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                                    }, 
+                                    "httpMethod": "POST", 
+                                    "requestTemplates": {
+                                        "application/json": {
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
+                                        }
+                                    }, 
+                                    "credentials": {
+                                        "Fn::GetAtt": [
+                                            "StateMachineWithCognitoMultipleUserPoolsAuthorizerRole", 
+                                            "Arn"
+                                        ]
+                                    }, 
+                                    "type": "aws"
+                                }, 
+                                "security": [
+                                    {
+                                        "MyCognitoAuthMultipleUserPools": []
+                                    }, 
+                                    {
+                                        "api_key": []
+                                    }
+                                ], 
+                                "responses": {
+                                    "200": {
+                                        "description": "OK"
+                                    }, 
+                                    "400": {
+                                        "description": "Bad Request"
+                                    }
+                                }
+                            }, 
+                            "patch": {
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "200": {
+                                            "statusCode": "200"
+                                        }, 
+                                        "400": {
+                                            "statusCode": "400"
+                                        }
+                                    }, 
+                                    "uri": {
+                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                                    }, 
+                                    "httpMethod": "POST", 
+                                    "requestTemplates": {
+                                        "application/json": {
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
+                                        }
+                                    }, 
+                                    "credentials": {
+                                        "Fn::GetAtt": [
+                                            "StateMachineWithLambdaTokenAuthorizerRole", 
+                                            "Arn"
+                                        ]
+                                    }, 
+                                    "type": "aws"
+                                }, 
+                                "security": [
+                                    {
+                                        "MyLambdaTokenAuthNoneFunctionInvokeRole": []
+                                    }, 
+                                    {
+                                        "api_key": []
+                                    }
+                                ], 
+                                "responses": {
+                                    "200": {
+                                        "description": "OK"
+                                    }, 
+                                    "400": {
+                                        "description": "Bad Request"
+                                    }
+                                }
+                            }, 
+                            "delete": {
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "200": {
+                                            "statusCode": "200"
+                                        }, 
+                                        "400": {
+                                            "statusCode": "400"
+                                        }
+                                    }, 
+                                    "uri": {
+                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                                    }, 
+                                    "httpMethod": "POST", 
+                                    "requestTemplates": {
+                                        "application/json": {
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
+                                        }
+                                    }, 
+                                    "credentials": {
+                                        "Fn::GetAtt": [
+                                            "StateMachineWithLambdaRequestAuthorizerRole", 
+                                            "Arn"
+                                        ]
+                                    }, 
+                                    "type": "aws"
+                                }, 
+                                "security": [
+                                    {
+                                        "MyLambdaRequestAuth": []
+                                    }, 
+                                    {
+                                        "api_key": []
+                                    }
+                                ], 
+                                "responses": {
+                                    "200": {
+                                        "description": "OK"
+                                    }, 
+                                    "400": {
+                                        "description": "Bad Request"
+                                    }
+                                }
+                            }
+                        }
+                    }, 
+                    "swagger": "2.0", 
+                    "securityDefinitions": {
+                        "MyLambdaTokenAuthNoneFunctionInvokeRole": {
+                            "in": "header", 
+                            "type": "apiKey", 
+                            "name": "Authorization", 
+                            "x-amazon-apigateway-authorizer": {
+                                "type": "token", 
+                                "authorizerResultTtlInSeconds": 0, 
+                                "authorizerUri": {
+                                    "Fn::Sub": [
+                                        "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                                        {
+                                            "__FunctionArn__": "arn:aws"
+                                        }
+                                    ]
+                                }
+                            }, 
+                            "x-amazon-apigateway-authtype": "custom"
+                        }, 
+                        "MyCognitoAuthMultipleUserPools": {
+                            "in": "header", 
+                            "type": "apiKey", 
+                            "name": "MyAuthorizationHeader2", 
+                            "x-amazon-apigateway-authorizer": {
+                                "identityValidationExpression": "myauthvalidationexpression2", 
+                                "providerARNs": [
+                                    "arn:aws:2", 
+                                    "arn:aws:3"
+                                ], 
+                                "type": "cognito_user_pools"
+                            }, 
+                            "x-amazon-apigateway-authtype": "cognito_user_pools"
+                        }, 
+                        "MyLambdaRequestAuth": {
+                            "in": "header", 
+                            "type": "apiKey", 
+                            "name": "Unused", 
+                            "x-amazon-apigateway-authorizer": {
+                                "type": "request", 
+                                "authorizerResultTtlInSeconds": 0, 
+                                "identitySource": "method.request.header.Authorization1, method.request.querystring.Authorization2, stageVariables.Authorization3, context.Authorization4", 
+                                "authorizerUri": {
+                                    "Fn::Sub": [
+                                        "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                                        {
+                                            "__FunctionArn__": "arn:aws"
+                                        }
+                                    ]
+                                }, 
+                                "authorizerCredentials": "arn:aws:iam::123456789012:role/S3Access"
+                            }, 
+                            "x-amazon-apigateway-authtype": "custom"
+                        }, 
+                        "MyCognitoAuth": {
+                            "in": "header", 
+                            "type": "apiKey", 
+                            "name": "MyAuthorizationHeader", 
+                            "x-amazon-apigateway-authorizer": {
+                                "identityValidationExpression": "myauthvalidationexpression", 
+                                "providerARNs": [
+                                    "arn:aws:1"
+                                ], 
+                                "type": "cognito_user_pools"
+                            }, 
+                            "x-amazon-apigateway-authtype": "cognito_user_pools"
+                        }, 
+                        "MyLambdaTokenAuth": {
+                            "in": "header", 
+                            "type": "apiKey", 
+                            "name": "MyCustomAuthHeader", 
+                            "x-amazon-apigateway-authorizer": {
+                                "type": "token", 
+                                "authorizerResultTtlInSeconds": 20, 
+                                "authorizerUri": {
+                                    "Fn::Sub": [
+                                        "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                                        {
+                                            "__FunctionArn__": "arn:aws"
+                                        }
+                                    ]
+                                }, 
+                                "authorizerCredentials": "arn:aws:iam::123456789012:role/S3Access", 
+                                "identityValidationExpression": "mycustomauthexpression"
+                            }, 
+                            "x-amazon-apigateway-authtype": "custom"
+                        }, 
+                        "api_key": {
+                            "type": "apiKey", 
+                            "name": "x-api-key", 
+                            "in": "header"
+                        }
+                    }
+                }, 
+                "EndpointConfiguration": {
+                    "Types": [
+                        "REGIONAL"
+                    ]
+                }, 
+                "Parameters": {
+                    "endpointConfigurationTypes": "REGIONAL"
+                }
+            }
+        }
+    }
+}

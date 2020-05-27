@@ -274,6 +274,29 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_event_dest_conditional",
                 "api_with_usageplans",
                 "api_with_usageplans_intrinsics",
+                "state_machine_with_inline_definition",
+                "state_machine_with_tags",
+                "state_machine_with_inline_definition_intrinsics",
+                "state_machine_with_role",
+                "state_machine_with_inline_policies",
+                "state_machine_with_sam_policy_templates",
+                "state_machine_with_definition_S3_string",
+                "state_machine_with_definition_S3_object",
+                "state_machine_with_definition_substitutions",
+                "state_machine_with_standard_logging",
+                "state_machine_with_express_logging",
+                "state_machine_with_managed_policy",
+                "state_machine_with_condition",
+                "state_machine_with_schedule",
+                "state_machine_with_cwe",
+                "state_machine_with_explicit_api",
+                "state_machine_with_implicit_api",
+                "state_machine_with_implicit_api_globals",
+                "state_machine_with_api_authorizer",
+                "state_machine_with_api_authorizer_maximum",
+                "state_machine_with_api_resource_policy",
+                "state_machine_with_api_auth_default_scopes",
+                "state_machine_with_condition_and_events",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -534,6 +557,12 @@ class TestTranslatorEndToEnd(TestCase):
 @pytest.mark.parametrize(
     "testcase",
     [
+        "error_state_machine_definition_string",
+        "error_state_machine_invalid_s3_object",
+        "error_state_machine_invalid_s3_string",
+        "error_state_machine_with_api_auth_none",
+        "error_state_machine_with_no_api_authorizers",
+        "error_state_machine_with_undefined_api_authorizer",
         "error_cognito_userpool_duplicate_trigger",
         "error_api_duplicate_methods_same_path",
         "error_api_gateway_responses_nonnumeric_status_code",
@@ -914,7 +943,7 @@ class TestPluginsUsage(TestCase):
         self.assertEqual(6, len(sam_plugins))
 
     @patch("samtranslator.translator.translator.PolicyTemplatesProcessor")
-    @patch("samtranslator.translator.translator.PolicyTemplatesForFunctionPlugin")
+    @patch("samtranslator.translator.translator.PolicyTemplatesForResourcePlugin")
     def test_make_policy_template_for_function_plugin_must_work(
         self, policy_templates_for_function_plugin_mock, policy_templates_processor_mock
     ):

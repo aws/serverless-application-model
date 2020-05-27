@@ -16,7 +16,7 @@ from samtranslator.plugins.application.serverless_app_plugin import ServerlessAp
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
-from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
+from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
 
@@ -170,10 +170,11 @@ class Translator:
         Returns a list of resources to iterate, order them based on the following order:
 
             1. AWS::Serverless::Function - because API Events need to modify the corresponding Serverless::Api resource.
-            2. AWS::Serverless::Api
-            3. Anything else
+            2. AWS::Serverless::StateMachine - because API Events need to modify the corresponding Serverless::Api resource.
+            3. AWS::Serverless::Api
+            4. Anything else
 
-        This is necessary because a Function resource with API Events will modify the API resource's Swagger JSON.
+        This is necessary because a Function or State Machine resource with API Events will modify the API resource's Swagger JSON.
         Therefore API resource needs to be parsed only after all the Swagger modifications are complete.
 
         :param dict sam_template: SAM template
@@ -182,6 +183,7 @@ class Translator:
         """
 
         functions = []
+        statemachines = []
         apis = []
         others = []
         resources = sam_template["Resources"]
@@ -195,12 +197,14 @@ class Translator:
                 continue
             elif resource["Type"] == "AWS::Serverless::Function":
                 functions.append(data)
+            elif resource["Type"] == "AWS::Serverless::StateMachine":
+                statemachines.append(data)
             elif resource["Type"] == "AWS::Serverless::Api" or resource["Type"] == "AWS::Serverless::HttpApi":
                 apis.append(data)
             else:
                 others.append(data)
 
-        return functions + apis + others
+        return functions + statemachines + apis + others
 
 
 def prepare_plugins(plugins, parameters={}):
@@ -250,9 +254,9 @@ def make_policy_template_for_function_plugin():
     """
     Constructs an instance of policy templates processing plugin using default policy templates JSON data
 
-    :return plugins.policies.policy_templates_plugin.PolicyTemplatesForFunctionPlugin: Instance of the plugin
+    :return plugins.policies.policy_templates_plugin.PolicyTemplatesForResourcePlugin: Instance of the plugin
     """
 
     policy_templates = PolicyTemplatesProcessor.get_default_policy_templates_json()
     processor = PolicyTemplatesProcessor(policy_templates)
-    return PolicyTemplatesForFunctionPlugin(processor)
+    return PolicyTemplatesForResourcePlugin(processor)

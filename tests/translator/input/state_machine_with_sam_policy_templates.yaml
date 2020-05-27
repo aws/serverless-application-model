@@ -1,0 +1,126 @@
+Resources:
+  StarterLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/starter.zip
+      Handler: starter.handler
+      Runtime: python2.7
+  
+  ProcessingQueue:
+    Type: AWS::SQS::Queue
+  
+  ResolverLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/resolver.zip
+      Handler: resolver.handler
+      Runtime: python3.8
+  
+  NestedWorkflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      Definition:
+        Comment: An example ASL file for nested workflows
+        StartAt: NestedStateOne
+        States:
+          NestedStateOne:
+            Type: Pass
+            Result:
+              Value: MyValue
+            Next: NestedStateTwo
+          NestedStateTwo:
+            Type: Task
+            Resource: !GetAtt StarterLambda.Arn
+            End: True
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole
+
+  OutputStore:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: MySimpleTable
+
+  ProcessingWorkflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: STANDARD
+      Definition:
+        Comment: An example ASL file with parallel states
+        StartAt: StateOne
+        States:
+          StateOne:
+            Type: Pass
+            Result:
+              Value: MyValue
+            Next: StateTwo
+          StateTwo:
+            Type: Parallel
+            End: true
+            Branches:
+            - StartAt: BranchOne_StateOne
+              States:
+                BranchOne_StateOne:
+                  Type: Task
+                  Resource: !GetAtt StarterLambda.Arn
+                  Next: BranchOne_StateTwo
+                BranchOne_StateTwo:
+                  Type: Task
+                  Resource: arn:aws:states:::sqs:sendMessage.waitForTaskToken
+                  Parameters:
+                    QueueUrl: !Ref ProcessingQueue
+                    MessageBody.$: "$.input.message"
+                  Next: BranchOne_StateThree
+                BranchOne_StateThree:
+                  Type: Task
+                  Resource: arn:aws:states:::lambda:invoke
+                  Parameters:
+                    FunctionName: !Ref ResolverLambda
+                  Next: BranchOne_StateFour
+                BranchOne_StateFour:
+                  Type: Choice
+                  Choices:
+                  - Variable: "$.value"
+                    NumericEquals: 0
+                    Next: ValueIsZero
+                  - Variable: "$.value"
+                    NumericEquals: 1
+                    Next: ValueIsOne
+                ValueIsZero:
+                  Type: Fail
+                ValueIsOne:
+                  Type: Succeed
+            - StartAt: BranchTwo_StateOne
+              States:
+                BranchTwo_StateOne:
+                  Type: Task
+                  Resource: arn:aws:states:::states:startExecution.sync
+                  Parameters:
+                    StateMachineArn: !Ref NestedWorkflow
+                    Input:
+                      KeyA: ValueA
+                      KeyC: ValueC
+                  Next: BranchTwo_StateTwo
+                BranchTwo_StateTwo:
+                  Type: Task
+                  Resource: arn:aws:states:::dynamodb:putItem
+                  Parameters:
+                    TableName: !Ref OutputStore
+                    Item:
+                      MessageId:
+                        S.$: "$.MessageDetails.MessageId"
+                      Body:
+                        S.$: "$.MessageDetails.Body"
+                  Next: BranchTwo_StateThree
+                BranchTwo_StateThree:
+                  Type: Succeed
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref StarterLambda
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt ProcessingQueue.QueueName
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ResolverLambda
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: !GetAtt NestedWorkflow.Name
+        - DynamoDBWritePolicy:
+            TableName: !Ref OutputStore

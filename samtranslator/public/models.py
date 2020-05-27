@@ -1,3 +1,3 @@
 # flake8: noqa
 
-from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
+from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
