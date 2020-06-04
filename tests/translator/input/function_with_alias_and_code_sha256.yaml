@@ -1,3 +1,9 @@
+Parameters:
+  AutoPublishCodeSha256:
+    Type: "String"
+    Description: "Sha256 to uniquely identify creation of the lambda"
+    Default: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+
 Resources:
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
@@ -6,6 +12,6 @@ Resources:
       Handler: hello.handler
       Runtime: python2.7
       AutoPublishAlias: live
-      AutoPublishCodeSha256: 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
+      AutoPublishCodeSha256: !Ref AutoPublishCodeSha256
       VersionDescription: sam-testing
 

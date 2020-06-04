@@ -6,6 +6,7 @@ from samtranslator.model.intrinsics import fnGetAtt, ref
 class CognitoUserPool(Resource):
     resource_type = "AWS::Cognito::UserPool"
     property_types = {
+        "AccountRecoverySetting": PropertyType(False, is_type(dict)),
         "AdminCreateUserConfig": PropertyType(False, is_type(dict)),
         "AliasAttributes": PropertyType(False, list_of(is_str())),
         "AutoVerifiedAttributes": PropertyType(False, list_of(is_str())),
@@ -13,6 +14,7 @@ class CognitoUserPool(Resource):
         "EmailConfiguration": PropertyType(False, is_type(dict)),
         "EmailVerificationMessage": PropertyType(False, is_str()),
         "EmailVerificationSubject": PropertyType(False, is_str()),
+        "EnabledMfas": PropertyType(False, list_of(is_str())),
         "LambdaConfig": PropertyType(False, is_type(dict)),
         "MfaConfiguration": PropertyType(False, is_str()),
         "Policies": PropertyType(False, is_type(dict)),
@@ -21,6 +23,7 @@ class CognitoUserPool(Resource):
         "SmsConfiguration": PropertyType(False, list_of(dict)),
         "SmsVerificationMessage": PropertyType(False, is_str()),
         "UsernameAttributes": PropertyType(False, list_of(is_str())),
+        "UsernameConfiguration": PropertyType(False, is_type(dict)),
         "UserPoolAddOns": PropertyType(False, list_of(dict)),
         "UserPoolName": PropertyType(False, is_str()),
         "UserPoolTags": PropertyType(False, is_type(dict)),

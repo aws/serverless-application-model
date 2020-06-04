@@ -1,0 +1,83 @@
+{
+  "Resources": {
+    "StateMachineCWEvent": {
+      "Type": "AWS::Events::Rule", 
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        }, 
+        "Targets": [
+          {
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "StateMachineCWEventRole", 
+                "Arn"
+              ]
+            }, 
+            "Id": "StateMachineCWEventStepFunctionsTarget", 
+            "Arn": {
+              "Ref": "StateMachine"
+            }
+          }
+        ]
+      }
+    }, 
+    "StateMachine": {
+      "Type": "AWS::StepFunctions::StateMachine", 
+      "Properties": {
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket", 
+          "Key": "my_state_machine.asl.json"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "stateMachine:createdBy"
+          }
+        ]
+      }
+    }, 
+    "StateMachineCWEventRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "Policies": [
+          {
+            "PolicyName": "StateMachineCWEventRoleStartExecutionPolicy", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution", 
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ], 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

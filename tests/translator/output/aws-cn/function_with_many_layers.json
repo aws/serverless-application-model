@@ -2,7 +2,6 @@
   "Resources": {
     "MyLayera5167acaba": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::LayerVersion", 
       "Properties": {
         "Content": {

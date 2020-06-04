@@ -125,7 +125,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
         SamTemplateMock.assert_called_with(template_dict)
 
         # Make sure this is called only for Apis
-        sam_template.iterate.assert_called_with("AWS::Serverless::Application")
+        sam_template.iterate.assert_called_with({"AWS::Serverless::Application"})
 
     @patch("samtranslator.plugins.application.serverless_app_plugin.SamTemplate")
     @patch("botocore.client.BaseClient._make_api_call", mock_get_application)
@@ -150,7 +150,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
         SamTemplateMock.assert_called_with(template_dict)
 
         # Make sure this is called only for Apis
-        sam_template.iterate.assert_called_with("AWS::Serverless::Application")
+        sam_template.iterate.assert_called_with({"AWS::Serverless::Application"})
 
     @patch("samtranslator.plugins.application.serverless_app_plugin.SamTemplate")
     @patch("botocore.client.BaseClient._make_api_call", mock_create_cloud_formation_template)
@@ -174,7 +174,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
         SamTemplateMock.assert_called_with(template_dict)
 
         # Make sure this is called only for Apis
-        sam_template.iterate.assert_called_with("AWS::Serverless::Application")
+        sam_template.iterate.assert_called_with({"AWS::Serverless::Application"})
 
     @patch("samtranslator.plugins.application.serverless_app_plugin.SamTemplate")
     @patch("botocore.client.BaseClient._make_api_call", mock_get_application)
@@ -198,7 +198,7 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
         SamTemplateMock.assert_called_with(template_dict)
 
         # Make sure this is called only for Apis
-        sam_template.iterate.assert_called_with("AWS::Serverless::Application")
+        sam_template.iterate.assert_called_with({"AWS::Serverless::Application"})
 
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
     def test_sar_service_calls(self):

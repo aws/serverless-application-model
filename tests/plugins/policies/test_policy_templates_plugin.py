@@ -2,20 +2,20 @@ from unittest import TestCase
 from mock import Mock, MagicMock, patch, call
 
 from samtranslator.plugins import BasePlugin
-from samtranslator.model.function_policies import PolicyTypes, PolicyEntry
+from samtranslator.model.resource_policies import PolicyTypes, PolicyEntry
 from samtranslator.model.exceptions import InvalidResourceException
-from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
+from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 
 
-class TestPolicyTemplatesForFunctionPlugin(TestCase):
+class TestPolicyTemplatesForResourcePlugin(TestCase):
     def setUp(self):
         self._policy_template_processor_mock = Mock()
-        self.plugin = PolicyTemplatesForFunctionPlugin(self._policy_template_processor_mock)
+        self.plugin = PolicyTemplatesForResourcePlugin(self._policy_template_processor_mock)
 
     def test_plugin_must_setup_correct_name(self):
         # Name is the class name
-        expected_name = "PolicyTemplatesForFunctionPlugin"
+        expected_name = "PolicyTemplatesForResourcePlugin"
 
         self.assertEqual(self.plugin.name, expected_name)
 
@@ -30,7 +30,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         resource_type = "AWS::Serverless::Api"
         self.assertFalse(self.plugin._is_supported(resource_type))
 
-    @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
+    @patch("samtranslator.plugins.policies.policy_templates_plugin.ResourcePolicies")
     def test_on_before_transform_resource_must_work_on_every_policy_template(self, function_policies_class_mock):
         is_supported_mock = Mock()
         self.plugin._is_supported = is_supported_mock
@@ -69,7 +69,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             [call("MyTemplate1", {"Param1": "value1"}), call("MyTemplate2", {"Param2": "value2"})]
         )
 
-    @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
+    @patch("samtranslator.plugins.policies.policy_templates_plugin.ResourcePolicies")
     def test_on_before_transform_resource_must_skip_non_policy_templates(self, function_policies_class_mock):
         is_supported_mock = Mock()
         self.plugin._is_supported = is_supported_mock
@@ -114,7 +114,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
             [call("MyTemplate1", {"Param1": "value1"}), call("MyTemplate2", {"Param2": "value2"})]
         )
 
-    @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
+    @patch("samtranslator.plugins.policies.policy_templates_plugin.ResourcePolicies")
     def test_on_before_transform_must_raise_on_insufficient_parameter_values(self, function_policies_class_mock):
         is_supported_mock = Mock()
         self.plugin._is_supported = is_supported_mock
@@ -141,7 +141,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         # Make sure the input was not changed
         self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
 
-    @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
+    @patch("samtranslator.plugins.policies.policy_templates_plugin.ResourcePolicies")
     def test_on_before_transform_must_raise_on_invalid_parameter_values(self, function_policies_class_mock):
         is_supported_mock = Mock()
         self.plugin._is_supported = is_supported_mock
@@ -167,7 +167,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         # Make sure the input was not changed
         self.assertEqual(resource_properties, {"Policies": {"MyTemplate1": {"Param1": "value1"}}})
 
-    @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
+    @patch("samtranslator.plugins.policies.policy_templates_plugin.ResourcePolicies")
     def test_on_before_transform_must_bubble_exception(self, function_policies_class_mock):
         is_supported_mock = Mock()
         self.plugin._is_supported = is_supported_mock
@@ -206,7 +206,7 @@ class TestPolicyTemplatesForFunctionPlugin(TestCase):
         # Make sure none of the data elements were accessed, because the method returned immediately
         self.assertEqual([], data_mock.method_calls)
 
-    @patch("samtranslator.plugins.policies.policy_templates_plugin.FunctionPolicies")
+    @patch("samtranslator.plugins.policies.policy_templates_plugin.ResourcePolicies")
     def test_on_before_transform_resource_must_skip_function_with_no_policies(self, function_policies_class_mock):
         is_supported_mock = Mock()
         self.plugin._is_supported = is_supported_mock
