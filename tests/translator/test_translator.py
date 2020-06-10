@@ -276,6 +276,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "api_with_usageplans_intrinsics",
                 "state_machine_with_inline_definition",
                 "state_machine_with_tags",
+                "state_machine_with_inline_definition_parameters_intrinsics",
                 "state_machine_with_inline_definition_intrinsics",
                 "state_machine_with_role",
                 "state_machine_with_inline_policies",

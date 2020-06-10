@@ -111,6 +111,7 @@ class StateMachineGenerator(object):
             )
         elif self.definition:
             processed_definition = deepcopy(self.definition)
+            processed_definition = self.intrinsics_resolver.resolve_parameter_refs(processed_definition)
             substitutions = self._replace_dynamic_values_with_substitutions(processed_definition)
             if len(substitutions) > 0:
                 if self.state_machine.DefinitionSubstitutions:
