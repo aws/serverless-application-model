@@ -1731,6 +1731,53 @@
         ]
       }
     },
+    "StepFunctionsSyncExecutionPolicy": {
+      "Description": "Gives permission to start a synchronous (.sync[:2]) Step Functions state machine execution",
+      "Parameters": {
+        "StateMachineName": {
+          "Description":"The name of the state machine to execute."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "states:StartExecution"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  "stateMachineName": {
+                    "Ref": "StateMachineName"
+                  }
+                }
+              ]
+            }
+          },
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "states:DescribeExecution",
+                  "states:StopExecution"
+              ],
+              "Resource": "*"
+          },
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "events:PutTargets",
+                  "events:PutRule",
+                  "events:DescribeRule"
+              ],
+              "Resource": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+              ]
+          }
+        ]
+      }
+    },
     "CodeCommitCrudPolicy": {
       "Description": "Gives permissions to create/read/update/delete objects within a specific codecommit repository",
       "Parameters": {
