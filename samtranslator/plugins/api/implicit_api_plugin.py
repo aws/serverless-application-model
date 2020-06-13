@@ -69,15 +69,17 @@ class ImplicitApiPlugin(BasePlugin):
         template.set(self.implicit_api_logical_id, self._generate_implicit_api_resource())
 
         errors = []
-        for logicalId, function in template.iterate(SamResourceType.Function.value):
+        for logicalId, resource in template.iterate(
+            {SamResourceType.Function.value, SamResourceType.StateMachine.value}
+        ):
 
-            api_events = self._get_api_events(function)
-            condition = function.condition
+            api_events = self._get_api_events(resource)
+            condition = resource.condition
             if len(api_events) == 0:
                 continue
 
             try:
-                self._process_api_events(function, api_events, template, condition)
+                self._process_api_events(resource, api_events, template, condition)
 
             except InvalidEventException as ex:
                 errors.append(InvalidResourceException(logicalId, ex.message))
@@ -89,11 +91,11 @@ class ImplicitApiPlugin(BasePlugin):
         if len(errors) > 0:
             raise InvalidDocumentException(errors)
 
-    def _get_api_events(self, function):
+    def _get_api_events(self, resource):
         """
-        Method to return a dictionary of API Events on the function
+        Method to return a dictionary of API Events on the resource
 
-        :param SamResource function: Function Resource object
+        :param SamResource resource: SAM Resource object
         :return dict: Dictionary of API events along with any other configuration passed to it.
             Example: {
                 FooEvent: {Path: "/foo", Method: "post", RestApiId: blah, MethodSettings: {<something>},
@@ -104,30 +106,30 @@ class ImplicitApiPlugin(BasePlugin):
         """
 
         if not (
-            function.valid()
-            and isinstance(function.properties, dict)
-            and isinstance(function.properties.get("Events"), dict)
+            resource.valid()
+            and isinstance(resource.properties, dict)
+            and isinstance(resource.properties.get("Events"), dict)
         ):
-            # Function resource structure is invalid.
+            # Resource structure is invalid.
             return {}
 
         api_events = {}
-        for event_id, event in function.properties["Events"].items():
+        for event_id, event in resource.properties["Events"].items():
 
             if event and isinstance(event, dict) and event.get("Type") == self.api_event_type:
                 api_events[event_id] = event
 
         return api_events
 
-    def _process_api_events(self, function, api_events, template, condition=None):
+    def _process_api_events(self, resource, api_events, template, condition=None):
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
         resource from the template
 
-        :param SamResource function: SAM Function containing the API events to be processed
-        :param dict api_events: API Events extracted from the function. These events will be processed
+        :param SamResource resource: SAM Resource containing the API events to be processed
+        :param dict api_events: API Events extracted from the resource. These events will be processed
         :param SamTemplate template: SAM Template where Serverless::Api resources can be found
-        :param str condition: optional; this is the condition that is on the function with the API event
+        :param str condition: optional; this is the condition that is on the resource with the API event
         """
         raise NotImplementedError(
             "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
@@ -275,7 +277,7 @@ class ImplicitApiPlugin(BasePlugin):
         that composite condition is added to the resource path.
         """
 
-        for api_id, api in template.iterate(self.api_type):
+        for api_id, api in template.iterate({self.api_type}):
             if not api.properties.get("__MANAGE_SWAGGER"):
                 continue
 

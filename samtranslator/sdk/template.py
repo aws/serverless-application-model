@@ -19,20 +19,21 @@ class SamTemplate(object):
         self.template_dict = template_dict
         self.resources = template_dict["Resources"]
 
-    def iterate(self, resource_type=None):
+    def iterate(self, resource_types=None):
         """
         Iterate over all resources within the SAM template, optionally filtering by type
 
-        :param string resource_type: Optional type to filter the resources by
+        :param dict resource_types: Optional types to filter the resources by
         :yields (string, SamResource): Tuple containing LogicalId and the resource
         """
-
+        if resource_types is None:
+            resource_types = {}
         for logicalId, resource_dict in self.resources.items():
 
             resource = SamResource(resource_dict)
             needs_filter = resource.valid()
-            if resource_type:
-                needs_filter = needs_filter and resource.type == resource_type
+            if resource_types:
+                needs_filter = needs_filter and resource.type in resource_types
 
             if needs_filter:
                 yield logicalId, resource

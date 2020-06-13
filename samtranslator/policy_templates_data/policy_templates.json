@@ -2014,6 +2014,252 @@
           }
         ]
       }
+    },
+    "ElasticMapReduceModifyInstanceFleetPolicy": {
+      "Description": "Gives permission to list details and modify capacities for instance fleets within a cluster",
+      "Parameters": {
+        "ClusterId": {
+          "Description": "The unique identifier of the cluster"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "elasticmapreduce:ModifyInstanceFleet",
+              "elasticmapreduce:ListInstanceFleets"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:elasticmapreduce:${AWS::Region}:${AWS::AccountId}:cluster/${clusterId}",
+                {
+                  "clusterId": {
+                    "Ref": "ClusterId"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
+    },
+    "ElasticMapReduceSetTerminationProtectionPolicy": {
+      "Description": "Gives permission to set termination protection for a cluster",
+      "Parameters": {
+        "ClusterId": {
+          "Description": "The unique identifier of the cluster"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "elasticmapreduce:SetTerminationProtection",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:elasticmapreduce:${AWS::Region}:${AWS::AccountId}:cluster/${clusterId}",
+                {
+                  "clusterId": {
+                    "Ref": "ClusterId"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
+    },
+    "ElasticMapReduceModifyInstanceGroupsPolicy": {
+      "Description": "Gives permission to list details and modify settings for instance groups within a cluster",
+      "Parameters": {
+        "ClusterId": {
+          "Description": "The unique identifier of the cluster"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "elasticmapreduce:ModifyInstanceGroups",
+              "elasticmapreduce:ListInstanceGroups"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:elasticmapreduce:${AWS::Region}:${AWS::AccountId}:cluster/${clusterId}",
+                {
+                  "clusterId": {
+                    "Ref": "ClusterId"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
+    },
+    "ElasticMapReduceCancelStepsPolicy": {
+      "Description": "Gives permission to cancel a pending step or steps in a running cluster",
+      "Parameters": {
+        "ClusterId": {
+          "Description": "The unique identifier of the cluster"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "elasticmapreduce:CancelSteps",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:elasticmapreduce:${AWS::Region}:${AWS::AccountId}:cluster/${clusterId}",
+                {
+                  "clusterId": {
+                    "Ref": "ClusterId"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
+    },
+    "ElasticMapReduceTerminateJobFlowsPolicy": {
+      "Description": "Gives permission to shut down a cluster",
+      "Parameters": {
+        "ClusterId": {
+          "Description": "The unique identifier of the cluster"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "elasticmapreduce:TerminateJobFlows",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:elasticmapreduce:${AWS::Region}:${AWS::AccountId}:cluster/${clusterId}",
+                {
+                  "clusterId": {
+                    "Ref": "ClusterId"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
+    },
+    "ElasticMapReduceAddJobFlowStepsPolicy": {
+      "Description": "Gives permission to add new steps to a running cluster",
+      "Parameters": {
+        "ClusterId": {
+          "Description": "The unique identifier of the cluster"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "elasticmapreduce:AddJobFlowSteps",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:elasticmapreduce:${AWS::Region}:${AWS::AccountId}:cluster/${clusterId}",
+                {
+                  "clusterId": {
+                    "Ref": "ClusterId"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
+    },
+    "SageMakerCreateEndpointPolicy": {
+      "Description": "Gives permission to create an endpoint in SageMaker",
+      "Parameters": {
+        "EndpointName": {
+          "Description": "Name of the SageMaker endpoint"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "sagemaker:CreateEndpoint"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint/${endpointName}",
+                {
+                  "endpointName": {
+                    "Ref": "EndpointName"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
+    },
+    "SageMakerCreateEndpointConfigPolicy": {
+      "Description": "Gives permission to create an endpoint configuration in SageMaker",
+      "Parameters": {
+        "EndpointConfigName": {
+          "Description": "Name of the SageMaker endpoint configuration"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "sagemaker:CreateEndpointConfig"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint-config/${endpointConfigName}",
+                {
+                  "endpointConfigName": {
+                    "Ref": "EndpointConfigName"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
+    },
+    "EcsRunTaskPolicy": {
+      "Description": "Gives permission to start a new task for a task definition",
+      "Parameters": {
+        "TaskDefinition": {
+          "Description": "The family and revision (family:revision) of the task definition"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": [
+              "ecs:RunTask"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${taskDefinition}",
+                {
+                  "taskDefinition": {
+                    "Ref": "TaskDefinition"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
     }
   }
 }

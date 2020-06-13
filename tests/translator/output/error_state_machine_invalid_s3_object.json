@@ -1,0 +1,9 @@
+{
+    "errors": [
+      {
+        "errorMessage": "Resource with id [StateMachine] is invalid. 'DefinitionUri' requires Bucket and Key properties to be specified."
+      }
+    ],
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [StateMachine] is invalid. 'DefinitionUri' requires Bucket and Key properties to be specified."
+}
+  

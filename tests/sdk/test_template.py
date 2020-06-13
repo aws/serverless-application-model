@@ -43,7 +43,7 @@ class TestSamTemplate(TestCase):
             ("Function2", {"Type": "AWS::Serverless::Function", "a": "b", "Properties": {}}),
         ]
 
-        actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
+        actual = [(id, resource.to_dict()) for id, resource in template.iterate({type})]
         self.assertEqual(expected, actual)
 
     def test_iterate_must_filter_by_layers_resource_type(self):
@@ -52,7 +52,7 @@ class TestSamTemplate(TestCase):
         type = "AWS::Serverless::LayerVersion"
         expected = [("Layer", {"Type": "AWS::Serverless::LayerVersion", "Properties": {}})]
 
-        actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
+        actual = [(id, resource.to_dict()) for id, resource in template.iterate({type})]
         self.assertEqual(expected, actual)
 
     def test_iterate_must_not_return_non_sam_resources_with_filter(self):
@@ -61,7 +61,7 @@ class TestSamTemplate(TestCase):
         type = "AWS::Lambda::Function"
         expected = []
 
-        actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
+        actual = [(id, resource.to_dict()) for id, resource in template.iterate({type})]
         self.assertEqual(expected, actual)
 
     def test_iterate_must_filter_with_resource_not_found(self):
@@ -70,7 +70,7 @@ class TestSamTemplate(TestCase):
         type = "AWS::Serverless::SimpleTable"
         expected = []
 
-        actual = [(id, resource.to_dict()) for id, resource in template.iterate(type)]
+        actual = [(id, resource.to_dict()) for id, resource in template.iterate({type})]
         self.assertEqual(expected, actual)
 
     def test_set_must_add_to_template(self):

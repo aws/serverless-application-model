@@ -65,6 +65,7 @@ class SamResourceType(Enum):
     Application = "AWS::Serverless::Application"
     LambdaLayerVersion = "AWS::Serverless::LayerVersion"
     HttpApi = "AWS::Serverless::HttpApi"
+    StateMachine = "AWS::Serverless::StateMachine"
 
     @classmethod
     def has_value(cls, value):
