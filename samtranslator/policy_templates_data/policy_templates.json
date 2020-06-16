@@ -2260,6 +2260,52 @@
           }
         ]
       }
+    },
+    "EFSWriteAccessPolicy": {
+      "Description": "Gives permission to mount an Elastic File System with write access",
+      "Parameters": {
+        "FileSystem": {
+          "Description": "Resource ID of the Elastic File System"
+        },
+        "AccessPoint": {
+          "Description": "Resource ID of the Elastic File System Access Point"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "elasticfilesystem:ClientMount",
+              "elasticfilesystem:ClientWrite"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:file-system/${FileSystem}",
+                {
+                  "FileSystem": {
+                    "Ref": "FileSystem"
+                  }
+                }
+              ]
+            },
+            "Condition": {
+              "StringEquals": {
+                "elasticfilesystem:AccessPointArn": {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:access-point/${AccessPoint}",
+                    {
+                      "AccessPoint": {
+                        "Ref": "AccessPoint"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
     }
   }
 }
