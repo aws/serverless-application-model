@@ -297,6 +297,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "state_machine_with_api_resource_policy",
                 "state_machine_with_api_auth_default_scopes",
                 "state_machine_with_condition_and_events",
+                "function_with_file_system_config",
             ],
             [
                 ("aws", "ap-southeast-1"),

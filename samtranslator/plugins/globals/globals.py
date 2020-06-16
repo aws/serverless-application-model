@@ -40,6 +40,7 @@ class Globals(object):
             "ProvisionedConcurrencyConfig",
             "AssumeRolePolicyDocument",
             "EventInvokeConfig",
+            "FileSystemConfigs",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
