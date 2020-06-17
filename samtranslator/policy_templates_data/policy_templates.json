@@ -19,7 +19,7 @@
               "sqs:DeleteMessageBatch",
               "sqs:GetQueueAttributes",
               "sqs:ReceiveMessage",
-	      "sqs:GetQueueUrl"
+              "sqs:GetQueueUrl"
             ],
             "Resource": {
               "Fn::Sub": [
