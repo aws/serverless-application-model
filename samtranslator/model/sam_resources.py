@@ -1119,6 +1119,7 @@ class SamStateMachine(SamResourceMacro):
         "Type": PropertyType(False, is_str()),
         "Tags": PropertyType(False, is_type(dict)),
         "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "PermissionsBoundary": PropertyType(False, is_str()),
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.stepfunctions.events,)
 
@@ -1137,6 +1138,7 @@ class SamStateMachine(SamResourceMacro):
             logging=self.Logging,
             name=self.Name,
             policies=self.Policies,
+            permissions_boundary=self.PermissionsBoundary,
             definition_substitutions=self.DefinitionSubstitutions,
             role=self.Role,
             state_machine_type=self.Type,
