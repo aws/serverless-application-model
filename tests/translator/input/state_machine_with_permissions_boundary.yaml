@@ -1,0 +1,39 @@
+Resources:
+  MyFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: s3://sam-demo-bucket/hello.zip
+        Handler: hello.handler
+        Runtime: python2.7
+        ReservedConcurrentExecutions: 100
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachine
+      Events:
+        ScheduleEvent:
+          Type: Schedule
+          Properties:
+            Schedule: "rate(1 minute)"
+            Name: TestSchedule
+        CWEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                  - terminated
+        MyApiEvent:
+          Type: Api
+          Properties:
+            Path: /startMyExecution
+            Method: post
+      DefinitionUri:
+        Bucket: sam-demo-bucket
+        Key: my-state-machine.asl.json
+        Version: 3
+      PermissionsBoundary: arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MyFunction

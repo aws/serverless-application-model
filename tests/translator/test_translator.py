@@ -300,6 +300,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "state_machine_with_condition_and_events",
                 "state_machine_with_xray",
                 "function_with_file_system_config",
+                "state_machine_with_permissions_boundary",
             ],
             [
                 ("aws", "ap-southeast-1"),

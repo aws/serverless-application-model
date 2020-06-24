@@ -37,6 +37,7 @@ class StateMachineGenerator(object):
         logging,
         name,
         policies,
+        permissions_boundary,
         definition_substitutions,
         role,
         state_machine_type,
@@ -82,6 +83,7 @@ class StateMachineGenerator(object):
         self.name = name
         self.logging = logging
         self.policies = policies
+        self.permissions_boundary = permissions_boundary
         self.definition_substitutions = definition_substitutions
         self.role = role
         self.type = state_machine_type
@@ -220,6 +222,7 @@ class StateMachineGenerator(object):
             assume_role_policy_document=IAMRolePolicies.stepfunctions_assume_role_policy(),
             resource_policies=state_machine_policies,
             tags=self._construct_tag_list(),
+            permissions_boundary=self.permissions_boundary,
         )
         return execution_role
 
@@ -242,7 +245,10 @@ class StateMachineGenerator(object):
         resources = []
         if self.events:
             for logical_id, event_dict in self.events.items():
-                kwargs = {"intrinsics_resolver": self.intrinsics_resolver}
+                kwargs = {
+                    "intrinsics_resolver": self.intrinsics_resolver,
+                    "permissions_boundary": self.permissions_boundary,
+                }
                 try:
                     eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         self.state_machine.logical_id + logical_id, event_dict, logical_id
