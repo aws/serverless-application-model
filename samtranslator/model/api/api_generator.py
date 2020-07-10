@@ -303,15 +303,7 @@ class ApiGenerator(object):
 
         domain.EndpointConfiguration = {"Types": [endpoint]}
 
-        security_policy = self.domain.get("SecurityPolicy")
-
-        if security_policy:
-            if security_policy not in ["TLS_1_0", "TLS_1_2"]:
-                raise InvalidResourceException(
-                    self.logical_id,
-                    "SecurityPolicy for Custom Domains must be one of {}".format(["TLS_1_0", "TLS_1_2"]),
-                )
-            domain.SecurityPolicy = security_policy
+        domain.SecurityPolicy = self.domain.get("SecurityPolicy")
 
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):

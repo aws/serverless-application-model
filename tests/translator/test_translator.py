@@ -648,7 +648,6 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_with_api_key_false",
         "error_api_with_usage_plan_invalid_parameter",
         "error_http_api_with_cors_def_uri",
-        "error_api_with_custom_domains_security_policy_invalid",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
