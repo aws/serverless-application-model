@@ -1,0 +1,33 @@
+Parameters:
+  EndpointConfigType:
+    Type: String
+  VpcEndpointId:
+    Type: String
+
+Globals:
+  Api:
+    # Overriding this property for Implicit API
+    EndpointConfiguration:
+      Type: { "Ref" : "EndpointConfigType" }
+      VPCEndpointIds:
+        - { "Ref": "VpcEndpointId" }
+Resources:
+  ImplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
+      EndpointConfiguration: SomeValue

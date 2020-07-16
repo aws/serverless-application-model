@@ -22,6 +22,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input")
         "implicit_api",
         "explicit_api",
         "api_endpoint_configuration",
+        "api_endpoint_configuration_with_vpcendpoint",
         "api_with_method_settings",
         "api_with_binary_media_types",
         "api_with_minimum_compression_size",
@@ -80,6 +81,7 @@ def test_validate_template_success(testcase):
     # These templates are failing validation, will fix schema one at a time
     excluded = [
         "api_endpoint_configuration",
+        "api_endpoint_configuration_with_vpcendpoint",
         "api_with_binary_media_types",
         "api_with_minimum_compression_size",
         "api_with_cors",

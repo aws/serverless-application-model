@@ -714,7 +714,7 @@ class SamApi(SamResourceMacro):
         "CacheClusterEnabled": PropertyType(False, is_type(bool)),
         "CacheClusterSize": PropertyType(False, is_str()),
         "Variables": PropertyType(False, is_type(dict)),
-        "EndpointConfiguration": PropertyType(False, is_str()),
+        "EndpointConfiguration": PropertyType(False, one_of(is_str(), is_type(dict))),
         "MethodSettings": PropertyType(False, is_type(list)),
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),
