@@ -277,6 +277,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "api_with_usageplans_intrinsics",
                 "state_machine_with_inline_definition",
                 "state_machine_with_tags",
+                "state_machine_with_inline_definition_parameters_intrinsics",
                 "state_machine_with_inline_definition_intrinsics",
                 "state_machine_with_role",
                 "state_machine_with_inline_policies",
@@ -298,6 +299,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "state_machine_with_api_resource_policy",
                 "state_machine_with_api_auth_default_scopes",
                 "state_machine_with_condition_and_events",
+                "state_machine_with_permissions_boundary",
             ],
             [
                 ("aws", "ap-southeast-1"),
