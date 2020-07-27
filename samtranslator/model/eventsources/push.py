@@ -115,7 +115,10 @@ class Schedule(PushEventSource):
 
         events_rule.ScheduleExpression = self.Schedule
         if self.Enabled is not None:
-            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+            if isinstance(self.Enabled, bool):
+                events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+            else:
+                events_rule.State = self.Enabled
         events_rule.Name = self.Name
         events_rule.Description = self.Description
         events_rule.Targets = [self._construct_target(function)]
