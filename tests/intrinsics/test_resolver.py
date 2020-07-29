@@ -2,6 +2,7 @@ from unittest import TestCase
 from mock import Mock, patch
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import Action
+from samtranslator.model.exceptions import InvalidTemplateException
 
 
 class TestParameterReferenceResolution(TestCase):
@@ -101,11 +102,11 @@ class TestParameterReferenceResolution(TestCase):
         self.assertEqual(output, expected)
 
     def test_throw_on_empty_parameters(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(InvalidTemplateException):
             IntrinsicsResolver(None).resolve_parameter_refs({})
 
     def test_throw_on_non_dict_parameters(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(InvalidTemplateException):
             IntrinsicsResolver([1, 2, 3]).resolve_parameter_refs({})
 
     def test_short_circuit_on_empty_parameters(self):
@@ -188,15 +189,15 @@ class TestSupportedIntrinsics(TestCase):
 
         # All intrinsics must have a value to be subclass of "Action"
         supported_intrinsics = {"A": "B", "Foo": SomeAction()}
-        with self.assertRaises(TypeError):
+        with self.assertRaises(InvalidTemplateException):
             IntrinsicsResolver({}, supported_intrinsics)
 
     def test_configure_supported_intrinsics_must_error_for_none_input(self):
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(InvalidTemplateException):
             IntrinsicsResolver({}, None)
 
     def test_configure_supported_intrinsics_must_error_for_non_dict_input(self):
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(InvalidTemplateException):
             IntrinsicsResolver({}, [1, 2, 3])

@@ -1,6 +1,7 @@
 # Help resolve intrinsic functions
 
 from samtranslator.intrinsics.actions import Action, SubAction, RefAction, GetAttAction
+from samtranslator.model.exceptions import InvalidTemplateException
 
 # All intrinsics are supported by default
 DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [RefAction, SubAction, GetAttAction]}
@@ -17,12 +18,13 @@ class IntrinsicsResolver(object):
         """
 
         if parameters is None or not isinstance(parameters, dict):
-            raise TypeError("parameters must be a valid dictionary")
+            raise InvalidTemplateException("parameters must be a valid dictionary")
 
         if not isinstance(supported_intrinsics, dict) or not all(
             [isinstance(value, Action) for value in supported_intrinsics.values()]
         ):
-            raise TypeError("supported_intrinsics argument must be intrinsic names to corresponding Action classes")
+            raise InvalidTemplateException(
+                "supported_intrinsics argument must be intrinsic names to corresponding Action classes")
 
         self.supported_intrinsics = supported_intrinsics
         self.parameters = parameters

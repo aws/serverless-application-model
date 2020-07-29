@@ -1,5 +1,6 @@
 import copy
 import re
+import collections
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
@@ -216,6 +217,8 @@ class S3(PushEventSource):
     def resources_to_link(self, resources):
         if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
             bucket_id = self.Bucket["Ref"]
+            if not isinstance(bucket_id, collections.Hashable):
+                raise InvalidEventException(self.relative_id, "Invalid 'Ref' value in S3 events.")
             if bucket_id in resources:
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
         raise InvalidEventException(self.relative_id, "S3 events must reference an S3 bucket in the same template.")
@@ -655,6 +658,15 @@ class Api(PushEventSource):
                             ),
                         )
 
+                    if not isinstance(method_authorizer, collections.Hashable):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                            "because it wasn't defined properly in the API's Authorizers.".format(
+                                authorizer=method_authorizer, method=self.Method, path=self.Path
+                            ),
+                        )
+
                     if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
                         raise InvalidEventException(
                             self.relative_id,
@@ -713,6 +725,14 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because the related API does not define any Models.".format(
+                            model=method_model, method=self.Method, path=self.Path
+                        ),
+                    )
+                if not isinstance(method_model, collections.Hashable):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
+                        "because the related API does not contain valid Models.".format(
                             model=method_model, method=self.Method, path=self.Path
                         ),
                     )
@@ -1091,7 +1111,7 @@ class HttpApi(PushEventSource):
         method_authorizer = self.Auth.get("Authorizer")
         api_auth = api.get("Auth")
         if not method_authorizer:
-            if api_auth.get("DefaultAuthorizer"):
+            if api_auth and api_auth.get("DefaultAuthorizer"):
                 self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")
             else:
                 # currently, we require either a default auth or auth in the method

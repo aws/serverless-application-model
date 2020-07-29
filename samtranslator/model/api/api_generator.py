@@ -773,11 +773,17 @@ class ApiGenerator(object):
         ):
             if definition_body.get("securityDefinitions"):
                 components = definition_body.get("components", {})
+                if components is None:
+                    raise InvalidResourceException(self.logical_id,
+                                                   "Invalid value for 'components' property in 'securityDefinitions'")
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
                 del definition_body["securityDefinitions"]
             if definition_body.get("definitions"):
                 components = definition_body.get("components", {})
+                if components is None:
+                    raise InvalidResourceException(self.logical_id,
+                                                   "Invalid value for 'components' property in 'definitions'")
                 components["schemas"] = definition_body["definitions"]
                 definition_body["components"] = components
                 del definition_body["definitions"]

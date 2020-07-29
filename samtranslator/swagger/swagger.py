@@ -621,6 +621,9 @@ class SwaggerEditor(object):
                 # (e.g. sigv4 (AWS_IAM), authorizers, NONE (marker for ignoring default authorizer))
                 # We want to ensure only a single ApiKey security entry exists while keeping everything else
                 for security in existing_security:
+                    if not isinstance(security, dict):
+                        raise InvalidDocumentException(["Invalid entry {security} in 'security'"
+                                                       .format(security=security)])
                     if apikey_security_names.isdisjoint(security.keys()):
                         existing_non_apikey_security.append(security)
                     else:
@@ -830,10 +833,10 @@ class SwaggerEditor(object):
             model_properties = schema.get("properties")
 
             if not model_type:
-                raise ValueError("Invalid input. Value for type is required")
+                raise InvalidDocumentException(["Invalid input. Value for type is required"])
 
             if not model_properties:
-                raise ValueError("Invalid input. Value for properties is required")
+                raise InvalidDocumentException(["Invalid input. Value for properties is required"])
 
             self.definitions[model_name.lower()] = schema
 
@@ -846,6 +849,8 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
+        if not isinstance(resource_policy, dict):
+            raise InvalidDocumentException(["Invalid resource policy"])
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
