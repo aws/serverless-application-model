@@ -669,11 +669,6 @@ def test_transform_invalid_document(testcase):
         transform(manifest, parameter_values, mock_policy_loader)
 
     error_message = get_exception_error_message(e)
-    print("===============================================================")
-    print(error_message)
-    print("===============================================================")
-    print(expected.get("errorMessage"))
-    print("===============================================================")
     assert error_message == expected.get("errorMessage")
 
 
