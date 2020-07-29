@@ -622,8 +622,9 @@ class SwaggerEditor(object):
                 # We want to ensure only a single ApiKey security entry exists while keeping everything else
                 for security in existing_security:
                     if not isinstance(security, dict):
-                        raise InvalidDocumentException(["Invalid entry {security} in 'security'"
-                                                       .format(security=security)])
+                        raise InvalidDocumentException(
+                            ["Invalid entry {security} in 'security'".format(security=security)]
+                        )
                     if apikey_security_names.isdisjoint(security.keys()):
                         existing_non_apikey_security.append(security)
                     else:

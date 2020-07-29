@@ -24,7 +24,8 @@ class IntrinsicsResolver(object):
             [isinstance(value, Action) for value in supported_intrinsics.values()]
         ):
             raise InvalidTemplateException(
-                "supported_intrinsics argument must be intrinsic names to corresponding Action classes")
+                "supported_intrinsics argument must be intrinsic names to corresponding Action classes"
+            )
 
         self.supported_intrinsics = supported_intrinsics
         self.parameters = parameters
