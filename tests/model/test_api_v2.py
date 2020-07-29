@@ -12,7 +12,7 @@ class TestApiGatewayV2Authorizer(TestCase):
             name="authName",
             jwt_configuration={"config": "value"},
             id_source="https://example.com",
-            authorization_scopes=["scope1", "scope2"]
+            authorization_scopes=["scope1", "scope2"],
         )
         self.assertEquals(auth.auth_type, "oauth2")
 
@@ -29,5 +29,8 @@ class TestApiGatewayV2Authorizer(TestCase):
     def test_create_authorizer_fails_with_string_authorization_scopes(self):
         with pytest.raises(InvalidResourceException):
             auth = ApiGatewayV2Authorizer(
-                api_logical_id="logicalId", name="authName", jwt_configuration={"config": "value"}, authorization_scopes="invalid_scope"
+                api_logical_id="logicalId",
+                name="authName",
+                jwt_configuration={"config": "value"},
+                authorization_scopes="invalid_scope",
             )
