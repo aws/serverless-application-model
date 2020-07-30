@@ -1703,6 +1703,41 @@
         ]
       }
     },
+    "SSMParameterWritePolicy": {
+      "Description": "Gives access to write values to a parameter in this account. If not using default key, KMSEncryptPolicy will also be needed.",
+      "Parameters": {
+        "ParameterName": {
+          "Description":"The name of the secret to be stored in SSM in your account."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:DescribeParameters"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:PutParameter",
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
+                {
+                  "parameterName": {
+                    "Ref": "ParameterName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "StepFunctionsExecutionPolicy": {
       "Description": "Gives permission to start a Step Functions state machine execution",
       "Parameters": {
