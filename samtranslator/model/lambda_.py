@@ -22,6 +22,7 @@ class LambdaFunction(Resource):
         "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
         "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "ReservedConcurrentExecutions": PropertyType(False, any_type()),
+        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}

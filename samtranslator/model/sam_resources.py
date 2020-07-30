@@ -82,6 +82,7 @@ class SamFunction(SamResourceMacro):
         "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
         "VersionDescription": PropertyType(False, is_str()),
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
+        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
     }
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -404,6 +405,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.ReservedConcurrentExecutions = self.ReservedConcurrentExecutions
         lambda_function.Tags = self._construct_tag_list(self.Tags)
         lambda_function.Layers = self.Layers
+        lambda_function.FileSystemConfigs = self.FileSystemConfigs
 
         if self.Tracing:
             lambda_function.TracingConfig = {"Mode": self.Tracing}
@@ -714,7 +716,7 @@ class SamApi(SamResourceMacro):
         "CacheClusterEnabled": PropertyType(False, is_type(bool)),
         "CacheClusterSize": PropertyType(False, is_str()),
         "Variables": PropertyType(False, is_type(dict)),
-        "EndpointConfiguration": PropertyType(False, is_str()),
+        "EndpointConfiguration": PropertyType(False, one_of(is_str(), is_type(dict))),
         "MethodSettings": PropertyType(False, is_type(list)),
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),

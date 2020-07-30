@@ -1,3 +1,0 @@
-Steps to run sample app.
- - GOOS=linux go build -o main
- - sam local start-api

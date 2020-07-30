@@ -62,6 +62,9 @@ class ApiGatewayV2Authorizer(object):
         """
         Creates an authorizer for use in V2 Http Apis
         """
+        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
+            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
+
         # Currently only one type of auth
         self.auth_type = "oauth2"
 

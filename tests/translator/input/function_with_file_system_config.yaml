@@ -1,0 +1,53 @@
+Description: SAM + Lambda + EFS
+
+Parameters:
+  ExistingEfsFileSystem:
+    Type: String
+
+  SecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Security Group IDs that Lambda will use
+
+  VpcSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: VPC Subnet IDs that Lambda will use
+
+Resources:
+  EfsFileSystem:
+    Type: AWS::EFS::FileSystem
+
+  MountTarget:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EfsFileSystem
+      SubnetId: subnet-abc123
+      SecurityGroups: !Ref SecurityGroupIds
+
+  AccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref EfsFileSystem
+
+  LambdaFunctionWithEfs:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        const fs = require('fs')
+        const path = require('path')
+        const efsMountPath = '/mnt/efs'
+
+        exports.handler = async (event, context, callback) => {
+        const directory = path.join(efsMountPath, event.body)
+        const files = fs.readdirSync(directory)
+        return files
+        }
+      Handler: index.handler
+      MemorySize: 128
+      Runtime: nodejs12.x
+      Timeout: 3
+      VpcConfig:
+        SecurityGroupIds: !Ref SecurityGroupIds
+        SubnetIds: !Ref VpcSubnetIds
+      FileSystemConfigs:
+        - Arn: !GetAtt AccessPoint.Arn
+          LocalMountPath: /mnt/EFS
