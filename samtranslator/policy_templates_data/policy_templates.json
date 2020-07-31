@@ -1722,7 +1722,7 @@
           {
             "Effect": "Allow",
             "Action": [
-              "ssm:PutParameter",
+              "ssm:PutParameter"
             ],
             "Resource": {
               "Fn::Sub": [
