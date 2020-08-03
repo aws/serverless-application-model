@@ -326,6 +326,34 @@ AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
 AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger** 
 ================================== ================================
 
+MSK
+^^^^^^^
+
+Example:
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        MyTrigger:
+          Type: MSK
+          Properties:
+            Stream: arn:aws:kafka:us-east-1:123456789012:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            StartingPosition: TRIM_HORIZON
+      ...
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID
+================================== ================================
+AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
+AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger**
+================================== ================================
+
 SQS
 ^^^
 
