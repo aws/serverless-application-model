@@ -1,7 +1,7 @@
 import copy
 import re
 from six import string_types
-from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model import ResourceMacro, PropertyType, Resource
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
 from samtranslator.model.intrinsics import ref, fnGetAtt, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
@@ -19,6 +19,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.utils.get_service_regions import get_available_nonserviceable_regions
 
 CONDITION = "Condition"
 
@@ -371,6 +372,19 @@ class SNS(PushEventSource):
         "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),
     }
 
+    def __setattr__(self, name, value):
+        """Allows an attribute of this resource to be set only if it is a keyword or a property of the Resource with a
+        valid value.
+
+        :param str name: the name of the attribute to be set
+        :param value: the value of the attribute to be set
+        :raises InvalidResourceException: if an invalid property is provided
+        """
+        if name == 'principal':
+            return super(Resource, self).__setattr__(name, value)
+        else:
+            return super(SNS, self).__setattr__(name, value)
+
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda Permission resource allowing SNS to invoke the function this event source triggers.
 
@@ -386,6 +400,10 @@ class SNS(PushEventSource):
 
         # SNS -> Lambda
         if not self.SqsSubscription:
+            optin_regions = get_available_nonserviceable_regions('sns')
+            if self.Region in optin_regions:
+                self.principal = "sns." + self.Region + ".amazonaws.com"
+
             subscription = self._inject_subscription(
                 "lambda",
                 function.get_runtime_attr("arn"),
