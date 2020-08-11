@@ -1193,4 +1193,5 @@ class SwaggerEditor(object):
 
     @staticmethod
     def get_path_without_trailing_slash(path):
-        return re.sub(r"{([a-zA-Z0-9._-]+|proxy\+)}", "*", path)
+        # convert greedy paths to such as {greedy+}, {proxy+} to "*"
+        return re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
