@@ -380,7 +380,7 @@ class SNS(PushEventSource):
         :param value: the value of the attribute to be set
         :raises InvalidResourceException: if an invalid property is provided
         """
-        if name == 'principal':
+        if name == "principal":
             return super(Resource, self).__setattr__(name, value)
         else:
             return super(SNS, self).__setattr__(name, value)
@@ -400,7 +400,7 @@ class SNS(PushEventSource):
 
         # SNS -> Lambda
         if not self.SqsSubscription:
-            optin_regions = get_available_nonserviceable_regions('sns')
+            optin_regions = get_available_nonserviceable_regions("sns")
             if self.Region in optin_regions:
                 self.principal = "sns." + self.Region + ".amazonaws.com"
 
