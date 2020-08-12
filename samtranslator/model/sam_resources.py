@@ -66,7 +66,7 @@ class SamFunction(SamResourceMacro):
         "VpcConfig": PropertyType(False, is_type(dict)),
         "Role": PropertyType(False, is_str()),
         "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
-        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
         "PermissionsBoundary": PropertyType(False, is_str()),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
@@ -1015,7 +1015,7 @@ class SamLayerVersion(SamResourceMacro):
         "LayerName": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Description": PropertyType(False, is_str()),
         "ContentUri": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "CompatibleRuntimes": PropertyType(False, list_of(is_str())),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "LicenseInfo": PropertyType(False, is_str()),
         "RetentionPolicy": PropertyType(False, is_str()),
     }
@@ -1120,7 +1120,7 @@ class SamStateMachine(SamResourceMacro):
         "Name": PropertyType(False, is_str()),
         "Type": PropertyType(False, is_str()),
         "Tags": PropertyType(False, is_type(dict)),
-        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.stepfunctions.events,)
 

@@ -10,6 +10,10 @@
     "LayerNameParam": {
       "Default": "SomeLayerName",
       "Type": "String"
+    },
+    "LayerRuntimeRefString": {
+      "Default": "SomeRuntimeName",
+      "Type": "String"
     }
   },
   "Resources": {
@@ -61,6 +65,39 @@
           "Ref": "LayerRuntimeList"
         }
       }
+    },
+    "LayerWithSingleListRefRuntimesIntrinsic9d7a72f24a": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "CompatibleRuntimes": [
+          {
+            "Ref": "LayerRuntimeRefString"
+          }
+        ],
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithSingleListRefRuntimesIntrinsic"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
+    },
+    "LayerWithMixedListRefRuntimesIntrinsic71fd80f592": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "CompatibleRuntimes": [
+          {
+            "Ref": "LayerRuntimeString"
+          },
+          "SomeRuntimeNameString"
+        ],
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithMixedListRefRuntimesIntrinsic"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
     },
     "LayerWithLicenseIntrinsic965c8d0c9b": {
       "DeletionPolicy": "Retain",
