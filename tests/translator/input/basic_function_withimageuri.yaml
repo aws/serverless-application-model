@@ -1,0 +1,101 @@
+Parameters:
+  SomeParameter:
+    Type: String
+    Default: param
+  SomeOtherParameter:
+    Type: String
+    Default: otherparam
+Resources:
+  MinimalImageFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
+      PackageType: Image
+
+  MinimalImageFunctionPackageTypeAndImageConfig:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
+      PackageType: Image
+      ImageConfig:
+        WorkingDirectory: /var/task
+        Command: /bin/sh
+        EntryPoint: "echo hello world!"
+
+  CompleteImageFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: MyAwesomeFunction
+      ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
+      PackageType: Image
+      Description: Starter Lambda Function
+      Timeout: 60
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-edcd9784
+        SubnetIds:
+        - subnet-9d4a7b6c
+        - subnet-65ea5f08
+        - {Ref: SomeParameter}
+        - {Ref: SomeOtherParameter}
+      Role: arn:aws:iam::012345678901:role/lambda_basic_execution
+      ImageConfig:
+        WorkingDirectory: /var/task
+        Command: /bin/sh
+        EntryPoint: "echo hello world!"
+      Environment:
+        Variables:
+          Name: Value
+          Name2: Value2
+
+  FunctionWithPolicies:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
+      PackageType: Image
+      Policies: AmazonDynamoDBFullAccess
+
+  FunctionWithPolicyDocument:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
+      PackageType: Image
+      Policies:
+        Statement:
+        - Action: [ 'dynamodb:*' ]
+          Effect: Allow
+          Resource: '*'
+
+  FunctionWithRoleRef:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
+      PackageType: Image
+      Role:
+        Fn::GetAtt: ["MyFunctionRole", "Arn"]
+
+  MyFunctionRole:
+    # This is just some role. Actual role definition might be wrong
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "*"
+                Resource: "*"
