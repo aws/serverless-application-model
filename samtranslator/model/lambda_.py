@@ -7,10 +7,11 @@ class LambdaFunction(Resource):
     resource_type = "AWS::Lambda::Function"
     property_types = {
         "Code": PropertyType(True, is_type(dict)),
+        "PackageType": PropertyType(False, is_str()),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "FunctionName": PropertyType(False, is_str()),
-        "Handler": PropertyType(True, is_str()),
+        "Handler": PropertyType(False, is_str()),
         "MemorySize": PropertyType(False, is_type(int)),
         "Role": PropertyType(False, is_str()),
         "Runtime": PropertyType(False, is_str()),
@@ -24,6 +25,7 @@ class LambdaFunction(Resource):
         "ReservedConcurrentExecutions": PropertyType(False, any_type()),
         "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
         "CodeSigningConfigArn": PropertyType(False, is_str()),
+        "ImageConfig": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}

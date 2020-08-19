@@ -6,14 +6,14 @@ from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
 from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion
-from samtranslator.model.apigateway import ApiGatewayRestApi
-from samtranslator.model.apigateway import ApiGatewayDeployment
+from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.iam import IAMRole
+from samtranslator.model.packagetype import IMAGE, ZIP
 from samtranslator.model.sam_resources import SamFunction, SamApi, SamHttpApi
 
 
-class TestCodeUri(TestCase):
+class TestCodeUriandImageUri(TestCase):
     kwargs = {
         "intrinsics_resolver": IntrinsicsResolver({}),
         "event_resources": [],
@@ -24,6 +24,8 @@ class TestCodeUri(TestCase):
     def test_with_code_uri(self):
         function = SamFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedFunctionList = [x for x in cfnResources if isinstance(x, LambdaFunction)]
@@ -34,14 +36,62 @@ class TestCodeUri(TestCase):
     def test_with_zip_file(self):
         function = SamFunction("foo")
         function.InlineCode = "hello world"
+        function.Runtime = "foo"
+        function.Handler = "bar"
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedFunctionList = [x for x in cfnResources if isinstance(x, LambdaFunction)]
         self.assertEqual(generatedFunctionList.__len__(), 1)
         self.assertEqual(generatedFunctionList[0].Code, {"ZipFile": "hello world"})
 
-    def test_with_no_code_uri_or_zipfile(self):
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_no_code_uri_or_zipfile_or_no_image_uri(self):
         function = SamFunction("foo")
+        with pytest.raises(InvalidResourceException):
+            function.to_cloudformation(**self.kwargs)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_image_uri(self):
+        function = SamFunction("foo")
+        function.ImageUri = "123456789.dkr.ecr.us-east-1.amazonaws.com/myimage:latest"
+        function.PackageType = IMAGE
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedFunctionList = [x for x in cfnResources if isinstance(x, LambdaFunction)]
+        self.assertEqual(generatedFunctionList.__len__(), 1)
+        self.assertEqual(generatedFunctionList[0].Code, {"ImageUri": function.ImageUri})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_image_uri_layers_runtime_handler(self):
+        function = SamFunction("foo")
+        function.ImageUri = "123456789.dkr.ecr.us-east-1.amazonaws.com/myimage:latest"
+        function.Layers = ["Layer1"]
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.PackageType = IMAGE
+        with pytest.raises(InvalidResourceException):
+            function.to_cloudformation(**self.kwargs)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_image_uri_package_type_zip(self):
+        function = SamFunction("foo")
+        function.ImageUri = "123456789.dkr.ecr.us-east-1.amazonaws.com/myimage:latest"
+        function.PackageType = ZIP
+        with pytest.raises(InvalidResourceException):
+            function.to_cloudformation(**self.kwargs)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_image_uri_invalid_package_type(self):
+        function = SamFunction("foo")
+        function.ImageUri = "123456789.dkr.ecr.us-east-1.amazonaws.com/myimage:latest"
+        function.PackageType = "fake"
+        with pytest.raises(InvalidResourceException):
+            function.to_cloudformation(**self.kwargs)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_image_uri_and_code_uri(self):
+        function = SamFunction("foo")
+        function.ImageUri = "123456789.dkr.ecr.us-east-1.amazonaws.com/myimage:latest"
+        function.CodeUri = "s3://foobar/foo.zip"
         with pytest.raises(InvalidResourceException):
             function.to_cloudformation(**self.kwargs)
 
@@ -57,6 +107,8 @@ class TestAssumeRolePolicyDocument(TestCase):
     def test_with_assume_role_policy_document(self):
         function = SamFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
 
         assume_role_policy_document = {
             "Version": "2012-10-17",
@@ -79,6 +131,8 @@ class TestAssumeRolePolicyDocument(TestCase):
     def test_without_assume_role_policy_document(self):
         function = SamFunction("foo")
         function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
 
         assume_role_policy_document = {
             "Version": "2012-10-17",
@@ -104,6 +158,8 @@ class TestVersionDescription(TestCase):
         function = SamFunction("foo")
         test_description = "foobar"
 
+        function.Runtime = "foo"
+        function.Handler = "bar"
         function.CodeUri = "s3://foobar/foo.zip"
         function.VersionDescription = test_description
         function.AutoPublishAlias = "live"
