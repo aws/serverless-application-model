@@ -1,8 +1,7 @@
 import copy
-import json
 
 from unittest import TestCase
-from mock import Mock, patch
+from mock import Mock
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -1144,7 +1143,11 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
     def test_must_add_vpc_allow(self):
 
-        resourcePolicy = {"SourceVpcWhitelist": ["vpc-123", "vpce-345"]}
+        resourcePolicy = {
+            "SourceVpcWhitelist": ["vpc-123", "vpce-345"],
+            "IntrinsicVpcWhitelist": ["SomeVpc"],
+            "IntrinsicVpceWhitelist": ["SomeVpce"],
+        }
 
         self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
@@ -1167,7 +1170,12 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
                     ],
                     "Effect": "Deny",
-                    "Condition": {"StringNotEquals": {"aws:SourceVpc": ["vpc-123"], "aws:SourceVpce": ["vpce-345"]}},
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:SourceVpc": ["vpc-123", "SomeVpc"],
+                            "aws:SourceVpce": ["vpce-345", "SomeVpce"],
+                        }
+                    },
                     "Principal": "*",
                 },
             ],
@@ -1177,7 +1185,11 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
     def test_must_add_vpc_deny(self):
 
-        resourcePolicy = {"SourceVpcBlacklist": ["vpc-123"]}
+        resourcePolicy = {
+            "SourceVpcBlacklist": ["vpc-123"],
+            "IntrinsicVpcBlacklist": ["SomeVpc"],
+            "IntrinsicVpceBlacklist": ["SomeVpce"],
+        }
 
         self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
 
@@ -1200,7 +1212,9 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
                     ],
                     "Effect": "Deny",
-                    "Condition": {"StringEquals": {"aws:SourceVpc": ["vpc-123"]}},
+                    "Condition": {
+                        "StringEquals": {"aws:SourceVpc": ["vpc-123", "SomeVpc"], "aws:SourceVpce": ["SomeVpce"]}
+                    },
                     "Principal": "*",
                 },
             ],
