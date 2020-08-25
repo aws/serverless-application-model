@@ -1119,6 +1119,7 @@ class SamStateMachine(SamResourceMacro):
         "Type": PropertyType(False, is_str()),
         "Tags": PropertyType(False, is_type(dict)),
         "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "TracingConfiguration": PropertyType(False, is_type(dict)),
     }
     event_resolver = ResourceTypeResolver(samtranslator.model.stepfunctions.events,)
 
@@ -1140,6 +1141,7 @@ class SamStateMachine(SamResourceMacro):
             definition_substitutions=self.DefinitionSubstitutions,
             role=self.Role,
             state_machine_type=self.Type,
+            tracing=self.TracingConfiguration,
             events=self.Events,
             event_resources=event_resources,
             event_resolver=self.event_resolver,
