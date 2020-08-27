@@ -19,7 +19,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.utils.get_service_regions import get_available_nonserviceable_regions
+from samtranslator.utils import get_service_regions
 
 CONDITION = "Condition"
 
@@ -400,7 +400,7 @@ class SNS(PushEventSource):
 
         # SNS -> Lambda
         if not self.SqsSubscription:
-            optin_regions = get_available_nonserviceable_regions("sns")
+            optin_regions = get_service_regions.get_available_nonserviceable_regions("sns")
             if self.Region in optin_regions:
                 self.principal = "sns." + self.Region + ".amazonaws.com"
 

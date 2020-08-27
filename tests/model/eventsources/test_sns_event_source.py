@@ -1,6 +1,7 @@
 from mock import Mock
 from unittest import TestCase
 from samtranslator.model.eventsources.push import SNS
+from samtranslator.utils import get_service_regions
 
 
 class SnsEventSource(TestCase):
@@ -77,3 +78,20 @@ class SnsEventSource(TestCase):
         self.assertEqual(subscription.Endpoint, "arn:aws:lambda:mock")
         self.assertIsNone(subscription.Region)
         self.assertIsNone(subscription.FilterPolicy)
+
+    def test_to_cloudformation_when_region_is_optin(self):
+        get_service_regions.get_available_nonserviceable_regions = Mock(return_value=["optin-region-1"])
+        sqsSubscription = False
+        self.sns_event_source.SqsSubscription = sqsSubscription
+
+        region = "optin-region-1"
+        self.sns_event_source.Region = region
+        self.sns_event_source.to_cloudformation(function=self.function)
+        principal = "sns."+region+".amazonaws.com"
+        self.assertEqual(principal, self.sns_event_source.principal)
+
+        region = "other-region"
+        self.sns_event_source.Region = region
+        self.sns_event_source.to_cloudformation(function=self.function)
+        principal = "sns."+region+".amazonaws.com"
+        self.assertNotEqual(principal, self.sns_event_source.principal)
