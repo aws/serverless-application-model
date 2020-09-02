@@ -948,8 +948,8 @@ class SwaggerEditor(object):
         if not ip_list:
             return
 
-        if not isinstance(ip_list, list):
-            ip_list = [ip_list]
+        # if not isinstance(ip_list, list):
+        #     ip_list = [ip_list]
 
         if conditional not in ["IpAddress", "NotIpAddress"]:
             raise ValueError("Conditional must be one of {}".format(["IpAddress", "NotIpAddress"]))
