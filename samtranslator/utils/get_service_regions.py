@@ -25,7 +25,8 @@ def get_available_serviceable_regions(service_name):
 
 def get_available_nonserviceable_regions(service_name):
     """
-    Wrapper function to get only non serviceable regions
+    Wrapper function to get only non serviceable or AWS opt-in regions.
+    AWS opt-in regions require users to enable them manually in order to use them.
 
     :param service_name: Name of service to get available regions like 's3' etc.
     :return:Returns a list of endpoint names (e.g., ["us-east-1"]).
