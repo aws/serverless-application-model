@@ -1,0 +1,9 @@
+{
+    "errors": [
+      {
+        "errorMessage": "Resource with id [MyApiWithCognitoAuth] is invalid. AuthorizationScopes must be a list."
+      }
+    ], 
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApiWithCognitoAuth] is invalid. AuthorizationScopes must be a list."
+  }
+

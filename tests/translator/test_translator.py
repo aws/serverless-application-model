@@ -162,6 +162,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "implicit_api",
                 "explicit_api",
                 "api_endpoint_configuration",
+                "api_endpoint_configuration_with_vpcendpoint",
                 "api_with_auth_all_maximum",
                 "api_with_auth_all_minimum",
                 "api_with_auth_no_default",
@@ -298,6 +299,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "state_machine_with_api_auth_default_scopes",
                 "state_machine_with_condition_and_events",
                 "state_machine_with_xray",
+                "function_with_file_system_config",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -628,6 +630,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_with_invalid_condition_name",
         "error_invalid_document_empty_semantic_version",
         "error_api_with_invalid_open_api_version_type",
+        "error_api_with_invalid_auth_scopes_openapi",
         "error_api_with_custom_domains_invalid",
         "error_api_with_custom_domains_route53_invalid",
         "error_api_event_import_vaule_reference",

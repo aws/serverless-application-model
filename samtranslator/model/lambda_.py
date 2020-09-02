@@ -22,6 +22,7 @@ class LambdaFunction(Resource):
         "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
         "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "ReservedConcurrentExecutions": PropertyType(False, any_type()),
+        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
@@ -68,6 +69,7 @@ class LambdaEventSourceMapping(Resource):
         "DestinationConfig": PropertyType(False, is_type(dict)),
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "StartingPosition": PropertyType(False, is_str()),
+        "Topics": PropertyType(False, is_type(list)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
@@ -105,7 +107,7 @@ class LambdaLayerVersion(Resource):
         "Content": PropertyType(True, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "LayerName": PropertyType(False, is_str()),
-        "CompatibleRuntimes": PropertyType(False, list_of(is_str())),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "LicenseInfo": PropertyType(False, is_str()),
     }
 

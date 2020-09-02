@@ -244,6 +244,9 @@ class ApiGatewayAuthorizer(object):
                 "of Headers, QueryStrings, StageVariables, or Context.",
             )
 
+        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
+            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
+
         self.api_logical_id = api_logical_id
         self.name = name
         self.user_pool_arn = user_pool_arn
