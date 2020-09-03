@@ -191,7 +191,8 @@
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+          "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambdaLimited",
+          "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
         ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 

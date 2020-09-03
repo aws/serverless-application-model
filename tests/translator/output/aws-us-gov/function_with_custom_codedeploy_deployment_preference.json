@@ -348,7 +348,7 @@
       "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSCodeDeployRoleForLambdaLimited"
         ], 
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 

@@ -55,7 +55,7 @@ class TestDeploymentPreferenceCollection(TestCase):
             ],
         }
         expected_codedeploy_iam_role.ManagedPolicyArns = [
-            "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+            "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambdaLimited"
         ]
 
         self.assertEqual(
