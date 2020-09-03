@@ -1168,12 +1168,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
                     ],
                     "Effect": "Deny",
-                    "Condition": {
-                        "StringNotEquals": {
-                            "aws:SourceVpc": ["vpc-123"],
-                            "aws:SourceVpce": ["vpce-345"],
-                        }
-                    },
+                    "Condition": {"StringNotEquals": {"aws:SourceVpc": ["vpc-123"], "aws:SourceVpce": ["vpce-345"],}},
                     "Principal": "*",
                 },
             ],
@@ -1208,9 +1203,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
                     ],
                     "Effect": "Deny",
-                    "Condition": {
-                        "StringEquals": {"aws:SourceVpc": ["vpc-123"]}
-                    },
+                    "Condition": {"StringEquals": {"aws:SourceVpc": ["vpc-123"]}},
                     "Principal": "*",
                 },
             ],
@@ -1218,13 +1211,12 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-
     def test_must_add_vpc_allow_string_and_instrinic(self):
 
         resourcePolicy = {
-            "SourceVpcWhitelist": ["vpc-123", "vpce-345"],
-            "IntrinsicVpcWhitelist": ["Some-Vpc-List"],
-            "IntrinsicVpceWhitelist": ["Some-Vpce-List"],
+            "SourceVpcWhitelist": ["vpc-123", "vpce-345", "vpc-678"],
+            "IntrinsicVpcWhitelist": ["Mock-Allowlist-A", "Mock-Allowlist-B"],
+            "IntrinsicVpceWhitelist": ["Mock-Allowlist-C"],
         }
 
         self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
@@ -1250,8 +1242,8 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     "Effect": "Deny",
                     "Condition": {
                         "StringNotEquals": {
-                            "aws:SourceVpc": ["vpc-123", "Some-Vpc-List"],
-                            "aws:SourceVpce": ["vpce-345", "Some-Vpce-List"],
+                            "aws:SourceVpc": ["vpc-123", "vpc-678", "Mock-Allowlist-A", "Mock-Allowlist-B"],
+                            "aws:SourceVpce": ["vpce-345", "Mock-Allowlist-C"],
                         }
                     },
                     "Principal": "*",
@@ -1262,10 +1254,9 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_vpc_deny_string_and_intrinsic(self):
-
         resourcePolicy = {
-            "SourceVpcBlacklist": ["vpc-123"],
-            "IntrinsicVpceBlacklist": ["Some-Vpce-List"],
+            "SourceVpcBlacklist": ["vpc-123", "vpce-789", "vpce-abc"],
+            "IntrinsicVpceBlacklist": ["Mock-Denylist-A", "Mock-List-1"],
         }
 
         self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
@@ -1290,13 +1281,87 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                     ],
                     "Effect": "Deny",
                     "Condition": {
-                        "StringEquals": {"aws:SourceVpc": ["vpc-123"], "aws:SourceVpce": ["Some-Vpce-List"]}
+                        "StringEquals": {
+                            "aws:SourceVpc": ["vpc-123"],
+                            "aws:SourceVpce": ["vpce-789", "vpce-abc", "Mock-Denylist-A", "Mock-List-1"],
+                        }
                     },
                     "Principal": "*",
                 },
             ],
         }
 
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    def test_must_not_add_non_valid_string_list(self):
+
+        resourcePolicy = {
+            "SourceVpcBlacklist": ["non-valid-endpoint-name-a", "non-valid-endpoint-name-b"],
+            "SourceVpcWhitelist": ["non-valid-endpoint-name-1", "non-valid-endpoint-name-2"],
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {}
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    def test_must_add_vpc_mixed_lists(self):
+
+        resourcePolicy = {
+            "SourceVpcWhitelist": ["vpc-123", "vpc-abc", "vpce-123", "vpce-ghi"],
+            "IntrinsicVpcWhitelist": ["Mock-Allowlist-A", "Mock-Allowlist-B"],
+            "IntrinsicVpceWhitelist": ["Mock-Allowlist-C"],
+            "SourceVpcBlacklist": ["vpc-456", "vpc-def", "vpce-789", "vpce-abc"],
+            "IntrinsicVpcBlacklist": ["Mock-List-1"],
+            "IntrinsicVpceBlacklist": ["Mock-Denylist-A", "Mock-List-1"],
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Allow",
+                    "Principal": "*",
+                },
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Deny",
+                    "Condition": {
+                        "StringEquals": {
+                            "aws:SourceVpc": ["vpc-456", "vpc-def", "Mock-List-1"],
+                            "aws:SourceVpce": ["vpce-789", "vpce-abc", "Mock-Denylist-A", "Mock-List-1"],
+                        },
+                    },
+                    "Principal": "*",
+                },
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Deny",
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:SourceVpc": ["vpc-123", "vpc-abc", "Mock-Allowlist-A", "Mock-Allowlist-B"],
+                            "aws:SourceVpce": ["vpce-123", "vpce-ghi", "Mock-Allowlist-C"],
+                        }
+                    },
+                    "Principal": "*",
+                },
+            ],
+        }
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
     def test_must_add_iam_allow_and_custom(self):

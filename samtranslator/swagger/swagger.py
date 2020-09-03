@@ -1035,7 +1035,9 @@ class SwaggerEditor(object):
             condition.setdefault("aws:SourceVpc", []).extend(intrinsic_vpc_endpoint_list)
         if intrinsic_vpce_endpoint_list is not None:
             condition.setdefault("aws:SourceVpce", []).extend(intrinsic_vpce_endpoint_list)
-        if not condition:
+
+        # Skip writing to transformed template if both vpc and vpce endpoint lists are empty
+        if (not condition.get("aws:SourceVpc", [])) and (not condition.get("aws:SourceVpce", [])):
             return
 
         self.resource_policy["Version"] = "2012-10-17"
