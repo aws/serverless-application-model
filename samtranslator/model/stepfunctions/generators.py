@@ -40,6 +40,7 @@ class StateMachineGenerator(object):
         definition_substitutions,
         role,
         state_machine_type,
+        tracing,
         events,
         event_resources,
         event_resolver,
@@ -62,6 +63,7 @@ class StateMachineGenerator(object):
         :param definition_substitutions: Variable-to-value mappings to be replaced in the State Machine definition
         :param role: Role ARN to use for the execution role
         :param state_machine_type: Type of the State Machine
+        :param tracing: Tracing configuration for the State Machine
         :param events: List of event sources for the State Machine
         :param event_resources: Event resources to link
         :param event_resolver: Resolver that maps Event types to Event classes
@@ -83,6 +85,7 @@ class StateMachineGenerator(object):
         self.definition_substitutions = definition_substitutions
         self.role = role
         self.type = state_machine_type
+        self.tracing = tracing
         self.events = events
         self.event_resources = event_resources
         self.event_resolver = event_resolver
@@ -144,6 +147,7 @@ class StateMachineGenerator(object):
         self.state_machine.StateMachineName = self.name
         self.state_machine.StateMachineType = self.type
         self.state_machine.LoggingConfiguration = self.logging
+        self.state_machine.TracingConfiguration = self.tracing
         self.state_machine.Tags = self._construct_tag_list()
 
         event_resources = self._generate_event_resources()

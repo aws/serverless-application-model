@@ -15,6 +15,7 @@ class StepFunctionsStateMachine(Resource):
         "StateMachineType": PropertyType(False, is_str()),
         "Tags": PropertyType(False, list_of(is_type(dict))),
         "DefinitionSubstitutions": PropertyType(False, is_type(dict)),
+        "TracingConfiguration": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {
