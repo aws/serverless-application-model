@@ -1,8 +1,16 @@
+Parameters:
+  MyVpceParam:
+    Type: String
+    Default: SomeArbitraryValue
+
 Globals:
   Api:
     Auth:
       ResourcePolicy:
         SourceVpcBlacklist: ['vpce-3456']
+        IntrinsicVpceBlacklist:
+          - !Ref MyVpceParam
+
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
@@ -23,4 +31,4 @@ Resources:
           Properties:
             Method: Put
             Path: /get
-        
+
