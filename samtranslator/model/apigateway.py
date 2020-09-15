@@ -237,7 +237,7 @@ class ApiGatewayAuthorizer(object):
                 name + " Authorizer has invalid " "'FunctionPayloadType': " + function_payload_type + ".",
             )
 
-        if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):	
+        if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):
             identity = {}
 
         self.api_logical_id = api_logical_id
