@@ -3,8 +3,8 @@ import json
 import re
 from six import string_types
 
-from samtranslator.model.intrinsics import ref, is_intrinsic_no_value
-from samtranslator.model.intrinsics import make_conditional, fnSub, is_intrinsic_if
+from samtranslator.model.intrinsics import ref
+from samtranslator.model.intrinsics import make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
@@ -853,6 +853,10 @@ class SwaggerEditor(object):
         ip_range_blacklist = resource_policy.get("IpRangeBlacklist")
         source_vpc_whitelist = resource_policy.get("SourceVpcWhitelist")
         source_vpc_blacklist = resource_policy.get("SourceVpcBlacklist")
+        source_vpc_intrinsic_whitelist = resource_policy.get("IntrinsicVpcWhitelist")
+        source_vpce_intrinsic_whitelist = resource_policy.get("IntrinsicVpceWhitelist")
+        source_vpc_intrinsic_blacklist = resource_policy.get("IntrinsicVpcBlacklist")
+        source_vpce_intrinsic_blacklist = resource_policy.get("IntrinsicVpceBlacklist")
 
         if aws_account_whitelist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
@@ -870,13 +874,31 @@ class SwaggerEditor(object):
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
-        if source_vpc_whitelist is not None:
+        if (
+            (source_vpc_blacklist is not None)
+            or (source_vpc_intrinsic_blacklist is not None)
+            or (source_vpce_intrinsic_blacklist is not None)
+        ):
+            blacklist_dict = {
+                "StringEndpointList": source_vpc_blacklist,
+                "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
+                "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
+            }
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(source_vpc_whitelist, "StringNotEquals", resource_list)
+            self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
 
-        if source_vpc_blacklist is not None:
+        if (
+            (source_vpc_whitelist is not None)
+            or (source_vpc_intrinsic_whitelist is not None)
+            or (source_vpce_intrinsic_whitelist is not None)
+        ):
+            whitelist_dict = {
+                "StringEndpointList": source_vpc_whitelist,
+                "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
+                "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
+            }
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(source_vpc_blacklist, "StringEquals", resource_list)
+            self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -980,33 +1002,44 @@ class SwaggerEditor(object):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(self, endpoint_list, conditional, resource_list):
+    def _add_vpc_resource_policy_for_method(self, endpoint_dict, conditional, resource_list):
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
         :raises ValueError: If the conditional passed in does not match the allowed values.
         """
-        if not endpoint_list:
-            return
 
         if conditional not in ["StringNotEquals", "StringEquals"]:
             raise ValueError("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))
 
-        vpce_regex = r"^vpce-"
-        vpc_regex = r"^vpc-"
-        vpc_list = []
-        vpce_list = []
-        for endpoint in endpoint_list:
-            if re.match(vpce_regex, endpoint):
-                vpce_list.append(endpoint)
-            if re.match(vpc_regex, endpoint):
-                vpc_list.append(endpoint)
-
         condition = {}
-        if vpc_list:
-            condition["aws:SourceVpc"] = vpc_list
-        if vpce_list:
-            condition["aws:SourceVpce"] = vpce_list
+        string_endpoint_list = endpoint_dict.get("StringEndpointList")
+        intrinsic_vpc_endpoint_list = endpoint_dict.get("IntrinsicVpcList")
+        intrinsic_vpce_endpoint_list = endpoint_dict.get("IntrinsicVpceList")
+
+        if string_endpoint_list is not None:
+            vpce_regex = r"^vpce-"
+            vpc_regex = r"^vpc-"
+            vpc_list = []
+            vpce_list = []
+            for endpoint in string_endpoint_list:
+                if re.match(vpce_regex, endpoint):
+                    vpce_list.append(endpoint)
+                if re.match(vpc_regex, endpoint):
+                    vpc_list.append(endpoint)
+            if vpc_list:
+                condition.setdefault("aws:SourceVpc", []).extend(vpc_list)
+            if vpce_list:
+                condition.setdefault("aws:SourceVpce", []).extend(vpce_list)
+        if intrinsic_vpc_endpoint_list is not None:
+            condition.setdefault("aws:SourceVpc", []).extend(intrinsic_vpc_endpoint_list)
+        if intrinsic_vpce_endpoint_list is not None:
+            condition.setdefault("aws:SourceVpce", []).extend(intrinsic_vpce_endpoint_list)
+
+        # Skip writing to transformed template if both vpc and vpce endpoint lists are empty
+        if (not condition.get("aws:SourceVpc", [])) and (not condition.get("aws:SourceVpce", [])):
+            return
+
         self.resource_policy["Version"] = "2012-10-17"
         allow_statement = {}
         allow_statement["Effect"] = "Allow"
