@@ -1,3 +1,4 @@
+pyrsistent~=0.16.0; python_version<"3"
 boto3~=1.5
 enum34~=1.1; python_version<"3.4"
 jsonschema~=3.0
