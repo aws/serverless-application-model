@@ -734,6 +734,7 @@ class SamApi(SamResourceMacro):
         "OpenApiVersion": PropertyType(False, is_str()),
         "Models": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -787,6 +788,7 @@ class SamApi(SamResourceMacro):
             open_api_version=self.OpenApiVersion,
             models=self.Models,
             domain=self.Domain,
+            description=self.Description,
         )
 
         (
@@ -837,6 +839,7 @@ class SamHttpApi(SamResourceMacro):
         "RouteSettings": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "Description": PropertyType(False, is_str()),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
@@ -877,6 +880,7 @@ class SamHttpApi(SamResourceMacro):
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
             fail_on_warnings=self.FailOnWarnings,
+            description=self.Description,
             disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
         )
 
