@@ -62,6 +62,9 @@ Resources:
         CertificateArn: 'my-api-cert-arn'
         EndpointConfiguration: 'EDGE'
         BasePath: [ "/get", "/fetch" ]
+        MutualTlsAuthentication:
+          TruststoreUri: 'my-api-truststore-uri'
+          TruststoreVersion: 'my-api-truststore-version'
 
   MyAnotherApi:
     Type: AWS::Serverless::Api

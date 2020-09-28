@@ -15,6 +15,14 @@
     "EndpointConf": {
       "Default": "REGIONAL", 
       "Type": "String"
+    },
+    "MyMTLSUriHTTP": {
+      "Default": "another-api-v2-truststore-uri",
+      "Type": "String"
+    },
+    "MyMTLSVersionHTTP": {
+      "Default": "another-api-v2-truststore-version",
+      "Type": "String"
     }
   }, 
   "Resources": {
@@ -176,7 +184,11 @@
             "CertificateArn": "another-api-arn", 
             "EndpointType": "REGIONAL"
           }
-        ], 
+        ],
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "another-api-v2-truststore-uri",
+          "TruststoreVersion": "another-api-v2-truststore-version"
+        },
         "DomainName": {
           "Fn::Sub": "example-cn-north-1.com"
         }, 

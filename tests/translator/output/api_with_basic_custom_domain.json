@@ -61,7 +61,11 @@
           "Types": [
             "EDGE"
           ]
-        }, 
+        },
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "my-api-truststore-uri",
+          "TruststoreVersion": "my-api-truststore-version"
+        },
         "DomainName": "api-example.com"
       }
     }, 
@@ -268,7 +272,7 @@
           "Types": [
             "REGIONAL"
           ]
-        }, 
+        },
         "RegionalCertificateArn": "another-api-arn", 
         "DomainName": "another-example.com"
       }

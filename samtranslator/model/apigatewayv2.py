@@ -44,6 +44,7 @@ class ApiGatewayV2DomainName(Resource):
     property_types = {
         "DomainName": PropertyType(True, is_str()),
         "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),
+        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
         "Tags": PropertyType(False, is_type(dict)),
     }
 

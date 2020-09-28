@@ -13,6 +13,9 @@ Globals:
       DomainName: !Ref MyDomainName
       CertificateArn: !Ref MyDomainCert
       EndpointConfiguration: REGIONAL
+      MutualTlsAuthentication:
+        TruststoreUri: 'my-api-v2-truststore-uri'
+        TruststoreVersion: 'my-api-v2-truststore-version'
       BasePath: ["/basic", "/begin-here"]
       Route53:
         HostedZoneName: sam-example.com.

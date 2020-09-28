@@ -165,6 +165,7 @@ class ApiGatewayDomainName(Resource):
         "RegionalCertificateArn": PropertyType(False, is_str()),
         "DomainName": PropertyType(True, is_str()),
         "EndpointConfiguration": PropertyType(False, is_type(dict)),
+        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
         "CertificateArn": PropertyType(False, is_str()),
     }
 
