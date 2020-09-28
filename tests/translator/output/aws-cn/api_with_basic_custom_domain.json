@@ -57,7 +57,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment062deb3f92"
+          "Ref": "MyApiDeploymenta08ea03f7f"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -317,13 +317,13 @@
         "StageName": "Prod"
       }
     }, 
-    "MyApiDeployment062deb3f92": {
+    "MyApiDeploymenta08ea03f7f": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 062deb3f92aa9993cabcc1ae62b31c0411a7c2ce"
+        "Description": "RestApi deployment id: a08ea03f7ffaf365fd77e830ba0eb75533e0191a"
       }
     }, 
     "ServerlessRestApiBasePathMapping": {

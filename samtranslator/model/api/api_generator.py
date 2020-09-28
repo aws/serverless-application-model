@@ -307,11 +307,10 @@ class ApiGenerator(object):
         mutual_tls_auth = self.domain.get("MutualTlsAuthentication")
         if mutual_tls_auth and isinstance(mutual_tls_auth, dict):
             domain.MutualTlsAuthentication = {}
-            if mutual_tls_auth.get("TruststoreUri", None) and isinstance(mutual_tls_auth["TruststoreUri"], str):
+            if mutual_tls_auth.get("TruststoreUri", None):
                 domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
-            if mutual_tls_auth.get("TruststoreVersion", None) and isinstance(mutual_tls_auth["TruststoreUri"], str):
+            if mutual_tls_auth.get("TruststoreVersion", None):
                 domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
-
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
             basepaths = [self.domain.get("BasePath")]
