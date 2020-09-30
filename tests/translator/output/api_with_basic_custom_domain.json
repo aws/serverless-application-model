@@ -66,6 +66,7 @@
           "TruststoreUri": "my-api-truststore-uri",
           "TruststoreVersion": "my-api-truststore-version"
         },
+        "SecurityPolicy": "TLS_1_2",
         "DomainName": "api-example.com"
       }
     }, 

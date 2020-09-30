@@ -254,6 +254,7 @@
           "TruststoreUri": "another-api-truststore-uri",
           "TruststoreVersion": "another-api-truststore-version"
         },
+        "SecurityPolicy": "TLS_1_2",
         "RegionalCertificateArn": "another-api-arn", 
         "DomainName": {
           "Fn::Sub": "example-us-gov-west-1.com"

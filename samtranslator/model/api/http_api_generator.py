@@ -215,6 +215,8 @@ class HttpApiGenerator(object):
             )
         domain_config["EndpointType"] = endpoint
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
+        if self.domain.get("SecurityPolicy", None):
+            domain_config["SecurityPolicy"] = self.domain.get("SecurityPolicy")
 
         domain.DomainNameConfigurations = [domain_config]
 

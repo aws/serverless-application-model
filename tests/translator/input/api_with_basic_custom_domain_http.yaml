@@ -16,6 +16,7 @@ Globals:
       MutualTlsAuthentication:
         TruststoreUri: 'my-api-v2-truststore-uri'
         TruststoreVersion: 'my-api-v2-truststore-version'
+      SecurityPolicy: TLS_1_2
       BasePath: ["/basic", "/begin-here"]
       Route53:
         HostedZoneName: sam-example.com.

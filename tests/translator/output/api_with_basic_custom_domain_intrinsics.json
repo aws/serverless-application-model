@@ -86,8 +86,9 @@
         "MutualTlsAuthentication": {
           "TruststoreUri": "another-api-truststore-uri",
           "TruststoreVersion": "another-api-truststore-version"
-        }
-      }, 
+        },
+        "SecurityPolicy": "TLS_1_2"
+      },
       "Condition": "C1"
     }, 
     "ServerlessRestApiProdStage": {

@@ -182,7 +182,8 @@
         "DomainNameConfigurations": [
           {
             "CertificateArn": "another-api-arn", 
-            "EndpointType": "REGIONAL"
+            "EndpointType": "REGIONAL",
+            "SecurityPolicy": "TLS_1_2"
           }
         ],
         "MutualTlsAuthentication": {

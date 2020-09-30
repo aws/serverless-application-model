@@ -61,4 +61,5 @@ Resources:
         MutualTlsAuthentication:
           TruststoreUri: !Ref MyMTLSUriHTTP
           TruststoreVersion: !Ref MyMTLSVersionHTTP
+        SecurityPolicy: TLS_1_2
 
