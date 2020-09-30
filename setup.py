@@ -5,16 +5,16 @@
 # Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
+# You may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# Distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
+# Limitations under the License.
 #
 
 """
@@ -48,22 +48,22 @@ def read_requirements(req="base.txt"):
 
 
 setup(
-    name="aws-sam-translator",
-    version=read_version(),
-    description="AWS SAM Translator is a library that transform SAM templates into AWS CloudFormation templates",
-    long_description=read("README.md"),
-    long_description_content_type="text/markdown",
-    author="Amazon Web Services",
-    author_email="aws-sam-developers@amazon.com",
-    url="https://github.com/awslabs/serverless-application-model",
-    license="Apache License 2.0",
+    name = "aws-sam-translator",
+    version = read_version(),
+    description = "AWS SAM Translator is a library that transform SAM templates into AWS CloudFormation templates",
+    long_description = read("README.md"),
+    long_description_content_type = "text/markdown",
+    author = "Amazon Web Services",
+    author_email = "aws-sam-developers@amazon.com",
+    url = "https://github.com/awslabs/serverless-application-model",
+    license = "Apache License 2.0",
     # Exclude all but the code folders
-    packages=find_packages(exclude=("tests", "tests.*", "docs", "examples", "versions")),
-    install_requires=read_requirements("base.txt"),
-    include_package_data=True,
-    extras_require={"dev": read_requirements("dev.txt")},
-    keywords="AWS SAM Serverless Application Model",
-    classifiers=[
+    packages = find_packages(exclude=("tests", "tests.*", "docs", "examples", "versions")),
+    install_requires = read_requirements("base.txt"),
+    include_package_data = True,
+    extras_require = {"dev": read_requirements("dev.txt")},
+    keywords = "AWS SAM Serverless Application Model",
+    classifiers = [
         "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Environment :: Other Environment",
@@ -78,6 +78,6 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Topic :: Internet",
         "Topic :: Software Development :: Build Tools",
-        "Topic :: Utilities",
-    ],
+        "Topic :: Utilities"
+    ]
 )
