@@ -550,10 +550,8 @@ class TestVersionsAndAliases(TestCase):
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved(self):
 
         property_name = "something"
-        expected_exception_msg = (
-            "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
-                self.sam_func.logical_id, property_name
-            )
+        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
+            self.sam_func.logical_id, property_name
         )
 
         alias_value = {"Ref": "param1"}
@@ -569,10 +567,8 @@ class TestVersionsAndAliases(TestCase):
     def test_get_resolved_alias_name_must_error_if_intrinsics_are_not_resolved_with_list(self):
 
         property_name = "something"
-        expected_exception_msg = (
-            "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
-                self.sam_func.logical_id, property_name
-            )
+        expected_exception_msg = "Resource with id [{}] is invalid. '{}' must be a string or a Ref to a template parameter".format(
+            self.sam_func.logical_id, property_name
         )
 
         alias_value = ["Ref", "param1"]

@@ -101,7 +101,8 @@ class TestResourceAttributes(TestCase):
         property_types = {}
 
     def test_to_dict(self):
-        """Tests if resource attributes are correctly set and converted to dictionary"""
+        """Tests if resource attributes are correctly set and converted to dictionary
+        """
 
         empty_resource_dict = {"id": {"Type": "foo", "Properties": {}}}
         dict_with_attributes = {

@@ -4,6 +4,7 @@ from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.translator.arn_generator import ArnGenerator
 
+APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 
 class ApiGatewayV2HttpApi(Resource):
     resource_type = "AWS::ApiGatewayV2::Api"
@@ -89,7 +90,7 @@ class ApiGatewayV2Authorizer(object):
             raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
 
         # Validate necessary parameters exist
-        authorizer_type = self._get_type()
+        authorizer_type = self._get_auth_type()
         if authorizer_type == "JWT":
             if not self.jwt_configuration:
                 raise InvalidResourceException(
@@ -108,7 +109,7 @@ class ApiGatewayV2Authorizer(object):
                     api_logical_id, name + " Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
                 )
 
-    def _get_type(self):
+    def _get_auth_type(self):
         if self.jwt_configuration:
             return "JWT"
         return "REQUEST"
@@ -117,16 +118,14 @@ class ApiGatewayV2Authorizer(object):
         """
         Generates OAS for the securitySchemes section
         """
-        authorizer_type = self._get_type()
-        APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
+        authorizer_type = self._get_auth_type()
+
         if authorizer_type == "JWT":
-            openapi = {
-                "type": "oauth2",
-                "x-amazon-apigateway-authorizer": {
-                    "jwtConfiguration": self.jwt_configuration,
-                    "identitySource": self.id_source,
-                    "type": "jwt",
-                },
+            openapi = {"type": "oauth2"}
+            openapi[APIGATEWAY_AUTHORIZER_KEY] = {
+                "jwtConfiguration": self.jwt_configuration,
+                "identitySource": self.id_source,
+                "type": "jwt",
             }
 
         if authorizer_type == "REQUEST":
@@ -163,9 +162,7 @@ class ApiGatewayV2Authorizer(object):
                 openapi[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
 
             # Set authorizerPayloadFormatVersion. It's a required parameter
-            openapi[APIGATEWAY_AUTHORIZER_KEY][
-                "authorizerPayloadFormatVersion"
-            ] = self.authorizer_payload_format_version
+            openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerPayloadFormatVersion"] = self.authorizer_payload_format_version
 
             # Set authorizerPayloadFormatVersion. It's a required parameter
             if self.enable_simple_responses:
