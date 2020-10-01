@@ -1168,7 +1168,12 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
                     ],
                     "Effect": "Deny",
-                    "Condition": {"StringNotEquals": {"aws:SourceVpc": ["vpc-123"], "aws:SourceVpce": ["vpce-345"],}},
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:SourceVpc": ["vpc-123"],
+                            "aws:SourceVpce": ["vpce-345"],
+                        }
+                    },
                     "Principal": "*",
                 },
             ],

@@ -208,7 +208,13 @@ class SwaggerEditor(object):
             path_dict[method] = make_conditional(condition, path_dict[method])
 
     def add_state_machine_integration(
-        self, path, method, integration_uri, credentials, request_templates=None, condition=None,
+        self,
+        path,
+        method,
+        integration_uri,
+        credentials,
+        request_templates=None,
+        condition=None,
     ):
         """
         Adds aws APIGW integration to the given path+method.
