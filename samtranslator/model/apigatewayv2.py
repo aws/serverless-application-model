@@ -62,8 +62,8 @@ class ApiGatewayV2Authorizer(object):
         self,
         api_logical_id=None,
         name=None,
-        authorization_scopes=[],
-        jwt_configuration={},
+        authorization_scopes=None,
+        jwt_configuration=None,
         id_source=None,
         function_arn=None,
         function_invoke_role=None,
@@ -85,34 +85,85 @@ class ApiGatewayV2Authorizer(object):
         self.authorizer_payload_format_version = authorizer_payload_format_version
         self.enable_simple_responses = enable_simple_responses
 
-        # Validate parameters
-        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
-            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
+        self._validate_input_parameters()
+
+        authorizer_type = self._get_auth_type()
 
         # Validate necessary parameters exist
-        authorizer_type = self._get_auth_type()
         if authorizer_type == "JWT":
-            if not self.jwt_configuration:
-                raise InvalidResourceException(
-                    api_logical_id, name + " OAuth2 Authorizer must define 'JwtConfiguration'."
-                )
-            if not self.id_source:
-                raise InvalidResourceException(
-                    api_logical_id, name + " OAuth2 Authorizer must define 'IdentitySource'."
-                )
+            self._validate_jwt_authorizer()
 
         if authorizer_type == "REQUEST":
-            if not self.function_arn:
-                raise InvalidResourceException(api_logical_id, name + " Lambda Authorizer must define 'FunctionArn'.")
-            if not self.authorizer_payload_format_version:
-                raise InvalidResourceException(
-                    api_logical_id, name + " Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
-                )
+            self._validate_lambda_authorizer()
 
     def _get_auth_type(self):
         if self.jwt_configuration:
             return "JWT"
         return "REQUEST"
+
+    def _validate_input_parameters(self):
+        authorizer_type = self._get_auth_type()
+
+        if self.authorization_scopes is not None and not isinstance(self.authorization_scopes, list):
+            raise InvalidResourceException(self.api_logical_id, "AuthorizationScopes must be a list.")
+
+        if self.authorization_scopes is not None and not authorizer_type == "JWT":
+            raise InvalidResourceException(
+                self.api_logical_id, "AuthorizationScopes must be defined only for OAuth2 Authorizer."
+            )
+
+        if self.jwt_configuration is not None and not authorizer_type == "JWT":
+            raise InvalidResourceException(
+                self.api_logical_id, "JwtConfiguration must be defined only for OAuth2 Authorizer."
+            )
+
+        if self.id_source is not None and not authorizer_type == "JWT":
+            raise InvalidResourceException(
+                self.api_logical_id, "IdentitySource must be defined only for OAuth2 Authorizer."
+            )
+
+        if self.function_arn is not None and not authorizer_type == "REQUEST":
+            raise InvalidResourceException(
+                self.api_logical_id, "FunctionArn must be defined only for Lambda Authorizer."
+            )
+
+        if self.function_invoke_role is not None and not authorizer_type == "REQUEST":
+            raise InvalidResourceException(
+                self.api_logical_id, "FunctionInvokeRole must be defined only for Lambda Authorizer."
+            )
+
+        if self.identity is not None and not authorizer_type == "REQUEST":
+            raise InvalidResourceException(self.api_logical_id, "Identity must be defined only for Lambda Authorizer.")
+
+        if self.authorizer_payload_format_version is not None and not authorizer_type == "REQUEST":
+            raise InvalidResourceException(
+                self.api_logical_id, "AuthorizerPayloadFormatVersion must be defined only for Lambda Authorizer."
+            )
+
+        if self.enable_simple_responses is not None and not authorizer_type == "REQUEST":
+            raise InvalidResourceException(
+                self.api_logical_id, "EnableSimpleResponses must be defined only for Lambda Authorizer."
+            )
+
+    def _validate_jwt_authorizer(self):
+        if not self.jwt_configuration:
+            raise InvalidResourceException(
+                self.api_logical_id, self.name + " OAuth2 Authorizer must define 'JwtConfiguration'."
+            )
+        if not self.id_source:
+            raise InvalidResourceException(
+                self.api_logical_id, self.name + " OAuth2 Authorizer must define 'IdentitySource'."
+            )
+
+    def _validate_lambda_authorizer(self):
+        if not self.function_arn:
+            raise InvalidResourceException(
+                self.api_logical_id, self.name + " Lambda Authorizer must define 'FunctionArn'."
+            )
+        if not self.authorizer_payload_format_version:
+            raise InvalidResourceException(
+                self.api_logical_id, self.name + " Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
+            )
 
     def generate_openapi(self):
         """
