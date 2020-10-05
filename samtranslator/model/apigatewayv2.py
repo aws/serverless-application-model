@@ -6,6 +6,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 
 APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
 
+
 class ApiGatewayV2HttpApi(Resource):
     resource_type = "AWS::ApiGatewayV2::Api"
     property_types = {
@@ -213,7 +214,9 @@ class ApiGatewayV2Authorizer(object):
                 openapi[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
 
             # Set authorizerPayloadFormatVersion. It's a required parameter
-            openapi[APIGATEWAY_AUTHORIZER_KEY]["authorizerPayloadFormatVersion"] = self.authorizer_payload_format_version
+            openapi[APIGATEWAY_AUTHORIZER_KEY][
+                "authorizerPayloadFormatVersion"
+            ] = self.authorizer_payload_format_version
 
             # Set authorizerPayloadFormatVersion. It's a required parameter
             if self.enable_simple_responses:
