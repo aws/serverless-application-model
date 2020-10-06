@@ -9,6 +9,7 @@ from samtranslator.model.apigateway import ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayDeployment
 from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.iam import IAMRole
+from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.sam_resources import SamFunction
 from samtranslator.model.sam_resources import SamApi
 
@@ -188,3 +189,45 @@ class TestApiTags(TestCase):
 
         self.assertEqual(deployment.__len__(), 1)
         self.assertEqual(deployment[0].Tags, [{"Key": "MyKey", "Value": "MyValue"}])
+
+
+class TestAuthorizer(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_conditional_lambda_permission(self):
+        simpleApi = SamApi("simple")
+        simpleApi.DefinitionBody = {"swagger": "2.0", "paths": {}}
+        simpleApi.Auth = {
+            "Authorizers": {
+                "Foo": {
+                    "FunctionArn": "arn:aws:lambda:ap-southeast-1:00000000000:function:dummy-authorizer",
+                    "FunctionInvokeRole": None,
+                    "FunctionPayloadType": "TOKEN",
+                    "Identity": {"Header": "Authorization", "ReauthorizeEvery": 300},
+                }
+            }
+        }
+        apiWithRole = SamApi("role")
+        apiWithRole.DefinitionBody = {"swagger": "2.0", "paths": {}}
+        apiWithRole.Auth = {
+            "Authorizers": {
+                "Foo": {
+                    "FunctionArn": "arn:aws:lambda:ap-southeast-1:00000000000:function:dummy-authorizer",
+                    "FunctionInvokeRole": "arn:aws:iam::00000000000:role/dummy-iam-role",
+                    "FunctionPayloadType": "TOKEN",
+                    "Identity": {"Header": "Authorization", "ReauthorizeEvery": 300},
+                }
+            }
+        }
+
+        cfnResourcesSimpleApi = simpleApi.to_cloudformation(**self.kwargs)
+        cfnResourcesApiWithRole = apiWithRole.to_cloudformation(**self.kwargs)
+        simpleApiPermissions = [x for x in cfnResourcesSimpleApi if isinstance(x, LambdaPermission)]
+        apiWithRolePermissions = [x for x in cfnResourcesApiWithRole if isinstance(x, LambdaPermission)]
+        self.assertEqual(simpleApiPermissions.__len__(), 1)
+        self.assertEqual(apiWithRolePermissions.__len__(), 0)

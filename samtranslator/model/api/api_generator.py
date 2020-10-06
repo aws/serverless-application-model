@@ -885,7 +885,8 @@ class ApiGenerator(object):
 
         for authorizer_name, authorizer in authorizers.items():
             # Construct permissions for Lambda Authorizers only
-            if not authorizer.function_arn:
+            # Also ignore if APIG needs to use a role to invoke authorizer (instead of resource-based policy)
+            if not authorizer.function_arn or authorizer.function_invoke_role:
                 continue
 
             permission = self._get_permission(authorizer_name, authorizer.function_arn)
