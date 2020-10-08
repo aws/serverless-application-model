@@ -873,7 +873,7 @@ class SamHttpApi(SamResourceMacro):
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
             fail_on_warnings=self.FailOnWarnings,
-            disable_execute_api_endpoint=self.DisableExecuteApiEndpoint
+            disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
         )
 
         (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()
