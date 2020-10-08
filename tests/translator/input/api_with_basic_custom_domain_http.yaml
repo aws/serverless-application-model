@@ -51,4 +51,5 @@ Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      DisableExecuteApiEndpoint: true
       StageName: Prod

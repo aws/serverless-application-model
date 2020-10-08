@@ -14,6 +14,7 @@ class ApiGatewayV2HttpApi(Resource):
         "BodyS3Location": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
         "BasePath": PropertyType(False, is_str()),
         "CorsConfiguration": PropertyType(False, is_type(dict)),
     }

@@ -235,7 +235,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment70d6fa6cbe"
+          "Ref": "MyApiDeployment19c8cf5c63"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -244,13 +244,13 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApiDeployment70d6fa6cbe": {
+    "MyApiDeployment19c8cf5c63": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 70d6fa6cbe4760886e4c02163e63b5ec94eabee4"
+        "Description": "RestApi deployment id: 19c8cf5c63090f12c5a96f6f57162495bed446c7"
       }, 
       "Condition": "C1"
     }, 
