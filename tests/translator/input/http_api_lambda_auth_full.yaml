@@ -1,0 +1,57 @@
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        Basic: # integration exists
+          Type: HttpApi
+          Properties:
+            PayloadFormatVersion: "2.0"
+            Path: /basic
+            Method: post
+            ApiId: !Ref MyApi
+        Basic2: # integration exists, auth doesn't
+          Type: HttpApi
+          Properties:
+            Path: /basic
+            Method: get
+            ApiId: !Ref MyApi
+        SimpleCase: # path exists, integration doesn't
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
+      Auth:
+        Authorizers:
+          LambdaAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: !GetAtt MyAuthFnRole.Arn
+            Identity:
+              Context:
+                - contextVar
+              Headers:
+                - Authorization
+              QueryStrings:
+                - petId
+              StageVariables:
+                - stageVar
+              ReauthorizeEvery: 60
+            AuthorizerPayloadFormatVersion: 2.0
+            EnableSimpleResponses: true
+        DefaultAuthorizer: LambdaAuth

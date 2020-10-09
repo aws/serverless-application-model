@@ -54,7 +54,7 @@ class StateMachineGenerator(object):
         :param logical_id: Logical id of the SAM State Machine Resource
         :param depends_on: Any resources that need to be depended on
         :param managed_policy_map: Map of managed policy names to the ARNs
-        :param intrinsics_resolver: Instance of the resolver that knows how to resolve parameter references 
+        :param intrinsics_resolver: Instance of the resolver that knows how to resolve parameter references
         :param definition: State Machine definition
         :param definition_uri: URI to State Machine definition
         :param logging: Logging configuration for the State Machine

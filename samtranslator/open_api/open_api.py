@@ -246,7 +246,7 @@ class OpenApiEditor(object):
     def add_timeout_to_method(self, api, path, method_name, timeout):
         """
         Adds a timeout to this path/method.
-        
+
         :param dict api: Reference to the related Api's properties as defined in the template.
         :param string path: Path name
         :param string method_name: Method name
@@ -260,7 +260,7 @@ class OpenApiEditor(object):
     def add_path_parameters_to_method(self, api, path, method_name, path_parameters):
         """
         Adds path parameters to this path + method
-        
+
         :param dict api: Reference to the related Api's properties as defined in the template.
         :param string path: Path name
         :param string method_name: Method name
