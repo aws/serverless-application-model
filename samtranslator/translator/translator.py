@@ -1,7 +1,10 @@
 import copy
 
-from samtranslator.feature_toggle.feature_toggle import FeatureToggle, FeatureToggleLocalConfigProvider, \
-    FeatureToggleDefaultConfigProvider
+from samtranslator.feature_toggle.feature_toggle import (
+    FeatureToggle,
+    FeatureToggleLocalConfigProvider,
+    FeatureToggleDefaultConfigProvider,
+)
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
