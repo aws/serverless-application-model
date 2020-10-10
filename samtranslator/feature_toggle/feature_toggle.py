@@ -36,7 +36,7 @@ class FeatureToggle:
             return False
         region_config = stage_config.get(region, {}) if region in stage_config else stage_config.get("default", {})
         is_enabled = region_config.get("enabled", False)
-        LOG.info("Feature '{}' is '{}'".format(feature_name, is_enabled))
+        LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
         return is_enabled
 
     def is_enabled_for_account_in_region(self, feature_name, stage, account_id, region="default"):
@@ -55,13 +55,13 @@ class FeatureToggle:
         if not stage_config:
             LOG.info("Stage '{}' not enabled for Feature '{}'.".format(stage, feature_name))
             return False
-        if not stage_config:
-            return False
         account_config = stage_config.get(account_id) if account_id in stage_config else stage_config.get("default", {})
         region_config = (
             account_config.get(region, {}) if region in account_config else account_config.get("default", {})
         )
-        return region_config.get("enabled", False)
+        is_enabled = region_config.get("enabled", False)
+        LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
+        return is_enabled
 
 
 class FeatureToggleConfigProvider:
