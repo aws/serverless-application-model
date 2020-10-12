@@ -96,7 +96,11 @@ def transform_template(input_file_path, output_file_path):
         sam_template = yaml_parse(f)
 
     try:
-        feature_toggle = FeatureToggle(FeatureToggleLocalConfigProvider())
+        feature_toggle = FeatureToggle(
+            FeatureToggleLocalConfigProvider(
+                os.path.join(my_path, "..", "tests", "feature_toggle", "input", "feature_toggle_config.json")
+            )
+        )
         cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client), feature_toggle)
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=2)
 

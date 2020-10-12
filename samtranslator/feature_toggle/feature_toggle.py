@@ -89,7 +89,7 @@ class FeatureToggleDefaultConfigProvider(FeatureToggleConfigProvider):
 class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which uses a local file. This is to facilitate local testing."""
 
-    def __init__(self, local_config_path=os.path.join(my_path, "..", "..", "bin", "feature_toggle_config.json")):
+    def __init__(self, local_config_path):
         FeatureToggleConfigProvider.__init__(self)
         with open(local_config_path, "r") as f:
             config_json = f.read()
@@ -116,8 +116,7 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
             binary_config_string = response["Content"].read()
             self.feature_toggle_config = json.loads(binary_config_string.decode("utf-8"))
         except Exception as ex:
-            LOG.error("Failed to load config from AppConfig: {}".format(ex))
-            LOG.info("Falling to empty config.")
+            LOG.error("Failed to load config from AppConfig: {}. Using empty config.".format(ex))
             # There is chance that AppConfig is not available in a particular region.
             self.feature_toggle_config = json.loads("{}")
 
