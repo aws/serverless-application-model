@@ -305,12 +305,27 @@ class ApiGenerator(object):
         domain.EndpointConfiguration = {"Types": [endpoint]}
 
         mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
-        if mutual_tls_auth and isinstance(mutual_tls_auth, dict):
-            domain.MutualTlsAuthentication = {}
-            if mutual_tls_auth.get("TruststoreUri", None):
-                domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
-            if mutual_tls_auth.get("TruststoreVersion", None):
-                domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
+        if mutual_tls_auth:
+            if isinstance(mutual_tls_auth, dict):
+                if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                    raise InvalidResourceException(
+                        mutual_tls_auth.keys(),
+                        "Available MutualTlsAuthentication fields are {}.".format(
+                            ["TruststoreUri", "TruststoreVersion"]
+                        ),
+                    )
+                domain.MutualTlsAuthentication = {}
+                if mutual_tls_auth.get("TruststoreUri", None):
+                    domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
+                if mutual_tls_auth.get("TruststoreVersion", None):
+                    domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
+            else:
+                raise InvalidResourceException(
+                    mutual_tls_auth,
+                    "MutualTlsAuthentication must contains one of the following fields {}.".format(
+                        ["TruststoreUri", "TruststoreVersion"]
+                    ),
+                )
 
         if self.domain.get("SecurityPolicy", None):
             domain.SecurityPolicy = self.domain["SecurityPolicy"]
