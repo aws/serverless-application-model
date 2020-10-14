@@ -229,8 +229,13 @@ class HttpApiGenerator(object):
         if mutual_tls_auth:
             if isinstance(mutual_tls_auth, dict):
                 if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                    invalid_keys = []
+                    for key in mutual_tls_auth.keys():
+                        if key not in {"TruststoreUri", "TruststoreVersion"}:
+                            invalid_keys.append(key)
+                    invalid_keys.sort()
                     raise InvalidResourceException(
-                        mutual_tls_auth.keys(),
+                        ",".join(invalid_keys),
                         "Available MutualTlsAuthentication fields are {}.".format(
                             ["TruststoreUri", "TruststoreVersion"]
                         ),
@@ -243,7 +248,7 @@ class HttpApiGenerator(object):
             else:
                 raise InvalidResourceException(
                     mutual_tls_auth,
-                    "MutualTlsAuthentication must contains one of the following fields {}.".format(
+                    "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
                         ["TruststoreUri", "TruststoreVersion"]
                     ),
                 )
