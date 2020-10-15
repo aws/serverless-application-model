@@ -218,7 +218,7 @@ class S3(PushEventSource):
         if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
             bucket_id = self.Bucket["Ref"]
             if not isinstance(bucket_id, collections.Hashable):
-                raise InvalidEventException(self.relative_id, "Invalid 'Ref' value in S3 events.")
+                raise InvalidEventException(self.relative_id, "'Ref' value in S3 events is not a valid string.")
             if bucket_id in resources:
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
         raise InvalidEventException(self.relative_id, "S3 events must reference an S3 bucket in the same template.")
@@ -662,7 +662,7 @@ class Api(PushEventSource):
                         raise InvalidEventException(
                             self.relative_id,
                             "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because it wasn't defined properly in the API's Authorizers.".format(
+                            "because it wasn't defined with acceptable values in the API's Authorizers.".format(
                                 authorizer=method_authorizer, method=self.Method, path=self.Path
                             ),
                         )
@@ -1109,9 +1109,9 @@ class HttpApi(PushEventSource):
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
         method_authorizer = self.Auth.get("Authorizer")
-        api_auth = api.get("Auth")
+        api_auth = api.get("Auth", {})
         if not method_authorizer:
-            if api_auth and api_auth.get("DefaultAuthorizer"):
+            if api_auth.get("DefaultAuthorizer"):
                 self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")
             else:
                 # currently, we require either a default auth or auth in the method

@@ -17,13 +17,16 @@ class IntrinsicsResolver(object):
         :raises TypeError: If parameters or the supported_intrinsics arguments are invalid
         """
 
-        if parameters is None or not isinstance(parameters, dict):
-            raise InvalidTemplateException("parameters must be a valid dictionary")
+        if parameters is None:
+            raise TypeError("parameters must be a valid dictionary")
+
+        if not isinstance(parameters, dict):
+            raise InvalidTemplateException("'Mappings' is not a valid dictionary")
 
         if not isinstance(supported_intrinsics, dict) or not all(
             [isinstance(value, Action) for value in supported_intrinsics.values()]
         ):
-            raise InvalidTemplateException(
+            raise TypeError(
                 "supported_intrinsics argument must be intrinsic names to corresponding Action classes"
             )
 

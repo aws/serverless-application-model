@@ -542,6 +542,10 @@ class SwaggerEditor(object):
                     # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
                     # We want to ensure only a single Authorizer security entry exists while keeping everything else
                     for security in existing_security:
+                        if not isinstance(security, dict):
+                            raise InvalidDocumentException(
+                                ["{security} in ApiKey 'security' is not a valid dictionary".format(security=security)]
+                            )
                         if authorizer_names.isdisjoint(security.keys()):
                             existing_non_authorizer_security.append(security)
                         else:
@@ -623,7 +627,7 @@ class SwaggerEditor(object):
                 for security in existing_security:
                     if not isinstance(security, dict):
                         raise InvalidDocumentException(
-                            ["Invalid entry {security} in 'security'".format(security=security)]
+                            ["{security} in ApiKey 'security' is not a valid dictionary".format(security=security)]
                         )
                     if apikey_security_names.isdisjoint(security.keys()):
                         existing_non_apikey_security.append(security)
@@ -834,10 +838,10 @@ class SwaggerEditor(object):
             model_properties = schema.get("properties")
 
             if not model_type:
-                raise InvalidDocumentException(["Invalid input. Value for type is required"])
+                raise InvalidDocumentException(["Invalid or missing 'type' in swagger model definitions"])
 
             if not model_properties:
-                raise InvalidDocumentException(["Invalid input. Value for properties is required"])
+                raise InvalidDocumentException(["Invalid or missing 'properties' in swagger model definitions"])
 
             self.definitions[model_name.lower()] = schema
 
@@ -851,7 +855,7 @@ class SwaggerEditor(object):
         if resource_policy is None:
             return
         if not isinstance(resource_policy, dict):
-            raise InvalidDocumentException(["Invalid resource policy"])
+            raise TypeError(["Auth 'ResourcePolicy' in swagger definition is not a valid dictionary"])
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")

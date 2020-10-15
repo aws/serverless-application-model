@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, Hashable
 from six import string_types
 from samtranslator.model.intrinsics import ref, fnGetAtt
 from samtranslator.model.apigateway import (
@@ -775,7 +775,7 @@ class ApiGenerator(object):
                 components = definition_body.get("components", {})
                 if components is None:
                     raise InvalidResourceException(
-                        self.logical_id, "Invalid value for 'components' property in 'securityDefinitions'"
+                        self.logical_id, "Could not find 'components' property in 'securityDefinitions'."
                     )
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
@@ -906,7 +906,13 @@ class ApiGenerator(object):
     ):
         if not default_authorizer:
             return
-
+        if not isinstance(default_authorizer, Hashable):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set DefaultAuthorizer because '"
+                + default_authorizer
+                + "' was not a valid string.",
+            )
         if not authorizers.get(default_authorizer) and default_authorizer != "AWS_IAM":
             raise InvalidResourceException(
                 self.logical_id,
