@@ -9,7 +9,7 @@
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=compat.py
+ignore=compat.py, __main__.py
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -59,7 +59,7 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
-disable=R0201,W0613,I0021,I0020,W1618,W1619,R0902,R0903,W0231,W0611,R0913,W0703,C0330,R0204,I0011,R0904
+disable=R0201,W0613,W0640,I0021,I0020,W1618,W1619,R0902,R0903,W0231,W0611,R0913,W0703,C0330,R0204,I0011,R0904,R0914,C0301
 
 
 [REPORTS]
@@ -162,7 +162,7 @@ module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
 module-name-hint=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
 
 # Regular expression matching correct method names
-method-rgx=[a-z_][a-z0-9_]{2,30}$
+method-rgx=[a-z_][a-z0-9_]{2,50}$
 
 # Naming hint for method names
 method-name-hint=[a-z_][a-z0-9_]{2,30}$
@@ -221,16 +221,16 @@ notes=FIXME,XXX
 [SIMILARITIES]
 
 # Minimum lines number of a similarity.
-min-similarity-lines=5
+min-similarity-lines=12
 
 # Ignore comments when computing similarities.
-ignore-comments=no
+ignore-comments=yes
 
 # Ignore docstrings when computing similarities.
-ignore-docstrings=no
+ignore-docstrings=yes
 
 # Ignore imports when computing similarities.
-ignore-imports=no
+ignore-imports=yes
 
 
 [SPELLING]
@@ -315,7 +315,7 @@ max-args=5
 ignored-argument-names=_.*
 
 # Maximum number of locals for function / method body
-max-locals=15
+max-locals=17
 
 # Maximum number of return / yield for function / method body
 max-returns=6
