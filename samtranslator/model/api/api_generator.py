@@ -909,9 +909,7 @@ class ApiGenerator(object):
         if not isinstance(default_authorizer, Hashable):
             raise InvalidResourceException(
                 self.logical_id,
-                "Unable to set DefaultAuthorizer because '"
-                + default_authorizer
-                + "' was not a valid string.",
+                "Unable to set DefaultAuthorizer because '" + default_authorizer + "' was not a valid string.",
             )
         if not authorizers.get(default_authorizer) and default_authorizer != "AWS_IAM":
             raise InvalidResourceException(

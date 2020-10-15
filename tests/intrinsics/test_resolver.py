@@ -102,7 +102,7 @@ class TestParameterReferenceResolution(TestCase):
         self.assertEqual(output, expected)
 
     def test_throw_on_empty_parameters(self):
-        with self.assertRaises(InvalidTemplateException):
+        with self.assertRaises(TypeError):
             IntrinsicsResolver(None).resolve_parameter_refs({})
 
     def test_throw_on_non_dict_parameters(self):
@@ -189,15 +189,15 @@ class TestSupportedIntrinsics(TestCase):
 
         # All intrinsics must have a value to be subclass of "Action"
         supported_intrinsics = {"A": "B", "Foo": SomeAction()}
-        with self.assertRaises(InvalidTemplateException):
+        with self.assertRaises(TypeError):
             IntrinsicsResolver({}, supported_intrinsics)
 
     def test_configure_supported_intrinsics_must_error_for_none_input(self):
 
-        with self.assertRaises(InvalidTemplateException):
+        with self.assertRaises(TypeError):
             IntrinsicsResolver({}, None)
 
     def test_configure_supported_intrinsics_must_error_for_non_dict_input(self):
 
-        with self.assertRaises(InvalidTemplateException):
+        with self.assertRaises(TypeError):
             IntrinsicsResolver({}, [1, 2, 3])
