@@ -1,7 +1,7 @@
 <p align="center">
 </p>
 
-# AWS Serverless Application Model (AWS SAM)
+# AWS Serverless Application Model (AWS SAM):-
 
 ![Apache-2.0](https://img.shields.io/github/license/awslabs/serverless-application-model.svg)
 ![SAM_CLI release](https://img.shields.io/github/release/awslabs/aws-sam-cli.svg?label=CLI%20Version)
@@ -12,7 +12,7 @@ With just a few lines of configuration, you can define the application you want 
 
 [![Getting Started with AWS SAM](./docs/get-started-youtube.png)](https://www.youtube.com/watch?v=1dzihtC5LJ0)
 
-## Get Started
+## Get Started:-
 
 To get started with building SAM-based applications, use the SAM CLI. SAM CLI provides a Lambda-like execution 
 environment that lets you locally build, test, debug, and deploy applications defined by SAM templates.
@@ -32,7 +32,7 @@ environment that lets you locally build, test, debug, and deploy applications de
 * [SAM Template Specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html)
 * [Policy Templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)
 
-## Why SAM
+## Why SAM:-
 
 + **Single\-deployment configuration**\. SAM makes it easy to organize related components and resources, and operate on a single stack\. You can use SAM to share configuration \(such as memory and timeouts\) between resources, and deploy all related resources together as a single, versioned entity\.
    
@@ -58,7 +58,7 @@ In the words of SAM developers:
 with tons of tests to ensure your changes don't break compatibility. Change the code, run the tests, and if they pass, you should be good to go! 
 Clone it and run `make pr`!
 
-## Contribute to SAM
+## Contribute to SAM:-
 
 We love our contributors ❤️ We have over 100 contributors who have built various parts of the product. 
 Read this [testimonial from @ndobryanskyy](https://www.lohika.com/aws-sam-my-exciting-first-open-source-experience/) to learn
@@ -66,14 +66,14 @@ more about what it was like contributing to SAM.
 
 Depending on your interest and skill, you can help build the different parts of the SAM project; 
 
-**Enhance the SAM Specification**
+**Enhance the SAM Specification**:-
 
 Make pull requests, report bugs, and share ideas to improve the full SAM template specification.
 Source code is located on Github at [awslabs/serverless-application-model](https://github.com/awslabs/serverless-application-model). 
 Read the [SAM Specification Contributing Guide](https://github.com/awslabs/serverless-application-model/blob/master/CONTRIBUTING.md)
 to get started.
     
-**Strengthen SAM CLI**
+**Strengthen SAM CLI**:-
 
 Add new commands or enhance existing ones, report bugs, or request new features for the SAM CLI.
 Source code is located on Github at [awslabs/aws-sam-cli](https://github.com/awslabs/aws-sam-cli). Read the [SAM CLI Contributing Guide](https://github.com/awslabs/aws-sam-cli/blob/develop/CONTRIBUTING.md) to 
@@ -86,7 +86,8 @@ Source code is located on Github at [awsdocs/aws-sam-developer-guide](https://gi
 Read the [SAM Documentation Contribution Guide](https://github.com/awsdocs/aws-sam-developer-guide/blob/master/CONTRIBUTING.md) to get
 started. 
 
-### Join the SAM Community on Slack
+### Join the SAM Community on Slack:-
+### Join Community man 
 [Join the SAM developers channel (#samdev)](https://join.slack.com/t/awsdevelopers/shared_invite/zt-h82odes6-qYN2Cxit7hBGIvC6oMjGpg) on Slack to collaborate with fellow community members and the AWS SAM team.
 
 
