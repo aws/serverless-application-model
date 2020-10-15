@@ -2,7 +2,7 @@ coverage>=4.4.0
 flake8>=3.3.0
 tox>=2.2.1
 pytest-cov>=2.4.0
-pylint>=1.7.2,<2.0
+pylint~=2.6.0
 pyyaml>=5.1
 
 # Test requirements
