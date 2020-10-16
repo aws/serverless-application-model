@@ -1,0 +1,10 @@
+Resources:
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachineWithXRayTracing
+      Type: STANDARD
+      DefinitionUri: s3://sam-demo-bucket/my-state-machine.asl.json
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole
+      Tracing:
+        Enabled: true

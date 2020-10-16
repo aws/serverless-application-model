@@ -1,4 +1,10 @@
 import copy
+
+from samtranslator.feature_toggle.feature_toggle import (
+    FeatureToggle,
+    FeatureToggleLocalConfigProvider,
+    FeatureToggleDefaultConfigProvider,
+)
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
@@ -35,6 +41,7 @@ class Translator:
         self.managed_policy_map = managed_policy_map
         self.plugins = plugins
         self.sam_parser = sam_parser
+        self.feature_toggle = None
 
     def _get_function_names(self, resource_dict, intrinsics_resolver):
         """
@@ -66,7 +73,7 @@ class Translator:
                                 )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values):
+    def translate(self, sam_template, parameter_values, feature_toggle=None):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -81,6 +88,7 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
+        self.feature_toggle = feature_toggle if feature_toggle else FeatureToggle(FeatureToggleDefaultConfigProvider())
         self.function_names = dict()
         self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)

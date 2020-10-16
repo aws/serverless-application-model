@@ -140,7 +140,7 @@ class CloudWatchEvent(EventSource):
     }
 
     def to_cloudformation(self, resource, **kwargs):
-        """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this 
+        """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
@@ -387,10 +387,10 @@ class Api(EventSource):
         api["DefinitionBody"] = editor.swagger
 
     def _generate_request_template(self, resource):
-        """Generates the Body mapping request template for the Api. This allows for the input 
+        """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 
-        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine 
+        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine
                 resource to which the Api event source must be associated
 
         :returns: a body mapping request which passes the Api input to the state machine execution
