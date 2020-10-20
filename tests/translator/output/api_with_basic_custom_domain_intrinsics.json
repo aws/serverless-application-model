@@ -15,6 +15,14 @@
     "EndpointConf": {
       "Default": "REGIONAL", 
       "Type": "String"
+    },
+    "MyMTLSUri": {
+      "Default": "another-api-truststore-uri",
+      "Type": "String"
+    },
+    "MyMTLSVersion": {
+      "Default": "another-api-truststore-version",
+      "Type": "String"
     }
   }, 
   "Resources": {
@@ -74,8 +82,13 @@
         "RegionalCertificateArn": "another-api-arn", 
         "DomainName": {
           "Fn::Sub": "example-ap-southeast-1.com"
-        }
-      }, 
+        },
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "another-api-truststore-uri",
+          "TruststoreVersion": "another-api-truststore-version"
+        },
+        "SecurityPolicy": "TLS_1_2"
+      },
       "Condition": "C1"
     }, 
     "ServerlessRestApiProdStage": {
@@ -222,7 +235,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment462f07ab8f"
+          "Ref": "MyApiDeployment19c8cf5c63"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -231,13 +244,13 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApiDeployment462f07ab8f": {
+    "MyApiDeployment19c8cf5c63": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 462f07ab8fcdc437955985b08464280d2a9244be"
+        "Description": "RestApi deployment id: 19c8cf5c63090f12c5a96f6f57162495bed446c7"
       }, 
       "Condition": "C1"
     }, 

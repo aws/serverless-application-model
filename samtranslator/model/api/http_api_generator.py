@@ -48,6 +48,7 @@ class HttpApiGenerator(object):
         passthrough_resource_attributes=None,
         domain=None,
         fail_on_warnings=False,
+        disable_execute_api_endpoint=False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -81,6 +82,7 @@ class HttpApiGenerator(object):
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.domain = domain
         self.fail_on_warnings = fail_on_warnings
+        self.disable_execute_api_endpoint = disable_execute_api_endpoint
 
     def _construct_http_api(self):
         """Constructs and returns the ApiGatewayV2 HttpApi.
@@ -103,6 +105,9 @@ class HttpApiGenerator(object):
 
         if self.fail_on_warnings:
             http_api.FailOnWarnings = self.fail_on_warnings
+
+        if self.disable_execute_api_endpoint:
+            http_api.DisableExecuteApiEndpoint = self.disable_execute_api_endpoint
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
@@ -215,8 +220,38 @@ class HttpApiGenerator(object):
             )
         domain_config["EndpointType"] = endpoint
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
+        if self.domain.get("SecurityPolicy", None):
+            domain_config["SecurityPolicy"] = self.domain.get("SecurityPolicy")
 
         domain.DomainNameConfigurations = [domain_config]
+
+        mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
+        if mutual_tls_auth:
+            if isinstance(mutual_tls_auth, dict):
+                if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                    invalid_keys = []
+                    for key in mutual_tls_auth.keys():
+                        if key not in {"TruststoreUri", "TruststoreVersion"}:
+                            invalid_keys.append(key)
+                    invalid_keys.sort()
+                    raise InvalidResourceException(
+                        ",".join(invalid_keys),
+                        "Available MutualTlsAuthentication fields are {}.".format(
+                            ["TruststoreUri", "TruststoreVersion"]
+                        ),
+                    )
+                domain.MutualTlsAuthentication = {}
+                if mutual_tls_auth.get("TruststoreUri", None):
+                    domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
+                if mutual_tls_auth.get("TruststoreVersion", None):
+                    domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
+            else:
+                raise InvalidResourceException(
+                    mutual_tls_auth,
+                    "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
+                        ["TruststoreUri", "TruststoreVersion"]
+                    ),
+                )
 
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):

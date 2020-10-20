@@ -833,6 +833,7 @@ class SamHttpApi(SamResourceMacro):
         "RouteSettings": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
     referable_properties = {
@@ -872,6 +873,7 @@ class SamHttpApi(SamResourceMacro):
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
             fail_on_warnings=self.FailOnWarnings,
+            disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
         )
 
         (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()
