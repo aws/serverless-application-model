@@ -1,4 +1,4 @@
-# https://github.com/psf/black/blob/master/.pre-commit-config.yaml
+# https://pre-commit.com/#repository-local-hooks
 repos:
 - repo: local
   hooks:
@@ -6,5 +6,4 @@ repos:
       name: black
       entry: black
       language: system
-      require_serial: true
       types: [python]
