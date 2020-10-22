@@ -21,15 +21,6 @@ matrix:
 
 install:
 # Install the code requirements
-- >
-  if [ $TOXENV = py27 ]; then
-    mkdir $HOME/bin-black
-    # make sure we are using the same black version as in dev.txt
-    wget -O $HOME/bin-black/black https://github.com/python/black/releases/download/20.8b1/black
-    chmod +x $HOME/bin-black/black
-    export PATH=$PATH:$HOME/bin-black
-    black --version
-  fi
 - make init
 
 # Install Docs requirements
