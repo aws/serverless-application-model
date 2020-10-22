@@ -17,4 +17,4 @@ requests>=2.20.0
 docopt>=0.6.2
 
 # formatter
-black==20.8b1
+black==20.8b1; python_version >= '3.6'
