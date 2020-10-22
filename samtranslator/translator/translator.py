@@ -28,8 +28,7 @@ from samtranslator.sdk.parameter import SamParameterValues
 
 
 class Translator:
-    """Translates SAM templates into CloudFormation templates
-    """
+    """Translates SAM templates into CloudFormation templates"""
 
     def __init__(self, managed_policy_map, sam_parser, plugins=None):
         """

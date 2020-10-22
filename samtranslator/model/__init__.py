@@ -355,8 +355,7 @@ class ResourceMacro(Resource):
 
 
 class SamResourceMacro(ResourceMacro):
-    """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources.
-    """
+    """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources."""
 
     # SAM resources can provide a list of properties that they expose. These properties usually resolve to
     # CFN resources that this SAM resource generates. This is provided as a map with the following format:
