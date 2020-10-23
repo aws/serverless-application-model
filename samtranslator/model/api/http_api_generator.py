@@ -216,7 +216,8 @@ class HttpApiGenerator(object):
             self.domain["EndpointConfiguration"] = "REGIONAL"
         elif endpoint not in ["REGIONAL"]:
             raise InvalidResourceException(
-                self.logical_id, "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
+                self.logical_id,
+                "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
             )
         domain_config["EndpointType"] = endpoint
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
@@ -352,7 +353,8 @@ class HttpApiGenerator(object):
             alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
         else:
             raise InvalidResourceException(
-                self.logical_id, "Only REGIONAL endpoint is supported on HTTP APIs.",
+                self.logical_id,
+                "Only REGIONAL endpoint is supported on HTTP APIs.",
             )
         return alias_target
 

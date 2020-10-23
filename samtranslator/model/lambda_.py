@@ -99,8 +99,7 @@ class LambdaEventInvokeConfig(Resource):
 
 
 class LambdaLayerVersion(Resource):
-    """ Lambda layer version resource
-    """
+    """Lambda layer version resource"""
 
     resource_type = "AWS::Lambda::LayerVersion"
     property_types = {
