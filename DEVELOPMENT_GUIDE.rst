@@ -49,7 +49,7 @@ instruction <https://black.readthedocs.io/en/stable/editor_integration.html>`__,
    (samtranslator37) $ where black
    /Users/<username>/.pyenv/shims/black
 
-However, IDEs such PyCharm (using FileWatcher) will have a hard time
+However, IDEs such as PyCharm (using FileWatcher) will have a hard time
 invoking ``/Users/<username>/.pyenv/shims/black`` and this will happen:
 
 ::
