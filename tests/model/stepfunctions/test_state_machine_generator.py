@@ -22,6 +22,7 @@ class StepFunctionsStateMachine(TestCase):
             "definition_substitutions": None,
             "role": None,
             "state_machine_type": None,
+            "tracing": None,
             "events": None,
             "event_resources": None,
             "event_resolver": None,

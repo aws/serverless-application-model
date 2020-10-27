@@ -14,7 +14,7 @@ class Parser:
 
     # private methods
     def _validate(self, sam_template, parameter_values):
-        """ Validates the template and parameter values and raises exceptions if there's an issue
+        """Validates the template and parameter values and raises exceptions if there's an issue
 
         :param dict sam_template: SAM template
         :param dict parameter_values: Dictionary of parameter values provided by the user

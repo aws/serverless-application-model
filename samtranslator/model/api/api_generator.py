@@ -304,6 +304,37 @@ class ApiGenerator(object):
 
         domain.EndpointConfiguration = {"Types": [endpoint]}
 
+        mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
+        if mutual_tls_auth:
+            if isinstance(mutual_tls_auth, dict):
+                if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                    invalid_keys = list()
+                    for key in mutual_tls_auth.keys():
+                        if not key in {"TruststoreUri", "TruststoreVersion"}:
+                            invalid_keys.append(key)
+                    invalid_keys.sort()
+                    raise InvalidResourceException(
+                        ",".join(invalid_keys),
+                        "Available MutualTlsAuthentication fields are {}.".format(
+                            ["TruststoreUri", "TruststoreVersion"]
+                        ),
+                    )
+                domain.MutualTlsAuthentication = {}
+                if mutual_tls_auth.get("TruststoreUri", None):
+                    domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
+                if mutual_tls_auth.get("TruststoreVersion", None):
+                    domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
+            else:
+                raise InvalidResourceException(
+                    mutual_tls_auth,
+                    "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
+                        ["TruststoreUri", "TruststoreVersion"]
+                    ),
+                )
+
+        if self.domain.get("SecurityPolicy", None):
+            domain.SecurityPolicy = self.domain["SecurityPolicy"]
+
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
             basepaths = [self.domain.get("BasePath")]

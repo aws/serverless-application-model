@@ -150,6 +150,7 @@ class CloudWatchEvent(PushEventSource):
         "Pattern": PropertyType(False, is_type(dict)),
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
+        "Target": PropertyType(False, is_type(dict)),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -187,7 +188,8 @@ class CloudWatchEvent(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
+        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"
+        target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input
 

@@ -101,15 +101,14 @@ class LambdaEventInvokeConfig(Resource):
 
 
 class LambdaLayerVersion(Resource):
-    """ Lambda layer version resource
-    """
+    """Lambda layer version resource"""
 
     resource_type = "AWS::Lambda::LayerVersion"
     property_types = {
         "Content": PropertyType(True, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "LayerName": PropertyType(False, is_str()),
-        "CompatibleRuntimes": PropertyType(False, list_of(is_str())),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "LicenseInfo": PropertyType(False, is_str()),
     }
 
