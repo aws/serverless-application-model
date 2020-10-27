@@ -43,7 +43,7 @@ class EventSource(ResourceMacro):
         return logical_id
 
     def _construct_role(self, resource, prefix=None, suffix=""):
-        """Constructs the IAM Role resource allowing the event service to invoke 
+        """Constructs the IAM Role resource allowing the event service to invoke
         the StartExecution API of the state machine resource it is associated with.
 
         :param model.stepfunctions.StepFunctionsStateMachine resource: The state machine resource associated with the event
@@ -135,7 +135,7 @@ class CloudWatchEvent(EventSource):
     }
 
     def to_cloudformation(self, resource, **kwargs):
-        """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this 
+        """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
@@ -379,10 +379,10 @@ class Api(EventSource):
         api["DefinitionBody"] = editor.swagger
 
     def _generate_request_template(self, resource):
-        """Generates the Body mapping request template for the Api. This allows for the input 
+        """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 
-        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine 
+        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine
                 resource to which the Api event source must be associated
 
         :returns: a body mapping request which passes the Api input to the state machine execution

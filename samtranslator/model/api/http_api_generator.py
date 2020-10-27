@@ -436,6 +436,11 @@ class HttpApiGenerator(object):
                 authorization_scopes=authorizer.get("AuthorizationScopes"),
                 jwt_configuration=authorizer.get("JwtConfiguration"),
                 id_source=authorizer.get("IdentitySource"),
+                function_arn=authorizer.get("FunctionArn"),
+                function_invoke_role=authorizer.get("FunctionInvokeRole"),
+                identity=authorizer.get("Identity"),
+                authorizer_payload_format_version=authorizer.get("AuthorizerPayloadFormatVersion"),
+                enable_simple_responses=authorizer.get("EnableSimpleResponses"),
             )
         return authorizers
 
