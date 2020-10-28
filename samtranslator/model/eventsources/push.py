@@ -218,7 +218,7 @@ class S3(PushEventSource):
     def resources_to_link(self, resources):
         if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
             bucket_id = self.Bucket["Ref"]
-            if not isinstance(bucket_id, str):
+            if not isinstance(bucket_id, string_types):
                 raise InvalidEventException(self.relative_id, "'Ref' value in S3 events is not a valid string.")
             if bucket_id in resources:
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
@@ -659,7 +659,7 @@ class Api(PushEventSource):
                             ),
                         )
 
-                    if not isinstance(method_authorizer, str):
+                    if not isinstance(method_authorizer, string_types):
                         raise InvalidEventException(
                             self.relative_id,
                             "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
@@ -729,7 +729,7 @@ class Api(PushEventSource):
                             model=method_model, method=self.Method, path=self.Path
                         ),
                     )
-                if not isinstance(method_model, str):
+                if not isinstance(method_model, string_types):
                     raise InvalidEventException(
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
