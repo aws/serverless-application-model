@@ -85,3 +85,12 @@ Resources:
             Auth:
               Authorizer: MyCognitoAuthWithDefaultScopes
               AuthorizationScopes: []
+        CognitoAuthorizerNotString:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Path: /cognitoauthorizernotstring
+            Auth:
+              Authorizer:
+                - NotString
