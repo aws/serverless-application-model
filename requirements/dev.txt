@@ -1,17 +1,18 @@
-coverage>=4.4.0
-flake8>=3.3.0
-tox>=2.2.1
-pytest-cov>=2.4.0
+coverage>=5.3
+flake8>=3.8.4
+tox>=3.20.1
+pytest-cov>=2.10.1
 pylint>=1.7.2,<2.0
-pyyaml>=5.1
+pyyaml>=5.3.1
 
 # Test requirements
-pytest>=3.0.7
-mock>=2.0.0
-parameterized>=0.6.1
+pytest>=6.1.1; python_version >= '3.6'
+pytest~=4.6.11; python_version < '3.6' # pytest dropped python 2 support after 4.6.x
+mock>=3.0.5,<4.0.0  # 4.0.0 drops Python 2 support
+parameterized>=0.7.4
 
 # Requirements for examples
-requests>=2.20.0
+requests>=2.24.0
 
 # CLI requirements
 docopt>=0.6.2
