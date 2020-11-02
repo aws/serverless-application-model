@@ -852,6 +852,8 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
+        if not isinstance(resource_policy, dict):
+            raise InvalidDocumentException([InvalidTemplateException("Resource Policy is not a valid dictionary.")])
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
