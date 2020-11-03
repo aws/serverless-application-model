@@ -5,7 +5,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess",
+          "arn:aws-us-gov:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary",
@@ -107,7 +107,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess",
+          "arn:aws-us-gov:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary",
