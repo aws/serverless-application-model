@@ -169,6 +169,8 @@ CloudWatchEvent (superseded by EventBridgeRule, see below)
 Pattern                  All
 Input                    All
 InputPath                All
+DeadLetterConfig         All
+RetryPolicy              All
 ======================== ================================== ========================
 
 EventBridgeRule
@@ -179,6 +181,8 @@ EventBridgeRule
 Pattern                  All
 Input                    All
 InputPath                All
+DeadLetterConfig         All
+RetryPolicy              All
 ======================== ================================== ========================
 
 IotRule

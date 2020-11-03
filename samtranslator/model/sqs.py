@@ -34,3 +34,19 @@ class SQSQueuePolicies:
             ],
         }
         return document
+
+    @classmethod
+    def eventbridge_dlq_send_message_resource_based_policy(cls, rule_arn, queue_arn):
+        document = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "sqs:SendMessage",
+                    "Effect": "Allow",
+                    "Principal": {"Service": "events.amazonaws.com"},
+                    "Resource": queue_arn,
+                    "Condition": {"ArnEquals": {"aws:SourceArn": rule_arn}},
+                }
+            ],
+        }
+        return document
