@@ -836,10 +836,10 @@ class SwaggerEditor(object):
             model_properties = schema.get("properties")
 
             if not model_type:
-                raise ValueError("Invalid input. Value for type is required")
+                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'type'.")])
 
             if not model_properties:
-                raise ValueError("Invalid input. Value for properties is required")
+                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'properties'.")])
 
             self.definitions[model_name.lower()] = schema
 
@@ -852,6 +852,8 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
+        if not isinstance(resource_policy, dict):
+            raise InvalidDocumentException([InvalidTemplateException("Resource Policy is not a valid dictionary.")])
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
