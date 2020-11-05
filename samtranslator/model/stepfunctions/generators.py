@@ -61,6 +61,7 @@ class StateMachineGenerator(object):
         :param logging: Logging configuration for the State Machine
         :param name: Name of the State Machine resource
         :param policies: Policies attached to the execution role
+        :param permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
         :param definition_substitutions: Variable-to-value mappings to be replaced in the State Machine definition
         :param role: Role ARN to use for the execution role
         :param state_machine_type: Type of the State Machine

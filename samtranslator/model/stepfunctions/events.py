@@ -47,6 +47,7 @@ class EventSource(ResourceMacro):
         the StartExecution API of the state machine resource it is associated with.
 
         :param model.stepfunctions.StepFunctionsStateMachine resource: The state machine resource associated with the event
+        :param string permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
         :param string prefix: Prefix to use for the logical ID of the IAM role
         :param string suffix: Suffix to add for the logical ID of the IAM role
 
