@@ -70,6 +70,8 @@ class LambdaEventSourceMapping(Resource):
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "StartingPosition": PropertyType(False, is_str()),
         "Topics": PropertyType(False, is_type(list)),
+        "Queues": PropertyType(False, is_type(list)),
+        "SourceAccessConfigurations": PropertyType(False, is_type(list)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
@@ -99,8 +101,7 @@ class LambdaEventInvokeConfig(Resource):
 
 
 class LambdaLayerVersion(Resource):
-    """ Lambda layer version resource
-    """
+    """Lambda layer version resource"""
 
     resource_type = "AWS::Lambda::LayerVersion"
     property_types = {

@@ -157,6 +157,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "cloudwatchlog",
                 "streams",
                 "sqs",
+                "amq",
                 "simpletable",
                 "simpletable_with_sse",
                 "implicit_api",
@@ -604,6 +605,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_invalid_request_parameters",
         "error_invalid_logical_id",
         "error_layer_invalid_properties",
+        "error_missing_broker",
         "error_missing_queue",
         "error_missing_startingposition",
         "error_missing_stream",
@@ -653,6 +655,10 @@ class TestTranslatorEndToEnd(TestCase):
         "error_api_with_usage_plan_invalid_parameter",
         "error_http_api_with_cors_def_uri",
         "error_http_api_invalid_lambda_auth",
+        "error_api_mtls_configuration_invalid_field",
+        "error_api_mtls_configuration_invalid_type",
+        "error_httpapi_mtls_configuration_invalid_field",
+        "error_httpapi_mtls_configuration_invalid_type",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

@@ -32,9 +32,14 @@
         "DomainNameConfigurations": [
           {
             "CertificateArn": "arn:aws:acm:us-east-1:123455353535:certificate/6c911401-620d-4d41-b89e-366c238bb2f3", 
-            "EndpointType": "REGIONAL"
+            "EndpointType": "REGIONAL",
+            "SecurityPolicy": "TLS_1_2"
           }
-        ], 
+        ],
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "my-api-v2-truststore-uri",
+          "TruststoreVersion": "my-api-v2-truststore-version"
+        },
         "Tags": {
           "httpapi:createdBy": "SAM"
         }
@@ -170,6 +175,7 @@
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
       "Properties": {
+        "DisableExecuteApiEndpoint": true,
         "Body": {
           "info": {
             "version": "1.0", 
