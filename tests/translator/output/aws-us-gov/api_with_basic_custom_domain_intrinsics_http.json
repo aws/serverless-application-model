@@ -15,6 +15,14 @@
     "EndpointConf": {
       "Default": "REGIONAL", 
       "Type": "String"
+    },
+    "MyMTLSUriHTTP": {
+      "Default": "another-api-v2-truststore-uri",
+      "Type": "String"
+    },
+    "MyMTLSVersionHTTP": {
+      "Default": "another-api-v2-truststore-version",
+      "Type": "String"
     }
   }, 
   "Resources": {
@@ -177,9 +185,14 @@
         "DomainNameConfigurations": [
           {
             "CertificateArn": "another-api-arn", 
-            "EndpointType": "REGIONAL"
+            "EndpointType": "REGIONAL",
+            "SecurityPolicy": "TLS_1_2"
           }
-        ], 
+        ],
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "another-api-v2-truststore-uri",
+          "TruststoreVersion": "another-api-v2-truststore-version"
+        },
         "Tags": {
           "httpapi:createdBy": "SAM"
         }
