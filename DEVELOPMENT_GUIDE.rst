@@ -28,16 +28,44 @@ Setup Python locally using `pyenv`_
 
 2. Install Additional Tooling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1. Black
-~~~~~~~~
+Black
+'''''
 We format our code using `Black`_ and verify the source code is black compliant
-in Appveyor during PRs. You can find installation instructions on `Black's docs`_.
+in Appveyor during PRs. Black will be installed automatically with ``make init``.
 
-After installing, you can check your formatting through our Makefile by running `make black-check`. To automatically update your code to match our formatting, please run `make black`. You can also integrate Black directly in your favorite IDE (instructions
-can be found `here`_)
+After installing, you can run our formatting through our Makefile by
+``make black`` or integrating Black directly in your favorite IDE
+(instructions can be found `here <https://black.readthedocs.io/en/stable/editor_integration.html>`__)
+
+(workaround) Integrating Black directly in your favorite IDE
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Since black is installed in virtualenv, when you follow `this
+instruction <https://black.readthedocs.io/en/stable/editor_integration.html>`__,
+``which black`` might give you this
+
+::
+
+   (samtranslator37) $ where black
+   /Users/<username>/.pyenv/shims/black
+
+However, IDEs such as PyCharm (using FileWatcher) will have a hard time
+invoking ``/Users/<username>/.pyenv/shims/black`` and this will happen:
+
+::
+
+   pyenv: black: command not found
+
+   The `black' command exists in these Python versions:
+     3.7.2/envs/samtranslator37
+     samtranslator37
+
+A simple workaround is to use
+``/Users/<username>/.pyenv/versions/samtranslator37/bin/black`` instead of
+``/Users/<username>/.pyenv/shims/black``.
 
 Pre-commit
-~~~~~~~~~~
+''''''''''
 If you don't wish to manually run black on each pr or install black manually, we have integrated black into git hooks through `pre-commit`_.
 After installing pre-commit, run `pre-commit install` in the root of the project. This will install black for you and run the black formatting on
 commit.

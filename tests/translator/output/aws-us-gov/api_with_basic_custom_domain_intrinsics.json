@@ -15,6 +15,14 @@
     "EndpointConf": {
       "Default": "REGIONAL", 
       "Type": "String"
+    },
+    "MyMTLSUri": {
+      "Default": "another-api-truststore-uri",
+      "Type": "String"
+    },
+    "MyMTLSVersion": {
+      "Default": "another-api-truststore-version",
+      "Type": "String"
     }
   }, 
   "Resources": {
@@ -150,13 +158,13 @@
       }, 
       "Condition": "C1"
     }, 
-    "MyApiDeploymentc2e138c194": {
+    "MyApiDeployment32e59613e2": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: c2e138c1943ffe20492a6a242e7537c4cd3c35f9"
+        "Description": "RestApi deployment id: 32e59613e2e02a1f1d264849167ea359f10342f0"
       }, 
       "Condition": "C1"
     }, 
@@ -225,7 +233,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentc2e138c194"
+          "Ref": "MyApiDeployment32e59613e2"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -241,7 +249,12 @@
           "Types": [
             "REGIONAL"
           ]
-        }, 
+        },
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "another-api-truststore-uri",
+          "TruststoreVersion": "another-api-truststore-version"
+        },
+        "SecurityPolicy": "TLS_1_2",
         "RegionalCertificateArn": "another-api-arn", 
         "DomainName": {
           "Fn::Sub": "example-us-gov-west-1.com"

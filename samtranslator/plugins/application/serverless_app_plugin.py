@@ -294,9 +294,11 @@ class ServerlessAppPlugin(BasePlugin):
 
                 # Check each resource to make sure it's active
                 for application_id, template_id in temp:
-                    get_cfn_template = lambda application_id, template_id: self._sar_client.get_cloud_formation_template(
-                        ApplicationId=self._sanitize_sar_str_param(application_id),
-                        TemplateId=self._sanitize_sar_str_param(template_id),
+                    get_cfn_template = (
+                        lambda application_id, template_id: self._sar_client.get_cloud_formation_template(
+                            ApplicationId=self._sanitize_sar_str_param(application_id),
+                            TemplateId=self._sanitize_sar_str_param(template_id),
+                        )
                     )
                     response = self._sar_service_call(get_cfn_template, application_id, application_id, template_id)
                     self._handle_get_cfn_template_response(response, application_id, template_id)

@@ -14,6 +14,7 @@ class ApiGatewayV2HttpApi(Resource):
         "BodyS3Location": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
         "BasePath": PropertyType(False, is_str()),
         "CorsConfiguration": PropertyType(False, is_type(dict)),
     }
@@ -44,6 +45,7 @@ class ApiGatewayV2DomainName(Resource):
     property_types = {
         "DomainName": PropertyType(True, is_str()),
         "DomainNameConfigurations": PropertyType(False, list_of(is_type(dict))),
+        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
         "Tags": PropertyType(False, is_type(dict)),
     }
 

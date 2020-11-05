@@ -10,7 +10,7 @@ from samtranslator.model.iam import IAMRolePolicies
 class PullEventSource(ResourceMacro):
     """Base class for pull event sources for SAM Functions.
 
-    The pull events are Kinesis Streams, DynamoDB Streams, Kafka Streams and SQS Queues. All of these correspond to an
+    The pull events are Kinesis Streams, DynamoDB Streams, Kafka Topics, ActiveMQ Queues and SQS Queues. All of these correspond to an
     EventSourceMapping in Lambda, and require that the execution role be given to Kinesis Streams, DynamoDB
     Streams, or SQS Queues, respectively.
 
@@ -31,6 +31,9 @@ class PullEventSource(ResourceMacro):
         "DestinationConfig": PropertyType(False, is_type(dict)),
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "Topics": PropertyType(False, is_type(list)),
+        "Broker": PropertyType(False, is_str()),
+        "Queues": PropertyType(False, is_type(list)),
+        "SourceAccessConfigurations": PropertyType(False, is_type(list)),
     }
 
     def get_policy_arn(self):
@@ -60,16 +63,17 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if not self.Stream and not self.Queue:
+        if not self.Stream and not self.Queue and not self.Broker:
             raise InvalidEventException(
-                self.relative_id, "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) provided."
+                self.relative_id,
+                "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for ActiveMQ) provided.",
             )
 
         if self.Stream and not self.StartingPosition:
             raise InvalidEventException(self.relative_id, "StartingPosition is required for Kinesis, DynamoDB and MSK.")
 
         lambda_eventsourcemapping.FunctionName = function_name_or_arn
-        lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue
+        lambda_eventsourcemapping.EventSourceArn = self.Stream or self.Queue or self.Broker
         lambda_eventsourcemapping.StartingPosition = self.StartingPosition
         lambda_eventsourcemapping.BatchSize = self.BatchSize
         lambda_eventsourcemapping.Enabled = self.Enabled
@@ -79,6 +83,8 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.MaximumRecordAgeInSeconds = self.MaximumRecordAgeInSeconds
         lambda_eventsourcemapping.ParallelizationFactor = self.ParallelizationFactor
         lambda_eventsourcemapping.Topics = self.Topics
+        lambda_eventsourcemapping.Queues = self.Queues
+        lambda_eventsourcemapping.SourceAccessConfigurations = self.SourceAccessConfigurations
 
         destination_config_policy = None
         if self.DestinationConfig:
@@ -170,3 +176,12 @@ class MSK(PullEventSource):
 
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
+
+
+class MQ(PullEventSource):
+    """MQ event source."""
+
+    resource_type = "MQ"
+
+    def get_policy_arn(self):
+        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaAMQExecutionRole")

@@ -47,13 +47,16 @@ class TestApiGatewayV2Authorizer(TestCase):
                 authorization_scopes="invalid_scope",
             )
         self.assertEqual(
-            e.value.message, "Resource with id [logicalId] is invalid. " + "AuthorizationScopes must be a list.",
+            e.value.message,
+            "Resource with id [logicalId] is invalid. " + "AuthorizationScopes must be a list.",
         )
 
     def test_create_authorizer_fails_with_authorization_scopes_non_oauth2(self):
         with pytest.raises(InvalidResourceException) as e:
             ApiGatewayV2Authorizer(
-                api_logical_id="logicalId", name="authName", authorization_scopes=["scope1", "scope2"],
+                api_logical_id="logicalId",
+                name="authName",
+                authorization_scopes=["scope1", "scope2"],
             )
         self.assertEqual(
             e.value.message,
@@ -67,7 +70,9 @@ class TestApiGatewayV2Authorizer(TestCase):
     def test_create_authorizer_fails_with_jtw_configuration_non_oauth2(self):
         with pytest.raises(InvalidResourceException) as e:
             ApiGatewayV2Authorizer(
-                api_logical_id="logicalId", name="authName", jwt_configuration={"config": "value"},
+                api_logical_id="logicalId",
+                name="authName",
+                jwt_configuration={"config": "value"},
             )
         self.assertEqual(
             e.value.message,
@@ -78,7 +83,9 @@ class TestApiGatewayV2Authorizer(TestCase):
     def test_create_authorizer_fails_with_id_source_non_oauth2(self):
         with pytest.raises(InvalidResourceException) as e:
             ApiGatewayV2Authorizer(
-                api_logical_id="logicalId", name="authName", id_source="https://example.com",
+                api_logical_id="logicalId",
+                name="authName",
+                id_source="https://example.com",
             )
         self.assertEqual(
             e.value.message,
@@ -180,7 +187,8 @@ class TestApiGatewayV2Authorizer(TestCase):
     def test_create_lambda_auth_no_function_arn(self):
         with pytest.raises(InvalidResourceException) as e:
             ApiGatewayV2Authorizer(
-                api_logical_id="logicalId", name="lambdaAuth",
+                api_logical_id="logicalId",
+                name="lambdaAuth",
             )
         self.assertEqual(
             e.value.message,
@@ -190,7 +198,9 @@ class TestApiGatewayV2Authorizer(TestCase):
     def test_create_lambda_auth_no_authorizer_payload_format_version(self):
         with pytest.raises(InvalidResourceException) as e:
             ApiGatewayV2Authorizer(
-                api_logical_id="logicalId", name="lambdaAuth", function_arn="lambdaArn",
+                api_logical_id="logicalId",
+                name="lambdaAuth",
+                function_arn="lambdaArn",
             )
         self.assertEqual(
             e.value.message,

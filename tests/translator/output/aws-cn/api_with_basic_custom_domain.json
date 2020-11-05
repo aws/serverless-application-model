@@ -57,7 +57,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment062deb3f92"
+          "Ref": "MyApiDeployment92d6d51a5e"
         }, 
         "RestApiId": {
           "Ref": "MyApi"
@@ -284,7 +284,7 @@
           "Types": [
             "REGIONAL"
           ]
-        }, 
+        },
         "RegionalCertificateArn": "another-api-arn", 
         "DomainName": "another-example.com"
       }
@@ -297,7 +297,12 @@
           "Types": [
             "EDGE"
           ]
-        }, 
+        },
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "my-api-truststore-uri",
+          "TruststoreVersion": "my-api-truststore-version"
+        },
+        "SecurityPolicy": "TLS_1_2",
         "DomainName": "api-example.com"
       }
     }, 
@@ -313,13 +318,13 @@
         "StageName": "Prod"
       }
     }, 
-    "MyApiDeployment062deb3f92": {
+    "MyApiDeployment92d6d51a5e": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: 062deb3f92aa9993cabcc1ae62b31c0411a7c2ce"
+        "Description": "RestApi deployment id: 92d6d51a5e324a2836c79d3645d7e678f063037e"
       }
     }, 
     "ServerlessRestApiBasePathMapping": {
