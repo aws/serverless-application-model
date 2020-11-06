@@ -570,6 +570,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_state_machine_with_undefined_api_authorizer",
         "error_state_machine_with_invalid_default_authorizer",
         "error_cognito_userpool_duplicate_trigger",
+        "error_cognito_userpool_not_string",
         "error_api_duplicate_methods_same_path",
         "error_api_gateway_responses_nonnumeric_status_code",
         "error_api_gateway_responses_unknown_responseparameter",
