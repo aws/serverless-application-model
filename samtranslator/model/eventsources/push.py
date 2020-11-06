@@ -889,6 +889,11 @@ class Cognito(PushEventSource):
     def resources_to_link(self, resources):
         if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
             userpool_id = self.UserPool["Ref"]
+            if not isinstance(userpool_id, string_types):
+                raise InvalidEventException(
+                    self.logical_id,
+                    "Ref in Userpool is not a string.",
+                )
             if userpool_id in resources:
                 return {"userpool": resources[userpool_id], "userpool_id": userpool_id}
         raise InvalidEventException(
