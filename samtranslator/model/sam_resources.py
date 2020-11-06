@@ -443,7 +443,14 @@ class SamFunction(SamResourceMacro):
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXrayWriteOnlyAccess"))
+            # use previous (old) policy name for regular regions
+            # for china and gov regions, use the newer policy name
+            partition_name = ArnGenerator.get_partition_name()
+            if partition_name == "aws":
+                managed_policy_name = "AWSXrayWriteOnlyAccess"
+            else:
+                managed_policy_name = "AWSXRayDaemonWriteAccess"
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:
             managed_policy_arns.append(
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
