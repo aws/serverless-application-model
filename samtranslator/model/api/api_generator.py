@@ -85,6 +85,7 @@ class ApiGenerator(object):
         open_api_version=None,
         models=None,
         domain=None,
+        description=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -104,6 +105,7 @@ class ApiGenerator(object):
         :param resource_attributes: Resource attributes to add to API resources
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
         :param models: Model definitions to be used by API methods
+        :param description: Description of the API Gateway resource
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
@@ -131,6 +133,7 @@ class ApiGenerator(object):
         self.remove_extra_stage = open_api_version
         self.models = models
         self.domain = domain
+        self.description = description
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -180,6 +183,9 @@ class ApiGenerator(object):
 
         if self.name:
             rest_api.Name = self.name
+
+        if self.description:
+            rest_api.Description = self.description
 
         return rest_api
 

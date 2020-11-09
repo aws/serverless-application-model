@@ -48,6 +48,7 @@ class HttpApiGenerator(object):
         passthrough_resource_attributes=None,
         domain=None,
         fail_on_warnings=False,
+        description=None,
         disable_execute_api_endpoint=False,
     ):
         """Constructs an API Generator class that generates API Gateway resources
@@ -63,6 +64,7 @@ class HttpApiGenerator(object):
         :param access_log_settings: Whether to send access logs and where for Stage
         :param resource_attributes: Resource attributes to add to API resources
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
+        :param description: Description of the API Gateway resource
         """
         self.logical_id = logical_id
         self.stage_variables = stage_variables
@@ -82,6 +84,7 @@ class HttpApiGenerator(object):
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.domain = domain
         self.fail_on_warnings = fail_on_warnings
+        self.description = description
         self.disable_execute_api_endpoint = disable_execute_api_endpoint
 
     def _construct_http_api(self):
@@ -120,6 +123,9 @@ class HttpApiGenerator(object):
                 "'AWS::Serverless::HttpApi'. Add a value for one of these properties or "
                 "add a 'HttpApi' event to an 'AWS::Serverless::Function'.",
             )
+
+        if self.description:
+            http_api.Description = self.description
 
         return http_api
 
