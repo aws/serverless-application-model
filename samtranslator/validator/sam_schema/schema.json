@@ -55,6 +55,9 @@
                 }
               ]
             },
+            "Description": {
+              "type": "string"
+            },
             "Name": {
               "type": "string"
             },
