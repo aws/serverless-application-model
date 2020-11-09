@@ -20,6 +20,7 @@ class OpenApiEditor(object):
     _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
     _X_APIGW_TAG_VALUE = "x-amazon-apigateway-tag-value"
     _X_APIGW_CORS = "x-amazon-apigateway-cors"
+    _X_APIGW_ENDPOINT_CONFIG = "x-amazon-apigateway-endpoint-configuration"
     _CONDITIONAL_IF = "Fn::If"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -426,6 +427,23 @@ class OpenApiEditor(object):
             else:
                 tag = {"name": name, self._X_APIGW_TAG_VALUE: value}
                 self.tags.append(tag)
+
+    def add_endpoint_config(self, disable_execute_api_endpoint):
+        """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG header in open api definition
+
+        Following this guide:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableexecuteapiendpoint
+
+        :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
+
+        """
+        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
+        endpoint_configuration = self._doc.get(self._X_APIGW_ENDPOINT_CONFIG, dict())
+
+        endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
+
+        self._doc[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
 
     def add_cors(
         self,

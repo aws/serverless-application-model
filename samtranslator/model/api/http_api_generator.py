@@ -48,7 +48,7 @@ class HttpApiGenerator(object):
         passthrough_resource_attributes=None,
         domain=None,
         fail_on_warnings=False,
-        disable_execute_api_endpoint=False,
+        disable_execute_api_endpoint=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -106,8 +106,8 @@ class HttpApiGenerator(object):
         if self.fail_on_warnings:
             http_api.FailOnWarnings = self.fail_on_warnings
 
-        if self.disable_execute_api_endpoint:
-            http_api.DisableExecuteApiEndpoint = self.disable_execute_api_endpoint
+        if self.disable_execute_api_endpoint is not None:
+            self._add_endpoint_configuration()
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
@@ -122,6 +122,23 @@ class HttpApiGenerator(object):
             )
 
         return http_api
+
+    def _add_endpoint_configuration(self):
+        """Add disableExecuteApiEndpoint if it is set in SAM
+        HttpApi doesn't have vpcEndpointIds
+
+        """
+        if isinstance(self.disable_execute_api_endpoint, bool) and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "Cors works only with inline OpenApi specified in 'DefinitionBody' property."
+            )
+        editor = OpenApiEditor(self.definition_body)
+        # if CORS is set in both definition_body and as a CorsConfiguration property,
+        # SAM merges and overrides the cors headers in definition_body with headers of CorsConfiguration
+        editor.add_endpoint_config(self.disable_execute_api_endpoint)
+
+        # Assign the OpenApi back to template
+        self.definition_body = editor.openapi
 
     def _add_cors(self):
         """
