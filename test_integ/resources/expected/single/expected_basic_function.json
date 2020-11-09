@@ -1,0 +1,4 @@
+{
+  "MyLambdaFunction": "AWS::Lambda::Function",
+  "MyLambdaFunctionRole": "AWS::IAM::Role"
+}
