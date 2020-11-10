@@ -1,0 +1,36 @@
+Parameters:
+  Bucket:
+    Type: String
+  CodeKey:
+    Type: String
+  SwaggerKey:
+    Type: String
+  TracingParamPassThrough:
+    Type: String
+    Default: PassThrough
+
+Resources:
+    ActiveTracingFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: nodejs12.x
+            CodeUri: ${codeuri}
+            MemorySize: 128
+            Policies:
+                - AWSLambdaRole
+                - AmazonS3ReadOnlyAccess
+            Tracing: Active
+
+    PassThroughTracingFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: nodejs12.x
+            CodeUri: ${codeuri}
+            MemorySize: 128
+            Policies:
+                - AWSLambdaRole
+                - AmazonS3ReadOnlyAccess
+            Tracing:
+              Ref: TracingParamPassThrough

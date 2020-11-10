@@ -1,0 +1,12 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: ${definitionuri}
+      CacheClusterEnabled: true
+      CacheClusterSize: '1.6'
+      Variables:
+        a: foo
+        b: bar
+
