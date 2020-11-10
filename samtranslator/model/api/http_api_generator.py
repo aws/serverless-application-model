@@ -133,18 +133,23 @@ class HttpApiGenerator(object):
         """Add disableExecuteApiEndpoint if it is set in SAM
         HttpApi doesn't have vpcEndpointIds
 
+        Note:
+        DisableExecuteApiEndpoint as a property of AWS::ApiGatewayV2::Api needs both DefinitionBody and
+        DefinitionUri to be None. However, if neither DefinitionUri nor DefinitionBody are specified,
+        SAM will generate a openapi definition body based on template configuration.
+        https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
+        For this reason, we always put DisableExecuteApiEndpoint into openapi object.
+
         """
-        # DisableExecuteApiEndpoint as a property of AWS::ApiGatewayV2::Api needs both DefinitionBody and
-        # DefinitionUri to be None. However, if neither DefinitionUri nor DefinitionBody are specified,
-        # SAM will generate a DefinitionBody based on template configuration.
-        # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
-        # For this reason, we put DisableExecuteApiEndpoint into openapi object.
         if self.disable_execute_api_endpoint and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
         editor = OpenApiEditor(self.definition_body)
 
+        # if DisableExecuteApiEndpoint is set in both definition_body and as a property,
+        # SAM merges and overrides the disableExecuteApiEndpoint in definition_body with headers of
+        # "x-amazon-apigateway-endpoint-configuration"
         editor.add_endpoint_config(self.disable_execute_api_endpoint)
 
         # Assign the OpenApi back to template
