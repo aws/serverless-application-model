@@ -49,7 +49,7 @@ class HttpApiGenerator(object):
         domain=None,
         fail_on_warnings=False,
         description=None,
-        disable_execute_api_endpoint=False,
+        disable_execute_api_endpoint=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -134,6 +134,15 @@ class HttpApiGenerator(object):
         HttpApi doesn't have vpcEndpointIds
 
         """
+        # DisableExecuteApiEndpoint as a property of AWS::ApiGatewayV2::Api needs both DefinitionBody and
+        # DefinitionUri to be None. However, if neither DefinitionUri nor DefinitionBody are specified,
+        # SAM will generate a DefinitionBody based on template configuration.
+        # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
+        # For this reason, we put DisableExecuteApiEndpoint into openapi object.
+        if self.disable_execute_api_endpoint and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
+            )
         editor = OpenApiEditor(self.definition_body)
 
         editor.add_endpoint_config(self.disable_execute_api_endpoint)
