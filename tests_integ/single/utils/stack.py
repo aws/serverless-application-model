@@ -9,7 +9,7 @@ def verify_stack_resources(expected_file_path, stack_resources):
     if len(expected_resources) != len(parsed_resources):
         return False
 
-    for i, in enumerate(expected_resources):
+    for i in range(len(expected_resources)):
         exp = expected_resources[i]
         parsed = parsed_resources[i]
         if parsed["ResourceStatus"] != "CREATE_COMPLETE":
