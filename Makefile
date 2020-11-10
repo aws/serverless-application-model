@@ -8,6 +8,9 @@ init:
 test:
 	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 tests
 
+test-integ:
+	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 tests_integ
+
 black:
 	black setup.py samtranslator/* tests/* bin/*
 
@@ -27,6 +30,7 @@ Usage: $ make [TARGETS]
 TARGETS
 	init        Initialize and install the requirements and dev-requirements for this project.
 	test        Run the Unit tests.
+	test-integ  Run the Integration tests.
 	dev         Run all development tests after a change.
 	pr          Perform all checks before submitting a Pull Request.
 
