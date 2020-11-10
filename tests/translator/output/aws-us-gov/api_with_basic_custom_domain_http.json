@@ -218,9 +218,13 @@
               "x-amazon-apigateway-tag-value": "SAM"
             }
           ],
-          "x-amazon-apigateway-endpoint-configuration": {
-            "disableExecuteApiEndpoint": true
-          }
+          "servers": [
+            {
+              "x-amazon-apigateway-endpoint-configuration": {
+                "disableExecuteApiEndpoint": true
+              }
+            }
+          ]
         }
       }
     }

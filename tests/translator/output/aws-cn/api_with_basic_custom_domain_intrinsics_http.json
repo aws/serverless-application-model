@@ -23,10 +23,6 @@
     "MyMTLSVersionHTTP": {
       "Default": "another-api-v2-truststore-version",
       "Type": "String"
-    },
-    "MyDisableExecuteApiEndpoint": {
-      "Default": false,
-      "Type": "Bool"
     }
   }, 
   "Resources": {
@@ -311,11 +307,13 @@
               "x-amazon-apigateway-tag-value": "SAM"
             }
           ],
-          "x-amazon-apigateway-endpoint-configuration": {
-            "disableExecuteApiEndpoint": {
-              "Ref": "MyDisableExecuteApiEndpoint"
+          "servers": [
+            {
+              "x-amazon-apigateway-endpoint-configuration": {
+                "disableExecuteApiEndpoint": false
+              }
             }
-          }
+          ]
         }
       }, 
       "Condition": "C1"

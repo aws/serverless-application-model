@@ -20,10 +20,6 @@ Parameters:
     Default: another-api-v2-truststore-version
     Type: String
 
-  MyDisableExecuteApiEndpoint:
-    Default: false
-    Type: Bool
-
 Resources:
   MyFunction:
     Condition: C1
@@ -57,7 +53,7 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
-      DisableExecuteApiEndpoint: !Ref MyDisableExecuteApiEndpoint
+      DisableExecuteApiEndpoint: False
       Domain:
         DomainName: !Sub 'example-${AWS::Region}.com'
         CertificateArn: !Ref MyDomainCert

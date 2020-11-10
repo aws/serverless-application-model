@@ -128,13 +128,8 @@ class HttpApiGenerator(object):
         HttpApi doesn't have vpcEndpointIds
 
         """
-        if isinstance(self.disable_execute_api_endpoint, bool) and not self.definition_body:
-            raise InvalidResourceException(
-                self.logical_id, "Cors works only with inline OpenApi specified in 'DefinitionBody' property."
-            )
         editor = OpenApiEditor(self.definition_body)
-        # if CORS is set in both definition_body and as a CorsConfiguration property,
-        # SAM merges and overrides the cors headers in definition_body with headers of CorsConfiguration
+
         editor.add_endpoint_config(self.disable_execute_api_endpoint)
 
         # Assign the OpenApi back to template
