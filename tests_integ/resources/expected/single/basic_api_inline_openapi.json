@@ -1,0 +1,5 @@
+[
+    { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi"},
+    { "LogicalResourceId":"MyApiDeployment[0-9a-e]{10}", "ResourceType":"AWS::ApiGateway::Deployment" },
+    { "LogicalResourceId":"MyApiMyNewStageNameStage", "ResourceType":"AWS::ApiGateway::Stage" }
+]
