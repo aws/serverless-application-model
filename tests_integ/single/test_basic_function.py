@@ -1,88 +1,41 @@
-import json
-import logging
 import os
-import sys
-from functools import reduce
+from pathlib import Path
 from unittest.case import TestCase
 
 import boto3
+import pytest
+from parameterized import parameterized
 from samcli.lib.deploy.deployer import Deployer
-from samtranslator.model.exceptions import InvalidDocumentException
-from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
-from samtranslator.translator.transform import transform
-from samtranslator.yaml_helper import yaml_parse
+from tests_integ.helpers.helpers import transform_template, verify_stack_resources
 
-LOG = logging.getLogger(__name__)
-iam_client = boto3.client("iam")
-my_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, my_path + "/..")
-
-STACK_NAME = "foss-integ-test"
-INPUT_TEMPLATE = "basic_function.yaml"
-TRANSLATED_CFN_TEMPLATE = "cfn_basic_function.yaml"
-EXPECTED_JSON_FILE = "expected_basic_function.json"
-
-
-# can we import this from sam-translate.py?
-def transform_template(input_file_path, output_file_path):
-    with open(input_file_path, "r") as f:
-        sam_template = yaml_parse(f)
-
-    try:
-        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))
-        cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=2)
-
-        with open(output_file_path, "w") as f:
-            f.write(cloud_formation_template_prettified)
-
-        print("Wrote transformed CloudFormation template to: " + output_file_path)
-    except InvalidDocumentException as e:
-        errorMessage = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
-        LOG.error(errorMessage)
-        errors = map(lambda cause: cause.message, e.causes)
-        LOG.error(errors)
-
-
-def verify_stack_resources(expected_file_path, stack_resources):
-    with open(expected_file_path, 'r') as expected_data:
-        expected_resources = json.load(expected_data)
-        parsed_resources = _parse_stack_resources(stack_resources)
-    return expected_resources == parsed_resources
-
-
-def _parse_stack_resources(stack_resources):
-    logic_id_to_resource_type = {}
-    for resource in stack_resources['StackResourceSummaries']:
-        logic_id_to_resource_type[resource['LogicalResourceId']] = resource['ResourceType']
-    return logic_id_to_resource_type
+STACK_NAME_PREFIX = "sam-integ-test-"
 
 
 class TestBasicFunction(TestCase):
     # set up before every tests run:
-    # upload test code to s3
-    # replace the template's codeuri with s3 location
+    def setUp(self):
+        tests_integ_dir = Path(__file__).resolve().parents[1]
+        self.template_dir = Path(tests_integ_dir, 'resources', 'templates', 'single')
+        self.output_dir = tests_integ_dir
+        self.expected_dir = Path(tests_integ_dir, 'resources', 'expected', 'single')
 
-    # move client set up to here and create template folder to store translated cfn template, or upload template to s3?
-    # def setUp(self):
-    #     pass
+        self.cloudformation_client = boto3.client("cloudformation")
+        self.deployer = Deployer(self.cloudformation_client, changeset_prefix="sam-integ-")
 
-    def test_basic_function(self):
-        # make stack
-        # transform sam template to cfn template
-        cwd = os.getcwd()
-        input_file_path = os.path.join(cwd, 'resources', 'templates', 'single', INPUT_TEMPLATE)
-        output_file_path = os.path.join(cwd, TRANSLATED_CFN_TEMPLATE)
-        expected_resource_path = os.path.join(cwd, EXPECTED_JSON_FILE)
-        transform_template(input_file_path, output_file_path)
+    @parameterized.expand([("basic_function.yaml", "cfn_basic_function.yaml", "basic_function.json")])
+    @pytest.mark.flaky(reruns=1) # why we need this one?
+    def test_basic_function(self, input_file_name, out_put_file_name, expected_name):
+        input_file_path = str(Path(self.template_dir, input_file_name))
+        self.output_file_path = str(Path(self.output_dir, out_put_file_name))
+        expected_resource_path = str(Path(self.expected_dir, expected_name))
+        self.stack_name = STACK_NAME_PREFIX + input_file_name.split('.')[0].replace('_', '-')
 
-        # cfn part
-        cloudformation_client = boto3.client("cloudformation")
-        deployer = Deployer(cloudformation_client, changeset_prefix="foss-integ")
+        transform_template(input_file_path, self.output_file_path)
 
         # deploy to cfn
-        with open(output_file_path, 'r') as cfn_file:
-            result, changeset_type = deployer.create_and_wait_for_changeset(
-                stack_name=STACK_NAME,
+        with open(self.output_file_path, 'r') as cfn_file:
+            result, changeset_type = self.deployer.create_and_wait_for_changeset(
+                stack_name=self.stack_name,
                 cfn_template=cfn_file.read(),
                 parameter_values=[],
                 capabilities=['CAPABILITY_IAM'],
@@ -91,12 +44,12 @@ class TestBasicFunction(TestCase):
                 s3_uploader=None,
                 tags=[],
             )
-            deployer.execute_changeset(result["Id"], STACK_NAME)
-            deployer.wait_for_execute(STACK_NAME, changeset_type)
+            self.deployer.execute_changeset(result["Id"], self.stack_name)
+            self.deployer.wait_for_execute(self.stack_name, changeset_type)
 
             # verify
-            stacks_description = cloudformation_client.describe_stacks(StackName=STACK_NAME)
-            stack_resources = cloudformation_client.list_stack_resources(StackName=STACK_NAME)
+            stacks_description = self.cloudformation_client.describe_stacks(StackName=self.stack_name)
+            stack_resources = self.cloudformation_client.list_stack_resources(StackName=self.stack_name)
             # verify if the stack is create successfully or not
             self.assertEqual(stacks_description['Stacks'][0]['StackStatus'], 'CREATE_COMPLETE')
             # verify if the stack contain the expected resources
@@ -104,5 +57,6 @@ class TestBasicFunction(TestCase):
 
     # clean up
     # delete stack and delete translated cfn template
-    # def tearDown(self):
-    #     pass
+    def tearDown(self):
+        self.cloudformation_client.delete_stack(StackName=self.stack_name)
+        os.remove(self.output_file_path)
