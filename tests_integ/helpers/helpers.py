@@ -45,15 +45,10 @@ def verify_stack_resources(expected_file_path, stack_resources):
         exp = expected_resources[i]
         parsed = parsed_resources[i]
         if parsed["ResourceStatus"] != "CREATE_COMPLETE":
-            print("---------not complete")
             return False
         if not re.fullmatch(exp["LogicalResourceId"]+"([0-9a-f]{10})?", parsed["LogicalResourceId"]):
-            print("---------id not match")
-            print(exp["LogicalResourceId"])
-            print(parsed["LogicalResourceId"])
             return False
         if exp["ResourceType"] != parsed["ResourceType"]:
-            print("---------resource not match")
             return False
     return True
 
