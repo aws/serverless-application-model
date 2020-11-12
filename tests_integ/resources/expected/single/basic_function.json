@@ -1,4 +1,4 @@
-{
-  "MyLambdaFunction": "AWS::Lambda::Function",
-  "MyLambdaFunctionRole": "AWS::IAM::Role"
-}
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function"},
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" }
+]
