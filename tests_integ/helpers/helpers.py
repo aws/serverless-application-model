@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from functools import reduce
 
 import boto3
@@ -31,16 +32,24 @@ def transform_template(input_file_path, output_file_path):
         errors = map(lambda cause: cause.message, e.causes)
         LOG.error(errors)
 
-
 def verify_stack_resources(expected_file_path, stack_resources):
     with open(expected_file_path, 'r') as expected_data:
-        expected_resources = json.load(expected_data)
-        parsed_resources = _parse_stack_resources(stack_resources)
-    return expected_resources == parsed_resources
+        expected_resources = _sort_resources(json.load(expected_data))
+    parsed_resources = _sort_resources(stack_resources['StackResourceSummaries'])
 
+    if len(expected_resources) != len(parsed_resources):
+        return False
 
-def _parse_stack_resources(stack_resources):
-    logic_id_to_resource_type = {}
-    for resource in stack_resources['StackResourceSummaries']:
-        logic_id_to_resource_type[resource['LogicalResourceId']] = resource['ResourceType']
-    return logic_id_to_resource_type
+    for i in range(len(expected_resources)):
+        exp = expected_resources[i]
+        parsed = parsed_resources[i]
+        if parsed["ResourceStatus"] != "CREATE_COMPLETE":
+            return False
+        if re.fullmatch(exp["LogicalResourceId"], parsed["LogicalResourceId"]) is None:
+            return False
+        if exp["ResourceType"] != parsed["ResourceType"]:
+            return False
+    return True
+
+def _sort_resources(resources):
+    return sorted(resources, key=lambda d: d["LogicalResourceId"])

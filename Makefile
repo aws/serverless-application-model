@@ -6,10 +6,10 @@ init:
 	pip install -e '.[dev]'
 
 test:
-	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 tests
+	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 tests/*
 
 test-integ:
-	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 tests_integ
+	pytest --no-cov tests_integ/*
 
 black:
 	black setup.py samtranslator/* tests/* bin/*.py
