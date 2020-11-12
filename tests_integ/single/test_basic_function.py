@@ -22,11 +22,12 @@ class TestBasicFunction(TestCase):
         self.cloudformation_client = boto3.client("cloudformation")
         self.deployer = Deployer(self.cloudformation_client, changeset_prefix="sam-integ-")
 
-    @parameterized.expand([("basic_function.yaml", "cfn_basic_function.yaml", "basic_function.json")])
-    @pytest.mark.flaky(reruns=1) # why we need this one?
-    def test_basic_function(self, input_file_name, out_put_file_name, expected_name):
+    @parameterized.expand([("basic_function.yaml", "basic_function.json"),
+                           ("basic_function_event_destinations.yaml", "basic_function_event_destinations.json")
+                           ])
+    def test_basic_function(self, input_file_name, expected_name):
         input_file_path = str(Path(self.template_dir, input_file_name))
-        self.output_file_path = str(Path(self.output_dir, out_put_file_name))
+        self.output_file_path = str(Path(self.output_dir, 'cfn_' + input_file_name))
         expected_resource_path = str(Path(self.expected_dir, expected_name))
         self.stack_name = STACK_NAME_PREFIX + input_file_name.split('.')[0].replace('_', '-')
 
@@ -59,4 +60,5 @@ class TestBasicFunction(TestCase):
     # delete stack and delete translated cfn template
     def tearDown(self):
         self.cloudformation_client.delete_stack(StackName=self.stack_name)
-        os.remove(self.output_file_path)
+        if os.path.exists(self.output_file_path):
+            os.remove(self.output_file_path)
