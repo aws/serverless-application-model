@@ -175,7 +175,6 @@
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
       "Properties": {
-        "DisableExecuteApiEndpoint": true,
         "Body": {
           "info": {
             "version": "1.0", 
@@ -217,6 +216,13 @@
             {
               "name": "httpapi:createdBy", 
               "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ],
+          "servers": [
+            {
+              "x-amazon-apigateway-endpoint-configuration": {
+                "disableExecuteApiEndpoint": true
+              }
             }
           ]
         }
