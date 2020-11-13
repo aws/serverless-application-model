@@ -336,6 +336,14 @@ class OpenApiEditor(object):
             if normalized_method_name != "options":
                 normalized_method_name = self._normalize_method_name(method_name)
                 # It is possible that the method could have two definitions in a Fn::If block.
+                if normalized_method_name not in self.get_path(path):
+                    raise InvalidDocumentException(
+                        [
+                            InvalidTemplateException(
+                                "Could not find {} in {} within DefinitionBody.".format(normalized_method_name, path)
+                            )
+                        ]
+                    )
                 for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                     if not self.method_definition_has_integration(method_definition):

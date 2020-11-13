@@ -665,6 +665,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_httpapi_mtls_configuration_invalid_field",
         "error_httpapi_mtls_configuration_invalid_type",
         "error_resource_policy_not_dict",
+        "error_implicit_http_api_auth_any_method",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
