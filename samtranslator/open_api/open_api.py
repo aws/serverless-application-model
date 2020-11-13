@@ -338,7 +338,7 @@ class OpenApiEditor(object):
                     raise InvalidDocumentException(
                         [
                             InvalidTemplateException(
-                                f"Could not find {normalized_method_name} in {path} within DefinitionBody."
+                                "Could not find {} in {} within DefinitionBody.".format(normalized_method_name, path)
                             )
                         ]
                     )
