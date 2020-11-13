@@ -48,7 +48,7 @@ class BaseTest(TestCase):
             data = f.read()
         for key, value in BaseTest.code_key_to_url.items():
             data = data.replace(f"${{{key}}}", value)
-        yaml_doc = yaml.load(data)
+        yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
         with open(self.sub_input_file_path, 'w') as f:
             yaml.dump(yaml_doc, f)
