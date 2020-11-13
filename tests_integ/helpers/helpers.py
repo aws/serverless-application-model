@@ -44,14 +44,11 @@ def verify_stack_resources(expected_file_path, stack_resources):
     for i in range(len(expected_resources)):
         exp = expected_resources[i]
         parsed = parsed_resources[i]
-        if parsed["ResourceStatus"] != "CREATE_COMPLETE":
-            return False
-        if not re.fullmatch(exp["LogicalResourceId"]+"([0-9a-f]{10})?", parsed["LogicalResourceId"]):
+        if not re.fullmatch(exp["LogicalResourceId"] + "([0-9a-f]{10})?", parsed["LogicalResourceId"]):
             return False
         if exp["ResourceType"] != parsed["ResourceType"]:
             return False
     return True
-
 
 def _sort_resources(resources):
     return sorted(resources, key=lambda d: d["LogicalResourceId"])
