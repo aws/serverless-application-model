@@ -50,5 +50,6 @@ def verify_stack_resources(expected_file_path, stack_resources):
             return False
     return True
 
+
 def _sort_resources(resources):
     return sorted(resources, key=lambda d: d["LogicalResourceId"])
