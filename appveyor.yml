@@ -11,7 +11,9 @@ environment:
 build: off
 
 install:
-- make init
+- export PATH=/home/appveyor/.local/bin:$PATH
+- python -m pip install --upgrade pip awscli boto3 setuptools
+- pip install -e '.[dev]' --use-feature=2020-resolver
 
 test_script:
 - tox
