@@ -4,10 +4,7 @@ Resources:
         Properties:
             Handler: index.handler
             Runtime: nodejs12.x
-            InlineCode: |
-                exports.handler = function(event) {
-                console.log("Hello World");
-                }
+            CodeUri: ${codeuri}
             MemorySize: 128
             Policies:
                 - AWSLambdaRole
