@@ -528,6 +528,77 @@
       },
       "Condition": "MyCondition"
     },
+    "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {}
+    },
+    "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionEventSourceMapping": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "BatchSize": 10,
+        "Enabled": true,
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue",
+            "Arn"
+          ]
+        }
+      },
+      "Condition": "MyCondition"
+    },
+    "MyAwesomeFunctionAnotherSNSWithSQSSubscription": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue",
+            "Arn"
+          ]
+        },
+        "Protocol": "sqs",
+        "TopicArn": {
+          "Ref": "Notifications"
+        }
+      },
+      "Condition": "MyCondition"
+    },
+    "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueuePolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue",
+                  "Arn"
+                ]
+              },
+              "Effect": "Allow",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "Notifications"
+                  }
+                }
+              },
+              "Principal": "*"
+            }
+          ]
+        }
+      },
+      "Condition": "MyCondition"
+    },
     "Queue": {
       "Type": "AWS::SQS::Queue",
       "Condition": "MyCondition"
