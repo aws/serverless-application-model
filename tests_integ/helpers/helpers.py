@@ -1,6 +1,8 @@
 import json
 import logging
 import re
+import random
+import string # not deprecated, a bug from pylint https://www.logilab.org/ticket/2481
 from functools import reduce
 
 import boto3
@@ -11,6 +13,7 @@ from samtranslator.translator.managed_policy_translator import ManagedPolicyLoad
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 
+RANDOM_SUFFIX_LENGTH = 12
 
 def transform_template(input_file_path, output_file_path):
     LOG = logging.getLogger(__name__)
@@ -51,6 +54,9 @@ def verify_stack_resources(expected_file_path, stack_resources):
             return False
     return True
 
+def generate_suffix():
+    # Very basic random letters generator
+    return ''.join(random.choice(string.ascii_lowercase) for i in range(RANDOM_SUFFIX_LENGTH))
 
 def _sort_resources(resources):
     return sorted(resources, key=lambda d: d["LogicalResourceId"])
@@ -60,6 +66,7 @@ def create_bucket(bucket_name, region=None):
     """Create an S3 bucket in a specified region
 
     copy code from boto3 doc example
+    MG: removed the try so that the exception bubbles up and interrupts the test
 
     If a region is not specified, the bucket is created in the S3 default
     region (us-east-1).
@@ -70,16 +77,10 @@ def create_bucket(bucket_name, region=None):
     """
 
     # Create bucket
-    try:
-        if region is None:
-            s3_client = boto3.client('s3')
-            s3_client.create_bucket(Bucket=bucket_name)
-        else:
-            s3_client = boto3.client('s3', region_name=region)
-            location = {'LocationConstraint': region}
-            s3_client.create_bucket(Bucket=bucket_name,
-                                    CreateBucketConfiguration=location)
-    except ClientError as e:
-        logging.error(e)
-        return False
-    return True
+    if region is None:
+        s3_client = boto3.client('s3')
+        s3_client.create_bucket(Bucket=bucket_name)
+    else:
+        s3_client = boto3.client('s3', region_name=region)
+        location = {'LocationConstraint': region}
+        s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
