@@ -6,10 +6,10 @@ import boto3
 import pytest
 import yaml
 from samcli.lib.deploy.deployer import Deployer
-from tests_integ.helpers.helpers import transform_template, verify_stack_resources
+from tests_integ.helpers.helpers import transform_template, verify_stack_resources, create_bucket
 
 STACK_NAME_PREFIX = "sam-integ-test-"
-S3_BUCKET = "sam-integ-bucket-test245b" # need to add suffix to allow multiple test
+S3_BUCKET = "sam-integ-bucket-test245b3x" # need to add random suffix to allow run multiple test set in the sam account
 CODE_KEY_TO_FILE_MAP = {'codeuri': 'code.zip', 'contenturi': 'layer1.zip', 'definitionuri': "swagger1.json"}
 
 
@@ -23,14 +23,18 @@ class BaseTest(TestCase):
         BaseTest.expected_dir = Path(BaseTest.tests_integ_dir, 'resources', 'expected', 'single')
         code_dir = Path(BaseTest.tests_integ_dir, 'resources', 'code')
 
-        BaseTest.s3_client = boto3.client("s3")
-        BaseTest.s3_client.create_bucket(Bucket=S3_BUCKET)
+        session = boto3.session.Session()
+        my_region = session.region_name
+        create_bucket(S3_BUCKET, region=my_region)
+
+        s3_client = boto3.client("s3")
         BaseTest.code_key_to_url = {}
-        for key, value in CODE_KEY_TO_FILE_MAP.items():
-            code_path = Path(code_dir, value)
+
+        for key, file_name in CODE_KEY_TO_FILE_MAP.items():
+            code_path = Path(code_dir, file_name)
             code_file = code_path.open(mode='rb')
-            BaseTest.s3_client.put_object(Bucket=S3_BUCKET, Body=code_file, Key=value)
-            code_url = f"s3://{S3_BUCKET}/{value}"
+            s3_client.put_object(Bucket=S3_BUCKET, Body=code_file, Key=file_name)
+            code_url = f"s3://{S3_BUCKET}/{file_name}"
             BaseTest.code_key_to_url[key] = code_url
 
     def setUp(self):
@@ -46,8 +50,8 @@ class BaseTest(TestCase):
         self.sub_input_file_path = str(Path(BaseTest.output_dir, 'sub_' + file_name + ".yaml"))
         with open(input_file_path, 'r') as f:
             data = f.read()
-        for key, value in BaseTest.code_key_to_url.items():
-            data = data.replace(f"${{{key}}}", value)
+        for key, s3_url in BaseTest.code_key_to_url.items():
+            data = data.replace(f"${{{key}}}", s3_url)
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
         with open(self.sub_input_file_path, 'w') as f:
@@ -87,7 +91,8 @@ class BaseTest(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        response = BaseTest.s3_client.list_objects(Bucket=S3_BUCKET)
+        s3_client = boto3.client("s3")
+        response = s3_client.list_objects(Bucket=S3_BUCKET)
         for content in response['Contents']:
-            BaseTest.s3_client.delete_object(Key=content['Key'], Bucket=S3_BUCKET)
-        BaseTest.s3_client.delete_bucket(Bucket=S3_BUCKET)
+            s3_client.delete_object(Key=content['Key'], Bucket=S3_BUCKET)
+        s3_client.delete_bucket(Bucket=S3_BUCKET)
