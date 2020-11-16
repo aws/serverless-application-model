@@ -12,10 +12,10 @@ test-integ:
 	pytest --no-cov tests_integ/*
 
 black:
-	black setup.py samtranslator/* tests/* bin/*.py
+	black setup.py samtranslator/* tests/* tests_integ/* bin/*.py
 
 black-check:
-	black --check setup.py samtranslator/* tests/* bin/*.py
+	black --check setup.py samtranslator/* tests/* tests_integ/* bin/*.py
 
 # Command to run everytime you make changes to verify everything works
 dev: test
