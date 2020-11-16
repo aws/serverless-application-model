@@ -2,7 +2,7 @@ import json
 import logging
 import re
 import random
-import string # not deprecated, a bug from pylint https://www.logilab.org/ticket/2481
+import string  # not deprecated, a bug from pylint https://www.logilab.org/ticket/2481
 from functools import reduce
 
 import boto3
@@ -14,6 +14,7 @@ from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 
 RANDOM_SUFFIX_LENGTH = 12
+
 
 def transform_template(input_file_path, output_file_path):
     LOG = logging.getLogger(__name__)
@@ -38,9 +39,9 @@ def transform_template(input_file_path, output_file_path):
 
 
 def verify_stack_resources(expected_file_path, stack_resources):
-    with open(expected_file_path, 'r') as expected_data:
+    with open(expected_file_path, "r") as expected_data:
         expected_resources = _sort_resources(json.load(expected_data))
-    parsed_resources = _sort_resources(stack_resources['StackResourceSummaries'])
+    parsed_resources = _sort_resources(stack_resources["StackResourceSummaries"])
 
     if len(expected_resources) != len(parsed_resources):
         return False
@@ -54,9 +55,11 @@ def verify_stack_resources(expected_file_path, stack_resources):
             return False
     return True
 
+
 def generate_suffix():
     # Very basic random letters generator
-    return ''.join(random.choice(string.ascii_lowercase) for i in range(RANDOM_SUFFIX_LENGTH))
+    return "".join(random.choice(string.ascii_lowercase) for i in range(RANDOM_SUFFIX_LENGTH))
+
 
 def _sort_resources(resources):
     return sorted(resources, key=lambda d: d["LogicalResourceId"])
@@ -78,9 +81,9 @@ def create_bucket(bucket_name, region=None):
 
     # Create bucket
     if region is None:
-        s3_client = boto3.client('s3')
+        s3_client = boto3.client("s3")
         s3_client.create_bucket(Bucket=bucket_name)
     else:
-        s3_client = boto3.client('s3', region_name=region)
-        location = {'LocationConstraint': region}
+        s3_client = boto3.client("s3", region_name=region)
+        location = {"LocationConstraint": region}
         s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
