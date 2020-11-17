@@ -667,6 +667,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_resource_policy_not_dict",
         "error_implicit_http_api_auth_any_method",
         "error_invalid_method_definition",
+        "error_mappings_is_null",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -686,7 +687,7 @@ def test_transform_invalid_document(testcase):
         transform(manifest, parameter_values, mock_policy_loader)
 
     error_message = get_exception_error_message(e)
-
+    print(error_message)
     assert error_message == expected.get("errorMessage")
 
 
