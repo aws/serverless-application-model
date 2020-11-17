@@ -534,6 +534,14 @@ class SwaggerEditor(object):
                 for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                    if not isinstance(method_definition, dict):
+                        raise InvalidDocumentException(
+                            [
+                                InvalidTemplateException(
+                                    "{} for path {} is not a valid dictionary.".format(method_definition, path)
+                                )
+                            ]
+                        )
                     if not self.method_definition_has_integration(method_definition):
                         continue
                     existing_security = method_definition.get("security", [])
