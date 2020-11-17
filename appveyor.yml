@@ -11,6 +11,7 @@ environment:
 build: off
 
 install:
+- python --version
 - make init
 
 test_script:
