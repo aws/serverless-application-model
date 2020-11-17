@@ -15,7 +15,7 @@ environment:
 build: off
 
 install:
-- sh: "source ${HOME}/venv${PYTHON_VERSION}/bin/activate"
+- sh: "source ${HOME}/venv/${PYTHON_VERSION}/bin/activate"
 - sh: "python --version"
 - make init
 
