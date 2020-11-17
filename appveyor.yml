@@ -4,14 +4,29 @@ image: Ubuntu
 environment:
   matrix:
   - TOXENV: py27
+    PYTHON_HOME: "C:\\Python27-x64"
+    PYTHON_VERSION: '2.7.14'
+    PYTHON_ARCH: '64'
   - TOXENV: py36
+    PYTHON_HOME: "C:\\Python36-x64"
+    PYTHON_VERSION: '3.6.10'
+    PYTHON_ARCH: '64'
   - TOXENV: py37
+    PYTHON_HOME: "C:\\Python37-x64"
+    PYTHON_VERSION: '2.7.7'
+    PYTHON_ARCH: '64'
   - TOXENV: py38
+    PYTHON_HOME: "C:\\Python38-x64"
+    PYTHON_VERSION: '2.8.2'
+    PYTHON_ARCH: '64'
 
 build: off
 
 install:
-- python --version
+- "SET PATH=%PYTHON_HOME%;%PATH%"
+- "echo %PYTHON_HOME%"
+- "echo %PATH%"
+- "python --version"
 - make init
 
 test_script:
