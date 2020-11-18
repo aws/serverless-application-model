@@ -85,6 +85,7 @@ class ApiGenerator(object):
         open_api_version=None,
         models=None,
         domain=None,
+        description=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -104,6 +105,7 @@ class ApiGenerator(object):
         :param resource_attributes: Resource attributes to add to API resources
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
         :param models: Model definitions to be used by API methods
+        :param description: Description of the API Gateway resource
         """
         self.logical_id = logical_id
         self.cache_cluster_enabled = cache_cluster_enabled
@@ -131,6 +133,7 @@ class ApiGenerator(object):
         self.remove_extra_stage = open_api_version
         self.models = models
         self.domain = domain
+        self.description = description
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -180,6 +183,9 @@ class ApiGenerator(object):
 
         if self.name:
             rest_api.Name = self.name
+
+        if self.description:
+            rest_api.Description = self.description
 
         return rest_api
 
@@ -303,6 +309,37 @@ class ApiGenerator(object):
             domain.CertificateArn = self.domain.get("CertificateArn")
 
         domain.EndpointConfiguration = {"Types": [endpoint]}
+
+        mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
+        if mutual_tls_auth:
+            if isinstance(mutual_tls_auth, dict):
+                if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                    invalid_keys = list()
+                    for key in mutual_tls_auth.keys():
+                        if not key in {"TruststoreUri", "TruststoreVersion"}:
+                            invalid_keys.append(key)
+                    invalid_keys.sort()
+                    raise InvalidResourceException(
+                        ",".join(invalid_keys),
+                        "Available MutualTlsAuthentication fields are {}.".format(
+                            ["TruststoreUri", "TruststoreVersion"]
+                        ),
+                    )
+                domain.MutualTlsAuthentication = {}
+                if mutual_tls_auth.get("TruststoreUri", None):
+                    domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
+                if mutual_tls_auth.get("TruststoreVersion", None):
+                    domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
+            else:
+                raise InvalidResourceException(
+                    mutual_tls_auth,
+                    "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
+                        ["TruststoreUri", "TruststoreVersion"]
+                    ),
+                )
+
+        if self.domain.get("SecurityPolicy", None):
+            domain.SecurityPolicy = self.domain["SecurityPolicy"]
 
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
@@ -898,6 +935,12 @@ class ApiGenerator(object):
     ):
         if not default_authorizer:
             return
+
+        if not isinstance(default_authorizer, string_types):
+            raise InvalidResourceException(
+                self.logical_id,
+                "DefaultAuthorizer is not a string.",
+            )
 
         if not authorizers.get(default_authorizer) and default_authorizer != "AWS_IAM":
             raise InvalidResourceException(

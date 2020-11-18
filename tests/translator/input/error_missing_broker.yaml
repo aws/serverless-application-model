@@ -1,0 +1,16 @@
+Resources:
+  MQFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/queues.zip
+      Handler: queue.mq_handler
+      Runtime: python2.7
+      Events:
+        MyMQQueue:
+          Type: MQ
+          Properties:
+            Queues:
+              - "Queue1"
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c

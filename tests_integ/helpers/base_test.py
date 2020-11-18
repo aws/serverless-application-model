@@ -19,28 +19,46 @@ CODE_KEY_TO_FILE_MAP = {"codeuri": "code.zip", "contenturi": "layer1.zip", "defi
 class BaseTest(TestCase):
     @classmethod
     def setUpClass(cls):
-        BaseTest.tests_integ_dir = Path(__file__).resolve().parents[1]
-        BaseTest.resources_dir = Path(BaseTest.tests_integ_dir, "resources")
-        BaseTest.template_dir = Path(BaseTest.resources_dir, "templates", "single") # need to replace the single with variable to be extenable
-        BaseTest.output_dir = BaseTest.tests_integ_dir
-        BaseTest.expected_dir = Path(BaseTest.resources_dir, "expected", "single")
-        code_dir = Path(BaseTest.resources_dir, "code")
+        cls.tests_integ_dir = Path(__file__).resolve().parents[1]
+        cls.resources_dir = Path(cls.tests_integ_dir, "resources")
+        cls.template_dir = Path(cls.resources_dir, "templates", "single")
+        cls.output_dir = cls.tests_integ_dir
+        cls.expected_dir = Path(cls.resources_dir, "expected", "single")
+        code_dir = Path(cls.resources_dir, "code")
 
-        BaseTest.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
-        BaseTest.code_key_to_url = _upload_resources(code_dir, BaseTest.s3_bucket_name, CODE_KEY_TO_FILE_MAP)
+        cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
+        session = boto3.session.Session()
+        my_region = session.region_name
+        create_bucket(cls.s3_bucket_name, region=my_region)
+
+        cls.s3_client = boto3.client("s3")
+        cls.code_key_to_url = {}
+
+        for key, file_name in CODE_KEY_TO_FILE_MAP.items():
+            code_path = str(Path(code_dir, file_name))
+            cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
+            code_url = f"s3://{cls.s3_bucket_name}/{file_name}"
+            cls.code_key_to_url[key] = code_url
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        _clean_bucket(BaseTest.s3_bucket_name)
+    def tearDownClass(cls):
+        cls._clean_bucket()
+
+    @classmethod
+    def _clean_bucket(cls):
+        response = cls.s3_client.list_objects_v2(Bucket=cls.s3_bucket_name)
+        for content in response["Contents"]:
+            cls.s3_client.delete_object(Key=content["Key"], Bucket=cls.s3_bucket_name)
+        cls.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
 
     def setUp(self):
         self.cloudformation_client = boto3.client("cloudformation")
         self.deployer = Deployer(self.cloudformation_client, changeset_prefix="sam-integ-")
 
     def create_and_verify_stack(self, file_name):
-        input_file_path = str(Path(BaseTest.template_dir, file_name + ".yaml"))
-        self.output_file_path = str(Path(BaseTest.output_dir, "cfn_" + file_name + ".yaml"))
-        expected_resource_path = str(Path(BaseTest.expected_dir, file_name + ".json"))
+        input_file_path = str(Path(self.template_dir, file_name + ".yaml"))
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
+        expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
         self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + generate_suffix()
 
         self.sub_input_file_path = self._update_template(input_file_path, file_name)
@@ -56,10 +74,10 @@ class BaseTest(TestCase):
             os.remove(self.sub_input_file_path)
 
     def _update_template(self, input_file_path, file_name):
-        updated_template_path = str(Path(BaseTest.output_dir, "sub_" + file_name + ".yaml"))
+        updated_template_path = str(Path(self.output_dir, "sub_" + file_name + ".yaml"))
         with open(input_file_path, "r") as f:
             data = f.read()
-        for key, s3_url in BaseTest.code_key_to_url.items():
+        for key, s3_url in self.code_key_to_url.items():
             data = data.replace(f"${{{key}}}", s3_url)
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 

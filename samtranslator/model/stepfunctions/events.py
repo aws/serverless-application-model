@@ -42,11 +42,12 @@ class EventSource(ResourceMacro):
             logical_id = generator.gen()
         return logical_id
 
-    def _construct_role(self, resource, prefix=None, suffix=""):
-        """Constructs the IAM Role resource allowing the event service to invoke 
+    def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):
+        """Constructs the IAM Role resource allowing the event service to invoke
         the StartExecution API of the state machine resource it is associated with.
 
         :param model.stepfunctions.StepFunctionsStateMachine resource: The state machine resource associated with the event
+        :param string permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
         :param string prefix: Prefix to use for the logical ID of the IAM role
         :param string suffix: Suffix to add for the logical ID of the IAM role
 
@@ -62,6 +63,9 @@ class EventSource(ResourceMacro):
         event_role.Policies = [
             IAMRolePolicies.step_functions_start_execution_role_policy(state_machine_arn, role_logical_id)
         ]
+
+        if permissions_boundary:
+            event_role.PermissionsBoundary = permissions_boundary
 
         return event_role
 
@@ -88,6 +92,8 @@ class Schedule(EventSource):
         """
         resources = []
 
+        permissions_boundary = kwargs.get("permissions_boundary")
+
         events_rule = EventsRule(self.logical_id)
         resources.append(events_rule)
 
@@ -99,7 +105,7 @@ class Schedule(EventSource):
         if CONDITION in resource.resource_attributes:
             events_rule.set_resource_attribute(CONDITION, resource.resource_attributes[CONDITION])
 
-        role = self._construct_role(resource)
+        role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
         events_rule.Targets = [self._construct_target(resource, role)]
 
@@ -135,7 +141,7 @@ class CloudWatchEvent(EventSource):
     }
 
     def to_cloudformation(self, resource, **kwargs):
-        """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this 
+        """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
@@ -143,6 +149,8 @@ class CloudWatchEvent(EventSource):
         :rtype: list
         """
         resources = []
+
+        permissions_boundary = kwargs.get("permissions_boundary")
 
         events_rule = EventsRule(self.logical_id)
         events_rule.EventBusName = self.EventBusName
@@ -152,7 +160,7 @@ class CloudWatchEvent(EventSource):
 
         resources.append(events_rule)
 
-        role = self._construct_role(resource)
+        role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
         events_rule.Targets = [self._construct_target(resource, role)]
 
@@ -243,9 +251,9 @@ class Api(EventSource):
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
     def to_cloudformation(self, resource, **kwargs):
-        """If the Api event source has a RestApi property, then simply return the IAM role resource 
-        allowing API Gateway to start the state machine execution. If no RestApi is provided, then 
-        additionally inject the path, method, and the x-amazon-apigateway-integration into the 
+        """If the Api event source has a RestApi property, then simply return the IAM role resource
+        allowing API Gateway to start the state machine execution. If no RestApi is provided, then
+        additionally inject the path, method, and the x-amazon-apigateway-integration into the
         Swagger body for a provided implicit API.
 
         :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine \
@@ -259,12 +267,13 @@ class Api(EventSource):
         resources = []
 
         intrinsics_resolver = kwargs.get("intrinsics_resolver")
+        permissions_boundary = kwargs.get("permissions_boundary")
 
         if self.Method is not None:
             # Convert to lower case so that user can specify either GET or get
             self.Method = self.Method.lower()
 
-        role = self._construct_role(resource)
+        role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
 
         explicit_api = kwargs["explicit_api"]
@@ -379,10 +388,10 @@ class Api(EventSource):
         api["DefinitionBody"] = editor.swagger
 
     def _generate_request_template(self, resource):
-        """Generates the Body mapping request template for the Api. This allows for the input 
+        """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 
-        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine 
+        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine
                 resource to which the Api event source must be associated
 
         :returns: a body mapping request which passes the Api input to the state machine execution

@@ -1,0 +1,96 @@
+{
+  "Resources": {
+    "Function": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.handler", 
+        "Code": {
+          "S3Bucket": "bucket", 
+          "S3Key": "key"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python3.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "FunctionApiPermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "Function"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": "HttpApi"
+            }
+          ]
+        }
+      }
+    },
+    "FunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "HttpApiApiGatewayDefaultStage": {
+      "Type": "AWS::ApiGatewayV2::Stage", 
+      "Properties": {
+        "AutoDeploy": true, 
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "StageName": "$default"
+      }
+    }, 
+    "HttpApi": {
+      "Type": "AWS::ApiGatewayV2::Api", 
+      "Properties": {
+        "BodyS3Location": {
+          "Bucket": "bucket",
+          "Key": "key"
+        },
+        "Description": "my description"
+      }
+    }
+  }
+}

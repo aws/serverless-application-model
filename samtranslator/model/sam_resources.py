@@ -49,8 +49,7 @@ from samtranslator.model.role_utils import construct_role_for_resource
 
 
 class SamFunction(SamResourceMacro):
-    """SAM function macro.
-    """
+    """SAM function macro."""
 
     resource_type = "AWS::Serverless::Function"
     property_types = {
@@ -66,7 +65,7 @@ class SamFunction(SamResourceMacro):
         "VpcConfig": PropertyType(False, is_type(dict)),
         "Role": PropertyType(False, is_str()),
         "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
-        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
         "PermissionsBoundary": PropertyType(False, is_str()),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
@@ -444,7 +443,14 @@ class SamFunction(SamResourceMacro):
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXrayWriteOnlyAccess"))
+            # use previous (old) policy name for regular regions
+            # for china and gov regions, use the newer policy name
+            partition_name = ArnGenerator.get_partition_name()
+            if partition_name == "aws":
+                managed_policy_name = "AWSXrayWriteOnlyAccess"
+            else:
+                managed_policy_name = "AWSXRayDaemonWriteAccess"
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:
             managed_policy_arns.append(
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
@@ -697,8 +703,7 @@ class SamFunction(SamResourceMacro):
 
 
 class SamApi(SamResourceMacro):
-    """SAM rest API macro.
-    """
+    """SAM rest API macro."""
 
     resource_type = "AWS::Serverless::Api"
     property_types = {
@@ -729,6 +734,7 @@ class SamApi(SamResourceMacro):
         "OpenApiVersion": PropertyType(False, is_str()),
         "Models": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -782,6 +788,7 @@ class SamApi(SamResourceMacro):
             open_api_version=self.OpenApiVersion,
             models=self.Models,
             domain=self.Domain,
+            description=self.Description,
         )
 
         (
@@ -810,8 +817,7 @@ class SamApi(SamResourceMacro):
 
 
 class SamHttpApi(SamResourceMacro):
-    """SAM rest API macro.
-    """
+    """SAM rest API macro."""
 
     resource_type = "AWS::Serverless::HttpApi"
     property_types = {
@@ -833,6 +839,8 @@ class SamHttpApi(SamResourceMacro):
         "RouteSettings": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "Description": PropertyType(False, is_str()),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
     referable_properties = {
@@ -872,9 +880,17 @@ class SamHttpApi(SamResourceMacro):
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
             fail_on_warnings=self.FailOnWarnings,
+            description=self.Description,
+            disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
         )
 
-        (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()
+        (
+            http_api,
+            stage,
+            domain,
+            basepath_mapping,
+            route53,
+        ) = api_generator.to_cloudformation()
 
         resources.append(http_api)
         if domain:
@@ -892,8 +908,7 @@ class SamHttpApi(SamResourceMacro):
 
 
 class SamSimpleTable(SamResourceMacro):
-    """SAM simple table macro.
-    """
+    """SAM simple table macro."""
 
     resource_type = "AWS::Serverless::SimpleTable"
     property_types = {
@@ -952,8 +967,7 @@ class SamSimpleTable(SamResourceMacro):
 
 
 class SamApplication(SamResourceMacro):
-    """SAM application macro.
-    """
+    """SAM application macro."""
 
     APPLICATION_ID_KEY = "ApplicationId"
     SEMANTIC_VERSION_KEY = "SemanticVersion"
@@ -971,14 +985,12 @@ class SamApplication(SamResourceMacro):
     }
 
     def to_cloudformation(self, **kwargs):
-        """Returns the stack with the proper parameters for this application
-        """
+        """Returns the stack with the proper parameters for this application"""
         nested_stack = self._construct_nested_stack()
         return [nested_stack]
 
     def _construct_nested_stack(self):
-        """Constructs a AWS::CloudFormation::Stack resource
-        """
+        """Constructs a AWS::CloudFormation::Stack resource"""
         nested_stack = NestedStack(
             self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()
         )
@@ -992,8 +1004,7 @@ class SamApplication(SamResourceMacro):
         return nested_stack
 
     def _get_application_tags(self):
-        """Adds tags to the stack if this resource is using the serverless app repo
-        """
+        """Adds tags to the stack if this resource is using the serverless app repo"""
         application_tags = {}
         if isinstance(self.Location, dict):
             if self.APPLICATION_ID_KEY in self.Location.keys() and self.Location[self.APPLICATION_ID_KEY] is not None:
@@ -1007,15 +1018,14 @@ class SamApplication(SamResourceMacro):
 
 
 class SamLayerVersion(SamResourceMacro):
-    """ SAM Layer macro
-    """
+    """SAM Layer macro"""
 
     resource_type = "AWS::Serverless::LayerVersion"
     property_types = {
         "LayerName": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Description": PropertyType(False, is_str()),
         "ContentUri": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "CompatibleRuntimes": PropertyType(False, list_of(is_str())),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "LicenseInfo": PropertyType(False, is_str()),
         "RetentionPolicy": PropertyType(False, is_str()),
     }
@@ -1106,8 +1116,7 @@ class SamLayerVersion(SamResourceMacro):
 
 
 class SamStateMachine(SamResourceMacro):
-    """SAM state machine macro.
-    """
+    """SAM state machine macro."""
 
     resource_type = "AWS::Serverless::StateMachine"
     property_types = {
@@ -1121,8 +1130,12 @@ class SamStateMachine(SamResourceMacro):
         "Type": PropertyType(False, is_str()),
         "Tags": PropertyType(False, is_type(dict)),
         "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "Tracing": PropertyType(False, is_type(dict)),
+        "PermissionsBoundary": PropertyType(False, is_str()),
     }
-    event_resolver = ResourceTypeResolver(samtranslator.model.stepfunctions.events,)
+    event_resolver = ResourceTypeResolver(
+        samtranslator.model.stepfunctions.events,
+    )
 
     def to_cloudformation(self, **kwargs):
         managed_policy_map = kwargs.get("managed_policy_map", {})
@@ -1139,9 +1152,11 @@ class SamStateMachine(SamResourceMacro):
             logging=self.Logging,
             name=self.Name,
             policies=self.Policies,
+            permissions_boundary=self.PermissionsBoundary,
             definition_substitutions=self.DefinitionSubstitutions,
             role=self.Role,
             state_machine_type=self.Type,
+            tracing=self.Tracing,
             events=self.Events,
             event_resources=event_resources,
             event_resolver=self.event_resolver,

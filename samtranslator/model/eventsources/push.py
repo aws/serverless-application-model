@@ -150,6 +150,7 @@ class CloudWatchEvent(PushEventSource):
         "Pattern": PropertyType(False, is_type(dict)),
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
+        "Target": PropertyType(False, is_type(dict)),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -187,7 +188,8 @@ class CloudWatchEvent(PushEventSource):
         :returns: the Target property
         :rtype: dict
         """
-        target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
+        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"
+        target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input
 
@@ -216,6 +218,8 @@ class S3(PushEventSource):
     def resources_to_link(self, resources):
         if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
             bucket_id = self.Bucket["Ref"]
+            if not isinstance(bucket_id, string_types):
+                raise InvalidEventException(self.relative_id, "'Ref' value in S3 events is not a valid string.")
             if bucket_id in resources:
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
         raise InvalidEventException(self.relative_id, "S3 events must reference an S3 bucket in the same template.")
@@ -655,6 +659,15 @@ class Api(PushEventSource):
                             ),
                         )
 
+                    if not isinstance(method_authorizer, string_types):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                            "because it wasn't defined with acceptable values in the API's Authorizers.".format(
+                                authorizer=method_authorizer, method=self.Method, path=self.Path
+                            ),
+                        )
+
                     if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
                         raise InvalidEventException(
                             self.relative_id,
@@ -713,6 +726,14 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because the related API does not define any Models.".format(
+                            model=method_model, method=self.Method, path=self.Path
+                        ),
+                    )
+                if not isinstance(method_model, string_types):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
+                        "because the related API does not contain valid Models.".format(
                             model=method_model, method=self.Method, path=self.Path
                         ),
                     )
@@ -868,6 +889,11 @@ class Cognito(PushEventSource):
     def resources_to_link(self, resources):
         if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
             userpool_id = self.UserPool["Ref"]
+            if not isinstance(userpool_id, string_types):
+                raise InvalidEventException(
+                    self.logical_id,
+                    "Ref in Userpool is not a string.",
+                )
             if userpool_id in resources:
                 return {"userpool": resources[userpool_id], "userpool_id": userpool_id}
         raise InvalidEventException(
@@ -1089,7 +1115,7 @@ class HttpApi(PushEventSource):
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
         method_authorizer = self.Auth.get("Authorizer")
-        api_auth = api.get("Auth")
+        api_auth = api.get("Auth", {})
         if not method_authorizer:
             if api_auth.get("DefaultAuthorizer"):
                 self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")

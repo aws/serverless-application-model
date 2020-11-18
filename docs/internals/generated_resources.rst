@@ -326,6 +326,64 @@ AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
 AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger** 
 ================================== ================================
 
+MQ
+^^^^^^^
+
+Example:
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        MyTrigger:
+          Type: MQ
+          Properties:
+            Broker: arn:aws:mq:us-east-2:123456789012:broker:MyBroker:b-1234a5b6-78cd-901e-2fgh-3i45j6k178l9
+            SourceAccessConfigurations:
+              Type: BASIC_AUTH
+              URI: arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c
+      ...
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID
+================================== ================================
+AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
+AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger**
+================================== ================================
+
+MSK
+^^^^^^^
+
+Example:
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      Events:
+        MyTrigger:
+          Type: MSK
+          Properties:
+            Stream: arn:aws:kafka:us-east-1:123456789012:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            StartingPosition: TRIM_HORIZON
+      ...
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID
+================================== ================================
+AWS::Lambda::Permission            MyFunction\ **MyTrigger**\ Permission
+AWS::Lambda::EventSourceMapping    MyFunction\ **MyTrigger**
+================================== ================================
+
 SQS
 ^^^
 

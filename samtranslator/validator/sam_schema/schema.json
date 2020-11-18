@@ -55,6 +55,9 @@
                 }
               ]
             },
+            "Description": {
+              "type": "string"
+            },
             "Name": {
               "type": "string"
             },
@@ -475,6 +478,12 @@
               "$ref": "#/definitions/AWS::Serverless::Function.KinesisEvent"
             },
             {
+              "$ref": "#/definitions/AWS::Serverless::Function.MSKEvent"
+            },
+            {
+              "$ref": "#/definitions/AWS::Serverless::Function.MQEvent"
+            },
+            {
               "$ref": "#/definitions/AWS::Serverless::Function.SQSEvent"
             },
             {
@@ -586,6 +595,47 @@
       ],
       "type": "object"
     },
+    "AWS::Serverless::Function.MSKEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "StartingPosition": {
+          "type": "string"
+        },
+        "Stream": {
+          "type": "string"
+        },
+        "Topics": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "StartingPosition",
+        "Stream",
+        "Topics"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Function.MQEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "Broker": {
+          "type": "string"
+        },
+        "Queues": {
+          "type": "array"
+        },
+        "SourceAccessConfigurations": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "Broker",
+        "Queues",
+        "SourceAccessConfigurations"
+      ],
+      "type": "object"
+    },
+
     "AWS::Serverless::Function.SQSEvent": {
       "additionalProperties": false,
       "properties": {
