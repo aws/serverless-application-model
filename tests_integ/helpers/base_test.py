@@ -24,15 +24,13 @@ class BaseTest(TestCase):
         cls.template_dir = Path(cls.resources_dir, "templates", "single")
         cls.output_dir = cls.tests_integ_dir
         cls.expected_dir = Path(cls.resources_dir, "expected", "single")
-        code_dir = Path(cls.resources_dir, "code")
-
+        cls.code_dir = Path(cls.resources_dir, "code")
         cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
-        session = boto3.session.Session()
-        my_region = session.region_name
-        create_bucket(cls.s3_bucket_name, region=my_region)
-
+        cls.session = boto3.session.Session()
+        cls.my_region = cls.session.region_name
         cls.s3_client = boto3.client("s3")
-        cls.code_key_to_url = cls._upload_resources(code_dir, cls.s3_bucket_name, CODE_KEY_TO_FILE_MAP)
+
+        cls._upload_resources()
 
     @classmethod
     def tearDownClass(cls):
@@ -40,6 +38,9 @@ class BaseTest(TestCase):
 
     @classmethod
     def _clean_bucket(cls):
+        """
+        Empties and deletes the bucket used for the tests
+        """
         s3 = boto3.resource('s3')
         bucket = s3.Bucket(cls.s3_bucket_name)
         object_summary_iterator = bucket.objects.all()
@@ -49,41 +50,32 @@ class BaseTest(TestCase):
         cls.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
 
     @classmethod
-    def _upload_resources(cls, code_dir, s3_bucket_name, key_to_file_map):
-        session = boto3.session.Session()
-        my_region = session.region_name
-        create_bucket(s3_bucket_name, region=my_region)
+    def _upload_resources(cls):
+        """
+        Creates the bucket and uploads the files used by the tests to it
+        """
+        create_bucket(cls.s3_bucket_name, region=cls.my_region)
         code_key_to_url = {}
 
         try:
-            for key, file_name in key_to_file_map.items():
-                code_path = str(Path(code_dir, file_name))
-                LOG.debug(f"Uploading file {file_name} to s3 bucket {s3_bucket_name}.")
-                cls.s3_client.upload_file(code_path, s3_bucket_name, file_name)
+            for key, file_name in CODE_KEY_TO_FILE_MAP.items():
+                code_path = str(Path(cls.code_dir, file_name))
+                LOG.debug(f"Uploading file {file_name} to s3 bucket {cls.s3_bucket_name}.")
+                cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
                 LOG.debug(f"{file_name} uploaded successfully.")
-                code_url = f"s3://{s3_bucket_name}/{file_name}"
+                code_url = f"s3://{cls.s3_bucket_name}/{file_name}"
                 code_key_to_url[key] = code_url
         except ClientError as error:
             LOG.error('upload failed')
             LOG.error('Error code: ' + error.response['Error']['Code'])
-            cls._clean_bucket(s3_bucket_name)
+            cls._clean_bucket()
             raise error
-        return code_key_to_url
+
+        cls.code_key_to_url = code_key_to_url
 
     def setUp(self):
         self.cloudformation_client = boto3.client("cloudformation")
         self.deployer = Deployer(self.cloudformation_client, changeset_prefix="sam-integ-")
-
-    def create_and_verify_stack(self, file_name):
-        input_file_path = str(Path(self.template_dir, file_name + ".yaml"))
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
-        expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
-        self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + generate_suffix()
-
-        self.sub_input_file_path = self._update_template(input_file_path, file_name)
-        transform_template(self.sub_input_file_path, self.output_file_path)
-        self._deploy_stack()
-        self._verify_stack(expected_resource_path)
 
     def tearDown(self):
         self.cloudformation_client.delete_stack(StackName=self.stack_name)
@@ -92,7 +84,36 @@ class BaseTest(TestCase):
         if os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-    def _update_template(self, input_file_path, file_name):
+    def create_and_verify_stack(self, file_name):
+        """
+        Creates the Cloud Formation stack and verifies it against the expected
+        result
+
+        Parameters
+        ----------
+        file_name : string
+            Template file name
+        """
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
+        expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
+        self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + generate_suffix()
+
+        self._update_template(file_name)
+        transform_template(self.sub_input_file_path, self.output_file_path)
+        self._deploy_stack()
+        self._verify_stack(expected_resource_path)
+
+    def _update_template(self, file_name):
+        """
+        Updates a template before converting it to a cloud formation template
+        and saves it to sub_input_file_path
+
+        Parameters
+        ----------
+        file_name : string
+            Template file name
+        """
+        input_file_path = str(Path(self.template_dir, file_name + ".yaml"))
         updated_template_path = str(Path(self.output_dir, "sub_" + file_name + ".yaml"))
         with open(input_file_path, "r") as f:
             data = f.read()
@@ -103,9 +124,12 @@ class BaseTest(TestCase):
         with open(updated_template_path, "w") as f:
             yaml.dump(yaml_doc, f)
 
-        return updated_template_path
+        self.sub_input_file_path = updated_template_path
 
     def _deploy_stack(self):
+        """
+        Deploys the current cloud formation stack
+        """
         with open(self.output_file_path, "r") as cfn_file:
             result, changeset_type = self.deployer.create_and_wait_for_changeset(
                 stack_name=self.stack_name,
@@ -121,6 +145,14 @@ class BaseTest(TestCase):
             self.deployer.wait_for_execute(self.stack_name, changeset_type)
 
     def _verify_stack(self, expected_resource_path):
+        """
+        Gets and compares the Cloud Formation stack against the expect result file
+
+        Parameters:
+        ----------
+        expected_resource_path: string
+            Absolute path to the expected result file
+        """
         stacks_description = self.cloudformation_client.describe_stacks(StackName=self.stack_name)
         stack_resources = self.cloudformation_client.list_stack_resources(StackName=self.stack_name)
         # verify if the stack was successfully created
