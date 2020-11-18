@@ -292,7 +292,7 @@ class TestOpenApiEditor_iter_on_path(TestCase):
     def test_must_iterate_on_paths(self):
 
         expected = {"/foo", "/bar", "/baz"}
-        actual = set([path for path in self.editor.iter_on_path()])
+        actual = set(list(self.editor.iter_on_path()))
 
         self.assertEqual(expected, actual)
 
