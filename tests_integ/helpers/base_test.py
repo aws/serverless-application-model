@@ -9,7 +9,7 @@ import yaml
 from botocore.exceptions import ClientError
 from samcli.lib.deploy.deployer import Deployer
 from tests_integ.helpers.helpers import transform_template, verify_stack_resources, generate_suffix, create_bucket
-from tests_integ.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
+from tests_integ.helpers.file_resources import FILE_TO_S3_URL_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
 STACK_NAME_PREFIX = "sam-integ-stack-"
@@ -68,13 +68,13 @@ class BaseTest(TestCase):
         current_file_name = ""
 
         try:
-            for file_name, _ in FILE_TO_S3_URI_MAP.items():
+            for file_name, _ in FILE_TO_S3_URL_MAP.items():
                 current_file_name = file_name
                 code_path = str(Path(cls.code_dir, file_name))
                 LOG.debug("Uploading file %s to bucket %s", file_name, cls.s3_bucket_name)
                 cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
                 LOG.debug("File %s uploaded successfully to bucket %s", file_name, cls.s3_bucket_name)
-                FILE_TO_S3_URI_MAP[file_name] = f"s3://{cls.s3_bucket_name}/{file_name}"
+                FILE_TO_S3_URL_MAP[file_name] = f"s3://{cls.s3_bucket_name}/{file_name}"
         except ClientError as error:
             LOG.error("Upload of file %s to bucket %s failed", current_file_name, cls.s3_bucket_name, exc_info=error)
             cls._clean_bucket()
@@ -122,7 +122,7 @@ class BaseTest(TestCase):
         file_name : string
             Resource file name
         """
-        return FILE_TO_S3_URI_MAP[file_name]
+        return FILE_TO_S3_URL_MAP[file_name]
 
     def get_code_key_s3_uri(self, code_key):
         """
@@ -133,7 +133,7 @@ class BaseTest(TestCase):
         code_key : string
             Template code key
         """
-        return FILE_TO_S3_URI_MAP[CODE_KEY_TO_FILE_MAP[code_key]]
+        return FILE_TO_S3_URL_MAP[CODE_KEY_TO_FILE_MAP[code_key]]
     
     def get_deployment_ids(self):
         ids = []

@@ -1,4 +1,4 @@
-FILE_TO_S3_URI_MAP = {
+FILE_TO_S3_URL_MAP = {
     "code.zip": "",
     "layer1.zip": "",
     "swagger1.json": "",
