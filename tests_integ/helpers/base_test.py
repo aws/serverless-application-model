@@ -9,11 +9,11 @@ import yaml
 from botocore.exceptions import ClientError
 from samcli.lib.deploy.deployer import Deployer
 from tests_integ.helpers.helpers import transform_template, verify_stack_resources, generate_suffix, create_bucket
+from tests_integ.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
 STACK_NAME_PREFIX = "sam-integ-stack-"
 S3_BUCKET_PREFIX = "sam-integ-bucket-"
-CODE_KEY_TO_FILE_MAP = {"codeuri": "code.zip", "contenturi": "layer1.zip", "definitionuri": "swagger1.json"}
 
 
 class BaseTest(TestCase):
@@ -22,13 +22,16 @@ class BaseTest(TestCase):
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
         cls.template_dir = Path(cls.resources_dir, "templates", "single")
-        cls.output_dir = cls.tests_integ_dir
+        cls.output_dir = Path(cls.tests_integ_dir, "tmp")
         cls.expected_dir = Path(cls.resources_dir, "expected", "single")
         cls.code_dir = Path(cls.resources_dir, "code")
         cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
         cls.session = boto3.session.Session()
         cls.my_region = cls.session.region_name
         cls.s3_client = boto3.client("s3")
+
+        if not os.path.exists(cls.output_dir):
+            os.mkdir(cls.output_dir)
 
         cls._upload_resources()
 
@@ -46,8 +49,14 @@ class BaseTest(TestCase):
         object_summary_iterator = bucket.objects.all()
 
         for object_summary in object_summary_iterator:
-            cls.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
-        cls.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
+            try:
+                cls.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
+            except ClientError as e:
+                LOG.error("Unable to delete object %s from bucket %s", object_summary.key, cls.s3_bucket_name, exc_info=e)
+        try:
+            cls.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
+        except ClientError as e:
+            LOG.error("Unable to delete bucket %s", cls.s3_bucket_name, exc_info=e)
 
     @classmethod
     def _upload_resources(cls):
@@ -55,23 +64,21 @@ class BaseTest(TestCase):
         Creates the bucket and uploads the files used by the tests to it
         """
         create_bucket(cls.s3_bucket_name, region=cls.my_region)
-        code_key_to_url = {}
+
+        current_file_name = ""
 
         try:
-            for key, file_name in CODE_KEY_TO_FILE_MAP.items():
+            for file_name, _ in FILE_TO_S3_URI_MAP.items():
+                current_file_name = file_name
                 code_path = str(Path(cls.code_dir, file_name))
-                LOG.debug(f"Uploading file {file_name} to s3 bucket {cls.s3_bucket_name}.")
+                LOG.debug("Uploading file %s to bucket %s", file_name, cls.s3_bucket_name)
                 cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
-                LOG.debug(f"{file_name} uploaded successfully.")
-                code_url = f"s3://{cls.s3_bucket_name}/{file_name}"
-                code_key_to_url[key] = code_url
+                LOG.debug("File %s uploaded successfully to bucket %s", file_name, cls.s3_bucket_name)
+                FILE_TO_S3_URI_MAP[file_name] = f"s3://{cls.s3_bucket_name}/{file_name}"
         except ClientError as error:
-            LOG.error('upload failed')
-            LOG.error('Error code: ' + error.response['Error']['Code'])
+            LOG.error("Upload of file %s to bucket %s failed", current_file_name, cls.s3_bucket_name, exc_info=error)
             cls._clean_bucket()
             raise error
-
-        cls.code_key_to_url = code_key_to_url
 
     def setUp(self):
         self.cloudformation_client = boto3.client("cloudformation")
@@ -103,6 +110,28 @@ class BaseTest(TestCase):
         self._deploy_stack()
         self._verify_stack(expected_resource_path)
 
+    def get_s3_uri(self, file_name):
+        """
+        Returns the S3 URI of a resource file
+
+        Parameters
+        ----------
+        file_name : string
+            Resource file name
+        """
+        return FILE_TO_S3_URI_MAP[file_name]
+
+    def get_code_key_s3_uri(self, code_key):
+        """
+        Returns the S3 URI of a code key for template replacement
+
+        Parameters
+        ----------
+        code_key : string
+            Template code key
+        """
+        return FILE_TO_S3_URI_MAP[CODE_KEY_TO_FILE_MAP[code_key]]
+
     def _update_template(self, file_name):
         """
         Updates a template before converting it to a cloud formation template
@@ -117,8 +146,8 @@ class BaseTest(TestCase):
         updated_template_path = str(Path(self.output_dir, "sub_" + file_name + ".yaml"))
         with open(input_file_path, "r") as f:
             data = f.read()
-        for key, s3_url in self.code_key_to_url.items():
-            data = data.replace(f"${{{key}}}", s3_url)
+        for key, _ in CODE_KEY_TO_FILE_MAP.items():
+            data = data.replace(f"${{{key}}}", self.get_code_key_s3_uri(key))
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
         with open(updated_template_path, "w") as f:
