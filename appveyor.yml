@@ -4,13 +4,19 @@ image: Ubuntu
 environment:
   matrix:
   - TOXENV: py27
+    PYTHON_VERSION: '2.7'
   - TOXENV: py36
+    PYTHON_VERSION: '3.6'
   - TOXENV: py37
+    PYTHON_VERSION: '3.7'
   - TOXENV: py38
+    PYTHON_VERSION: '3.8'
 
 build: off
 
 install:
+- sh: "source ${HOME}/venv${PYTHON_VERSION}/bin/activate"
+- sh: "python --version"
 - make init
 
 test_script:
