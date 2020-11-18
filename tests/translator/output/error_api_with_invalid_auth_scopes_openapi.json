@@ -4,6 +4,6 @@
         "errorMessage": "Resource with id [MyApiWithCognitoAuth] is invalid. AuthorizationScopes must be a list."
       }
     ], 
-    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApiWithCognitoAuth] is invalid. AuthorizationScopes must be a list."
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [MyApiWithCognitoAuth] is invalid. AuthorizationScopes must be a list. Resource with id [MyFn] is invalid. Event with id [CognitoAuthorizerNotString] is invalid. Unable to set Authorizer [['NotString']] on API method [get] for path [/cognitoauthorizernotstring] because it wasn't defined with acceptable values in the API's Authorizers."
   }
 

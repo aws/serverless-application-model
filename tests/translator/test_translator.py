@@ -162,6 +162,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "simpletable_with_sse",
                 "implicit_api",
                 "explicit_api",
+                "api_description",
                 "api_endpoint_configuration",
                 "api_endpoint_configuration_with_vpcendpoint",
                 "api_with_auth_all_maximum",
@@ -301,6 +302,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "state_machine_with_condition_and_events",
                 "state_machine_with_xray",
                 "function_with_file_system_config",
+                "state_machine_with_permissions_boundary",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -380,6 +382,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "http_api_def_uri",
                 "explicit_http_api",
                 "http_api_with_cors",
+                "http_api_description",
                 "http_api_lambda_auth",
                 "http_api_lambda_auth_full",
             ],
@@ -569,7 +572,9 @@ class TestTranslatorEndToEnd(TestCase):
         "error_state_machine_with_api_auth_none",
         "error_state_machine_with_no_api_authorizers",
         "error_state_machine_with_undefined_api_authorizer",
+        "error_state_machine_with_invalid_default_authorizer",
         "error_cognito_userpool_duplicate_trigger",
+        "error_cognito_userpool_not_string",
         "error_api_duplicate_methods_same_path",
         "error_api_gateway_responses_nonnumeric_status_code",
         "error_api_gateway_responses_unknown_responseparameter",
@@ -659,6 +664,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_api_mtls_configuration_invalid_type",
         "error_httpapi_mtls_configuration_invalid_field",
         "error_httpapi_mtls_configuration_invalid_type",
+        "error_resource_policy_not_dict",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

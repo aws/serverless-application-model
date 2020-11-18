@@ -443,7 +443,14 @@ class SamFunction(SamResourceMacro):
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXrayWriteOnlyAccess"))
+            # use previous (old) policy name for regular regions
+            # for china and gov regions, use the newer policy name
+            partition_name = ArnGenerator.get_partition_name()
+            if partition_name == "aws":
+                managed_policy_name = "AWSXrayWriteOnlyAccess"
+            else:
+                managed_policy_name = "AWSXRayDaemonWriteAccess"
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:
             managed_policy_arns.append(
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
@@ -727,6 +734,7 @@ class SamApi(SamResourceMacro):
         "OpenApiVersion": PropertyType(False, is_str()),
         "Models": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -780,6 +788,7 @@ class SamApi(SamResourceMacro):
             open_api_version=self.OpenApiVersion,
             models=self.Models,
             domain=self.Domain,
+            description=self.Description,
         )
 
         (
@@ -830,6 +839,7 @@ class SamHttpApi(SamResourceMacro):
         "RouteSettings": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "Description": PropertyType(False, is_str()),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
@@ -870,6 +880,7 @@ class SamHttpApi(SamResourceMacro):
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
             fail_on_warnings=self.FailOnWarnings,
+            description=self.Description,
             disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
         )
 
@@ -1120,6 +1131,7 @@ class SamStateMachine(SamResourceMacro):
         "Tags": PropertyType(False, is_type(dict)),
         "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
         "Tracing": PropertyType(False, is_type(dict)),
+        "PermissionsBoundary": PropertyType(False, is_str()),
     }
     event_resolver = ResourceTypeResolver(
         samtranslator.model.stepfunctions.events,
@@ -1140,6 +1152,7 @@ class SamStateMachine(SamResourceMacro):
             logging=self.Logging,
             name=self.Name,
             policies=self.Policies,
+            permissions_boundary=self.PermissionsBoundary,
             definition_substitutions=self.DefinitionSubstitutions,
             role=self.Role,
             state_machine_type=self.Type,

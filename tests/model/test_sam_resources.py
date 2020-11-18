@@ -4,13 +4,13 @@ import pytest
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException
+from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
 from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion
 from samtranslator.model.apigateway import ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayDeployment
 from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.sam_resources import SamFunction
-from samtranslator.model.sam_resources import SamApi
+from samtranslator.model.sam_resources import SamFunction, SamApi, SamHttpApi
 
 
 class TestCodeUri(TestCase):
@@ -188,3 +188,55 @@ class TestApiTags(TestCase):
 
         self.assertEqual(deployment.__len__(), 1)
         self.assertEqual(deployment[0].Tags, [{"Key": "MyKey", "Value": "MyValue"}])
+
+
+class TestApiDescription(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    @patch("boto3.session.Session.region_name", "eu-central-1")
+    def test_with_no_description(self):
+        sam_api = SamApi("foo")
+
+        resources = sam_api.to_cloudformation(**self.kwargs)
+        rest_api = [x for x in resources if isinstance(x, ApiGatewayRestApi)]
+        self.assertEqual(rest_api[0].Description, None)
+
+    @patch("boto3.session.Session.region_name", "eu-central-1")
+    def test_with_description(self):
+        sam_api = SamApi("foo")
+        sam_api.Description = "my description"
+
+        resources = sam_api.to_cloudformation(**self.kwargs)
+        rest_api = [x for x in resources if isinstance(x, ApiGatewayRestApi)]
+        self.assertEqual(rest_api[0].Description, "my description")
+
+
+class TestHttpApiDescription(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    @patch("boto3.session.Session.region_name", "eu-central-1")
+    def test_with_no_description(self):
+        sam_http_api = SamHttpApi("foo")
+        sam_http_api.DefinitionUri = "s3://foobar/foo.zip"
+
+        resources = sam_http_api.to_cloudformation(**self.kwargs)
+        rest_api = [x for x in resources if isinstance(x, ApiGatewayV2HttpApi)]
+        self.assertEqual(rest_api[0].Description, None)
+
+    @patch("boto3.session.Session.region_name", "eu-central-1")
+    def test_with_description(self):
+        sam_http_api = SamHttpApi("foo")
+        sam_http_api.DefinitionUri = "s3://foobar/foo.zip"
+        sam_http_api.Description = "my description"
+
+        resources = sam_http_api.to_cloudformation(**self.kwargs)
+        rest_api = [x for x in resources if isinstance(x, ApiGatewayV2HttpApi)]
+        self.assertEqual(rest_api[0].Description, "my description")
