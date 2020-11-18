@@ -32,13 +32,7 @@ class BaseTest(TestCase):
         create_bucket(cls.s3_bucket_name, region=my_region)
 
         cls.s3_client = boto3.client("s3")
-        cls.code_key_to_url = {}
-
-        for key, file_name in CODE_KEY_TO_FILE_MAP.items():
-            code_path = str(Path(code_dir, file_name))
-            cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
-            code_url = f"s3://{cls.s3_bucket_name}/{file_name}"
-            cls.code_key_to_url[key] = code_url
+        cls.code_key_to_url = cls._upload_resources(code_dir, cls.s3_bucket_name, CODE_KEY_TO_FILE_MAP)
 
     @classmethod
     def tearDownClass(cls):
@@ -46,10 +40,35 @@ class BaseTest(TestCase):
 
     @classmethod
     def _clean_bucket(cls):
-        response = cls.s3_client.list_objects_v2(Bucket=cls.s3_bucket_name)
-        for content in response["Contents"]:
-            cls.s3_client.delete_object(Key=content["Key"], Bucket=cls.s3_bucket_name)
+        s3 = boto3.resource('s3')
+        bucket = s3.Bucket(cls.s3_bucket_name)
+        object_summary_iterator = bucket.objects.all()
+
+        for object_summary in object_summary_iterator:
+            cls.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
         cls.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
+
+    @classmethod
+    def _upload_resources(cls, code_dir, s3_bucket_name, key_to_file_map):
+        session = boto3.session.Session()
+        my_region = session.region_name
+        create_bucket(s3_bucket_name, region=my_region)
+        code_key_to_url = {}
+
+        try:
+            for key, file_name in key_to_file_map.items():
+                code_path = str(Path(code_dir, file_name))
+                LOG.debug(f"Uploading file {file_name} to s3 bucket {s3_bucket_name}.")
+                cls.s3_client.upload_file(code_path, s3_bucket_name, file_name)
+                LOG.debug(f"{file_name} uploaded successfully.")
+                code_url = f"s3://{s3_bucket_name}/{file_name}"
+                code_key_to_url[key] = code_url
+        except ClientError as error:
+            LOG.error('upload failed')
+            LOG.error('Error code: ' + error.response['Error']['Code'])
+            cls._clean_bucket(s3_bucket_name)
+            raise error
+        return code_key_to_url
 
     def setUp(self):
         self.cloudformation_client = boto3.client("cloudformation")
@@ -108,38 +127,3 @@ class BaseTest(TestCase):
         self.assertEqual(stacks_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
         # verify if the stack contains the expected resources
         self.assertTrue(verify_stack_resources(expected_resource_path, stack_resources))
-
-
-def _upload_resources(code_dir, s3_bucket_name, key_to_file_map):
-    session = boto3.session.Session()
-    my_region = session.region_name
-    create_bucket(s3_bucket_name, region=my_region)
-
-    s3_client = boto3.client("s3")
-    code_key_to_url = {}
-
-    try:
-        for key, file_name in key_to_file_map.items():
-            code_path = str(Path(code_dir, file_name))
-            LOG.debug(f"Uploading file {file_name} to s3 bucket {s3_bucket_name}.")
-            s3_client.upload_file(code_path, s3_bucket_name, file_name)
-            LOG.debug(f"{file_name} uploaded successfully.")
-            code_url = f"s3://{s3_bucket_name}/{file_name}"
-            code_key_to_url[key] = code_url
-    except ClientError as error:
-        LOG.error('upload failed')
-        LOG.error('Error code: ' + error.response['Error']['Code'])
-        _clean_bucket(s3_bucket_name)
-        raise error
-    return code_key_to_url
-
-
-def _clean_bucket(s3_bucket_name):
-    s3_client = boto3.client("s3")
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket(s3_bucket_name)
-    object_summary_iterator = bucket.objects.all()
-
-    for object_summary in object_summary_iterator:
-        s3_client.delete_object(Key=object_summary.key, Bucket=s3_bucket_name)
-    s3_client.delete_bucket(Bucket=s3_bucket_name)
