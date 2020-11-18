@@ -102,13 +102,16 @@ class BaseTest(TestCase):
             Template file name
         """
         self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
-        expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
-        self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + generate_suffix()
+        self.expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
+        self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
 
-        self._update_template(file_name)
+        self._fill_template(file_name)
+        self.transform_template()
+        self.deploy_stack()
+        self.verify_stack()
+
+    def transform_template(self):
         transform_template(self.sub_input_file_path, self.output_file_path)
-        self._deploy_stack()
-        self._verify_stack(expected_resource_path)
 
     def get_s3_uri(self, file_name):
         """
@@ -131,11 +134,21 @@ class BaseTest(TestCase):
             Template code key
         """
         return FILE_TO_S3_URI_MAP[CODE_KEY_TO_FILE_MAP[code_key]]
+    
+    def get_deployment_ids(self):
+        ids = []
+        if not self.stack_resources:
+            return ids
+        
+        for res in self.stack_resources["StackResourceSummaries"]:
+            if res["ResourceType"] == "AWS::ApiGateway::Deployment":
+                ids.append(res["LogicalResourceId"])
+        
+        return ids
 
-    def _update_template(self, file_name):
+    def _fill_template(self, file_name):
         """
-        Updates a template before converting it to a cloud formation template
-        and saves it to sub_input_file_path
+        Replaces the template variables with their value
 
         Parameters
         ----------
@@ -155,7 +168,16 @@ class BaseTest(TestCase):
 
         self.sub_input_file_path = updated_template_path
 
-    def _deploy_stack(self):
+    def set_template_resource(self, resource_name, property_name, value):
+        with open(self.sub_input_file_path, "r+") as f:
+            data = f.read()        
+        yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
+        yaml_doc['Resources'][resource_name]["Properties"][property_name] = value
+
+        with open(self.sub_input_file_path, "w") as f:
+            yaml.dump(yaml_doc, f)
+
+    def deploy_stack(self):
         """
         Deploys the current cloud formation stack
         """
@@ -173,18 +195,14 @@ class BaseTest(TestCase):
             self.deployer.execute_changeset(result["Id"], self.stack_name)
             self.deployer.wait_for_execute(self.stack_name, changeset_type)
 
-    def _verify_stack(self, expected_resource_path):
+        self.stack_description = self.cloudformation_client.describe_stacks(StackName=self.stack_name)
+        self.stack_resources = self.cloudformation_client.list_stack_resources(StackName=self.stack_name)        
+
+    def verify_stack(self):
         """
         Gets and compares the Cloud Formation stack against the expect result file
-
-        Parameters:
-        ----------
-        expected_resource_path: string
-            Absolute path to the expected result file
         """
-        stacks_description = self.cloudformation_client.describe_stacks(StackName=self.stack_name)
-        stack_resources = self.cloudformation_client.list_stack_resources(StackName=self.stack_name)
         # verify if the stack was successfully created
-        self.assertEqual(stacks_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
+        self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
         # verify if the stack contains the expected resources
-        self.assertTrue(verify_stack_resources(expected_resource_path, stack_resources))
+        self.assertTrue(verify_stack_resources(self.expected_resource_path, self.stack_resources))
