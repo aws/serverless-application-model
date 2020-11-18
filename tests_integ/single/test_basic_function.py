@@ -1,5 +1,3 @@
-import os
-
 from parameterized import parameterized
 from tests_integ.helpers.base_test import BaseTest
 
@@ -16,8 +14,6 @@ class TestBasicFunction(BaseTest):
             "basic_function_with_sqs_dlq",
             "basic_function_with_tags",
             # ("basic_function_with_tracing"), # need different set up to create changeset
-            # ("basic_table_no_param"), # no test case in java code base
-            # ("basic_table_with_param") # no test case in java code base
         ]
     )
     def test_basic_function(self, file_name):

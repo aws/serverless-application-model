@@ -4,6 +4,7 @@ import re
 import random
 import string  # not deprecated, a bug from pylint https://www.logilab.org/ticket/2481
 from functools import reduce
+from pathlib import Path
 
 import boto3
 from botocore.exceptions import ClientError
@@ -65,7 +66,7 @@ def _sort_resources(resources):
     return sorted(resources, key=lambda d: d["LogicalResourceId"])
 
 
-def create_bucket(bucket_name, region=None):
+def create_bucket(bucket_name, region):
     """Create an S3 bucket in a specified region
 
     copy code from boto3 doc example
@@ -80,10 +81,11 @@ def create_bucket(bucket_name, region=None):
     """
 
     # Create bucket
-    if region is None:
+    if region is None or region == 'us-east-1':
         s3_client = boto3.client("s3")
         s3_client.create_bucket(Bucket=bucket_name)
     else:
         s3_client = boto3.client("s3", region_name=region)
         location = {"LocationConstraint": region}
         s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
+

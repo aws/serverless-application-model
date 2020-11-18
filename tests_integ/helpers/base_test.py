@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 from unittest.case import TestCase
@@ -5,9 +6,11 @@ from unittest.case import TestCase
 import boto3
 import pytest
 import yaml
+from botocore.exceptions import ClientError
 from samcli.lib.deploy.deployer import Deployer
 from tests_integ.helpers.helpers import transform_template, verify_stack_resources, generate_suffix, create_bucket
 
+LOG = logging.getLogger(__name__)
 STACK_NAME_PREFIX = "sam-integ-stack-"
 S3_BUCKET_PREFIX = "sam-integ-bucket-"
 CODE_KEY_TO_FILE_MAP = {"codeuri": "code.zip", "contenturi": "layer1.zip", "definitionuri": "swagger1.json"}
@@ -18,36 +21,17 @@ class BaseTest(TestCase):
     def setUpClass(cls):
         BaseTest.tests_integ_dir = Path(__file__).resolve().parents[1]
         BaseTest.resources_dir = Path(BaseTest.tests_integ_dir, "resources")
-        BaseTest.template_dir = Path(BaseTest.resources_dir, "templates", "single")
+        BaseTest.template_dir = Path(BaseTest.resources_dir, "templates", "single") # need to replace the single with variable to be extenable
         BaseTest.output_dir = BaseTest.tests_integ_dir
         BaseTest.expected_dir = Path(BaseTest.resources_dir, "expected", "single")
         code_dir = Path(BaseTest.resources_dir, "code")
 
         BaseTest.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
-        session = boto3.session.Session()
-        my_region = session.region_name
-        create_bucket(BaseTest.s3_bucket_name, region=my_region)
-
-        s3_client = boto3.client("s3")
-        BaseTest.code_key_to_url = {}
-
-        for key, file_name in CODE_KEY_TO_FILE_MAP.items():
-            code_path = str(Path(code_dir, file_name))
-            s3_client.upload_file(code_path, BaseTest.s3_bucket_name, file_name)
-            code_url = f"s3://{BaseTest.s3_bucket_name}/{file_name}"
-            BaseTest.code_key_to_url[key] = code_url
+        BaseTest.code_key_to_url = _upload_resources(code_dir, BaseTest.s3_bucket_name, CODE_KEY_TO_FILE_MAP)
 
     @classmethod
     def tearDownClass(cls) -> None:
-        BaseTest._clean_bucket()
-
-    @classmethod
-    def _clean_bucket(cls):
-        s3_client = boto3.client("s3")
-        response = s3_client.list_objects(Bucket=BaseTest.s3_bucket_name)
-        for content in response["Contents"]:
-            s3_client.delete_object(Key=content["Key"], Bucket=BaseTest.s3_bucket_name)
-        s3_client.delete_bucket(Bucket=BaseTest.s3_bucket_name)
+        _clean_bucket(BaseTest.s3_bucket_name)
 
     def setUp(self):
         self.cloudformation_client = boto3.client("cloudformation")
@@ -106,3 +90,38 @@ class BaseTest(TestCase):
         self.assertEqual(stacks_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
         # verify if the stack contains the expected resources
         self.assertTrue(verify_stack_resources(expected_resource_path, stack_resources))
+
+
+def _upload_resources(code_dir, s3_bucket_name, key_to_file_map):
+    session = boto3.session.Session()
+    my_region = session.region_name
+    create_bucket(s3_bucket_name, region=my_region)
+
+    s3_client = boto3.client("s3")
+    code_key_to_url = {}
+
+    try:
+        for key, file_name in key_to_file_map.items():
+            code_path = str(Path(code_dir, file_name))
+            LOG.debug(f"Uploading file {file_name} to s3 bucket {s3_bucket_name}.")
+            s3_client.upload_file(code_path, s3_bucket_name, file_name)
+            LOG.debug(f"{file_name} uploaded successfully.")
+            code_url = f"s3://{s3_bucket_name}/{file_name}"
+            code_key_to_url[key] = code_url
+    except ClientError as error:
+        LOG.error('upload failed')
+        LOG.error('Error code: ' + error.response['Error']['Code'])
+        _clean_bucket(s3_bucket_name)
+        raise error
+    return code_key_to_url
+
+
+def _clean_bucket(s3_bucket_name):
+    s3_client = boto3.client("s3")
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(s3_bucket_name)
+    object_summary_iterator = bucket.objects.all()
+
+    for object_summary in object_summary_iterator:
+        s3_client.delete_object(Key=object_summary.key, Bucket=s3_bucket_name)
+    s3_client.delete_bucket(Bucket=s3_bucket_name)

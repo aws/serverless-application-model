@@ -1,5 +1,3 @@
-import os
-
 from parameterized import parameterized
 from tests_integ.helpers.base_test import BaseTest
 
@@ -9,7 +7,6 @@ class TestBasicApi(BaseTest):
         [
             "basic_api_inline_openapi",
             "basic_api_inline_swagger",
-            # "basic_api_with_cache", # no test case in java code base
             "basic_api_with_tags",
             "basic_api",
         ]

@@ -1,5 +1,4 @@
 from parameterized import parameterized
-
 from tests_integ.helpers.base_test import BaseTest
 
 
