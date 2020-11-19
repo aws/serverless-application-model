@@ -30,6 +30,7 @@ class BaseTest(TestCase):
         cls.my_region = cls.session.region_name
         cls.s3_client = boto3.client("s3")
         cls.api_client = boto3.client('apigateway', cls.my_region)
+        cls.api_v2_client = boto3.client('apigatewayv2')
 
         if not os.path.exists(cls.output_dir):
             os.mkdir(cls.output_dir)
@@ -182,8 +183,16 @@ class BaseTest(TestCase):
 
         if not resources:
             return []
-        
+
         return self.api_client.get_stages(restApiId=resources[0]["PhysicalResourceId"])["item"]
+
+    def get_stack_stages_v2(self):
+        resources = self.get_stack_resources("AWS::ApiGatewayV2::Api")
+
+        if not resources:
+            return None
+
+        return self.api_v2_client.get_stages(ApiId=resources[0]["PhysicalResourceId"])["Items"]
 
     def get_stack_nested_stack_resources(self):
         resources = self.get_stack_resources("AWS::CloudFormation::Stack")
