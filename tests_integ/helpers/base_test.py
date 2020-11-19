@@ -29,6 +29,7 @@ class BaseTest(TestCase):
         cls.session = boto3.session.Session()
         cls.my_region = cls.session.region_name
         cls.s3_client = boto3.client("s3")
+        cls.api_client = boto3.client('apigateway', cls.my_region)
 
         if not os.path.exists(cls.output_dir):
             os.mkdir(cls.output_dir)
@@ -52,7 +53,12 @@ class BaseTest(TestCase):
             try:
                 cls.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
             except ClientError as e:
-                LOG.error("Unable to delete object %s from bucket %s", object_summary.key, cls.s3_bucket_name, exc_info=e)
+                LOG.error(
+                    "Unable to delete object %s from bucket %s",
+                    object_summary.key,
+                    cls.s3_bucket_name,
+                    exc_info=e
+                )
         try:
             cls.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
         except ClientError as e:
@@ -134,17 +140,27 @@ class BaseTest(TestCase):
             Template code key
         """
         return FILE_TO_S3_URL_MAP[CODE_KEY_TO_FILE_MAP[code_key]]
-    
-    def get_deployment_ids(self):
+
+    def get_stack_deployment_ids(self):
         ids = []
         if not self.stack_resources:
             return ids
-        
+
         for res in self.stack_resources["StackResourceSummaries"]:
             if res["ResourceType"] == "AWS::ApiGateway::Deployment":
                 ids.append(res["LogicalResourceId"])
-        
+
         return ids
+
+    def get_stack_stages(self):
+        if not self.stack_resources:
+            return []
+
+        for res in self.stack_resources["StackResourceSummaries"]:
+            if res["ResourceType"] == "AWS::ApiGateway::RestApi":
+                return self.api_client.get_stages(restApiId=res["PhysicalResourceId"])["item"]
+
+        return []
 
     def _fill_template(self, file_name):
         """
@@ -168,14 +184,33 @@ class BaseTest(TestCase):
 
         self.sub_input_file_path = updated_template_path
 
-    def set_template_resource(self, resource_name, property_name, value):
+    def set_template_resource_property(self, resource_name, property_name, value):
+        """
+        Updates a resource property of the current SAM template
+
+        Parameters
+        ----------
+        resource_name: string
+            resource name
+        property_name: string
+            property name
+        value
+            value
+        """
         with open(self.sub_input_file_path, "r+") as f:
-            data = f.read()        
+            data = f.read()
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
         yaml_doc['Resources'][resource_name]["Properties"][property_name] = value
 
         with open(self.sub_input_file_path, "w") as f:
             yaml.dump(yaml_doc, f)
+
+    def get_template_resource_property(self, resource_name, property_name):
+        with open(self.sub_input_file_path, "r+") as f:
+            data = f.read()
+        yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
+
+        return yaml_doc['Resources'][resource_name]["Properties"][property_name]
 
     def deploy_stack(self):
         """
@@ -196,7 +231,7 @@ class BaseTest(TestCase):
             self.deployer.wait_for_execute(self.stack_name, changeset_type)
 
         self.stack_description = self.cloudformation_client.describe_stacks(StackName=self.stack_name)
-        self.stack_resources = self.cloudformation_client.list_stack_resources(StackName=self.stack_name)        
+        self.stack_resources = self.cloudformation_client.list_stack_resources(StackName=self.stack_name)
 
     def verify_stack(self):
         """

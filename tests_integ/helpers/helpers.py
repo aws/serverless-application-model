@@ -32,8 +32,8 @@ def transform_template(input_file_path, output_file_path):
 
         print("Wrote transformed CloudFormation template to: " + output_file_path)
     except InvalidDocumentException as e:
-        errorMessage = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
-        LOG.error(errorMessage)
+        error_message = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
+        LOG.error(error_message)
         errors = map(lambda cause: cause.message, e.causes)
         LOG.error(errors)
 
