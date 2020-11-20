@@ -31,6 +31,7 @@ class BaseTest(TestCase):
         cls.s3_client = boto3.client("s3")
         cls.api_client = boto3.client('apigateway', cls.my_region)
         cls.api_v2_client = boto3.client('apigatewayv2')
+        cls.sfn_client = boto3.client('stepfunctions')
 
         if not os.path.exists(cls.output_dir):
             os.mkdir(cls.output_dir)
@@ -169,6 +170,16 @@ class BaseTest(TestCase):
                 resources.append(res)
 
         return resources
+    
+    def get_stack_output(self, output_key):
+        for output in self.stack_description["Stacks"][0]["Outputs"]:
+            if output["OutputKey"] == output_key:
+                return output
+        return None
+
+    def get_stack_tags(self, output_name):
+        resource_arn = self.get_stack_output(output_name)["OutputValue"]
+        return self.sfn_client.list_tags_for_resource(resourceArn=resource_arn)["tags"]
 
     def get_stack_deployment_ids(self):
         resources = self.get_stack_resources("AWS::ApiGateway::Deployment")
