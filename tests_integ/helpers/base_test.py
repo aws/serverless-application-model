@@ -171,7 +171,7 @@ class BaseTest(TestCase):
             return {}
         else:
             output_key_to_value = {}
-            output_list = self.stack_description["Outputs"]
+            output_list = self.stack_description["Stacks"][0]["Outputs"]
             for output in output_list:
                 output_key_to_value[output["OutputKey"]] = output["OutputValue"]
             return output_key_to_value
