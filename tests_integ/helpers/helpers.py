@@ -6,7 +6,7 @@ import string  # not deprecated, a bug from pylint https://www.logilab.org/ticke
 from functools import reduce
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, NoRegionError
 
 from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
@@ -80,7 +80,9 @@ def create_bucket(bucket_name, region=None):
     """
 
     # Create bucket
-    if region is None or region == 'us-east-1':
+    if region is None:
+        raise NoRegionError()
+    elif region == 'us-east-1':
         s3_client = boto3.client("s3")
         s3_client.create_bucket(Bucket=bucket_name)
     else:

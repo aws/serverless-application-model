@@ -1,4 +1,3 @@
-from parameterized import parameterized
 from tests_integ.helpers.base_test import BaseTest
 
 
@@ -23,7 +22,6 @@ class TestBasicLayerVersion(BaseTest):
         outputs = self.get_stack_outputs()
         layer_arn = outputs["MyLayerArn"]
         license = outputs["License"]
-        layer_name = outputs["LayerName"]
         description = outputs["Description"]
 
         layer_version_result = self.lambda_client.get_layer_version_by_arn(Arn=layer_arn)
