@@ -5,6 +5,7 @@ class TestBasicApi(BaseTest):
     """
     Basic AWS::Serverless::Api tests
     """
+
     def test_basic_api(self):
         """
         Creates an API and updates its DefinitionUri

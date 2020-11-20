@@ -5,6 +5,7 @@ class TestBasicHttpApi(BaseTest):
     """
     Basic AWS::Serverless::HttpApi tests
     """
+
     def test_basic_http_api(self):
         """
         Creates a HTTP API

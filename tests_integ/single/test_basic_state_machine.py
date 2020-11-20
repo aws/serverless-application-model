@@ -5,6 +5,7 @@ class TestBasicLayerVersion(BaseTest):
     """
     Basic AWS::Serverless::StateMachine tests
     """
+
     def test_basic_state_machine_inline_definition(self):
         """
         Creates a State Machine from inline definition

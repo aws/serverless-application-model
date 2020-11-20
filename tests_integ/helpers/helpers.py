@@ -82,7 +82,7 @@ def create_bucket(bucket_name, region=None):
     # Create bucket
     if region is None:
         raise NoRegionError()
-    elif region == 'us-east-1':
+    elif region == "us-east-1":
         s3_client = boto3.client("s3")
         s3_client.create_bucket(Bucket=bucket_name)
     else:

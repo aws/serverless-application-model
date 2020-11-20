@@ -29,11 +29,11 @@ class BaseTest(TestCase):
         cls.session = boto3.session.Session()
         cls.my_region = cls.session.region_name
         cls.s3_client = boto3.client("s3")
-        cls.api_client = boto3.client('apigateway', cls.my_region)
-        cls.lambda_client = boto3.client('lambda')
-        cls.iam_client = boto3.client('iam')
-        cls.api_v2_client = boto3.client('apigatewayv2')
-        cls.sfn_client = boto3.client('stepfunctions')
+        cls.api_client = boto3.client("apigateway", cls.my_region)
+        cls.lambda_client = boto3.client("lambda")
+        cls.iam_client = boto3.client("iam")
+        cls.api_v2_client = boto3.client("apigatewayv2")
+        cls.sfn_client = boto3.client("stepfunctions")
 
         if not os.path.exists(cls.output_dir):
             os.mkdir(cls.output_dir)
@@ -49,7 +49,7 @@ class BaseTest(TestCase):
         """
         Empties and deletes the bucket used for the tests
         """
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource("s3")
         bucket = s3.Bucket(cls.s3_bucket_name)
         object_summary_iterator = bucket.objects.all()
 
@@ -58,10 +58,7 @@ class BaseTest(TestCase):
                 cls.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
             except ClientError as e:
                 LOG.error(
-                    "Unable to delete object %s from bucket %s",
-                    object_summary.key,
-                    cls.s3_bucket_name,
-                    exc_info=e
+                    "Unable to delete object %s from bucket %s", object_summary.key, cls.s3_bucket_name, exc_info=e
                 )
         try:
             cls.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
@@ -138,7 +135,7 @@ class BaseTest(TestCase):
 
     def transform_template(self):
         transform_template(self.sub_input_file_path, self.output_file_path)
-    
+
     def get_region(self):
         return self.my_region
 
@@ -174,7 +171,7 @@ class BaseTest(TestCase):
                 resources.append(res)
 
         return resources
-    
+
     def get_stack_output(self, output_key):
         for output in self.stack_description["Stacks"][0]["Outputs"]:
             if output["OutputKey"] == output_key:
@@ -305,7 +302,7 @@ class BaseTest(TestCase):
         with open(self.sub_input_file_path, "r") as f:
             data = f.read()
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
-        yaml_doc['Resources'][resource_name]["Properties"][property_name] = value
+        yaml_doc["Resources"][resource_name]["Properties"][property_name] = value
 
         with open(self.sub_input_file_path, "w") as f:
             yaml.dump(yaml_doc, f)
@@ -315,7 +312,7 @@ class BaseTest(TestCase):
             data = f.read()
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
-        return yaml_doc['Resources'][resource_name]["Properties"][property_name]
+        return yaml_doc["Resources"][resource_name]["Properties"][property_name]
 
     def deploy_stack(self, parameters=[]):
         """

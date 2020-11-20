@@ -6,6 +6,7 @@ class TestBasicFunction(BaseTest):
     """
     Basic AWS::Lambda::Function tests
     """
+
     @parameterized.expand(
         [
             "basic_function",
@@ -40,7 +41,7 @@ class TestBasicFunction(BaseTest):
 
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         function_configuration = self.lambda_client.get_function_configuration(FunctionName=lambda_function_name)
-        dlq_arn = function_configuration['DeadLetterConfig']['TargetArn']
+        dlq_arn = function_configuration["DeadLetterConfig"]["TargetArn"]
         self.assertIsNotNone(dlq_arn, "DLQ Arn should be set")
 
         role_name = self.get_physical_id_by_type("AWS::IAM::Role")
@@ -48,9 +49,9 @@ class TestBasicFunction(BaseTest):
         statements = role_policy_result["PolicyDocument"]["Statement"]
 
         self.assertEqual(len(statements), 1, "Only one statement must be in policy")
-        self.assertEqual(statements[0]['Action'], action)
-        self.assertEqual(statements[0]['Resource'], dlq_arn)
-        self.assertEqual(statements[0]['Effect'], "Allow")
+        self.assertEqual(statements[0]["Action"], action)
+        self.assertEqual(statements[0]["Resource"], dlq_arn)
+        self.assertEqual(statements[0]["Effect"], "Allow")
 
     def test_basic_function_with_kms_key_arn(self):
         """
@@ -71,7 +72,7 @@ class TestBasicFunction(BaseTest):
         self.create_and_verify_stack("basic_function_with_tags")
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         get_function_result = self.lambda_client.get_function(FunctionName=lambda_function_name)
-        tags = get_function_result['Tags']
+        tags = get_function_result["Tags"]
 
         self.assertIsNotNone(tags, "Expecting tags on function.")
         self.assertTrue("lambda:createdBy" in tags, "Expected 'lambda:CreatedBy' tag key, but not found.")
@@ -90,50 +91,85 @@ class TestBasicFunction(BaseTest):
         test_function_1 = self.get_physical_id_by_logical_id("MyTestFunction")
         test_function_2 = self.get_physical_id_by_logical_id("MyTestFunction2")
 
-        function_invoke_config_result = self.lambda_client.get_function_event_invoke_config(FunctionName=test_function_1, Qualifier="$LATEST")
-        self.assertIsNotNone(function_invoke_config_result["DestinationConfig"], "Expecting destination config to be set.")
-        self.assertEqual(int(function_invoke_config_result["MaximumEventAgeInSeconds"]), 70, "MaximumEventAgeInSeconds value is not set or incorrect.")
-        self.assertEqual(int(function_invoke_config_result["MaximumRetryAttempts"]), 1, "MaximumRetryAttempts value is not set or incorrect.")
+        function_invoke_config_result = self.lambda_client.get_function_event_invoke_config(
+            FunctionName=test_function_1, Qualifier="$LATEST"
+        )
+        self.assertIsNotNone(
+            function_invoke_config_result["DestinationConfig"], "Expecting destination config to be set."
+        )
+        self.assertEqual(
+            int(function_invoke_config_result["MaximumEventAgeInSeconds"]),
+            70,
+            "MaximumEventAgeInSeconds value is not set or incorrect.",
+        )
+        self.assertEqual(
+            int(function_invoke_config_result["MaximumRetryAttempts"]),
+            1,
+            "MaximumRetryAttempts value is not set or incorrect.",
+        )
 
-        function_invoke_config_result = self.lambda_client.get_function_event_invoke_config(FunctionName=test_function_2, Qualifier="live")
-        self.assertIsNotNone(function_invoke_config_result["DestinationConfig"], "Expecting destination config to be set.")
-        self.assertEqual(int(function_invoke_config_result["MaximumEventAgeInSeconds"]), 80, "MaximumEventAgeInSeconds value is not set or incorrect.")
-        self.assertEqual(int(function_invoke_config_result["MaximumRetryAttempts"]), 2, "MaximumRetryAttempts value is not set or incorrect.")
+        function_invoke_config_result = self.lambda_client.get_function_event_invoke_config(
+            FunctionName=test_function_2, Qualifier="live"
+        )
+        self.assertIsNotNone(
+            function_invoke_config_result["DestinationConfig"], "Expecting destination config to be set."
+        )
+        self.assertEqual(
+            int(function_invoke_config_result["MaximumEventAgeInSeconds"]),
+            80,
+            "MaximumEventAgeInSeconds value is not set or incorrect.",
+        )
+        self.assertEqual(
+            int(function_invoke_config_result["MaximumRetryAttempts"]),
+            2,
+            "MaximumRetryAttempts value is not set or incorrect.",
+        )
 
     def test_basic_function_with_tracing(self):
         """
         Creates a basic lambda function with tracing
         """
         parameters = [
-                         {
-                             'ParameterKey': 'Bucket',
-                             'ParameterValue': self.s3_bucket_name,
-                             'UsePreviousValue': False,
-                             'ResolvedValue': 'string'
-                         },
-                         {
-                             'ParameterKey': 'CodeKey',
-                             'ParameterValue': "code.zip",
-                             'UsePreviousValue': False,
-                             'ResolvedValue': 'string'
-                         },
-                         {
-                             'ParameterKey': 'SwaggerKey',
-                             'ParameterValue': "swagger1.json",
-                             'UsePreviousValue': False,
-                             'ResolvedValue': 'string'
-                         },
-                     ]
+            {
+                "ParameterKey": "Bucket",
+                "ParameterValue": self.s3_bucket_name,
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+            {
+                "ParameterKey": "CodeKey",
+                "ParameterValue": "code.zip",
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+            {
+                "ParameterKey": "SwaggerKey",
+                "ParameterValue": "swagger1.json",
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+        ]
         self.create_and_verify_stack("basic_function_with_tracing", parameters)
 
         active_tracing_function_id = self.get_physical_id_by_logical_id("ActiveTracingFunction")
         pass_through_tracing_function_id = self.get_physical_id_by_logical_id("PassThroughTracingFunction")
 
-        function_configuration_result = self.lambda_client.get_function_configuration(FunctionName=active_tracing_function_id)
+        function_configuration_result = self.lambda_client.get_function_configuration(
+            FunctionName=active_tracing_function_id
+        )
         self.assertIsNotNone(function_configuration_result["TracingConfig"], "Expecting tracing config to be set.")
-        self.assertEqual(function_configuration_result["TracingConfig"]["Mode"], "Active", "Expecting tracing config mode to be set to Active.")
+        self.assertEqual(
+            function_configuration_result["TracingConfig"]["Mode"],
+            "Active",
+            "Expecting tracing config mode to be set to Active.",
+        )
 
-        function_configuration_result = self.lambda_client.get_function_configuration(FunctionName=pass_through_tracing_function_id)
+        function_configuration_result = self.lambda_client.get_function_configuration(
+            FunctionName=pass_through_tracing_function_id
+        )
         self.assertIsNotNone(function_configuration_result["TracingConfig"], "Expecting tracing config to be set.")
-        self.assertEqual(function_configuration_result["TracingConfig"]["Mode"], "PassThrough", "Expecting tracing config mode to be set to PassThrough.")
-
+        self.assertEqual(
+            function_configuration_result["TracingConfig"]["Mode"],
+            "PassThrough",
+            "Expecting tracing config mode to be set to PassThrough.",
+        )

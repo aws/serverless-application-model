@@ -5,6 +5,7 @@ class TestBasicLayerVersion(BaseTest):
     """
     Basic AWS::Lambda::LayerVersion tests
     """
+
     def test_basic_layer_version(self):
         """
         Creates a basic lambda layer version
@@ -38,4 +39,3 @@ class TestBasicLayerVersion(BaseTest):
 
         self.assertEqual(layer_version_result["LicenseInfo"], license)
         self.assertEqual(layer_version_result["Description"], description)
-
