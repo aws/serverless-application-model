@@ -3,7 +3,9 @@ from tests_integ.helpers.base_test import BaseTest
 
 
 class TestBasicFunction(BaseTest):
-
+    """
+    Basic AWS::Lambda::Function tests
+    """
     @parameterized.expand(
         [
             "basic_function",
@@ -12,6 +14,9 @@ class TestBasicFunction(BaseTest):
         ]
     )
     def test_basic_function(self, file_name):
+        """
+        Creates a basic lambda function
+        """
         self.create_and_verify_stack(file_name)
 
         self.set_template_resource_property("MyLambdaFunction", "Timeout", 10)
@@ -27,6 +32,9 @@ class TestBasicFunction(BaseTest):
         ]
     )
     def test_basic_function_with_dlq(self, file_name, action):
+        """
+        Creates a basic lambda function with dead letter queue policy
+        """
         dlq_policy_name = "DeadLetterQueuePolicy"
         self.create_and_verify_stack(file_name)
 
@@ -45,6 +53,9 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(statements[0]['Effect'], "Allow")
 
     def test_basic_function_with_kms_key_arn(self):
+        """
+        Creates a basic lambda function with KMS key arn
+        """
         self.create_and_verify_stack("basic_function_with_kmskeyarn")
 
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
@@ -54,6 +65,9 @@ class TestBasicFunction(BaseTest):
         self.assertIsNotNone(kms_key_arn, "Expecting KmsKeyArn to be set.")
 
     def test_basic_function_with_tags(self):
+        """
+        Creates a basic lambda function with tags
+        """
         self.create_and_verify_stack("basic_function_with_tags")
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         get_function_result = self.lambda_client.get_function(FunctionName=lambda_function_name)
@@ -68,6 +82,9 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(tags["TagKey2"], "")
 
     def test_basic_function_event_destinations(self):
+        """
+        Creates a basic lambda function with event destinations
+        """
         self.create_and_verify_stack("basic_function_event_destinations")
 
         test_function_1 = self.get_physical_id_by_logical_id("MyTestFunction")
@@ -84,6 +101,9 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(int(function_invoke_config_result["MaximumRetryAttempts"]), 2, "MaximumRetryAttempts value is not set or incorrect.")
 
     def test_basic_function_with_tracing(self):
+        """
+        Creates a basic lambda function with tracing
+        """
         parameters = [
                          {
                              'ParameterKey': 'Bucket',
