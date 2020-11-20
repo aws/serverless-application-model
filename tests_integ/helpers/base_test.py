@@ -78,21 +78,21 @@ class BaseTest(TestCase):
         current_file_name = ""
 
         try:
-            for file_name, _ in FILE_TO_S3_URL_MAP.items():
+            for file_name, file_info in FILE_TO_S3_URL_MAP.items():
                 current_file_name = file_name
                 code_path = str(Path(cls.code_dir, file_name))
                 LOG.debug("Uploading file %s to bucket %s", file_name, cls.s3_bucket_name)
                 cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
                 LOG.debug("File %s uploaded successfully to bucket %s", file_name, cls.s3_bucket_name)
-                FILE_TO_S3_URL_MAP[file_name] = cls._get_s3_url(file_name)
+                file_info["url"] = cls._get_s3_url(file_name, file_info["type"])
         except ClientError as error:
             LOG.error("Upload of file %s to bucket %s failed", current_file_name, cls.s3_bucket_name, exc_info=error)
             cls._clean_bucket()
             raise error
 
     @classmethod
-    def _get_s3_url(cls, file_name):
-        if file_name != "template.yaml":
+    def _get_s3_url(cls, file_name, url_type):
+        if url_type == "s3":
             return f"s3://{cls.s3_bucket_name}/{file_name}"
 
         if cls.my_region == "us-east-1":
@@ -151,7 +151,7 @@ class BaseTest(TestCase):
         file_name : string
             Resource file name
         """
-        return FILE_TO_S3_URL_MAP[file_name]
+        return FILE_TO_S3_URL_MAP[file_name]["url"]
 
     def get_code_key_s3_uri(self, code_key):
         """
@@ -162,7 +162,7 @@ class BaseTest(TestCase):
         code_key : string
             Template code key
         """
-        return FILE_TO_S3_URL_MAP[CODE_KEY_TO_FILE_MAP[code_key]]
+        return FILE_TO_S3_URL_MAP[CODE_KEY_TO_FILE_MAP[code_key]]["url"]
 
     def get_stack_resources(self, resource_type, stack_resources=None):
         if not stack_resources:
@@ -302,7 +302,7 @@ class BaseTest(TestCase):
         value
             value
         """
-        with open(self.sub_input_file_path, "r+") as f:
+        with open(self.sub_input_file_path, "r") as f:
             data = f.read()
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
         yaml_doc['Resources'][resource_name]["Properties"][property_name] = value
@@ -311,7 +311,7 @@ class BaseTest(TestCase):
             yaml.dump(yaml_doc, f)
 
     def get_template_resource_property(self, resource_name, property_name):
-        with open(self.sub_input_file_path, "r+") as f:
+        with open(self.sub_input_file_path, "r") as f:
             data = f.read()
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
