@@ -90,16 +90,16 @@ class BaseTest(TestCase):
     @classmethod
     def _get_s3_url(cls, file_name, url_type):
         if url_type == "s3":
-            return f"s3://{cls.s3_bucket_name}/{file_name}"
+            return "s3://{}/{}".format(cls.s3_bucket_name, file_name)
 
         if cls.my_region == "us-east-1":
-            return f"https://s3.amazonaws.com/{cls.s3_bucket_name}/{file_name}"
+            return "https://s3.amazonaws.com/{}/{}".format(cls.s3_bucket_name, file_name)
         if cls.my_region == "us-iso-east-1":
-            return f"https://s3.us-iso-east-1.c2s.ic.gov/{cls.s3_bucket_name}/{file_name}"
+            return "https://s3.us-iso-east-1.c2s.ic.gov/{}/{}".format(cls.s3_bucket_name, file_name)
         if cls.my_region == "us-isob-east-1":
-            return f"https://s3.us-isob-east-1.sc2s.sgov.gov/{cls.s3_bucket_name}/{file_name}"
+            return "https://s3.us-isob-east-1.sc2s.sgov.gov/{}/{}".format(cls.s3_bucket_name, file_name)
 
-        return f"https://s3-{cls.my_region}.amazonaws.com/{cls.s3_bucket_name}/{file_name}"
+        return "https://s3-{}.amazonaws.com/{}/{}".format(cls.my_region, cls.s3_bucket_name, file_name)
 
     def setUp(self):
         self.cloudformation_client = boto3.client("cloudformation")
