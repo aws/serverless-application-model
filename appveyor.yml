@@ -18,6 +18,7 @@ install:
 - sh: "source ${HOME}/venv${PYTHON_VERSION}/bin/activate"
 - sh: "python --version"
 - make init
+- make test-integ
 
 test_script:
 - tox
