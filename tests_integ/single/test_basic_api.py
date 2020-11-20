@@ -2,7 +2,13 @@ from tests_integ.helpers.base_test import BaseTest
 
 
 class TestBasicApi(BaseTest):
+    """
+    Basic AWS::Serverless::Api tests
+    """
     def test_basic_api(self):
+        """
+        Creates an API and updates its DefinitionUri
+        """
         self.create_and_verify_stack("basic_api")
 
         first_dep_ids = self.get_stack_deployment_ids()
@@ -18,6 +24,9 @@ class TestBasicApi(BaseTest):
         self.assertEqual(len(set(first_dep_ids).intersection(second_dep_ids)), 0)
 
     def test_basic_api_inline_openapi(self):
+        """
+        Creates an API with and inline OpenAPI and updates its DefinitionBody basePath
+        """
         self.create_and_verify_stack("basic_api_inline_openapi")
 
         first_dep_ids = self.get_stack_deployment_ids()
@@ -35,6 +44,9 @@ class TestBasicApi(BaseTest):
         self.assertEqual(len(set(first_dep_ids).intersection(second_dep_ids)), 0)
 
     def test_basic_api_inline_swagger(self):
+        """
+        Creates an API with an inline Swagger and updates its DefinitionBody basePath
+        """
         self.create_and_verify_stack("basic_api_inline_swagger")
 
         first_dep_ids = self.get_stack_deployment_ids()
@@ -52,6 +64,9 @@ class TestBasicApi(BaseTest):
         self.assertEqual(len(set(first_dep_ids).intersection(second_dep_ids)), 0)
 
     def test_basic_api_with_tags(self):
+        """
+        Creates an API with tags
+        """
         self.create_and_verify_stack("basic_api_with_tags")
 
         stages = self.get_stack_stages()
