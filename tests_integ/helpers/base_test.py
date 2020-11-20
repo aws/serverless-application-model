@@ -30,6 +30,8 @@ class BaseTest(TestCase):
         cls.my_region = cls.session.region_name
         cls.s3_client = boto3.client("s3")
         cls.api_client = boto3.client('apigateway', cls.my_region)
+        cls.lambda_client = boto3.client('lambda')
+        cls.iam_client = boto3.client('iam')
 
         if not os.path.exists(cls.output_dir):
             os.mkdir(cls.output_dir)
@@ -97,7 +99,7 @@ class BaseTest(TestCase):
         if os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-    def create_and_verify_stack(self, file_name):
+    def create_and_verify_stack(self, file_name, parameters=[]):
         """
         Creates the Cloud Formation stack and verifies it against the expected
         result
@@ -106,6 +108,8 @@ class BaseTest(TestCase):
         ----------
         file_name : string
             Template file name
+        parameters : list
+            List of parameters
         """
         self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
         self.expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
@@ -113,7 +117,7 @@ class BaseTest(TestCase):
 
         self._fill_template(file_name)
         self.transform_template()
-        self.deploy_stack()
+        self.deploy_stack(parameters)
         self.verify_stack()
 
     def transform_template(self):
@@ -161,6 +165,56 @@ class BaseTest(TestCase):
                 return self.api_client.get_stages(restApiId=res["PhysicalResourceId"])["item"]
 
         return []
+
+    def get_stack_outputs(self):
+        if not self.stack_description:
+            return {}
+        else:
+            output_key_to_value = {}
+            output_list = self.stack_description["Outputs"]
+            for output in output_list:
+                output_key_to_value[output["OutputKey"]] = output["OutputValue"]
+            return output_key_to_value
+
+    def get_resource_status_by_logical_id(self, logical_id):
+        if not self.stack_resources:
+            return ""
+
+        for res in self.stack_resources["StackResourceSummaries"]:
+            if res["LogicalResourceId"] == logical_id:
+                return res["ResourceStatus"]
+
+        return ""
+
+    def get_physical_id_by_type(self, resource_type):
+        if not self.stack_resources:
+            return ""
+
+        for res in self.stack_resources["StackResourceSummaries"]:
+            if res["ResourceType"] == resource_type:
+                return res["PhysicalResourceId"]
+
+        return ""
+
+    def get_logical_id_by_type(self, resource_type):
+        if not self.stack_resources:
+            return ""
+
+        for res in self.stack_resources["StackResourceSummaries"]:
+            if res["ResourceType"] == resource_type:
+                return res["LogicalResourceId"]
+
+        return ""
+
+    def get_physical_id_by_logical_id(self, logical_id):
+        if not self.stack_resources:
+            return ""
+
+        for res in self.stack_resources["StackResourceSummaries"]:
+            if res["LogicalResourceId"] == logical_id:
+                return res["PhysicalResourceId"]
+
+        return ""
 
     def _fill_template(self, file_name):
         """
@@ -212,7 +266,7 @@ class BaseTest(TestCase):
 
         return yaml_doc['Resources'][resource_name]["Properties"][property_name]
 
-    def deploy_stack(self):
+    def deploy_stack(self, parameters=[]):
         """
         Deploys the current cloud formation stack
         """
@@ -220,7 +274,7 @@ class BaseTest(TestCase):
             result, changeset_type = self.deployer.create_and_wait_for_changeset(
                 stack_name=self.stack_name,
                 cfn_template=cfn_file.read(),
-                parameter_values=[],
+                parameter_values=parameters,
                 capabilities=["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
                 role_arn=None,
                 notification_arns=[],
