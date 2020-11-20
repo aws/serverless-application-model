@@ -32,6 +32,8 @@ class BaseTest(TestCase):
         cls.api_client = boto3.client('apigateway', cls.my_region)
         cls.lambda_client = boto3.client('lambda')
         cls.iam_client = boto3.client('iam')
+        cls.api_v2_client = boto3.client('apigatewayv2')
+        cls.sfn_client = boto3.client('stepfunctions')
 
         if not os.path.exists(cls.output_dir):
             os.mkdir(cls.output_dir)
@@ -82,11 +84,25 @@ class BaseTest(TestCase):
                 LOG.debug("Uploading file %s to bucket %s", file_name, cls.s3_bucket_name)
                 cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
                 LOG.debug("File %s uploaded successfully to bucket %s", file_name, cls.s3_bucket_name)
-                FILE_TO_S3_URL_MAP[file_name] = f"s3://{cls.s3_bucket_name}/{file_name}"
+                FILE_TO_S3_URL_MAP[file_name] = cls._get_s3_url(file_name)
         except ClientError as error:
             LOG.error("Upload of file %s to bucket %s failed", current_file_name, cls.s3_bucket_name, exc_info=error)
             cls._clean_bucket()
             raise error
+
+    @classmethod
+    def _get_s3_url(cls, file_name):
+        if file_name != "template.yaml":
+            return f"s3://{cls.s3_bucket_name}/{file_name}"
+
+        if cls.my_region == "us-east-1":
+            return f"https://s3.amazonaws.com/{cls.s3_bucket_name}/{file_name}"
+        if cls.my_region == "us-iso-east-1":
+            return f"https://s3.us-iso-east-1.c2s.ic.gov/{cls.s3_bucket_name}/{file_name}"
+        if cls.my_region == "us-isob-east-1":
+            return f"https://s3.us-isob-east-1.sc2s.sgov.gov/{cls.s3_bucket_name}/{file_name}"
+
+        return f"https://s3-{cls.my_region}.amazonaws.com/{cls.s3_bucket_name}/{file_name}"
 
     def setUp(self):
         self.cloudformation_client = boto3.client("cloudformation")
@@ -122,6 +138,9 @@ class BaseTest(TestCase):
 
     def transform_template(self):
         transform_template(self.sub_input_file_path, self.output_file_path)
+    
+    def get_region(self):
+        return self.my_region
 
     def get_s3_uri(self, file_name):
         """
@@ -145,26 +164,58 @@ class BaseTest(TestCase):
         """
         return FILE_TO_S3_URL_MAP[CODE_KEY_TO_FILE_MAP[code_key]]
 
-    def get_stack_deployment_ids(self):
-        ids = []
-        if not self.stack_resources:
-            return ids
+    def get_stack_resources(self, resource_type, stack_resources=None):
+        if not stack_resources:
+            stack_resources = self.stack_resources
 
-        for res in self.stack_resources["StackResourceSummaries"]:
-            if res["ResourceType"] == "AWS::ApiGateway::Deployment":
-                ids.append(res["LogicalResourceId"])
+        resources = []
+        for res in stack_resources["StackResourceSummaries"]:
+            if res["ResourceType"] == resource_type:
+                resources.append(res)
+
+        return resources
+    
+    def get_stack_output(self, output_key):
+        for output in self.stack_description["Stacks"][0]["Outputs"]:
+            if output["OutputKey"] == output_key:
+                return output
+        return None
+
+    def get_stack_tags(self, output_name):
+        resource_arn = self.get_stack_output(output_name)["OutputValue"]
+        return self.sfn_client.list_tags_for_resource(resourceArn=resource_arn)["tags"]
+
+    def get_stack_deployment_ids(self):
+        resources = self.get_stack_resources("AWS::ApiGateway::Deployment")
+        ids = []
+        for res in resources:
+            ids.append(res["LogicalResourceId"])
 
         return ids
 
     def get_stack_stages(self):
-        if not self.stack_resources:
+        resources = self.get_stack_resources("AWS::ApiGateway::RestApi")
+
+        if not resources:
             return []
 
-        for res in self.stack_resources["StackResourceSummaries"]:
-            if res["ResourceType"] == "AWS::ApiGateway::RestApi":
-                return self.api_client.get_stages(restApiId=res["PhysicalResourceId"])["item"]
+        return self.api_client.get_stages(restApiId=resources[0]["PhysicalResourceId"])["item"]
 
-        return []
+    def get_stack_stages_v2(self):
+        resources = self.get_stack_resources("AWS::ApiGatewayV2::Api")
+
+        if not resources:
+            return None
+
+        return self.api_v2_client.get_stages(ApiId=resources[0]["PhysicalResourceId"])["Items"]
+
+    def get_stack_nested_stack_resources(self):
+        resources = self.get_stack_resources("AWS::CloudFormation::Stack")
+
+        if not resources:
+            return None
+
+        return self.cloudformation_client.list_stack_resources(StackName=resources[0]["PhysicalResourceId"])
 
     def get_stack_outputs(self):
         if not self.stack_description:
