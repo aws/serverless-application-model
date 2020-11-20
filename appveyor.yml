@@ -2,6 +2,9 @@ version: 1.0.{build}
 image: Ubuntu
 
 environment:
+
+  AWS_DEFAULT_REGION: us-east-1
+
   matrix:
   - TOXENV: py27
     PYTHON_VERSION: '2.7'
