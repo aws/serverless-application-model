@@ -53,6 +53,7 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
+      DisableExecuteApiEndpoint: False
       Domain:
         DomainName: !Sub 'example-${AWS::Region}.com'
         CertificateArn: !Ref MyDomainCert
