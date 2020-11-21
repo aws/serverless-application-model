@@ -278,7 +278,7 @@ class BaseTest(TestCase):
         with open(input_file_path, "r") as f:
             data = f.read()
         for key, _ in CODE_KEY_TO_FILE_MAP.items():
-            data = data.replace(f"${{{key}}}", self.get_code_key_s3_uri(key))
+            data = data.replace("${{{}}}".format(key), self.get_code_key_s3_uri(key))
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
         with open(updated_template_path, "w") as f:
