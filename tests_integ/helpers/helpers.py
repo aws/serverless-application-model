@@ -20,7 +20,7 @@ def transform_template(input_file_path, output_file_path):
     LOG = logging.getLogger(__name__)
     iam_client = boto3.client("iam")
 
-    with open(input_file_path, "r") as f:
+    with open(input_file_path) as f:
         sam_template = yaml_parse(f)
 
     try:
@@ -39,7 +39,7 @@ def transform_template(input_file_path, output_file_path):
 
 
 def verify_stack_resources(expected_file_path, stack_resources):
-    with open(expected_file_path, "r") as expected_data:
+    with open(expected_file_path) as expected_data:
         expected_resources = _sort_resources(json.load(expected_data))
     parsed_resources = _sort_resources(stack_resources["StackResourceSummaries"])
 

@@ -9,7 +9,7 @@ import yaml
 from botocore.exceptions import ClientError
 from samcli.lib.deploy.deployer import Deployer
 from tests_integ.helpers.helpers import transform_template, verify_stack_resources, generate_suffix, create_bucket
-from tests_integ.helpers.file_resources import FILE_TO_S3_URL_MAP, CODE_KEY_TO_FILE_MAP
+from tests_integ.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
 STACK_NAME_PREFIX = "sam-integ-stack-"
@@ -75,21 +75,21 @@ class BaseTest(TestCase):
         current_file_name = ""
 
         try:
-            for file_name, file_info in FILE_TO_S3_URL_MAP.items():
+            for file_name, file_info in FILE_TO_S3_URI_MAP.items():
                 current_file_name = file_name
                 code_path = str(Path(cls.code_dir, file_name))
                 LOG.debug("Uploading file %s to bucket %s", file_name, cls.s3_bucket_name)
                 cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
                 LOG.debug("File %s uploaded successfully to bucket %s", file_name, cls.s3_bucket_name)
-                file_info["url"] = cls._get_s3_url(file_name, file_info["type"])
+                file_info["uri"] = cls._get_s3_uri(file_name, file_info["type"])
         except ClientError as error:
             LOG.error("Upload of file %s to bucket %s failed", current_file_name, cls.s3_bucket_name, exc_info=error)
             cls._clean_bucket()
             raise error
 
     @classmethod
-    def _get_s3_url(cls, file_name, url_type):
-        if url_type == "s3":
+    def _get_s3_uri(cls, file_name, uri_type):
+        if uri_type == "s3":
             return "s3://{}/{}".format(cls.s3_bucket_name, file_name)
 
         if cls.my_region == "us-east-1":
@@ -112,7 +112,7 @@ class BaseTest(TestCase):
         if os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-    def create_and_verify_stack(self, file_name, parameters=[]):
+    def create_and_verify_stack(self, file_name, parameters=None):
         """
         Creates the Cloud Formation stack and verifies it against the expected
         result
@@ -148,7 +148,7 @@ class BaseTest(TestCase):
         file_name : string
             Resource file name
         """
-        return FILE_TO_S3_URL_MAP[file_name]["url"]
+        return FILE_TO_S3_URI_MAP[file_name]["uri"]
 
     def get_code_key_s3_uri(self, code_key):
         """
@@ -159,7 +159,7 @@ class BaseTest(TestCase):
         code_key : string
             Template code key
         """
-        return FILE_TO_S3_URL_MAP[CODE_KEY_TO_FILE_MAP[code_key]]["url"]
+        return FILE_TO_S3_URI_MAP[CODE_KEY_TO_FILE_MAP[code_key]]["uri"]
 
     def get_stack_resources(self, resource_type, stack_resources=None):
         if not stack_resources:
@@ -217,12 +217,11 @@ class BaseTest(TestCase):
     def get_stack_outputs(self):
         if not self.stack_description:
             return {}
-        else:
-            output_key_to_value = {}
-            output_list = self.stack_description["Stacks"][0]["Outputs"]
-            for output in output_list:
-                output_key_to_value[output["OutputKey"]] = output["OutputValue"]
-            return output_key_to_value
+        output_list = self.stack_description["Stacks"][0]["Outputs"]
+        return {
+            output["OutputKey"]: output["OutputValue"]
+            for output in output_list
+        }
 
     def get_resource_status_by_logical_id(self, logical_id):
         if not self.stack_resources:
@@ -275,14 +274,14 @@ class BaseTest(TestCase):
         """
         input_file_path = str(Path(self.template_dir, file_name + ".yaml"))
         updated_template_path = str(Path(self.output_dir, "sub_" + file_name + ".yaml"))
-        with open(input_file_path, "r") as f:
+        with open(input_file_path) as f:
             data = f.read()
         for key, _ in CODE_KEY_TO_FILE_MAP.items():
+            # We must double the {} to escape them so they will survive a round of unescape
             data = data.replace("${{{}}}".format(key), self.get_code_key_s3_uri(key))
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
-        with open(updated_template_path, "w") as f:
-            yaml.dump(yaml_doc, f)
+        self._dump_yaml(updated_template_path, yaml_doc)
 
         self.sub_input_file_path = updated_template_path
 
@@ -299,30 +298,23 @@ class BaseTest(TestCase):
         value
             value
         """
-        with open(self.sub_input_file_path, "r") as f:
-            data = f.read()
-        yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
+        yaml_doc = self._load_yaml(self.sub_input_file_path)
         yaml_doc["Resources"][resource_name]["Properties"][property_name] = value
-
-        with open(self.sub_input_file_path, "w") as f:
-            yaml.dump(yaml_doc, f)
+        self._dump_yaml(self.sub_input_file_path, yaml_doc)
 
     def get_template_resource_property(self, resource_name, property_name):
-        with open(self.sub_input_file_path, "r") as f:
-            data = f.read()
-        yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
-
+        yaml_doc = yaml_doc = self._load_yaml(self.sub_input_file_path)
         return yaml_doc["Resources"][resource_name]["Properties"][property_name]
 
-    def deploy_stack(self, parameters=[]):
+    def deploy_stack(self, parameters=None):
         """
         Deploys the current cloud formation stack
         """
-        with open(self.output_file_path, "r") as cfn_file:
+        with open(self.output_file_path) as cfn_file:
             result, changeset_type = self.deployer.create_and_wait_for_changeset(
                 stack_name=self.stack_name,
                 cfn_template=cfn_file.read(),
-                parameter_values=parameters,
+                parameter_values=[] if parameters is None else parameters,
                 capabilities=["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
                 role_arn=None,
                 notification_arns=[],
@@ -343,3 +335,35 @@ class BaseTest(TestCase):
         self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
         # verify if the stack contains the expected resources
         self.assertTrue(verify_stack_resources(self.expected_resource_path, self.stack_resources))
+
+    def _load_yaml(self, file_path):
+        """
+        Loads a yaml file
+
+        Parameters
+        ----------
+        file_path : Path
+            File path
+
+        Returns
+        -------
+        Object
+            Yaml object
+        """
+        with open(file_path) as f:
+            data = f.read()
+        return yaml.load(data, Loader=yaml.FullLoader)
+
+    def _dump_yaml(self, file_path, yaml_doc):
+        """
+        Writes a yaml object to a file
+
+        Parameters
+        ----------
+        file_path : Path
+            File path
+        yaml_doc : Object
+            Yaml object
+        """
+        with open(file_path, "w") as f:
+            yaml.dump(yaml_doc, f)
