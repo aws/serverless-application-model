@@ -82,6 +82,7 @@ class SamFunction(SamResourceMacro):
         "VersionDescription": PropertyType(False, is_str()),
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
         "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
+        "CodeSigningConfigArn": PropertyType(False, is_str()),
     }
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -411,6 +412,8 @@ class SamFunction(SamResourceMacro):
 
         if self.DeadLetterQueue:
             lambda_function.DeadLetterConfig = {"TargetArn": self.DeadLetterQueue["TargetArn"]}
+
+        lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
         return lambda_function
 
