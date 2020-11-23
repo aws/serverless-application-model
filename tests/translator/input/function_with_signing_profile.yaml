@@ -1,0 +1,24 @@
+Resources:
+
+  FunctionWithSigningProfile:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      CodeSigningConfigArn: !Ref MySignedFunctionCodeSigningConfig
+
+  MySignedFunctionCodeSigningConfig:
+    Type: AWS::Lambda::CodeSigningConfig
+    Properties:
+      Description: "Code Signing for MySignedLambdaFunction"
+      AllowedPublishers:
+        SigningProfileVersionArns:
+          - !GetAtt SigningProfile.ProfileVersionArn
+      CodeSigningPolicies:
+        UntrustedArtifactOnDeployment: "Enforce"
+
+  SigningProfile:
+    Type: AWS::Signer::SigningProfile
+    Properties:
+      PlatformId: AWSLambda-SHA384-ECDSA
