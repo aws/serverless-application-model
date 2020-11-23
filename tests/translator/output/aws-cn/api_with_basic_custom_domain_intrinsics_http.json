@@ -306,6 +306,13 @@
               "name": "httpapi:createdBy", 
               "x-amazon-apigateway-tag-value": "SAM"
             }
+          ],
+          "servers": [
+            {
+              "x-amazon-apigateway-endpoint-configuration": {
+                "disableExecuteApiEndpoint": false
+              }
+            }
           ]
         }
       }, 

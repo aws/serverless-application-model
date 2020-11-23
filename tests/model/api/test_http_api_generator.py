@@ -237,14 +237,14 @@ class TestCustomDomains(TestCase):
         self.kwargs["domain"] = {
             "DomainName": "example.com",
             "CertificateArn": "some-url",
-            "BasePath": ["one-1", "two_2", "three"],
+            "BasePath": ["one-1", "two_2", "three", "/"],
             "Route53": {"HostedZoneId": "xyz", "HostedZoneName": "abc", "IpV6": True},
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
         self.assertIsNotNone(domain, None)
         self.assertIsNotNone(basepath, None)
-        self.assertEqual(len(basepath), 3)
+        self.assertEqual(len(basepath), 4)
         self.assertIsNotNone(route, None)
         self.assertEqual(route.HostedZoneName, None)
         self.assertEqual(route.HostedZoneId, "xyz")

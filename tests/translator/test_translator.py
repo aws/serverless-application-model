@@ -251,6 +251,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_conditional_policy_template",
                 "function_with_conditional_policy_template_and_ref_no_value",
                 "function_with_request_parameters",
+                "function_with_signing_profile",
                 "global_handle_path_level_parameter",
                 "globals_for_function",
                 "globals_for_api",
@@ -665,6 +666,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_httpapi_mtls_configuration_invalid_field",
         "error_httpapi_mtls_configuration_invalid_type",
         "error_resource_policy_not_dict",
+        "error_implicit_http_api_auth_any_method",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

@@ -25,6 +25,37 @@ class TestVersionsAndAliases(TestCase):
         self.lambda_func = self._make_lambda_function(self.sam_func.logical_id)
         self.lambda_version = self._make_lambda_version("VersionLogicalId", self.sam_func)
 
+    @patch("boto3.session.Session.region_name", "us-west-2")
+    def test_sam_function_with_code_signer(self):
+        code_signing_config_arn = "code_signing_config_arn"
+        func = {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "CodeUri": self.code_uri,
+                "Runtime": "nodejs12.x",
+                "Handler": "index.handler",
+                "CodeSigningConfigArn": code_signing_config_arn,
+            },
+        }
+
+        sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
+
+        kwargs = {}
+        kwargs["managed_policy_map"] = {"a": "b"}
+        kwargs["event_resources"] = []
+        kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
+            "S3Bucket": "bucket",
+            "S3Key": "key",
+            "S3ObjectVersion": "version",
+        }
+        resources = sam_func.to_cloudformation(**kwargs)
+
+        lambda_functions = [r.to_dict() for r in resources if r.resource_type == LambdaFunction.resource_type]
+        self.assertEqual(len(lambda_functions), 1)
+        expected_code_signing_config_arn = lambda_functions[0]["foo"]["Properties"]["CodeSigningConfigArn"]
+        self.assertEqual(expected_code_signing_config_arn, code_signing_config_arn)
+
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     @patch.object(SamFunction, "_get_resolved_alias_name")
     def test_sam_function_with_alias(self, get_resolved_alias_name_mock):

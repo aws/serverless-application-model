@@ -23,6 +23,7 @@ class LambdaFunction(Resource):
         "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "ReservedConcurrentExecutions": PropertyType(False, any_type()),
         "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
+        "CodeSigningConfigArn": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
