@@ -39,7 +39,7 @@ class BaseTest(TestCase):
         cls.sfn_client = boto3.client("stepfunctions")
 
         if not cls.output_dir.exists():
-            os.mkdir(cls.output_dir)
+            os.mkdir(str(cls.output_dir))
 
         cls._upload_resources()
 
@@ -306,7 +306,7 @@ class BaseTest(TestCase):
         self._dump_yaml(self.sub_input_file_path, yaml_doc)
 
     def get_template_resource_property(self, resource_name, property_name):
-        yaml_doc = yaml_doc = self._load_yaml(self.sub_input_file_path)
+        yaml_doc = self._load_yaml(self.sub_input_file_path)
         return yaml_doc["Resources"][resource_name]["Properties"][property_name]
 
     def deploy_stack(self, parameters=None):
