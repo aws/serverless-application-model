@@ -1,13 +1,16 @@
 import logging
 import os
-from pathlib import Path
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
 from unittest.case import TestCase
 
 import boto3
 import pytest
 import yaml
 from botocore.exceptions import ClientError
-from samcli.lib.deploy.deployer import Deployer
+from tests_integ.helpers.deployer.deployer import Deployer
 from tests_integ.helpers.helpers import transform_template, verify_stack_resources, generate_suffix, create_bucket
 from tests_integ.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
@@ -35,7 +38,7 @@ class BaseTest(TestCase):
         cls.api_v2_client = boto3.client("apigatewayv2")
         cls.sfn_client = boto3.client("stepfunctions")
 
-        if not os.path.exists(cls.output_dir):
+        if not cls.output_dir.exists():
             os.mkdir(cls.output_dir)
 
         cls._upload_resources()
@@ -103,7 +106,7 @@ class BaseTest(TestCase):
 
     def setUp(self):
         self.cloudformation_client = boto3.client("cloudformation")
-        self.deployer = Deployer(self.cloudformation_client, changeset_prefix="sam-integ-")
+        self.deployer = Deployer(self.cloudformation_client)
 
     def tearDown(self):
         self.cloudformation_client.delete_stack(StackName=self.stack_name)
