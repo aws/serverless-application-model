@@ -15,7 +15,7 @@ Cloudformation deploy class which also streams events and changeset information
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-# This is a modified version of the Deployer class from aws-sam-cli 
+# This is a modified version of the Deployer class from aws-sam-cli
 # (and its dependencies) to work with python 2
 # Modifications:
 #  - Imports now reference local classes
@@ -35,7 +35,12 @@ import botocore
 
 from tests_integ.helpers.deployer.utils.colors import DeployColor
 from tests_integ.helpers.deployer.exceptions import exceptions as deploy_exceptions
-from tests_integ.helpers.deployer.utils.table_print import pprint_column_names, pprint_columns, newline_per_item, MIN_OFFSET
+from tests_integ.helpers.deployer.utils.table_print import (
+    pprint_column_names,
+    pprint_columns,
+    newline_per_item,
+    MIN_OFFSET,
+)
 from tests_integ.helpers.deployer.utils.artifact_exporter import mktempfile, parse_s3_url
 from tests_integ.helpers.deployer.utils.time import utc_to_timestamp
 
@@ -195,7 +200,9 @@ class Deployer:
             return resp, changeset_type
         except botocore.exceptions.ClientError as ex:
             if "The bucket you are attempting to access must be addressed using the specified endpoint" in str(ex):
-                raise deploy_exceptions.DeployBucketInDifferentRegionError("Failed to create/update stack {}".format(stack_name))
+                raise deploy_exceptions.DeployBucketInDifferentRegionError(
+                    "Failed to create/update stack {}".format(stack_name)
+                )
             raise deploy_exceptions.ChangeSetError(stack_name=stack_name, msg=str(ex))
 
         except Exception as ex:

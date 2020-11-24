@@ -2,10 +2,11 @@
 Utilities for table pretty printing using click
 """
 from itertools import count
+
 try:
     from itertools import zip_longest
-except ImportError: # py2
-    from itertools import izip_longest as zip_longest 
+except ImportError:  # py2
+    from itertools import izip_longest as zip_longest
 import textwrap
 from functools import wraps
 

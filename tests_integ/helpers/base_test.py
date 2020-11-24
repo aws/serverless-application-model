@@ -1,5 +1,6 @@
 import logging
 import os
+
 try:
     from pathlib import Path
 except ImportError:
@@ -221,10 +222,7 @@ class BaseTest(TestCase):
         if not self.stack_description:
             return {}
         output_list = self.stack_description["Stacks"][0]["Outputs"]
-        return {
-            output["OutputKey"]: output["OutputValue"]
-            for output in output_list
-        }
+        return {output["OutputKey"]: output["OutputValue"] for output in output_list}
 
     def get_resource_status_by_logical_id(self, logical_id):
         if not self.stack_resources:

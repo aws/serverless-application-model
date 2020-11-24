@@ -63,6 +63,7 @@ class Colored:
         kwargs = {"fg": color}
         return click.style(msg, **kwargs) if self.colorize else msg
 
+
 class DeployColor:
     def __init__(self):
         self._color = Colored()

@@ -3,6 +3,7 @@ Exceptions that are raised by sam deploy
 """
 import click
 
+
 class UserException(click.ClickException):
     """
     Base class for all exceptions that need to be surfaced to the user. Typically, we will display the exception
@@ -15,6 +16,7 @@ class UserException(click.ClickException):
         self.wrapped_from = wrapped_from
 
         click.ClickException.__init__(self, message)
+
 
 class ChangeEmptyError(UserException):
     def __init__(self, stack_name):
@@ -54,7 +56,9 @@ class DeployStackOutPutFailedError(UserException):
 
         message_fmt = "Failed to get outputs from stack: {stack_name}, {msg}"
 
-        super(DeployStackOutPutFailedError, self).__init__(message=message_fmt.format(stack_name=self.stack_name, msg=msg))
+        super(DeployStackOutPutFailedError, self).__init__(
+            message=message_fmt.format(stack_name=self.stack_name, msg=msg)
+        )
 
 
 class DeployBucketInDifferentRegionError(UserException):
