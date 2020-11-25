@@ -2,7 +2,7 @@ import json
 import logging
 import re
 import random
-import string  # not deprecated, a bug from pylint https://www.logilab.org/ticket/2481
+import string  # pylint: disable=deprecated-module
 from functools import reduce
 
 import boto3
@@ -13,24 +13,38 @@ from samtranslator.translator.managed_policy_translator import ManagedPolicyLoad
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 
+# Length of the suffix sometimes added by CFN to logical IDs
+LOGICAL_RES_SUFFIX_LENGTH = 10
+# Length of the random suffix added at the end of the resources we create
+# to avoid collisions between tests
 RANDOM_SUFFIX_LENGTH = 12
 
 
-def transform_template(input_file_path, output_file_path):
+def transform_template(sam_template_path, cfn_output_path):
+    """
+    Locally transforms a SAM template to a Cloud Formation template
+
+    Parameters
+    ----------
+    sam_template_path : Path
+        SAM template input path
+    cfn_output_path : Path
+        Cloud formation template output path
+    """
     LOG = logging.getLogger(__name__)
     iam_client = boto3.client("iam")
 
-    with open(input_file_path) as f:
+    with open(sam_template_path) as f:
         sam_template = yaml_parse(f)
 
     try:
         cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=2)
 
-        with open(output_file_path, "w") as f:
+        with open(cfn_output_path, "w") as f:
             f.write(cloud_formation_template_prettified)
 
-        print("Wrote transformed CloudFormation template to: " + output_file_path)
+        print("Wrote transformed CloudFormation template to: " + cfn_output_path)
     except InvalidDocumentException as e:
         error_message = reduce(lambda message, error: message + " " + error.message, e.causes, e.message)
         LOG.error(error_message)
@@ -39,6 +53,21 @@ def transform_template(input_file_path, output_file_path):
 
 
 def verify_stack_resources(expected_file_path, stack_resources):
+    """
+    Verifies that the stack resources match the expected ones
+
+    Parameters
+    ----------
+    expected_file_path : Path
+        Path to the file containing the expected resources
+    stack_resources : List
+        Stack resources
+
+    Returns
+    -------
+    bool
+        True if the stack resources exactly match the expected ones, False otherwise
+    """
     with open(expected_file_path) as expected_data:
         expected_resources = _sort_resources(json.load(expected_data))
     parsed_resources = _sort_resources(stack_resources["StackResourceSummaries"])
@@ -49,7 +78,10 @@ def verify_stack_resources(expected_file_path, stack_resources):
     for i in range(len(expected_resources)):
         exp = expected_resources[i]
         parsed = parsed_resources[i]
-        if not re.match("^" + exp["LogicalResourceId"] + "([0-9a-f]{10})?$", parsed["LogicalResourceId"]):
+        if not re.match(
+            "^" + exp["LogicalResourceId"] + "([0-9a-f]{" + str(LOGICAL_RES_SUFFIX_LENGTH) + "})?$",
+            parsed["LogicalResourceId"],
+        ):
             return False
         if exp["ResourceType"] != parsed["ResourceType"]:
             return False
@@ -57,32 +89,57 @@ def verify_stack_resources(expected_file_path, stack_resources):
 
 
 def generate_suffix():
-    # Very basic random letters generator
+    """
+    Generates a basic random string of length RANDOM_SUFFIX_LENGTH
+    to append to objects names used in the tests to avoid collisions
+    between tests runs
+
+    Returns
+    -------
+    string
+        Random lowercase alphanumeric string of length RANDOM_SUFFIX_LENGTH
+    """
     return "".join(random.choice(string.ascii_lowercase) for i in range(RANDOM_SUFFIX_LENGTH))
 
 
 def _sort_resources(resources):
+    """
+    Sorts a stack's resources by LogicalResourceId
+
+    Parameters
+    ----------
+    resources : list
+        Resources to sort
+
+    Returns
+    -------
+    list
+        List of resources, sorted
+    """
+    if resources is None:
+        return []
     return sorted(resources, key=lambda d: d["LogicalResourceId"])
 
 
-def create_bucket(bucket_name, region=None):
-    """Create an S3 bucket in a specified region
-
-    copy code from boto3 doc example
-    MG: removed the try so that the exception bubbles up and interrupts the test
-
-    If a region is not specified, the bucket is created in the S3 default
-    region (us-east-1).
-
-    :param bucket_name: Bucket to create
-    :param region: String region to create bucket in, e.g., 'us-west-2'
-    :return: True if bucket created, else False
+def create_bucket(bucket_name, region):
     """
+    Creates a S3 bucket in a specific region
 
-    # Create bucket
+    Parameters
+    ----------
+    bucket_name : string
+        Bucket name
+    region : string
+        Region name
+
+    Raises
+    ------
+    NoRegionError
+        If region is not specified
+    """
     if region is None:
         raise NoRegionError()
-    elif region == "us-east-1":
+    if region == "us-east-1":
         s3_client = boto3.client("s3")
         s3_client.create_bucket(Bucket=bucket_name)
     else:

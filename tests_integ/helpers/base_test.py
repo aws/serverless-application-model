@@ -206,7 +206,7 @@ class BaseTest(TestCase):
         resources = self.get_stack_resources("AWS::ApiGatewayV2::Api")
 
         if not resources:
-            return None
+            return []
 
         return self.api_v2_client.get_stages(ApiId=resources[0]["PhysicalResourceId"])["Items"]
 
@@ -226,43 +226,43 @@ class BaseTest(TestCase):
 
     def get_resource_status_by_logical_id(self, logical_id):
         if not self.stack_resources:
-            return ""
+            return None
 
         for res in self.stack_resources["StackResourceSummaries"]:
             if res["LogicalResourceId"] == logical_id:
                 return res["ResourceStatus"]
 
-        return ""
+        return None
 
     def get_physical_id_by_type(self, resource_type):
         if not self.stack_resources:
-            return ""
+            return None
 
         for res in self.stack_resources["StackResourceSummaries"]:
             if res["ResourceType"] == resource_type:
                 return res["PhysicalResourceId"]
 
-        return ""
+        return None
 
     def get_logical_id_by_type(self, resource_type):
         if not self.stack_resources:
-            return ""
+            return None
 
         for res in self.stack_resources["StackResourceSummaries"]:
             if res["ResourceType"] == resource_type:
                 return res["LogicalResourceId"]
 
-        return ""
+        return None
 
     def get_physical_id_by_logical_id(self, logical_id):
         if not self.stack_resources:
-            return ""
+            return None
 
         for res in self.stack_resources["StackResourceSummaries"]:
             if res["LogicalResourceId"] == logical_id:
                 return res["PhysicalResourceId"]
 
-        return ""
+        return None
 
     def _fill_template(self, file_name):
         """
