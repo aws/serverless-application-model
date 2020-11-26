@@ -33,7 +33,7 @@ class BaseTest(TestCase):
         cls.session = boto3.session.Session()
         cls.my_region = cls.session.region_name
         cls.s3_client = boto3.client("s3")
-        cls.api_client = boto3.client("apigateway", cls.my_region)
+        cls.api_client = boto3.client("apigateway")
         cls.lambda_client = boto3.client("lambda")
         cls.iam_client = boto3.client("iam")
         cls.api_v2_client = boto3.client("apigatewayv2")
@@ -194,7 +194,7 @@ class BaseTest(TestCase):
 
         return ids
 
-    def get_stack_stages(self):
+    def get_api_stack_stages(self):
         resources = self.get_stack_resources("AWS::ApiGateway::RestApi")
 
         if not resources:
@@ -202,7 +202,7 @@ class BaseTest(TestCase):
 
         return self.api_client.get_stages(restApiId=resources[0]["PhysicalResourceId"])["item"]
 
-    def get_stack_stages_v2(self):
+    def get_api_v2_stack_stages(self):
         resources = self.get_stack_resources("AWS::ApiGatewayV2::Api")
 
         if not resources:

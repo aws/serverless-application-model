@@ -12,7 +12,7 @@ class TestBasicHttpApi(BaseTest):
         """
         self.create_and_verify_stack("basic_http_api")
 
-        stages = self.get_stack_stages_v2()
+        stages = self.get_api_v2_stack_stages()
 
         self.assertEqual(len(stages), 1)
         self.assertEqual(stages[0]["StageName"], "$default")

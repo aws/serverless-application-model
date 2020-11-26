@@ -43,12 +43,6 @@ class DeployFailedError(UserException):
         super(DeployFailedError, self).__init__(message=message_fmt.format(stack_name=self.stack_name, msg=msg))
 
 
-class GuidedDeployFailedError(UserException):
-    def __init__(self, msg):
-        self.msg = msg
-        super(GuidedDeployFailedError, self).__init__(message=msg)
-
-
 class DeployStackOutPutFailedError(UserException):
     def __init__(self, stack_name, msg):
         self.stack_name = stack_name
@@ -68,26 +62,3 @@ class DeployBucketInDifferentRegionError(UserException):
         message_fmt = "{msg} : deployment s3 bucket is in a different region, try sam deploy --guided"
 
         super(DeployBucketInDifferentRegionError, self).__init__(message=message_fmt.format(msg=self.msg))
-
-
-class DeployBucketRequiredError(UserException):
-    def __init__(self):
-
-        message_fmt = (
-            "Templates with a size greater than 51,200 bytes must be deployed "
-            "via an S3 Bucket. Please add the --s3-bucket parameter to your "
-            "command. The local template will be copied to that S3 bucket and "
-            "then deployed."
-        )
-
-        super(DeployBucketRequiredError, self).__init__(message=message_fmt)
-
-
-class DeployResolveS3AndS3SetError(UserException):
-    def __init__(self):
-        message_fmt = (
-            "Cannot use both --resolve-s3 and --s3-bucket parameters in non-guided deployments."
-            " Please use only one or use the --guided option for a guided deployment."
-        )
-
-        super(DeployResolveS3AndS3SetError, self).__init__(message=message_fmt)

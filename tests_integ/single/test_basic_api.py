@@ -70,7 +70,7 @@ class TestBasicApi(BaseTest):
         """
         self.create_and_verify_stack("basic_api_with_tags")
 
-        stages = self.get_stack_stages()
+        stages = self.get_api_stack_stages()
         self.assertEqual(len(stages), 2)
 
         stage = next((s for s in stages if s["stageName"] == "my-new-stage-name"))
