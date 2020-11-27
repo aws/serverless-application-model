@@ -15,6 +15,7 @@ An Internet connection and an active AWS account are required to run the tests a
 AWS credentials must be configured either through a [credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) or [environment variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html)
 
 The user running the tests must have the following roles:
+
 ```
 AmazonSQSFullAccess
 AmazonSNSFullAccess
@@ -66,19 +67,18 @@ pytest --no-cov path/to/the/testfile.py::test_class::test_method
 Example:
 
 ```sh
-pytets --no-cov tests_integ/single/test_basic_api.py::TestBasicApi::test_basic_api
+pytest --no-cov tests_integ/single/test_basic_api.py::TestBasicApi::test_basic_api
 ```
 
 *We don't measure coverage for integration tests.*
 
 ## Write a test
 
-1. Add your test templates to the tests_integ/resources/templates ‘s  single or combination folder
-2. Write a expected json file for all the expected resources and add it to the tests_integ/resources/expected
-3. (option) Upload the resource files(.zip and etc.) to tests_integ/resources/code and update the relation in tests_integ/helpers/file_resources
-4. Write and add your python test code to the tests_integ ‘s  single or combination
+1. Add your test templates to the `tests_integ/resources/templates` single or combination folder
+2. Write an expected json file for all the expected resources and add it to the `tests_integ/resources/expected`
+3. (optional) Add the resource files (zip, json, etc.) to `tests_integ/resources/code` and update the relation in `tests_integ/helpers/file_resources.py`
+4. Write and add your python test code to the `tests_integ` single or combination folder
 5. Run it!
-
 
 ## Architecture
 
