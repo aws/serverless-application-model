@@ -19,7 +19,7 @@ The user running the tests must have the following roles:
 AmazonSQSFullAccess
 AmazonSNSFullAccess
 AmazonAPIGatewayAdministrator
-AWSKeyManagementServicePowerUser
+AWSKeyManagementServiceFullAccess
 AWSStepFunctionsFullAccess
 ```
 
@@ -55,7 +55,30 @@ Example:
 pytest --no-cov tests_integ/single/test_basic_api.py
 ```
 
+### Running a specific test
+
+From the command line, run:
+
+```
+pytest --no-cov path/to/the/testfile.py::test_class::test_method
+```
+
+Example:
+
+```sh
+pytets --no-cov tests_integ/single/test_basic_api.py::TestBasicApi::test_basic_api
+```
+
 *We don't measure coverage for integration tests.*
+
+## Write a test
+
+1. Add your test templates to the tests_integ/resources/templates ‘s  single or combination folder
+2. Write a expected json file for all the expected resources and add it to the tests_integ/resources/expected
+3. (option) Upload the resource files(.zip and etc.) to tests_integ/resources/code and update the relation in tests_integ/helpers/file_resources
+4. Write and add your python test code to the tests_integ ‘s  single or combination
+5. Run it!
+
 
 ## Architecture
 
@@ -90,7 +113,7 @@ Example: `single/test_basic_api.py` takes the `templates/single/basic_api.yaml` 
 
 ### Single
 
-Simple tests
+All basic tests file are here
 
 ### Tmp
 
