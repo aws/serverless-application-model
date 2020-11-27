@@ -39,6 +39,9 @@ class BaseTest(TestCase):
         cls.api_v2_client = boto3.client("apigatewayv2")
         cls.sfn_client = boto3.client("stepfunctions")
 
+        cls.file_to_s3_uri_map = FILE_TO_S3_URI_MAP
+        cls.code_key_to_file = CODE_KEY_TO_FILE_MAP
+
         if not cls.output_dir.exists():
             os.mkdir(str(cls.output_dir))
 
@@ -136,7 +139,7 @@ class BaseTest(TestCase):
         self.expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
         self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
 
-        self._fill_template(file_name, CODE_KEY_TO_FILE_MAP, FILE_TO_S3_URI_MAP)
+        self._fill_template(file_name)
         self.transform_template()
         self.deploy_stack(parameters)
         self.verify_stack()
@@ -147,7 +150,7 @@ class BaseTest(TestCase):
     def get_region(self):
         return self.my_region
 
-    def get_s3_uri(self, file_name, file_to_s3_uri_map):
+    def get_s3_uri(self, file_name):
         """
         Returns the S3 URI of a resource file
 
@@ -155,12 +158,10 @@ class BaseTest(TestCase):
         ----------
         file_name : string
             Resource file name
-        file_to_s3_uri_map : dict
-            code file name to it's s3 uri map
         """
-        return file_to_s3_uri_map[file_name]["uri"]
+        return self.file_to_s3_uri_map[file_name]["uri"]
 
-    def get_code_key_s3_uri(self, code_key, code_key_to_file, file_to_s3_uri_map):
+    def get_code_key_s3_uri(self, code_key):
         """
         Returns the S3 URI of a code key for template replacement
 
@@ -168,12 +169,8 @@ class BaseTest(TestCase):
         ----------
         code_key : string
             Template code key
-        code_key_to_file: dict
-            Template code key to code file name map
-        file_to_s3_uri_map : dict
-            code file name to it's s3 uri map
         """
-        return file_to_s3_uri_map[code_key_to_file[code_key]]["uri"]
+        return self.file_to_s3_uri_map[self.code_key_to_file[code_key]]["uri"]
 
     def get_stack_resources(self, resource_type, stack_resources=None):
         if not stack_resources:
@@ -274,7 +271,7 @@ class BaseTest(TestCase):
 
         return None
 
-    def _fill_template(self, file_name, code_key_to_file, file_to_s3_uri_map):
+    def _fill_template(self, file_name):
         """
         Replaces the template variables with their value
 
@@ -282,20 +279,14 @@ class BaseTest(TestCase):
         ----------
         file_name : string
             Template file name
-        code_key_to_file: dict
-            Template code key to code file name map
-        file_to_s3_uri_map : dict
-            code file name to it's s3 uri map
         """
         input_file_path = str(Path(self.template_dir, file_name + ".yaml"))
         updated_template_path = str(Path(self.output_dir, "sub_" + file_name + ".yaml"))
         with open(input_file_path) as f:
             data = f.read()
-        for key, _ in code_key_to_file.items():
+        for key, _ in self.code_key_to_file.items():
             # We must double the {} to escape them so they will survive a round of unescape
-            data = data.replace(
-                "${{{}}}".format(key), self.get_code_key_s3_uri(key, code_key_to_file, file_to_s3_uri_map)
-            )
+            data = data.replace("${{{}}}".format(key), self.get_code_key_s3_uri(key))
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
         self._dump_yaml(updated_template_path, yaml_doc)
