@@ -141,7 +141,7 @@ class Schedule(EventSource):
 
         return resources
 
-    def _construct_target(self, resource, role, deadLetterQueueArn=None):
+    def _construct_target(self, resource, role, dead_letter_queue_arn=None):
         """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
@@ -156,7 +156,7 @@ class Schedule(EventSource):
             target["Input"] = self.Input
 
         if self.DeadLetterConfig is not None:
-            target["DeadLetterConfig"] = {"Arn": deadLetterQueueArn}
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
         if self.RetryPolicy is not None:
             target["RetryPolicy"] = self.RetryPolicy
@@ -231,7 +231,7 @@ class CloudWatchEvent(EventSource):
 
         return resources
 
-    def _construct_target(self, resource, role, deadLetterQueueArn=None):
+    def _construct_target(self, resource, role, dead_letter_queue_arn=None):
         """Constructs the Target property for the CloudWatch Events/EventBridge Rule.
 
         :returns: the Target property
@@ -249,7 +249,7 @@ class CloudWatchEvent(EventSource):
             target["InputPath"] = self.InputPath
 
         if self.DeadLetterConfig is not None:
-            target["DeadLetterConfig"] = {"Arn": deadLetterQueueArn}
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
 
         if self.RetryPolicy is not None:
             target["RetryPolicy"] = self.RetryPolicy
