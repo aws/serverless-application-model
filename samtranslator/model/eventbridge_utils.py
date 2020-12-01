@@ -1,4 +1,5 @@
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
+from samtranslator.model.exceptions import InvalidEventException
 
 
 class EventBridgeRuleUtils:
@@ -21,3 +22,33 @@ class EventBridgeRuleUtils:
         resources.append(policy)
 
         return resources
+
+    @staticmethod
+    def validate_dlq_config(source_logical_id, dead_letter_config):
+        supported_types = ["SQS"]
+        is_arn_defined = "Arn" in dead_letter_config
+        is_type_defined = "Type" in dead_letter_config
+        if is_arn_defined and is_type_defined:
+            raise InvalidEventException(
+                source_logical_id, "You can either define 'Arn' or 'Type' property of DeadLetterConfig"
+            )
+        if is_type_defined and dead_letter_config.get("Type") not in supported_types:
+            raise InvalidEventException(
+                source_logical_id,
+                "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'",
+            )
+        if not is_arn_defined and not is_type_defined:
+            raise InvalidEventException(source_logical_id, "No 'Arn' or 'Type' property provided for DeadLetterConfig")
+
+    @staticmethod
+    def get_dlq_queue_arn_and_resources(cw_event_source, source_arn):
+        """returns dlq queue arn and dlq_resources, assuming cw_event_source.DeadLetterConfig has been validated"""
+        dlq_queue_arn = cw_event_source.DeadLetterConfig.get("Arn", None)
+        if dlq_queue_arn is not None:
+            return dlq_queue_arn, []
+        queue_logical_id = cw_event_source.DeadLetterConfig.get("QueueLogicalId", None)
+        dlq_resources = EventBridgeRuleUtils.create_dead_letter_queue_with_policy(
+            cw_event_source.logical_id, source_arn, queue_logical_id
+        )
+        dlq_queue_arn = dlq_resources[0].get_runtime_attr("arn")
+        return dlq_queue_arn, dlq_resources

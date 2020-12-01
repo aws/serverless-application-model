@@ -373,7 +373,7 @@
           "additionalProperties": false,
           "properties": {
             "Arn": {
-                "type": "string"
+              "type": "string"
             },
             "Type": {
               "type": "string"
@@ -394,7 +394,7 @@
             "MaximumRetryAttempts": {
               "type": "number"
             }
-         },
+          },
           "type": "object"
         }
       },

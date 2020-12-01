@@ -19,8 +19,8 @@ class SQSQueuePolicy(Resource):
 
 
 class SQSQueuePolicies:
-    @classmethod
-    def sns_topic_send_message_role_policy(cls, topic_arn, queue_arn):
+    @staticmethod
+    def sns_topic_send_message_role_policy(topic_arn, queue_arn):
         document = {
             "Version": "2012-10-17",
             "Statement": [
@@ -35,8 +35,8 @@ class SQSQueuePolicies:
         }
         return document
 
-    @classmethod
-    def eventbridge_dlq_send_message_resource_based_policy(cls, rule_arn, queue_arn):
+    @staticmethod
+    def eventbridge_dlq_send_message_resource_based_policy(rule_arn, queue_arn):
         document = {
             "Version": "2012-10-17",
             "Statement": [

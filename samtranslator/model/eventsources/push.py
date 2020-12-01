@@ -125,28 +125,9 @@ class Schedule(PushEventSource):
         source_arn = events_rule.get_runtime_attr("arn")
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:
-            if "Arn" in self.DeadLetterConfig and "Type" in self.DeadLetterConfig:
-                raise InvalidEventException(
-                    self.logical_id, "You can either define 'Arn' or 'Type' property of DeadLetterConfig"
-                )
-
-            if "Arn" in self.DeadLetterConfig:
-                dlq_queue_arn = self.DeadLetterConfig["Arn"]
-            elif "Type" in self.DeadLetterConfig:
-                if self.DeadLetterConfig.get("Type") not in ["SQS"]:
-                    raise InvalidEventException(
-                        self.logical_id, "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'"
-                    )
-                queue_logical_id = self.DeadLetterConfig.get("QueueLogicalId", None)
-                dlq_resources = EventBridgeRuleUtils.create_dead_letter_queue_with_policy(
-                    self.logical_id, source_arn, queue_logical_id
-                )
-                dlq_queue_arn = dlq_resources[0].get_runtime_attr("arn")
-                resources.extend(dlq_resources)
-            else:
-                raise InvalidEventException(
-                    self.logical_id, "No 'Arn' or 'Type' property provided for DeadLetterConfig"
-                )
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            resources.extend(dlq_resources)
 
         events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
 
@@ -212,28 +193,9 @@ class CloudWatchEvent(PushEventSource):
 
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:
-            if "Arn" in self.DeadLetterConfig and "Type" in self.DeadLetterConfig:
-                raise InvalidEventException(
-                    self.logical_id, "You can either define 'Arn' or 'Type' property of DeadLetterConfig"
-                )
-
-            if "Arn" in self.DeadLetterConfig:
-                dlq_queue_arn = self.DeadLetterConfig["Arn"]
-            elif "Type" in self.DeadLetterConfig:
-                if self.DeadLetterConfig.get("Type") not in ["SQS"]:
-                    raise InvalidEventException(
-                        self.logical_id, "The only valid value for 'Type' property of DeadLetterConfig is 'SQS'"
-                    )
-                queue_logical_id = self.DeadLetterConfig.get("QueueLogicalId", None)
-                dlq_resources = EventBridgeRuleUtils.create_dead_letter_queue_with_policy(
-                    self.logical_id, source_arn, queue_logical_id
-                )
-                dlq_queue_arn = dlq_resources[0].get_runtime_attr("arn")
-                resources.extend(dlq_resources)
-            else:
-                raise InvalidEventException(
-                    self.logical_id, "No 'Arn' or 'Type' property provided for DeadLetterConfig"
-                )
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            resources.extend(dlq_resources)
 
         events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
         if CONDITION in function.resource_attributes:
