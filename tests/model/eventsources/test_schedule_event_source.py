@@ -6,7 +6,7 @@ from samtranslator.model.lambda_ import LambdaFunction
 from samtranslator.model.exceptions import InvalidEventException
 
 
-class EventBridgeRuleSource(TestCase):
+class ScheduleEventSource(TestCase):
     def setUp(self):
         self.logical_id = "ScheduleEvent"
         self.schedule_event_source = Schedule(self.logical_id)
