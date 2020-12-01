@@ -12,7 +12,6 @@ from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
 
 CONDITION = "Condition"
 

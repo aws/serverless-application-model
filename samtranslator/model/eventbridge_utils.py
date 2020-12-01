@@ -43,10 +43,10 @@ class EventBridgeRuleUtils:
     @staticmethod
     def get_dlq_queue_arn_and_resources(cw_event_source, source_arn):
         """returns dlq queue arn and dlq_resources, assuming cw_event_source.DeadLetterConfig has been validated"""
-        dlq_queue_arn = cw_event_source.DeadLetterConfig.get("Arn", None)
+        dlq_queue_arn = cw_event_source.DeadLetterConfig.get("Arn")
         if dlq_queue_arn is not None:
             return dlq_queue_arn, []
-        queue_logical_id = cw_event_source.DeadLetterConfig.get("QueueLogicalId", None)
+        queue_logical_id = cw_event_source.DeadLetterConfig.get("QueueLogicalId")
         dlq_resources = EventBridgeRuleUtils.create_dead_letter_queue_with_policy(
             cw_event_source.logical_id, source_arn, queue_logical_id
         )
