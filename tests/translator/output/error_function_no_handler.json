@@ -1,8 +1,8 @@
 {
   "errors": [
     {
-      "errorMessage": "Resource with id [Function] is invalid. Missing required property 'Handler'."
+      "errorMessage": "Resource with id [Function] is invalid. Runtime and Handler needs to be present when PackageType is of type `Zip`"
     }
-  ], 
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function] is invalid. Missing required property 'Handler'."
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function] is invalid. Runtime and Handler needs to be present when PackageType is of type `Zip`"
 }
