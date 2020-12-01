@@ -212,7 +212,7 @@ available in CodeDeploy. You can pick the configuration that best suits your app
 
 They work as follows:
 
-- **LinearXPercentYMinutes**: Traffic to new version will linearly increase in steps of X percentage every Y minutes. 
+- **LinearXPercentEveryYMinutes**: Traffic to new version will linearly increase in steps of X percentage every Y minutes. 
 
   Ex: ``Linear10PercentEvery10Minutes`` will add 10 percentage of traffic every 10 minute to complete in 100 minutes.
 
