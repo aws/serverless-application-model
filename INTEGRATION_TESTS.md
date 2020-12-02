@@ -1,8 +1,8 @@
 # AWS SAM integration tests
 
-These integration tests test SAM against AWS services by translating SAM templates, deploying them to Cloud Formation and verifying the resulting objects.
+These tests run SAM against AWS services by translating SAM templates, deploying them to Cloud Formation and verifying the resulting objects.
 
-They must run under Python 2 and 3.
+They must run successfully under Python 2 and 3.
 
 ## Run the tests
 
@@ -24,6 +24,8 @@ AWSKeyManagementServiceFullAccess
 AWSStepFunctionsFullAccess
 ```
 
+If you plan on running the full tests suite, ensure that the user credentials you are running the tests with have a timeout of at least 30 minutes as the full suite can take more than 20 minutes to execute.
+
 #### Initialize the development environment
 
 If you haven't done so already, run the following command in a terminal at the root of the repository to initialize the development environment:
@@ -40,8 +42,6 @@ From the root of the repository, run:
 make test-integ
 ```
 
-This can take multiple minutes to execute.
-
 ### Running a specific test file
 
 From the command line, run:
@@ -50,7 +50,7 @@ From the command line, run:
 pytest --no-cov path/to/the/test_file.py
 ```
 
-Example:
+For example, from the root of the project:
 
 ```sh
 pytest --no-cov tests_integ/single/test_basic_api.py
@@ -61,10 +61,10 @@ pytest --no-cov tests_integ/single/test_basic_api.py
 From the command line, run:
 
 ```
-pytest --no-cov path/to/the/testfile.py::test_class::test_method
+pytest --no-cov path/to/the/test_file.py::test_class::test_method
 ```
 
-Example:
+For example, from the root of the project:
 
 ```sh
 pytest --no-cov tests_integ/single/test_basic_api.py::TestBasicApi::test_basic_api
@@ -74,13 +74,13 @@ pytest --no-cov tests_integ/single/test_basic_api.py::TestBasicApi::test_basic_a
 
 ## Write a test
 
-1. Add your test templates to the `tests_integ/resources/templates` single or combination folder
-2. Write an expected json file for all the expected resources and add it to the `tests_integ/resources/expected`
-3. (optional) Add the resource files (zip, json, etc.) to `tests_integ/resources/code` and update the relation in `tests_integ/helpers/file_resources.py`
-4. Write and add your python test code to the `tests_integ` single or combination folder
+1. Add your test templates to the `tests_integ/resources/templates` single or combination folder.
+2. Write an expected json file for all the expected resources and add it to the `tests_integ/resources/expected`.
+3. (Optional) Add the resource files (zip, json, etc.) to `tests_integ/resources/code` and update the dictionaries in `tests_integ/helpers/file_resources.py`.
+4. Write and add your python test code to the `tests_integ` single or combination folder.
 5. Run it!
 
-## Architecture
+## Directory structure
 
 ### Helpers
 
@@ -94,11 +94,11 @@ Common classes and tools used by tests.
 |   +-- helpers.py         Miscellaneous helpers
 ```
 
-`base_test.py` runs setup methods before all tests in a class to upload the `file_resources.py` resources to an S3 bucket and after all tests to empty and delete this bucket.
+`base_test.py` contains `setUpClass` and `tearDownClass` methods to respectively upload and clean the `file_resources.py` resources (upload the files to a new S3 bucket, empty and delete this bucket).
 
 ### Resources
 
-File resources used by tests
+File resources used by tests.
 
 ```
 +-- resources
@@ -109,12 +109,16 @@ File resources used by tests
 
 The matching *expected* and *template* files should have the same name.
 
-Example: `single/test_basic_api.py` takes the `templates/single/basic_api.yaml` file as input SAM template and tests it against the `expected/single/basic_api.json` file.
+For example, the `test_basic_api` test in the class `tests_integ/single/test_basic_api.py` takes `templates/single/basic_api.yaml` SAM template as input and verifies its result against `expected/single/basic_api.json`.
 
 ### Single
 
-All basic tests file are here
+Basic tests which interact with only one service should be put here.
+
+### Combination
+
+Tests which interact with multiple services should be put there.
 
 ### Tmp
 
-This directory will be created on the first run and will contain temporary and intermediary files used by the tests: sam templates with substituted variable values, translated temporary cloud formation templates, ...
+This directory is created on the first run and contains temporary and intermediary files used by the tests: sam templates with substituted variable values, translated temporary cloud formation templates, ...

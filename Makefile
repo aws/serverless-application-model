@@ -8,15 +8,14 @@ init:
 test:
 	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 tests/*
 
-# Need to specify *.py or pytest attempts to execute the README.md file
 test-integ:
-	pytest --no-cov tests_integ/**/*.py
+	pytest --no-cov tests_integ/*
 
 black:
-	black setup.py samtranslator/* tests/* tests_integ/**/*.py bin/*.py
+	black setup.py samtranslator/* tests/* tests_integ/* bin/*.py
 
 black-check:
-	black --check setup.py samtranslator/* tests/* tests_integ/**/*.py bin/*.py
+	black --check setup.py samtranslator/* tests/* tests_integ/* bin/*.py
 
 # Command to run everytime you make changes to verify everything works
 dev: test
