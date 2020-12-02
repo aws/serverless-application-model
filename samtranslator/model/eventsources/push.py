@@ -12,6 +12,7 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
 from samtranslator.model.eventsources.pull import SQS
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
+from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.translator import logical_id_generator
@@ -94,6 +95,8 @@ class Schedule(PushEventSource):
         "Enabled": PropertyType(False, is_type(bool)),
         "Name": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -118,16 +121,23 @@ class Schedule(PushEventSource):
             events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
         events_rule.Name = self.Name
         events_rule.Description = self.Description
-        events_rule.Targets = [self._construct_target(function)]
 
         source_arn = events_rule.get_runtime_attr("arn")
+        dlq_queue_arn = None
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            resources.extend(dlq_resources)
+
+        events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
+
         if CONDITION in function.resource_attributes:
             events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
 
-    def _construct_target(self, function):
+    def _construct_target(self, function, dead_letter_queue_arn=None):
         """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
@@ -136,6 +146,12 @@ class Schedule(PushEventSource):
         target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
         if self.Input is not None:
             target["Input"] = self.Input
+
+        if self.DeadLetterConfig is not None:
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
+
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
 
         return target
 
@@ -148,6 +164,8 @@ class CloudWatchEvent(PushEventSource):
     property_types = {
         "EventBusName": PropertyType(False, is_str()),
         "Pattern": PropertyType(False, is_type(dict)),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
         "Target": PropertyType(False, is_type(dict)),
@@ -171,18 +189,24 @@ class CloudWatchEvent(PushEventSource):
         events_rule = EventsRule(self.logical_id)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
-        events_rule.Targets = [self._construct_target(function)]
+        source_arn = events_rule.get_runtime_attr("arn")
+
+        dlq_queue_arn = None
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            resources.extend(dlq_resources)
+
+        events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
         if CONDITION in function.resource_attributes:
             events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         resources.append(events_rule)
-
-        source_arn = events_rule.get_runtime_attr("arn")
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
 
-    def _construct_target(self, function):
+    def _construct_target(self, function, dead_letter_queue_arn=None):
         """Constructs the Target property for the CloudWatch Events/EventBridge Rule.
 
         :returns: the Target property
@@ -195,6 +219,13 @@ class CloudWatchEvent(PushEventSource):
 
         if self.InputPath is not None:
             target["InputPath"] = self.InputPath
+
+        if self.DeadLetterConfig is not None:
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
+
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
+
         return target
 
 

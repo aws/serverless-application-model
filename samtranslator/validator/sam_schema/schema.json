@@ -368,6 +368,34 @@
         },
         "Pattern": {
           "type": "object"
+        },
+        "DeadLetterConfig": {
+          "additionalProperties": false,
+          "properties": {
+            "Arn": {
+              "type": "string"
+            },
+            "Type": {
+              "type": "string"
+            },
+            "QueueLogicalId": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "RetryPolicy": {
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "MaximumEventAgeInSeconds": {
+              "type": "number"
+            },
+            "MaximumRetryAttempts": {
+              "type": "number"
+            }
+          },
+          "type": "object"
         }
       },
       "required": [
