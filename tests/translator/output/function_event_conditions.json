@@ -9,44 +9,44 @@
   },
   "Resources": {
     "MyAwesomeFunctionAliasLive": {
-      "Type": "AWS::Lambda::Alias", 
+      "Type": "AWS::Lambda::Alias",
       "Condition": "MyCondition",
       "Properties": {
         "FunctionVersion": {
           "Fn::GetAtt": [
-            "MyAwesomeFunctionVersion640128d35d", 
+            "MyAwesomeFunctionVersion640128d35d",
             "Version"
           ]
-        }, 
+        },
         "FunctionName": {
           "Ref": "MyAwesomeFunction"
-        }, 
+        },
         "Name": "Live"
       }
-    }, 
+    },
     "MyAwesomeFunctionNotificationTopicPermission": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "sns.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "sns.amazonaws.com",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
+        },
         "SourceArn": {
           "Ref": "Notifications"
         }
       }
     },
     "MyAwesomeFunctionCWEventPermission": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "events.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
+        },
         "SourceArn": {
           "Fn::GetAtt": [
             "MyAwesomeFunctionCWEvent",
@@ -73,23 +73,23 @@
       }
     },
     "MyAwesomeFunctionDDBStream": {
-      "Type": "AWS::Lambda::EventSourceMapping", 
+      "Type": "AWS::Lambda::EventSourceMapping",
       "Condition": "MyCondition",
       "Properties": {
-        "BatchSize": 200, 
-        "EventSourceArn": "arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291", 
+        "BatchSize": 200,
+        "EventSourceArn": "arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
+        },
         "StartingPosition": "LATEST"
       }
     },
     "MyAwesomeFunctionIoTRule": {
-      "Type": "AWS::IoT::TopicRule", 
+      "Type": "AWS::IoT::TopicRule",
       "Condition": "MyCondition",
       "Properties": {
         "TopicRulePayload": {
-          "AwsIotSqlVersion": "beta", 
+          "AwsIotSqlVersion": "beta",
           "Actions": [
             {
               "Lambda": {
@@ -98,39 +98,39 @@
                 }
               }
             }
-          ], 
-          "RuleDisabled": false, 
+          ],
+          "RuleDisabled": false,
           "Sql": "SELECT * FROM 'topic/test'"
         }
       }
-    }, 
+    },
     "MyAwesomeFunctionKinesisStream": {
-      "Type": "AWS::Lambda::EventSourceMapping", 
+      "Type": "AWS::Lambda::EventSourceMapping",
       "Condition": "MyCondition",
       "Properties": {
-        "BatchSize": 100, 
-        "EventSourceArn": "arn:aws:kinesis:us-west-2:012345678901:stream/my-stream", 
+        "BatchSize": 100,
+        "EventSourceArn": "arn:aws:kinesis:us-west-2:012345678901:stream/my-stream",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
+        },
         "StartingPosition": "TRIM_HORIZON"
       }
     },
     "MyAwesomeFunctionIoTRulePermission": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
+        "Action": "lambda:InvokeFunction",
         "SourceAccount": {
           "Fn::Sub": "${AWS::AccountId}"
-        }, 
-        "Principal": "iot.amazonaws.com", 
+        },
+        "Principal": "iot.amazonaws.com",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:rule/${RuleName}", 
+            "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:rule/${RuleName}",
             {
               "RuleName": {
                 "Ref": "MyAwesomeFunctionIoTRule"
@@ -139,58 +139,58 @@
           ]
         }
       }
-    }, 
+    },
     "MyAwesomeFunctionNotificationTopic": {
-      "Type": "AWS::SNS::Subscription", 
+      "Type": "AWS::SNS::Subscription",
       "Condition": "MyCondition",
       "Properties": {
         "Endpoint": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
-        "Protocol": "lambda", 
+        },
+        "Protocol": "lambda",
         "TopicArn": {
           "Ref": "Notifications"
         }
       }
-    }, 
+    },
     "MyAwesomeFunctionS3TriggerPermission": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
+        "Action": "lambda:InvokeFunction",
         "SourceAccount": {
           "Ref": "AWS::AccountId"
-        }, 
+        },
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
+        },
         "Principal": "s3.amazonaws.com"
       }
     },
     "MyAwesomeFunctionCWLogPermission": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "logs.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "logs.amazonaws.com",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${__LogGroupName__}:*", 
+            "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${__LogGroupName__}:*",
             {
               "__LogGroupName__": "MyLogGroup"
             }
           ]
         }
       }
-    }, 
+    },
     "MyAwesomeFunctionEBSchedule": {
-      "Type": "AWS::Events::Rule", 
+      "Type": "AWS::Events::Rule",
       "Condition": "MyCondition",
       "Properties": {
-        "ScheduleExpression": "rate(1 minute)", 
+        "ScheduleExpression": "rate(1 minute)",
         "Targets": [
           {
             "Id": "MyAwesomeFunctionEBScheduleLambdaTarget",
@@ -200,29 +200,30 @@
           }
         ]
       }
-    }, 
+    },
     "MyAwesomeFunctionCWLog": {
-      "Type": "AWS::Logs::SubscriptionFilter", 
+      "Type": "AWS::Logs::SubscriptionFilter",
       "Condition": "MyCondition",
       "Properties": {
         "DestinationArn": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
-        "FilterPattern": "My pattern", 
+        },
+        "FilterPattern": "My pattern",
         "LogGroupName": "MyLogGroup"
-      }, 
+      },
       "DependsOn": [
         "MyAwesomeFunctionCWLogPermission"
       ]
-    }, 
+    },
     "MyAwesomeFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Condition": "MyCondition",
       "Properties": {
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole", 
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole"
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
         ],
         "Tags": [
           {
@@ -231,13 +232,13 @@
           }
         ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -247,33 +248,33 @@
           ]
         }
       }
-    }, 
+    },
     "MyAwesomeFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Condition": "MyCondition",
       "Properties": {
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
-        }, 
-        "Handler": "hello.handler", 
+        },
+        "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
-            "MyAwesomeFunctionRole", 
+            "MyAwesomeFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7", 
+        },
+        "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
       }
     },
     "MyAwesomeFunctionCWEvent": {
-      "Type": "AWS::Events::Rule", 
+      "Type": "AWS::Events::Rule",
       "Condition": "MyCondition",
       "Properties": {
         "EventPattern": {
@@ -282,7 +283,7 @@
               "terminated"
             ]
           }
-        }, 
+        },
         "Targets": [
           {
             "Id": "MyAwesomeFunctionCWEventLambdaTarget",
@@ -315,28 +316,28 @@
       }
     },
     "MyAwesomeFunctionVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::Version",
       "Condition": "MyCondition",
       "Properties": {
         "FunctionName": {
           "Ref": "MyAwesomeFunction"
         }
       }
-    }, 
+    },
     "Notifications": {
       "Condition": "MyCondition",
       "Type": "AWS::SNS::Topic"
     },
     "MyAwesomeFunctionEBSchedulePermission": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "events.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
         "FunctionName": {
           "Ref": "MyAwesomeFunctionAliasLive"
-        }, 
+        },
         "SourceArn": {
           "Fn::GetAtt": [
             "MyAwesomeFunctionEBSchedule",
@@ -344,7 +345,7 @@
           ]
         }
       }
-    }, 
+    },
     "FunctionOneImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -412,7 +413,7 @@
       }
     },
     "Images": {
-      "Type": "AWS::S3::Bucket", 
+      "Type": "AWS::S3::Bucket",
       "Properties": {
         "NotificationConfiguration": {
           "LambdaConfigurations": [
@@ -455,10 +456,152 @@
             }
           }
         ]
-      }, 
+      },
       "DependsOn": [
         "FunctionOneImageBucketPermission"
       ]
+    },
+    "MyAwesomeFunctionSNSTopicWithSQSSubscription": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "Queue",
+            "Arn"
+          ]
+        },
+        "Protocol": "sqs",
+        "TopicArn": {
+          "Ref": "Notifications"
+        }
+      },
+      "Condition": "MyCondition"
+    },
+    "MyAwesomeFunctionSNSTopicWithSQSSubscriptionQueuePolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "Queue"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "Queue",
+                  "Arn"
+                ]
+              },
+              "Effect": "Allow",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "Notifications"
+                  }
+                }
+              },
+              "Principal": "*"
+            }
+          ]
+        }
+      },
+      "Condition": "MyCondition"
+    },
+    "MyAwesomeFunctionSNSTopicWithSQSSubscriptionEventSourceMapping": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "BatchSize": 10,
+        "Enabled": true,
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "Queue",
+            "Arn"
+          ]
+        }
+      },
+      "Condition": "MyCondition"
+    },
+    "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {}
+    },
+    "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionEventSourceMapping": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "BatchSize": 10,
+        "Enabled": true,
+        "FunctionName": {
+          "Ref": "MyAwesomeFunctionAliasLive"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue",
+            "Arn"
+          ]
+        }
+      },
+      "Condition": "MyCondition"
+    },
+    "MyAwesomeFunctionAnotherSNSWithSQSSubscription": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue",
+            "Arn"
+          ]
+        },
+        "Protocol": "sqs",
+        "TopicArn": {
+          "Ref": "Notifications"
+        }
+      },
+      "Condition": "MyCondition"
+    },
+    "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueuePolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue",
+                  "Arn"
+                ]
+              },
+              "Effect": "Allow",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "Notifications"
+                  }
+                }
+              },
+              "Principal": "*"
+            }
+          ]
+        }
+      },
+      "Condition": "MyCondition"
+    },
+    "Queue": {
+      "Type": "AWS::SQS::Queue",
+      "Condition": "MyCondition"
     }
   }
 }

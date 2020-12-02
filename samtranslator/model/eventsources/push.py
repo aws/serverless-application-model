@@ -438,7 +438,7 @@ class SNS(PushEventSource):
             queue_arn = queue.get_runtime_attr("arn")
             queue_url = queue.get_runtime_attr("queue_url")
 
-            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url)
+            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function.resource_attributes)
             subscription = self._inject_subscription(
                 "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
             )
@@ -461,7 +461,9 @@ class SNS(PushEventSource):
         batch_size = self.SqsSubscription.get("BatchSize", None)
         enabled = self.SqsSubscription.get("Enabled", None)
 
-        queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, queue_policy_logical_id)
+        queue_policy = self._inject_sqs_queue_policy(
+            self.Topic, queue_arn, queue_url, function.resource_attributes, queue_policy_logical_id
+        )
         subscription = self._inject_subscription(
             "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
         )
@@ -497,8 +499,11 @@ class SNS(PushEventSource):
         event_source.Enabled = enabled or True
         return event_source.to_cloudformation(function=function, role=role)
 
-    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, logical_id=None):
+    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, resource_attributes, logical_id=None):
         policy = SQSQueuePolicy(logical_id or self.logical_id + "QueuePolicy")
+        if CONDITION in resource_attributes:
+            policy.set_resource_attribute(CONDITION, resource_attributes[CONDITION])
+
         policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(topic_arn, queue_arn)
         policy.Queues = [queue_url]
         return policy
