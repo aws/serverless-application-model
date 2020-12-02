@@ -1,0 +1,238 @@
+{
+  "Resources": {
+    "ScheduledFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ScheduledFunctionScheduleQueuePolicy": {
+      "Type": "AWS::SQS::QueuePolicy", 
+      "Properties": {
+        "Queues": [
+          {
+            "Ref": "ScheduledFunctionScheduleQueue"
+          }
+        ], 
+        "PolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage", 
+              "Resource": {
+                "Fn::GetAtt": [
+                  "ScheduledFunctionScheduleQueue", 
+                  "Arn"
+                ]
+              }, 
+              "Effect": "Allow", 
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Fn::GetAtt": [
+                      "ScheduledFunctionSchedule", 
+                      "Arn"
+                    ]
+                  }
+                }
+              }, 
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              }
+            }
+          ]
+        }
+      }
+    }, 
+    "TriggeredFunctionOnTerminate": {
+      "Type": "AWS::Events::Rule", 
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        }, 
+        "EventBusName": "ExternalEventBridge", 
+        "Targets": [
+          {
+            "DeadLetterConfig": {
+              "Arn": "ARN"
+            }, 
+            "Id": "TriggeredFunctionOnTerminateLambdaTarget", 
+            "Arn": {
+              "Fn::GetAtt": [
+                "TriggeredFunction", 
+                "Arn"
+              ]
+            }
+          }
+        ]
+      }
+    }, 
+    "TriggeredFunctionOnTerminatePermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "events.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "TriggeredFunction"
+        }, 
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "TriggeredFunctionOnTerminate", 
+            "Arn"
+          ]
+        }
+      }
+    }, 
+    "ScheduledFunctionSchedulePermission": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "events.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "ScheduledFunction"
+        }, 
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "ScheduledFunctionSchedule", 
+            "Arn"
+          ]
+        }
+      }
+    }, 
+    "ScheduledFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "hello.handler", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip", 
+          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "ScheduledFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ScheduledFunctionScheduleQueue": {
+      "Type": "AWS::SQS::Queue", 
+      "Properties": {}
+    }, 
+    "TriggeredFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "hello.handler", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip", 
+          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "TriggeredFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "TriggeredFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "ScheduledFunctionSchedule": {
+      "Type": "AWS::Events::Rule", 
+      "Properties": {
+        "ScheduleExpression": "rate(1 minute)", 
+        "Targets": [
+          {
+            "DeadLetterConfig": {
+              "Arn": {
+                "Fn::GetAtt": [
+                  "ScheduledFunctionScheduleQueue", 
+                  "Arn"
+                ]
+              }
+            }, 
+            "Id": "ScheduledFunctionScheduleLambdaTarget", 
+            "Arn": {
+              "Fn::GetAtt": [
+                "ScheduledFunction", 
+                "Arn"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
