@@ -7,7 +7,8 @@ import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.cloudwatchlogs
 from .api.api_generator import ApiGenerator
 from .api.http_api_generator import HttpApiGenerator
-from .s3_utils.uri_parser import construct_s3_location_object
+from .packagetype import ZIP, IMAGE
+from .s3_utils.uri_parser import construct_s3_location_object, construct_image_code_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.model import PropertyType, SamResourceMacro, ResourceTypeResolver
 from samtranslator.model.apigateway import (
@@ -54,9 +55,11 @@ class SamFunction(SamResourceMacro):
     resource_type = "AWS::Serverless::Function"
     property_types = {
         "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Handler": PropertyType(True, is_str()),
-        "Runtime": PropertyType(True, is_str()),
+        "Handler": PropertyType(False, is_str()),
+        "Runtime": PropertyType(False, is_str()),
         "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "ImageUri": PropertyType(False, is_str()),
+        "PackageType": PropertyType(False, is_str()),
         "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
         "DeadLetterQueue": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
@@ -82,6 +85,7 @@ class SamFunction(SamResourceMacro):
         "VersionDescription": PropertyType(False, is_str()),
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
         "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
+        "ImageConfig": PropertyType(False, is_type(dict)),
         "CodeSigningConfigArn": PropertyType(False, is_str()),
     }
     event_resolver = ResourceTypeResolver(
@@ -406,6 +410,8 @@ class SamFunction(SamResourceMacro):
         lambda_function.Tags = self._construct_tag_list(self.Tags)
         lambda_function.Layers = self.Layers
         lambda_function.FileSystemConfigs = self.FileSystemConfigs
+        lambda_function.ImageConfig = self.ImageConfig
+        lambda_function.PackageType = self.PackageType
 
         if self.Tracing:
             lambda_function.TracingConfig = {"Mode": self.Tracing}
@@ -415,6 +421,7 @@ class SamFunction(SamResourceMacro):
 
         lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
+        self._validate_package_type(lambda_function)
         return lambda_function
 
     def _add_event_invoke_managed_policy(self, dest_config, logical_id, condition, dest_arn):
@@ -490,6 +497,50 @@ class SamFunction(SamResourceMacro):
             tags=self._construct_tag_list(self.Tags),
         )
         return execution_role
+
+    def _validate_package_type(self, lambda_function):
+        """
+        Validates Function based on the existence of Package type
+        """
+        packagetype = lambda_function.PackageType or ZIP
+
+        if packagetype not in [ZIP, IMAGE]:
+            raise InvalidResourceException(
+                lambda_function.logical_id,
+                "PackageType needs to be `{zip}` or `{image}`".format(zip=ZIP, image=IMAGE),
+            )
+
+        def _validate_package_type_zip():
+            if not all([lambda_function.Runtime, lambda_function.Handler]):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "Runtime and Handler needs to be present when PackageType is of type `{zip}`".format(zip=ZIP),
+                )
+
+            if any([lambda_function.Code.get("ImageUri", False), lambda_function.ImageConfig]):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "ImageUri or ImageConfig cannot be present when PackageType is of type `{zip}`".format(zip=ZIP),
+                )
+
+        def _validate_package_type_image():
+            if any([lambda_function.Handler, lambda_function.Runtime, lambda_function.Layers]):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "Runtime, Handler, Layers cannot be present when PackageType is of type `{image}`".format(
+                        image=IMAGE
+                    ),
+                )
+            if not lambda_function.Code.get("ImageUri"):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "ImageUri needs to be present when PackageType is of type `{image}`".format(image=IMAGE),
+                )
+
+        _validate_per_package_type = {ZIP: _validate_package_type_zip, IMAGE: _validate_package_type_image}
+
+        # Call appropriate validation function based on the package type.
+        return _validate_per_package_type[packagetype]()
 
     def _validate_dlq(self):
         """Validates whether the DeadLetterQueue LogicalId is validation
@@ -577,12 +628,59 @@ class SamFunction(SamResourceMacro):
         return resources
 
     def _construct_code_dict(self):
-        if self.InlineCode:
+        """Constructs Lambda Code Dictionary based on the accepted SAM artifact properties such
+        as `InlineCode`, `CodeUri` and `ImageUri` and also raises errors if more than one of them is
+        defined. `PackageType` determines which artifacts are considered.
+
+        :raises InvalidResourceException when conditions on the SAM artifact properties are not met.
+        """
+        # list of accepted artifacts
+        packagetype = self.PackageType or ZIP
+        artifacts = {}
+
+        if packagetype == ZIP:
+            artifacts = {"InlineCode": self.InlineCode, "CodeUri": self.CodeUri}
+        elif packagetype == IMAGE:
+            artifacts = {"ImageUri": self.ImageUri}
+
+        if packagetype not in [ZIP, IMAGE]:
+            raise InvalidResourceException(self.logical_id, "invalid 'PackageType' : {}".format(packagetype))
+
+        # Inline function for transformation of inline code.
+        # It accepts arbitrary argumemnts, because the arguments do not matter for the result.
+        def _construct_inline_code(*args, **kwargs):
             return {"ZipFile": self.InlineCode}
-        elif self.CodeUri:
-            return construct_s3_location_object(self.CodeUri, self.logical_id, "CodeUri")
+
+        # dispatch mechanism per artifact on how it needs to be transformed.
+        artifact_dispatch = {
+            "InlineCode": _construct_inline_code,
+            "CodeUri": construct_s3_location_object,
+            "ImageUri": construct_image_code_object,
+        }
+
+        filtered_artifacts = dict(filter(lambda x: x[1] != None, artifacts.items()))
+        # There are more than one allowed artifact types present, raise an Error.
+        # There are no valid artifact types present, also raise an Error.
+        if len(filtered_artifacts) > 1 or len(filtered_artifacts) == 0:
+            if packagetype == ZIP and len(filtered_artifacts) == 0:
+                raise InvalidResourceException(self.logical_id, "Only one of 'InlineCode' or 'CodeUri' can be set.")
+            elif packagetype == IMAGE:
+                raise InvalidResourceException(self.logical_id, "'ImageUri' must be set.")
+
+        filtered_keys = [key for key in filtered_artifacts.keys()]
+        # NOTE(sriram-mv): This precedence order is important. It is protect against python2 vs python3
+        # dictionary ordering when getting the key values with .keys() on a dictionary.
+        # Do not change this precedence order.
+        if "InlineCode" in filtered_keys:
+            filtered_key = "InlineCode"
+        elif "CodeUri" in filtered_keys:
+            filtered_key = "CodeUri"
+        elif "ImageUri" in filtered_keys:
+            filtered_key = "ImageUri"
         else:
-            raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
+            raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
+        dispatch_function = artifact_dispatch[filtered_key]
+        return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
 
     def _construct_version(self, function, intrinsics_resolver, code_sha256=None):
         """Constructs a Lambda Version resource that will be auto-published when CodeUri of the function changes.
