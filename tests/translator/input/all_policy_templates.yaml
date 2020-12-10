@@ -168,3 +168,6 @@ Resources:
 
         - EventBridgePutEventsPolicy:
             EventBusName: name
+
+        - AcmGetCertificatePolicy:
+            CertificateArn: arn

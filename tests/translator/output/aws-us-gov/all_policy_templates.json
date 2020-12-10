@@ -1570,6 +1570,27 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy58",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "acm:GetCertificate"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "${certificateArn}",
+                      {
+                        "certificateArn": "arn"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "Tags": [
