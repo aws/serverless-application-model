@@ -47,6 +47,10 @@ class ArnGenerator(object):
         region_string = region.lower()
         if region_string.startswith("cn-"):
             return "aws-cn"
+        elif region_string.startswith("us-iso-"):
+            return "aws-iso"
+        elif region_string.startswith("us-isob"):
+            return "aws-iso-b"
         elif region_string.startswith("us-gov"):
             return "aws-us-gov"
         else:

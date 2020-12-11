@@ -7,7 +7,7 @@ class RegionConfiguration(object):
     class abstracts all region/partition specific configuration.
     """
 
-    partitions = {"govcloud": "aws-us-gov", "china": "aws-cn"}
+    partitions = {"govcloud": "aws-us-gov", "iso": "aws-iso", "isob": "aws-iso-b", "china": "aws-cn"}
 
     @classmethod
     def is_apigw_edge_configuration_supported(cls):
@@ -18,4 +18,9 @@ class RegionConfiguration(object):
         :return: True, if API Gateway does not support Edge configuration
         """
 
-        return ArnGenerator.get_partition_name() not in [cls.partitions["govcloud"], cls.partitions["china"]]
+        return ArnGenerator.get_partition_name() not in [
+            cls.partitions["govcloud"],
+            cls.partitions["iso"],
+            cls.partitions["isob"],
+            cls.partitions["china"],
+        ]
