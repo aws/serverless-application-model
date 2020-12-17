@@ -34,6 +34,7 @@ class PullEventSource(ResourceMacro):
         "Broker": PropertyType(False, is_str()),
         "Queues": PropertyType(False, is_type(list)),
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),
+        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
     }
 
     def get_policy_arn(self):
@@ -85,6 +86,7 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.Topics = self.Topics
         lambda_eventsourcemapping.Queues = self.Queues
         lambda_eventsourcemapping.SourceAccessConfigurations = self.SourceAccessConfigurations
+        lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
 
         destination_config_policy = None
         if self.DestinationConfig:
