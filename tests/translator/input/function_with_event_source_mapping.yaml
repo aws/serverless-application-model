@@ -52,6 +52,7 @@ Resources:
             BisectBatchOnFunctionError: true
             MaximumRecordAgeInSeconds: 86400
             StartingPosition: TRIM_HORIZON
+            TumblingWindowInSeconds: 60
             DestinationConfig:
               OnFailure:
                 Type: SQS

@@ -75,6 +75,7 @@ class LambdaEventSourceMapping(Resource):
         "Topics": PropertyType(False, is_type(list)),
         "Queues": PropertyType(False, is_type(list)),
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),
+        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
