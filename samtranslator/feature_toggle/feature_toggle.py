@@ -110,7 +110,7 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
         try:
             # Lambda function has 120 seconds limit
             # (5 + 25) * 2, 60 seconds maximum timeout duration
-            client_config = Config(connect_timeout= 5, read_timeout=25, retries={"total_max_attempts": 2})
+            client_config = Config(connect_timeout=5, read_timeout=25, retries={"total_max_attempts": 2})
             self.app_config_client = boto3.client("appconfig", config=client_config)
             response = self.app_config_client.get_configuration(
                 Application=application_id,
