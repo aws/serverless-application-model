@@ -1,0 +1,10 @@
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        "def lambda_handler():
+            pass"
+      CodeUri: .
+      Handler: index.lambda_handler
+      Runtime: python3.8

@@ -181,7 +181,8 @@
         "StartingPosition": "TRIM_HORIZON",
         "ParallelizationFactor": 8,
         "MaximumRetryAttempts": 100,
-        "BisectBatchOnFunctionError": true
+        "BisectBatchOnFunctionError": true,
+        "TumblingWindowInSeconds": 60
       }
     },
     "MyFunctionForBatchingExample": {

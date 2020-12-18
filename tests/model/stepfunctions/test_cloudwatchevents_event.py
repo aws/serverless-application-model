@@ -1,6 +1,7 @@
 from mock import Mock
 from unittest import TestCase
 from samtranslator.model.stepfunctions.events import CloudWatchEvent
+from samtranslator.model.exceptions import InvalidEventException
 
 
 class CloudWatchEventsEventSource(TestCase):
@@ -94,3 +95,55 @@ class CloudWatchEventsEventSource(TestCase):
         self.assertEqual(len(resources), 2)
         event_rule = resources[0]
         self.assertEqual(event_rule.Targets[0]["Input"], input_to_service)
+
+    def test_to_cloudformation_with_retry_policy(self):
+        retry_policy = {"MaximumRetryAttempts": "10", "MaximumEventAgeInSeconds": "300"}
+        self.cwe_event_source.RetryPolicy = retry_policy
+        resources = self.cwe_event_source.to_cloudformation(resource=self.state_machine)
+        self.assertEqual(len(resources), 2)
+        event_rule = resources[0]
+        self.assertEqual(event_rule.Targets[0]["RetryPolicy"], retry_policy)
+
+    def test_to_cloudformation_with_dlq_arn_provided(self):
+        dead_letter_config = {"Arn": "DeadLetterQueueArn"}
+        self.cwe_event_source.DeadLetterConfig = dead_letter_config
+        resources = self.cwe_event_source.to_cloudformation(resource=self.state_machine)
+        self.assertEqual(len(resources), 2)
+        event_rule = resources[0]
+        self.assertEqual(event_rule.Targets[0]["DeadLetterConfig"], dead_letter_config)
+
+    def test_to_cloudformation_invalid_both_dlq_arn_and_type_provided(self):
+        dead_letter_config = {"Arn": "DeadLetterQueueArn", "Type": "SQS"}
+        self.cwe_event_source.DeadLetterConfig = dead_letter_config
+        with self.assertRaises(InvalidEventException):
+            self.cwe_event_source.to_cloudformation(resource=self.state_machine)
+
+    def test_to_cloudformation_invalid_dlq_type_provided(self):
+        dead_letter_config = {"Type": "SNS", "QueueLogicalId": "MyDLQ"}
+        self.cwe_event_source.DeadLetterConfig = dead_letter_config
+        with self.assertRaises(InvalidEventException):
+            self.cwe_event_source.to_cloudformation(resource=self.state_machine)
+
+    def test_to_cloudformation_missing_dlq_type_or_arn(self):
+        dead_letter_config = {"QueueLogicalId": "MyDLQ"}
+        self.cwe_event_source.DeadLetterConfig = dead_letter_config
+        with self.assertRaises(InvalidEventException):
+            self.cwe_event_source.to_cloudformation(resource=self.state_machine)
+
+    def test_to_cloudformation_with_dlq_generated(self):
+        dead_letter_config = {"Type": "SQS"}
+        dead_letter_config_translated = {"Arn": {"Fn::GetAtt": [self.logical_id + "Queue", "Arn"]}}
+        self.cwe_event_source.DeadLetterConfig = dead_letter_config
+        resources = self.cwe_event_source.to_cloudformation(resource=self.state_machine)
+        self.assertEqual(len(resources), 4)
+        event_rule = resources[0]
+        self.assertEqual(event_rule.Targets[0]["DeadLetterConfig"], dead_letter_config_translated)
+
+    def test_to_cloudformation_with_dlq_generated_with_custom_logical_id(self):
+        dead_letter_config = {"Type": "SQS", "QueueLogicalId": "MyDLQ"}
+        dead_letter_config_translated = {"Arn": {"Fn::GetAtt": ["MyDLQ", "Arn"]}}
+        self.cwe_event_source.DeadLetterConfig = dead_letter_config
+        resources = self.cwe_event_source.to_cloudformation(resource=self.state_machine)
+        self.assertEqual(len(resources), 4)
+        event_rule = resources[0]
+        self.assertEqual(event_rule.Targets[0]["DeadLetterConfig"], dead_letter_config_translated)

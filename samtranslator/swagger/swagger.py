@@ -534,6 +534,14 @@ class SwaggerEditor(object):
                 for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                    if not isinstance(method_definition, dict):
+                        raise InvalidDocumentException(
+                            [
+                                InvalidTemplateException(
+                                    "{} for path {} is not a valid dictionary.".format(method_definition, path)
+                                )
+                            ]
+                        )
                     if not self.method_definition_has_integration(method_definition):
                         continue
                     existing_security = method_definition.get("security", [])
@@ -548,6 +556,14 @@ class SwaggerEditor(object):
                     # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
                     # We want to ensure only a single Authorizer security entry exists while keeping everything else
                     for security in existing_security:
+                        if not isinstance(security, dict):
+                            raise InvalidDocumentException(
+                                [
+                                    InvalidTemplateException(
+                                        "{} in Security for path {} is not a valid dictionary.".format(security, path)
+                                    )
+                                ]
+                            )
                         if authorizer_names.isdisjoint(security.keys()):
                             existing_non_authorizer_security.append(security)
                         else:
