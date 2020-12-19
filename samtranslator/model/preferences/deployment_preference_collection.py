@@ -102,7 +102,7 @@ class DeploymentPreferenceCollection(object):
             ],
         }
         iam_role.ManagedPolicyArns = [
-            ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")
+            ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambdaLimited")
         ]
 
         return iam_role
@@ -135,12 +135,15 @@ class DeploymentPreferenceCollection(object):
 
         deployment_group.DeploymentStyle = {"DeploymentType": "BLUE_GREEN", "DeploymentOption": "WITH_TRAFFIC_CONTROL"}
 
+        if deployment_preference.trigger_configurations:
+            deployment_group.TriggerConfigurations = deployment_preference.trigger_configurations
+            snsManagedPolicy = ArnGenerator.generate_aws_managed_policy_arn("AmazonSNSFullAccess")
+            if snsManagedPolicy not in self.codedeploy_iam_role.ManagedPolicyArns:
+                self.codedeploy_iam_role.ManagedPolicyArns.append(snsManagedPolicy)
+
         deployment_group.ServiceRoleArn = self.codedeploy_iam_role.get_runtime_attr("arn")
         if deployment_preference.role:
             deployment_group.ServiceRoleArn = deployment_preference.role
-
-        if deployment_preference.trigger_configurations:
-            deployment_group.TriggerConfigurations = deployment_preference.trigger_configurations
 
         return deployment_group
 
