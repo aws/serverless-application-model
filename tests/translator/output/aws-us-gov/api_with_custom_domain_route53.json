@@ -62,7 +62,7 @@
         "Description": "RestApi deployment id: 1deeaff6933b892391de7a35e4cf92e79a47aea9"
       }
     },
-    "RecordSetGroupbd00d962a4": {
+    "MyApiDomainRecordSetGroup": {
       "Type": "AWS::Route53::RecordSetGroup",
       "Properties": {
         "HostedZoneId": "ZQ1UAL4EFZVME",
