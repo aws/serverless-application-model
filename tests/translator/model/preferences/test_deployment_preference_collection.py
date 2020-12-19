@@ -18,6 +18,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         self.post_traffic_host_global = "post_traffic_function_ref"
         self.pre_traffic_hook_global = "pre_traffic_function_ref"
         self.function_logical_id = "FunctionLogicalId"
+        self.condition = "CodeDeployCondition"
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_when_no_global_dict_each_local_deployment_preference_requires_parameters(self):
@@ -37,7 +38,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         expected_codedeploy_application_resource.ComputePlatform = "Lambda"
 
         self.assertEqual(
-            DeploymentPreferenceCollection().codedeploy_application.to_dict(),
+            DeploymentPreferenceCollection().get_codedeploy_application().to_dict(),
             expected_codedeploy_application_resource.to_dict(),
         )
 
@@ -59,7 +60,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         ]
 
         self.assertEqual(
-            DeploymentPreferenceCollection().codedeploy_iam_role.to_dict(), expected_codedeploy_iam_role.to_dict()
+            DeploymentPreferenceCollection().get_codedeploy_iam_role().to_dict(), expected_codedeploy_iam_role.to_dict()
         )
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")

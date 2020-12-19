@@ -163,6 +163,7 @@ class SamFunction(SamResourceMacro):
                 lambda_alias,
                 intrinsics_resolver,
                 mappings_resolver,
+                self.get_passthrough_resource_attributes(),
             )
         event_invoke_policies = []
         if self.EventInvokeConfig:
@@ -769,7 +770,7 @@ class SamFunction(SamResourceMacro):
         return alias
 
     def _validate_deployment_preference_and_add_update_policy(
-        self, deployment_preference_collection, lambda_alias, intrinsics_resolver, mappings_resolver
+        self, deployment_preference_collection, lambda_alias, intrinsics_resolver, mappings_resolver, condition
     ):
         if "Enabled" in self.DeploymentPreference:
             # resolve intrinsics and mappings for Type
@@ -785,10 +786,15 @@ class SamFunction(SamResourceMacro):
             preference_type = mappings_resolver.resolve_parameter_refs(preference_type)
             self.DeploymentPreference["Type"] = preference_type
 
+        if condition:
+            condition = condition.get("Condition")
+
         if deployment_preference_collection is None:
             raise ValueError("deployment_preference_collection required for parsing the deployment preference")
 
-        deployment_preference_collection.add(self.logical_id, self.DeploymentPreference)
+        deployment_preference_collection.add(
+            self.logical_id, self.DeploymentPreference, condition,
+        )
 
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
