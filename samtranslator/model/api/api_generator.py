@@ -381,12 +381,8 @@ class ApiGenerator(object):
                     self.logical_id,
                     "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
                 )
-            logical_id = logical_id_generator.LogicalIdGenerator(
-                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
-            ).gen()
-            record_set_group = Route53RecordSetGroup(
-                "RecordSetGroup" + logical_id, attributes=self.passthrough_resource_attributes
-            )
+            logical_id = "{}{}".format(self.logical_id, "DomainRecordSetGroup")
+            record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
             if "HostedZoneId" in route53:
                 record_set_group.HostedZoneId = route53.get("HostedZoneId")
             if "HostedZoneName" in route53:
