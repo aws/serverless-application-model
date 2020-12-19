@@ -17,15 +17,33 @@ MIN_OFFSET = 20
 
 def pprint_column_names(format_string, format_kwargs, margin=None, table_header=None, color="yellow"):
     """
+    Prints column names
 
-    :param format_string: format string to be used that has the strings, minimum width to be replaced
-    :param format_kwargs: dictionary that is supplied to the format_string to format the string
-    :param margin: margin that is to be reduced from column width for columnar text.
-    :param table_header: Supplied table header
-    :param color: color supplied for table headers and column names.
-    :return: boilerplate table string
+    Parameters
+    ----------
+    format_string : str
+        format string to be used that has the strings, minimum width to be replaced
+    format_kwargs : list
+        dictionary that is supplied to the format_string to format the string
+    margin : int, optional
+        margin that is to be reduced from column width for columnar text, by default None
+    table_header : str, optional
+        Text to display before the table, by default None
+    color : str, optional
+        Table color, by default "yellow"
+
+    Returns
+    -------
+    str
+        Complete table string representation
+
+    Raises
+    ------
+    ValueError
+        format_kwargs is empty
+    ValueError
+        [description]
     """
-
     min_width = 100
     min_margin = 2
 
@@ -84,14 +102,21 @@ def pprint_column_names(format_string, format_kwargs, margin=None, table_header=
 
 def wrapped_text_generator(texts, width, margin, **textwrap_kwargs):
     """
+    Returns a generator where the contents are wrapped text to a specified width
 
-    Return a generator where the contents are wrapped text to a specified width.
+    Parameters
+    ----------
+    texts : list
+        list of text that needs to be wrapped at specified width
+    width : int
+        width of the text to be wrapped
+    margin : int
+        margin to be reduced from width for cleaner UX
 
-    :param texts: list of text that needs to be wrapped at specified width
-    :param width: width of the text to be wrapped
-    :param margin: margin to be reduced from width for cleaner UX
-    :param textwrap_kwargs: keyword arguments that are passed to textwrap.wrap
-    :return: generator of wrapped text
+    Yields
+    -------
+    func
+        generator of wrapped text
     """
     for text in texts:
         yield textwrap.wrap(text, width=width - margin, **textwrap_kwargs)
@@ -99,18 +124,24 @@ def wrapped_text_generator(texts, width, margin, **textwrap_kwargs):
 
 def pprint_columns(columns, width, margin, format_string, format_args, columns_dict, color="yellow", **textwrap_kwargs):
     """
+    Prints columns based on list of columnar text, associated formatting string and associated format arguments.
 
-    Print columns based on list of columnar text, associated formatting string and associated format arguments.
-
-    :param columns: list of columnnar text that go into columns as specified by the format_string
-    :param width: width of the text to be wrapped
-    :param margin: margin to be reduced from width for cleaner UX
-    :param format_string: A format string that has both width and text specifiers set.
-    :param format_args: list of offset specifiers
-    :param columns_dict: arguments dictionary that have dummy values per column
-    :param color: color supplied for rows within the table.
-    :param textwrap_kwargs: keyword arguments that are passed to textwrap.wrap
-    :return:
+    Parameters
+    ----------
+    columns : list
+        List of columnnar text that go into columns as specified by the format_string
+    width : int
+        Width of the text to be wrapped
+    margin : int
+        Margin to be reduced from width for cleaner UX
+    format_string : str
+        Format string that has both width and text specifiers set.
+    format_args : list
+        List of offset specifiers
+    columns_dict : dict
+        Arguments dictionary that have dummy values per column
+    color : str, optional
+        Rows color, by default "yellow"
     """
     for columns_text in zip_longest(*wrapped_text_generator(columns, width, margin, **textwrap_kwargs), fillvalue=""):
         counter = count()
@@ -124,14 +155,13 @@ def pprint_columns(columns, width, margin, format_string, format_args, columns_d
 def newline_per_item(iterable, counter):
     """
     Adds a new line based on the index of a given iterable
+
     Parameters
     ----------
-    iterable: Any iterable that implements __len__
-    counter: Current index within the iterable
-
-    Returns
-    -------
-
+    iterable : iterable
+        Any iterable that implements __len__
+    counter : int
+        Current index within the iterable
     """
     if counter < len(iterable) - 1:
         click.echo(message="", nl=True)

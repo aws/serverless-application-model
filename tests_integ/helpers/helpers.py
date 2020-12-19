@@ -11,10 +11,9 @@ from botocore.exceptions import ClientError, NoRegionError
 from samtranslator.model.exceptions import InvalidDocumentException
 from samtranslator.translator.managed_policy_translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
+from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.yaml_helper import yaml_parse
 
-# Length of the suffix sometimes added by CFN to logical IDs
-LOGICAL_RES_SUFFIX_LENGTH = 10
 # Length of the random suffix added at the end of the resources we create
 # to avoid collisions between tests
 RANDOM_SUFFIX_LENGTH = 12
@@ -79,7 +78,7 @@ def verify_stack_resources(expected_file_path, stack_resources):
         exp = expected_resources[i]
         parsed = parsed_resources[i]
         if not re.match(
-            "^" + exp["LogicalResourceId"] + "([0-9a-f]{" + str(LOGICAL_RES_SUFFIX_LENGTH) + "})?$",
+            "^" + exp["LogicalResourceId"] + "([0-9a-f]{" + str(LogicalIdGenerator.HASH_LENGTH) + "})?$",
             parsed["LogicalResourceId"],
         ):
             return False
