@@ -1,5 +1,6 @@
 """
 Date & Time related utilities
+This was ported over from the sam-cli repo
 """
 
 import datetime

@@ -1,5 +1,6 @@
 """
 Logic for uploading to S3 per Cloudformation Specific Resource
+This was ported over from the sam-cli repo
 """
 # pylint: disable=no-member
 

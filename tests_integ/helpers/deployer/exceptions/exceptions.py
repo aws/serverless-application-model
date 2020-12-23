@@ -1,5 +1,6 @@
 """
 Exceptions that are raised by sam deploy
+This was ported over from the sam-cli repo
 """
 import click
 

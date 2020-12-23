@@ -1,5 +1,6 @@
 """
 Cloudformation deploy class which also streams events and changeset information
+This was ported over from the sam-cli repo
 """
 
 # Copyright 2012-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.

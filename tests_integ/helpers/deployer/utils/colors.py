@@ -1,5 +1,6 @@
 """
 Wrapper to generated colored messages for printing in Terminal
+This was ported over from the sam-cli repo
 """
 
 import click

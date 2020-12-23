@@ -1,5 +1,6 @@
 """
 Utilities for table pretty printing using click
+This was ported over from the sam-cli repo
 """
 from itertools import count
 
