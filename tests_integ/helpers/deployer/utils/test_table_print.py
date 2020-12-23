@@ -3,7 +3,8 @@ This file is located here because it contains unit tests for integration tests u
 and not unit tests for the application code.
 """
 import io
-from contextlib import redirect_stdout
+import contextlib
+import sys
 from collections import OrderedDict
 from unittest import TestCase
 
@@ -13,9 +14,19 @@ TABLE_FORMAT_STRING = "{Alpha:<{0}} {Beta:<{1}} {Gamma:<{2}}"
 TABLE_FORMAT_ARGS = OrderedDict({"Alpha": "Alpha", "Beta": "Beta", "Gamma": "Gamma"})
 
 
+@contextlib.contextmanager
+def redirect_stdout(target):
+    original = sys.stdout
+    try:
+        sys.stdout = target
+        yield
+    finally:
+        sys.stdout = original
+
+
 class TestTablePrint(TestCase):
     def setUp(self):
-        self.redirect_out = io.StringIO()
+        self.redirect_out = io.BytesIO()
 
     def test_pprint_column_names(self):
         @pprint_column_names(TABLE_FORMAT_STRING, TABLE_FORMAT_ARGS)
@@ -31,7 +42,7 @@ class TestTablePrint(TestCase):
             "------------------------------------------------------------------------------------------------\n"
         )
 
-        self.assertEqual(output, self.redirect_out.getvalue())
+        self.assertEqual(output, self.redirect_out.getvalue().decode("UTF-8"))
 
     def test_pprint_column_names_and_text(self):
         @pprint_column_names(TABLE_FORMAT_STRING, TABLE_FORMAT_ARGS)
@@ -55,7 +66,7 @@ class TestTablePrint(TestCase):
             "A                                B                                C                              \n"
             "------------------------------------------------------------------------------------------------\n"
         )
-        self.assertEqual(output, self.redirect_out.getvalue())
+        self.assertEqual(output, self.redirect_out.getvalue().decode("UTF-8"))
 
     def test_pprint_exceptions_with_no_column_names(self):
         with self.assertRaises(ValueError):
