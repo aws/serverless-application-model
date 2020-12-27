@@ -515,6 +515,7 @@ class HttpApiGenerator(object):
                 identity=authorizer.get("Identity"),
                 authorizer_payload_format_version=authorizer.get("AuthorizerPayloadFormatVersion"),
                 enable_simple_responses=authorizer.get("EnableSimpleResponses"),
+                is_aws_iam_authorizer=authorizer.get("IamAuthorizer"),
             )
         return authorizers
 
