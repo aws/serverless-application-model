@@ -1167,7 +1167,8 @@ class HttpApi(PushEventSource):
         # Default auth should already be applied, so apply any other auth here or scope override to default
         api_authorizers = api_auth and api_auth.get("Authorizers")
 
-        if method_authorizer != "NONE" and not api_authorizers:
+        # "NONE" and "AWS_IAM" are placeholder authorizer values so they can be safely skipped.
+        if method_authorizer != "NONE" and method_authorizer != "AWS_IAM" and not api_authorizers:
             raise InvalidEventException(
                 self.relative_id,
                 "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
@@ -1176,7 +1177,11 @@ class HttpApi(PushEventSource):
                 ),
             )
 
-        if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
+        if (
+            method_authorizer != "NONE"
+            and method_authorizer != "AWS_IAM"
+            and not api_authorizers.get(method_authorizer)
+        ):
             raise InvalidEventException(
                 self.relative_id,
                 "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "

@@ -397,34 +397,45 @@ class HttpApiGenerator(object):
 
     def _add_auth(self):
         """
-        Add Auth configuration to the OAS file, if necessary
+        Add Auth configuration to the OAS file. In order to support the built-in AWS_IAM authorizer it is always added.
         """
-        if not self.auth:
-            return
-
-        if self.auth and not self.definition_body:
+        if not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "Auth works only with inline OpenApi specified in the 'DefinitionBody' property."
             )
-
-        # Make sure keys in the dict are recognized
-        if not all(key in AuthProperties._fields for key in self.auth.keys()):
-            raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
         if not OpenApiEditor.is_valid(self.definition_body):
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to add Auth configuration because 'DefinitionBody' does not contain a valid OpenApi definition.",
             )
-        open_api_editor = OpenApiEditor(self.definition_body)
-        auth_properties = AuthProperties(**self.auth)
-        authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)
 
-        # authorizers is guaranteed to return a value or raise an exception
-        open_api_editor.add_authorizers_security_definitions(authorizers)
-        self._set_default_authorizer(
-            open_api_editor, authorizers, auth_properties.DefaultAuthorizer, auth_properties.Authorizers
-        )
+        open_api_editor = OpenApiEditor(self.definition_body)
+
+        # To remain backwards compatible add the built-in "AWS_IAM" security scheme _before_ adding the authorizers defined
+        # in the template so that if the template already has an authorized named "AWS_IAM" it will override the built-in one.
+        open_api_editor.security_schemes["AWS_IAM"] = {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "x-amazon-apigateway-authtype": "awsSigv4",
+        }
+
+        # If auth is defined in the template validate it, set the default authorizer, and add any specified authorizers.
+        if self.auth:
+            # Make sure keys in the dict are recognized
+            if not all(key in AuthProperties._fields for key in self.auth.keys()):
+                raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
+
+            auth_properties = AuthProperties(**self.auth)
+            # authorizers is guaranteed to return a value or raise an exception
+            authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)
+
+            open_api_editor.add_authorizers_security_definitions(authorizers)
+            self._set_default_authorizer(
+                open_api_editor, authorizers, auth_properties.DefaultAuthorizer, auth_properties.Authorizers
+            )
+
         self.definition_body = open_api_editor.openapi
 
     def _add_tags(self):
@@ -468,7 +479,8 @@ class HttpApiGenerator(object):
         if not default_authorizer:
             return
 
-        if not authorizers.get(default_authorizer):
+        # The AWS_IAM authorizer is built-in and does not need to be defined in the template as an authorizer.
+        if not authorizers.get(default_authorizer) and default_authorizer != "AWS_IAM":
             raise InvalidResourceException(
                 self.logical_id,
                 "Unable to set DefaultAuthorizer because '"
@@ -488,8 +500,10 @@ class HttpApiGenerator(object):
         :param default_authorizer: name of the default authorizer
         """
         authorizers = {}
-
         if not isinstance(authorizers_config, dict):
+            # The AWS_IAM authorizer is built-in and does not need to be defined in the template as an authorizer.
+            if default_authorizer == "AWS_IAM":
+                return authorizers
             raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
 
         for authorizer_name, authorizer in authorizers_config.items():
