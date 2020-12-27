@@ -163,7 +163,8 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
 class ImplicitHttpApiResource(SamResource):
     """
     Returns a AWS::Serverless::HttpApi resource representing the Implicit APIs. The returned resource
-    includes the empty OpenApi along with default values for other properties.
+    includes the empty OpenApi along with default values for other properties (except Auth). Auth is
+    configured with a single IAM authorizer called "AWS_IAM".
     """
 
     def __init__(self):
@@ -173,6 +174,7 @@ class ImplicitHttpApiResource(SamResource):
             "Type": SamResourceType.HttpApi.value,
             "Properties": {
                 "DefinitionBody": open_api,
+                "Auth": {"Authorizers": {"AWS_IAM": {"IamAuthorizer": True}}},
                 # Internal property that means Event source code can add Events. Used only for implicit APIs, to
                 # prevent back compatibility issues for explicit APIs
                 "__MANAGE_SWAGGER": True,
