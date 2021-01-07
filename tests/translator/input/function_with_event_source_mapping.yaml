@@ -53,6 +53,8 @@ Resources:
             MaximumRecordAgeInSeconds: 86400
             StartingPosition: TRIM_HORIZON
             TumblingWindowInSeconds: 60
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
             DestinationConfig:
               OnFailure:
                 Type: SQS
