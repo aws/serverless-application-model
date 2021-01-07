@@ -182,7 +182,8 @@
         "ParallelizationFactor": 8,
         "MaximumRetryAttempts": 100,
         "BisectBatchOnFunctionError": true,
-        "TumblingWindowInSeconds": 60
+        "TumblingWindowInSeconds": 60,
+        "FunctionResponseTypes": ["ReportBatchItemFailures"]
       }
     },
     "MyFunctionForBatchingExample": {
