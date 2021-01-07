@@ -9,8 +9,7 @@ test:
 	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 tests/*
 
 test-integ:
-    $(info ${AWS_ACCESS_KEY_ID})
-# 	pytest --no-cov tests_integ/*
+	pytest --no-cov tests_integ/*
 
 black:
 	black setup.py samtranslator/* tests/* tests_integ/* bin/*.py
