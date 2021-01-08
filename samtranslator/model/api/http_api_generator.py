@@ -112,6 +112,8 @@ class HttpApiGenerator(object):
         if self.disable_execute_api_endpoint is not None:
             self._add_endpoint_configuration()
 
+        self._add_description()
+
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
@@ -123,9 +125,6 @@ class HttpApiGenerator(object):
                 "'AWS::Serverless::HttpApi'. Add a value for one of these properties or "
                 "add a 'HttpApi' event to an 'AWS::Serverless::Function'.",
             )
-
-        if self.description:
-            http_api.Description = self.description
 
         return http_api
 
@@ -585,6 +584,27 @@ class HttpApiGenerator(object):
         stage.RouteSettings = self.route_settings
 
         return stage
+
+    def _add_description(self):
+        """Add description to DefinitionBody if Description property is set in SAM"""
+        if not self.description:
+            return
+
+        if not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Description works only with inline OpenApi specified in the 'DefinitionBody' property.",
+            )
+        if self.definition_body.get("info", {}).get("description"):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set Description because it is already defined within inline OpenAPI specified in the "
+                "'DefinitionBody' property.",
+            )
+
+        open_api_editor = OpenApiEditor(self.definition_body)
+        open_api_editor.add_description(self.description)
+        self.definition_body = open_api_editor.openapi
 
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM HTTP API resource

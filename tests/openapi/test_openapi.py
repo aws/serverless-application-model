@@ -414,3 +414,26 @@ class TestOpenApiEditor_get_integration_function(TestCase):
             "HttpApiFunction",
         )
         self.assertFalse(self.editor.get_integration_function_logical_id("/bar", "get"))
+
+
+class TestOpenApiEdit_add_description(TestCase):
+    def setUp(self):
+        self.original_openapi_with_description = {
+            "openapi": "3.0.1",
+            "paths": {},
+            "info": {"description": "Existing Description"},
+        }
+        self.original_openapi_without_description = {
+            "openapi": "3.0.1",
+            "paths": {},
+        }
+
+    def test_must_add_description_if_not_defined(self):
+        editor = OpenApiEditor(self.original_openapi_without_description)
+        editor.add_description("New Description")
+        self.assertEqual(editor.openapi["info"]["description"], "New Description")
+
+    def test_must_not_add_description_if_already_defined(self):
+        editor = OpenApiEditor(self.original_openapi_with_description)
+        editor.add_description("New Description")
+        self.assertEqual(editor.openapi["info"]["description"], "Existing Description")

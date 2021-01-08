@@ -46,6 +46,7 @@ class OpenApiEditor(object):
         self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
         self.definitions = self._doc.get("definitions", {})
         self.tags = self._doc.get("tags", [])
+        self.info = self._doc.get("info", {})
 
     def get_path(self, path):
         """
@@ -521,6 +522,15 @@ class OpenApiEditor(object):
 
         self._doc[self._X_APIGW_CORS] = cors_configuration
 
+    def add_description(self, description):
+        """Add description in open api definition, if it is not already defined
+
+        :param string description: Description of the API
+        """
+        if self.info.get("description"):
+            return
+        self.info["description"] = description
+
     def has_api_gateway_cors(self):
         if self._doc.get(self._X_APIGW_CORS):
             return True
@@ -543,6 +553,9 @@ class OpenApiEditor(object):
         if self.security_schemes:
             self._doc.setdefault("components", {})
             self._doc["components"]["securitySchemes"] = self.security_schemes
+
+        if self.info:
+            self._doc["info"] = self.info
 
         return copy.deepcopy(self._doc)
 
