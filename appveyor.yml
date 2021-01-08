@@ -12,9 +12,6 @@ environment:
   - TOXENV: py38
     PYTHON_VERSION: '3.8'
 
-init:
-  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
-
 build: off
 
 install:
@@ -24,5 +21,9 @@ install:
 
 test_script:
 - tox
+
+on_finish:
+  - sh: export APPVEYOR_SSH_BLOCK=true
+  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
 
 
