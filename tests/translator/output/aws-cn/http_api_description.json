@@ -79,17 +79,44 @@
         "ApiId": {
           "Ref": "HttpApi"
         },
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        },
         "StageName": "$default"
       }
     }, 
     "HttpApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
       "Properties": {
-        "BodyS3Location": {
-          "Bucket": "bucket",
-          "Key": "key"
-        },
-        "Description": "my description"
+        "Body": {
+          "openapi": "3.0.1",
+          "paths": {
+            "/foo": {},
+            "$default": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "payloadFormatVersion": "2.0",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations"
+                  }
+                },
+                "isDefaultRoute": true,
+                "responses": {}
+              }
+            }
+          },
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ],
+          "info": {
+            "description": "my description"
+          }
+        }
       }
     }
   }
