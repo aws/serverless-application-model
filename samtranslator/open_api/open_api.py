@@ -522,8 +522,8 @@ class OpenApiEditor(object):
 
         self._doc[self._X_APIGW_CORS] = cors_configuration
 
-    def set_description(self, description):
-        """Set description in open api definition, if it is not already defined
+    def add_description(self, description):
+        """Add description in open api definition, if it is not already defined
 
         :param string description: Description of the API
         """

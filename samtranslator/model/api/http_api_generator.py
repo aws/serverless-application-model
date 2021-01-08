@@ -112,7 +112,7 @@ class HttpApiGenerator(object):
         if self.disable_execute_api_endpoint is not None:
             self._add_endpoint_configuration()
 
-        self._set_description()
+        self._add_description()
 
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
@@ -585,8 +585,8 @@ class HttpApiGenerator(object):
 
         return stage
 
-    def _set_description(self):
-        """Sets Description to DefinitionBody"""
+    def _add_description(self):
+        """Add description to DefinitionBody if Description property is set in SAM"""
         if not self.description:
             return
 
@@ -603,7 +603,7 @@ class HttpApiGenerator(object):
             )
 
         open_api_editor = OpenApiEditor(self.definition_body)
-        open_api_editor.set_description(self.description)
+        open_api_editor.add_description(self.description)
         self.definition_body = open_api_editor.openapi
 
     def to_cloudformation(self):
