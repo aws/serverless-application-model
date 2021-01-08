@@ -281,18 +281,54 @@ class TestHttpApiDescription(TestCase):
     @patch("boto3.session.Session.region_name", "eu-central-1")
     def test_with_no_description(self):
         sam_http_api = SamHttpApi("foo")
-        sam_http_api.DefinitionUri = "s3://foobar/foo.zip"
+        sam_http_api.DefinitionBody = {
+            "openapi": "3.0.1",
+            "paths": {"/foo": {}, "/bar": {}},
+            "info": {"description": "existing description"},
+        }
 
         resources = sam_http_api.to_cloudformation(**self.kwargs)
-        rest_api = [x for x in resources if isinstance(x, ApiGatewayV2HttpApi)]
-        self.assertEqual(rest_api[0].Description, None)
+        http_api = [x for x in resources if isinstance(x, ApiGatewayV2HttpApi)]
+        self.assertEqual(http_api[0].Body.get("info", {}).get("description"), "existing description")
 
     @patch("boto3.session.Session.region_name", "eu-central-1")
-    def test_with_description(self):
+    def test_with_no_definition_body(self):
         sam_http_api = SamHttpApi("foo")
-        sam_http_api.DefinitionUri = "s3://foobar/foo.zip"
         sam_http_api.Description = "my description"
 
+        with self.assertRaises(InvalidResourceException) as context:
+            sam_http_api.to_cloudformation(**self.kwargs)
+        self.assertEqual(
+            context.exception.message,
+            "Resource with id [foo] is invalid. "
+            "Description works only with inline OpenApi specified in the 'DefinitionBody' property.",
+        )
+
+    @patch("boto3.session.Session.region_name", "eu-central-1")
+    def test_with_description_defined_in_definition_body(self):
+        sam_http_api = SamHttpApi("foo")
+        sam_http_api.DefinitionBody = {
+            "openapi": "3.0.1",
+            "paths": {"/foo": {}, "/bar": {}},
+            "info": {"description": "existing description"},
+        }
+        sam_http_api.Description = "new description"
+
+        with self.assertRaises(InvalidResourceException) as context:
+            sam_http_api.to_cloudformation(**self.kwargs)
+        self.assertEqual(
+            context.exception.message,
+            "Resource with id [foo] is invalid. "
+            "Unable to set Description because it is already defined within inline OpenAPI specified in the "
+            "'DefinitionBody' property.",
+        )
+
+    @patch("boto3.session.Session.region_name", "eu-central-1")
+    def test_with_description_not_defined_in_definition_body(self):
+        sam_http_api = SamHttpApi("foo")
+        sam_http_api.DefinitionBody = {"openapi": "3.0.1", "paths": {"/foo": {}}, "info": {}}
+        sam_http_api.Description = "new description"
+
         resources = sam_http_api.to_cloudformation(**self.kwargs)
-        rest_api = [x for x in resources if isinstance(x, ApiGatewayV2HttpApi)]
-        self.assertEqual(rest_api[0].Description, "my description")
+        http_api = [x for x in resources if isinstance(x, ApiGatewayV2HttpApi)]
+        self.assertEqual(http_api[0].Body.get("info", {}).get("description"), "new description")
