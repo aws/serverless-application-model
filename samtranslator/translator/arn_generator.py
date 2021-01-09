@@ -39,15 +39,23 @@ class ArnGenerator(object):
         :param region: Optional name of the region
         :return: Partition name
         """
+
         if region is None:
             # Use Boto3 to get the region where code is running. This uses Boto's regular region resolution
             # mechanism, starting from AWS_DEFAULT_REGION environment variable.
             region = boto3.session.Session().region_name
 
+        # setting default partition to aws, this will be overwritten by checking the region below
+        partition = "aws"
+
         region_string = region.lower()
         if region_string.startswith("cn-"):
-            return "aws-cn"
+            partition = "aws-cn"
+        elif region_string.startswith("us-iso-"):
+            partition = "aws-iso"
+        elif region_string.startswith("us-isob"):
+            partition = "aws-iso-b"
         elif region_string.startswith("us-gov"):
-            return "aws-us-gov"
-        else:
-            return "aws"
+            partition = "aws-us-gov"
+
+        return partition
