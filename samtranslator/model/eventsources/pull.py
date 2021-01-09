@@ -129,8 +129,17 @@ class PullEventSource(ResourceMacro):
         :param model.iam.IAMRole role: the execution role generated for the function
         """
         policy_arn = self.get_policy_arn()
-        if role is not None and policy_arn not in role.ManagedPolicyArns:
-            role.ManagedPolicyArns.append(policy_arn)
+        policy_statements = self.get_policy_statements()
+        if role is not None:
+            if policy_arn is not None and policy_arn not in role.ManagedPolicyArns:
+                role.ManagedPolicyArns.append(policy_arn)
+            if policy_statements is not None:
+                if role.Policies is None:
+                    role.Policies = []
+                for policy in policy_statements:
+                    if policy not in role.Policies:
+                        if not policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
+                            role.Policies.append(policy)
         # add SQS or SNS policy only if role is present in kwargs
         if role is not None and destination_config_policy is not None and destination_config_policy:
             if role.Policies is None:
@@ -150,6 +159,8 @@ class Kinesis(PullEventSource):
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
 
+    def get_policy_statements():
+        return None
 
 class DynamoDB(PullEventSource):
     """DynamoDB Streams event source."""
@@ -159,6 +170,9 @@ class DynamoDB(PullEventSource):
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
 
+    def get_policy_statements():
+        return None
+
 
 class SQS(PullEventSource):
     """SQS Queue event source."""
@@ -167,7 +181,9 @@ class SQS(PullEventSource):
 
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
-
+    
+    def get_policy_statements():
+        return None
 
 class MSK(PullEventSource):
     """MSK event source."""
@@ -177,6 +193,8 @@ class MSK(PullEventSource):
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
 
+    def get_policy_statements():
+        return None
 
 class MQ(PullEventSource):
     """MQ event source."""
@@ -184,4 +202,11 @@ class MQ(PullEventSource):
     resource_type = "MQ"
 
     def get_policy_arn(self):
-        return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaAMQExecutionRole")
+        return None
+
+    def get_policy_statements():
+        document = {
+            "PolicyName": "TestPolicy",
+            "PolicyDocument": {"Statement": [{"Action": "Test", "Effect": "Allow", "Resource": "Test"}]},
+        }
+        return [document]
