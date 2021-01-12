@@ -114,12 +114,7 @@ class BaseTest(TestCase):
         return "https://s3-{}.amazonaws.com/{}/{}".format(cls.my_region, cls.s3_bucket_name, file_name)
 
     def setUp(self):
-        config = Config(
-            retries={
-                'max_attempts': 10,
-                'mode': 'standard'
-            }
-        )
+        config = Config(retries={"max_attempts": 10, "mode": "standard"})
         self.cloudformation_client = boto3.client("cloudformation", config=config)
         self.deployer = Deployer(self.cloudformation_client)
 
