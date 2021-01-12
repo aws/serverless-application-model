@@ -11,6 +11,7 @@ import boto3
 import pytest
 import yaml
 from botocore.exceptions import ClientError
+from botocore.config import Config
 from tests_integ.helpers.deployer.deployer import Deployer
 from tests_integ.helpers.helpers import transform_template, verify_stack_resources, generate_suffix, create_bucket
 from tests_integ.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
@@ -113,7 +114,13 @@ class BaseTest(TestCase):
         return "https://s3-{}.amazonaws.com/{}/{}".format(cls.my_region, cls.s3_bucket_name, file_name)
 
     def setUp(self):
-        self.cloudformation_client = boto3.client("cloudformation")
+        config = Config(
+            retries={
+                'max_attempts': 10,
+                'mode': 'standard'
+            }
+        )
+        self.cloudformation_client = boto3.client("cloudformation", config=config)
         self.deployer = Deployer(self.cloudformation_client)
 
     def tearDown(self):
