@@ -21,4 +21,3 @@ install:
 
 test_script:
 - tox
-
