@@ -34,11 +34,15 @@ class PullEventSource(ResourceMacro):
         "Broker": PropertyType(False, is_str()),
         "Queues": PropertyType(False, is_type(list)),
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),
+        "SecretsManagerKmsKeyId": PropertyType(False, is_str()),
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
     }
 
     def get_policy_arn(self):
+        raise NotImplementedError("Subclass must implement this method")
+
+    def get_policy_statements(self):
         raise NotImplementedError("Subclass must implement this method")
 
     def to_cloudformation(self, **kwargs):
@@ -163,7 +167,7 @@ class Kinesis(PullEventSource):
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaKinesisExecutionRole")
 
-    def get_policy_statements():
+    def get_policy_statements(self):
         return None
 
 class DynamoDB(PullEventSource):
@@ -174,7 +178,7 @@ class DynamoDB(PullEventSource):
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaDynamoDBExecutionRole")
 
-    def get_policy_statements():
+    def get_policy_statements(self):
         return None
 
 
@@ -186,7 +190,7 @@ class SQS(PullEventSource):
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
     
-    def get_policy_statements():
+    def get_policy_statements(self):
         return None
 
 class MSK(PullEventSource):
@@ -197,7 +201,7 @@ class MSK(PullEventSource):
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaMSKExecutionRole")
 
-    def get_policy_statements():
+    def get_policy_statements(self):
         return None
 
 class MQ(PullEventSource):
@@ -208,9 +212,58 @@ class MQ(PullEventSource):
     def get_policy_arn(self):
         return None
 
-    def get_policy_statements():
+    def get_policy_statements(self):
+        if not self.SourceAccessConfigurations:
+            raise InvalidEventException(
+                self.relative_id,
+                "No SourceAccessConfigurations for ActiveMQ provided.",
+            )
+        if not type(self.SourceAccessConfigurations) is list:
+            raise InvalidEventException(
+                self.relative_id,
+                "Provided SourceAccessConfigurations cannot be parsed into a list.",
+            )
+        # MQ only supports SourceAccessConfigurations with list size of 1
+        if not (len(self.SourceAccessConfigurations) == 1):
+            raise InvalidEventException(
+                self.relative_id,
+                "SourceAccessConfigurations for ActiveMQ only supports single configuration entry.",
+            )
+        if not self.SourceAccessConfigurations[0].get("URI"):
+            raise InvalidEventException(
+                self.relative_id,
+                "No URI property specified in SourceAccessConfigurations for ActiveMQ.",
+            )
         document = {
-            "PolicyName": "TestPolicy",
-            "PolicyDocument": {"Statement": [{"Action": "Test", "Effect": "Allow", "Resource": "Test"}]},
+            "PolicyName": "AMQPolicy",
+            "PolicyDocument": 
+            {
+                "Statement": [
+                    {
+                        "Action": [
+                            "secretsmanager:GetSecretValue",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": self.SourceAccessConfigurations[0].get("URI")
+                    },
+                    {
+                        "Action": [
+                            "mq:DescribeBroker",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": self.Broker
+                    }
+                ]
+            }
         }
+        if self.SecretsManagerKmsKeyId:
+            kms_policy = {
+                "Action": "kms:Decrypt",
+                "Effect": "Allow",
+                "Resource": {
+                    "Fn::Sub":
+                        "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/" + self.SecretsManagerKmsKeyId
+                }
+            }
+            document["PolicyDocument"]["Statement"].append(kms_policy)
         return [document]
