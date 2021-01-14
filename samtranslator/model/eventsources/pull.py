@@ -170,6 +170,7 @@ class Kinesis(PullEventSource):
     def get_policy_statements(self):
         return None
 
+
 class DynamoDB(PullEventSource):
     """DynamoDB Streams event source."""
 
@@ -189,9 +190,10 @@ class SQS(PullEventSource):
 
     def get_policy_arn(self):
         return ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaSQSQueueExecutionRole")
-    
+
     def get_policy_statements(self):
         return None
+
 
 class MSK(PullEventSource):
     """MSK event source."""
@@ -203,6 +205,7 @@ class MSK(PullEventSource):
 
     def get_policy_statements(self):
         return None
+
 
 class MQ(PullEventSource):
     """MQ event source."""
@@ -236,34 +239,33 @@ class MQ(PullEventSource):
             )
         document = {
             "PolicyName": "AMQPolicy",
-            "PolicyDocument": 
-            {
+            "PolicyDocument": {
                 "Statement": [
                     {
                         "Action": [
                             "secretsmanager:GetSecretValue",
                         ],
                         "Effect": "Allow",
-                        "Resource": self.SourceAccessConfigurations[0].get("URI")
+                        "Resource": self.SourceAccessConfigurations[0].get("URI"),
                     },
                     {
                         "Action": [
                             "mq:DescribeBroker",
                         ],
                         "Effect": "Allow",
-                        "Resource": self.Broker
-                    }
+                        "Resource": self.Broker,
+                    },
                 ]
-            }
+            },
         }
         if self.SecretsManagerKmsKeyId:
             kms_policy = {
                 "Action": "kms:Decrypt",
                 "Effect": "Allow",
                 "Resource": {
-                    "Fn::Sub":
-                        "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/" + self.SecretsManagerKmsKeyId
-                }
+                    "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
+                    + self.SecretsManagerKmsKeyId
+                },
             }
             document["PolicyDocument"]["Statement"].append(kms_policy)
         return [document]
