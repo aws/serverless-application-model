@@ -1,0 +1,66 @@
+Globals:
+  Api:
+    Name: "some api"
+    CacheClusterEnabled: True
+    CacheClusterSize: "1.6"
+    Auth:
+      DefaultAuthorizer: MyCognitoAuth
+      Authorizers:
+        MyCognitoAuth:
+          UserPoolArn: !GetAtt MyUserPool.Arn
+    Variables:
+      SomeVar: Value
+
+Resources:
+  ImplicitApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: SomeStage
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          version: '1.0'
+          title: !Ref AWS::StackName
+        paths:
+          "/":
+            parameters:
+              - name: domain
+                in: path
+                description: Application domain
+                type: string
+                required: true
+            tags:
+              - InvalidMethodDefinition
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations
+              responses: {}
+
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: UserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
