@@ -1,6 +1,8 @@
 import logging
 import os
 
+from tests_integ.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
+
 try:
     from pathlib import Path
 except ImportError:
@@ -13,7 +15,8 @@ import yaml
 from botocore.exceptions import ClientError
 from botocore.config import Config
 from tests_integ.helpers.deployer.deployer import Deployer
-from tests_integ.helpers.helpers import transform_template, verify_stack_resources, generate_suffix, create_bucket
+from tests_integ.helpers.template import transform_template
+
 from tests_integ.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
