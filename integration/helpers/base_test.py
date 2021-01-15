@@ -113,10 +113,10 @@ class BaseTest(TestCase):
         return "https://s3-{}.amazonaws.com/{}/{}".format(cls.my_region, cls.s3_bucket_name, file_name)
 
     def setUp(self):
-        self.deployer = Deployer(self.client_provider.cloudformation_client)
+        self.deployer = Deployer(self.client_provider.cfn_client)
 
     def tearDown(self):
-        self.client_provider.cloudformation_client.delete_stack(StackName=self.stack_name)
+        self.client_provider.cfn_client.delete_stack(StackName=self.stack_name)
         if os.path.exists(self.output_file_path):
             os.remove(self.output_file_path)
         if os.path.exists(self.sub_input_file_path):
@@ -222,9 +222,7 @@ class BaseTest(TestCase):
         if not resources:
             return None
 
-        return self.client_provider.cloudformation_client.list_stack_resources(
-            StackName=resources[0]["PhysicalResourceId"]
-        )
+        return self.client_provider.cfn_client.list_stack_resources(StackName=resources[0]["PhysicalResourceId"])
 
     def get_stack_outputs(self):
         if not self.stack_description:
@@ -333,10 +331,8 @@ class BaseTest(TestCase):
             self.deployer.execute_changeset(result["Id"], self.stack_name)
             self.deployer.wait_for_execute(self.stack_name, changeset_type)
 
-        self.stack_description = self.client_provider.cloudformation_client.describe_stacks(StackName=self.stack_name)
-        self.stack_resources = self.client_provider.cloudformation_client.list_stack_resources(
-            StackName=self.stack_name
-        )
+        self.stack_description = self.client_provider.cfn_client.describe_stacks(StackName=self.stack_name)
+        self.stack_resources = self.client_provider.cfn_client.list_stack_resources(StackName=self.stack_name)
 
     def verify_stack(self):
         """
