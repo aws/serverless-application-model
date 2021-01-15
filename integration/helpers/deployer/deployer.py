@@ -34,16 +34,16 @@ from datetime import datetime
 
 import botocore
 
-from tests_integ.helpers.deployer.utils.colors import DeployColor
-from tests_integ.helpers.deployer.exceptions import exceptions as deploy_exceptions
-from tests_integ.helpers.deployer.utils.table_print import (
+from integration.helpers.deployer.utils.colors import DeployColor
+from integration.helpers.deployer.exceptions import exceptions as deploy_exceptions
+from integration.helpers.deployer.utils.table_print import (
     pprint_column_names,
     pprint_columns,
     newline_per_item,
     MIN_OFFSET,
 )
-from tests_integ.helpers.deployer.utils.artifact_exporter import mktempfile, parse_s3_url
-from tests_integ.helpers.deployer.utils.time import utc_to_timestamp
+from integration.helpers.deployer.utils.artifact_exporter import mktempfile, parse_s3_url
+from integration.helpers.deployer.utils.time import utc_to_timestamp
 
 LOG = logging.getLogger(__name__)
 

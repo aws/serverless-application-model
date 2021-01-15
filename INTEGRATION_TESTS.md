@@ -39,7 +39,7 @@ make init
 From the root of the repository, run:
 
 ```
-make test-integ
+make integ-test
 ```
 
 ### Running a specific test file
@@ -53,7 +53,7 @@ pytest --no-cov path/to/the/test_file.py
 For example, from the root of the project:
 
 ```sh
-pytest --no-cov tests_integ/single/test_basic_api.py
+pytest --no-cov integration/single/test_basic_api.py
 ```
 
 ### Running a specific test
@@ -67,17 +67,17 @@ pytest --no-cov path/to/the/test_file.py::test_class::test_method
 For example, from the root of the project:
 
 ```sh
-pytest --no-cov tests_integ/single/test_basic_api.py::TestBasicApi::test_basic_api
+pytest --no-cov integration/single/test_basic_api.py::TestBasicApi::test_basic_api
 ```
 
 *We don't measure coverage for integration tests.*
 
 ## Write a test
 
-1. Add your test templates to the `tests_integ/resources/templates` single or combination folder.
-2. Write an expected json file for all the expected resources and add it to the `tests_integ/resources/expected`.
-3. (Optional) Add the resource files (zip, json, etc.) to `tests_integ/resources/code` and update the dictionaries in `tests_integ/helpers/file_resources.py`.
-4. Write and add your python test code to the `tests_integ` single or combination folder.
+1. Add your test templates to the `integration/resources/templates` single or combination folder.
+2. Write an expected json file for all the expected resources and add it to the `integration/resources/expected`.
+3. (Optional) Add the resource files (zip, json, etc.) to `integration/resources/code` and update the dictionaries in `integration/helpers/file_resources.py`.
+4. Write and add your python test code to the `integration` single or combination folder.
 5. Run it!
 
 ## Directory structure
@@ -91,7 +91,8 @@ Common classes and tools used by tests.
 |   +-- deployer           Tools to deploy to Cloud Formation
 |   +-- base_test.py       Common class from which all test classes inherit
 |   +-- file_resources.py  Files to upload to S3
-|   +-- helpers.py         Miscellaneous helpers
+|   +-- resource.py        Helper functions to manipulate resources
+|   +-- template.py        Helper functions to translate the template
 ```
 
 `base_test.py` contains `setUpClass` and `tearDownClass` methods to respectively upload and clean the `file_resources.py` resources (upload the files to a new S3 bucket, empty and delete this bucket).

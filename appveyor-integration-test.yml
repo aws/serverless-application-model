@@ -20,5 +20,5 @@ install:
 - make init
 
 test_script:
-- make test-integ
+- make integ-test
 

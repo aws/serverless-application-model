@@ -1,5 +1,5 @@
 from parameterized import parameterized
-from tests_integ.helpers.base_test import BaseTest
+from integration.helpers.base_test import BaseTest
 
 
 class TestBasicFunction(BaseTest):

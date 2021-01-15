@@ -1,7 +1,7 @@
 import logging
 import os
 
-from tests_integ.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
+from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 
 try:
     from pathlib import Path
@@ -14,10 +14,10 @@ import pytest
 import yaml
 from botocore.exceptions import ClientError
 from botocore.config import Config
-from tests_integ.helpers.deployer.deployer import Deployer
-from tests_integ.helpers.template import transform_template
+from integration.helpers.deployer.deployer import Deployer
+from integration.helpers.template import transform_template
 
-from tests_integ.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
+from integration.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
 STACK_NAME_PREFIX = "sam-integ-stack-"
