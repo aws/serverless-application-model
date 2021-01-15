@@ -34,8 +34,10 @@ class TestBasicLayerVersion(BaseTest):
         layer_name = outputs["LayerName"]
         description = outputs["Description"]
 
-        layer_version_result = self.lambda_client.get_layer_version_by_arn(Arn=layer_arn)
-        self.lambda_client.delete_layer_version(LayerName=layer_name, VersionNumber=layer_version_result["Version"])
+        layer_version_result = self.client_provider.lambda_client.get_layer_version_by_arn(Arn=layer_arn)
+        self.client_provider.lambda_client.delete_layer_version(
+            LayerName=layer_name, VersionNumber=layer_version_result["Version"]
+        )
 
         self.assertEqual(layer_version_result["LicenseInfo"], license)
         self.assertEqual(layer_version_result["Description"], description)

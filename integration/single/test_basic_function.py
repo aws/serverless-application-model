@@ -40,12 +40,16 @@ class TestBasicFunction(BaseTest):
         self.create_and_verify_stack(file_name)
 
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
-        function_configuration = self.lambda_client.get_function_configuration(FunctionName=lambda_function_name)
+        function_configuration = self.client_provider.lambda_client.get_function_configuration(
+            FunctionName=lambda_function_name
+        )
         dlq_arn = function_configuration["DeadLetterConfig"]["TargetArn"]
         self.assertIsNotNone(dlq_arn, "DLQ Arn should be set")
 
         role_name = self.get_physical_id_by_type("AWS::IAM::Role")
-        role_policy_result = self.iam_client.get_role_policy(RoleName=role_name, PolicyName=dlq_policy_name)
+        role_policy_result = self.client_provider.iam_client.get_role_policy(
+            RoleName=role_name, PolicyName=dlq_policy_name
+        )
         statements = role_policy_result["PolicyDocument"]["Statement"]
 
         self.assertEqual(len(statements), 1, "Only one statement must be in policy")
@@ -60,7 +64,9 @@ class TestBasicFunction(BaseTest):
         self.create_and_verify_stack("basic_function_with_kmskeyarn")
 
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
-        function_configuration = self.lambda_client.get_function_configuration(FunctionName=lambda_function_name)
+        function_configuration = self.client_provider.lambda_client.get_function_configuration(
+            FunctionName=lambda_function_name
+        )
         kms_key_arn = function_configuration["KMSKeyArn"]
 
         self.assertIsNotNone(kms_key_arn, "Expecting KmsKeyArn to be set.")
@@ -71,7 +77,7 @@ class TestBasicFunction(BaseTest):
         """
         self.create_and_verify_stack("basic_function_with_tags")
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
-        get_function_result = self.lambda_client.get_function(FunctionName=lambda_function_name)
+        get_function_result = self.client_provider.lambda_client.get_function(FunctionName=lambda_function_name)
         tags = get_function_result["Tags"]
 
         self.assertIsNotNone(tags, "Expecting tags on function.")
@@ -91,7 +97,7 @@ class TestBasicFunction(BaseTest):
         test_function_1 = self.get_physical_id_by_logical_id("MyTestFunction")
         test_function_2 = self.get_physical_id_by_logical_id("MyTestFunction2")
 
-        function_invoke_config_result = self.lambda_client.get_function_event_invoke_config(
+        function_invoke_config_result = self.client_provider.lambda_client.get_function_event_invoke_config(
             FunctionName=test_function_1, Qualifier="$LATEST"
         )
         self.assertIsNotNone(
@@ -108,7 +114,7 @@ class TestBasicFunction(BaseTest):
             "MaximumRetryAttempts value is not set or incorrect.",
         )
 
-        function_invoke_config_result = self.lambda_client.get_function_event_invoke_config(
+        function_invoke_config_result = self.client_provider.lambda_client.get_function_event_invoke_config(
             FunctionName=test_function_2, Qualifier="live"
         )
         self.assertIsNotNone(
@@ -154,7 +160,7 @@ class TestBasicFunction(BaseTest):
         active_tracing_function_id = self.get_physical_id_by_logical_id("ActiveTracingFunction")
         pass_through_tracing_function_id = self.get_physical_id_by_logical_id("PassThroughTracingFunction")
 
-        function_configuration_result = self.lambda_client.get_function_configuration(
+        function_configuration_result = self.client_provider.lambda_client.get_function_configuration(
             FunctionName=active_tracing_function_id
         )
         self.assertIsNotNone(function_configuration_result["TracingConfig"], "Expecting tracing config to be set.")
@@ -164,7 +170,7 @@ class TestBasicFunction(BaseTest):
             "Expecting tracing config mode to be set to Active.",
         )
 
-        function_configuration_result = self.lambda_client.get_function_configuration(
+        function_configuration_result = self.client_provider.lambda_client.get_function_configuration(
             FunctionName=pass_through_tracing_function_id
         )
         self.assertIsNotNone(function_configuration_result["TracingConfig"], "Expecting tracing config to be set.")

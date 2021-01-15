@@ -1,6 +1,7 @@
 import logging
 import os
 
+from integration.helpers.client_provider import ClientProvider
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 
 try:
@@ -36,13 +37,7 @@ class BaseTest(TestCase):
         cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
         cls.session = boto3.session.Session()
         cls.my_region = cls.session.region_name
-        cls.s3_client = boto3.client("s3")
-        cls.api_client = boto3.client("apigateway")
-        cls.lambda_client = boto3.client("lambda")
-        cls.iam_client = boto3.client("iam")
-        cls.api_v2_client = boto3.client("apigatewayv2")
-        cls.sfn_client = boto3.client("stepfunctions")
-
+        cls.client_provider = ClientProvider()
         cls.file_to_s3_uri_map = FILE_TO_S3_URI_MAP
         cls.code_key_to_file = CODE_KEY_TO_FILE_MAP
 
@@ -66,13 +61,13 @@ class BaseTest(TestCase):
 
         for object_summary in object_summary_iterator:
             try:
-                cls.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
+                cls.client_provider.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
             except ClientError as e:
                 LOG.error(
                     "Unable to delete object %s from bucket %s", object_summary.key, cls.s3_bucket_name, exc_info=e
                 )
         try:
-            cls.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
+            cls.client_provider.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
         except ClientError as e:
             LOG.error("Unable to delete bucket %s", cls.s3_bucket_name, exc_info=e)
 
@@ -94,7 +89,8 @@ class BaseTest(TestCase):
                 current_file_name = file_name
                 code_path = str(Path(cls.code_dir, file_name))
                 LOG.debug("Uploading file %s to bucket %s", file_name, cls.s3_bucket_name)
-                cls.s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
+                s3_client = cls.client_provider.s3_client
+                s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
                 LOG.debug("File %s uploaded successfully to bucket %s", file_name, cls.s3_bucket_name)
                 file_info["uri"] = cls._get_s3_uri(file_name, file_info["type"])
         except ClientError as error:
@@ -117,12 +113,10 @@ class BaseTest(TestCase):
         return "https://s3-{}.amazonaws.com/{}/{}".format(cls.my_region, cls.s3_bucket_name, file_name)
 
     def setUp(self):
-        config = Config(retries={"max_attempts": 10, "mode": "standard"})
-        self.cloudformation_client = boto3.client("cloudformation", config=config)
-        self.deployer = Deployer(self.cloudformation_client)
+        self.deployer = Deployer(self.client_provider.cloudformation_client)
 
     def tearDown(self):
-        self.cloudformation_client.delete_stack(StackName=self.stack_name)
+        self.client_provider.cloudformation_client.delete_stack(StackName=self.stack_name)
         if os.path.exists(self.output_file_path):
             os.remove(self.output_file_path)
         if os.path.exists(self.sub_input_file_path):
@@ -196,7 +190,7 @@ class BaseTest(TestCase):
 
     def get_stack_tags(self, output_name):
         resource_arn = self.get_stack_output(output_name)["OutputValue"]
-        return self.sfn_client.list_tags_for_resource(resourceArn=resource_arn)["tags"]
+        return self.client_provider.sfn_client.list_tags_for_resource(resourceArn=resource_arn)["tags"]
 
     def get_stack_deployment_ids(self):
         resources = self.get_stack_resources("AWS::ApiGateway::Deployment")
@@ -212,7 +206,7 @@ class BaseTest(TestCase):
         if not resources:
             return []
 
-        return self.api_client.get_stages(restApiId=resources[0]["PhysicalResourceId"])["item"]
+        return self.client_provider.api_client.get_stages(restApiId=resources[0]["PhysicalResourceId"])["item"]
 
     def get_api_v2_stack_stages(self):
         resources = self.get_stack_resources("AWS::ApiGatewayV2::Api")
@@ -220,7 +214,7 @@ class BaseTest(TestCase):
         if not resources:
             return []
 
-        return self.api_v2_client.get_stages(ApiId=resources[0]["PhysicalResourceId"])["Items"]
+        return self.client_provider.api_v2_client.get_stages(ApiId=resources[0]["PhysicalResourceId"])["Items"]
 
     def get_stack_nested_stack_resources(self):
         resources = self.get_stack_resources("AWS::CloudFormation::Stack")
@@ -228,7 +222,9 @@ class BaseTest(TestCase):
         if not resources:
             return None
 
-        return self.cloudformation_client.list_stack_resources(StackName=resources[0]["PhysicalResourceId"])
+        return self.client_provider.cloudformation_client.list_stack_resources(
+            StackName=resources[0]["PhysicalResourceId"]
+        )
 
     def get_stack_outputs(self):
         if not self.stack_description:
@@ -337,8 +333,10 @@ class BaseTest(TestCase):
             self.deployer.execute_changeset(result["Id"], self.stack_name)
             self.deployer.wait_for_execute(self.stack_name, changeset_type)
 
-        self.stack_description = self.cloudformation_client.describe_stacks(StackName=self.stack_name)
-        self.stack_resources = self.cloudformation_client.list_stack_resources(StackName=self.stack_name)
+        self.stack_description = self.client_provider.cloudformation_client.describe_stacks(StackName=self.stack_name)
+        self.stack_resources = self.client_provider.cloudformation_client.list_stack_resources(
+            StackName=self.stack_name
+        )
 
     def verify_stack(self):
         """
