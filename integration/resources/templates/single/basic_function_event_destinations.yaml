@@ -1,0 +1,95 @@
+Conditions:
+    QueueCreationDisabled:
+        Fn::Equals:
+            - false
+            - true
+Resources:
+    MyTestFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            EventInvokeConfig:
+                MaximumEventAgeInSeconds: 70
+                MaximumRetryAttempts: 1
+                DestinationConfig:
+                    OnSuccess:
+                        Type: SQS
+                        Destination:
+                            Fn::If:
+                                - QueueCreationDisabled
+                                - Fn::GetAtt:
+                                    - DestinationSQS
+                                    - Arn
+                                - Ref: 'AWS::NoValue'
+                    OnFailure:
+                        Type: Lambda
+                        Destination:
+                            Fn::GetAtt:
+                                - DestinationLambda
+                                - Arn
+            InlineCode: |
+                exports.handler = function(event, context, callback) {
+                  var event_received_at = new Date().toISOString();
+                  console.log('Event received at: ' + event_received_at);
+                  console.log('Received event:', JSON.stringify(event, null, 2));
+                  if (event.Success) {
+                      console.log("Success");
+                      context.callbackWaitsForEmptyEventLoop = false;
+                      callback(null);
+                  } else {
+                      console.log("Failure");
+                      context.callbackWaitsForEmptyEventLoop = false;
+                      callback(new Error("Failure from event, Success = false, I am failing!"), 'Destination Function Error Thrown');
+                  }
+                };
+            Handler: index.handler
+            Runtime: nodejs10.x
+            MemorySize: 1024
+    MyTestFunction2:
+        Type: AWS::Serverless::Function
+        Properties:
+            AutoPublishAlias: live
+            EventInvokeConfig:
+                MaximumEventAgeInSeconds: 80
+                MaximumRetryAttempts: 2
+                DestinationConfig:
+                    OnSuccess:
+                        Type: SNS
+                    OnFailure:
+                        Type: EventBridge
+                        Destination:
+                            Fn::Sub: arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+            InlineCode: |
+                exports.handler = function(event, context, callback) {
+                  var event_received_at = new Date().toISOString();
+                  console.log('Event received at: ' + event_received_at);
+                  console.log('Received event:', JSON.stringify(event, null, 2));
+                  if (event.Success) {
+                      console.log("Success");
+                      context.callbackWaitsForEmptyEventLoop = false;
+                      callback(null);
+                  } else {
+                      console.log("Failure");
+                      context.callbackWaitsForEmptyEventLoop = false;
+                      callback(new Error("Failure from event, Success = false, I am failing!"), 'Destination Function Error Thrown');
+                  }
+                };
+            Handler: index.handler
+            Runtime: nodejs10.x
+            MemorySize: 1024
+    DestinationLambda:
+        Type: AWS::Serverless::Function
+        Properties:
+            InlineCode: |
+                exports.handler = async (event) => {
+                  const response = {
+                    statusCode: 200,
+                    body: JSON.stringify('Hello from Lambda!'),
+                  };
+                  return response;
+                };
+            Handler: index.handler
+            Runtime: nodejs10.x
+            MemorySize: 1024
+    DestinationSQS:
+        Condition: QueueCreationDisabled
+        Type: AWS::SQS::Queue

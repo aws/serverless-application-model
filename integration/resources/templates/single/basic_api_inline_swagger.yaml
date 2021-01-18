@@ -1,0 +1,27 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: MyNewStageName
+      DefinitionBody:
+        # Simple HTTP Proxy API
+        swagger: "2.0"
+        info:
+          version: "2016-09-23T22:23:23Z"
+          title: "Simple Api"
+        basePath: "/demo"
+        schemes:
+        - "https"
+        paths:
+          /http/{proxy+}:
+            x-amazon-apigateway-any-method:
+              parameters:
+              - name: "proxy"
+                in: "path"
+              x-amazon-apigateway-integration:
+                type: "http_proxy"
+                uri: "http://httpbin.org/{proxy}"
+                httpMethod: "ANY"
+                passthroughBehavior: "when_no_match"
+                requestParameters:
+                  integration.request.path.proxy: "method.request.path.proxy"

@@ -1,0 +1,5 @@
+[
+  { "LogicalResourceId":"BasicFunctionWithKmsKeyArn", "ResourceType":"AWS::Lambda::Function"},
+  { "LogicalResourceId":"BasicFunctionWithKmsKeyArnRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyKey", "ResourceType":"AWS::KMS::Key" }
+]

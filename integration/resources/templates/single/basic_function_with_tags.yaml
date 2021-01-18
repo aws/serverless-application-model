@@ -1,0 +1,14 @@
+Resources:
+    MyLambdaFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: nodejs12.x
+            CodeUri: ${codeuri}
+            MemorySize: 128
+            Policies:
+                - AWSLambdaRole
+                - AmazonS3ReadOnlyAccess
+            Tags:
+                TagKey1: TagValue1
+                TagKey2: ""
