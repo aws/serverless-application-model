@@ -1,0 +1,4 @@
+[
+    { "LogicalResourceId":"MyNestedApp", "ResourceType":"AWS::CloudFormation::Stack" },
+    { "LogicalResourceId":"MySns", "ResourceType":"AWS::SNS::Topic" }
+]

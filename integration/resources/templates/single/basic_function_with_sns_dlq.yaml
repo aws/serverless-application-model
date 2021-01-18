@@ -1,0 +1,14 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      DeadLetterQueue:
+        Type: SNS
+        TargetArn:
+          Ref: "MyTopic"
+
+  MyTopic:
+    Type: AWS::SNS::Topic

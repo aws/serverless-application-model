@@ -1,0 +1,4 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::SimpleTable
+    # SimpleTable does NOT require any parameters
