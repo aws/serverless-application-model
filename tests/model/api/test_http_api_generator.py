@@ -69,6 +69,13 @@ class TestHttpApiGenerator(TestCase):
         with pytest.raises(InvalidResourceException):
             HttpApiGenerator(**self.kwargs)._construct_http_api()
 
+    def test_auth_intrinsic_default_auth(self):
+        self.kwargs["auth"] = self.authorizers
+        self.kwargs["auth"]["DefaultAuthorizer"] = {"Ref": "SomeValue"}
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        with pytest.raises(InvalidResourceException):
+            HttpApiGenerator(**self.kwargs)._construct_http_api()
+
     def test_def_uri_invalid_dict(self):
         self.kwargs["auth"] = None
         self.kwargs["definition_body"] = None
