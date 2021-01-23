@@ -2306,6 +2306,32 @@
           }
         ]
       }
+    },
+    "CodebuildStartBuildPolicy": {
+      "Description": "Gives permission to start a new build for a CodeBuild project",
+      "Parameters": {
+        "CodeBuildProject": {
+          "Description": "The name of the Codebuild project"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": ["codebuild:StartBuild"],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/${codebuildProject}",
+                {
+                  "codebuildProject": {
+                    "Ref": "CodeBuildProject"
+                  }
+                }
+              ]
+            },
+            "Effect": "Allow"
+          }
+        ]
+      }
     }
   }
 }
