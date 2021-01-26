@@ -52,7 +52,7 @@ class LambdaAlias(Resource):
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
     }
 
-    runtime_attrs = {"arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
+    runtime_attrs = {"arn": lambda self: ref(self.logical_id)}
 
 
 class LambdaEventSourceMapping(Resource):
