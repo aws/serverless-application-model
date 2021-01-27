@@ -2,7 +2,7 @@ import os.path
 import pytest
 from unittest import TestCase
 from samtranslator.yaml_helper import yaml_parse
-from samtranslator.validator.validator import SamTemplateValidator
+from samtranslator.validator.validator import SamTemplateValidator, sam_schema
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input")
@@ -122,3 +122,59 @@ def test_validate_template_success(testcase):
         print("\nFailing template: {0}\n".format(testcase))
         print(validation_errors)
     assert len(validation_errors) == 0
+
+
+class TestValidatorProvider:
+    validator = None
+
+    @staticmethod
+    def get():
+        if TestValidatorProvider.validator is None:
+            # TODO: Remove the parameter once validation is complete
+            TestValidatorProvider.validator = SamTemplateValidator(sam_schema.SCHEMA_NEW_FILE)
+        return TestValidatorProvider.validator
+
+
+class TestValidatorBase(TestCase):
+    """
+    Base class for TestValidator test classes
+
+    Parameters
+    ----------
+    TestCase : TestCase
+        unittest base class
+    """
+
+    def _test_validator_success(self, template):
+        manifest = self._get_template_content(template)
+
+        validation_errors = TestValidatorProvider.get().validate(manifest)
+
+        self.assertFalse(validation_errors)
+
+    def _test_validator_error(self, template, errors):
+        manifest = self._get_template_content(template)
+
+        validation_errors = TestValidatorProvider.get().validate(manifest)
+
+        self.assertEqual(len(validation_errors), len(errors))
+
+        for i, v in enumerate(validation_errors):
+            self.assertEqual(v, errors[i])
+
+    def _get_template_content(self, template):
+        """
+        Returns the content of a template
+
+        Parameters
+        ----------
+        template : str
+            template path and name from the input dir (without .yaml)
+
+        Returns
+        -------
+        str
+            Template content
+        """
+        with open(template + ".yaml", "r") as t:
+            return yaml_parse(t)

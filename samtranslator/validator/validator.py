@@ -5,51 +5,82 @@ from jsonschema.exceptions import ValidationError
 
 from . import sam_schema
 
+ERRORS_MAPPING = {"None is not of type 'object'": "Must not be empty"}
+
 
 class SamTemplateValidator(object):
-    @staticmethod
-    def validate(template_dict, schema=None):
+    """
+    SAM template validator
+    """
+
+    def __init__(self, schema_path=None):
         """
-        Is this a valid SAM template dictionary
+        Constructor
 
-        :param dict template_dict: Data to be validated
-        :param dict schema: Optional, dictionary containing JSON Schema representing SAM template
-        :return: Empty string if there are no validation errors in template
+        Parameters
+        ----------
+        schema_path : str, optional
+            Path to a schema to use for validation, by default None, the default schema.json will be used
+        """
+        super().__init__()
+
+        if not schema_path:
+            schema_content = self._read_default_schema()
+        else:
+            schema_content = self._read_json(schema_path)
+
+        # Helps resolve the $Ref to external files
+        resolver = jsonschema.RefResolver("file://" + sam_schema.SCHEMA_DIR + "/", None)
+
+        self.validator = jsonschema.Draft7Validator(schema_content, resolver=resolver)
+
+    def validate(self, template_dict):
+        """
+        Validates a SAM Template
+
+        Parameters
+        ----------
+        template_dict : dict
+            Template to validate
+        schema : str, optional
+            Schema content, by default None
+
+        Returns
+        -------
+        list[str]
+            List of validation errors if any, empty otherwise
         """
 
-        if not schema:
-            schema = SamTemplateValidator._read_schema()
+        validation_errors = list(self.validator.iter_errors(template_dict))
 
-        validation_errors = ""
+        return [
+            "{} (/{})".format(ERRORS_MAPPING.get(e.message, e.message), "/".join(e.path)) for e in validation_errors
+        ]
 
-        try:
-            jsonschema.validate(template_dict, schema)
-        except ValidationError as ex:
-            # Stringifying the exception will give us useful error message
-            validation_errors = str(ex)
-            # Swallowing expected exception here as our caller is expecting validation errors and
-            # not the valiation exception itself
-            pass
-
-        return validation_errors
-
-    @staticmethod
-    def _read_schema():
+    def _read_default_schema(self):
         """
-        Reads the JSON Schema at given file path
+        Returns the content of the default schema
 
-        :param string schema_file: Optional path to the schema file. If not provided, the system configured value
-            will be used
-        :return dict: JSON Schema of the policy template
+        Returns
+        -------
+        dict
+            Content of the default schema
         """
-        return SamTemplateValidator._read_json(sam_schema.SCHEMA_FILE)
+        return self._read_json(sam_schema.SCHEMA_FILE)
 
-    @staticmethod
-    def _read_json(filepath):
+    def _read_json(self, filepath):
         """
-        Helper method to read a JSON file
-        :param filepath: Path to the file
-        :return dict: Dictionary containing file data
+        Returns the content of a JSON file
+
+        Parameters
+        ----------
+        filepath : str
+            File path
+
+        Returns
+        -------
+        dict
+            Dictionary representing the JSON content
         """
         with open(filepath, "r") as fp:
             return json.load(fp)

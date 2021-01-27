@@ -55,4 +55,5 @@ class Parser:
                     ]
                 )
 
-        SamTemplateValidator.validate(sam_template)
+        validator = SamTemplateValidator()
+        validation_errors = validator.validate(sam_template)

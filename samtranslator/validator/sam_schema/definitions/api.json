@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "type": "object",
+  "definitions": {
+    "AWS::Serverless::Api": {
+      "additionalProperties": false,
+      "properties": {
+        "DeletionPolicy": {
+          "enum": [
+            "Delete",
+            "Retain",
+            "Snapshot"
+          ],
+          "type": "string"
+        },
+        "DependsOn": {
+          "anyOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+$",
+              "type": "string"
+            },
+            {
+              "items": {
+                "pattern": "^[a-zA-Z0-9]+$",
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "Metadata": {
+          "type": "object"
+        },
+        "Properties": {
+          "additionalProperties": false,
+          "properties": {
+            "CacheClusterEnabled": {
+              "type": "boolean"
+            },
+            "CacheClusterSize": {
+              "type": "string"
+            },
+            "DefinitionBody": {
+              "type": "object"
+            },
+            "DefinitionUri": {
+              "anyOf": [
+                {
+                  "type": [
+                    "string"
+                  ]
+                },
+                {
+                  "$ref": "#/definitions/AWS::Serverless::Api.S3Location"
+                }
+              ]
+            },
+            "Description": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            },
+            "StageName": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            },
+            "TracingEnabled": {
+              "type": "boolean"
+            },
+            "Variables": {
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "required": [
+            "StageName"
+          ],
+          "type": "object"
+        },
+        "Type": {
+          "enum": [
+            "AWS::Serverless::Api"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type",
+        "Properties"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Api.S3Location": {
+      "additionalProperties": false,
+      "properties": {
+        "Bucket": {
+          "type": "string"
+        },
+        "Key": {
+          "type": "string"
+        },
+        "Version": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "Bucket",
+        "Key"
+      ],
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "CloudFormationResource": {
+      "additionalProperties": true,
+      "properties": {
+        "Type": {
+          "pattern": "^(?!^AWS::Serverless).*",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "type": "object"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "AWSTemplateFormatVersion": {
+      "enum": [
+        "2010-09-09"
+      ],
+      "type": "string"
+    },
+    "Conditions": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Description": {
+      "description": "Template description",
+      "maxLength": 1024,
+      "type": "string"
+    },
+    "Mappings": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Metadata": {
+      "type": "object"
+    },
+    "Outputs": {
+      "additionalProperties": false,
+      "maxProperties": 60,
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Parameters": {
+      "additionalProperties": false,
+      "maxProperties": 50,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "$ref": "#/definitions/Parameter"
+        }
+      },
+      "type": "object"
+    },
+    "Resources": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "anyOf": [
+            {
+              "$ref": "file:definitions/api.json#/definitions/AWS::Serverless::Api"
+            },
+            {
+              "$ref": "file:definitions/function.json#/definitions/AWS::Serverless::Function"
+            },
+            {
+              "$ref": "file:definitions/simpletable.json#/definitions/AWS::Serverless::SimpleTable"
+            },
+            {
+              "$ref": "#/definitions/CloudFormationResource"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "Transform": {
+      "enum": [
+        "AWS::Serverless-2016-10-31"
+      ],
+      "type": "string"
+    },
+    "Globals": {
+      "type": "object"
+    },
+    "Properties": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "Resources",
+    "Transform"
+  ],
+  "type": "object"
+}
