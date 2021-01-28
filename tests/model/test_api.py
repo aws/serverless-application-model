@@ -2,7 +2,7 @@ from unittest import TestCase
 import pytest
 
 from samtranslator.model import InvalidResourceException
-from samtranslator.model.apigateway import ApiGatewayAuthorizer
+from samtranslator.model.apigateway import ApiGatewayAuthorizer, ApiGatewayDeployment
 
 
 class TestApiGatewayAuthorizer(TestCase):
@@ -17,3 +17,21 @@ class TestApiGatewayAuthorizer(TestCase):
             auth = ApiGatewayAuthorizer(
                 api_logical_id="logicalId", name="authName", authorization_scopes="invalid_scope"
             )
+
+
+class TestApiGatewayDeployment(TestCase):
+    def test__make_hash_input_is_dict(self):
+        deployment = ApiGatewayDeployment(logical_id="logicalIdDeployment")
+
+        openapi_version = "3.0.0"
+        swagger = {"foo": "bar", "nested": {"a": "b", "c": "d"}}
+        domain = {"foo": "bar"}
+        redeploy_restapi_parameters = {"function_names": {"logicalId": "functionName"}}
+
+        expected = deployment._make_hash_input(openapi_version, swagger, domain, redeploy_restapi_parameters)
+
+        self.assertIsInstance(expected, dict)
+        self.assertIn("openapi_version", expected)
+        self.assertIn("swagger", expected)
+        self.assertIn("domain", expected)
+        self.assertIn("function_names", expected)

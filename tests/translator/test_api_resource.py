@@ -118,13 +118,14 @@ class TestApiGatewayDeploymentResource(TestCase):
         generator_mock.get_hash.return_value = full_hash
 
         swagger = {"a": "b"}
+        hash_input = {"swagger": swagger}
         deployment = ApiGatewayDeployment(logical_id=prefix)
         deployment.make_auto_deployable(stage, swagger=swagger)
 
         self.assertEqual(deployment.logical_id, id_val)
         self.assertEqual(deployment.Description, "RestApi deployment id: {}".format(full_hash))
 
-        LogicalIdGeneratorMock.assert_called_once_with(prefix, str(swagger))
+        LogicalIdGeneratorMock.assert_called_once_with(prefix, hash_input)
         generator_mock.gen.assert_called_once_with()
         generator_mock.get_hash.assert_called_once_with(length=40)  # getting full SHA
         stage.update_deployment_ref.assert_called_once_with(id_val)

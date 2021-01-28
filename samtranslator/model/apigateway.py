@@ -88,12 +88,30 @@ class ApiGatewayDeployment(Resource):
         # redeploy only when the API data changes. First 10 characters of hash is good enough
         # to prevent redeployment when API has not changed
 
-        # NOTE: `str(swagger)` is for backwards compatibility. Changing it to a JSON or something will break compat
-        hash_input = [str(swagger)]
+        hash_input = self._make_hash_input(openapi_version, swagger, domain, redeploy_restapi_parameters)
+
+        generator = logical_id_generator.LogicalIdGenerator(self.logical_id, hash_input)
+        self.logical_id = generator.gen()
+        digest = generator.get_hash(length=40)  # Get the full hash
+        self.Description = "RestApi deployment id: {}".format(digest)
+        stage.update_deployment_ref(self.logical_id)
+
+    def _make_hash_input(self, openapi_version, swagger, domain, redeploy_restapi_parameters):
+        """
+        Returns a dict as hash_obj for LogicalIdGenerator
+        NOTE: using dict as hash_obj for LogicalIdGenerator ensures consistent hash suffix for same dict objects
+
+        :param dict swagger: Dictionary containing the Swagger definition of the API
+        :param str openapi_version: string containing value of OpenApiVersion flag in the template
+        :param dict domain: Dictionary containing the custom domain configuration for the API
+        :param dict redeploy_restapi_parameters: Dictionary containing the properties for which rest api will be redeployed
+        :return dict: Dictionary containing information used for generating logical ID
+        """
+        hash_input = {"swagger": swagger}
         if openapi_version:
-            hash_input.append(str(openapi_version))
+            hash_input["openapi_version"] = openapi_version
         if domain:
-            hash_input.append(json.dumps(domain))
+            hash_input["domain"] = domain
         if redeploy_restapi_parameters:
             function_names = redeploy_restapi_parameters.get("function_names")
         else:
@@ -101,13 +119,8 @@ class ApiGatewayDeployment(Resource):
         # The deployment logical id is <api logicalId> + "Deployment"
         # The keyword "Deployment" is removed and all the function names associated with api is obtained
         if function_names and function_names.get(self.logical_id[:-10], None):
-            hash_input.append(function_names.get(self.logical_id[:-10], ""))
-        data = self._X_HASH_DELIMITER.join(hash_input)
-        generator = logical_id_generator.LogicalIdGenerator(self.logical_id, data)
-        self.logical_id = generator.gen()
-        digest = generator.get_hash(length=40)  # Get the full hash
-        self.Description = "RestApi deployment id: {}".format(digest)
-        stage.update_deployment_ref(self.logical_id)
+            hash_input["function_names"] = function_names.get(self.logical_id[:-10], None)
+        return hash_input
 
 
 class ApiGatewayResponse(object):
