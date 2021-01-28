@@ -1,45 +1,78 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
-  "type": "object",
   "definitions": {
     "AWS::Serverless::Api": {
       "additionalProperties": false,
       "properties": {
-        "DeletionPolicy": {
-          "enum": [
-            "Delete",
-            "Retain",
-            "Snapshot"
-          ],
-          "type": "string"
-        },
-        "DependsOn": {
-          "anyOf": [
-            {
-              "pattern": "^[a-zA-Z0-9]+$",
-              "type": "string"
-            },
-            {
-              "items": {
-                "pattern": "^[a-zA-Z0-9]+$",
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ]
-        },
         "Metadata": {
           "type": "object"
         },
         "Properties": {
           "additionalProperties": false,
           "properties": {
+            "AccessLogSetting": {
+              "additionalProperties": false,
+              "properties": {
+                "DestinationArn": {
+                  "type": "string"
+                },
+                "Format": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "Auth": {
+              "$ref": "#/definitions/AWS::Serverless::Api.Auth"
+            },
+            "BinaryMediaTypes": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
             "CacheClusterEnabled": {
               "type": "boolean"
             },
             "CacheClusterSize": {
               "type": "string"
+            },
+            "CanarySetting": {
+              "additionalProperties": false,
+              "properties": {
+                "DeploymentId": {
+                  "type": "string"
+                },
+                "PercentTraffic": {
+                  "type": "number"
+                },
+                "StageVariableOverrides": {
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[a-zA-Z0-9]+$": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "UseStageCache": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "Cors": {
+              "anyOf": [
+                {
+                  "type": [
+                    "string"
+                  ]
+                },
+                {
+                  "$ref": "#/definitions/AWS::Serverless::Api.CorsConfiguration"
+                }
+              ]
             },
             "DefinitionBody": {
               "type": "object"
@@ -56,37 +89,32 @@
                 }
               ]
             },
-            "Description": {
+            "EndpointConfiguration": {
               "type": "string"
+            },
+            "MethodSettings": {
+              "items": {
+                "type": "object"
+              },
+              "type": "array"
             },
             "Name": {
               "type": "string"
             },
+            "OpenApiVersion": {
+              "type": "string"
+            },
             "StageName": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object"
-                }
-              ]
+              "type": "string"
             },
             "TracingEnabled": {
               "type": "boolean"
             },
             "Variables": {
-              "additionalProperties": false,
+              "additionalProperties": true,
               "patternProperties": {
                 "^[a-zA-Z0-9]+$": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "object"
-                    }
-                  ]
+                  "type": "string"
                 }
               },
               "type": "object"
@@ -110,6 +138,42 @@
       ],
       "type": "object"
     },
+    "AWS::Serverless::Api.Auth": {
+      "additionalProperties": false,
+      "properties": {
+        "Authorizers": {
+          "type": "object"
+        },
+        "DefaultAuthorizer": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::Serverless::Api.CorsConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AllowCredentials": {
+          "type": "boolean"
+        },
+        "AllowHeaders": {
+          "type": "string"
+        },
+        "AllowMethods": {
+          "type": "string"
+        },
+        "AllowOrigin": {
+          "type": "string"
+        },
+        "MaxAge": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AllowOrigin"
+      ],
+      "type": "object"
+    },
     "AWS::Serverless::Api.S3Location": {
       "additionalProperties": false,
       "properties": {
@@ -129,5 +193,6 @@
       ],
       "type": "object"
     }
-  }
+  },
+  "type": "object"
 }

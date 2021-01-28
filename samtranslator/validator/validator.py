@@ -1,4 +1,5 @@
 import json
+import re
 
 import jsonschema
 from jsonschema.exceptions import ValidationError
@@ -51,11 +52,44 @@ class SamTemplateValidator(object):
             List of validation errors if any, empty otherwise
         """
 
-        validation_errors = list(self.validator.iter_errors(template_dict))
+        validation_errors = self.validator.iter_errors(template_dict)
 
-        return [
-            "{} (/{})".format(ERRORS_MAPPING.get(e.message, e.message), "/".join(e.path)) for e in validation_errors
-        ]
+        # List of
+        # [/Path/To/Element] Error message. Context: additional context (if any)
+        formatted_errors = []
+
+        for e in validation_errors:
+            # [/Path/To/Element] Error message
+            error = "[/{}] {}".format("/".join(e.path), self._cleanup_error_message(e.message))
+
+            if e.context:
+                # Adds more precise information like "'X' was expected but not found"
+                error += ". Context: " + "; ".join([c.message for c in e.context])
+
+            formatted_errors.append(error)
+
+        return formatted_errors
+
+    def _cleanup_error_message(self, message):
+        """
+        Cleans an error message up to remove unecessary clutter or replace
+        it with a more meaningful one
+
+        Parameters
+        ----------
+        message : str
+            Message to clean
+
+        Returns
+        -------
+        str
+            Cleaned message
+        """
+
+        final_message = re.sub(" under any of the given schemas$", "", message)
+        final_message = ERRORS_MAPPING.get(final_message, final_message)
+
+        return final_message
 
     def _read_default_schema(self):
         """

@@ -96,15 +96,6 @@
           "anyOf": [
             {
               "$ref": "file:definitions/api.json#/definitions/AWS::Serverless::Api"
-            },
-            {
-              "$ref": "file:definitions/function.json#/definitions/AWS::Serverless::Function"
-            },
-            {
-              "$ref": "file:definitions/simpletable.json#/definitions/AWS::Serverless::SimpleTable"
-            },
-            {
-              "$ref": "#/definitions/CloudFormationResource"
             }
           ]
         }
