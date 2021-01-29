@@ -12,6 +12,7 @@ class TestBasicFunction(BaseTest):
             "basic_function",
             "basic_function_no_envvar",
             "basic_function_openapi",
+            "function_alias_with_http_api_events",
         ]
     )
     def test_basic_function(self, file_name):
