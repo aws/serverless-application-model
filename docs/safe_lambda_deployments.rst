@@ -139,7 +139,7 @@ resource:
         - Name: FunctionName
           Value: !Ref MyLambdaFunction
         - Name: ExecutedVersion
-          Value: !GetAtt MyLambdaFunction.Version.Version
+          Value: !Ref MyLambdaFunction.Version.Version
       EvaluationPeriods: 2
       MetricName: Errors
       Namespace: AWS/Lambda
