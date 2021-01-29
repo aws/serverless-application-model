@@ -1,4 +1,4 @@
-# AccessLogSetting has an unknown property
+# DestinationArn is not a string
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:

@@ -1,10 +1,12 @@
-# Format is not a string
+# UserPoolArn is missing
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
-      AccessLogSetting:
-        DestinationArn: destination arn
-        Format: 3
       StageName: Stage name
+      Auth:
+        MyCognitoAuth:
+          AuthorizationScopes:
+            - Scope1
+            - Scope2

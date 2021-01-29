@@ -145,14 +145,7 @@ class TestValidatorBase(TestCase):
         unittest base class
     """
 
-    def _test_validator_success(self, template):
-        manifest = self._get_template_content(template)
-
-        validation_errors = TestValidatorProvider.get().validate(manifest)
-
-        self.assertFalse(validation_errors)
-
-    def _test_validator_error(self, template, errors):
+    def _test_validator(self, template, errors):
         manifest = self._get_template_content(template)
 
         validation_errors = TestValidatorProvider.get().validate(manifest)

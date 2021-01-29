@@ -13,14 +13,6 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input", "api")
 class TestValidatorApi(TestValidatorBase):
     @parameterized.expand(
         [
-            "success_minimum_api",
-        ],
-    )
-    def test_validator_api_success(self, template):
-        self._test_validator_success(os.path.join(INPUT_FOLDER, template))
-
-    @parameterized.expand(
-        [
             (
                 "error_accesslogsetting_empty",
                 [
@@ -63,7 +55,11 @@ class TestValidatorApi(TestValidatorBase):
                     "[/Resources/MyApi] {'Type': 'AWS::Serverless::Api', 'Properties': {'CacheClusterSize': '32'}} is not valid. Context: 'StageName' is a required property"
                 ],
             ),
+            (
+                "success_minimum_api",
+                [],
+            ),
         ],
     )
-    def test_validator_api_error(self, template, errors):
-        self._test_validator_error(os.path.join(INPUT_FOLDER, template), errors)
+    def test_validator_api(self, template, errors):
+        self._test_validator(os.path.join(INPUT_FOLDER, template), errors)

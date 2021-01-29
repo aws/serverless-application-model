@@ -12,10 +12,10 @@
           "additionalProperties": false,
           "properties": {
             "AccessLogSetting": {
-              "$ref": "file:definitions/cfn.json#definitions/AccessLogSetting"
+              "$ref": "file:cfn.json#definitions/AccessLogSetting"
             },
             "Auth": {
-              "$ref": "#/definitions/AWS::Serverless::Api.Auth"
+              "$ref": "#definitions/AWS::Serverless::Api.Auth"
             },
             "BinaryMediaTypes": {
               "items": {
@@ -40,7 +40,7 @@
                   ]
                 },
                 {
-                  "$ref": "#/definitions/AWS::Serverless::Api.CorsConfiguration"
+                  "$ref": "#definitions/AWS::Serverless::Api.CorsConfiguration"
                 }
               ]
             },
@@ -60,7 +60,7 @@
                   "type": "string"
                 },
                 {
-                  "$ref": "#/definitions/AWS::Serverless::Api.S3Location"
+                  "$ref": "#definitions/AWS::Serverless::Api.S3Location"
                 }
               ]
             },
