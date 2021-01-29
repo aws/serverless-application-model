@@ -6,6 +6,5 @@ Resources:
     Properties:
       AccessLogSetting:
         DestinationArn: destination arn
-        Format: format
-        Unknown: Value
+        Format: 3
       StageName: Stage name

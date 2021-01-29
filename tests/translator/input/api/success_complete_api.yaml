@@ -13,16 +13,16 @@ Resources:
       Cors: String | CorsConfiguration
       DefinitionBody: "{}"
       DefinitionUri: String | ApiDefinition
-      Description: "My API description"
+      Description: My API description
       Domain: DomainConfiguration
       EndpointConfiguration: EndpointConfiguration
       GatewayResponses: Map
       MethodSettings: MethodSettings
       MinimumCompressionSize: 30
       Models: Map
-      Name: "MyApi"
+      Name: MyApi
       OpenApiVersion: String
-      StageName: "Stage name"
+      StageName: Stage name
       Tags: Map
       TracingEnabled: true
       Variables: Map

@@ -1,6 +1,6 @@
 # Transform is missing
 Resources:
-  MinimalApi:
-    Type: "AWS::Serverless::Api"
+  MyApi:
+    Type: AWS::Serverless::Api
     Properties:
-      StageName: "Stage Name"
+      StageName: Stage Name

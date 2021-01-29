@@ -14,25 +14,6 @@
         "Type"
       ],
       "type": "object"
-    },
-    "Tag": {
-      "additionalProperties": false,
-      "properties": {
-        "Key": {
-          "type": "string"
-        },
-        "Value": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        }
-      },
-      "type": "object"
     }
   },
   "properties": {

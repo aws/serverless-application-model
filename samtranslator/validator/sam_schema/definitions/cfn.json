@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "AccessLogSetting": {
+      "additionalProperties": false,
+      "properties": {
+        "DestinationArn": {
+          "type": "string"
+        },
+        "Format": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ApiGateway::Stage.CanarySetting": {
+      "additionalProperties": false,
+      "properties": {
+        "DeploymentId": {
+          "type": "string"
+        },
+        "PercentTraffic": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "StageVariableOverrides": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "UseStageCache": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ApiGateway::Stage.MethodSetting": {
+      "additionalProperties": false,
+      "properties": {
+        "CacheDataEncrypted": {
+          "type": "boolean"
+        },
+        "CacheTtlInSeconds": {
+          "type": "integer"
+        },
+        "CachingEnabled": {
+          "type": "boolean"
+        },
+        "DataTraceEnabled": {
+          "type": "boolean"
+        },
+        "HttpMethod": {
+          "type": "string"
+        },
+        "LoggingLevel": {
+          "type": "string"
+        },
+        "MetricsEnabled": {
+          "type": "boolean"
+        },
+        "ResourcePath": {
+          "type": "string"
+        },
+        "ThrottlingBurstLimit": {
+          "type": "integer"
+        },
+        "ThrottlingRateLimit": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ApiGateway::UsagePlan.QuotaSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "Limit": {
+          "type": "integer"
+        },
+        "Offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "Period": {
+          "$ref": "#definitions/Period"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ApiGateway::UsagePlan.ThrottleSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "BurstLimit": {
+          "type": "integer"
+        },
+        "RateLimit": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ApiGatewayV2::DomainName.MutualTlsAuthentication": {
+      "additionalProperties": false,
+      "properties": {
+        "TruststoreUri": {
+          "type": "string"
+        },
+        "TruststoreVersion": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Period": {
+      "enum": [
+        "DAY",
+        "WEEK",
+        "MONTH"
+      ],
+      "references": [
+        "https://docs.aws.amazon.com/apigateway/api-reference/resource/usage-plan/"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

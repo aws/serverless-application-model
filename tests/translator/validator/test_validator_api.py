@@ -28,6 +28,18 @@ class TestValidatorApi(TestValidatorBase):
                 ],
             ),
             (
+                "error_accesslogsetting_destinationarn_not_string",
+                [
+                    "[/Resources/MyApi] {'Type': 'AWS::Serverless::Api', 'Properties': {'AccessLogSetting': {'DestinationArn': 3, 'Format': 'format'}, 'StageName': 'Stage name'}} is not valid. Context: 3 is not of type 'string'"
+                ],
+            ),
+            (
+                "error_accesslogsetting_format_not_string",
+                [
+                    "[/Resources/MyApi] {'Type': 'AWS::Serverless::Api', 'Properties': {'AccessLogSetting': {'DestinationArn': 'destination arn', 'Format': 3}, 'StageName': 'Stage name'}} is not valid. Context: 3 is not of type 'string'"
+                ],
+            ),
+            (
                 "error_accesslogsetting_unknown_property",
                 [
                     "[/Resources/MyApi] {'Type': 'AWS::Serverless::Api', 'Properties': {'AccessLogSetting': {'DestinationArn': 'destination arn', 'Format': 'format', 'Unknown': 'Value'}, 'StageName': 'Stage name'}} is not valid. Context: Additional properties are not allowed ('Unknown' was unexpected)"

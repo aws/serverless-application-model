@@ -5,7 +5,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       AccessLogSetting:
-        DestinationArn: destination arn
+        DestinationArn: 3
         Format: format
-        Unknown: Value
       StageName: Stage name
