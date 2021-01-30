@@ -13,14 +13,6 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input", "root")
 class TestValidatorRoot(TestValidatorBase):
     @parameterized.expand(
         [
-            "success_minimum_template",
-        ],
-    )
-    def test_validator_root_success(self, template):
-        self._test_validator_success(os.path.join(INPUT_FOLDER, template))
-
-    @parameterized.expand(
-        [
             ("error_empty_template", ["[/] Must not be empty"]),
             ("error_resources_missing", ["[/] 'Resources' is a required property"]),
             ("error_resources_empty", ["[/Resources] Must not be empty"]),
@@ -28,7 +20,7 @@ class TestValidatorRoot(TestValidatorBase):
             ("error_transform_missing", ["[/] 'Transform' is a required property"]),
             (
                 "error_resources_one_empty",
-                ["[/Resources/MinimalApi] None is not valid. Context: None is not of type 'object'"],
+                ["[/Resources/MinimalApi] None is not valid. Context: Must not be empty"],
             ),
             (
                 "error_resources_one_missing_type_element",
@@ -44,7 +36,8 @@ class TestValidatorRoot(TestValidatorBase):
                 "error_awstemplateformatversion_unknown",
                 ["[/AWSTemplateFormatVersion] '2021-01-26' is not one of ['2010-09-09']"],
             ),
+            ("success_minimum_template", []),
         ],
     )
-    def test_validator_root_error(self, template, errors):
-        self._test_validator_error(os.path.join(INPUT_FOLDER, template), errors)
+    def test_validator_root(self, template, errors):
+        self._test_validator(os.path.join(INPUT_FOLDER, template), errors)

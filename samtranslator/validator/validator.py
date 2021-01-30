@@ -59,16 +59,24 @@ class SamTemplateValidator(object):
         formatted_errors = []
 
         for e in validation_errors:
-            # [/Path/To/Element] Error message
-            error = "[/{}] {}".format("/".join(e.path), self._cleanup_error_message(e.message))
-
-            if e.context:
-                # Adds more precise information like "'X' was expected but not found"
-                error += ". Context: " + "; ".join([c.message for c in e.context])
-
-            formatted_errors.append(error)
+            self._process_error(e, formatted_errors)
 
         return formatted_errors
+
+    def _process_error(self, error, formatted_errors, parent_path=""):
+        if error is None:
+            return
+
+        # [/Path/To/Element] Error message
+        error_content = "[{}/{}] {}".format(
+            parent_path, "/".join(error.path), self._cleanup_error_message(error.message)
+        )
+
+        formatted_errors.append(error_content)
+
+        for context_error in error.context:
+            # Each context item is also a validation error
+            self._process_error(context_error, formatted_errors, "/__" + parent_path)
 
     def _cleanup_error_message(self, message):
         """
@@ -85,8 +93,11 @@ class SamTemplateValidator(object):
         str
             Cleaned message
         """
+        final_message = message
 
-        final_message = re.sub(" under any of the given schemas$", "", message)
+        if final_message.endswith(" under any of the given schemas"):
+            final_message = "Is not valid"
+
         final_message = ERRORS_MAPPING.get(final_message, final_message)
 
         return final_message

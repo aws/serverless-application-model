@@ -1,0 +1,30 @@
+# Complete LambdaRequest auth
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          MyLambdaRequestAuth:
+            AuthorizationScopes:
+              - Scope1
+              - Scope2
+            FunctionArn: Function.Arn
+            FunctionInvokeRole: My function invoke role
+            FunctionPayloadType: TOKEN
+            Identity:
+              Context:
+                - Context1
+                - Context2
+              Headers:
+                - Headers1
+                - Headers2
+              QueryStrings:
+                - QueryString1
+                - QueryString2
+              ReauthorizeEvery: 3
+              Variables:
+                - Variable1
+                - Variable2

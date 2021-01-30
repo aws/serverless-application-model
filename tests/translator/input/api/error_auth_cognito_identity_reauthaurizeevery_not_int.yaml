@@ -1,5 +1,4 @@
-# UserPoolArn is missing
-# We need to set Identity/Header for the validator to check it as a Cognito authorizer
+# ReauthorizeEvery is not an integer
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -10,4 +9,5 @@ Resources:
         Authorizers:
           MyCognitoAuth:
             Identity:
-              Header: Identity header
+              ReauthorizeEvery: "3"
+            UserPoolArn: User.pool.arn

@@ -1,4 +1,4 @@
-# Minimal Cognito auth
+# AuthorizationScopes is not a list
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,5 +7,7 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyCognitoAuth:
-            UserPoolArn: User.pool.arn
+          MyLambdaRequestAuth:
+            AuthorizationScopes:
+              - 3
+            FunctionArn: Function.arn

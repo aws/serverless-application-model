@@ -1,4 +1,4 @@
-# ApiKeyRequired is not a boolean
+# FunctionArn is not a string
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -6,4 +6,6 @@ Resources:
     Properties:
       StageName: Stage name
       Auth:
-        ApiKeyRequired: "true"
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionArn: 3

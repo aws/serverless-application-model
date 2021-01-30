@@ -178,17 +178,22 @@
           "type": "boolean"
         },
         "Authorizers": {
-          "anyOf": [
-            {
-              "$ref": "#definitions/AWS::Serverless::Api.CognitoAuthorizer"
-            },
-            {
-              "$ref": "#definitions/AWS::Serverless::Api.LambdaRequestAuthorizer"
-            },
-            {
-              "$ref": "#definitions/AWS::Serverless::Api.LambdaTokenAuthorizer"
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "oneOf": [
+                {
+                  "$ref": "#definitions/AWS::Serverless::Api.CognitoAuthorizer"
+                },
+                {
+                  "$ref": "#definitions/AWS::Serverless::Api.LambdaRequestAuthorizer"
+                },
+                {
+                  "$ref": "#definitions/AWS::Serverless::Api.LambdaTokenAuthorizer"
+                }
+              ]
             }
-          ],
+          },
           "type": "object"
         },
         "DefaultAuthorizer": {
@@ -212,7 +217,6 @@
       "type": "object"
     },
     "AWS::Serverless::Api.CognitoAuthorizer": {
-      "additionalProperties": false,
       "properties": {
         "AuthorizationScopes": {
           "items": {
@@ -332,7 +336,6 @@
       "type": "object"
     },
     "AWS::Serverless::Api.LambdaRequestAuthorizer": {
-      "additionalProperties": false,
       "properties": {
         "AuthorizationScopes": {
           "items": {
@@ -398,7 +401,6 @@
       "type": "object"
     },
     "AWS::Serverless::Api.LambdaTokenAuthorizer": {
-      "additionalProperties": false,
       "properties": {
         "AuthorizationScopes": {
           "items": {

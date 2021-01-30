@@ -5,4 +5,5 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
-      ApiKeyRequired:
+      Auth:
+        ApiKeyRequired:

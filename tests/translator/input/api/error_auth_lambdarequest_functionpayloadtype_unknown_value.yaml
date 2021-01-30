@@ -1,4 +1,4 @@
-# Minimal Cognito auth
+# FunctionInvokeRole is not a string
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,5 +7,6 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyCognitoAuth:
-            UserPoolArn: User.pool.arn
+          MyLambdaRequestAuth:
+            FunctionArn: Function.arn
+            FunctionPayloadType: MyPayloadType

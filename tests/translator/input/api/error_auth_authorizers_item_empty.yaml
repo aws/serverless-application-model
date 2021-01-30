@@ -1,5 +1,4 @@
-# UserPoolArn is missing
-# We need to set Identity/Header for the validator to check it as a Cognito authorizer
+# Authorizers item is empty
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -9,5 +8,3 @@ Resources:
       Auth:
         Authorizers:
           MyCognitoAuth:
-            Identity:
-              Header: Identity header

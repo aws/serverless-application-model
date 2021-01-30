@@ -1,4 +1,4 @@
-# Cognito auth is empty
+# FunctionArn is empty
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -6,4 +6,6 @@ Resources:
     Properties:
       StageName: Stage name
       Auth:
-        MyCognitoAuth:
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionArn:

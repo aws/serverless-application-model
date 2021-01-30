@@ -6,5 +6,7 @@ Resources:
     Properties:
       StageName: Stage name
       Auth:
-        MyCognitoAuth:
-          AuthorizationScopes: scopes1
+        Authorizers:
+          MyCognitoAuth:
+            AuthorizationScopes: scopes1
+            UserPoolArn: User.pool.arn
