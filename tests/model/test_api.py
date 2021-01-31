@@ -35,12 +35,3 @@ class TestApiGatewayDeployment(TestCase):
         self.assertIn("swagger", expected)
         self.assertIn("domain", expected)
         self.assertIn("function_names", expected)
-
-    def test__make_hash_input_is_deep_sorted(self):
-        deployment = ApiGatewayDeployment(logical_id="logicalIdDeployment")
-        swagger = {"foo": "bar", "nested": {"a": "b", "c": "d"}}
-        swagger_other = {"nested": {"c": "d", "a": "b"}, "foo": "bar"}
-
-        hash_input = deployment._make_hash_input(None, swagger, None, None)
-        hash_input_other = deployment._make_hash_input(None, swagger_other, None, None)
-        self.assertEqual(hash_input, hash_input_other)
