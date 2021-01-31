@@ -1,4 +1,5 @@
 import copy
+import json
 
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
@@ -67,8 +68,8 @@ class Translator:
                                 resource_dict_copy.get("Properties").get("FunctionName")
                             )
                             if function_name:
-                                self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
-                                    function_name
+                                self.function_names[api_name] = self.function_names.get(api_name, "") + json.dumps(
+                                    function_name, sort_keys=True
                                 )
         return self.function_names
 
