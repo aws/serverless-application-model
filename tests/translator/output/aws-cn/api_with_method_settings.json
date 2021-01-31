@@ -1,30 +1,30 @@
 {
   "Resources": {
     "ImplicitApiFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "member_portal.zip"
-        }, 
-        "Handler": "index.gethtml", 
+        },
+        "Handler": "index.gethtml",
         "Role": {
           "Fn::GetAtt": [
-            "ImplicitApiFunctionRole", 
+            "ImplicitApiFunctionRole",
             "Arn"
           ]
-        }, 
+        },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
       }
-    }, 
+    },
     "ImplicitApiFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -36,13 +36,13 @@
           }
         ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -54,16 +54,16 @@
       }
     },
     "ImplicitApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "ImplicitApiFunction"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
               "__Stage__": "*",
               "__ApiId__": {
@@ -73,120 +73,120 @@
           ]
         }
       }
-    }, 
+    },
     "ExplicitApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
           ]
-        }, 
+        },
         "BodyS3Location": {
-          "Bucket": "sam-demo-bucket", 
+          "Bucket": "sam-demo-bucket",
           "Key": "webpage_swagger.json"
-        }, 
+        },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
       }
-    }, 
+    },
     "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "MethodSettings": [
           {
-            "HttpMethod": "*", 
-            "MetricsEnabled": true, 
-            "ResourcePath": "/*", 
-            "DataTraceEnabled": true, 
+            "HttpMethod": "*",
+            "MetricsEnabled": true,
+            "ResourcePath": "/*",
+            "DataTraceEnabled": true,
             "LoggingLevel": "INFO"
           }
-        ], 
+        ],
         "RestApiId": {
           "Ref": "ExplicitApi"
-        }, 
+        },
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentf117c932f7"
-        }, 
+          "Ref": "ExplicitApiDeployment53cc66445c"
+        },
         "StageName": "Prod"
       }
-    }, 
+    },
     "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "MethodSettings": [
           {
-            "HttpMethod": "*", 
-            "MetricsEnabled": true, 
-            "ResourcePath": "/*", 
-            "DataTraceEnabled": true, 
+            "HttpMethod": "*",
+            "MetricsEnabled": true,
+            "ResourcePath": "/*",
+            "DataTraceEnabled": true,
             "LoggingLevel": "INFO"
           }
-        ], 
+        ],
         "RestApiId": {
           "Ref": "ServerlessRestApi"
-        }, 
+        },
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentcb4fb12558"
-        }, 
+          "Ref": "ServerlessRestApiDeploymentd572487786"
+        },
         "StageName": "Prod"
       }
-    }, 
-    "ServerlessRestApiDeploymentcb4fb12558": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        }, 
-        "Description": "RestApi deployment id: cb4fb1255811b7b6a25dd35f23ee7ad133003b89", 
-        "StageName": "Stage"
-      }
-    }, 
-    "ExplicitApiDeploymentf117c932f7": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289", 
-        "StageName": "Stage"
-      }
-    }, 
+    },
     "ServerlessRestApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
+            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
           "paths": {
             "/": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                   }
-                }, 
+                },
                 "responses": {}
               }
             }
-          }, 
+          },
           "swagger": "2.0"
-        }, 
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
           ]
-        }, 
+        },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    },
+    "ServerlessRestApiDeploymentd572487786": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: d5724877861288ceb1c8be167c55955a3102b187",
+        "StageName": "Stage"
+      }
+    },
+    "ExplicitApiDeployment53cc66445c": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "Description": "RestApi deployment id: 53cc66445c0accdc5f3244004331940761c72c8b",
+        "StageName": "Stage"
       }
     }
   }

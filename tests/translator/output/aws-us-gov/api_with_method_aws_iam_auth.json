@@ -147,21 +147,11 @@
         ]
       }
     },
-    "MyApiWithoutAuthDeploymentd7b0de15e2": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithoutAuth"
-        },
-        "Description": "RestApi deployment id: d7b0de15e29c2d947cc5a2004fd545fec3260faf",
-        "StageName": "Stage"
-      }
-    },
     "MyApiWithoutAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithoutAuthDeploymentd7b0de15e2"
+          "Ref": "MyApiWithoutAuthDeployment36b5195d85"
         },
         "RestApiId": {
           "Ref": "MyApiWithoutAuth"
@@ -218,6 +208,16 @@
             }
           ]
         }
+      }
+    },
+    "MyApiWithoutAuthDeployment36b5195d85": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithoutAuth"
+        },
+        "Description": "RestApi deployment id: 36b5195d8508bb21595257c2f601a109e4c95490",
+        "StageName": "Stage"
       }
     }
   }

@@ -2,33 +2,33 @@
   "Conditions": {
     "TrueCondition": {
       "Fn::Equals": [
-        true, 
+        true,
         true
       ]
     }
-  }, 
+  },
   "Parameters": {
     "CodeKey": {
-      "Default": "key", 
+      "Default": "key",
       "Type": "String"
-    }, 
+    },
     "CodeBucket": {
-      "Default": "sam-demo-bucket", 
+      "Default": "sam-demo-bucket",
       "Type": "String"
-    }, 
+    },
     "FunctionName": {
-      "Default": "MySuperFunctionName", 
+      "Default": "MySuperFunctionName",
       "Type": "String"
-    }, 
+    },
     "MyExplicitApiName": {
-      "Default": "SomeName", 
+      "Default": "SomeName",
       "Type": "String"
-    }, 
+    },
     "TracingConfigParam": {
-      "Default": "PassThrough", 
+      "Default": "PassThrough",
       "Type": "String"
     }
-  }, 
+  },
   "Resources": {
     "MyExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi",
@@ -113,16 +113,6 @@
         }
       },
       "Condition": "TrueCondition"
-    },
-    "MyExplicitApiDeployment7145dd00ce": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyExplicitApi"
-        },
-        "Description": "RestApi deployment id: 7145dd00cea59b4a62b4d7855add490c587f3f62",
-        "StageName": "Stage"
-      }
     },
     "FunctionWithExplicitS3Uri": {
       "Type": "AWS::Lambda::Function",
@@ -409,7 +399,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiWithExplicitS3UriDeploymenta227798f00"
+          "Ref": "ApiWithExplicitS3UriDeploymentdf00ae04c1"
         },
         "RestApiId": {
           "Ref": "ApiWithExplicitS3Uri"
@@ -433,17 +423,6 @@
         },
         "StartingPosition": "LATEST"
       }
-    },
-    "ApiWithExplicitS3UriDeploymenta227798f00": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ApiWithExplicitS3Uri"
-        },
-        "Description": "RestApi deployment id: a227798f004a50b665fe47a20bb9afbf076bd85d",
-        "StageName": "Stage"
-      },
-      "Condition": "TrueCondition"
     },
     "MySqsDlqLambdaFunctionRole": {
       "Type": "AWS::IAM::Role",
@@ -499,7 +478,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyExplicitApiDeployment7145dd00ce"
+          "Ref": "MyExplicitApiDeploymentac5370c463"
         },
         "RestApiId": {
           "Ref": "MyExplicitApi"
@@ -524,7 +503,7 @@
     "MyFunctionMyApiPermissiondev": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction"
@@ -541,6 +520,27 @@
           ]
         }
       }
+    },
+    "MyExplicitApiDeploymentac5370c463": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyExplicitApi"
+        },
+        "Description": "RestApi deployment id: ac5370c463a1506e2d2d574f796b90853a805218",
+        "StageName": "Stage"
+      }
+    },
+    "ApiWithExplicitS3UriDeploymentdf00ae04c1": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ApiWithExplicitS3Uri"
+        },
+        "Description": "RestApi deployment id: df00ae04c10d650fc54bbd3b1444d09ff6ee0ae6",
+        "StageName": "Stage"
+      },
+      "Condition": "TrueCondition"
     }
   }
 }

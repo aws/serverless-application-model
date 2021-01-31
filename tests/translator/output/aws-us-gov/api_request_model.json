@@ -1,7 +1,7 @@
 {
   "Resources": {
     "HtmlFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -13,13 +13,13 @@
           }
         ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -29,27 +29,27 @@
           ]
         }
       }
-    }, 
+    },
     "HtmlApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment3744537077"
-        }, 
+          "Ref": "HtmlApiDeployment9fa756eff2"
+        },
         "RestApiId": {
           "Ref": "HtmlApi"
-        }, 
+        },
         "StageName": "Prod"
       }
-    }, 
+    },
     "HtmlFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "HtmlFunction"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
@@ -61,18 +61,8 @@
         }
       }
     },
-    "HtmlApiDeployment3744537077": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: 374453707756d2ce5439fb8f0995a4ced3659a0e",
-        "StageName": "Stage"
-      }
-    }, 
     "HtmlApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "EndpointConfiguration": {
           "Types": [
@@ -126,28 +116,38 @@
           "endpointConfigurationTypes": "REGIONAL"
         }
       }
-    }, 
+    },
     "HtmlFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "member_portal.zip"
-        }, 
-        "Handler": "index.gethtml", 
+        },
+        "Handler": "index.gethtml",
         "Role": {
           "Fn::GetAtt": [
-            "HtmlFunctionRole", 
+            "HtmlFunctionRole",
             "Arn"
           ]
-        }, 
+        },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
+      }
+    },
+    "HtmlApiDeployment9fa756eff2": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        },
+        "Description": "RestApi deployment id: 9fa756eff2da92d60ae10383ffbbc642775dc851",
+        "StageName": "Stage"
       }
     }
   }

@@ -1,15 +1,5 @@
 {
   "Resources": {
-    "MyApiWithAuthDeployment084855ab6d": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAuth"
-        },
-        "Description": "RestApi deployment id: 084855ab6d04ef5b762ac75de403810cd5f0c166",
-        "StageName": "Stage"
-      }
-    },
     "MyFunctionWithApiKeyRequiredTrueMyApiWithApiKeyRequiredTruePermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -56,7 +46,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAuthDeployment084855ab6d"
+          "Ref": "MyApiWithAuthDeploymentd185af4c11"
         },
         "RestApiId": {
           "Ref": "MyApiWithAuth"
@@ -320,6 +310,16 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    },
+    "MyApiWithAuthDeploymentd185af4c11": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAuth"
+        },
+        "Description": "RestApi deployment id: d185af4c113b3307353bafba7307ada78d383dbf",
+        "StageName": "Stage"
       }
     }
   }

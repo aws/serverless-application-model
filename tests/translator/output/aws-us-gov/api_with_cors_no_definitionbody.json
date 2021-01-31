@@ -16,10 +16,12 @@
           ]
         },
         "Runtime": "nodejs12.x",
-        "Tags": [{
-          "Value": "SAM",
-          "Key": "lambda:createdBy"
-        }]
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     },
     "ImplicitApiFunctionRole": {
@@ -36,17 +38,19 @@
         ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
-          "Statement": [{
-            "Action": [
-              "sts:AssumeRole"
-            ],
-            "Effect": "Allow",
-            "Principal": {
-              "Service": [
-                "lambda.amazonaws.com"
-              ]
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
             }
-          }]
+          ]
         }
       }
     },
@@ -182,7 +186,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentc934a493f3"
+          "Ref": "ExplicitApiDeployment576056a97f"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -190,13 +194,13 @@
         "StageName": "Prod"
       }
     },
-    "ExplicitApiDeploymentc934a493f3": {
+    "ExplicitApiDeployment576056a97f": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
         },
-        "Description": "RestApi deployment id: c934a493f3473efce5bb2acbf1d54e9c2ce0fef3",
+        "Description": "RestApi deployment id: 576056a97f7b8812d2cfd96adc568d19ea891ae0",
         "StageName": "Stage"
       }
     }

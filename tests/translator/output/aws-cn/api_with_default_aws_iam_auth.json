@@ -23,16 +23,6 @@
         ]
       }
     },
-    "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentd0103947f7": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
-        },
-        "Description": "RestApi deployment id: d0103947f7e2e1d52ca7afac92f5afc8339a051b",
-        "StageName": "Stage"
-      }
-    },
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionProd": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
@@ -58,7 +48,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthDeploymentc8adfb74cf"
+          "Ref": "MyApiWithAwsIamAuthDeployment887cc1248a"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
@@ -70,7 +60,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentd0103947f7"
+          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentc6f3a437ce"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
@@ -97,16 +87,6 @@
             }
           ]
         }
-      }
-    },
-    "MyApiWithAwsIamAuthDeploymentc8adfb74cf": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuth"
-        },
-        "Description": "RestApi deployment id: c8adfb74cfae8b8052802a21a258ecbd5178d144",
-        "StageName": "Stage"
       }
     },
     "MyApiWithAwsIamAuthAndCustomInvokeRole": {
@@ -163,7 +143,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRoleDeployment2a6ecd9264"
+          "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRoleDeploymentd4d32aebb7"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRole"
@@ -219,16 +199,6 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
-      }
-    },
-    "MyApiWithAwsIamAuthAndCustomInvokeRoleDeployment2a6ecd9264": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRole"
-        },
-        "Description": "RestApi deployment id: 2a6ecd9264d4f59054caa89a94960604594cd94f",
-        "StageName": "Stage"
       }
     },
     "MyApiWithAwsIamAuth": {
@@ -330,6 +300,36 @@
             }
           ]
         }
+      }
+    },
+    "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentc6f3a437ce": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
+        },
+        "Description": "RestApi deployment id: c6f3a437ce1e535949842d208b049e87313a1969",
+        "StageName": "Stage"
+      }
+    },
+    "MyApiWithAwsIamAuthDeployment887cc1248a": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuth"
+        },
+        "Description": "RestApi deployment id: 887cc1248a02331bcabf9fc639accbcbda096695",
+        "StageName": "Stage"
+      }
+    },
+    "MyApiWithAwsIamAuthAndCustomInvokeRoleDeploymentd4d32aebb7": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRole"
+        },
+        "Description": "RestApi deployment id: d4d32aebb7b6e1d50761082334369ae4be5501b0",
+        "StageName": "Stage"
       }
     }
   }

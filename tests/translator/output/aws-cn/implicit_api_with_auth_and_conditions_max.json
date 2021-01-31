@@ -201,7 +201,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment6b0de9dc9a"
+          "Ref": "ServerlessRestApiDeployment8aaf85d88a"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -566,17 +566,6 @@
         }
       },
       "Condition": "FunctionCondition"
-    },
-    "ServerlessRestApiDeployment6b0de9dc9a": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 6b0de9dc9a2450a248988d39c61e2ee23b257724",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
     },
     "MyFunction3WithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
@@ -945,6 +934,17 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
+    "ServerlessRestApiDeployment8aaf85d88a": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 8aaf85d88a7ac4896b7aa5d376d66bcd15a8698b",
+        "StageName": "Stage"
       },
       "Condition": "ServerlessRestApiCondition"
     }

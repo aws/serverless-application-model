@@ -57,22 +57,12 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment929d2126a7"
+          "Ref": "ServerlessRestApiDeployment4a15f1add4"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Prod"
-      }
-    },
-    "ServerlessRestApiDeployment929d2126a7": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 929d2126a7a3b228757ccb4aa5e896c1bd5c76e8",
-        "StageName": "Stage"
       }
     },
     "FunctionGetHtmlPermissionProd": {
@@ -142,6 +132,16 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    },
+    "ServerlessRestApiDeployment4a15f1add4": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 4a15f1add42b24f6d7f36cb2a8a9308b2b1bcb01",
+        "StageName": "Stage"
       }
     }
   }

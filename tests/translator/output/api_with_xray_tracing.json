@@ -34,7 +34,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeploymentf117c932f7"
+          "Ref": "HtmlApiDeployment53cc66445c"
         },
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -60,16 +60,6 @@
             }
           ]
         }
-      }
-    },
-    "HtmlApiDeploymentf117c932f7": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        },
-        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289",
-        "StageName": "Stage"
       }
     },
     "HtmlApi": {
@@ -102,6 +92,16 @@
             "Key": "lambda:createdBy"
           }
         ]
+      }
+    },
+    "HtmlApiDeployment53cc66445c": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        },
+        "Description": "RestApi deployment id: 53cc66445c0accdc5f3244004331940761c72c8b",
+        "StageName": "Stage"
       }
     }
   }

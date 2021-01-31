@@ -68,21 +68,11 @@
         ]
       }
     },
-    "MyApiOneDeployment7997029260": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiOne"
-        },
-        "Description": "RestApi deployment id: 79970292604071da8105ffd8503f82af32b30550",
-        "StageName": "Stage"
-      }
-    },
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment40b50dc688"
+          "Ref": "ServerlessRestApiDeploymenta026edcc69"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -368,16 +358,6 @@
         ]
       }
     },
-    "ServerlessRestApiDeployment40b50dc688": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 40b50dc6888e5b556b1073ba4304ec9b550659db",
-        "StageName": "Stage"
-      }
-    },
     "ServerlessUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
       "Properties": {
@@ -469,7 +449,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeployment03730b64c4"
+          "Ref": "MyApiTwoDeployment3d6c6dd58e"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -481,22 +461,12 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiOneDeployment7997029260"
+          "Ref": "MyApiOneDeployment1f6a9f6fe8"
         },
         "RestApiId": {
           "Ref": "MyApiOne"
         },
         "StageName": "Prod"
-      }
-    },
-    "MyApiTwoDeployment03730b64c4": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiTwo"
-        },
-        "Description": "RestApi deployment id: 03730b64c486cc490deefb3b8225244b0fe85d34",
-        "StageName": "Stage"
       }
     },
     "MyFunctionThree": {
@@ -525,7 +495,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiThreeDeploymentfa9f73f027"
+          "Ref": "MyApiThreeDeployment223f7fbbed"
         },
         "RestApiId": {
           "Ref": "MyApiThree"
@@ -671,16 +641,6 @@
         }
       }
     },
-    "MyApiThreeDeploymentfa9f73f027": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiThree"
-        },
-        "Description": "RestApi deployment id: fa9f73f0272017527c24cc93cc4440dd4476b9f4",
-        "StageName": "Stage"
-      }
-    },
     "MyApiTwoApiKey": {
       "Type": "AWS::ApiGateway::ApiKey",
       "Properties": {
@@ -699,6 +659,46 @@
       "DependsOn": [
         "MyApiTwoUsagePlan"
       ]
+    },
+    "MyApiOneDeployment1f6a9f6fe8": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiOne"
+        },
+        "Description": "RestApi deployment id: 1f6a9f6fe81391d645a410c38d51885e07808e9d",
+        "StageName": "Stage"
+      }
+    },
+    "ServerlessRestApiDeploymenta026edcc69": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: a026edcc698e2c25f4d9233700433dbc5b0fd44c",
+        "StageName": "Stage"
+      }
+    },
+    "MyApiTwoDeployment3d6c6dd58e": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiTwo"
+        },
+        "Description": "RestApi deployment id: 3d6c6dd58e53f371270509ea4e9d663d7b44e765",
+        "StageName": "Stage"
+      }
+    },
+    "MyApiThreeDeployment223f7fbbed": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiThree"
+        },
+        "Description": "RestApi deployment id: 223f7fbbedcd84caa38aeae40c6683d0e59040ba",
+        "StageName": "Stage"
+      }
     }
   }
 }

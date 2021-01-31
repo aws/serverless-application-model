@@ -43,15 +43,6 @@
         "MyApiTwoApiKey"
       ]
     },
-    "MyApiTwoDeploymenta78b9db9dd": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiTwo"
-        },
-        "Description": "RestApi deployment id: a78b9db9ddd80dec31c4b3c3e2b6e037345252ce"
-      }
-    },
     "MyApiOneUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
       "Properties": {
@@ -92,7 +83,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeploymenta78b9db9dd"
+          "Ref": "MyApiTwoDeployment9f0a4609e6"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -100,21 +91,11 @@
         "StageName": "Prod"
       }
     },
-    "MyApiOneDeployment37a3a51a0f": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiOne"
-        },
-        "Description": "RestApi deployment id: 37a3a51a0fd9d750b0bd43bdab40046fdc167e8d"
-      },
-      "Condition": "C1"
-    },
     "MyApiOneProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiOneDeployment37a3a51a0f"
+          "Ref": "MyApiOneDeployment8b730503db"
         },
         "RestApiId": {
           "Ref": "MyApiOne"
@@ -406,6 +387,25 @@
           }
         ]
       }
+    },
+    "MyApiTwoDeployment9f0a4609e6": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiTwo"
+        },
+        "Description": "RestApi deployment id: 9f0a4609e65623f1b3c75b64cf19bad1440118f7"
+      }
+    },
+    "MyApiOneDeployment8b730503db": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiOne"
+        },
+        "Description": "RestApi deployment id: 8b730503dbef334f318b7c9ab91be400de7cc07f"
+      },
+      "Condition": "C1"
     }
   }
 }

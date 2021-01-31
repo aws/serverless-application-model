@@ -43,15 +43,6 @@
         "MyApiTwoApiKey"
       ]
     },
-    "MyApiTwoDeployment802c3b471d": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiTwo"
-        },
-        "Description": "RestApi deployment id: 802c3b471de66f79d6d2cac656e6c9319fa0ba51"
-      }
-    },
     "MyApiOneUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
       "Properties": {
@@ -69,16 +60,6 @@
       "DependsOn": [
         "MyApiOne"
       ]
-    },
-    "MyApiOneDeployment8b73115419": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiOne"
-        },
-        "Description": "RestApi deployment id: 8b731154198483502cc4b2bff739c404e88bfe41"
-      },
-      "Condition": "C1"
     },
     "MyApiTwoUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
@@ -102,7 +83,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeployment802c3b471d"
+          "Ref": "MyApiTwoDeployment7bf63abfd5"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -114,7 +95,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiOneDeployment8b73115419"
+          "Ref": "MyApiOneDeploymentb5ca569a5d"
         },
         "RestApiId": {
           "Ref": "MyApiOne"
@@ -422,6 +403,25 @@
           }
         ]
       }
+    },
+    "MyApiTwoDeployment7bf63abfd5": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiTwo"
+        },
+        "Description": "RestApi deployment id: 7bf63abfd57b28c5c571dbb5b861077d36bae7f4"
+      }
+    },
+    "MyApiOneDeploymentb5ca569a5d": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiOne"
+        },
+        "Description": "RestApi deployment id: b5ca569a5d7fdd43b261bbd3c840c606e16590eb"
+      },
+      "Condition": "C1"
     }
   }
 }

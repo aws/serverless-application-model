@@ -27,16 +27,6 @@
         "MySamTable"
       ]
     },
-    "MyExplicitApiDeployment74b681ce04": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyExplicitApi"
-        },
-        "Description": "RestApi deployment id: 74b681ce04601a2cf69b6d05d53782b216cf96bb",
-        "StageName": "Stage"
-      }
-    },
     "MyExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
@@ -76,7 +66,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyExplicitApiDeployment74b681ce04"
+          "Ref": "MyExplicitApiDeployment98d1d7451d"
         },
         "RestApiId": {
           "Ref": "MyExplicitApi"
@@ -149,6 +139,16 @@
             }
           ]
         }
+      }
+    },
+    "MyExplicitApiDeployment98d1d7451d": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyExplicitApi"
+        },
+        "Description": "RestApi deployment id: 98d1d7451d36eeb109d8152b3c842314ceec54e5",
+        "StageName": "Stage"
       }
     }
   }

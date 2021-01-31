@@ -79,15 +79,6 @@
         "MyApiTwo"
       ]
     },
-    "MyApiTwoDeploymenta997b9e562": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiTwo"
-        },
-        "Description": "RestApi deployment id: a997b9e562a05ea9cb87782748d6df042f6a82d4"
-      }
-    },
     "MyApiOneUsagePlanKey": {
       "Type": "AWS::ApiGateway::UsagePlanKey",
       "Properties": {
@@ -107,7 +98,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeploymenta997b9e562"
+          "Ref": "MyApiTwoDeploymentbf024374d9"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -119,7 +110,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiOneDeploymentd8cca8c82b"
+          "Ref": "MyApiOneDeploymente8b9a105da"
         },
         "RestApiId": {
           "Ref": "MyApiOne"
@@ -176,16 +167,6 @@
           }
         ]
       }
-    },
-    "MyApiOneDeploymentd8cca8c82b": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiOne"
-        },
-        "Description": "RestApi deployment id: d8cca8c82bb70492b08f8ad3e95b75b30fb6ce14"
-      },
-      "Condition": "C1"
     },
     "MyApiTwoApiKey": {
       "Type": "AWS::ApiGateway::ApiKey",
@@ -422,6 +403,25 @@
           }
         ]
       }
+    },
+    "MyApiTwoDeploymentbf024374d9": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiTwo"
+        },
+        "Description": "RestApi deployment id: bf024374d9451533a7351c5295d6d753cf9d49ff"
+      }
+    },
+    "MyApiOneDeploymente8b9a105da": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiOne"
+        },
+        "Description": "RestApi deployment id: e8b9a105da2fa5b34e5d83491180a6b6888a58cb"
+      },
+      "Condition": "C1"
     }
   }
 }

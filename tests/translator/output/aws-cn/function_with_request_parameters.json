@@ -53,16 +53,6 @@
         }
       }
     },
-    "ServerlessRestApiDeploymentc2741b5220": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: c2741b5220c940a753e3d1e18da6763aaba1c19b",
-        "StageName": "Stage"
-      }
-    },
     "ApiParameterFunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -118,22 +108,12 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentc2741b5220"
+          "Ref": "ServerlessRestApiDeploymentc622a9d8fe"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Prod"
-      }
-    },
-    "ApiDeploymentd779e9df57": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "Api"
-        },
-        "Description": "RestApi deployment id: d779e9df577321942ace63ca5592fbc8ba6fa9ec",
-        "StageName": "Stage"
       }
     },
     "Api": {
@@ -206,7 +186,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiDeploymentd779e9df57"
+          "Ref": "ApiDeploymentcda848f3dd"
         },
         "RestApiId": {
           "Ref": "Api"
@@ -285,6 +265,26 @@
             "Key": "lambda:createdBy"
           }
         ]
+      }
+    },
+    "ServerlessRestApiDeploymentc622a9d8fe": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: c622a9d8feb76e1fc1e8a9b2ce115657d3ea2377",
+        "StageName": "Stage"
+      }
+    },
+    "ApiDeploymentcda848f3dd": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "Description": "RestApi deployment id: cda848f3ddb68014da459e73cd12a0a60e99d215",
+        "StageName": "Stage"
       }
     }
   }

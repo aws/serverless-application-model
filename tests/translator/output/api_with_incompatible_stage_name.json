@@ -1,53 +1,43 @@
 {
   "Resources": {
-    "HyphenApiDeployment19b8787883": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HyphenApi"
-        }, 
-        "Description": "RestApi deployment id: 19b8787883c74d792cf1ba94de3fd550cf820694", 
-        "StageName": "Stage"
-      }
-    }, 
     "UnderscoreApiStageb34d3ad84e": {
-      "Type": "AWS::ApiGateway::Stage", 
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "UnderscoreApiDeploymentc6c2bbcee6"
-        }, 
+          "Ref": "UnderscoreApiDeploymentca79588921"
+        },
         "RestApiId": {
           "Ref": "UnderscoreApi"
-        }, 
+        },
         "StageName": "hoge_fuga"
       }
-    }, 
+    },
     "UnderscoreApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
+            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
           "paths": {
             "/": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnderscoreFunction.Arn}/invocations"
                   }
-                }, 
-                "responses": {}, 
+                },
+                "responses": {},
                 "parameters": [
                   {
-                    "required": true, 
-                    "in": "body", 
-                    "name": "user", 
+                    "required": true,
+                    "in": "body",
+                    "name": "user",
                     "schema": {
                       "$ref": "#/definitions/user"
                     }
@@ -55,11 +45,11 @@
                 ]
               }
             }
-          }, 
-          "swagger": "2.0", 
+          },
+          "swagger": "2.0",
           "definitions": {
             "user": {
-              "type": "object", 
+              "type": "object",
               "properties": {
                 "username": {
                   "type": "string"
@@ -69,9 +59,9 @@
           }
         }
       }
-    }, 
+    },
     "UnderscoreFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -83,13 +73,13 @@
           }
         ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -100,27 +90,17 @@
         }
       }
     },
-    "UnderscoreApiDeploymentc6c2bbcee6": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "UnderscoreApi"
-        }, 
-        "Description": "RestApi deployment id: c6c2bbcee65f47628f0f53f9a9e5134f2f6394b5", 
-        "StageName": "Stage"
-      }
-    }, 
     "HyphenFunctionGetHtmlPermission0c8ecc62cb": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "HyphenFunction"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
               "__Stage__": "*",
               "__ApiId__": "HyphenApi"
@@ -128,53 +108,53 @@
           ]
         }
       }
-    }, 
+    },
     "HyphenApiStage0c8ecc62cb": {
-      "Type": "AWS::ApiGateway::Stage", 
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "HyphenApiDeployment19b8787883"
-        }, 
+          "Ref": "HyphenApiDeployment20155d2bd1"
+        },
         "RestApiId": {
           "Ref": "HyphenApi"
-        }, 
+        },
         "StageName": "hoge-fuga"
       }
-    }, 
+    },
     "UnderscoreFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "index.gethtml", 
+        "Handler": "index.gethtml",
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "member_portal.zip"
-        }, 
+        },
         "Role": {
           "Fn::GetAtt": [
-            "UnderscoreFunctionRole", 
+            "UnderscoreFunctionRole",
             "Arn"
           ]
-        }, 
+        },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
       }
-    }, 
+    },
     "UnderscoreFunctionGetHtmlPermissionb34d3ad84e": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "UnderscoreFunction"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
               "__Stage__": "*",
               "__ApiId__": "UnderscoreApi"
@@ -184,54 +164,54 @@
       }
     },
     "HyphenFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "index.gethtml", 
+        "Handler": "index.gethtml",
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "member_portal.zip"
-        }, 
+        },
         "Role": {
           "Fn::GetAtt": [
-            "HyphenFunctionRole", 
+            "HyphenFunctionRole",
             "Arn"
           ]
-        }, 
+        },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
       }
-    }, 
+    },
     "HyphenApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
+            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
           "paths": {
             "/": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HyphenFunction.Arn}/invocations"
                   }
-                }, 
-                "responses": {}, 
+                },
+                "responses": {},
                 "parameters": [
                   {
-                    "required": true, 
-                    "in": "body", 
-                    "name": "user", 
+                    "required": true,
+                    "in": "body",
+                    "name": "user",
                     "schema": {
                       "$ref": "#/definitions/user"
                     }
@@ -239,11 +219,11 @@
                 ]
               }
             }
-          }, 
-          "swagger": "2.0", 
+          },
+          "swagger": "2.0",
           "definitions": {
             "user": {
-              "type": "object", 
+              "type": "object",
               "properties": {
                 "username": {
                   "type": "string"
@@ -253,9 +233,9 @@
           }
         }
       }
-    }, 
+    },
     "HyphenFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -267,13 +247,13 @@
           }
         ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -282,6 +262,26 @@
             }
           ]
         }
+      }
+    },
+    "HyphenApiDeployment20155d2bd1": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HyphenApi"
+        },
+        "Description": "RestApi deployment id: 20155d2bd10f3835cdec06ddbf3b938f1fcf8e72",
+        "StageName": "Stage"
+      }
+    },
+    "UnderscoreApiDeploymentca79588921": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "UnderscoreApi"
+        },
+        "Description": "RestApi deployment id: ca7958892140fa005c37adcdc8132f756efd007b",
+        "StageName": "Stage"
       }
     }
   }

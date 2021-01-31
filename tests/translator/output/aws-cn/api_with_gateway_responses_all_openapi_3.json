@@ -1,39 +1,30 @@
 {
   "Resources": {
     "Function": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "index.gethtml", 
+        "Handler": "index.gethtml",
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "member_portal.zip"
-        }, 
+        },
         "Role": {
           "Fn::GetAtt": [
-            "FunctionRole", 
+            "FunctionRole",
             "Arn"
           ]
-        }, 
+        },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
       }
-    }, 
-    "ExplicitApiDeploymenta2f31986fe": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        }, 
-        "Description": "RestApi deployment id: a2f31986fe718bd69858a109ac2b401fb7d8560f"
-      }
-    }, 
+    },
     "FunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -45,13 +36,13 @@
           }
         ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -61,86 +52,86 @@
           ]
         }
       }
-    }, 
+    },
     "ExplicitApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
+            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
           "paths": {
             "/": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations"
                   }
-                }, 
+                },
                 "responses": {}
               }
             }
-          }, 
-          "openapi": "3.0", 
+          },
+          "openapi": "3.0",
           "x-amazon-apigateway-gateway-responses": {
             "QUOTA_EXCEEDED": {
               "responseParameters": {
                 "gatewayresponse.header.Retry-After": "'31536000'"
-              }, 
-              "responseTemplates": {}, 
+              },
+              "responseTemplates": {},
               "statusCode": "429"
-            }, 
+            },
             "UNAUTHORIZED": {
               "responseParameters": {
-                "gatewayresponse.header.WWW-Authenticate": "'Bearer realm=\"admin\"'", 
-                "gatewayresponse.header.Access-Control-Expose-Headers": "'WWW-Authenticate'", 
-                "gatewayresponse.header.Access-Control-Allow-Origin": "'*'", 
-                "gatewayresponse.path.PathKey": "'path-value'", 
+                "gatewayresponse.header.WWW-Authenticate": "'Bearer realm=\"admin\"'",
+                "gatewayresponse.header.Access-Control-Expose-Headers": "'WWW-Authenticate'",
+                "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
+                "gatewayresponse.path.PathKey": "'path-value'",
                 "gatewayresponse.querystring.QueryStringKey": "'query-string-value'"
-              }, 
-              "responseTemplates": {}, 
+              },
+              "responseTemplates": {},
               "statusCode": "401"
             }
           }
-        }, 
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
           ]
-        }, 
+        },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
       }
-    }, 
+    },
     "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymenta2f31986fe"
-        }, 
+          "Ref": "ExplicitApiDeployment0d27c44486"
+        },
         "RestApiId": {
           "Ref": "ExplicitApi"
-        }, 
+        },
         "StageName": "Prod"
       }
-    }, 
+    },
     "FunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "Function"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
               "__Stage__": "*",
               "__ApiId__": {
@@ -149,6 +140,15 @@
             }
           ]
         }
+      }
+    },
+    "ExplicitApiDeployment0d27c44486": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "Description": "RestApi deployment id: 0d27c4448689d9cc426686de480d4c2613d5733b"
       }
     }
   }

@@ -1,193 +1,193 @@
 {
   "Resources": {
     "MyApiWithCognitoAuth": {
-      "Type": "AWS::ApiGateway::RestApi", 
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
+            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
           "paths": {
             "/cognitowithauthnone": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
-                }, 
+                },
                 "security": [
                   {
                     "NONE": []
                   }
-                ], 
+                ],
                 "responses": {}
               }
-            }, 
+            },
             "/cognitodefaultauthdefaultscopesnone": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
-                }, 
+                },
                 "security": [
                   {
                     "MyCognitoAuthWithDefaultScopes": []
                   }
-                ], 
+                ],
                 "responses": {}
               }
-            }, 
+            },
             "/cognitodefaultscopesnone": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
-                }, 
+                },
                 "security": [
                   {
                     "MyDefaultCognitoAuth": []
                   }
-                ], 
+                ],
                 "responses": {}
               }
-            }, 
+            },
             "/cognitoauthorizerwithdefaultscopes": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
-                }, 
+                },
                 "security": [
                   {
                     "MyCognitoAuthWithDefaultScopes": [
-                      "default.delete", 
+                      "default.delete",
                       "default.update"
                     ]
                   }
-                ], 
+                ],
                 "responses": {}
               }
-            }, 
+            },
             "/cognitoauthorizercopesoverwritten": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
-                }, 
+                },
                 "security": [
                   {
                     "MyCognitoAuthWithDefaultScopes": [
-                      "overwritten.read", 
+                      "overwritten.read",
                       "overwritten.write"
                     ]
                   }
-                ], 
+                ],
                 "responses": {}
               }
-            }, 
+            },
             "/cognitodefaultscopesoverwritten": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
-                }, 
+                },
                 "security": [
                   {
                     "MyDefaultCognitoAuth": [
-                      "overwritten.read", 
+                      "overwritten.read",
                       "overwritten.write"
                     ]
                   }
-                ], 
+                ],
                 "responses": {}
               }
-            }, 
+            },
             "/cognitodefaultscopesdefaultauthorizer": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
-                }, 
+                },
                 "security": [
                   {
                     "MyDefaultCognitoAuth": [
-                      "default.write", 
+                      "default.write",
                       "default.read"
                     ]
                   }
-                ], 
+                ],
                 "responses": {}
               }
             }
-          }, 
-          "openapi": "3.0.1", 
+          },
+          "openapi": "3.0.1",
           "components": {
             "securitySchemes": {
               "MyCognitoAuthWithDefaultScopes": {
-                "in": "header", 
-                "type": "apiKey", 
-                "name": "Authorization", 
+                "in": "header",
+                "type": "apiKey",
+                "name": "Authorization",
                 "x-amazon-apigateway-authorizer": {
                   "providerARNs": [
                     "arn:aws:2"
-                  ], 
+                  ],
                   "type": "cognito_user_pools"
-                }, 
+                },
                 "x-amazon-apigateway-authtype": "cognito_user_pools"
-              }, 
+              },
               "MyDefaultCognitoAuth": {
-                "in": "header", 
-                "type": "apiKey", 
-                "name": "Authorization", 
+                "in": "header",
+                "type": "apiKey",
+                "name": "Authorization",
                 "x-amazon-apigateway-authorizer": {
                   "providerARNs": [
                     "arn:aws:1"
-                  ], 
+                  ],
                   "type": "cognito_user_pools"
-                }, 
+                },
                 "x-amazon-apigateway-authtype": "cognito_user_pools"
               }
             }
           }
         }
       }
-    }, 
+    },
     "MyFnCognitoDefaultScopesNonePermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com", 
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFn"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesnone", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesnone",
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithCognitoAuth"
               }
@@ -195,20 +195,20 @@
           ]
         }
       }
-    }, 
+    },
     "MyFnCognitoDefaultAuthDefaultScopesNonePermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com", 
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFn"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultauthdefaultscopesnone", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultauthdefaultscopesnone",
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithCognitoAuth"
               }
@@ -216,20 +216,20 @@
           ]
         }
       }
-    }, 
+    },
     "MyFnCognitoAuthorizerWithDefaultScopesPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com", 
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFn"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizerwithdefaultscopes", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizerwithdefaultscopes",
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithCognitoAuth"
               }
@@ -237,20 +237,20 @@
           ]
         }
       }
-    }, 
+    },
     "MyFnCognitoDefaultScopesDefaultAuthorizerPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com", 
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFn"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesdefaultauthorizer", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesdefaultauthorizer",
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithCognitoAuth"
               }
@@ -258,20 +258,20 @@
           ]
         }
       }
-    }, 
+    },
     "MyFnCognitoAuthorizerScopesOverwrittenPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com", 
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFn"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizercopesoverwritten", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitoauthorizercopesoverwritten",
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithCognitoAuth"
               }
@@ -279,27 +279,18 @@
           ]
         }
       }
-    }, 
-    "MyApiWithCognitoAuthDeployment85cd9eefb8": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithCognitoAuth"
-        }, 
-        "Description": "RestApi deployment id: 85cd9eefb8a3340e269379417aec51cb16416c4f"
-      }
-    }, 
+    },
     "MyFnRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -307,31 +298,31 @@
               }
             }
           ]
-        }, 
+        },
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
       }
-    }, 
+    },
     "MyFnCognitoWithAuthNonePermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com", 
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFn"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitowithauthnone", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitowithauthnone",
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithCognitoAuth"
               }
@@ -339,61 +330,70 @@
           ]
         }
       }
-    }, 
+    },
     "MyApiWithCognitoAuthProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeployment85cd9eefb8"
-        }, 
+          "Ref": "MyApiWithCognitoAuthDeployment8a290e07ee"
+        },
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
-        }, 
+        },
         "StageName": "Prod"
       }
-    }, 
+    },
     "MyFn": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "index.handler", 
+        "Handler": "index.handler",
         "Code": {
-          "S3Bucket": "bucket", 
+          "S3Bucket": "bucket",
           "S3Key": "key"
-        }, 
+        },
         "Role": {
           "Fn::GetAtt": [
-            "MyFnRole", 
+            "MyFnRole",
             "Arn"
           ]
-        }, 
+        },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
+            "Value": "SAM",
             "Key": "lambda:createdBy"
           }
         ]
       }
-    }, 
+    },
     "MyFnCognitoDefaultScopesWithOverwrittenPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com", 
+        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFn"
-        }, 
+        },
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesoverwritten", 
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/cognitodefaultscopesoverwritten",
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApiWithCognitoAuth"
               }
             }
           ]
         }
+      }
+    },
+    "MyApiWithCognitoAuthDeployment8a290e07ee": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithCognitoAuth"
+        },
+        "Description": "RestApi deployment id: 8a290e07ee2f8bf0e68dffcba06400e011ec9af8"
       }
     }
   }

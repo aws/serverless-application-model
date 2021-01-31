@@ -149,7 +149,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentd229cbabc1"
+          "Ref": "ServerlessRestApiDeployment3b79e27255"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -438,17 +438,6 @@
         }
       },
       "Condition": "Cond2"
-    },
-    "ServerlessRestApiDeploymentd229cbabc1": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: d229cbabc195ae9406a1e544dedb556864eb05b0",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
     },
     "helloworld3ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
@@ -1405,6 +1394,17 @@
           },
           "swagger": "2.0"
         }
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
+    "ServerlessRestApiDeployment3b79e27255": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 3b79e27255461c32c7006261077cb40593ddf4c1",
+        "StageName": "Stage"
       },
       "Condition": "ServerlessRestApiCondition"
     }

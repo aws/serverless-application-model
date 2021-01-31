@@ -122,7 +122,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "explicitapiDeployment9fcb053eda"
+          "Ref": "explicitapiDeployment6d637c9442"
         },
         "RestApiId": {
           "Ref": "explicitapi"
@@ -134,7 +134,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentfa2ce19a90"
+          "Ref": "ServerlessRestApiDeployment887b2aec6d"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -290,17 +290,6 @@
       },
       "Condition": "explicithello2condition"
     },
-    "ServerlessRestApiDeploymentfa2ce19a90": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: fa2ce19a90f37f90f1ece14a3dfcef1fed1f1a6a",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
     "explicitapi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
@@ -442,16 +431,6 @@
       },
       "Condition": "explicithello1condition"
     },
-    "explicitapiDeployment9fcb053eda": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "explicitapi"
-        },
-        "Description": "RestApi deployment id: 9fcb053edaaf92e1c6366f31270d2fb87b370240",
-        "StageName": "Stage"
-      }
-    },
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
@@ -571,6 +550,27 @@
         }
       },
       "Condition": "implicithello1condition"
+    },
+    "ServerlessRestApiDeployment887b2aec6d": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 887b2aec6d4dce31236432b538163caca39ef0cb",
+        "StageName": "Stage"
+      },
+      "Condition": "ServerlessRestApiCondition"
+    },
+    "explicitapiDeployment6d637c9442": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "explicitapi"
+        },
+        "Description": "RestApi deployment id: 6d637c9442463766f49790e426cef1f8a0a787bb",
+        "StageName": "Stage"
+      }
     }
   },
   "Description": "A template to test for API condition handling with a mix of explicit and implicit api events."

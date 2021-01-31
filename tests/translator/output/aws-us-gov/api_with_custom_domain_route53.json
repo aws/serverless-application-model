@@ -53,15 +53,6 @@
         }
       }
     },
-    "MyApiDeployment1deeaff693": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "Description": "RestApi deployment id: 1deeaff6933b892391de7a35e4cf92e79a47aea9"
-      }
-    },
     "RecordSetGroupbd00d962a4": {
       "Type": "AWS::Route53::RecordSetGroup",
       "Properties": {
@@ -115,7 +106,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment1deeaff693"
+          "Ref": "MyApiDeployment7452a804af"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -199,6 +190,15 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    },
+    "MyApiDeployment7452a804af": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Description": "RestApi deployment id: 7452a804afa36533c64861ac23cdf3f3a247f6f9"
       }
     }
   }

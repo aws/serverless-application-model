@@ -53,26 +53,6 @@
         }
       }
     },
-    "ServerlessRestApiDeployment7c706bcd56": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 7c706bcd56e685afb5882e0219515c9413bcd13b",
-        "StageName": "Stage"
-      }
-    },
-    "ApiDeployment5e67eb8be3": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "Api"
-        },
-        "Description": "RestApi deployment id: 5e67eb8be3d6956bbeadcb3ffdae9abcac90f01e",
-        "StageName": "Stage"
-      }
-    },
     "ApiParameterFunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -128,7 +108,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment7c706bcd56"
+          "Ref": "ServerlessRestApiDeploymentc3033d78a8"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -206,7 +186,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiDeployment5e67eb8be3"
+          "Ref": "ApiDeploymentab93381864"
         },
         "RestApiId": {
           "Ref": "Api"
@@ -285,6 +265,26 @@
             "Key": "lambda:createdBy"
           }
         ]
+      }
+    },
+    "ServerlessRestApiDeploymentc3033d78a8": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: c3033d78a8a749f43919fb95e1746af8aa03e4ff",
+        "StageName": "Stage"
+      }
+    },
+    "ApiDeploymentab93381864": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "Api"
+        },
+        "Description": "RestApi deployment id: ab93381864395f26ac5a7d7ccac2bca0d0fef644",
+        "StageName": "Stage"
       }
     }
   }

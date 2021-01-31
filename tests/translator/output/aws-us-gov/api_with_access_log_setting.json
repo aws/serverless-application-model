@@ -99,32 +99,12 @@
           "Format": "$context.requestId"
         },
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentf117c932f7"
+          "Ref": "ExplicitApiDeployment53cc66445c"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
         },
         "StageName": "Prod"
-      }
-    },
-    "ServerlessRestApiDeployment5b2cb4ba8f": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 5b2cb4ba8fce8a9445b1914c6c6fbeef81a9075a",
-        "StageName": "Stage"
-      }
-    },
-    "ExplicitApiDeploymentf117c932f7": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289",
-        "StageName": "Stage"
       }
     },
     "ServerlessRestApiProdStage": {
@@ -135,7 +115,7 @@
           "Format": "$context.requestId"
         },
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment5b2cb4ba8f"
+          "Ref": "ServerlessRestApiDeployment48b9be5f17"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -177,6 +157,26 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    },
+    "ServerlessRestApiDeployment48b9be5f17": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 48b9be5f1703467615aff7539d0d6987624f84c5",
+        "StageName": "Stage"
+      }
+    },
+    "ExplicitApiDeployment53cc66445c": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "Description": "RestApi deployment id: 53cc66445c0accdc5f3244004331940761c72c8b",
+        "StageName": "Stage"
       }
     }
   }

@@ -126,22 +126,12 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithAwsIamAuthDeploymentd4892df344"
+          "Ref": "MyApiWithAwsIamAuthDeployment47abb83643"
         },
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
         },
         "StageName": "Prod"
-      }
-    },
-    "MyApiWithAwsIamAuthDeploymentd4892df344": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithAwsIamAuth"
-        },
-        "Description": "RestApi deployment id: d4892df3448eaab6a467b44ffd4ed87f18f9a5d8",
-        "StageName": "Stage"
       }
     },
     "MyFunctionWithAwsIamAuthRole": {
@@ -172,6 +162,16 @@
             }
           ]
         }
+      }
+    },
+    "MyApiWithAwsIamAuthDeployment47abb83643": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithAwsIamAuth"
+        },
+        "Description": "RestApi deployment id: 47abb836438fb5e6654bef900bc93dea990f4fea",
+        "StageName": "Stage"
       }
     }
   }
