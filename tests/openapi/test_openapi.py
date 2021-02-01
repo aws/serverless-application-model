@@ -438,6 +438,7 @@ class TestOpenApiEdit_add_description(TestCase):
         editor.add_description("New Description")
         self.assertEqual(editor.openapi["info"]["description"], "Existing Description")
 
+
 class TestOpenApiEditor_get_integration_function_of_alias(TestCase):
     def setUp(self):
 
