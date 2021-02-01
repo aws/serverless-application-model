@@ -105,9 +105,10 @@ class OpenApiEditor(object):
         matches = re.findall(regex, arn)
         # For AWS::Serverless::Functions with AutoPublishAlias, the integration URI will
         # contain ${LogicalId} (where LogicalId is the logical ID of a AWS::Lambda::Alias),
-        # not ${LogicalId.Arn} (where LogicalId is the logical ID of a AWS::Lambda::Function).
-        # Without the .Arn suffix, parsing the URI is even more ambiguous, so instead of
-        # introducing more hacks, we return gracefully to prevent IndexErrors.
+        # not ${LogicalId.Arn} (where LogicalId is the logical ID of a AWS::Lambda::Function)
+        # (see intrinsics.make_shorthand and lambda_.LambdaAlias). Without the .Arn suffix,
+        # parsing the URI is even more ambiguous, so instead of introducing more hacks, we
+        # return gracefully to prevent IndexErrors.
         if not matches:
             return False
         match = matches[0].split(".Arn")[0]
