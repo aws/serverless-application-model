@@ -20,12 +20,13 @@ class TestValidatorRoot(TestValidatorBase):
             ("error_transform_missing", ["[/] 'Transform' is a required property"]),
             (
                 "error_resources_one_empty",
-                ["[/Resources/MinimalApi] None is not valid. Context: Must not be empty"],
+                ["[/Resources/MyApi] Is not valid", "[/__/] Must not be empty"],
             ),
             (
                 "error_resources_one_missing_type_element",
                 [
-                    "[/Resources/MinimalApi] {'Properties': {'StageName': 'Stage Name'}} is not valid. Context: 'Type' is a required property"
+                    "[/Resources/MyApi] Is not valid",
+                    "[/__/] 'Type' is a required property",
                 ],
             ),
             (

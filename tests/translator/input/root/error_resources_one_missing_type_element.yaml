@@ -1,6 +1,6 @@
 # Missing Type element
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  MinimalApi:
+  MyApi:
     Properties:
       StageName: Stage Name
