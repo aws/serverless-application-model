@@ -6,7 +6,8 @@ Resources:
     Properties:
       AccessLogSetting: AccessLogSetting
       Auth: ApiAuth
-      BinaryMediaTypes: ["image/png"]
+      BinaryMediaTypes:
+        - "image/png"
       CacheClusterEnabled: true
       CacheClusterSize: "32"
       CanarySetting: CanarySetting

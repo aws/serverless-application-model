@@ -1,0 +1,12 @@
+# FunctionArn is missing
+# We need to set FunctionInvokeRole for the validator to check it as a Lambda authorizer
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          MyLambdaAuth:
+            FunctionInvokeRole: Function invoke role

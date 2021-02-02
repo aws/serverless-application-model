@@ -6,7 +6,14 @@ from jsonschema.exceptions import ValidationError
 
 from . import sam_schema
 
-ERRORS_MAPPING = {"None is not of type 'object'": "Must not be empty"}
+ERRORS_MAPPING = {
+    "None is not of type 'object'": "Must not be empty",
+    "None is not of type 'string'": "Must not be empty",
+    "None is not of type 'boolean'": "Must not be empty",
+    "None is not of type 'integer'": "Must not be empty",
+    "None is not of type 'array'": "Must not be empty",
+    "None is not of type 'number'": "Must not be empty",
+}
 
 
 class SamTemplateValidator(object):
@@ -69,10 +76,12 @@ class SamTemplateValidator(object):
 
         # [/Path/To/Element] Error message
         error_content = "[{}/{}] {}".format(
-            parent_path, "/".join(error.path), self._cleanup_error_message(error.message)
+            parent_path, "/".join([str(p) for p in error.path]), self._cleanup_error_message(error.message)
         )
 
-        formatted_errors.append(error_content)
+        if error_content and error_content not in formatted_errors:
+            # Remove duplicates
+            formatted_errors.append(error_content)
 
         for context_error in error.context:
             # Each context item is also a validation error

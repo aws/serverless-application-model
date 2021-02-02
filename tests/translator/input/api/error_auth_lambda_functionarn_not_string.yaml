@@ -1,4 +1,4 @@
-# FunctionInvokeRole is not a string
+# FunctionArn is not a string
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,6 +7,5 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyLambdaRequestAuth:
-            FunctionArn: Function.arn
-            FunctionInvokeRole: 3
+          MyLambdaAuth:
+            FunctionArn: 3

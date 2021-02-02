@@ -1,4 +1,4 @@
-# AuthorizationScopes is not a list
+# LambdaRequest with only Context on Identity
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -8,5 +8,7 @@ Resources:
       Auth:
         Authorizers:
           MyLambdaRequestAuth:
-            AuthorizationScopes: scopes1
-            FunctionArn: Function.arn
+            FunctionArn: Function.Arn
+            Identity:
+              Context:
+                - Context1

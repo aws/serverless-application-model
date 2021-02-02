@@ -1,4 +1,4 @@
-# FunctionInvokeRole is empty
+# AuthorizationScopes is not a list
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,6 +7,6 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyLambdaRequestAuth:
+          MyLambdaAuth:
+            AuthorizationScopes: scopes1
             FunctionArn: Function.arn
-            FunctionInvokeRole:

@@ -1,4 +1,4 @@
-# AuthorizationScopes is not a list
+# FunctionPayloadType value is unknown
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,7 +7,6 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyLambdaRequestAuth:
-            AuthorizationScopes:
-              - 3
+          MyLambdaAuth:
             FunctionArn: Function.arn
+            FunctionPayloadType: MyPayloadType

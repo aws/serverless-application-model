@@ -181,15 +181,60 @@
           "additionalProperties": false,
           "patternProperties": {
             "^[a-zA-Z0-9]+$": {
-              "oneOf": [
+              "allOf": [
                 {
-                  "$ref": "#definitions/AWS::Serverless::Api.CognitoAuthorizer"
+                  "if": {
+                    "required": [
+                      "UserPoolArn"
+                    ]
+                  },
+                  "then": {
+                    "$ref": "#definitions/AWS::Serverless::Api.CognitoAuthorizer"
+                  }
                 },
                 {
-                  "$ref": "#definitions/AWS::Serverless::Api.LambdaRequestAuthorizer"
+                  "if": {
+                    "required": [
+                      "FunctionArn"
+                    ]
+                  },
+                  "then": {
+                    "$ref": "#definitions/AWS::Serverless::Api.LambdaRequestAuthorizer"
+                  }
                 },
                 {
-                  "$ref": "#definitions/AWS::Serverless::Api.LambdaTokenAuthorizer"
+                  "if": {
+                    "required": [
+                      "FunctionArn"
+                    ]
+                  },
+                  "then": {
+                    "$ref": "#definitions/AWS::Serverless::Api.LambdaTokenAuthorizer"
+                  }
+                },
+                {
+                  "if": {
+                    "not": {
+                      "oneOf": [
+                        {
+                          "required": [
+                            "UserPoolArn"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "FunctionArn"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "UserPoolArn",
+                      "FunctionArn"
+                    ]
+                  }
                 }
               ]
             }
@@ -217,6 +262,7 @@
       "type": "object"
     },
     "AWS::Serverless::Api.CognitoAuthorizer": {
+      "additionalProperties": false,
       "properties": {
         "AuthorizationScopes": {
           "items": {
@@ -336,6 +382,7 @@
       "type": "object"
     },
     "AWS::Serverless::Api.LambdaRequestAuthorizer": {
+      "additionalProperties": false,
       "properties": {
         "AuthorizationScopes": {
           "items": {
@@ -401,6 +448,7 @@
       "type": "object"
     },
     "AWS::Serverless::Api.LambdaTokenAuthorizer": {
+      "additionalProperties": false,
       "properties": {
         "AuthorizationScopes": {
           "items": {

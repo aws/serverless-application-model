@@ -1,11 +1,9 @@
-# FunctionArn is empty
+# CanarySetting/PercentTraffic is not a number
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
-      Auth:
-        Authorizers:
-          MyLambdaRequestAuth:
-            FunctionArn:
+      CanarySetting:
+        PercentTraffic: "3.5"

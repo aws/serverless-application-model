@@ -1,4 +1,4 @@
-# FunctionArn is not a string
+# AuthorizationScopes is not a list
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,5 +7,7 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyLambdaRequestAuth:
-            FunctionArn: 3
+          MyLambdaAuth:
+            AuthorizationScopes:
+              - 3
+            FunctionArn: Function.arn

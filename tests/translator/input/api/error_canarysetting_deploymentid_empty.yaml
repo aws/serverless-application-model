@@ -1,0 +1,9 @@
+# CanarySetting/DeploymentId is empty
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        DeploymentId:
