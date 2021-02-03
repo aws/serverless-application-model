@@ -1,0 +1,16 @@
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      AutoPublishAlias: live
+      Handler: index.handler
+      Runtime: python3.8
+      CodeUri: ${codeuri}
+      Events:
+        FooEvent:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: HttpApi

@@ -12,7 +12,6 @@ class TestBasicFunction(BaseTest):
             "basic_function",
             "basic_function_no_envvar",
             "basic_function_openapi",
-            "function_alias_with_http_api_events",
         ]
     )
     def test_basic_function(self, file_name):
@@ -26,6 +25,15 @@ class TestBasicFunction(BaseTest):
         self.deploy_stack()
 
         self.assertEqual(self.get_resource_status_by_logical_id("MyLambdaFunction"), "UPDATE_COMPLETE")
+
+    @parameterized.expand(
+        [
+            "function_alias_with_http_api_event",
+            "function_alias_with_http_api_events",
+        ]
+    )
+    def test_function_alias(self, file_name):
+        self.create_and_verify_stack(file_name)
 
     @parameterized.expand(
         [
