@@ -28,11 +28,11 @@ class TestBasicFunction(BaseTest):
 
     @parameterized.expand(
         [
-            "function_alias_with_http_api_event",
             "function_alias_with_http_api_events",
+            "function_with_http_api_events",
         ]
     )
-    def test_function_alias(self, file_name):
+    def test_function_with_http_api_events(self, file_name):
         self.create_and_verify_stack(file_name)
 
     @parameterized.expand(

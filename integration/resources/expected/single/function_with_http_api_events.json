@@ -1,8 +1,6 @@
 [
   { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyLambdaFunctionAliaslive", "ResourceType":"AWS::Lambda::Alias" },
   { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"MyLambdaFunctionVersion", "ResourceType":"AWS::Lambda::Version" },
   { "LogicalResourceId":"MyLambdaFunctionFooEventPermission", "ResourceType":"AWS::Lambda::Permission" },
   { "LogicalResourceId":"HttpApi", "ResourceType":"AWS::ApiGatewayV2::Api" },
   { "LogicalResourceId":"HttpApiApiGatewayDefaultStage", "ResourceType":"AWS::ApiGatewayV2::Stage" }
