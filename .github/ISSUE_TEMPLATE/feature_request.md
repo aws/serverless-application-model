@@ -17,7 +17,7 @@ Ex: I wish the SAM Translator would [...]
 
 ### Proposal
 
-Add details of how to add this to the product.
+Add details on how to add this to the product.
 
 Things to consider:
 [ ] The [SAM documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html) will need to be updated
