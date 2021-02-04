@@ -33,7 +33,7 @@ If you do find an existing Issue, re-open or add a comment to that Issue instead
 ### Additional environment details (Ex: Windows, Mac, Amazon Linux etc)
 
 1. OS:
-2. `sam --version`:
+2. If using SAM CLI, `sam --version`:
 3. AWS region:
 
-`Add --debug flag to commands you are running`
+`Add --debug flag to any SAM CLI commands you are running`

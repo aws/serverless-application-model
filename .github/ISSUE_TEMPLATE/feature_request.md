@@ -7,17 +7,19 @@ assignees: ''
 
 ---
 
-<!-- Make sure we don't have an existing Issue for that feature request (both open and closed). -->
+<!-- Make sure we don't have an existing Issue for that feature request (open or closed). -->
 
 ### Describe your idea/feature/enhancement
 
-Provide a clear description. Ex. I wish the SAM Translator would [...]
+Provide a clear description.
+
+Ex: I wish the SAM Translator would [...]
 
 ### Proposal
 
 Add details of how to add this to the product.
 
 Things to consider:
-1. Will this require any updates to the [SAM Spec](https://github.com/awslabs/serverless-application-model)
+[ ] The [SAM documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html) will need to be updated
 
 ### Additional Details
