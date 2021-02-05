@@ -106,6 +106,7 @@ class OpenApiEditor(object):
         # Prevent IndexError when integration URI doesn't contain .Arn (e.g. a Function with
         # AutoPublishAlias translates to AWS::Lambda::Alias, which make_shorthand represents
         # as LogicalId instead of LogicalId.Arn).
+        # TODO: Consistent handling of Functions with and without AutoPublishAlias (see #1901)
         if not matches:
             return False
         match = matches[0].split(".Arn")[0]
