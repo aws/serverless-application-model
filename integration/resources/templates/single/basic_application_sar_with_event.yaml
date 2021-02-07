@@ -1,0 +1,17 @@
+Resources:
+  NestedApp:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location:
+        ApplicationId: 'arn:aws:serverlessrepo:us-east-1:380013960170:applications/test-app-for-testing'
+        SemanticVersion: 1.0.1
+      Events:
+        APILambda:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*    
+
+  Images:
+    Type: AWS::S3::Bucket

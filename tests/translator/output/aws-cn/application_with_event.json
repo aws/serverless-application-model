@@ -1,0 +1,72 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+      "Images": {
+        "Type": "AWS::S3::Bucket",
+        "DependsOn": [
+          "NestedAppThumbnailFunctionPermission"
+        ],
+        "Properties": {
+          "NotificationConfiguration": {
+            "LambdaConfigurations": [
+              {
+                "Function": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:"
+                      },
+                      {
+                        "Fn::GetAtt": [
+                          "NestedApp",
+                          "Outputs.ThumbnailFunction"
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                "Event": "s3:ObjectCreated:*"
+              }
+            ]
+          }
+        }
+      },
+      "NestedApp": {
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+          "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
+          "Tags": [
+            {
+              "Key": "lambda:createdBy",
+              "Value": "SAM"
+            },
+            {
+              "Key": "serverlessrepo:applicationId",
+              "Value": "arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world"
+            },
+            {
+              "Key": "serverlessrepo:semanticVersion",
+              "Value": "1.0.1"
+            }
+          ]
+        }
+      },
+      "NestedAppThumbnailFunctionPermission": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:InvokeFunction",
+          "FunctionName": {
+            "Fn::GetAtt": [
+              "NestedApp",
+              "Outputs.ThumbnailFunction"
+            ]
+          },
+          "Principal": "s3.amazonaws.com",
+          "SourceAccount": {
+            "Ref": "AWS::AccountId"
+          }
+        }
+      }
+    }
+  }

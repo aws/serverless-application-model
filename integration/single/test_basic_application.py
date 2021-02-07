@@ -43,3 +43,35 @@ class TestBasicApplication(BaseTest):
 
         self.assertEqual(len(functions), 1)
         self.assertEqual(functions[0]["LogicalResourceId"], expected_function_name)
+
+    def test_basic_application_sar_with_event(self):
+        """
+        Creates an application with a lambda function with intrinsics
+        """
+        self.create_and_verify_stack("basic_application_sar_with_event")
+
+        nested_stack_resource = self.get_stack_nested_stack_resources()
+        functions = self.get_stack_resources("AWS::Lambda::Function", nested_stack_resource)
+
+        bucket_id = self.get_physical_id_by_logical_id("Images")
+        config = self.client_provider.s3_client.get_bucket_notification_configuration(
+            Bucket=bucket_id
+        )
+        
+        self.assertRegexpMatches(config['LambdaFunctionConfigurations'][0]['LambdaFunctionArn'], functions[0]['PhysicalResourceId'])
+
+    def test_basic_stack_with_event(self):
+        """
+        Creates an application with a lambda function with intrinsics
+        """
+        self.create_and_verify_stack("basic_stack_with_event")
+
+        nested_stack_resource = self.get_stack_nested_stack_resources()
+        functions = self.get_stack_resources("AWS::Lambda::Function", nested_stack_resource)
+
+        bucket_id = self.get_physical_id_by_logical_id("Images")
+        config = self.client_provider.s3_client.get_bucket_notification_configuration(
+            Bucket=bucket_id
+        )
+        
+        self.assertRegexpMatches(config['LambdaFunctionConfigurations'][0]['LambdaFunctionArn'], functions[0]['PhysicalResourceId'])

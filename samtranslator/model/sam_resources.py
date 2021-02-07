@@ -42,6 +42,9 @@ from samtranslator.model.intrinsics import (
     make_not_conditional,
     make_conditional,
     make_and_condition,
+    fnSub,
+    fnJoin,
+    fnGetAtt
 )
 from samtranslator.model.sqs import SQSQueue
 from samtranslator.model.sns import SNSTopic
@@ -49,50 +52,127 @@ from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 
 
-class SamFunction(SamResourceMacro):
-    """SAM function macro."""
+class SamEventsResource(SamResourceMacro):
+    """Base class for resources that can have events."""
 
-    resource_type = "AWS::Serverless::Function"
-    property_types = {
-        "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Handler": PropertyType(False, is_str()),
-        "Runtime": PropertyType(False, is_str()),
-        "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "ImageUri": PropertyType(False, is_str()),
-        "PackageType": PropertyType(False, is_str()),
-        "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "DeadLetterQueue": PropertyType(False, is_type(dict)),
-        "Description": PropertyType(False, is_str()),
-        "MemorySize": PropertyType(False, is_type(int)),
-        "Timeout": PropertyType(False, is_type(int)),
-        "VpcConfig": PropertyType(False, is_type(dict)),
-        "Role": PropertyType(False, is_str()),
-        "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
-        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
-        "PermissionsBoundary": PropertyType(False, is_str()),
-        "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
-        "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
-        "Tags": PropertyType(False, is_type(dict)),
-        "Tracing": PropertyType(False, one_of(is_type(dict), is_str())),
-        "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
-        "DeploymentPreference": PropertyType(False, is_type(dict)),
-        "ReservedConcurrentExecutions": PropertyType(False, any_type()),
-        "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-        "EventInvokeConfig": PropertyType(False, is_type(dict)),
-        # Intrinsic functions in value of Alias property are not supported, yet
-        "AutoPublishAlias": PropertyType(False, one_of(is_str())),
-        "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
-        "VersionDescription": PropertyType(False, is_str()),
-        "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
-        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
-        "ImageConfig": PropertyType(False, is_type(dict)),
-        "CodeSigningConfigArn": PropertyType(False, is_str()),
-    }
+    property_types = {"Events": PropertyType(False, dict_of(is_str(), is_type(dict)))}
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
         samtranslator.model.eventsources.pull,
         samtranslator.model.eventsources.push,
         samtranslator.model.eventsources.cloudwatchlogs,
+    )
+
+    def resources_to_link(self, resources):
+        try:
+            return {"event_resources": self._event_resources_to_link(resources)}
+        except InvalidEventException as e:
+            raise InvalidResourceException(self.logical_id, e.message)
+
+    def _event_resources_to_link(self, resources):
+        event_resources = {}
+        if self.Events:
+            for logical_id, event_dict in self.Events.items():
+                try:
+                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        self.logical_id + logical_id, event_dict, logical_id
+                    )
+                except (TypeError, AttributeError) as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
+                event_resources[logical_id] = event_source.resources_to_link(resources)
+        return event_resources
+
+    @staticmethod
+    def order_events(event):
+        """
+        Helper method for sorting Function Events. Returns a key to use in sorting this event
+        This is mainly used for HttpApi Events, where we need to evaluate the "$default" path (if any)
+            before we evaluate any of the other paths ("/", etc), so we can make sure we don't create any
+            redundant permissions. This sort places "$" before "/" or any alphanumeric characters.
+        :param event: tuple of (logical_id, event_dictionary) that contains event information
+        """
+        logical_id, event_dict = event
+        if not isinstance(event_dict, dict):
+            return logical_id
+        return event_dict.get("Properties", {}).get("Path", logical_id)
+
+    def _generate_event_resources(
+        self, parent, execution_role, event_resources, intrinsics_resolver, function_resolver=None
+    ):
+        """Generates and returns the resources associated with the events.
+
+        :param parent: Function, FunctionReference or Application
+        :param event_resources: All the event sources associated with this Lambda function
+        :param iam.IAMRole execution_role: Optional generated Lambda execution role
+        :returns: a list containing the function's event resources
+        :rtype: list
+        """
+        resources = []
+        if self.Events:
+            for logical_id, event_dict in sorted(self.Events.items(), key=SamEventsResource.order_events):
+                try:
+                    eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
+                        parent.logical_id + logical_id, event_dict, logical_id
+                    )
+                except TypeError as e:
+                    raise InvalidEventException(logical_id, "{}".format(e))
+
+                function = parent
+                if function_resolver is not None:
+                    function = function_resolver(self, logical_id)
+                kwargs = {
+                    "function": function,
+                    "role": execution_role,
+                    "intrinsics_resolver": intrinsics_resolver,
+                }
+
+                for name, resource in event_resources[logical_id].items():
+                    kwargs[name] = resource
+                resources += eventsource.to_cloudformation(**kwargs)
+
+        return resources
+
+
+class SamFunction(SamEventsResource):
+    """SAM function macro."""
+
+    resource_type = "AWS::Serverless::Function"
+    property_types = SamEventsResource.property_types.copy()
+    property_types.update(
+        {
+            "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),
+            "Handler": PropertyType(False, is_str()),
+            "Runtime": PropertyType(False, is_str()),
+            "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+            "ImageUri": PropertyType(False, is_str()),
+            "PackageType": PropertyType(False, is_str()),
+            "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
+            "DeadLetterQueue": PropertyType(False, is_type(dict)),
+            "Description": PropertyType(False, is_str()),
+            "MemorySize": PropertyType(False, is_type(int)),
+            "Timeout": PropertyType(False, is_type(int)),
+            "VpcConfig": PropertyType(False, is_type(dict)),
+            "Role": PropertyType(False, is_str()),
+            "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
+            "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
+            "PermissionsBoundary": PropertyType(False, is_str()),
+            "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
+            "Tags": PropertyType(False, is_type(dict)),
+            "Tracing": PropertyType(False, one_of(is_type(dict), is_str())),
+            "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
+            "DeploymentPreference": PropertyType(False, is_type(dict)),
+            "ReservedConcurrentExecutions": PropertyType(False, any_type()),
+            "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+            "EventInvokeConfig": PropertyType(False, is_type(dict)),
+            # Intrinsic functions in value of Alias property are not supported, yet
+            "AutoPublishAlias": PropertyType(False, one_of(is_str())),
+            "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
+            "VersionDescription": PropertyType(False, is_str()),
+            "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
+            "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
+            "ImageConfig": PropertyType(False, is_type(dict)),
+            "CodeSigningConfigArn": PropertyType(False, is_str()),
+        }
     )
 
     # DeadLetterQueue
@@ -110,12 +190,6 @@ class SamFunction(SamResourceMacro):
         "DestinationTopic": SNSTopic.resource_type,
         "DestinationQueue": SQSQueue.resource_type,
     }
-
-    def resources_to_link(self, resources):
-        try:
-            return {"event_resources": self._event_resources_to_link(resources)}
-        except InvalidEventException as e:
-            raise InvalidResourceException(self.logical_id, e.message)
 
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
@@ -188,7 +262,7 @@ class SamFunction(SamResourceMacro):
                 execution_role,
                 kwargs["event_resources"],
                 intrinsics_resolver,
-                lambda_alias=lambda_alias,
+                function_resolver=lambda self, logical_id: lambda_alias or lambda_function,
             )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
@@ -560,73 +634,6 @@ class SamFunction(SamResourceMacro):
                 self.logical_id, "'DeadLetterQueue' requires Type of {}".format(valid_dlq_types)
             )
 
-    def _event_resources_to_link(self, resources):
-        event_resources = {}
-        if self.Events:
-            for logical_id, event_dict in self.Events.items():
-                try:
-                    event_source = self.event_resolver.resolve_resource_type(event_dict).from_dict(
-                        self.logical_id + logical_id, event_dict, logical_id
-                    )
-                except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e))
-                event_resources[logical_id] = event_source.resources_to_link(resources)
-        return event_resources
-
-    @staticmethod
-    def order_events(event):
-        """
-        Helper method for sorting Function Events. Returns a key to use in sorting this event
-
-        This is mainly used for HttpApi Events, where we need to evaluate the "$default" path (if any)
-            before we evaluate any of the other paths ("/", etc), so we can make sure we don't create any
-            redundant permissions. This sort places "$" before "/" or any alphanumeric characters.
-        :param event: tuple of (logical_id, event_dictionary) that contains event information
-        """
-        logical_id, event_dict = event
-        if not isinstance(event_dict, dict):
-            return logical_id
-        return event_dict.get("Properties", {}).get("Path", logical_id)
-
-    def _generate_event_resources(
-        self, lambda_function, execution_role, event_resources, intrinsics_resolver, lambda_alias=None
-    ):
-        """Generates and returns the resources associated with this function's events.
-
-        :param model.lambda_.LambdaFunction lambda_function: generated Lambda function
-        :param iam.IAMRole execution_role: generated Lambda execution role
-        :param implicit_api: Global Implicit API resource where the implicit APIs get attached to, if necessary
-        :param implicit_api_stage: Global implicit API stage resource where implicit APIs get attached to, if necessary
-        :param event_resources: All the event sources associated with this Lambda function
-        :param model.lambda_.LambdaAlias lambda_alias: Optional Lambda Alias resource if we want to connect the
-            event sources to this alias
-
-        :returns: a list containing the function's event resources
-        :rtype: list
-        """
-        resources = []
-        if self.Events:
-            for logical_id, event_dict in sorted(self.Events.items(), key=SamFunction.order_events):
-                try:
-                    eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
-                        lambda_function.logical_id + logical_id, event_dict, logical_id
-                    )
-                except TypeError as e:
-                    raise InvalidEventException(logical_id, "{}".format(e))
-
-                kwargs = {
-                    # When Alias is provided, connect all event sources to the alias and *not* the function
-                    "function": lambda_alias or lambda_function,
-                    "role": execution_role,
-                    "intrinsics_resolver": intrinsics_resolver,
-                }
-
-                for name, resource in event_resources[logical_id].items():
-                    kwargs[name] = resource
-                resources += eventsource.to_cloudformation(**kwargs)
-
-        return resources
-
     def _construct_code_dict(self):
         """Constructs Lambda Code Dictionary based on the accepted SAM artifact properties such
         as `InlineCode`, `CodeUri` and `ImageUri` and also raises errors if more than one of them is
@@ -801,6 +808,60 @@ class SamFunction(SamResourceMacro):
             lambda_alias.set_resource_attribute(
                 "UpdatePolicy", deployment_preference_collection.update_policy(self.logical_id).to_dict()
             )
+
+
+class SamStackFunctionReference(SamResourceMacro):
+    """SAM function reference macro."""
+
+    property_types = {"FunctionName": PropertyType(True, is_str()), "Parent": PropertyType(True, any_type())}
+
+    runtime_attrs = {
+        "name": lambda self: fnGetAtt(self.Parent.logical_id, "Outputs." + self.FunctionName),
+        "arn": lambda self: fnJoin(
+            "",
+            [
+                fnSub("arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:"),
+                fnGetAtt(self.Parent.logical_id, "Outputs." + self.FunctionName),
+            ],
+        ),
+    }
+
+
+class SamFunctionReference(SamEventsResource):
+    """SAM function reference macro."""
+
+    resource_type = "AWS::Serverless::FunctionReference"
+    property_types = SamEventsResource.property_types.copy()
+    property_types.update({"FunctionName": PropertyType(True, one_of(is_str(), is_type(dict)))})
+
+    runtime_attrs = {
+        "name": lambda self: self.FunctionName,
+        "arn": lambda self: fnJoin(
+            "", [fnSub("arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:"), self.FunctionName]
+        ),
+    }
+
+    def to_cloudformation(self, **kwargs):
+        """Returns the event resources to which this SAM Function corresponds.
+        :param dict kwargs: already-converted resources that may need to be modified when converting this \
+        macro to pure CloudFormation
+        :returns: a list of vanilla CloudFormation Resources, to which this Function expands
+        :rtype: list
+        """
+        resources = []
+
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
+        try:
+            resources += self._generate_event_resources(
+                self, 
+                None,
+                kwargs["event_resources"],
+                intrinsics_resolver,
+            )
+        except InvalidEventException as e:
+            raise InvalidResourceException(self.logical_id, e.message)
+
+        return resources
 
 
 class SamApi(SamResourceMacro):
@@ -1067,7 +1128,7 @@ class SamSimpleTable(SamResourceMacro):
         raise InvalidResourceException(self.logical_id, "Invalid 'Type' \"{actual}\".".format(actual=attribute_type))
 
 
-class SamApplication(SamResourceMacro):
+class SamApplication(SamEventsResource):
     """SAM application macro."""
 
     APPLICATION_ID_KEY = "ApplicationId"
@@ -1076,19 +1137,42 @@ class SamApplication(SamResourceMacro):
     resource_type = "AWS::Serverless::Application"
 
     # The plugin will always insert the TemplateUrl parameter
-    property_types = {
-        "Location": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "TemplateUrl": PropertyType(False, is_str()),
-        "Parameters": PropertyType(False, is_type(dict)),
-        "NotificationARNs": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
-        "Tags": PropertyType(False, is_type(dict)),
-        "TimeoutInMinutes": PropertyType(False, is_type(int)),
-    }
+    property_types = SamEventsResource.property_types.copy()
+    property_types.update(
+        {
+            "Location": PropertyType(True, one_of(is_str(), is_type(dict))),
+            "TemplateUrl": PropertyType(False, is_str()),
+            "Parameters": PropertyType(False, is_type(dict)),
+            "NotificationARNs": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+            "Tags": PropertyType(False, is_type(dict)),
+            "TimeoutInMinutes": PropertyType(False, is_type(int)),
+        }
+    )
+
+    def _create_helper(self, logical_id):
+        function = SamStackFunctionReference(logical_id)
+        function.FunctionName = logical_id
+        function.Parent = self
+        return function
 
     def to_cloudformation(self, **kwargs):
         """Returns the stack with the proper parameters for this application"""
+        resources = []
+        intrinsics_resolver = kwargs["intrinsics_resolver"]
         nested_stack = self._construct_nested_stack()
-        return [nested_stack]
+        resources.append(nested_stack)
+
+        try:
+            resources += self._generate_event_resources(
+                nested_stack, 
+                None,
+                kwargs['event_resources'],
+                intrinsics_resolver,
+                function_resolver=lambda self, logical_id: self._create_helper(logical_id))
+        except InvalidEventException as e:
+            raise InvalidResourceException(self.logical_id, e.message)
+
+        return resources
 
     def _construct_nested_stack(self):
         """Constructs a AWS::CloudFormation::Stack resource"""
