@@ -44,7 +44,7 @@ from samtranslator.model.intrinsics import (
     make_and_condition,
     fnSub,
     fnJoin,
-    fnGetAtt
+    fnGetAtt,
 )
 from samtranslator.model.sqs import SQSQueue
 from samtranslator.model.sns import SNSTopic
@@ -853,7 +853,7 @@ class SamFunctionReference(SamEventsResource):
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         try:
             resources += self._generate_event_resources(
-                self, 
+                self,
                 None,
                 kwargs["event_resources"],
                 intrinsics_resolver,
@@ -1164,11 +1164,12 @@ class SamApplication(SamEventsResource):
 
         try:
             resources += self._generate_event_resources(
-                nested_stack, 
+                nested_stack,
                 None,
-                kwargs['event_resources'],
+                kwargs["event_resources"],
                 intrinsics_resolver,
-                function_resolver=lambda self, logical_id: self._create_helper(logical_id))
+                function_resolver=lambda self, logical_id: self._create_helper(logical_id),
+            )
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
