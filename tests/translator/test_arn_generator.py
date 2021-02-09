@@ -1,6 +1,6 @@
 from unittest import TestCase
 from parameterized import parameterized
-from mock import Mock
+from mock import Mock, patch
 
 from samtranslator.translator.arn_generator import ArnGenerator, NoRegionFound
 
@@ -17,6 +17,7 @@ class TestArnGenerator(TestCase):
 
         self.assertEqual(actual, expected)
 
+    @patch("boto3.session.Session.region_name", None)
     def test_get_partition_name_raise_NoRegionFound(self):
         with self.assertRaises(NoRegionFound):
             ArnGenerator.get_partition_name(None)
