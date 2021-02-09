@@ -1,0 +1,22 @@
+Resources:
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      Events:
+        FooEvent:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyHttpApi
+        BarEvent:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyHttpApi
+            Path: /bar
+            Method: POST

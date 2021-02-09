@@ -28,6 +28,7 @@ S3_BUCKET_PREFIX = "sam-integ-bucket-"
 class BaseTest(TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
         cls.template_dir = Path(cls.resources_dir, "templates", "single")
@@ -215,6 +216,11 @@ class BaseTest(TestCase):
             return []
 
         return self.client_provider.api_v2_client.get_stages(ApiId=resources[0]["PhysicalResourceId"])["Items"]
+
+    def get_api_v2_endpoint(self, logical_id):
+        api_id = self.get_physical_id_by_logical_id(logical_id)
+        api = self.client_provider.api_v2_client.get_api(ApiId=api_id)
+        return api["ApiEndpoint"]
 
     def get_stack_nested_stack_resources(self):
         resources = self.get_stack_resources("AWS::CloudFormation::Stack")
