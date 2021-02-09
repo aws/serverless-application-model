@@ -28,6 +28,7 @@ S3_BUCKET_PREFIX = "sam-integ-bucket-"
 class BaseTest(TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
         cls.template_dir = Path(cls.resources_dir, "templates", "single")

@@ -38,7 +38,7 @@ class TestBasicFunction(BaseTest):
 
         endpoint = self.get_api_v2_endpoint("MyHttpApi")
 
-        self.assertEqual(requests.get(endpoint).text, "hello")
+        self.assertEqual(requests.get(endpoint).text, self.FUNCTION_OUTPUT)
 
     @parameterized.expand(
         [
