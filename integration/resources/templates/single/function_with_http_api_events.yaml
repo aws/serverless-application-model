@@ -1,22 +1,22 @@
 Resources:
-  HttpApi:
+  MyHttpApi:
     Type: AWS::Serverless::HttpApi
   MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: python3.8
+      Runtime: nodejs12.x
       CodeUri: ${codeuri}
       Events:
         FooEvent:
           Type: HttpApi
           Properties:
             ApiId:
-              Ref: HttpApi
+              Ref: MyHttpApi
         BarEvent:
           Type: HttpApi
           Properties:
             ApiId:
-              Ref: HttpApi
+              Ref: MyHttpApi
             Path: /bar
-            Method: ANY
+            Method: POST

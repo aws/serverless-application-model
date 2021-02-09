@@ -1,3 +1,4 @@
+import requests
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
 
@@ -28,12 +29,16 @@ class TestBasicFunction(BaseTest):
 
     @parameterized.expand(
         [
-            "function_alias_with_http_api_events",
             "function_with_http_api_events",
+            "function_alias_with_http_api_events",
         ]
     )
     def test_function_with_http_api_events(self, file_name):
         self.create_and_verify_stack(file_name)
+
+        endpoint = self.get_api_v2_endpoint("MyHttpApi")
+
+        self.assertEqual(requests.get(endpoint).text, "hello")
 
     @parameterized.expand(
         [

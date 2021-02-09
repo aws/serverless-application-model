@@ -216,6 +216,11 @@ class BaseTest(TestCase):
 
         return self.client_provider.api_v2_client.get_stages(ApiId=resources[0]["PhysicalResourceId"])["Items"]
 
+    def get_api_v2_endpoint(self, logical_id):
+        api_id = self.get_physical_id_by_logical_id(logical_id)
+        api = self.client_provider.api_v2_client.get_api(ApiId=api_id)
+        return api["ApiEndpoint"]
+
     def get_stack_nested_stack_resources(self):
         resources = self.get_stack_resources("AWS::CloudFormation::Stack")
 
