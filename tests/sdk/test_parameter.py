@@ -103,7 +103,7 @@ class TestSAMParameterValues(TestCase):
         sam_parameter_values.add_pseudo_parameter_values()
         self.assertEqual(expected, sam_parameter_values.parameter_values)
 
-    def test_add_pseduo_parameter_values_raises_NoRegionFound(self):
+    def test_add_pseudo_parameter_values_raises_NoRegionFound(self):
         boto_session_mock = Mock()
         boto_session_mock.region_name = None
         sam_parameter_values = SamParameterValues({})
