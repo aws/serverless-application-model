@@ -164,6 +164,22 @@ class TestDeploymentPreferenceCollection(TestCase):
         self.assertEqual(deployment_group.to_dict(), expected_deployment_group.to_dict())
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_intrinsic_if(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Fn::If": ["MyCondition", ["Alarm1", "Alarm2"], ["Alarm3"]]},
+        }
+        expected_alarm_configuration = {
+            "Enabled": True,
+            "Alarms": {"Fn::If": ["MyCondition", [{"Name": "Alarm1"}, {"Name": "Alarm2"}], [{"Name": "Alarm3"}]]},
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertEqual(expected_alarm_configuration, deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_update_policy_with_minimal_parameters(self):
         expected_update_policy = {
             "CodeDeployLambdaAliasUpdate": {

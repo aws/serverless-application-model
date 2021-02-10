@@ -2,7 +2,7 @@ from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.intrinsics import fnSub, is_intrinsic
+from samtranslator.model.intrinsics import fnSub, is_intrinsic, is_intrinsic_if
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 import copy
@@ -128,7 +128,7 @@ class DeploymentPreferenceCollection(object):
         if deployment_preference.alarms is not None:
             deployment_group.AlarmConfiguration = {
                 "Enabled": True,
-                "Alarms": [{"Name": alarm} for alarm in deployment_preference.alarms],
+                "Alarms": self._process_alarms(deployment_preference.alarms),
             }
 
         deployment_group.ApplicationName = self.codedeploy_application.get_runtime_attr("name")
@@ -151,6 +151,19 @@ class DeploymentPreferenceCollection(object):
             deployment_group.TriggerConfigurations = deployment_preference.trigger_configurations
 
         return deployment_group
+
+    def _process_alarms(self, alarms):
+        if is_intrinsic_if(alarms):
+            processed_alarms = copy.deepcopy(alarms)
+            alarms_list = processed_alarms.get("Fn::If")
+            alarms_list[1] = self._transform_alarms_list(alarms_list[1])
+            alarms_list[2] = self._transform_alarms_list(alarms_list[2])
+            return processed_alarms
+
+        return self._transform_alarms_list(alarms)
+
+    def _transform_alarms_list(self, alarms):
+        return [{"Name": alarm} for alarm in alarms]
 
     def _replace_deployment_types(self, value, key=None):
         if isinstance(value, list):
