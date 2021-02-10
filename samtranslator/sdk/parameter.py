@@ -1,6 +1,8 @@
 import boto3
 import copy
 
+from samtranslator.translator.arn_generator import ArnGenerator, NoRegionFound
+
 
 class SamParameterValues(object):
     """
@@ -58,21 +60,20 @@ class SamParameterValues(object):
             if param_name not in self.parameter_values and isinstance(value, dict) and "Default" in value:
                 self.parameter_values[param_name] = value["Default"]
 
-    def add_pseudo_parameter_values(self):
+    def add_pseudo_parameter_values(self, session=None):
         """
         Add pseudo parameter values
         :return: parameter values that have pseudo parameter in it
         """
+
+        if session is None:
+            session = boto3.session.Session()
+
+        if not session.region_name:
+            raise NoRegionFound("AWS Region cannot be found")
+
         if "AWS::Region" not in self.parameter_values:
-            self.parameter_values["AWS::Region"] = boto3.session.Session().region_name
+            self.parameter_values["AWS::Region"] = session.region_name
 
         if "AWS::Partition" not in self.parameter_values:
-            region = boto3.session.Session().region_name
-
-            # neither boto nor botocore has any way of returning the partition value yet
-            if region.startswith("cn-"):
-                self.parameter_values["AWS::Partition"] = "aws-cn"
-            elif region.startswith("us-gov-"):
-                self.parameter_values["AWS::Partition"] = "aws-us-gov"
-            else:
-                self.parameter_values["AWS::Partition"] = "aws"
+            self.parameter_values["AWS::Partition"] = ArnGenerator.get_partition_name(session.region_name)
