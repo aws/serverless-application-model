@@ -1,0 +1,9 @@
+[
+    { "LogicalResourceId":"APIGatewayDeploymentdevStage", "ResourceType":"AWS::ApiGatewayV2::Stage"},
+    { "LogicalResourceId":"APIGatewayDeployment", "ResourceType":"AWS::ApiGatewayV2::Api" },
+    { "LogicalResourceId":"APIGatewayDeploymentMyStateMachineRole", "ResourceType":"AWS::IAM::Role" },
+    { "LogicalResourceId":"MyStateMachineRole", "ResourceType":"AWS::IAM::Role" },
+    { "LogicalResourceId":"MyStateMachine", "ResourceType":"AWS::StepFunctions::StateMachine" },
+    { "LogicalResourceId":"TestFunctionRole", "ResourceType":"AWS::IAM::Role" },
+    { "LogicalResourceId":"TestFunction", "ResourceType":"AWS::Lambda::Function" }
+] 

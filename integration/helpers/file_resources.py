@@ -4,6 +4,7 @@ FILE_TO_S3_URI_MAP = {
     "swagger1.json": {"type": "s3", "uri": ""},
     "swagger2.json": {"type": "s3", "uri": ""},
     "template.yaml": {"type": "http", "uri": ""},
+    "statemachine.json": {"type": "s3", "uri": ""},
 }
 
 CODE_KEY_TO_FILE_MAP = {
@@ -11,4 +12,5 @@ CODE_KEY_TO_FILE_MAP = {
     "contenturi": "layer1.zip",
     "definitionuri": "swagger1.json",
     "templateurl": "template.yaml",
+    "statemachineurl": "statemachine.json",
 }

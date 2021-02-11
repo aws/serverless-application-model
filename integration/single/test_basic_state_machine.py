@@ -25,6 +25,12 @@ class TestBasicLayerVersion(BaseTest):
         self._verify_tag_presence(tags, "TagOne", "ValueOne")
         self._verify_tag_presence(tags, "TagTwo", "ValueTwo")
 
+    def test_basic_state_machine_with_http_api(self):
+        """
+        Creates a State Machine with tags
+        """
+        self.create_and_verify_stack("basic_state_machine_with_http_api")
+
     def _verify_tag_presence(self, tags, key, value):
         """
         Verifies the presence of a tag and its value
