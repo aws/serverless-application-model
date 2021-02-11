@@ -360,6 +360,9 @@
     "AWS::Serverless::Function.EventBridgeRule": {
       "additionalProperties": false,
       "properties": {
+        "EventBusName": {
+          "type": "string"
+        },
         "TargetId": {
           "type": "string"
         },
