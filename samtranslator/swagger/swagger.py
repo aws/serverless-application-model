@@ -212,6 +212,7 @@ class SwaggerEditor(object):
         path,
         method,
         integration_uri,
+        action,  # ignored, added for symmetry with openapi
         credentials,
         request_templates=None,
         condition=None,
