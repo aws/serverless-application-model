@@ -153,6 +153,21 @@ class DeploymentPreferenceCollection(object):
         return deployment_group
 
     def _process_alarms(self, preference, group):
+        """
+        Processes the deployment preferences alarms and updates the deployment group accordingly
+
+        Parameters
+        ----------
+        preference : dict
+            Deployment preferences
+        group : dict
+            Deployment group
+
+        Raises
+        ------
+        ValueError
+            If Alarms is in the wrong format
+        """
         if not preference.alarms or is_intrinsic_no_value(preference.alarms):
             return
 
@@ -169,6 +184,24 @@ class DeploymentPreferenceCollection(object):
         group.AlarmConfiguration = self._build_alarms_configuration(preference.alarms)
 
     def _build_alarms_configuration(self, alarms):
+        """
+        Builds an Alarms configuration from a list of alarms
+
+        Parameters
+        ----------
+        alarms : list[str]
+            Alarms
+
+        Returns
+        -------
+        dict
+            AlarmsConfiguration for a deployment group
+
+        Raises
+        ------
+        ValueError
+            If alarms is not a list
+        """
         if not isinstance(alarms, list):
             raise ValueError("Alarms must be a list")
 
