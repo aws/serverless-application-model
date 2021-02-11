@@ -1,8 +1,9 @@
 from .deployment_preference import DeploymentPreference
 from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
+from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.intrinsics import fnSub, is_intrinsic, is_intrinsic_if
+from samtranslator.model.intrinsics import fnSub, is_intrinsic, is_intrinsic_if, is_intrinsic_no_value
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 import copy
@@ -125,11 +126,10 @@ class DeploymentPreferenceCollection(object):
 
         deployment_group = CodeDeployDeploymentGroup(self.deployment_group_logical_id(function_logical_id))
 
-        if deployment_preference.alarms is not None:
-            deployment_group.AlarmConfiguration = {
-                "Enabled": True,
-                "Alarms": self._process_alarms(deployment_preference.alarms),
-            }
+        try:
+            self._process_alarms(deployment_preference, deployment_group)
+        except ValueError as e:
+            raise InvalidResourceException(function_logical_id, str(e))
 
         deployment_group.ApplicationName = self.codedeploy_application.get_runtime_attr("name")
         deployment_group.AutoRollbackConfiguration = {
@@ -152,18 +152,33 @@ class DeploymentPreferenceCollection(object):
 
         return deployment_group
 
-    def _process_alarms(self, alarms):
-        if is_intrinsic_if(alarms):
-            processed_alarms = copy.deepcopy(alarms)
+    def _process_alarms(self, preference, group):
+        if not preference.alarms or is_intrinsic_no_value(preference.alarms):
+            return
+
+        if is_intrinsic_if(preference.alarms):
+            processed_alarms = copy.deepcopy(preference.alarms)
             alarms_list = processed_alarms.get("Fn::If")
-            alarms_list[1] = self._transform_alarms_list(alarms_list[1])
-            alarms_list[2] = self._transform_alarms_list(alarms_list[2])
-            return processed_alarms
+            if not isinstance(alarms_list, list) or not len(alarms_list) == 3:
+                raise ValueError("Fn::If requires 3 arguments")
+            alarms_list[1] = self._build_alarms_configuration(alarms_list[1])
+            alarms_list[2] = self._build_alarms_configuration(alarms_list[2])
+            group.AlarmConfiguration = processed_alarms
+            return
 
-        return self._transform_alarms_list(alarms)
+        group.AlarmConfiguration = self._build_alarms_configuration(preference.alarms)
 
-    def _transform_alarms_list(self, alarms):
-        return [{"Name": alarm} for alarm in alarms]
+    def _build_alarms_configuration(self, alarms):
+        if not isinstance(alarms, list):
+            raise ValueError("Alarms must be a list")
+
+        if len(alarms) == 0 or is_intrinsic_no_value(alarms[0]):
+            return {}
+
+        return {
+            "Enabled": True,
+            "Alarms": [{"Name": alarm} for alarm in alarms],
+        }
 
     def _replace_deployment_types(self, value, key=None):
         if isinstance(value, list):

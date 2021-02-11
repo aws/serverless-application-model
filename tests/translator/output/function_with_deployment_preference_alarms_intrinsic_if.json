@@ -129,11 +129,11 @@
       "Type": "AWS::CodeDeploy::DeploymentGroup",
       "Properties": {
         "AlarmConfiguration": {
-          "Enabled": true,
-          "Alarms": {
-            "Fn::If": [
-              "MyCondition",
-              [
+          "Fn::If": [
+            "MyCondition",
+            {
+              "Enabled": true,
+              "Alarms": [
                 {
                   "Name": "Alarm1"
                 },
@@ -143,23 +143,20 @@
                 {
                   "Name": "Alarm3"
                 }
-              ],
-              [
+              ]
+            },
+            {
+              "Enabled": true,
+              "Alarms": [
                 {
                   "Name": "Alarm1"
                 },
                 {
-                  "Name": "Alarm4"
-                },
-                {
                   "Name": "Alarm5"
-                },
-                {
-                  "Name": "Alarm6"
                 }
               ]
-            ]
-          }
+            }
+          ]
         },
         "ApplicationName": {
           "Ref": "ServerlessDeploymentApplication"
