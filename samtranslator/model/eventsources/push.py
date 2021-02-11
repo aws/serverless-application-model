@@ -233,6 +233,22 @@ class EventBridgeRule(CloudWatchEvent):
     """EventBridge Rule event source for SAM Functions."""
 
     resource_type = "EventBridgeRule"
+    property_types = {
+        "EventBusName": PropertyType(False, is_str()),
+        "Pattern": PropertyType(False, is_type(dict)),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
+        "Input": PropertyType(False, is_str()),
+        "InputPath": PropertyType(False, is_str()),
+        "Target": PropertyType(False, is_type(dict)),
+        "TargetId": PropertyType(False, is_str()),
+    }
+
+    def _construct_target(self, function, dead_letter_queue_arn=None):
+        target = super()._construct_target(function, dead_letter_queue_arn)
+        if self.TargetId is not None:
+            target["Id"] = self.TargetId
+        return target
 
 
 class S3(PushEventSource):

@@ -20,6 +20,7 @@ Resources:
         OnTerminate:
           Type: EventBridgeRule
           Properties:
+            TargetId: CustomTargetId
             EventBusName: ExternalEventBridge
             Pattern:
               detail:

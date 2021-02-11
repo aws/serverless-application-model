@@ -99,7 +99,7 @@
         "EventBusName": "ExternalEventBridge",
         "Targets": [
           {
-            "Id": "TriggeredFunctionOnTerminateLambdaTarget", 
+            "Id": "CustomTargetId",
             "Arn": {
               "Fn::GetAtt": [
                 "TriggeredFunction", 
