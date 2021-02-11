@@ -1,0 +1,27 @@
+Resources:
+  APIGatewayDeployment:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: 'dev'
+    DefinitionBody:
+        info:
+          title: !Ref AWS::StackName
+          version: "1.0"
+        openapi: 3.0.1
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: s3://bucket/key
+      DefinitionSubstitutions:
+        MyFunction: !GetAtt MyFunction.Arn
+      Events:
+        HttpAPIGateway:
+          Type: HttpApi
+          Properties:
+            Path: /inbound
+            Method: post
+            ApiId: !Ref APIGatewayDeployment
+      Policies: 
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MyFunction
