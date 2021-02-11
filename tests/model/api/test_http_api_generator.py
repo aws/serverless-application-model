@@ -76,6 +76,102 @@ class TestHttpApiGenerator(TestCase):
         with pytest.raises(InvalidResourceException):
             HttpApiGenerator(**self.kwargs)._construct_http_api()
 
+    def test_auth_iam_enabled(self):
+        self.kwargs["auth"] = {
+            "EnableIamAuthorizer": True,
+        }
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
+        self.assertEqual(
+            http_api.Body["components"]["securitySchemes"],
+            {
+                "AWS_IAM": {
+                    "type": "apiKey",
+                    "name": "Authorization",
+                    "in": "header",
+                    "x-amazon-apigateway-authtype": "awsSigv4",
+                }
+            },
+        )
+
+    def test_enabling_auth_iam_does_not_clobber_conflicting_custom_authorizer(self):
+        self.kwargs["auth"] = {
+            "EnableIamAuthorizer": True,
+            "Authorizers": {
+                "AWS_IAM": {
+                    "AuthorizationScopes": ["scope"],
+                    "JwtConfiguration": {"config": "value"},
+                    "IdentitySource": "https://example.com",
+                }
+            },
+        }
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
+        self.assertEqual(
+            http_api.Body["components"]["securitySchemes"],
+            {
+                "AWS_IAM": {
+                    "type": "oauth2",
+                    "x-amazon-apigateway-authorizer": {
+                        "jwtConfiguration": {"config": "value"},
+                        "identitySource": "https://example.com",
+                        "type": "jwt",
+                    },
+                }
+            },
+        )
+
+    def test_auth_iam_enabled_with_default(self):
+        self.kwargs["auth"] = {
+            "DefaultAuthorizer": "AWS_IAM",
+            "EnableIamAuthorizer": True,
+        }
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
+        self.assertEqual(
+            http_api.Body["components"]["securitySchemes"],
+            {
+                "AWS_IAM": {
+                    "type": "apiKey",
+                    "name": "Authorization",
+                    "in": "header",
+                    "x-amazon-apigateway-authtype": "awsSigv4",
+                }
+            },
+        )
+
+    def test_auth_missing_iam_enablement(self):
+        self.kwargs["auth"] = {
+            "DefaultAuthorizer": "AWS_IAM",
+            "EnableIamAuthorizer": False,
+        }
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        with pytest.raises(InvalidResourceException) as e:
+            HttpApiGenerator(**self.kwargs)._construct_http_api()
+        self.assertEqual(
+            e.value.message,
+            "Resource with id [HttpApiId] is invalid. "
+            + "Unable to set DefaultAuthorizer because 'AWS_IAM' was not defined in 'Authorizers'.",
+        )
+
+    def test_auth_iam_disabled(self):
+        self.kwargs["auth"] = {
+            "EnableIamAuthorizer": False,
+        }
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
+        self.assertNotIn("components", http_api.Body)
+
+    def test_auth_iam_not_enabled_with_unsupported_values(self):
+        unsupported_values = [1, "", [], {}, {"Ref": "MyVar"}, "True", None]
+        for val in unsupported_values:
+            self.kwargs["auth"] = {
+                "EnableIamAuthorizer": val,
+            }
+            self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+            http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
+            self.assertNotIn("components", http_api.Body, "EnableIamAuthorizer value: %s" % val)
+
     def test_auth_novalue_default_does_not_raise(self):
         self.kwargs["auth"] = self.authorizers
         self.kwargs["auth"]["DefaultAuthorizer"] = {"Ref": "AWS::NoValue"}

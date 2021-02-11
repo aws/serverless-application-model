@@ -1,0 +1,28 @@
+Globals:
+  HttpApi:
+    Auth:
+      EnableIamAuthorizer: true
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        # The following events use the implicit AWS::Serverless::HttpApi called "ServerlessHttpApi".
+        # The Iam Authorizer of the implicit AWS::Serverless::HttpApi is enabled using the global above.
+        # Should not have any auth enabled because there is no one set as the default on the implicit HttpApi.
+        ImplicitApiDefaultAuthEvent:
+          Type: HttpApi
+          Properties:
+            Path: /default-auth
+            Method: GET
+        # Should have Iam auth as it is set here and enabled globally.
+        ImplicitApiIamAuthEvent:
+          Type: HttpApi
+          Properties:
+            Auth:
+              Authorizer: AWS_IAM
+            Path: /iam-auth
+            Method: GET

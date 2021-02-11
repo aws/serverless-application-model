@@ -1,12 +1,15 @@
 target:
 	$(info ${HELP_MESSAGE})
 	@exit 0
-	
+
 init:
 	pip install -e '.[dev]'
 
 test:
 	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
+
+test-fast:
+	pytest -x --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
 
 test-cov-report:
 	pytest --cov samtranslator --cov-report term-missing --cov-report html --cov-fail-under 95 tests/*

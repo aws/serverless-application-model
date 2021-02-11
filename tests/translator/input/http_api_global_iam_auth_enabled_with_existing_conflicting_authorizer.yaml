@@ -1,0 +1,23 @@
+# This test-case tests what happens when an AWS_IAM authorizer is defined on an HttpApi and also enabled globally.
+# In this case the defined authorizer should NOT be overwritten.
+Globals:
+  HttpApi:
+    Auth:
+      EnableIamAuthorizer: true
+Resources:
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          AWS_IAM:
+            AuthorizationScopes:
+              - scope
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              audience:
+                - audience1
+                - audience2
+              issuer: "https://www.example.com/v1/connect/oidc"
+        DefaultAuthorizer: AWS_IAM
+        # EnableIamAuthorizer: true
