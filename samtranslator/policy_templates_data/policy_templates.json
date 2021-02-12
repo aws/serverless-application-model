@@ -2306,6 +2306,34 @@
           }
         ]
       }
+    },
+    "AcmGetCertificatePolicy": {
+      "Description": "Gives permission to retrieve a certificate and its certificate chain from ACM",
+      "Parameters": {
+        "CertificateArn": {
+          "Description": "The ARN of the certificate to grant access to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "acm:GetCertificate"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "${certificateArn}",
+                {
+                  "certificateArn": {
+                    "Ref": "CertificateArn"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
