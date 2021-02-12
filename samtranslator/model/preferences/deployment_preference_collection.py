@@ -127,7 +127,7 @@ class DeploymentPreferenceCollection(object):
         deployment_group = CodeDeployDeploymentGroup(self.deployment_group_logical_id(function_logical_id))
 
         try:
-            self._process_alarms(deployment_preference, deployment_group)
+            deployment_group.AlarmConfiguration = self._convert_alarms(deployment_preference.alarms)
         except ValueError as e:
             raise InvalidResourceException(function_logical_id, str(e))
 
@@ -152,40 +152,42 @@ class DeploymentPreferenceCollection(object):
 
         return deployment_group
 
-    def _process_alarms(self, preference, group):
+    def _convert_alarms(self, preference_alarms):
         """
-        Processes the deployment preferences alarms and updates the deployment group accordingly
+        Converts deployment preference alarms to an AlarmsConfiguration
 
         Parameters
         ----------
-        preference : dict
-            Deployment preferences
-        group : dict
-            Deployment group
+        preference_alarms : dict
+            Deployment preference alarms
+
+        Returns
+        -------
+        dict
+            AlarmsConfiguration if alarms is set, None otherwise
 
         Raises
         ------
         ValueError
             If Alarms is in the wrong format
         """
-        if not preference.alarms or is_intrinsic_no_value(preference.alarms):
-            return
+        if not preference_alarms or is_intrinsic_no_value(preference_alarms):
+            return None
 
-        if is_intrinsic_if(preference.alarms):
-            processed_alarms = copy.deepcopy(preference.alarms)
+        if is_intrinsic_if(preference_alarms):
+            processed_alarms = copy.deepcopy(preference_alarms)
             alarms_list = processed_alarms.get("Fn::If")
             if not isinstance(alarms_list, list) or not len(alarms_list) == 3:
                 raise ValueError("Fn::If requires 3 arguments")
-            alarms_list[1] = self._build_alarms_configuration(alarms_list[1])
-            alarms_list[2] = self._build_alarms_configuration(alarms_list[2])
-            group.AlarmConfiguration = processed_alarms
-            return
+            alarms_list[1] = self._build_alarm_configuration(alarms_list[1])
+            alarms_list[2] = self._build_alarm_configuration(alarms_list[2])
+            return processed_alarms
 
-        group.AlarmConfiguration = self._build_alarms_configuration(preference.alarms)
+        return self._build_alarm_configuration(preference_alarms)
 
-    def _build_alarms_configuration(self, alarms):
+    def _build_alarm_configuration(self, alarms):
         """
-        Builds an Alarms configuration from a list of alarms
+        Builds an AlarmConfiguration from a list of alarms
 
         Parameters
         ----------
