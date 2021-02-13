@@ -1,11 +1,12 @@
 {
     "Resources": {
-      "APIGatewayDeploymentMyStateMachineRole": {
+      "ServerlessHttpApiMyExpressStateMachineRole": {
         "Type": "AWS::IAM::Role", 
         "Properties": {
+          "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary", 
           "Policies": [
             {
-              "PolicyName": "APIGatewayDeploymentMyStateMachineRoleStartExecutionPolicy", 
+              "PolicyName": "ServerlessHttpApiMyExpressStateMachineRoleStartExecutionPolicy", 
               "PolicyDocument": {
                 "Statement": [
                   {
@@ -14,7 +15,7 @@
                       "states:StartSyncExecution"
                     ], 
                     "Resource": {
-                      "Ref": "MyStateMachine"
+                      "Ref": "MyExpressStateMachine"
                     }, 
                     "Effect": "Allow"
                   }, 
@@ -27,7 +28,7 @@
                           {
                             "__Name__": {
                               "Fn::GetAtt": [
-                                "MyStateMachine", 
+                                "MyExpressStateMachine", 
                                 "Name"
                               ]
                             }
@@ -59,97 +60,7 @@
           }
         }
       }, 
-      "MyStateMachine": {
-        "Type": "AWS::StepFunctions::StateMachine", 
-        "Properties": {
-          "DefinitionSubstitutions": {
-            "MyFunction": {
-              "Fn::GetAtt": [
-                "MyFunction", 
-                "Arn"
-              ]
-            }
-          }, 
-          "RoleArn": {
-            "Fn::GetAtt": [
-              "MyStateMachineRole", 
-              "Arn"
-            ]
-          }, 
-          "DefinitionS3Location": {
-            "Bucket": "bucket", 
-            "Key": "key"
-          }, 
-          "Tags": [
-            {
-              "Value": "SAM", 
-              "Key": "stateMachine:createdBy"
-            }
-          ]
-        }
-      }, 
-      "APIGatewayDeployment": {
-        "Type": "AWS::ApiGatewayV2::Api", 
-        "Properties": {
-          "Body": {
-            "info": {
-              "version": "1.0", 
-              "title": {
-                "Ref": "AWS::StackName"
-              }
-            }, 
-            "paths": {
-              "/inbound": {
-                "post": {
-                  "x-amazon-apigateway-integration": {
-                    "requestParameters": {
-                      "StateMachineArn": {
-                        "Ref": "MyStateMachine"
-                      }
-                    }, 
-                    "integrationSubtype": "StepFunctions-StartExecution", 
-                    "connectionType": "INTERNET", 
-                    "payloadFormatVersion": "1.0", 
-                    "credentials": {
-                      "Fn::GetAtt": [
-                        "APIGatewayDeploymentMyStateMachineRole", 
-                        "Arn"
-                      ]
-                    }, 
-                    "type": "aws_proxy"
-                  }, 
-                  "responses": {
-                    "default": {
-                      "description": "Default response for Method=post Path=/inbound"
-                    }
-                  }
-                }
-              }
-            }, 
-            "openapi": "3.0.1", 
-            "tags": [
-              {
-                "name": "httpapi:createdBy", 
-                "x-amazon-apigateway-tag-value": "SAM"
-              }
-            ]
-          }
-        }
-      }, 
-      "APIGatewayDeploymentdevStage": {
-        "Type": "AWS::ApiGatewayV2::Stage", 
-        "Properties": {
-          "ApiId": {
-            "Ref": "APIGatewayDeployment"
-          }, 
-          "AutoDeploy": true, 
-          "StageName": "dev", 
-          "Tags": {
-            "httpapi:createdBy": "SAM"
-          }
-        }
-      }, 
-      "MyStateMachineRole": {
+      "MyExpressStateMachineRole": {
         "Type": "AWS::IAM::Role", 
         "Properties": {
           "AssumeRolePolicyDocument": {
@@ -169,9 +80,10 @@
             ]
           }, 
           "ManagedPolicyArns": [], 
+          "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary", 
           "Policies": [
             {
-              "PolicyName": "MyStateMachineRolePolicy0", 
+              "PolicyName": "MyExpressStateMachineRolePolicy0", 
               "PolicyDocument": {
                 "Statement": [
                   {
@@ -194,6 +106,340 @@
               }
             }
           ], 
+          "Tags": [
+            {
+              "Value": "SAM", 
+              "Key": "stateMachine:createdBy"
+            }
+          ]
+        }
+      }, 
+      "MyStandardStateMachineRole": {
+        "Type": "AWS::IAM::Role", 
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17", 
+            "Statement": [
+              {
+                "Action": [
+                  "sts:AssumeRole"
+                ], 
+                "Effect": "Allow", 
+                "Principal": {
+                  "Service": [
+                    "states.amazonaws.com"
+                  ]
+                }
+              }
+            ]
+          }, 
+          "ManagedPolicyArns": [], 
+          "Policies": [
+            {
+              "PolicyName": "MyStandardStateMachineRolePolicy0", 
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": [
+                      "lambda:InvokeFunction"
+                    ], 
+                    "Resource": {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*", 
+                        {
+                          "functionName": {
+                            "Ref": "MyFunction"
+                          }
+                        }
+                      ]
+                    }, 
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            }
+          ], 
+          "Tags": [
+            {
+              "Value": "SAM", 
+              "Key": "stateMachine:createdBy"
+            }
+          ]
+        }
+      }, 
+      "ServerlessHttpApi": {
+        "Type": "AWS::ApiGatewayV2::Api", 
+        "Properties": {
+          "Body": {
+            "info": {
+              "version": "1.0", 
+              "title": {
+                "Ref": "AWS::StackName"
+              }
+            }, 
+            "paths": {
+              "/startExpl": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "requestParameters": {
+                      "StateMachineArn": {
+                        "Ref": "MyStandardStateMachine"
+                      }
+                    }, 
+                    "integrationSubtype": "StepFunctions-StartExecution", 
+                    "connectionType": "INTERNET", 
+                    "payloadFormatVersion": "1.0", 
+                    "credentials": {
+                      "Fn::GetAtt": [
+                        "ServerlessHttpApiMyStandardStateMachineRole", 
+                        "Arn"
+                      ]
+                    }, 
+                    "type": "aws_proxy"
+                  }, 
+                  "responses": {
+                    "default": {
+                      "description": "Default response for Method=post Path=/startExpl"
+                    }
+                  }
+                }
+              }, 
+              "/exprstart": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "requestParameters": {
+                      "StateMachineArn": {
+                        "Ref": "MyExpressStateMachine"
+                      }
+                    }, 
+                    "integrationSubtype": "StepFunctions-StartExecution", 
+                    "connectionType": "INTERNET", 
+                    "payloadFormatVersion": "1.0", 
+                    "credentials": {
+                      "Fn::GetAtt": [
+                        "ServerlessHttpApiMyExpressStateMachineRole", 
+                        "Arn"
+                      ]
+                    }, 
+                    "type": "aws_proxy"
+                  }, 
+                  "responses": {
+                    "default": {
+                      "description": "Default response for Method=post Path=/exprstart"
+                    }
+                  }
+                }
+              }, 
+              "/stop": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "requestParameters": {
+                      "ExecutionArn": "$request.body.ExecutionArn"
+                    }, 
+                    "integrationSubtype": "StepFunctions-StopExecution", 
+                    "connectionType": "INTERNET", 
+                    "payloadFormatVersion": "1.0", 
+                    "credentials": {
+                      "Fn::GetAtt": [
+                        "ServerlessHttpApiMyStandardStateMachineRole", 
+                        "Arn"
+                      ]
+                    }, 
+                    "type": "aws_proxy"
+                  }, 
+                  "responses": {
+                    "default": {
+                      "description": "Default response for Method=post Path=/stop"
+                    }
+                  }
+                }
+              }, 
+              "/start": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "requestParameters": {
+                      "StateMachineArn": {
+                        "Ref": "MyStandardStateMachine"
+                      }
+                    }, 
+                    "integrationSubtype": "StepFunctions-StartExecution", 
+                    "connectionType": "INTERNET", 
+                    "payloadFormatVersion": "1.0", 
+                    "credentials": {
+                      "Fn::GetAtt": [
+                        "ServerlessHttpApiMyStandardStateMachineRole", 
+                        "Arn"
+                      ]
+                    }, 
+                    "type": "aws_proxy"
+                  }, 
+                  "responses": {
+                    "default": {
+                      "description": "Default response for Method=post Path=/start"
+                    }
+                  }
+                }
+              }, 
+              "/exprsync": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "requestParameters": {
+                      "StateMachineArn": {
+                        "Ref": "MyExpressStateMachine"
+                      }
+                    }, 
+                    "integrationSubtype": "StepFunctions-StartSyncExecution", 
+                    "connectionType": "INTERNET", 
+                    "payloadFormatVersion": "1.0", 
+                    "credentials": {
+                      "Fn::GetAtt": [
+                        "ServerlessHttpApiMyExpressStateMachineRole", 
+                        "Arn"
+                      ]
+                    }, 
+                    "type": "aws_proxy"
+                  }, 
+                  "responses": {
+                    "default": {
+                      "description": "Default response for Method=post Path=/exprsync"
+                    }
+                  }
+                }
+              }
+            }, 
+            "openapi": "3.0.1", 
+            "tags": [
+              {
+                "name": "httpapi:createdBy", 
+                "x-amazon-apigateway-tag-value": "SAM"
+              }
+            ]
+          }
+        }
+      }, 
+      "ServerlessHttpApiApiGatewayDefaultStage": {
+        "Type": "AWS::ApiGatewayV2::Stage", 
+        "Properties": {
+          "ApiId": {
+            "Ref": "ServerlessHttpApi"
+          }, 
+          "AutoDeploy": true, 
+          "StageName": "$default", 
+          "Tags": {
+            "httpapi:createdBy": "SAM"
+          }
+        }
+      }, 
+      "MyStandardStateMachine": {
+        "Type": "AWS::StepFunctions::StateMachine", 
+        "Properties": {
+          "DefinitionSubstitutions": {
+            "MyFunction": {
+              "Fn::GetAtt": [
+                "MyFunction", 
+                "Arn"
+              ]
+            }
+          }, 
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "MyStandardStateMachineRole", 
+              "Arn"
+            ]
+          }, 
+          "DefinitionS3Location": {
+            "Bucket": "bucket", 
+            "Key": "key"
+          }, 
+          "Tags": [
+            {
+              "Value": "SAM", 
+              "Key": "stateMachine:createdBy"
+            }
+          ]
+        }
+      }, 
+      "ServerlessHttpApiMyStandardStateMachineRole": {
+        "Type": "AWS::IAM::Role", 
+        "Properties": {
+          "Policies": [
+            {
+              "PolicyName": "ServerlessHttpApiMyStandardStateMachineRoleStartExecutionPolicy", 
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": [
+                      "states:StartExecution", 
+                      "states:StartSyncExecution"
+                    ], 
+                    "Resource": {
+                      "Ref": "MyStandardStateMachine"
+                    }, 
+                    "Effect": "Allow"
+                  }, 
+                  {
+                    "Action": "states:StopExecution", 
+                    "Resource": [
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${__Name__}:*", 
+                          {
+                            "__Name__": {
+                              "Fn::GetAtt": [
+                                "MyStandardStateMachine", 
+                                "Name"
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    ], 
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            }
+          ], 
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17", 
+            "Statement": [
+              {
+                "Action": [
+                  "sts:AssumeRole"
+                ], 
+                "Effect": "Allow", 
+                "Principal": {
+                  "Service": [
+                    "apigateway.amazonaws.com"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }, 
+      "MyExpressStateMachine": {
+        "Type": "AWS::StepFunctions::StateMachine", 
+        "Properties": {
+          "DefinitionSubstitutions": {
+            "MyFunction": {
+              "Fn::GetAtt": [
+                "MyFunction", 
+                "Arn"
+              ]
+            }
+          }, 
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "MyExpressStateMachineRole", 
+              "Arn"
+            ]
+          }, 
+          "DefinitionS3Location": {
+            "Bucket": "bucket", 
+            "Key": "key"
+          }, 
+          "StateMachineType": "EXPRESS", 
           "Tags": [
             {
               "Value": "SAM", 

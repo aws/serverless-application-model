@@ -692,6 +692,10 @@ class TestTranslatorEndToEnd(TestCase):
         "error_invalid_method_definition",
         "error_mappings_is_null",
         "error_swagger_security_not_dict",
+        "error_state_machine_with_http_api_express_stop",
+        "error_state_machine_with_http_api_standard_startsync",
+        "error_state_machine_with_http_api_invalid_action",
+        "error_state_machine_with_http_api_duplicate_path",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
