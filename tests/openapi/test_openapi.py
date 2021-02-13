@@ -300,6 +300,7 @@ class TestOpenApiEditor_add_state_machine_integration(TestCase):
         with self.assertRaises(ValueError):
             self.editor.add_state_machine_integration("/bar", "get", "integrationUri", "start", None, "credentials")
 
+
 class TestOpenApiEditor_iter_on_path(TestCase):
     def setUp(self):
 

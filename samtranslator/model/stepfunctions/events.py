@@ -595,6 +595,8 @@ class HttpApi(EventSource):
                 api_auth = api.get("Auth", {})
                 if api_auth.get("DefaultAuthorizer"):
                     self.Auth["Authorizer"] = api_auth.get("DefaultAuthorizer")
-            editor.add_auth_to_integration(api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id)
+            editor.add_auth_to_integration(
+                api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id
+            )
 
         api["DefinitionBody"] = editor.openapi

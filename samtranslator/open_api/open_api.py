@@ -236,13 +236,7 @@ class OpenApiEditor(object):
             return "StepFunctions-StopExecution"
         if action == "startSync":
             return "StepFunctions-StartSyncExecution"
-        raise InvalidDocumentException(
-            [
-                InvalidTemplateException(
-                    "Action should be start, stop or startSync."
-                )
-            ]            
-        )
+        raise InvalidDocumentException([InvalidTemplateException("Action should be start, stop or startSync.")])
 
     def add_state_machine_integration(
         self,
@@ -488,7 +482,7 @@ class OpenApiEditor(object):
                 "'Auth' section requires either "
                 "an explicit 'Authorizer' set or a 'DefaultAuthorizer' "
                 "configured on the HttpApi.",
-            )        
+            )
 
         api_auth = api.get("Auth", {})
         api_authorizers = api_auth and api_auth.get("Authorizers")
