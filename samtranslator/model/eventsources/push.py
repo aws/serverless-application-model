@@ -1130,7 +1130,12 @@ class HttpApi(PushEventSource):
 
         editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)
         if self.Auth:
-            self._add_auth_to_openapi_integration(api, editor)
+            method_authorizer = self.Auth.get("Authorizer")
+            if not method_authorizer:
+                api_auth = api.get("Auth", {})
+                if api_auth.get("DefaultAuthorizer"):
+                    self.Auth["Authorizer"] = api_auth.get("DefaultAuthorizer")
+            editor.add_auth_to_integration(api, self.Path, self.Method, self.Auth, self.relative_id)
         if self.TimeoutInMillis:
             editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
         path_parameters = re.findall("{(.*?)}", self.Path)
@@ -1144,59 +1149,3 @@ class HttpApi(PushEventSource):
                 api=api, path=self.Path, method_name=self.Method, payload_format_version=self.PayloadFormatVersion
             )
         api["DefinitionBody"] = editor.openapi
-
-    def _add_auth_to_openapi_integration(self, api, editor):
-        """Adds authorization to the lambda integration
-        :param api: api object
-        :param editor: OpenApiEditor object that contains the OpenApi definition
-        """
-        method_authorizer = self.Auth.get("Authorizer")
-        api_auth = api.get("Auth", {})
-        if not method_authorizer:
-            if api_auth.get("DefaultAuthorizer"):
-                self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")
-            else:
-                # currently, we require either a default auth or auth in the method
-                raise InvalidEventException(
-                    self.relative_id,
-                    "'Auth' section requires either "
-                    "an explicit 'Authorizer' set or a 'DefaultAuthorizer' "
-                    "configured on the HttpApi.",
-                )
-
-        # Default auth should already be applied, so apply any other auth here or scope override to default
-        api_authorizers = api_auth and api_auth.get("Authorizers")
-
-        if method_authorizer != "NONE" and not api_authorizers:
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                "because the related API does not define any Authorizers.".format(
-                    authorizer=method_authorizer, method=self.Method, path=self.Path
-                ),
-            )
-
-        if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                "because it wasn't defined in the API's Authorizers.".format(
-                    authorizer=method_authorizer, method=self.Method, path=self.Path
-                ),
-            )
-
-        if method_authorizer == "NONE" and not api_auth.get("DefaultAuthorizer"):
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
-                "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                    method=self.Method, path=self.Path
-                ),
-            )
-        if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer on API method [{method}] for path [{path}] because "
-                "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
-            )
-        editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)

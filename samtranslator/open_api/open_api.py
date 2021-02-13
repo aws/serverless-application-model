@@ -5,7 +5,7 @@ from six import string_types
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.intrinsics import is_intrinsic
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidEventException
 import json
 
 
@@ -236,7 +236,13 @@ class OpenApiEditor(object):
             return "StepFunctions-StopExecution"
         if action == "startSync":
             return "StepFunctions-StartSyncExecution"
-        raise ValueError("Action should be start, stop or startSync")
+        raise InvalidDocumentException(
+            [
+                InvalidTemplateException(
+                    "Action should be start, stop or startSync."
+                )
+            ]            
+        )
 
     def add_state_machine_integration(
         self,
@@ -245,7 +251,7 @@ class OpenApiEditor(object):
         integration_uri,
         action,
         parameters,
-        #responseParameters
+        # responseParameters
         credentials,
         request_templates=None,  # this param is ignored (only used in Swagger)
         condition=None,
@@ -289,14 +295,14 @@ class OpenApiEditor(object):
         request_parameters = parameters
         if request_parameters is None:
             request_parameters = {}
-        
+
         request_parameters[param] = integration_uri
 
         path_dict[method][self._X_APIGW_INTEGRATION] = {
             "type": "aws_proxy",
-            #responseParameters:
+            # responseParameters:
             #    200:
-            #    - overwrite:header.test_test: "$response.header.test_test"            
+            #    - overwrite:header.test_test: "$response.header.test_test"
             "requestParameters": request_parameters,
             "payloadFormatVersion": "1.0",
             "credentials": credentials,
@@ -468,6 +474,60 @@ class OpenApiEditor(object):
         authorizers = api_auth and api_auth.get("Authorizers")
         if method_authorizer:
             self._set_method_authorizer(path, method_name, method_authorizer, authorizers, authorization_scopes)
+
+    def add_auth_to_integration(self, api, path, method, auth, relative_id):
+        """Adds authorization to the lambda integration
+        :param api: api object
+        :param editor: OpenApiEditor object that contains the OpenApi definition
+        """
+        method_authorizer = auth.get("Authorizer")
+        if method_authorizer is None:
+            # currently, we require either a default auth or auth in the method
+            raise InvalidEventException(
+                relative_id,
+                "'Auth' section requires either "
+                "an explicit 'Authorizer' set or a 'DefaultAuthorizer' "
+                "configured on the HttpApi.",
+            )        
+
+        api_auth = api.get("Auth", {})
+        api_authorizers = api_auth and api_auth.get("Authorizers")
+
+        if method_authorizer != "AWS_IAM":
+            if method_authorizer != "NONE" and not api_authorizers:
+                raise InvalidEventException(
+                    relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because the related API does not define any Authorizers.".format(
+                        authorizer=method_authorizer, method=method, path=path
+                    ),
+                )
+
+            if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
+                raise InvalidEventException(
+                    relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because it wasn't defined in the API's Authorizers.".format(
+                        authorizer=method_authorizer, method=method, path=path
+                    ),
+                )
+
+            if method_authorizer == "NONE" and not api_auth.get("DefaultAuthorizer"):
+                raise InvalidEventException(
+                    relative_id,
+                    "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
+                    "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
+                        method=method, path=path
+                    ),
+                )
+
+        if auth.get("AuthorizationScopes") and not isinstance(auth.get("AuthorizationScopes"), list):
+            raise InvalidEventException(
+                relative_id,
+                "Unable to set Authorizer on API method [{method}] for path [{path}] because "
+                "'AuthorizationScopes' must be a list of strings.".format(method=method, path=path),
+            )
+        self.add_auth_to_method(api=api, path=path, method_name=method, auth=auth)
 
     def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers, authorization_scopes=[]):
         """

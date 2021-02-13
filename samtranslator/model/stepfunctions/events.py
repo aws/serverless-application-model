@@ -90,15 +90,14 @@ class EventSource(ResourceMacro):
         state_machine_arn = resource.get_runtime_attr("arn")
         state_machine_name = resource.get_runtime_attr("name")
         event_role.Policies = [
-            IAMRolePolicies.step_functions_execution_role_policy(
-                state_machine_arn, state_machine_name, role_logical_id
-            )
+            IAMRolePolicies.step_functions_execution_role_policy(state_machine_arn, state_machine_name, role_logical_id)
         ]
 
         if permissions_boundary:
             event_role.PermissionsBoundary = permissions_boundary
 
         return event_role
+
 
 class Schedule(EventSource):
     """Scheduled executions for SAM State Machine."""
@@ -487,8 +486,8 @@ class HttpApi(EventSource):
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
         "Action": PropertyType(False, is_str()),
-        "Parameters": PropertyType(False, is_type(dict)), # Name, Cause, Error, TraceHeader, Input
-        #"Responses": PropertyType(False, is_type(dict)), # 200: target method source
+        "Parameters": PropertyType(False, is_type(dict)),  # Name, Cause, Error, TraceHeader, Input
+        # "Responses": PropertyType(False, is_type(dict)), # 200: target method source
     }
 
     def resources_to_link(self, resources):
@@ -566,7 +565,9 @@ class HttpApi(EventSource):
                 'Action "stop" cannot be used on StateMachines of type EXPRESS',
             )
 
-        if resource.StateMachineType == "STANDARD" and self.Action == "startSync":
+        if (
+            resource.StateMachineType is None or resource.StateMachineType == "STANDARD"
+        ) and self.Action == "startSync":
             raise InvalidEventException(
                 self.relative_id,
                 'Action "startSync" cannot be used on StateMachines of type STANDARD',
@@ -590,69 +591,10 @@ class HttpApi(EventSource):
         # Note: Refactor and combine the section below with the Api eventsource for functions
         if self.Auth:
             method_authorizer = self.Auth.get("Authorizer")
-            api_auth = api.get("Auth")
-            api_auth = intrinsics_resolver.resolve_parameter_refs(api_auth)
-
-            if method_authorizer:
-                api_authorizers = api_auth and api_auth.get("Authorizers")
-
-                if method_authorizer != "AWS_IAM":
-                    if method_authorizer != "NONE" and not api_authorizers:
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because the related API does not define any Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path
-                            ),
-                        )
-
-                    if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because it wasn't defined in the API's Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path
-                            ),
-                        )
-
-                    if method_authorizer == "NONE":
-                        if not api_auth or not api_auth.get("DefaultAuthorizer"):
-                            raise InvalidEventException(
-                                self.relative_id,
-                                "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
-                                "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                                    method=self.Method, path=self.Path
-                                ),
-                            )
-
-            if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
-                raise InvalidEventException(
-                    self.relative_id,
-                    "Unable to set Authorizer on API method [{method}] for path [{path}] because "
-                    "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
-                )
-
-            # this ApiKey is only for RestApi not for HttpApi
-            apikey_required_setting = self.Auth.get("ApiKeyRequired")
-            apikey_required_setting_is_false = apikey_required_setting is not None and not apikey_required_setting
-            if apikey_required_setting_is_false and (not api_auth or not api_auth.get("ApiKeyRequired")):
-                raise InvalidEventException(
-                    self.relative_id,
-                    "Unable to set ApiKeyRequired [False] on API method [{method}] for path [{path}] "
-                    "because the related API does not specify any ApiKeyRequired.".format(
-                        method=self.Method, path=self.Path
-                    ),
-                )
-
-            if method_authorizer or apikey_required_setting is not None:
-                editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
-
-            if self.Auth.get("ResourcePolicy"):
-                resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(
-                    resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
-                )
-                if resource_policy.get("CustomStatements"):
-                    editor.add_custom_statements(resource_policy.get("CustomStatements"))
+            if not method_authorizer:
+                api_auth = api.get("Auth", {})
+                if api_auth.get("DefaultAuthorizer"):
+                    self.Auth["Authorizer"] = api_auth.get("DefaultAuthorizer")
+            editor.add_auth_to_integration(api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id)
 
         api["DefinitionBody"] = editor.openapi
