@@ -487,6 +487,8 @@ class HttpApi(EventSource):
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
         "Action": PropertyType(False, is_str()),
+        "Parameters": PropertyType(False, is_type(dict)), # Name, Cause, Error, TraceHeader, Input
+        #"Responses": PropertyType(False, is_type(dict)), # 200: target method source
     }
 
     def resources_to_link(self, resources):
@@ -559,10 +561,15 @@ class HttpApi(EventSource):
             )
 
         if resource.StateMachineType == "EXPRESS" and self.Action == "stop":
-            # Cannot add the integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
                 'Action "stop" cannot be used on StateMachines of type EXPRESS',
+            )
+
+        if resource.StateMachineType == "STANDARD" and self.Action == "startSync":
+            raise InvalidEventException(
+                self.relative_id,
+                'Action "startSync" cannot be used on StateMachines of type STANDARD',
             )
 
         condition = None
@@ -574,6 +581,7 @@ class HttpApi(EventSource):
             self.Method,
             resource_arn,  # was integration_uri
             self.Action,
+            self.Parameters,
             role.get_runtime_attr("arn"),
             request_templates=None,
             condition=condition,

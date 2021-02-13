@@ -244,6 +244,8 @@ class OpenApiEditor(object):
         method,
         integration_uri,
         action,
+        parameters,
+        #responseParameters
         credentials,
         request_templates=None,  # this param is ignored (only used in Swagger)
         condition=None,
@@ -284,14 +286,18 @@ class OpenApiEditor(object):
             param = "ExecutionArn"
             integration_uri = "$request.body.ExecutionArn"
 
+        request_parameters = parameters
+        if request_parameters is None:
+            request_parameters = {}
+        
+        request_parameters[param] = integration_uri
+
         path_dict[method][self._X_APIGW_INTEGRATION] = {
             "type": "aws_proxy",
-            "requestParameters": {
-                param: integration_uri,
-                # Region
-                # Name
-                # Input
-            },
+            #responseParameters:
+            #    200:
+            #    - overwrite:header.test_test: "$response.header.test_test"            
+            "requestParameters": request_parameters,
             "payloadFormatVersion": "1.0",
             "credentials": credentials,
             "integrationSubtype": integration_subtype,
