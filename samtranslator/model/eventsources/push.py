@@ -1129,8 +1129,10 @@ class HttpApi(PushEventSource):
             condition = function.resource_attributes[CONDITION]
 
         editor.add_lambda_integration(self.Path, self.Method, uri, self.Auth, api.get("Auth"), condition=condition)
-        if self.Auth: # ?? is this a BUG in case there is a defaultAthorizer the intergration needs to be added right?
-            editor.add_auth_to_integration(api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id)
+        if self.Auth:  # ?? is this a BUG in case there is a defaultAthorizer the intergration needs to be added right?
+            editor.add_auth_to_integration(
+                api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id
+            )
         if self.TimeoutInMillis:
             editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
         path_parameters = re.findall("{(.*?)}", self.Path)

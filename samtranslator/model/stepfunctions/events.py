@@ -532,7 +532,9 @@ class HttpApi(EventSource):
         role = self._construct_full_role(resource, permissions_boundary, kwargs["api_id"] + resource.logical_id)
         resources.append(role)
 
-        self._add_swagger_integration(explicit_api, resource, role, intrinsics_resolver, explicit_api.get("__MANAGE_SWAGGER"))
+        self._add_swagger_integration(
+            explicit_api, resource, role, intrinsics_resolver, explicit_api.get("__MANAGE_SWAGGER")
+        )
 
         return resources
 
