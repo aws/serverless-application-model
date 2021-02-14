@@ -314,6 +314,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
                 "state_machine_with_http_api",
+                "state_machine_with_http_api_authorizer_maximum",
             ],
             [
                 ("aws", "ap-southeast-1"),
