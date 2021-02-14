@@ -1,16 +1,58 @@
 {
     "Resources": {
+      "StateMachine": {
+        "Type": "AWS::StepFunctions::StateMachine",
+        "Properties": {
+          "DefinitionString": {
+            "Fn::Join": [
+              "\n",
+              [
+                "{",
+                "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",",
+                "    \"StartAt\": \"Hello\",",
+                "    \"States\": {",
+                "        \"Hello\": {",
+                "            \"Next\": \"World\",",
+                "            \"Result\": \"Hello\",",
+                "            \"Type\": \"Pass\"",
+                "        },",
+                "        \"World\": {",
+                "            \"End\": true,",
+                "            \"Result\": \"World\",",
+                "            \"Type\": \"Pass\"",
+                "        }",
+                "    }",
+                "}"
+              ]
+            ]
+          },
+          "RoleArn": {
+            "Fn::GetAtt": [
+              "StateMachineRole",
+              "Arn"
+            ]
+          },
+          "StateMachineName": "MyStateMachine",
+          "StateMachineType": "STANDARD",
+          "Tags": [
+            {
+              "Key": "stateMachine:createdBy",
+              "Value": "SAM"
+            }
+          ]
+        }
+      },
       "StateMachineRole": {
-        "Type": "AWS::IAM::Role", 
+        "Type": "AWS::IAM::Role",
         "Properties": {
           "AssumeRolePolicyDocument": {
-            "Version": "2012-10-17", 
+            "Version": "2012-10-17",
             "Statement": [
               {
                 "Action": [
                   "sts:AssumeRole"
-                ], 
-                "Effect": "Allow", 
+                ],
+                "Effect": "Allow",
                 "Principal": {
                   "Service": [
                     "states.amazonaws.com"
@@ -18,93 +60,42 @@
                 }
               }
             ]
-          }, 
-          "ManagedPolicyArns": [], 
+          },
+          "ManagedPolicyArns": [],
           "Policies": [
             {
-              "PolicyName": "StateMachineRolePolicy0", 
+              "PolicyName": "StateMachineRolePolicy0",
               "PolicyDocument": {
-                "Version": "2012-10-17", 
+                "Version": "2012-10-17",
                 "Statement": [
                   {
-                    "Action": "*", 
-                    "Resource": "*", 
-                    "Effect": "Deny"
+                    "Effect": "Deny",
+                    "Action": "*",
+                    "Resource": "*"
                   }
                 ]
               }
             }
-          ], 
+          ],
           "Tags": [
             {
-              "Value": "SAM", 
-              "Key": "stateMachine:createdBy"
+              "Key": "stateMachine:createdBy",
+              "Value": "SAM"
             }
           ]
         }
-      }, 
-      "MyApiProdStage": {
-        "Type": "AWS::ApiGatewayV2::Stage", 
-        "Properties": {
-          "ApiId": {
-            "Ref": "MyApi"
-          }, 
-          "AutoDeploy": true, 
-          "StageName": "Prod", 
-          "Tags": {
-            "httpapi:createdBy": "SAM"
-          }
-        }
-      }, 
+      },
       "MyApiStateMachineRole": {
-        "Type": "AWS::IAM::Role", 
+        "Type": "AWS::IAM::Role",
         "Properties": {
-          "Policies": [
-            {
-              "PolicyName": "MyApiStateMachineRoleStartExecutionPolicy", 
-              "PolicyDocument": {
-                "Statement": [
-                  {
-                    "Action": [
-                      "states:StartExecution", 
-                      "states:StartSyncExecution"
-                    ], 
-                    "Resource": {
-                      "Ref": "StateMachine"
-                    }, 
-                    "Effect": "Allow"
-                  }, 
-                  {
-                    "Action": "states:StopExecution", 
-                    "Resource": [
-                      {
-                        "Fn::Sub": [
-                          "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${__Name__}:*", 
-                          {
-                            "__Name__": {
-                              "Fn::GetAtt": [
-                                "StateMachine", 
-                                "Name"
-                              ]
-                            }
-                          }
-                        ]
-                      }
-                    ], 
-                    "Effect": "Allow"
-                  }
-                ]
-              }
-            }
-          ], 
           "AssumeRolePolicyDocument": {
-            "Version": "2012-10-17", 
+            "Version": "2012-10-17",
             "Statement": [
               {
                 "Action": [
                   "sts:AssumeRole"
-                ], 
-                "Effect": "Allow", 
+                ],
+                "Effect": "Allow",
                 "Principal": {
                   "Service": [
                     "apigateway.amazonaws.com"
@@ -112,232 +103,241 @@
                 }
               }
             ]
-          }
-        }
-      }, 
-      "StateMachine": {
-        "Type": "AWS::StepFunctions::StateMachine", 
-        "Properties": {
-          "RoleArn": {
-            "Fn::GetAtt": [
-              "StateMachineRole", 
-              "Arn"
-            ]
-          }, 
-          "StateMachineName": "MyStateMachine", 
-          "DefinitionString": {
-            "Fn::Join": [
-              "\n", 
-              [
-                "{", 
-                "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",", 
-                "    \"StartAt\": \"Hello\",", 
-                "    \"States\": {", 
-                "        \"Hello\": {", 
-                "            \"Next\": \"World\",", 
-                "            \"Result\": \"Hello\",", 
-                "            \"Type\": \"Pass\"", 
-                "        },", 
-                "        \"World\": {", 
-                "            \"End\": true,", 
-                "            \"Result\": \"World\",", 
-                "            \"Type\": \"Pass\"", 
-                "        }", 
-                "    }", 
-                "}"
-              ]
-            ]
-          }, 
-          "StateMachineType": "STANDARD", 
-          "Tags": [
+          },
+          "Policies": [
             {
-              "Value": "SAM", 
-              "Key": "stateMachine:createdBy"
+              "PolicyName": "MyApiStateMachineRoleStartExecutionPolicy",
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": [
+                      "states:StartExecution",
+                      "states:StartSyncExecution"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": {
+                      "Ref": "StateMachine"
+                    }
+                  },
+                  {
+                    "Action": "states:StopExecution",
+                    "Effect": "Allow",
+                    "Resource": [
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${__Name__}:*",
+                          {
+                            "__Name__": {
+                              "Fn::GetAtt": [
+                                "StateMachine",
+                                "Name"
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
             }
           ]
         }
-      }, 
+      },
       "MyApi": {
-        "Type": "AWS::ApiGatewayV2::Api", 
+        "Type": "AWS::ApiGatewayV2::Api",
         "Properties": {
           "Body": {
+            "openapi": "3.0.1",
             "info": {
-              "version": "1.0", 
+              "version": "1.0",
               "title": {
                 "Ref": "AWS::StackName"
               }
-            }, 
+            },
             "paths": {
               "/": {
                 "get": {
                   "x-amazon-apigateway-integration": {
+                    "type": "aws_proxy",
                     "requestParameters": {
                       "StateMachineArn": {
                         "Ref": "StateMachine"
                       }
-                    }, 
-                    "integrationSubtype": "StepFunctions-StartExecution", 
-                    "connectionType": "INTERNET", 
-                    "payloadFormatVersion": "1.0", 
+                    },
+                    "payloadFormatVersion": "1.0",
                     "credentials": {
                       "Fn::GetAtt": [
-                        "MyApiStateMachineRole", 
+                        "MyApiStateMachineRole",
                         "Arn"
                       ]
-                    }, 
-                    "type": "aws_proxy"
-                  }, 
-                  "security": [
-                    {
-                      "NONE": []
-                    }
-                  ], 
+                    },
+                    "integrationSubtype": "StepFunctions-StartExecution",
+                    "connectionType": "INTERNET"
+                  },
                   "responses": {
                     "default": {
                       "description": "Default response for Method=get Path=/"
                     }
-                  }
-                }
-              }, 
-              "/users": {
-                "put": {
-                  "x-amazon-apigateway-integration": {
-                    "requestParameters": {
-                      "StateMachineArn": {
-                        "Ref": "StateMachine"
-                      }
-                    }, 
-                    "integrationSubtype": "StepFunctions-StartExecution", 
-                    "connectionType": "INTERNET", 
-                    "payloadFormatVersion": "1.0", 
-                    "credentials": {
-                      "Fn::GetAtt": [
-                        "MyApiStateMachineRole", 
-                        "Arn"
-                      ]
-                    }, 
-                    "type": "aws_proxy"
-                  }, 
+                  },
                   "security": [
                     {
-                      "LambdaAuth": []
+                      "NONE": []
                     }
-                  ], 
-                  "responses": {
-                    "default": {
-                      "description": "Default response for Method=put Path=/users"
-                    }
-                  }
-                }, 
+                  ]
+                }
+              },
+              "/users": {
                 "post": {
                   "x-amazon-apigateway-integration": {
+                    "type": "aws_proxy",
                     "requestParameters": {
                       "StateMachineArn": {
                         "Ref": "StateMachine"
                       }
-                    }, 
-                    "integrationSubtype": "StepFunctions-StartExecution", 
-                    "connectionType": "INTERNET", 
-                    "payloadFormatVersion": "1.0", 
+                    },
+                    "payloadFormatVersion": "1.0",
                     "credentials": {
                       "Fn::GetAtt": [
-                        "MyApiStateMachineRole", 
+                        "MyApiStateMachineRole",
                         "Arn"
                       ]
-                    }, 
-                    "type": "aws_proxy"
-                  }, 
-                  "security": [
-                    {
-                      "LambdaAuth": []
-                    }
-                  ], 
+                    },
+                    "integrationSubtype": "StepFunctions-StartExecution",
+                    "connectionType": "INTERNET"
+                  },
                   "responses": {
                     "default": {
                       "description": "Default response for Method=post Path=/users"
                     }
-                  }
-                }, 
+                  },
+                  "security": [
+                    {
+                      "LambdaAuth": []
+                    }
+                  ]
+                },
                 "get": {
                   "x-amazon-apigateway-integration": {
+                    "type": "aws_proxy",
                     "requestParameters": {
                       "StateMachineArn": {
                         "Ref": "StateMachine"
                       }
-                    }, 
-                    "integrationSubtype": "StepFunctions-StartExecution", 
-                    "connectionType": "INTERNET", 
-                    "payloadFormatVersion": "1.0", 
+                    },
+                    "payloadFormatVersion": "1.0",
                     "credentials": {
                       "Fn::GetAtt": [
-                        "MyApiStateMachineRole", 
+                        "MyApiStateMachineRole",
                         "Arn"
                       ]
-                    }, 
-                    "type": "aws_proxy"
-                  }, 
+                    },
+                    "integrationSubtype": "StepFunctions-StartExecution",
+                    "connectionType": "INTERNET"
+                  },
+                  "responses": {
+                    "default": {
+                      "description": "Default response for Method=get Path=/users"
+                    }
+                  },
                   "security": [
                     {
                       "OAuthAuth": [
                         "scope4"
                       ]
                     }
-                  ], 
+                  ]
+                },
+                "put": {
+                  "x-amazon-apigateway-integration": {
+                    "type": "aws_proxy",
+                    "requestParameters": {
+                      "StateMachineArn": {
+                        "Ref": "StateMachine"
+                      }
+                    },
+                    "payloadFormatVersion": "1.0",
+                    "credentials": {
+                      "Fn::GetAtt": [
+                        "MyApiStateMachineRole",
+                        "Arn"
+                      ]
+                    },
+                    "integrationSubtype": "StepFunctions-StartExecution",
+                    "connectionType": "INTERNET"
+                  },
                   "responses": {
                     "default": {
-                      "description": "Default response for Method=get Path=/users"
+                      "description": "Default response for Method=put Path=/users"
                     }
-                  }
+                  },
+                  "security": [
+                    {
+                      "LambdaAuth": []
+                    }
+                  ]
                 }
               }
-            }, 
-            "openapi": "3.0.1", 
+            },
             "components": {
               "securitySchemes": {
-                "OAuthAuth": {
-                  "type": "oauth2", 
-                  "x-amazon-apigateway-authorizer": {
-                    "identitySource": "$request.querystring.param", 
-                    "type": "jwt", 
-                    "jwtConfiguration": {
-                      "audience": [
-                        "MyApi"
-                      ], 
-                      "issuer": "https://www.example.com/v1/connect/oidc"
-                    }
-                  }
-                }, 
                 "LambdaAuth": {
-                  "type": "apiKey", 
-                  "name": "Unused", 
+                  "type": "apiKey",
+                  "name": "Unused",
+                  "in": "header",
                   "x-amazon-apigateway-authorizer": {
-                    "type": "request", 
+                    "type": "request",
                     "authorizerUri": {
                       "Fn::Sub": [
-                        "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                        "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                         {
                           "__FunctionArn__": {
                             "Fn::GetAtt": [
-                              "MyAuthFn", 
+                              "MyAuthFn",
                               "Arn"
                             ]
                           }
                         }
                       ]
-                    }, 
+                    },
                     "authorizerPayloadFormatVersion": 1.0
-                  }, 
-                  "in": "header"
+                  }
+                },
+                "OAuthAuth": {
+                  "type": "oauth2",
+                  "x-amazon-apigateway-authorizer": {
+                    "jwtConfiguration": {
+                      "issuer": "https://www.example.com/v1/connect/oidc",
+                      "audience": [
+                        "MyApi"
+                      ]
+                    },
+                    "identitySource": "$request.querystring.param",
+                    "type": "jwt"
+                  }
                 }
               }
-            }, 
+            },
             "tags": [
               {
-                "name": "httpapi:createdBy", 
+                "name": "httpapi:createdBy",
                 "x-amazon-apigateway-tag-value": "SAM"
               }
             ]
           }
+        }
+      },
+      "MyApiProdStage": {
+        "Type": "AWS::ApiGatewayV2::Stage",
+        "Properties": {
+          "ApiId": {
+            "Ref": "MyApi"
+          },
+          "StageName": "Prod",
+          "Tags": {
+            "httpapi:createdBy": "SAM"
+          },
+          "AutoDeploy": true
         }
       }
     }

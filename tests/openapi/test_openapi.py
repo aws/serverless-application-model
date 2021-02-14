@@ -282,25 +282,6 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
         self.assertEqual(expected, actual)
 
 
-class TestOpenApiEditor_add_state_machine_integration(TestCase):
-    def setUp(self):
-
-        self.original_openapi = {
-            "openapi": "3.0.1",
-            "paths": {
-                "/foo": {"post": {"a": [1, 2, "b"], "responses": {"something": "is already here"}}},
-                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
-            },
-        }
-
-        self.editor = OpenApiEditor(self.original_openapi)
-
-    def test_must_raise_on_existing_integration(self):
-
-        with self.assertRaises(ValueError):
-            self.editor.add_state_machine_integration("/bar", "get", "integrationUri", "start", None, "credentials")
-
-
 class TestOpenApiEditor_iter_on_path(TestCase):
     def setUp(self):
 

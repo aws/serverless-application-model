@@ -263,7 +263,8 @@ class OpenApiEditor(object):
 
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
-            raise ValueError("Integration already exists on Path={}, Method={}".format(path, method))
+            # Not throwing an error- we will add lambda integrations to existing swagger if not present
+            return
 
         integration_subtype = self._get_integration_subtype(action)
 
@@ -463,7 +464,7 @@ class OpenApiEditor(object):
         :param dict api: Reference to the related Api's properties as defined in the template.
         """
         method_authorizer = auth and auth.get("Authorizer")
-        authorization_scopes = auth.get("AuthorizationScopes", [])
+        authorization_scopes = auth and auth.get("AuthorizationScopes", [])
         api_auth = api and api.get("Auth")
         authorizers = api_auth and api_auth.get("Authorizers")
         if method_authorizer:
@@ -474,8 +475,14 @@ class OpenApiEditor(object):
         :param api: api object
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
-        method_authorizer = auth.get("Authorizer")
+        api_auth = api.get("Auth", {})
+
+        method_authorizer = auth and auth.get("Authorizer")
         if method_authorizer is None:
+            if api_auth.get("DefaultAuthorizer"):
+                method_authorizer = api_auth.get("DefaultAuthorizer")
+
+        if auth and method_authorizer is None:
             # currently, we require either a default auth or auth in the method
             raise InvalidEventException(
                 relative_id,
@@ -484,7 +491,9 @@ class OpenApiEditor(object):
                 "configured on the HttpApi.",
             )
 
-        api_auth = api.get("Auth", {})
+        if method_authorizer is None:
+            return
+
         api_authorizers = api_auth and api_auth.get("Authorizers")
 
         if method_authorizer != "AWS_IAM":
@@ -515,13 +524,16 @@ class OpenApiEditor(object):
                     ),
                 )
 
-        if auth.get("AuthorizationScopes") and not isinstance(auth.get("AuthorizationScopes"), list):
+        if auth and auth.get("AuthorizationScopes") and not isinstance(auth.get("AuthorizationScopes"), list):
             raise InvalidEventException(
                 relative_id,
                 "Unable to set Authorizer on API method [{method}] for path [{path}] because "
                 "'AuthorizationScopes' must be a list of strings.".format(method=method, path=path),
             )
-        self.add_auth_to_method(api=api, path=path, method_name=method, auth=auth)
+
+        authorization_scopes = auth and auth.get("AuthorizationScopes", [])
+        if method_authorizer:
+            self._set_method_authorizer(path, method, method_authorizer, api_authorizers, authorization_scopes)
 
     def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers, authorization_scopes=[]):
         """

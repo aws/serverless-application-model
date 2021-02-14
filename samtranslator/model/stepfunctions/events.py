@@ -532,12 +532,11 @@ class HttpApi(EventSource):
         role = self._construct_full_role(resource, permissions_boundary, kwargs["api_id"] + resource.logical_id)
         resources.append(role)
 
-        if explicit_api.get("__MANAGE_SWAGGER"):
-            self._add_swagger_integration(explicit_api, resource, role, intrinsics_resolver)
+        self._add_swagger_integration(explicit_api, resource, role, intrinsics_resolver, explicit_api.get("__MANAGE_SWAGGER"))
 
         return resources
 
-    def _add_swagger_integration(self, api, resource, role, intrinsics_resolver):
+    def _add_swagger_integration(self, api, resource, role, intrinsics_resolver, manage_swagger=False):
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
 
         :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
@@ -550,7 +549,7 @@ class HttpApi(EventSource):
 
         editor = OpenApiEditor(swagger_body)
 
-        if editor.has_integration(self.Path, self.Method):
+        if manage_swagger and editor.has_integration(self.Path, self.Method):
             # Cannot add the integration, if it is already present
             raise InvalidEventException(
                 self.relative_id,
@@ -588,15 +587,8 @@ class HttpApi(EventSource):
             condition=condition,
         )
 
-        # Note: Refactor and combine the section below with the Api eventsource for functions
-        if self.Auth:
-            method_authorizer = self.Auth.get("Authorizer")
-            if not method_authorizer:
-                api_auth = api.get("Auth", {})
-                if api_auth.get("DefaultAuthorizer"):
-                    self.Auth["Authorizer"] = api_auth.get("DefaultAuthorizer")
-            editor.add_auth_to_integration(
-                api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id
-            )
+        editor.add_auth_to_integration(
+            api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id
+        )
 
         api["DefinitionBody"] = editor.openapi
