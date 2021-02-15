@@ -301,12 +301,10 @@ class TestOpenApiEditor_add_state_machine_integration(TestCase):
         integration_uri = "something"
         credentials = "creds"
         expected = {
-            "responses": { "default": { "description": "Default response for Method={} Path={}".format(method,path) } },
+            "responses": {"default": {"description": "Default response for Method={} Path={}".format(method, path)}},
             _X_INTEGRATION: {
                 "type": "aws_proxy",
-                "requestParameters": {
-                    "StateMachineArn": integration_uri
-                },                
+                "requestParameters": {"StateMachineArn": integration_uri},
                 "payloadFormatVersion": "1.0",
                 "credentials": credentials,
                 "integrationSubtype": "StepFunctions-StartExecution",
@@ -330,7 +328,9 @@ class TestOpenApiEditor_add_state_machine_integration(TestCase):
             "Fn::If": [
                 "condition",
                 {
-                    "responses": { "default": { "description": "Default response for Method={} Path={}".format(method, path) } },
+                    "responses": {
+                        "default": {"description": "Default response for Method={} Path={}".format(method, path)}
+                    },
                     _X_INTEGRATION: {
                         "type": "aws_proxy",
                         "requestParameters": {
@@ -346,7 +346,9 @@ class TestOpenApiEditor_add_state_machine_integration(TestCase):
             ]
         }
 
-        self.editor.add_state_machine_integration(path, method, integration_uri, None, None, credentials, condition=condition)
+        self.editor.add_state_machine_integration(
+            path, method, integration_uri, None, None, credentials, condition=condition
+        )
 
         self.assertTrue(self.editor.has_path(path, method))
         actual = self.editor.openapi["paths"][path][method]
@@ -365,9 +367,7 @@ class TestOpenApiEditor_add_state_machine_integration(TestCase):
             # New values must be added
             _X_INTEGRATION: {
                 "type": "aws_proxy",
-                "requestParameters": {
-                    "StateMachineArn": integration_uri
-                },
+                "requestParameters": {"StateMachineArn": integration_uri},
                 "payloadFormatVersion": "1.0",
                 "credentials": credentials,
                 "integrationSubtype": "StepFunctions-StartExecution",
