@@ -282,6 +282,107 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
         self.assertEqual(expected, actual)
 
 
+class TestOpenApiEditor_add_state_machine_integration(TestCase):
+    def setUp(self):
+
+        self.original_openapi = {
+            "openapi": "3.0.1",
+            "paths": {
+                "/foo": {"post": {"a": [1, 2, "b"], "responses": {"something": "is already here"}}},
+                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
+            },
+        }
+
+        self.editor = OpenApiEditor(self.original_openapi)
+
+    def test_must_add_new_integration_to_new_path(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        credentials = "creds"
+        expected = {
+            "responses": { "default": { "description": "Default response for Method={} Path={}".format(method,path) } },
+            _X_INTEGRATION: {
+                "type": "aws_proxy",
+                "requestParameters": {
+                    "StateMachineArn": integration_uri
+                },                
+                "payloadFormatVersion": "1.0",
+                "credentials": credentials,
+                "integrationSubtype": "StepFunctions-StartExecution",
+                "connectionType": "INTERNET",
+            },
+        }
+
+        self.editor.add_state_machine_integration(path, method, integration_uri, None, None, credentials)
+
+        self.assertTrue(self.editor.has_path(path, method))
+        actual = self.editor.openapi["paths"][path][method]
+        self.assertEqual(expected, actual)
+
+    def test_must_add_new_integration_with_conditions_to_new_path(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        credentials = "creds"
+        condition = "condition"
+        expected = {
+            "Fn::If": [
+                "condition",
+                {
+                    "responses": { "default": { "description": "Default response for Method={} Path={}".format(method, path) } },
+                    _X_INTEGRATION: {
+                        "type": "aws_proxy",
+                        "requestParameters": {
+                            "StateMachineArn": {"Fn::If": ["condition", integration_uri, {"Ref": "AWS::NoValue"}]}
+                        },
+                        "payloadFormatVersion": "1.0",
+                        "credentials": credentials,
+                        "integrationSubtype": "StepFunctions-StartExecution",
+                        "connectionType": "INTERNET",
+                    },
+                },
+                {"Ref": "AWS::NoValue"},
+            ]
+        }
+
+        self.editor.add_state_machine_integration(path, method, integration_uri, None, None, credentials, condition=condition)
+
+        self.assertTrue(self.editor.has_path(path, method))
+        actual = self.editor.openapi["paths"][path][method]
+        self.assertEqual(expected, actual)
+
+    def test_must_add_new_integration_to_existing_path(self):
+        path = "/foo"
+        method = "post"
+        integration_uri = "something"
+        credentials = "creds"
+        expected = {
+            # Current values present in the dictionary *MUST* be preserved
+            "a": [1, 2, "b"],
+            # Responses key must be untouched
+            "responses": {"something": "is already here"},
+            # New values must be added
+            _X_INTEGRATION: {
+                "type": "aws_proxy",
+                "requestParameters": {
+                    "StateMachineArn": integration_uri
+                },
+                "payloadFormatVersion": "1.0",
+                "credentials": credentials,
+                "integrationSubtype": "StepFunctions-StartExecution",
+                "connectionType": "INTERNET",
+            },
+        }
+        # Just make sure test is working on an existing path
+        self.assertTrue(self.editor.has_path(path, method))
+
+        self.editor.add_state_machine_integration(path, method, integration_uri, None, None, credentials)
+
+        actual = self.editor.openapi["paths"][path][method]
+        self.assertEqual(expected, actual)
+
+
 class TestOpenApiEditor_iter_on_path(TestCase):
     def setUp(self):
 

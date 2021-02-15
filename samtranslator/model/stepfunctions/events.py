@@ -488,6 +488,7 @@ class HttpApi(EventSource):
         "Action": PropertyType(False, is_str()),
         "Parameters": PropertyType(False, is_type(dict)),  # Name, Cause, Error, TraceHeader, Input
         # "Responses": PropertyType(False, is_type(dict)), # 200: target method source
+        "TimeoutInMillis": PropertyType(False, is_type(int)),
     }
 
     def resources_to_link(self, resources):
@@ -592,5 +593,6 @@ class HttpApi(EventSource):
         editor.add_auth_to_integration(
             api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id
         )
-
+        if self.TimeoutInMillis:
+            editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
         api["DefinitionBody"] = editor.openapi
