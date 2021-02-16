@@ -171,3 +171,6 @@ Resources:
 
         - AcmGetCertificatePolicy:
             CertificateArn: arn
+
+        - Route53ChangeResourceRecordSetsPolicy:
+            HostedZoneId: test
