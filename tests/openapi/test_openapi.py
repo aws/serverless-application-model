@@ -4,7 +4,7 @@ from unittest import TestCase
 from parameterized import parameterized, param
 
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidEventException
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
 _X_ANY_METHOD = "x-amazon-apigateway-any-method"
@@ -382,6 +382,78 @@ class TestOpenApiEditor_add_state_machine_integration(TestCase):
         actual = self.editor.openapi["paths"][path][method]
         self.assertEqual(expected, actual)
 
+    def test_should_not_add_integration_to_existing_path_with_integration(self):
+        path = "/bar"
+        method = "get"
+        integration_uri = "something"
+        credentials = "creds"
+        expected = {
+            # Old integration should remain
+            _X_INTEGRATION: {"a": "b"},
+        }
+        # Just make sure test is working on an existing path
+        self.assertTrue(self.editor.has_path(path, method))
+
+        self.editor.add_state_machine_integration(path, method, integration_uri, None, None, credentials)
+
+        actual = self.editor.openapi["paths"][path][method]
+        self.assertEqual(expected, actual)
+
+    def test_must_add_integration_with_parameters(self):
+        path = "/newpath"
+        method = "get"
+        integration_uri = "something"
+        credentials = "creds"
+        expected = {
+            "responses": {"default": {"description": "Default response for Method={} Path={}".format(method, path)}},
+            _X_INTEGRATION: {
+                "type": "aws_proxy",
+                "requestParameters": {"StateMachineArn": integration_uri, "test": "test"},
+                "payloadFormatVersion": "1.0",
+                "credentials": credentials,
+                "integrationSubtype": "StepFunctions-StartExecution",
+                "connectionType": "INTERNET",
+            },
+        }
+
+        self.editor.add_state_machine_integration(path, method, integration_uri, None, {"test": "test"}, credentials)
+
+        self.assertTrue(self.editor.has_path(path, method))
+        actual = self.editor.openapi["paths"][path][method]
+        self.assertEqual(expected, actual)
+
+
+class TestOpenApiEditor_test_add_timeout(TestCase):
+    def setUp(self):
+
+        self.original_openapi = {
+            "openapi": "3.0.1",
+            "paths": {
+                "/foo": {"post": {"a": [1, 2, "b"], "responses": {"something": "is already here"}}},
+                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
+            },
+        }
+
+        self.editor = OpenApiEditor(self.original_openapi)
+
+    def test_must_not_add_timeout_if_no_integration(self):
+        path = "/foo"
+        method = "post"
+        integration_uri = "something"
+        credentials = "creds"
+        expected = {
+            # Current values present in the dictionary *MUST* be preserved
+            "a": [1, 2, "b"],
+            # Responses key must be untouched
+            "responses": {"something": "is already here"},
+        }
+
+        self.editor.add_timeout_to_method(None, path, method, 3000)  # api parameter is not used...
+
+        self.assertTrue(self.editor.has_path(path, method))
+        actual = self.editor.openapi["paths"][path][method]
+        self.assertEqual(expected, actual)
+
 
 class TestOpenApiEditor_iter_on_path(TestCase):
     def setUp(self):
@@ -460,12 +532,64 @@ class TestOpenApiEditor_add_auth(TestCase):
         self.original_openapi = {
             "openapi": "3.0.1",
             "paths": {
-                "/foo": {"get": {_X_INTEGRATION: {"a": "b"}}, "post": {_X_INTEGRATION: {"a": "b"}}},
-                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
+                "/foo": {"get": {}, "post": {_X_INTEGRATION: {"a": "b"}}},
+                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}, "parameters": {}, "options": {}},
             },
         }
 
         self.editor = OpenApiEditor(self.original_openapi)
+
+    def test_dont_add_default_auth_on_parameters(self):
+        path = "/bar"
+        self.editor.set_path_default_authorizer(path, "test", {"test": {}}, {"test": {}})
+
+        self.assertEqual(
+            {"get": {_X_INTEGRATION: {"a": "b"}, "security": [{"test": []}]}, "parameters": {}, "options": {}},
+            self.editor.openapi["paths"]["/bar"],
+        )
+
+    def test_get_authoriser_scopes(self):
+        scopes = OpenApiEditor._get_authorization_scopes({"name": {"AuthorizationScopes": ["test"]}}, "name")
+
+        noscopes = OpenApiEditor._get_authorization_scopes(None, "wrongname")
+
+        self.assertEqual(scopes, ["test"])
+        self.assertEqual(noscopes, [])
+
+    def test_add_auth_to_integration(self):
+
+        with self.assertRaises(InvalidEventException):
+            self.editor.add_auth_to_integration({}, "/test", "post", {}, "123")
+
+
+class TestOpenApiEditor_add_cors(TestCase):
+    def setUp(self):
+
+        self.original_openapi = {
+            "openapi": "3.0.1",
+            "paths": {
+                "/foo": {"get": {}, "post": {_X_INTEGRATION: {"a": "b"}}},
+                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}, "parameters": {}, "options": {}},
+            },
+        }
+
+        self.editor = OpenApiEditor(self.original_openapi)
+
+    def test_add_cors(self):
+        self.editor.add_cors("testorg", "testhdr", "testmth", "textexp", 100, True)
+
+        self.maxDiff = None
+        self.assertEqual(
+            self.editor.openapi["x-amazon-apigateway-cors"],
+            {
+                "allowCredentials": True,
+                "allowHeaders": "testhdr",
+                "allowMethods": "testmth",
+                "allowOrigins": "testorg",
+                "exposeHeaders": "textexp",
+                "maxAge": 100,
+            },
+        )
 
 
 class TestOpenApiEditor_get_integration_function(TestCase):
