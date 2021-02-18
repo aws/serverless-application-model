@@ -7,7 +7,7 @@ from samtranslator.model.intrinsics import (
     is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
-    is_valid_intrinsic_if_items,
+    validate_intrinsic_if_items,
 )
 from samtranslator.model.exceptions import InvalidTemplateException
 
@@ -170,8 +170,10 @@ class FunctionPolicies(object):
         """
         intrinsic_if_value = policy["Fn::If"]
 
-        if not is_valid_intrinsic_if_items(intrinsic_if_value):
-            raise InvalidTemplateException("Fn::If requires 3 arguments")
+        try:
+            validate_intrinsic_if_items(intrinsic_if_value)
+        except ValueError as e:
+            raise InvalidTemplateException(e)
 
         if_data = intrinsic_if_value[1]
         else_data = intrinsic_if_value[2]

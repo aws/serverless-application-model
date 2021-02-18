@@ -5,7 +5,7 @@ from samtranslator.model.intrinsics import (
     is_intrinsic,
     make_shorthand,
     is_intrinsic_if,
-    is_valid_intrinsic_if_items,
+    validate_intrinsic_if_items,
     is_intrinsic_no_value,
 )
 
@@ -65,19 +65,19 @@ class TestIntrinsics(TestCase):
         self.assertFalse(is_intrinsic_if(not_if))
         self.assertFalse(is_intrinsic_if(None))
 
-    def test_is_valid_intrinsic_if_items_valid(self):
-        self.assertTrue(is_valid_intrinsic_if_items(["Condition", "Then", "Else"]))
+    def test_validate_intrinsic_if_items_valid(self):
+        validate_intrinsic_if_items(["Condition", "Then", "Else"])
 
-    def test_is_valid_intrinsic_if_items_invalid(self):
+    def test_validate_intrinsic_if_items_invalid(self):
         not_enough_items = ["Then", "Else"]
         is_string = "Then"
         is_integer = 3
         is_boolean = True
         is_dict = {"Fn::If": "some value", "Fn::And": "other value"}
 
-        self.assertFalse(is_valid_intrinsic_if_items(not_enough_items))
-        self.assertFalse(is_valid_intrinsic_if_items(is_string))
-        self.assertFalse(is_valid_intrinsic_if_items(None))
-        self.assertFalse(is_valid_intrinsic_if_items(is_integer))
-        self.assertFalse(is_valid_intrinsic_if_items(is_boolean))
-        self.assertFalse(is_valid_intrinsic_if_items(is_dict))
+        self.assertRaises(ValueError, validate_intrinsic_if_items, not_enough_items)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, is_string)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, None)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, is_integer)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, is_boolean)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, is_dict)

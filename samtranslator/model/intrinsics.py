@@ -162,21 +162,22 @@ def is_intrinsic_if(input):
     return key == "Fn::If"
 
 
-def is_valid_intrinsic_if_items(items):
+def validate_intrinsic_if_items(items):
     """
-    Returns a value indicating whether the items are valid Fn::If items or not
+    Validates Fn::If items
 
     Parameters
     ----------
     items : list
         Fn::If items
 
-    Returns
-    -------
-    boolean
-        True if valid items, False otherwise
+    Raises
+    ------
+    ValueError
+        If the items are invalid
     """
-    return isinstance(items, list) and len(items) == 3
+    if not isinstance(items, list) or len(items) != 3:
+        raise ValueError("Fn::If requires 3 arguments")
 
 
 def is_intrinsic_no_value(input):
