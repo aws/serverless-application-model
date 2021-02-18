@@ -3,7 +3,12 @@ from collections import namedtuple
 
 from six import string_types
 
-from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_if, is_intrinsic_no_value
+from samtranslator.model.intrinsics import (
+    is_intrinsic,
+    is_intrinsic_if,
+    is_intrinsic_no_value,
+    is_valid_intrinsic_if_items,
+)
 from samtranslator.model.exceptions import InvalidTemplateException
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
@@ -165,7 +170,7 @@ class FunctionPolicies(object):
         """
         intrinsic_if_value = policy["Fn::If"]
 
-        if not len(intrinsic_if_value) == 3:
+        if not is_valid_intrinsic_if_items(intrinsic_if_value):
             raise InvalidTemplateException("Fn::If requires 3 arguments")
 
         if_data = intrinsic_if_value[1]

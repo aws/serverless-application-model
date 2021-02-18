@@ -3,7 +3,13 @@ from samtranslator.model.codedeploy import CodeDeployApplication
 from samtranslator.model.codedeploy import CodeDeployDeploymentGroup
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.iam import IAMRole
-from samtranslator.model.intrinsics import fnSub, is_intrinsic, is_intrinsic_if, is_intrinsic_no_value
+from samtranslator.model.intrinsics import (
+    fnSub,
+    is_intrinsic,
+    is_intrinsic_if,
+    is_intrinsic_no_value,
+    is_valid_intrinsic_if_items,
+)
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
 import copy
@@ -177,7 +183,7 @@ class DeploymentPreferenceCollection(object):
         if is_intrinsic_if(preference_alarms):
             processed_alarms = copy.deepcopy(preference_alarms)
             alarms_list = processed_alarms.get("Fn::If")
-            if not isinstance(alarms_list, list) or not len(alarms_list) == 3:
+            if not is_valid_intrinsic_if_items(alarms_list):
                 raise ValueError("Fn::If requires 3 arguments")
             alarms_list[1] = self._build_alarm_configuration(alarms_list[1])
             alarms_list[2] = self._build_alarm_configuration(alarms_list[2])
