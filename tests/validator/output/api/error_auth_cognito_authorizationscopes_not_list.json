@@ -1,0 +1,4 @@
+[
+  "[/Resources/MyApi] Is not valid",
+  "[/__/Properties/Auth/Authorizers/MyCognitoAuth/AuthorizationScopes] 'scopes1' is not of type 'array'"
+]

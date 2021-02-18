@@ -145,15 +145,24 @@ class TestValidatorBase(TestCase):
         unittest base class
     """
 
-    def _test_validator(self, template, errors):
+    def _test_validator_error(self, template, output):
         manifest = self._get_template_content(template)
 
         validation_errors = TestValidatorProvider.get().validate(manifest)
+
+        errors = self._get_output_content(output)
 
         self.assertEqual(len(validation_errors), len(errors))
 
         for i, v in enumerate(validation_errors):
             self.assertEqual(v, errors[i])
+
+    def _test_validator_success(self, template):
+        manifest = self._get_template_content(template)
+
+        validation_errors = TestValidatorProvider.get().validate(manifest)
+
+        self.assertFalse(validation_errors)
 
     def _get_template_content(self, template):
         """
@@ -170,4 +179,21 @@ class TestValidatorBase(TestCase):
             Template content
         """
         with open(template + ".yaml", "r") as t:
+            return yaml_parse(t)
+
+    def _get_output_content(self, output):
+        """
+        Returns the content of an output file
+
+        Parameters
+        ----------
+        output : str
+            Output file path and name from the output dir (without .json)
+
+        Returns
+        -------
+        str
+            Output file content
+        """
+        with open(output + ".json", "r") as t:
             return yaml_parse(t)

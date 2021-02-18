@@ -1,0 +1,5 @@
+[
+  "[/Resources/MyApi] Is not valid",
+  "[/__/Properties/Auth/Authorizers/MyLambdaAuth] 'UserPoolArn' is a required property",
+  "[/__/Properties/Auth/Authorizers/MyLambdaAuth] 'FunctionArn' is a required property"
+]

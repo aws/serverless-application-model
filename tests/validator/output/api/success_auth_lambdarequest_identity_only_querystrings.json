@@ -1,0 +1,14 @@
+# LambdaRequest with only QueryStrings on Identity
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionArn: Function.Arn
+            Identity:
+            QueryStrings:
+              - QueryString1

@@ -1,0 +1,4 @@
+[
+  "[/Resources/MyApi] Is not valid",
+  "[/__/Properties/Auth/Authorizers/MyCognitoAuth/Identity/ReauthorizeEvery] 0 is less than the minimum of 1"
+]

@@ -1,0 +1,4 @@
+[
+  "[/Resources/MyApi] Is not valid",
+  "[/__/Properties/Auth/Authorizers/MyCognitoAuth/Identity/ReauthorizeEvery] 3601 is greater than the maximum of 3600"
+]

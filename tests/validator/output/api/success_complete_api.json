@@ -1,0 +1,29 @@
+# Complete API
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      AccessLogSetting: AccessLogSetting
+      Auth: ApiAuth
+      BinaryMediaTypes:
+        - "image/png"
+      CacheClusterEnabled: true
+      CacheClusterSize: "32"
+      CanarySetting: CanarySetting
+      Cors: String | CorsConfiguration
+      DefinitionBody: "{}"
+      DefinitionUri: String | ApiDefinition
+      Description: My API description
+      Domain: DomainConfiguration
+      EndpointConfiguration: EndpointConfiguration
+      GatewayResponses: Map
+      MethodSettings: MethodSettings
+      MinimumCompressionSize: 30
+      Models: Map
+      Name: MyApi
+      OpenApiVersion: String
+      StageName: Stage name
+      Tags: Map
+      TracingEnabled: true
+      Variables: Map

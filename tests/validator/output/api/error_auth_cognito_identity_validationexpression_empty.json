@@ -1,0 +1,4 @@
+[
+  "[/Resources/MyApi] Is not valid",
+  "[/__/Properties/Auth/Authorizers/MyCognitoAuth/Identity/ValidationExpression] Must not be empty"
+]
