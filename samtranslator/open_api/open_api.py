@@ -438,42 +438,21 @@ class OpenApiEditor(object):
                     existing_security = method_definition.get("security", [])
                     if existing_security:
                         return
-                    authorizer_list = []
-                    if authorizers:
-                        authorizer_list.extend(authorizers.keys())
                     security_dict = dict()
                     security_dict[default_authorizer] = self._get_authorization_scopes(
                         api_authorizers, default_authorizer
                     )
-                    authorizer_security = [security_dict]
+                    security = [security_dict]
 
-                    security = authorizer_security
-
-                    if security:
-                        method_definition["security"] = security
-
-    def add_auth_to_method(self, path, method_name, auth, api):
-        """
-        Adds auth settings for this path/method. Auth settings currently consist of Authorizers
-        but this method will eventually include setting other auth settings such as Resource Policy, etc.
-        This is used to configure the security for individual functions.
-
-        :param string path: Path name
-        :param string method_name: Method name
-        :param dict auth: Auth configuration such as Authorizers
-        :param dict api: Reference to the related Api's properties as defined in the template.
-        """
-        method_authorizer = auth and auth.get("Authorizer")
-        authorization_scopes = auth and auth.get("AuthorizationScopes", [])
-        api_auth = api and api.get("Auth")
-        authorizers = api_auth and api_auth.get("Authorizers")
-        if method_authorizer:
-            self._set_method_authorizer(path, method_name, method_authorizer, authorizers, authorization_scopes)
+                    method_definition["security"] = security
 
     def add_auth_to_integration(self, api, path, method, auth, relative_id):
         """Adds authorization to the lambda integration
         :param api: api object
-        :param editor: OpenApiEditor object that contains the OpenApi definition
+        :param string path: Path name
+        :param string method_name: Method name
+        :param dict auth: Auth configuration such as Authorizers
+        :relative_id: Relative id of the event source for which the authorisation is added
         """
         api_auth = api.get("Auth", {})
 
@@ -681,11 +660,6 @@ class OpenApiEditor(object):
         if self.info.get("description"):
             return
         self.info["description"] = description
-
-    def has_api_gateway_cors(self):
-        if self._doc.get(self._X_APIGW_CORS):
-            return True
-        return False
 
     @property
     def openapi(self):
