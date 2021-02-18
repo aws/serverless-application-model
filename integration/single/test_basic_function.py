@@ -40,6 +40,9 @@ class TestBasicFunction(BaseTest):
 
         self.assertEqual(requests.get(endpoint).text, self.FUNCTION_OUTPUT)
 
+    def test_function_with_deployment_preference_alarms_intrinsic_if(self):
+        self.create_and_verify_stack("function_with_deployment_preference_alarms_intrinsic_if")
+
     @parameterized.expand(
         [
             ("basic_function_with_sns_dlq", "sns:Publish"),
