@@ -1,6 +1,10 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import should_exclude_test_in_region
 
 
+@skipIf(should_exclude_test_in_region("Layers"), "Layers is not supported in this testing region")
 class TestBasicLayerVersion(BaseTest):
     """
     Basic AWS::Lambda::LayerVersion tests

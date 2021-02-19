@@ -1,4 +1,7 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import should_exclude_test_in_region
 
 
 class TestBasicHttpApi(BaseTest):
@@ -6,6 +9,7 @@ class TestBasicHttpApi(BaseTest):
     Basic AWS::Serverless::HttpApi tests
     """
 
+    @skipIf(should_exclude_test_in_region("HttpApi"), "HttpApi is not supported in this testing region")
     def test_basic_http_api(self):
         """
         Creates a HTTP API

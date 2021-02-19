@@ -3,6 +3,13 @@ import re
 import random
 import string  # pylint: disable=deprecated-module
 
+import yaml
+
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
+
 import boto3
 from botocore.exceptions import ClientError, NoRegionError
 
@@ -107,3 +114,50 @@ def create_bucket(bucket_name, region):
         s3_client = boto3.client("s3", region_name=region)
         location = {"LocationConstraint": region}
         s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
+
+
+def load_yaml(file_path):
+    """
+    Loads a yaml file
+
+    Parameters
+    ----------
+    file_path : Path
+        File path
+
+    Returns
+    -------
+    Object
+        Yaml object
+    """
+    with open(file_path) as f:
+        data = f.read()
+    return yaml.load(data, Loader=yaml.FullLoader)
+
+
+def should_exclude_test_in_region(exclude_resource):
+    """
+    Decide if a test should be skipped in the current testing region with the specific resource
+
+    Parameters
+    ----------
+    exclude_resource : String
+        the resource to be tested in the current testing region
+
+    Returns
+    -------
+    Boolean
+        If skip return true otherwise false
+    """
+
+    session = boto3.session.Session()
+    my_region = session.region_name
+
+    tests_integ_dir = Path(__file__).resolve().parents[1]
+    config_dir = Path(tests_integ_dir, "config")
+    region_exclude_resources_file = str(Path(config_dir, "region_exclude_resources.yml"))
+    region_exclude_resources = load_yaml(region_exclude_resources_file)
+
+    if my_region not in region_exclude_resources["regions"]:
+        return False
+    return exclude_resource in region_exclude_resources["regions"][my_region]["exclude_resources"]

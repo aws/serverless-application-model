@@ -2,7 +2,7 @@ import logging
 import os
 
 from integration.helpers.client_provider import ClientProvider
-from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
+from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources, load_yaml
 
 try:
     from pathlib import Path
@@ -28,7 +28,6 @@ S3_BUCKET_PREFIX = "sam-integ-bucket-"
 class BaseTest(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
         cls.template_dir = Path(cls.resources_dir, "templates", "single")
@@ -217,11 +216,6 @@ class BaseTest(TestCase):
 
         return self.client_provider.api_v2_client.get_stages(ApiId=resources[0]["PhysicalResourceId"])["Items"]
 
-    def get_api_v2_endpoint(self, logical_id):
-        api_id = self.get_physical_id_by_logical_id(logical_id)
-        api = self.client_provider.api_v2_client.get_api(ApiId=api_id)
-        return api["ApiEndpoint"]
-
     def get_stack_nested_stack_resources(self):
         resources = self.get_stack_resources("AWS::CloudFormation::Stack")
 
@@ -311,12 +305,12 @@ class BaseTest(TestCase):
         value
             value
         """
-        yaml_doc = self._load_yaml(self.sub_input_file_path)
+        yaml_doc = load_yaml(self.sub_input_file_path)
         yaml_doc["Resources"][resource_name]["Properties"][property_name] = value
         self._dump_yaml(self.sub_input_file_path, yaml_doc)
 
     def get_template_resource_property(self, resource_name, property_name):
-        yaml_doc = self._load_yaml(self.sub_input_file_path)
+        yaml_doc = load_yaml(self.sub_input_file_path)
         return yaml_doc["Resources"][resource_name]["Properties"][property_name]
 
     def deploy_stack(self, parameters=None):
@@ -348,24 +342,6 @@ class BaseTest(TestCase):
         self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
         # verify if the stack contains the expected resources
         self.assertTrue(verify_stack_resources(self.expected_resource_path, self.stack_resources))
-
-    def _load_yaml(self, file_path):
-        """
-        Loads a yaml file
-
-        Parameters
-        ----------
-        file_path : Path
-            File path
-
-        Returns
-        -------
-        Object
-            Yaml object
-        """
-        with open(file_path) as f:
-            data = f.read()
-        return yaml.load(data, Loader=yaml.FullLoader)
 
     def _dump_yaml(self, file_path, yaml_doc):
         """

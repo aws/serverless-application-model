@@ -1,4 +1,7 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import should_exclude_test_in_region
 
 
 class TestBasicLayerVersion(BaseTest):
@@ -12,6 +15,7 @@ class TestBasicLayerVersion(BaseTest):
         """
         self.create_and_verify_stack("basic_state_machine_inline_definition")
 
+    @skipIf(should_exclude_test_in_region("XRay"), "XRay is not supported in this testing region")
     def test_basic_state_machine_with_tags(self):
         """
         Creates a State Machine with tags

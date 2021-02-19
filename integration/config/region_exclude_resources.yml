@@ -1,0 +1,103 @@
+regions:
+  af-south-1:
+    exclude_resources:
+    - ServerlessRepo
+    - Cognito
+    - KMS
+    - CodeDeploy
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+  ap-east-1:
+    exclude_resources:
+    - Cognito
+    - IoT
+    - ServerlessRepo
+    - HttpApi
+  ap-northeast-2:
+    exclude_resources:
+    - HttpApi
+  ap-northeast-3:
+    exclude_resources:
+    - Cognito
+    - IoT
+    - ServerlessRepo
+    - XRay
+    - CodeDeploy
+    - HttpApi
+  ap-south-1:
+    exclude_resources:
+    - HttpApi
+  ap-southeast-1:
+    exclude_resources:
+    - HttpApi
+  ca-central-1:
+    exclude_resources:
+    - Cognito
+    - IoT
+    - HttpApi
+  cn-north-1:
+    exclude_resources:
+    - ServerlessRepo
+    - Cognito
+    - KMS
+    - CodeDeploy
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+  cn-northwest-1:
+    exclude_resources:
+    - ServerlessRepo
+    - Cognito
+    - KMS
+    - CodeDeploy
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+  eu-north-1:
+    exclude_resources:
+    - ServerlessRepo
+    - Cognito
+    - IoT
+    - HttpApi
+    - Layers
+  eu-south-1:
+    exclude_resources:
+    - ServerlessRepo
+    - Cognito
+    - KMS
+    - CodeDeploy
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+  eu-west-2:
+    exclude_resources:
+    - HttpApi
+  eu-west-3:
+    exclude_resources:
+    - Cognito
+    - IoT
+    - XRay
+    - HttpApi
+  me-south-1:
+    exclude_resources:
+    - ServerlessRepo
+    - Cognito
+    - IoT
+    - HttpApi
+  sa-east-1:
+    exclude_resources:
+    - IoT
+    - Cognito
+    - HttpApi
+  us-east-2:
+    exclude_resources:
+    - HttpApi
+  us-west-1:
+    exclude_resources:
+    - Cognito
+    - IoT
