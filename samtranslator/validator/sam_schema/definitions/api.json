@@ -33,16 +33,15 @@
               "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.CanarySetting"
             },
             "Cors": {
-              "anyOf": [
-                {
-                  "type": [
-                    "string"
-                  ]
-                },
-                {
-                  "$ref": "#definitions/AWS::Serverless::Api.CorsConfiguration"
-                }
-              ]
+              "if": {
+                "type": "string"
+              },
+              "then": {
+                "minLength": 1
+              },
+              "else": {
+                "$ref": "#definitions/AWS::Serverless::Api.CorsConfiguration"
+              }
             },
             "DefinitionBody": {
               "anyOf": [

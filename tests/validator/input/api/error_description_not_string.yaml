@@ -1,11 +1,8 @@
-# Minimal Cognito auth
+# Description is not a string
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
+      Description: 3
       StageName: Stage name
-      Auth:
-        Authorizers:
-          MyCognitoAuth:
-            UserPoolArn: User.pool.arn

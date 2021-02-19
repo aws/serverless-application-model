@@ -77,24 +77,40 @@ class TestValidatorApi(TestValidatorBase):
             "error_canarysetting_usestagecache_empty",
             "error_canarysetting_usestagecache_not_boolean",
             # Cors
+            "error_cors_allowcredentials_empty",
+            "error_cors_allowcredentials_not_boolean",
+            "error_cors_allowheaders_empty",
+            "error_cors_allowheaders_not_string",
+            "error_cors_allowmethods_empty",
+            "error_cors_allowmethods_not_string",
+            "error_cors_alloworigin_missing",
+            "error_cors_empty",
+            "error_cors_maxage_empty",
+            "error_cors_maxage_not_string",
+            "error_cors_not_string_or_object",
             # DefinitionBody
             # DefinitionUri
-            # Description
+            "error_description_empty",
+            "error_description_not_string",
             # Domain
             # EndpointConfiguration
             # GatewayResponses
             # MethodSettings
             # MinimumCompressionSize
             # Models
-            # Name
+            "error_name_empty",
+            "error_name_not_string",
             # OpenApiVersion
-            # StageName
             "error_stagename_empty",
             "error_stagename_missing",
             "error_stagename_not_string",
             # Tags
-            # TracingEnabled
-            # Variables
+            "error_tracingenabled_not_boolean",
+            "error_variables_empty",
+            "error_variables_not_object",
+            "error_variables_variable_name_not_alphanumeric",
+            "error_variables_variable_value_invalid_character",
+            "error_variables_variable_value_not_string",
         ],
     )
     def test_validator_api_errors(self, template):

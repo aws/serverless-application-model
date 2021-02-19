@@ -1,0 +1,4 @@
+[
+  "[/Resources/MyApi] Is not valid",
+  "[/__/Properties/Variables] 'My_Variable' does not match any of the regexes: '^[a-zA-Z0-9]+$'"
+]
