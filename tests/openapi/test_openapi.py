@@ -557,9 +557,36 @@ class TestOpenApiEditor_add_auth(TestCase):
         self.assertEqual(noscopes, [])
 
     def test_add_auth_to_integration(self):
+        rel_id = "123"
+        path = "/test"
+        method = "post"
+        authorizer = {}
+        with self.assertRaises(InvalidEventException) as raises_assert:
+            self.editor.add_auth_to_integration({}, path, method, authorizer, rel_id)
 
-        with self.assertRaises(InvalidEventException):
-            self.editor.add_auth_to_integration({}, "/test", "post", {}, "123")
+        ex = raises_assert.exception
+        self.assertEqual(
+            ex.message,
+            "Event with id [{}] is invalid. Unable to set Authorizer [{}] on API method [{}] for path [{}] because the related API does not define any Authorizers.".format(
+                rel_id, authorizer, method, path
+            ),
+        )
+
+    def test_add_auth_to_integration_empty(self):
+        rel_id = "123"
+        path = "/test"
+        method = "post"
+        authorizer = {"Authorizer": None}
+        with self.assertRaises(InvalidEventException) as raises_assert:
+            self.editor.add_auth_to_integration({"test": "test"}, path, method, authorizer, rel_id)
+
+        ex = raises_assert.exception
+        self.assertEqual(
+            ex.message,
+            "Event with id [{}] is invalid. 'Auth' section requires either an explicit 'Authorizer' set or a 'DefaultAuthorizer' configured on the HttpApi.".format(
+                rel_id
+            ),
+        )
 
 
 class TestOpenApiEditor_add_cors(TestCase):
