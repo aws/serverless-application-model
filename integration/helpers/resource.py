@@ -34,7 +34,7 @@ def verify_stack_resources(expected_file_path, stack_resources):
     parsed_resources = _sort_resources(stack_resources["StackResourceSummaries"])
 
     if len(expected_resources) != len(parsed_resources):
-        return False
+        return "'{}' resources expected, '{}' found".format(len(expected_resources), len(parsed_resources))
 
     for i in range(len(expected_resources)):
         exp = expected_resources[i]
@@ -43,10 +43,17 @@ def verify_stack_resources(expected_file_path, stack_resources):
             "^" + exp["LogicalResourceId"] + "([0-9a-f]{" + str(LogicalIdGenerator.HASH_LENGTH) + "})?$",
             parsed["LogicalResourceId"],
         ):
-            return False
+            parsed_trimed_down = {
+                "LogicalResourceId": parsed["LogicalResourceId"],
+                "ResourceType": parsed["ResourceType"],
+            }
+
+            return "'{}' expected, '{}' found (Resources must appear in the same order, don't include the LogicalId random suffix)".format(
+                exp, parsed_trimed_down
+            )
         if exp["ResourceType"] != parsed["ResourceType"]:
-            return False
-    return True
+            return "'{}' expected, '{}' found".format(exp["ResourceType"], parsed["ResourceType"])
+    return None
 
 
 def generate_suffix():

@@ -164,6 +164,170 @@ class TestDeploymentPreferenceCollection(TestCase):
         self.assertEqual(deployment_group.to_dict(), expected_deployment_group.to_dict())
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": ["Alarm1", "Alarm2", "Alarm3"],
+        }
+        expected_alarm_configuration = {
+            "Enabled": True,
+            "Alarms": [{"Name": "Alarm1"}, {"Name": "Alarm2"}, {"Name": "Alarm3"}],
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertEqual(expected_alarm_configuration, deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_intrinsic_if(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Fn::If": ["MyCondition", ["Alarm1", "Alarm2"], ["Alarm3"]]},
+        }
+        expected_alarm_configuration = {
+            "Fn::If": [
+                "MyCondition",
+                {"Enabled": True, "Alarms": [{"Name": "Alarm1"}, {"Name": "Alarm2"}]},
+                {"Enabled": True, "Alarms": [{"Name": "Alarm3"}]},
+            ],
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertEqual(expected_alarm_configuration, deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_intrinsic_if_empty_then(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Fn::If": ["MyCondition", [], ["Alarm3"]]},
+        }
+        expected_alarm_configuration = {
+            "Fn::If": ["MyCondition", {}, {"Enabled": True, "Alarms": [{"Name": "Alarm3"}]}],
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertEqual(expected_alarm_configuration, deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_intrinsic_if_noref_then(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Fn::If": ["MyCondition", [{"Ref": "AWS::NoValue"}], ["Alarm3"]]},
+        }
+        expected_alarm_configuration = {
+            "Fn::If": ["MyCondition", {}, {"Enabled": True, "Alarms": [{"Name": "Alarm3"}]}],
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertEqual(expected_alarm_configuration, deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_intrinsic_if_empty_else(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Fn::If": ["MyCondition", ["Alarm1", "Alarm2"], []]},
+        }
+        expected_alarm_configuration = {
+            "Fn::If": ["MyCondition", {"Enabled": True, "Alarms": [{"Name": "Alarm1"}, {"Name": "Alarm2"}]}, {}],
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertEqual(expected_alarm_configuration, deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_intrinsic_if_noref_else(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Fn::If": ["MyCondition", ["Alarm1", "Alarm2"], [{"Ref": "AWS::NoValue"}]]},
+        }
+        expected_alarm_configuration = {
+            "Fn::If": ["MyCondition", {"Enabled": True, "Alarms": [{"Name": "Alarm1"}, {"Name": "Alarm2"}]}, {}],
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertEqual(expected_alarm_configuration, deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_ref_novalue(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Ref": "AWS::NoValue"},
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertIsNone(deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_empty(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": [],
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
+
+        self.assertIsNone(deployment_group.AlarmConfiguration)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_not_list(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": "Alarm1",
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        with self.assertRaises(InvalidResourceException) as e:
+            deployment_preference_collection.deployment_group(self.function_logical_id)
+        self.assertEqual(
+            e.exception.message,
+            "Resource with id [{}] is invalid. Alarms must be a list".format(self.function_logical_id),
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_intrinsic_if_missing_arg(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Fn::If": ["MyCondition", ["Alarm1", "Alarm2"]]},
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        with self.assertRaises(InvalidResourceException) as e:
+            deployment_preference_collection.deployment_group(self.function_logical_id)
+        self.assertEqual(
+            e.exception.message,
+            "Resource with id [{}] is invalid. Fn::If requires 3 arguments".format(self.function_logical_id),
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_deployment_preference_with_alarms_intrinsic_if_not_list(self):
+        deployment_preference = {
+            "Type": "TestDeploymentConfiguration",
+            "Alarms": {"Fn::If": "Alarm1"},
+        }
+        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection.add(self.function_logical_id, deployment_preference)
+        with self.assertRaises(InvalidResourceException) as e:
+            deployment_preference_collection.deployment_group(self.function_logical_id)
+        self.assertEqual(
+            e.exception.message,
+            "Resource with id [{}] is invalid. Fn::If requires 3 arguments".format(self.function_logical_id),
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_update_policy_with_minimal_parameters(self):
         expected_update_policy = {
             "CodeDeployLambdaAliasUpdate": {
