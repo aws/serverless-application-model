@@ -75,6 +75,7 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input")
         "function_concurrency",
         "simple_table_with_extra_tags",
         "explicit_api_with_invalid_events_config",
+        "function_with_schedule_retry_policy",
     ],
 )
 def test_validate_template_success(testcase):

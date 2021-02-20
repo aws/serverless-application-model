@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Author: user1
+    Description: hello world
+    HomePageUrl: https://github.com/user1/my-app-project
+    Labels:
+    - tests
+    LicenseUrl: s3://sam-integ-bucket-bfewbgodigmw/128ecf542a35ac5270a87dc740918404
+    Name: my-app
+    ReadmeUrl: s3://sam-integ-bucket-bfewbgodigmw/3905d7917f2b3429490b01cfb60d8f5b
+    SemanticVersion: '0.0.1'
+    SourceCodeUrl: https://github.com/user1/my-app-project
+    SpdxLicenseId: Apache-2.0
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-integ-bucket-bfewbgodigmw/code.zip
+      Events:
+        MinutelyTrigger:
+          Type: Schedule
+          Properties:
+            Description: Minutely trigger for the CloudWatch adapter
+            DeadLetterConfig:
+              Type: SQS
+              QueueLogicalId: MyDLQ
+            Enabled: true
+            RetryPolicy:
+              MaximumEventAgeInSeconds: 60
+              MaximumRetryAttempts: 0
+            Schedule: rate(1 minute)
+      Handler: index.handler
+      MemorySize: 128
+      Policies:
+      - AWSLambdaRole
+      - AmazonS3ReadOnlyAccess
+      Runtime: nodejs12.x
