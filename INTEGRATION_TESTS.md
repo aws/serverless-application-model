@@ -82,9 +82,9 @@ pytest --no-cov integration/single/test_basic_api.py::TestBasicApi::test_basic_a
 
 ## Skip tests for a specific service in a region
 
-1. Add the service you want to skip to the `integration/config/region_exclude_resources.yml` under the region
-2. Add the @skipIf decorator to the test with the service type, take 'XRay' for example:
-```@skipIf(should_exclude_test_in_region('XRay'), 'XRay is not supported in this testing region')```
+1. Add the service you want to skip to the `integration/config/region_service_exclusion.yaml` under the region
+2. Add the @skipIf decorator to the test with the service name, take 'XRay' for example:
+```@skipIf(current_region_does_not_support('XRay'), 'XRay is not supported in this testing region')```
 
 ## Directory structure
 
