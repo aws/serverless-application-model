@@ -57,6 +57,10 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         for logicalId, event in api_events.items():
             # api_events only contains HttpApi events
             event_properties = event.get("Properties", {})
+
+            if event_properties and not isinstance(event_properties, dict):
+                raise InvalidEventException(logicalId, "Event Properties is invalid.")
+
             if not event_properties:
                 event["Properties"] = event_properties
             self._add_implicit_api_id_if_necessary(event_properties)

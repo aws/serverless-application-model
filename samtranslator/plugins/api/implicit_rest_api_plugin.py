@@ -63,6 +63,9 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
             if not event_properties:
                 continue
 
+            if not isinstance(event_properties, dict):
+                raise InvalidEventException(logicalId, "Event Properties is invalid.")
+
             self._add_implicit_api_id_if_necessary(event_properties)
 
             api_id = self._get_api_id(event_properties)
