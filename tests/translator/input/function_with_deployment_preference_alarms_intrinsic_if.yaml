@@ -1,0 +1,23 @@
+Conditions:
+  MyCondition:
+    Fn::Equals:
+      - true
+      - false
+Resources:
+  MinimalFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: Linear10PercentEvery3Minutes
+        Alarms:
+          Fn::If:
+            - MyCondition
+            - - Alarm1
+              - Alarm2
+              - Alarm3
+            - - Alarm1
+              - Alarm5

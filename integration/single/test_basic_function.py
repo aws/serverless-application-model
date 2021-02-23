@@ -32,6 +32,22 @@ class TestBasicFunction(BaseTest):
 
     @parameterized.expand(
         [
+            "function_with_http_api_events",
+            "function_alias_with_http_api_events",
+        ]
+    )
+    def test_function_with_http_api_events(self, file_name):
+        self.create_and_verify_stack(file_name)
+
+        endpoint = self.get_api_v2_endpoint("MyHttpApi")
+
+        self.assertEqual(requests.get(endpoint).text, self.FUNCTION_OUTPUT)
+
+    def test_function_with_deployment_preference_alarms_intrinsic_if(self):
+        self.create_and_verify_stack("function_with_deployment_preference_alarms_intrinsic_if")
+
+    @parameterized.expand(
+        [
             ("basic_function_with_sns_dlq", "sns:Publish"),
             ("basic_function_with_sqs_dlq", "sqs:SendMessage"),
         ]
