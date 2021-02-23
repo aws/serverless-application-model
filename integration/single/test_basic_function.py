@@ -19,7 +19,6 @@ class TestBasicFunction(BaseTest):
             "basic_function_openapi",
         ]
     )
-    @skipIf(current_region_does_not_support(["LambdaEnvVars"]), "LambdaEnvVars is not supported in this testing region")
     def test_basic_function(self, file_name):
         """
         Creates a basic lambda function
