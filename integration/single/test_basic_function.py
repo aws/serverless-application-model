@@ -1,6 +1,6 @@
 from unittest.case import skipIf
 
-from integration.helpers.resource import should_exclude_test_in_region
+from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
 
@@ -17,7 +17,7 @@ class TestBasicFunction(BaseTest):
             "basic_function_openapi",
         ]
     )
-    @skipIf(should_exclude_test_in_region("LambdaEnvVars"), "LambdaEnvVars is not supported in this testing region")
+    @skipIf(current_region_does_not_support(["LambdaEnvVars"]), "LambdaEnvVars is not supported in this testing region")
     def test_basic_function(self, file_name):
         """
         Creates a basic lambda function
@@ -61,7 +61,7 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(statements[0]["Resource"], dlq_arn)
         self.assertEqual(statements[0]["Effect"], "Allow")
 
-    @skipIf(should_exclude_test_in_region("KMS"), "KMS is not supported in this testing region")
+    @skipIf(current_region_does_not_support(["KMS"]), "KMS is not supported in this testing region")
     def test_basic_function_with_kms_key_arn(self):
         """
         Creates a basic lambda function with KMS key arn
@@ -136,7 +136,7 @@ class TestBasicFunction(BaseTest):
             "MaximumRetryAttempts value is not set or incorrect.",
         )
 
-    @skipIf(should_exclude_test_in_region("XRay"), "XRay is not supported in this testing region")
+    @skipIf(current_region_does_not_support(["XRay"]), "XRay is not supported in this testing region")
     def test_basic_function_with_tracing(self):
         """
         Creates a basic lambda function with tracing

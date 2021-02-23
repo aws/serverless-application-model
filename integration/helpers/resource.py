@@ -3,7 +3,7 @@ import re
 import random
 import string  # pylint: disable=deprecated-module
 
-import yaml
+from integration.helpers.yaml_utils import load_yaml
 
 try:
     from pathlib import Path
@@ -116,33 +116,14 @@ def create_bucket(bucket_name, region):
         s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
 
 
-def load_yaml(file_path):
+def current_region_does_not_support(services):
     """
-    Loads a yaml file
+    Decide if a test should be skipped in the current testing region with the specific resources
 
     Parameters
     ----------
-    file_path : Path
-        File path
-
-    Returns
-    -------
-    Object
-        Yaml object
-    """
-    with open(file_path) as f:
-        data = f.read()
-    return yaml.load(data, Loader=yaml.FullLoader)
-
-
-def should_exclude_test_in_region(exclude_resource):
-    """
-    Decide if a test should be skipped in the current testing region with the specific resource
-
-    Parameters
-    ----------
-    exclude_resource : String
-        the resource to be tested in the current testing region
+    services : List
+        the services to be tested in the current testing region
 
     Returns
     -------
@@ -151,13 +132,15 @@ def should_exclude_test_in_region(exclude_resource):
     """
 
     session = boto3.session.Session()
-    my_region = session.region_name
+    region = session.region_name
 
     tests_integ_dir = Path(__file__).resolve().parents[1]
     config_dir = Path(tests_integ_dir, "config")
-    region_exclude_resources_file = str(Path(config_dir, "region_exclude_resources.yml"))
-    region_exclude_resources = load_yaml(region_exclude_resources_file)
+    region_exclude_services_file = str(Path(config_dir, "region_service_exclusion.yaml"))
+    region_exclude_services = load_yaml(region_exclude_services_file)
 
-    if my_region not in region_exclude_resources["regions"]:
+    if region not in region_exclude_services["regions"]:
         return False
-    return exclude_resource in region_exclude_resources["regions"][my_region]["exclude_resources"]
+
+    # check if any one of the services is in the excluded services for current testing region
+    return bool(set(services).intersection(set(region_exclude_services["regions"][region])))
