@@ -1,5 +1,7 @@
 from unittest.case import skipIf
 
+import requests
+
 from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
