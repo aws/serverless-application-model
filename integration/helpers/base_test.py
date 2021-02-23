@@ -2,8 +2,8 @@ import logging
 import os
 
 from integration.helpers.client_provider import ClientProvider
-from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources, load_yaml
-from integration.helpers.yaml_utils import dump_yaml
+from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
+from integration.helpers.yaml_utils import dump_yaml, load_yaml
 
 try:
     from pathlib import Path
