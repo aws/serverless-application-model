@@ -342,4 +342,6 @@ class BaseTest(TestCase):
         # verify if the stack was successfully created
         self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
         # verify if the stack contains the expected resources
-        self.assertTrue(verify_stack_resources(self.expected_resource_path, self.stack_resources))
+        error = verify_stack_resources(self.expected_resource_path, self.stack_resources)
+        if error:
+            self.fail(error)

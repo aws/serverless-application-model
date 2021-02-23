@@ -1,0 +1,30 @@
+[
+  {
+    "LogicalResourceId": "ServerlessDeploymentApplication",
+    "ResourceType": "AWS::CodeDeploy::Application"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "CodeDeployServiceRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionDeploymentGroup",
+    "ResourceType": "AWS::CodeDeploy::DeploymentGroup"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionVersion",
+    "ResourceType": "AWS::Lambda::Version"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionAliaslive",
+    "ResourceType": "AWS::Lambda::Alias"
+  }
+]

@@ -156,7 +156,12 @@ class Translator:
                 template["Resources"].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
-                template["Resources"].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
+                try:
+                    template["Resources"].update(
+                        deployment_preference_collection.deployment_group(logical_id).to_dict()
+                    )
+                except InvalidResourceException as e:
+                    document_errors.append(e)
 
         # Run the after-transform plugin target
         try:
