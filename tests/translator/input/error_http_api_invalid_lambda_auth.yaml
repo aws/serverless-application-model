@@ -1,0 +1,79 @@
+Resources:
+  Function1:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.7
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi1
+            Auth:
+              Authorizer: LambdaAuth
+  Function2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.7
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Events:
+        Api2:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi2
+            Auth:
+              Authorizer: LambdaAuth
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+  MyApi1:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
+      Auth:
+        Authorizers:
+          LambdaAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            FunctionInvokeRole: !GetAtt MyAuthFnRole.Arn
+            Identity:
+              Context:
+                - contextVar
+              Headers:
+                - Authorization
+              QueryStrings:
+                - petId
+              StageVariables:
+                - stageVar
+              ReauthorizeEvery: 60
+            EnableSimpleResponses: true
+        DefaultAuthorizer: LambdaAuth
+
+  MyApi2:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          LambdaAuth:
+            FunctionInvokeRole: !GetAtt MyAuthFnRole.Arn
+            Identity:
+              Context:
+                - contextVar
+              Headers:
+                - Authorization
+              QueryStrings:
+                - petId
+              StageVariables:
+                - stageVar
+              ReauthorizeEvery: 60
+            AuthorizerPayloadFormatVersion: 2.0
+            EnableSimpleResponses: true
+        DefaultAuthorizer: LambdaAuth

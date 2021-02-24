@@ -1,19 +1,20 @@
 from samtranslator.plugins import BasePlugin
-from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes
+from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.policy_template_processor.exceptions import InsufficientParameterValues, InvalidParameterValues
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 
 
-class PolicyTemplatesForFunctionPlugin(BasePlugin):
+class PolicyTemplatesForResourcePlugin(BasePlugin):
     """
-    Use this plugin to allow the usage of Policy Templates in `Policies` section of AWS::Serverless::Function resource.
+    Use this plugin to allow the usage of Policy Templates in `Policies` section of AWS::Serverless::Function or
+    AWS::Serverless::StateMachine resource.
     This plugin runs a `before_transform_resource` hook and converts policy templates into regular policy statements
     for the core SAM translator to take care of.
     """
 
     _plugin_name = ""
-    SUPPORTED_RESOURCE_TYPE = "AWS::Serverless::Function"
+    SUPPORTED_RESOURCE_TYPE = {"AWS::Serverless::Function", "AWS::Serverless::StateMachine"}
 
     def __init__(self, policy_template_processor):
         """
@@ -24,8 +25,8 @@ class PolicyTemplatesForFunctionPlugin(BasePlugin):
         """
 
         # Plugin name is the class name for easy disambiguation
-        _plugin_name = PolicyTemplatesForFunctionPlugin.__name__
-        super(PolicyTemplatesForFunctionPlugin, self).__init__(_plugin_name)
+        _plugin_name = PolicyTemplatesForResourcePlugin.__name__
+        super(PolicyTemplatesForResourcePlugin, self).__init__(_plugin_name)
 
         self._policy_template_processor = policy_template_processor
 
@@ -42,7 +43,7 @@ class PolicyTemplatesForFunctionPlugin(BasePlugin):
         if not self._is_supported(resource_type):
             return
 
-        function_policies = FunctionPolicies(resource_properties, self._policy_template_processor)
+        function_policies = ResourcePolicies(resource_properties, self._policy_template_processor)
 
         if len(function_policies) == 0:
             # No policies to process
@@ -66,7 +67,7 @@ class PolicyTemplatesForFunctionPlugin(BasePlugin):
             result.append(converted_policy)
 
         # Save the modified policies list to the input
-        resource_properties[FunctionPolicies.POLICIES_PROPERTY_NAME] = result
+        resource_properties[ResourcePolicies.POLICIES_PROPERTY_NAME] = result
 
     def _process_intrinsic_if_policy_template(self, logical_id, policy_entry):
         intrinsic_if = policy_entry.data
@@ -117,4 +118,4 @@ class PolicyTemplatesForFunctionPlugin(BasePlugin):
         :param string resource_type: Type of the resource
         :return: True, if this plugin supports this resource. False otherwise
         """
-        return resource_type == self.SUPPORTED_RESOURCE_TYPE
+        return resource_type in self.SUPPORTED_RESOURCE_TYPE

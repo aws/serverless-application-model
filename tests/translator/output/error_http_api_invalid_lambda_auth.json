@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyApi1] is invalid. LambdaAuth Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'. Resource with id [MyApi2] is invalid. LambdaAuth Lambda Authorizer must define 'FunctionArn'."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [MyApi1] is invalid. LambdaAuth Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'. Resource with id [MyApi2] is invalid. LambdaAuth Lambda Authorizer must define 'FunctionArn'."
+}

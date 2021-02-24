@@ -43,7 +43,7 @@ class Resource(object):
     property_types = None
     _keywords = ["logical_id", "relative_id", "depends_on", "resource_attributes"]
 
-    _supported_resource_attributes = ["DeletionPolicy", "UpdateReplacePolicy", "UpdatePolicy", "Condition"]
+    _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition"]
 
     # Runtime attributes that can be qureied resource. They are CloudFormation attributes like ARN, Name etc that
     # will be resolvable at runtime. This map will be implemented by sub-classes to express list of attributes they
@@ -355,8 +355,7 @@ class ResourceMacro(Resource):
 
 
 class SamResourceMacro(ResourceMacro):
-    """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources.
-    """
+    """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources."""
 
     # SAM resources can provide a list of properties that they expose. These properties usually resolve to
     # CFN resources that this SAM resource generates. This is provided as a map with the following format:

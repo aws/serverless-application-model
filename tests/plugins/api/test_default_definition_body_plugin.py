@@ -41,8 +41,8 @@ class TestDefaultDefinitionBodyPlugin_on_before_transform_template(TestCase):
         SamTemplateMock.assert_called_with(template_dict)
 
         # Make sure this is called only for Apis
-        sam_template.iterate.assert_any_call("AWS::Serverless::Api")
-        sam_template.iterate.assert_any_call("AWS::Serverless::HttpApi")
+        sam_template.iterate.assert_any_call({"AWS::Serverless::Api"})
+        sam_template.iterate.assert_any_call({"AWS::Serverless::HttpApi"})
 
 
 class ApiResource(object):

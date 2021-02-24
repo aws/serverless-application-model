@@ -1,0 +1,22 @@
+{
+  "Resources": {
+    "StateMachine": {
+      "Type": "AWS::StepFunctions::StateMachine", 
+      "Properties": {
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
+        "StateMachineName": "MyStateMachineWithRole", 
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket", 
+          "Key": "my-state-machine.asl.json"
+        }, 
+        "StateMachineType": "STANDARD", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "stateMachine:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -14,7 +14,7 @@ from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.tags.resource_tagging import get_tag_list
-from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
 
 _CORS_WILDCARD = "*"
@@ -48,6 +48,8 @@ class HttpApiGenerator(object):
         passthrough_resource_attributes=None,
         domain=None,
         fail_on_warnings=False,
+        description=None,
+        disable_execute_api_endpoint=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -62,6 +64,7 @@ class HttpApiGenerator(object):
         :param access_log_settings: Whether to send access logs and where for Stage
         :param resource_attributes: Resource attributes to add to API resources
         :param passthrough_resource_attributes: Attributes such as `Condition` that are added to derived resources
+        :param description: Description of the API Gateway resource
         """
         self.logical_id = logical_id
         self.stage_variables = stage_variables
@@ -81,6 +84,8 @@ class HttpApiGenerator(object):
         self.passthrough_resource_attributes = passthrough_resource_attributes
         self.domain = domain
         self.fail_on_warnings = fail_on_warnings
+        self.description = description
+        self.disable_execute_api_endpoint = disable_execute_api_endpoint
 
     def _construct_http_api(self):
         """Constructs and returns the ApiGatewayV2 HttpApi.
@@ -104,6 +109,11 @@ class HttpApiGenerator(object):
         if self.fail_on_warnings:
             http_api.FailOnWarnings = self.fail_on_warnings
 
+        if self.disable_execute_api_endpoint is not None:
+            self._add_endpoint_configuration()
+
+        self._add_description()
+
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
@@ -117,6 +127,32 @@ class HttpApiGenerator(object):
             )
 
         return http_api
+
+    def _add_endpoint_configuration(self):
+        """Add disableExecuteApiEndpoint if it is set in SAM
+        HttpApi doesn't have vpcEndpointIds
+
+        Note:
+        DisableExecuteApiEndpoint as a property of AWS::ApiGatewayV2::Api needs both DefinitionBody and
+        DefinitionUri to be None. However, if neither DefinitionUri nor DefinitionBody are specified,
+        SAM will generate a openapi definition body based on template configuration.
+        https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
+        For this reason, we always put DisableExecuteApiEndpoint into openapi object.
+
+        """
+        if self.disable_execute_api_endpoint and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
+            )
+        editor = OpenApiEditor(self.definition_body)
+
+        # if DisableExecuteApiEndpoint is set in both definition_body and as a property,
+        # SAM merges and overrides the disableExecuteApiEndpoint in definition_body with headers of
+        # "x-amazon-apigateway-endpoint-configuration"
+        editor.add_endpoint_config(self.disable_execute_api_endpoint)
+
+        # Assign the OpenApi back to template
+        self.definition_body = editor.openapi
 
     def _add_cors(self):
         """
@@ -211,12 +247,43 @@ class HttpApiGenerator(object):
             self.domain["EndpointConfiguration"] = "REGIONAL"
         elif endpoint not in ["REGIONAL"]:
             raise InvalidResourceException(
-                self.logical_id, "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
+                self.logical_id,
+                "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
             )
         domain_config["EndpointType"] = endpoint
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
+        if self.domain.get("SecurityPolicy", None):
+            domain_config["SecurityPolicy"] = self.domain.get("SecurityPolicy")
 
         domain.DomainNameConfigurations = [domain_config]
+
+        mutual_tls_auth = self.domain.get("MutualTlsAuthentication", None)
+        if mutual_tls_auth:
+            if isinstance(mutual_tls_auth, dict):
+                if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
+                    invalid_keys = []
+                    for key in mutual_tls_auth.keys():
+                        if key not in {"TruststoreUri", "TruststoreVersion"}:
+                            invalid_keys.append(key)
+                    invalid_keys.sort()
+                    raise InvalidResourceException(
+                        ",".join(invalid_keys),
+                        "Available MutualTlsAuthentication fields are {}.".format(
+                            ["TruststoreUri", "TruststoreVersion"]
+                        ),
+                    )
+                domain.MutualTlsAuthentication = {}
+                if mutual_tls_auth.get("TruststoreUri", None):
+                    domain.MutualTlsAuthentication["TruststoreUri"] = mutual_tls_auth["TruststoreUri"]
+                if mutual_tls_auth.get("TruststoreVersion", None):
+                    domain.MutualTlsAuthentication["TruststoreVersion"] = mutual_tls_auth["TruststoreVersion"]
+            else:
+                raise InvalidResourceException(
+                    mutual_tls_auth,
+                    "MutualTlsAuthentication must be a map with at least one of the following fields {}.".format(
+                        ["TruststoreUri", "TruststoreVersion"]
+                    ),
+                )
 
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
@@ -272,11 +339,16 @@ class HttpApiGenerator(object):
                 invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
                 if re.search(invalid_regex, path) is not None:
                     raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
-                # ignore leading and trailing `/` in the path name
-                m = re.search(r"[a-zA-Z0-9]+[\-\_]?[a-zA-Z0-9]+", path)
-                path = m.string[m.start(0) : m.end(0)]
-                if path is None:
-                    raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+
+                if path == "/":
+                    path = ""
+                else:
+                    # ignore leading and trailing `/` in the path name
+                    m = re.search(r"[a-zA-Z0-9]+[\-\_]?[a-zA-Z0-9]+", path)
+                    path = m.string[m.start(0) : m.end(0)]
+                    if path is None:
+                        raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+
                 logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-\_]+", "", path), "ApiMapping")
                 basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
                 basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
@@ -317,7 +389,8 @@ class HttpApiGenerator(object):
             alias_target["DNSName"] = fnGetAtt(self.domain.get("ApiDomainName"), "RegionalDomainName")
         else:
             raise InvalidResourceException(
-                self.logical_id, "Only REGIONAL endpoint is supported on HTTP APIs.",
+                self.logical_id,
+                "Only REGIONAL endpoint is supported on HTTP APIs.",
             )
         return alias_target
 
@@ -394,6 +467,15 @@ class HttpApiGenerator(object):
         if not default_authorizer:
             return
 
+        if is_intrinsic_no_value(default_authorizer):
+            return
+
+        if is_intrinsic(default_authorizer):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set DefaultAuthorizer because intrinsic functions are not supported for this field.",
+            )
+
         if not authorizers.get(default_authorizer):
             raise InvalidResourceException(
                 self.logical_id,
@@ -436,6 +518,11 @@ class HttpApiGenerator(object):
                 authorization_scopes=authorizer.get("AuthorizationScopes"),
                 jwt_configuration=authorizer.get("JwtConfiguration"),
                 id_source=authorizer.get("IdentitySource"),
+                function_arn=authorizer.get("FunctionArn"),
+                function_invoke_role=authorizer.get("FunctionInvokeRole"),
+                identity=authorizer.get("Identity"),
+                authorizer_payload_format_version=authorizer.get("AuthorizerPayloadFormatVersion"),
+                enable_simple_responses=authorizer.get("EnableSimpleResponses"),
             )
         return authorizers
 
@@ -506,6 +593,27 @@ class HttpApiGenerator(object):
         stage.RouteSettings = self.route_settings
 
         return stage
+
+    def _add_description(self):
+        """Add description to DefinitionBody if Description property is set in SAM"""
+        if not self.description:
+            return
+
+        if not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Description works only with inline OpenApi specified in the 'DefinitionBody' property.",
+            )
+        if self.definition_body.get("info", {}).get("description"):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set Description because it is already defined within inline OpenAPI specified in the "
+                "'DefinitionBody' property.",
+            )
+
+        open_api_editor = OpenApiEditor(self.definition_body)
+        open_api_editor.add_description(self.description)
+        self.definition_body = open_api_editor.openapi
 
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM HTTP API resource

@@ -1,0 +1,32 @@
+Resources:
+  MyFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: "${my_state_var_1}"
+            Result: Hello
+            Next: World
+          World:
+            Type: "${my_state_var_2}"
+            Resource: !GetAtt MyFunction.Arn
+            End: true
+      DefinitionSubstitutions:
+        my_state_var_1: Pass
+        my_state_var_2: Task
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource: !GetAtt MyFunction.Arn

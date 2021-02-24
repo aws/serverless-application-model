@@ -1,0 +1,58 @@
+Resources:
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachine
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Deny
+              Action: "*"
+              Resource: "*"
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /one
+            Method: get
+            Auth:
+              ResourcePolicy:
+                IpRangeWhitelist: ["1.2.3.4"]
+                IpRangeBlacklist: ["1.2.3.4"]
+        PostHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /two
+            Method: post
+            Auth:
+              ResourcePolicy:
+                IpRangeWhitelist: ["1.2.3.4"]
+                IpRangeBlacklist: ["1.2.3.4"]
+        PutHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /three
+            Method: put

@@ -12,6 +12,14 @@ Parameters:
     Type: String
     Default: REGIONAL
 
+  MyMTLSUriHTTP:
+    Default: another-api-v2-truststore-uri
+    Type: String
+
+  MyMTLSVersionHTTP:
+    Default: another-api-v2-truststore-version
+    Type: String
+
 Resources:
   MyFunction:
     Condition: C1
@@ -45,9 +53,14 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
+      DisableExecuteApiEndpoint: False
       Domain:
         DomainName: !Sub 'example-${AWS::Region}.com'
         CertificateArn: !Ref MyDomainCert
         EndpointConfiguration: !Ref EndpointConf
         BasePath: [ "/get", "/fetch" ]
+        MutualTlsAuthentication:
+          TruststoreUri: !Ref MyMTLSUriHTTP
+          TruststoreVersion: !Ref MyMTLSVersionHTTP
+        SecurityPolicy: TLS_1_2
 

@@ -1,0 +1,11 @@
+{
+    "errors": [
+        {
+            "errorMessage": "Resource with id [MinimalFunction] is invalid. Alarms must be a list"
+        },
+        {
+            "errorMessage": "Resource with id [MinimalFunction] is invalid. Alarms must be a list"
+        }
+    ],
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [MinimalFunction] is invalid. Alarms must be a list Resource with id [MinimalFunction] is invalid. Alarms must be a list"
+}

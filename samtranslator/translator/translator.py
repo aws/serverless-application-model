@@ -1,4 +1,10 @@
 import copy
+
+from samtranslator.feature_toggle.feature_toggle import (
+    FeatureToggle,
+    FeatureToggleLocalConfigProvider,
+    FeatureToggleDefaultConfigProvider,
+)
 from samtranslator.model import ResourceTypeResolver, sam_resources
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
@@ -16,16 +22,16 @@ from samtranslator.plugins.application.serverless_app_plugin import ServerlessAp
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
-from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
+from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
+from samtranslator.translator.arn_generator import ArnGenerator
 
 
 class Translator:
-    """Translates SAM templates into CloudFormation templates
-    """
+    """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None):
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -35,6 +41,10 @@ class Translator:
         self.managed_policy_map = managed_policy_map
         self.plugins = plugins
         self.sam_parser = sam_parser
+        self.feature_toggle = None
+        self.boto_session = boto_session
+
+        ArnGenerator.class_boto_session = self.boto_session
 
     def _get_function_names(self, resource_dict, intrinsics_resolver):
         """
@@ -66,7 +76,7 @@ class Translator:
                                 )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values):
+    def translate(self, sam_template, parameter_values, feature_toggle=None):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -81,11 +91,12 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
+        self.feature_toggle = feature_toggle if feature_toggle else FeatureToggle(FeatureToggleDefaultConfigProvider())
         self.function_names = dict()
         self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
-        sam_parameter_values.add_pseudo_parameter_values()
+        sam_parameter_values.add_pseudo_parameter_values(self.boto_session)
         parameter_values = sam_parameter_values.parameter_values
         # Create & Install plugins
         sam_plugins = prepare_plugins(self.plugins, parameter_values)
@@ -145,7 +156,12 @@ class Translator:
                 template["Resources"].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
-                template["Resources"].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
+                try:
+                    template["Resources"].update(
+                        deployment_preference_collection.deployment_group(logical_id).to_dict()
+                    )
+                except InvalidResourceException as e:
+                    document_errors.append(e)
 
         # Run the after-transform plugin target
         try:
@@ -170,10 +186,11 @@ class Translator:
         Returns a list of resources to iterate, order them based on the following order:
 
             1. AWS::Serverless::Function - because API Events need to modify the corresponding Serverless::Api resource.
-            2. AWS::Serverless::Api
-            3. Anything else
+            2. AWS::Serverless::StateMachine - because API Events need to modify the corresponding Serverless::Api resource.
+            3. AWS::Serverless::Api
+            4. Anything else
 
-        This is necessary because a Function resource with API Events will modify the API resource's Swagger JSON.
+        This is necessary because a Function or State Machine resource with API Events will modify the API resource's Swagger JSON.
         Therefore API resource needs to be parsed only after all the Swagger modifications are complete.
 
         :param dict sam_template: SAM template
@@ -182,6 +199,7 @@ class Translator:
         """
 
         functions = []
+        statemachines = []
         apis = []
         others = []
         resources = sam_template["Resources"]
@@ -195,12 +213,14 @@ class Translator:
                 continue
             elif resource["Type"] == "AWS::Serverless::Function":
                 functions.append(data)
+            elif resource["Type"] == "AWS::Serverless::StateMachine":
+                statemachines.append(data)
             elif resource["Type"] == "AWS::Serverless::Api" or resource["Type"] == "AWS::Serverless::HttpApi":
                 apis.append(data)
             else:
                 others.append(data)
 
-        return functions + apis + others
+        return functions + statemachines + apis + others
 
 
 def prepare_plugins(plugins, parameters={}):
@@ -250,9 +270,9 @@ def make_policy_template_for_function_plugin():
     """
     Constructs an instance of policy templates processing plugin using default policy templates JSON data
 
-    :return plugins.policies.policy_templates_plugin.PolicyTemplatesForFunctionPlugin: Instance of the plugin
+    :return plugins.policies.policy_templates_plugin.PolicyTemplatesForResourcePlugin: Instance of the plugin
     """
 
     policy_templates = PolicyTemplatesProcessor.get_default_policy_templates_json()
     processor = PolicyTemplatesProcessor(policy_templates)
-    return PolicyTemplatesForFunctionPlugin(processor)
+    return PolicyTemplatesForResourcePlugin(processor)

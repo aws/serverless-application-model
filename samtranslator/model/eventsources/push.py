@@ -12,6 +12,7 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.model.events import EventsRule
 from samtranslator.model.eventsources.pull import SQS
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy, SQSQueuePolicies
+from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.iot import IotTopicRule
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.translator import logical_id_generator
@@ -94,6 +95,8 @@ class Schedule(PushEventSource):
         "Enabled": PropertyType(False, is_type(bool)),
         "Name": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -118,16 +121,23 @@ class Schedule(PushEventSource):
             events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
         events_rule.Name = self.Name
         events_rule.Description = self.Description
-        events_rule.Targets = [self._construct_target(function)]
 
         source_arn = events_rule.get_runtime_attr("arn")
+        dlq_queue_arn = None
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            resources.extend(dlq_resources)
+
+        events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
+
         if CONDITION in function.resource_attributes:
             events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
 
-    def _construct_target(self, function):
+    def _construct_target(self, function, dead_letter_queue_arn=None):
         """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
@@ -136,6 +146,12 @@ class Schedule(PushEventSource):
         target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
         if self.Input is not None:
             target["Input"] = self.Input
+
+        if self.DeadLetterConfig is not None:
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
+
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
 
         return target
 
@@ -148,8 +164,11 @@ class CloudWatchEvent(PushEventSource):
     property_types = {
         "EventBusName": PropertyType(False, is_str()),
         "Pattern": PropertyType(False, is_type(dict)),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
+        "Target": PropertyType(False, is_type(dict)),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -170,29 +189,43 @@ class CloudWatchEvent(PushEventSource):
         events_rule = EventsRule(self.logical_id)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
-        events_rule.Targets = [self._construct_target(function)]
+        source_arn = events_rule.get_runtime_attr("arn")
+
+        dlq_queue_arn = None
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            resources.extend(dlq_resources)
+
+        events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
         if CONDITION in function.resource_attributes:
             events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         resources.append(events_rule)
-
-        source_arn = events_rule.get_runtime_attr("arn")
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
 
-    def _construct_target(self, function):
+    def _construct_target(self, function, dead_letter_queue_arn=None):
         """Constructs the Target property for the CloudWatch Events/EventBridge Rule.
 
         :returns: the Target property
         :rtype: dict
         """
-        target = {"Arn": function.get_runtime_attr("arn"), "Id": self.logical_id + "LambdaTarget"}
+        target_id = self.Target["Id"] if self.Target and "Id" in self.Target else self.logical_id + "LambdaTarget"
+        target = {"Arn": function.get_runtime_attr("arn"), "Id": target_id}
         if self.Input is not None:
             target["Input"] = self.Input
 
         if self.InputPath is not None:
             target["InputPath"] = self.InputPath
+
+        if self.DeadLetterConfig is not None:
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
+
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
+
         return target
 
 
@@ -216,6 +249,8 @@ class S3(PushEventSource):
     def resources_to_link(self, resources):
         if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
             bucket_id = self.Bucket["Ref"]
+            if not isinstance(bucket_id, string_types):
+                raise InvalidEventException(self.relative_id, "'Ref' value in S3 events is not a valid string.")
             if bucket_id in resources:
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
         raise InvalidEventException(self.relative_id, "S3 events must reference an S3 bucket in the same template.")
@@ -403,7 +438,7 @@ class SNS(PushEventSource):
             queue_arn = queue.get_runtime_attr("arn")
             queue_url = queue.get_runtime_attr("queue_url")
 
-            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url)
+            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function.resource_attributes)
             subscription = self._inject_subscription(
                 "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
             )
@@ -426,7 +461,9 @@ class SNS(PushEventSource):
         batch_size = self.SqsSubscription.get("BatchSize", None)
         enabled = self.SqsSubscription.get("Enabled", None)
 
-        queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, queue_policy_logical_id)
+        queue_policy = self._inject_sqs_queue_policy(
+            self.Topic, queue_arn, queue_url, function.resource_attributes, queue_policy_logical_id
+        )
         subscription = self._inject_subscription(
             "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
         )
@@ -462,8 +499,11 @@ class SNS(PushEventSource):
         event_source.Enabled = enabled or True
         return event_source.to_cloudformation(function=function, role=role)
 
-    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, logical_id=None):
+    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, resource_attributes, logical_id=None):
         policy = SQSQueuePolicy(logical_id or self.logical_id + "QueuePolicy")
+        if CONDITION in resource_attributes:
+            policy.set_resource_attribute(CONDITION, resource_attributes[CONDITION])
+
         policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(topic_arn, queue_arn)
         policy.Queues = [queue_url]
         return policy
@@ -655,6 +695,15 @@ class Api(PushEventSource):
                             ),
                         )
 
+                    if not isinstance(method_authorizer, string_types):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                            "because it wasn't defined with acceptable values in the API's Authorizers.".format(
+                                authorizer=method_authorizer, method=self.Method, path=self.Path
+                            ),
+                        )
+
                     if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
                         raise InvalidEventException(
                             self.relative_id,
@@ -713,6 +762,14 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because the related API does not define any Models.".format(
+                            model=method_model, method=self.Method, path=self.Path
+                        ),
+                    )
+                if not isinstance(method_model, string_types):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
+                        "because the related API does not contain valid Models.".format(
                             model=method_model, method=self.Method, path=self.Path
                         ),
                     )
@@ -868,6 +925,11 @@ class Cognito(PushEventSource):
     def resources_to_link(self, resources):
         if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
             userpool_id = self.UserPool["Ref"]
+            if not isinstance(userpool_id, string_types):
+                raise InvalidEventException(
+                    self.logical_id,
+                    "Ref in Userpool is not a string.",
+                )
             if userpool_id in resources:
                 return {"userpool": resources[userpool_id], "userpool_id": userpool_id}
         raise InvalidEventException(
@@ -1089,7 +1151,7 @@ class HttpApi(PushEventSource):
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
         method_authorizer = self.Auth.get("Authorizer")
-        api_auth = api.get("Auth")
+        api_auth = api.get("Auth", {})
         if not method_authorizer:
             if api_auth.get("DefaultAuthorizer"):
                 self.Auth["Authorizer"] = method_authorizer = api_auth.get("DefaultAuthorizer")

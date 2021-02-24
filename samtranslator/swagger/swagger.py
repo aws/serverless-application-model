@@ -3,8 +3,8 @@ import json
 import re
 from six import string_types
 
-from samtranslator.model.intrinsics import ref, is_intrinsic_no_value
-from samtranslator.model.intrinsics import make_conditional, fnSub, is_intrinsic_if
+from samtranslator.model.intrinsics import ref
+from samtranslator.model.intrinsics import make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 
 
@@ -202,6 +202,61 @@ class SwaggerEditor(object):
 
         # If 'responses' key is *not* present, add it with an empty dict as value
         path_dict[method].setdefault("responses", {})
+
+        # If a condition is present, wrap all method contents up into the condition
+        if condition:
+            path_dict[method] = make_conditional(condition, path_dict[method])
+
+    def add_state_machine_integration(
+        self,
+        path,
+        method,
+        integration_uri,
+        credentials,
+        request_templates=None,
+        condition=None,
+    ):
+        """
+        Adds aws APIGW integration to the given path+method.
+
+        :param string path: Path name
+        :param string method: HTTP Method
+        :param string integration_uri: URI for the integration
+        :param string credentials: Credentials for the integration
+        :param dict request_templates: A map of templates that are applied on the request payload.
+        :param bool condition: Condition for the integration
+        """
+
+        method = self._normalize_method_name(method)
+        if self.has_integration(path, method):
+            raise ValueError("Integration already exists on Path={}, Method={}".format(path, method))
+
+        self.add_path(path, method)
+
+        # Wrap the integration_uri in a Condition if one exists on that state machine
+        # This is necessary so CFN doesn't try to resolve the integration reference.
+        if condition:
+            integration_uri = make_conditional(condition, integration_uri)
+
+        path_dict = self.get_path(path)
+
+        # Responses
+        integration_responses = {"200": {"statusCode": "200"}, "400": {"statusCode": "400"}}
+        default_method_responses = {"200": {"description": "OK"}, "400": {"description": "Bad Request"}}
+
+        path_dict[method][self._X_APIGW_INTEGRATION] = {
+            "type": "aws",
+            "httpMethod": "POST",
+            "uri": integration_uri,
+            "responses": integration_responses,
+            "credentials": credentials,
+        }
+
+        # If 'responses' key is *not* present, add it with an empty dict as value
+        path_dict[method].setdefault("responses", default_method_responses)
+
+        if request_templates:
+            path_dict[method][self._X_APIGW_INTEGRATION].update({"requestTemplates": request_templates})
 
         # If a condition is present, wrap all method contents up into the condition
         if condition:
@@ -479,6 +534,14 @@ class SwaggerEditor(object):
                 for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                    if not isinstance(method_definition, dict):
+                        raise InvalidDocumentException(
+                            [
+                                InvalidTemplateException(
+                                    "{} for path {} is not a valid dictionary.".format(method_definition, path)
+                                )
+                            ]
+                        )
                     if not self.method_definition_has_integration(method_definition):
                         continue
                     existing_security = method_definition.get("security", [])
@@ -493,6 +556,14 @@ class SwaggerEditor(object):
                     # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
                     # We want to ensure only a single Authorizer security entry exists while keeping everything else
                     for security in existing_security:
+                        if not isinstance(security, dict):
+                            raise InvalidDocumentException(
+                                [
+                                    InvalidTemplateException(
+                                        "{} in Security for path {} is not a valid dictionary.".format(security, path)
+                                    )
+                                ]
+                            )
                         if authorizer_names.isdisjoint(security.keys()):
                             existing_non_authorizer_security.append(security)
                         else:
@@ -781,10 +852,10 @@ class SwaggerEditor(object):
             model_properties = schema.get("properties")
 
             if not model_type:
-                raise ValueError("Invalid input. Value for type is required")
+                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'type'.")])
 
             if not model_properties:
-                raise ValueError("Invalid input. Value for properties is required")
+                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'properties'.")])
 
             self.definitions[model_name.lower()] = schema
 
@@ -797,6 +868,8 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
+        if not isinstance(resource_policy, dict):
+            raise InvalidDocumentException([InvalidTemplateException("Resource Policy is not a valid dictionary.")])
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
@@ -804,6 +877,10 @@ class SwaggerEditor(object):
         ip_range_blacklist = resource_policy.get("IpRangeBlacklist")
         source_vpc_whitelist = resource_policy.get("SourceVpcWhitelist")
         source_vpc_blacklist = resource_policy.get("SourceVpcBlacklist")
+        source_vpc_intrinsic_whitelist = resource_policy.get("IntrinsicVpcWhitelist")
+        source_vpce_intrinsic_whitelist = resource_policy.get("IntrinsicVpceWhitelist")
+        source_vpc_intrinsic_blacklist = resource_policy.get("IntrinsicVpcBlacklist")
+        source_vpce_intrinsic_blacklist = resource_policy.get("IntrinsicVpceBlacklist")
 
         if aws_account_whitelist is not None:
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
@@ -821,13 +898,31 @@ class SwaggerEditor(object):
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
-        if source_vpc_whitelist is not None:
+        if (
+            (source_vpc_blacklist is not None)
+            or (source_vpc_intrinsic_blacklist is not None)
+            or (source_vpce_intrinsic_blacklist is not None)
+        ):
+            blacklist_dict = {
+                "StringEndpointList": source_vpc_blacklist,
+                "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
+                "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
+            }
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(source_vpc_whitelist, "StringNotEquals", resource_list)
+            self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
 
-        if source_vpc_blacklist is not None:
+        if (
+            (source_vpc_whitelist is not None)
+            or (source_vpc_intrinsic_whitelist is not None)
+            or (source_vpce_intrinsic_whitelist is not None)
+        ):
+            whitelist_dict = {
+                "StringEndpointList": source_vpc_whitelist,
+                "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
+                "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
+            }
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(source_vpc_blacklist, "StringEquals", resource_list)
+            self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -931,33 +1026,44 @@ class SwaggerEditor(object):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(self, endpoint_list, conditional, resource_list):
+    def _add_vpc_resource_policy_for_method(self, endpoint_dict, conditional, resource_list):
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
         :raises ValueError: If the conditional passed in does not match the allowed values.
         """
-        if not endpoint_list:
-            return
 
         if conditional not in ["StringNotEquals", "StringEquals"]:
             raise ValueError("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))
 
-        vpce_regex = r"^vpce-"
-        vpc_regex = r"^vpc-"
-        vpc_list = []
-        vpce_list = []
-        for endpoint in endpoint_list:
-            if re.match(vpce_regex, endpoint):
-                vpce_list.append(endpoint)
-            if re.match(vpc_regex, endpoint):
-                vpc_list.append(endpoint)
-
         condition = {}
-        if vpc_list:
-            condition["aws:SourceVpc"] = vpc_list
-        if vpce_list:
-            condition["aws:SourceVpce"] = vpce_list
+        string_endpoint_list = endpoint_dict.get("StringEndpointList")
+        intrinsic_vpc_endpoint_list = endpoint_dict.get("IntrinsicVpcList")
+        intrinsic_vpce_endpoint_list = endpoint_dict.get("IntrinsicVpceList")
+
+        if string_endpoint_list is not None:
+            vpce_regex = r"^vpce-"
+            vpc_regex = r"^vpc-"
+            vpc_list = []
+            vpce_list = []
+            for endpoint in string_endpoint_list:
+                if re.match(vpce_regex, endpoint):
+                    vpce_list.append(endpoint)
+                if re.match(vpc_regex, endpoint):
+                    vpc_list.append(endpoint)
+            if vpc_list:
+                condition.setdefault("aws:SourceVpc", []).extend(vpc_list)
+            if vpce_list:
+                condition.setdefault("aws:SourceVpce", []).extend(vpce_list)
+        if intrinsic_vpc_endpoint_list is not None:
+            condition.setdefault("aws:SourceVpc", []).extend(intrinsic_vpc_endpoint_list)
+        if intrinsic_vpce_endpoint_list is not None:
+            condition.setdefault("aws:SourceVpce", []).extend(intrinsic_vpce_endpoint_list)
+
+        # Skip writing to transformed template if both vpc and vpce endpoint lists are empty
+        if (not condition.get("aws:SourceVpc", [])) and (not condition.get("aws:SourceVpce", [])):
+            return
+
         self.resource_policy["Version"] = "2012-10-17"
         allow_statement = {}
         allow_statement["Effect"] = "Allow"
@@ -1144,4 +1250,5 @@ class SwaggerEditor(object):
 
     @staticmethod
     def get_path_without_trailing_slash(path):
-        return re.sub(r"{([a-zA-Z0-9._-]+|proxy\+)}", "*", path)
+        # convert greedy paths to such as {greedy+}, {proxy+} to "*"
+        return re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)

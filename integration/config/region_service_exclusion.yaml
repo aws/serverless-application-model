@@ -1,0 +1,86 @@
+regions:
+  af-south-1:
+    - ServerlessRepo
+    - Cognito
+    - KMS
+    - CodeDeploy
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+  ap-east-1:
+    - Cognito
+    - IoT
+    - ServerlessRepo
+    - HttpApi
+  ap-northeast-2:
+    - HttpApi
+  ap-northeast-3:
+    - Cognito
+    - IoT
+    - ServerlessRepo
+    - XRay
+    - CodeDeploy
+    - HttpApi
+  ap-south-1:
+    - HttpApi
+  ap-southeast-1:
+    - HttpApi
+  ca-central-1:
+    - Cognito
+    - IoT
+    - HttpApi
+  cn-north-1:
+    - ServerlessRepo
+    - Cognito
+    - KMS
+    - CodeDeploy
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+  cn-northwest-1:
+    - ServerlessRepo
+    - Cognito
+    - KMS
+    - CodeDeploy
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+  eu-north-1:
+    - ServerlessRepo
+    - Cognito
+    - IoT
+    - HttpApi
+    - Layers
+  eu-south-1:
+    - ServerlessRepo
+    - Cognito
+    - KMS
+    - CodeDeploy
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+  eu-west-2:
+    - HttpApi
+  eu-west-3:
+    - Cognito
+    - IoT
+    - XRay
+    - HttpApi
+  me-south-1:
+    - ServerlessRepo
+    - Cognito
+    - IoT
+    - HttpApi
+  sa-east-1:
+    - IoT
+    - Cognito
+    - HttpApi
+  us-east-2:
+    - HttpApi
+  us-west-1:
+    - Cognito
+    - IoT

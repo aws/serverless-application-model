@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes, PolicyEntry
 from samtranslator.model.exceptions import InvalidTemplateException
-from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
 
 
 class TestFunctionPolicies(TestCase):
@@ -270,37 +269,6 @@ class TestFunctionPolicies(TestCase):
 
         self.assertFalse(function_policies_obj._is_policy_template(policy))
         self.policy_template_processor_mock.has.assert_not_called()
-
-    def test_is_intrinsic_if_must_return_true_for_if(self):
-        policy = {"Fn::If": "some value"}
-
-        self.assertTrue(is_intrinsic_if(policy))
-
-    def test_is_intrinsic_if_must_return_false_for_others(self):
-        too_many_keys = {"Fn::If": "some value", "Fn::And": "other value"}
-
-        not_if = {"Fn::Or": "some value"}
-
-        self.assertFalse(is_intrinsic_if(too_many_keys))
-        self.assertFalse(is_intrinsic_if(not_if))
-        self.assertFalse(is_intrinsic_if(None))
-
-    def test_is_intrinsic_no_value_must_return_true_for_no_value(self):
-        policy = {"Ref": "AWS::NoValue"}
-
-        self.assertTrue(is_intrinsic_no_value(policy))
-
-    def test_is_intrinsic_no_value_must_return_false_for_other_value(self):
-        bad_key = {"sRefs": "AWS::NoValue"}
-
-        bad_value = {"Ref": "SWA::NoValue"}
-
-        too_many_keys = {"Ref": "AWS::NoValue", "feR": "SWA::NoValue"}
-
-        self.assertFalse(is_intrinsic_no_value(bad_key))
-        self.assertFalse(is_intrinsic_no_value(bad_value))
-        self.assertFalse(is_intrinsic_no_value(None))
-        self.assertFalse(is_intrinsic_no_value(too_many_keys))
 
     def test_get_type_with_intrinsic_if_must_return_managed_policy_type(self):
         managed_policy = {"Fn::If": ["SomeCondition", "some managed policy arn", "other managed policy arn"]}

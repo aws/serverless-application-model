@@ -55,6 +55,9 @@
                 }
               ]
             },
+            "Description": {
+              "type": "string"
+            },
             "Name": {
               "type": "string"
             },
@@ -365,6 +368,34 @@
         },
         "Pattern": {
           "type": "object"
+        },
+        "DeadLetterConfig": {
+          "additionalProperties": false,
+          "properties": {
+            "Arn": {
+              "type": "string"
+            },
+            "Type": {
+              "type": "string"
+            },
+            "QueueLogicalId": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "RetryPolicy": {
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "MaximumEventAgeInSeconds": {
+              "type": "number"
+            },
+            "MaximumRetryAttempts": {
+              "type": "number"
+            }
+          },
+          "type": "object"
         }
       },
       "required": [
@@ -473,6 +504,12 @@
             },
             {
               "$ref": "#/definitions/AWS::Serverless::Function.KinesisEvent"
+            },
+            {
+              "$ref": "#/definitions/AWS::Serverless::Function.MSKEvent"
+            },
+            {
+              "$ref": "#/definitions/AWS::Serverless::Function.MQEvent"
             },
             {
               "$ref": "#/definitions/AWS::Serverless::Function.SQSEvent"
@@ -586,6 +623,47 @@
       ],
       "type": "object"
     },
+    "AWS::Serverless::Function.MSKEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "StartingPosition": {
+          "type": "string"
+        },
+        "Stream": {
+          "type": "string"
+        },
+        "Topics": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "StartingPosition",
+        "Stream",
+        "Topics"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Function.MQEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "Broker": {
+          "type": "string"
+        },
+        "Queues": {
+          "type": "array"
+        },
+        "SourceAccessConfigurations": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "Broker",
+        "Queues",
+        "SourceAccessConfigurations"
+      ],
+      "type": "object"
+    },
+
     "AWS::Serverless::Function.SQSEvent": {
       "additionalProperties": false,
       "properties": {

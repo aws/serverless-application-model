@@ -1,7 +1,13 @@
 from parameterized import parameterized
 from unittest import TestCase
 
-from samtranslator.model.intrinsics import is_intrinsic, make_shorthand
+from samtranslator.model.intrinsics import (
+    is_intrinsic,
+    make_shorthand,
+    is_intrinsic_if,
+    validate_intrinsic_if_items,
+    is_intrinsic_no_value,
+)
 
 
 class TestIntrinsics(TestCase):
@@ -30,3 +36,48 @@ class TestIntrinsics(TestCase):
 
         with self.assertRaises(NotImplementedError):
             make_shorthand(input)
+
+    def test_is_intrinsic_no_value_must_return_true_for_no_value(self):
+        policy = {"Ref": "AWS::NoValue"}
+
+        self.assertTrue(is_intrinsic_no_value(policy))
+
+    def test_is_intrinsic_no_value_must_return_false_for_other_value(self):
+        bad_key = {"sRefs": "AWS::NoValue"}
+        bad_value = {"Ref": "SWA::NoValue"}
+        too_many_keys = {"Ref": "AWS::NoValue", "feR": "SWA::NoValue"}
+
+        self.assertFalse(is_intrinsic_no_value(bad_key))
+        self.assertFalse(is_intrinsic_no_value(bad_value))
+        self.assertFalse(is_intrinsic_no_value(None))
+        self.assertFalse(is_intrinsic_no_value(too_many_keys))
+
+    def test_is_intrinsic_if_must_return_true_for_if(self):
+        policy = {"Fn::If": "some value"}
+
+        self.assertTrue(is_intrinsic_if(policy))
+
+    def test_is_intrinsic_if_must_return_false_for_others(self):
+        too_many_keys = {"Fn::If": "some value", "Fn::And": "other value"}
+        not_if = {"Fn::Or": "some value"}
+
+        self.assertFalse(is_intrinsic_if(too_many_keys))
+        self.assertFalse(is_intrinsic_if(not_if))
+        self.assertFalse(is_intrinsic_if(None))
+
+    def test_validate_intrinsic_if_items_valid(self):
+        validate_intrinsic_if_items(["Condition", "Then", "Else"])
+
+    def test_validate_intrinsic_if_items_invalid(self):
+        not_enough_items = ["Then", "Else"]
+        is_string = "Then"
+        is_integer = 3
+        is_boolean = True
+        is_dict = {"Fn::If": "some value", "Fn::And": "other value"}
+
+        self.assertRaises(ValueError, validate_intrinsic_if_items, not_enough_items)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, is_string)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, None)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, is_integer)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, is_boolean)
+        self.assertRaises(ValueError, validate_intrinsic_if_items, is_dict)

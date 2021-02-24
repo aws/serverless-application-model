@@ -5,7 +5,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ],
         "Tags": [
@@ -107,7 +107,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AWSXrayWriteOnlyAccess",
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ],
         "Tags": [
@@ -223,7 +223,6 @@
     }, 
     "FunctionWithOverridesVersion096ed3b52b": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
@@ -233,7 +232,6 @@
     }, 
     "MinimalFunctionVersion0a06fc8fb1": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {

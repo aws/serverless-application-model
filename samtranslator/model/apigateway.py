@@ -165,6 +165,8 @@ class ApiGatewayDomainName(Resource):
         "RegionalCertificateArn": PropertyType(False, is_str()),
         "DomainName": PropertyType(True, is_str()),
         "EndpointConfiguration": PropertyType(False, is_type(dict)),
+        "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
+        "SecurityPolicy": PropertyType(False, is_str()),
         "CertificateArn": PropertyType(False, is_str()),
     }
 
@@ -239,6 +241,9 @@ class ApiGatewayAuthorizer(object):
 
         if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):
             identity = {}
+
+        if authorization_scopes is not None and not isinstance(authorization_scopes, list):
+            raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
 
         self.api_logical_id = api_logical_id
         self.name = name

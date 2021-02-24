@@ -2,6 +2,7 @@ from unittest import TestCase
 from mock import Mock, patch
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import Action
+from samtranslator.model.exceptions import InvalidDocumentException
 
 
 class TestParameterReferenceResolution(TestCase):
@@ -101,11 +102,11 @@ class TestParameterReferenceResolution(TestCase):
         self.assertEqual(output, expected)
 
     def test_throw_on_empty_parameters(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(InvalidDocumentException):
             IntrinsicsResolver(None).resolve_parameter_refs({})
 
     def test_throw_on_non_dict_parameters(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(InvalidDocumentException):
             IntrinsicsResolver([1, 2, 3]).resolve_parameter_refs({})
 
     def test_short_circuit_on_empty_parameters(self):

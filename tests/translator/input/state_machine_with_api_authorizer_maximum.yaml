@@ -1,0 +1,123 @@
+Resources:
+  MyApi:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyCognitoAuth
+        ApiKeyRequired: true
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: arn:aws:1
+            Identity:
+              Header: MyAuthorizationHeader
+              ValidationExpression: myauthvalidationexpression
+
+          MyCognitoAuthMultipleUserPools:
+            UserPoolArn:
+              - arn:aws:2
+              - arn:aws:3
+            Identity:
+              Header: MyAuthorizationHeader2
+              ValidationExpression: myauthvalidationexpression2
+
+          MyLambdaTokenAuth:
+            FunctionPayloadType: TOKEN
+            FunctionArn: arn:aws
+            FunctionInvokeRole: arn:aws:iam::123456789012:role/S3Access
+            Identity:
+              Header: MyCustomAuthHeader
+              ValidationExpression: mycustomauthexpression
+              ReauthorizeEvery: 20
+
+          MyLambdaTokenAuthNoneFunctionInvokeRole:
+            FunctionArn: arn:aws
+            FunctionInvokeRole: NONE
+            Identity:
+              ReauthorizeEvery: 0
+
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: arn:aws
+            FunctionInvokeRole: arn:aws:iam::123456789012:role/S3Access
+            Identity:
+              Headers:
+                - Authorization1
+              QueryStrings:
+                - Authorization2
+              StageVariables:
+                - Authorization3
+              Context:
+                - Authorization4
+              ReauthorizeEvery: 0
+  
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachine
+      Type: STANDARD
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Deny
+              Action: "*"
+              Resource: "*"
+      Events:
+        WithNoAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: NONE
+        WithCognitoMultipleUserPoolsAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: post
+            Auth:
+              Authorizer: MyCognitoAuthMultipleUserPools
+        WithLambdaTokenAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: get
+            Auth:
+              Authorizer: MyLambdaTokenAuth
+        WithLambdaTokenAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: patch
+            Auth:
+              Authorizer: MyLambdaTokenAuthNoneFunctionInvokeRole
+        WithLambdaRequestAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: delete
+            Auth:
+              Authorizer: MyLambdaRequestAuth
+        WithDefaultAuthorizer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /users
+            Method: put

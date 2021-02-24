@@ -26,3 +26,17 @@ Resources:
             Stream: arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291
             BatchSize: 200
             StartingPosition: LATEST
+  MSKFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/streams.zip
+      Handler: stream.msk_handler
+      Runtime: python2.7
+      Events:
+        MyMSKStream:
+          Type: MSK
+          Properties:
+            Stream: arn:aws:kafka:us-west-2:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+            StartingPosition: LATEST
+            Topics:
+              - "Topic1"
