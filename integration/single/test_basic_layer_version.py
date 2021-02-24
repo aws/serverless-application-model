@@ -1,4 +1,7 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
 
 
 class TestBasicLayerVersion(BaseTest):
@@ -6,6 +9,7 @@ class TestBasicLayerVersion(BaseTest):
     Basic AWS::Lambda::LayerVersion tests
     """
 
+    @skipIf(current_region_does_not_support(["Layers"]), "Layers is not supported in this testing region")
     def test_basic_layer_version(self):
         """
         Creates a basic lambda layer version
@@ -22,6 +26,7 @@ class TestBasicLayerVersion(BaseTest):
 
         self.assertFalse(layer_logical_id_1 == layer_logical_id_2)
 
+    @skipIf(current_region_does_not_support(["Layers"]), "Layers is not supported in this testing region")
     def test_basic_layer_with_parameters(self):
         """
         Creates a basic lambda layer version with parameters
