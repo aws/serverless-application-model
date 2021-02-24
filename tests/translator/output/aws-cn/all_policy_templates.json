@@ -1602,9 +1602,9 @@
                   ],
                   "Resource": {
                     "Fn::Sub": [
-                      "arn:${AWS::Partition}:route53:${AWS::Region}:${AWS::AccountId}:hostedzone/${hostedZoneId}",
+                      "arn:${AWS::Partition}:route53:${AWS::Region}:${AWS::AccountId}:hostedzone/${HostedZoneId}",
                       {
-                        "hostedZoneId": "test"
+                        "HostedZoneId": "test"
                       }
                     ]
                   },
