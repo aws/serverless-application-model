@@ -3,6 +3,13 @@ import re
 import random
 import string  # pylint: disable=deprecated-module
 
+from integration.helpers.yaml_utils import load_yaml
+
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
+
 import boto3
 from botocore.exceptions import ClientError, NoRegionError
 
@@ -114,3 +121,33 @@ def create_bucket(bucket_name, region):
         s3_client = boto3.client("s3", region_name=region)
         location = {"LocationConstraint": region}
         s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
+
+
+def current_region_does_not_support(services):
+    """
+    Decide if a test should be skipped in the current testing region with the specific resources
+
+    Parameters
+    ----------
+    services : List
+        the services to be tested in the current testing region
+
+    Returns
+    -------
+    Boolean
+        If skip return true otherwise false
+    """
+
+    session = boto3.session.Session()
+    region = session.region_name
+
+    tests_integ_dir = Path(__file__).resolve().parents[1]
+    config_dir = Path(tests_integ_dir, "config")
+    region_exclude_services_file = str(Path(config_dir, "region_service_exclusion.yaml"))
+    region_exclude_services = load_yaml(region_exclude_services_file)
+
+    if region not in region_exclude_services["regions"]:
+        return False
+
+    # check if any one of the services is in the excluded services for current testing region
+    return bool(set(services).intersection(set(region_exclude_services["regions"][region])))

@@ -3,6 +3,7 @@ import os
 
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
+from integration.helpers.yaml_utils import dump_yaml, load_yaml
 
 try:
     from pathlib import Path
@@ -294,7 +295,7 @@ class BaseTest(TestCase):
             data = data.replace("${{{}}}".format(key), self.get_code_key_s3_uri(key))
         yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
 
-        self._dump_yaml(updated_template_path, yaml_doc)
+        dump_yaml(updated_template_path, yaml_doc)
 
         self.sub_input_file_path = updated_template_path
 
@@ -311,12 +312,12 @@ class BaseTest(TestCase):
         value
             value
         """
-        yaml_doc = self._load_yaml(self.sub_input_file_path)
+        yaml_doc = load_yaml(self.sub_input_file_path)
         yaml_doc["Resources"][resource_name]["Properties"][property_name] = value
-        self._dump_yaml(self.sub_input_file_path, yaml_doc)
+        dump_yaml(self.sub_input_file_path, yaml_doc)
 
     def get_template_resource_property(self, resource_name, property_name):
-        yaml_doc = self._load_yaml(self.sub_input_file_path)
+        yaml_doc = load_yaml(self.sub_input_file_path)
         return yaml_doc["Resources"][resource_name]["Properties"][property_name]
 
     def deploy_stack(self, parameters=None):
@@ -350,35 +351,3 @@ class BaseTest(TestCase):
         error = verify_stack_resources(self.expected_resource_path, self.stack_resources)
         if error:
             self.fail(error)
-
-    def _load_yaml(self, file_path):
-        """
-        Loads a yaml file
-
-        Parameters
-        ----------
-        file_path : Path
-            File path
-
-        Returns
-        -------
-        Object
-            Yaml object
-        """
-        with open(file_path) as f:
-            data = f.read()
-        return yaml.load(data, Loader=yaml.FullLoader)
-
-    def _dump_yaml(self, file_path, yaml_doc):
-        """
-        Writes a yaml object to a file
-
-        Parameters
-        ----------
-        file_path : Path
-            File path
-        yaml_doc : Object
-            Yaml object
-        """
-        with open(file_path, "w") as f:
-            yaml.dump(yaml_doc, f)
