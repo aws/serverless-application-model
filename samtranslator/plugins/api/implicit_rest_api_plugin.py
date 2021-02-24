@@ -64,7 +64,10 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
                 continue
 
             if not isinstance(event_properties, dict):
-                raise InvalidEventException(logicalId, "Event Properties is invalid.")
+                raise InvalidEventException(
+                    logicalId,
+                    "Event 'Properties' must be an Object. If you're using YAML, this may be an indentation issue.",
+                )
 
             self._add_implicit_api_id_if_necessary(event_properties)
 
