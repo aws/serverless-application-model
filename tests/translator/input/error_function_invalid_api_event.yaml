@@ -1,4 +1,15 @@
 Resources:
+  FunctionApiInvalidProperties:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties: '/hello' # NOTE: Should be an object no a string
+
   FunctionApiNoMethod:
     Type: 'AWS::Serverless::Function'
     Properties:
