@@ -311,7 +311,8 @@ class TestTranslatorEndToEnd(TestCase):
                 "state_machine_with_api_resource_policy",
                 "state_machine_with_api_auth_default_scopes",
                 "state_machine_with_condition_and_events",
-                "state_machine_with_xray",
+                "state_machine_with_xray_policies",
+                "state_machine_with_xray_role",
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
             ],
@@ -349,6 +350,14 @@ class TestTranslatorEndToEnd(TestCase):
                 "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
                 "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
             }
+            if partition == "aws":
+                mock_policy_loader.load.return_value[
+                    "AWSXrayWriteOnlyAccess"
+                ] = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+            else:
+                mock_policy_loader.load.return_value[
+                    "AWSXRayDaemonWriteAccess"
+                ] = "arn:{}:iam::aws:policy/AWSXRayDaemonWriteAccess".format(partition)
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 

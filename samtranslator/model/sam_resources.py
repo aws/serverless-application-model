@@ -47,6 +47,7 @@ from samtranslator.model.sqs import SQSQueue
 from samtranslator.model.sns import SNSTopic
 from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
+from samtranslator.model.xray_utils import get_xray_managed_policy_name
 
 
 class SamFunction(SamResourceMacro):
@@ -453,13 +454,7 @@ class SamFunction(SamResourceMacro):
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            # use previous (old) policy name for regular regions
-            # for china and gov regions, use the newer policy name
-            partition_name = ArnGenerator.get_partition_name()
-            if partition_name == "aws":
-                managed_policy_name = "AWSXrayWriteOnlyAccess"
-            else:
-                managed_policy_name = "AWSXRayDaemonWriteAccess"
+            managed_policy_name = get_xray_managed_policy_name()
             managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:
             managed_policy_arns.append(
