@@ -454,8 +454,6 @@ class SamFunction(SamResourceMacro):
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            # use previous (old) policy name for regular regions
-            # for china and gov regions, use the newer policy name
             managed_policy_name = get_xray_managed_policy_name()
             managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:
