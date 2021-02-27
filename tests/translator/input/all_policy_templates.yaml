@@ -159,6 +159,11 @@ Resources:
 
         - AthenaQueryPolicy:
             WorkGroupName: name
+            Database: db
+            Table: table
+            QueryResultBucket: query-result-bucket
+            SourceBucket: source-bucket
+            SourceKey: key
 
         - S3WritePolicy:
             BucketName: name

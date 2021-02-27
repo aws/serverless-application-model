@@ -1482,6 +1482,93 @@
                     ]
                   }, 
                   "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "glue:GetTable",
+                    "glue:GetPartitions",
+                    "glue:GetPartition"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:catalog"
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/${database}",
+                        {
+                          "database": "db"
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:table/${database}/${table}",
+                        {
+                          "database": "db",
+                          "table": "table"
+                        }
+                      ]
+                    }
+                  ],
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "s3:ListBucket",
+                    "s3:GetBucketLocation",
+                    "s3:GetObject",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:ListMultipartUploadParts",
+                    "s3:AbortMultipartUpload",
+                    "s3:PutObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:s3:::${queryResultBucket}",
+                        {
+                          "queryResultBucket": "query-result-bucket"
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:s3:::${queryResultBucket}/*",
+                        {
+                          "queryResultBucket": "query-result-bucket"
+                        }
+                      ]
+                    }
+                  ],
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "s3:ListBucket",
+                    "s3:GetBucketLocation",
+                    "s3:GetObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:s3:::${sourceBucket}",
+                        {
+                          "sourceBucket": "source-bucket"
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:s3:::${sourceBucket}/${sourceKey}",
+                        {
+                          "sourceBucket": "source-bucket",
+                          "sourceKey": "key"
+                        }
+                      ]
+                    }
+                  ],
+                  "Effect": "Allow"
                 }
               ]
             }

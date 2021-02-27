@@ -1885,6 +1885,21 @@
       "Parameters": {
         "WorkGroupName": {
           "Description": "Name of the Athena Workgroup"
+        },
+        "Database": {
+          "Description": "Name of the Athena Database"
+        },
+        "Table": {
+          "Description": "Name of the Athena Table"
+        },
+        "QueryResultBucket": {
+          "Description": "S3 Bucket to store Athena query result"
+        },
+        "SourceBucket": {
+          "Description": "S3 Bucket containing the source data"
+        },
+        "SourceKey": {
+          "Description": "S3 Key containing the source data"
         }
       },
       "Definition": {
@@ -1930,6 +1945,109 @@
                 }
               ]
             }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "glue:GetTable",
+              "glue:GetPartitions",
+              "glue:GetPartition"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:catalog"
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/${database}",
+                  {
+                    "database": {
+                      "Ref": "Database"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:table/${database}/${table}",
+                  {
+                    "database": {
+                      "Ref": "Database"
+                    },
+                    "table": {
+                      "Ref": "Table"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObject",
+              "s3:ListBucketMultipartUploads",
+              "s3:ListMultipartUploadParts",
+              "s3:AbortMultipartUpload",
+              "s3:PutObject"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:aws:s3:::${queryResultBucket}",
+                  {
+                    "queryResultBucket": {
+                      "Ref": "QueryResultBucket"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:aws:s3:::${queryResultBucket}/*",
+                  {
+                    "queryResultBucket": {
+                      "Ref": "QueryResultBucket"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetObject"
+            ],
+            "Resource": [
+              {
+                "Fn::Sub": [
+                  "arn:aws:s3:::${sourceBucket}",
+                  {
+                    "sourceBucket": {
+                      "Ref": "SourceBucket"
+                    }
+                  }
+                ]
+              },
+              {
+                "Fn::Sub": [
+                  "arn:aws:s3:::${sourceBucket}/${sourceKey}",
+                  {
+                    "sourceBucket": {
+                      "Ref": "SourceBucket"
+                    },
+                    "sourceKey": {
+                      "Ref": "SourceKey"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
