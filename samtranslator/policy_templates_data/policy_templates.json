@@ -478,9 +478,7 @@
             "Action": [
               "ec2:DescribeImages"
             ],
-            "Resource": {
-              "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/*"
-            }
+            "Resource": "*"
           }
         ]
       }
