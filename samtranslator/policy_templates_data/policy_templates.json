@@ -2336,7 +2336,7 @@
       }
     },
     "Route53ChangeResourceRecordSetsPolicy": {
-      "Description": "Gives permission to change resource records sets in Route53",
+      "Description": "Gives permission to change resource record sets in Route 53",
       "Parameters": {
         "HostedZoneId": {
           "Description": "ID of the hosted zone"
