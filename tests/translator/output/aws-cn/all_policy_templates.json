@@ -1589,6 +1589,27 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy59",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "route53:ChangeResourceRecordSets"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:route53:::hostedzone/${HostedZoneId}",
+                      {
+                        "HostedZoneId": "test"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "Tags": [
