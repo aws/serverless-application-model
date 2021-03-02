@@ -4,6 +4,7 @@ import os
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
+from samtranslator.yaml_helper import yaml_parse
 
 try:
     from pathlib import Path
@@ -293,7 +294,7 @@ class BaseTest(TestCase):
         for key, _ in self.code_key_to_file.items():
             # We must double the {} to escape them so they will survive a round of unescape
             data = data.replace("${{{}}}".format(key), self.get_code_key_s3_uri(key))
-        yaml_doc = yaml.load(data, Loader=yaml.FullLoader)
+        yaml_doc = yaml_parse(data)
 
         dump_yaml(updated_template_path, yaml_doc)
 
