@@ -102,7 +102,14 @@ class OpenApiEditor(object):
 
         # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
         regex = "([A-Za-z0-9]+\.Arn)"
-        match = re.findall(regex, arn)[0].split(".Arn")[0]
+        matches = re.findall(regex, arn)
+        # Prevent IndexError when integration URI doesn't contain .Arn (e.g. a Function with
+        # AutoPublishAlias translates to AWS::Lambda::Alias, which make_shorthand represents
+        # as LogicalId instead of LogicalId.Arn).
+        # TODO: Consistent handling of Functions with and without AutoPublishAlias (see #1901)
+        if not matches:
+            return False
+        match = matches[0].split(".Arn")[0]
         return match
 
     def method_has_integration(self, method):

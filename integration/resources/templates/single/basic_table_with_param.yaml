@@ -1,0 +1,12 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+
+      PrimaryKey:
+        Name: mynewid
+        Type: Number
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2

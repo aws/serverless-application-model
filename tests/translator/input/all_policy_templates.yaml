@@ -168,3 +168,9 @@ Resources:
 
         - EventBridgePutEventsPolicy:
             EventBusName: name
+
+        - AcmGetCertificatePolicy:
+            CertificateArn: arn
+
+        - Route53ChangeResourceRecordSetsPolicy:
+            HostedZoneId: test

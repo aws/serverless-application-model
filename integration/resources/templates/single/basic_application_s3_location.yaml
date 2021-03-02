@@ -1,0 +1,5 @@
+Resources:
+  MyNestedApp:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ${templateurl}

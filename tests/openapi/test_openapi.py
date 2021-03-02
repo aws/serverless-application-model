@@ -437,3 +437,50 @@ class TestOpenApiEdit_add_description(TestCase):
         editor = OpenApiEditor(self.original_openapi_with_description)
         editor.add_description("New Description")
         self.assertEqual(editor.openapi["info"]["description"], "Existing Description")
+
+
+class TestOpenApiEditor_get_integration_function_of_alias(TestCase):
+    def setUp(self):
+
+        self.original_openapi = {
+            "openapi": "3.0.1",
+            "paths": {
+                "$default": {
+                    "x-amazon-apigateway-any-method": {
+                        "Fn::If": [
+                            "condition",
+                            {
+                                "security": [{"OpenIdAuth": ["scope1", "scope2"]}],
+                                "isDefaultRoute": True,
+                                "x-amazon-apigateway-integration": {
+                                    "httpMethod": "POST",
+                                    "type": "aws_proxy",
+                                    "uri": {
+                                        "Fn::If": [
+                                            "condition",
+                                            {
+                                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunctionAlias}/invocations"
+                                            },
+                                            {"Ref": "AWS::NoValue"},
+                                        ]
+                                    },
+                                    "payloadFormatVersion": "1.0",
+                                },
+                                "responses": {},
+                            },
+                            {"Ref": "AWS::NoValue"},
+                        ]
+                    }
+                },
+                "/bar": {},
+                "/badpath": "string value",
+            },
+        }
+
+        self.editor = OpenApiEditor(self.original_openapi)
+
+    def test_no_logical_id_if_alias(self):
+
+        self.assertFalse(
+            self.editor.get_integration_function_logical_id(OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD),
+        )

@@ -240,6 +240,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "function_with_deployment_preference_all_parameters",
                 "function_with_deployment_preference_from_parameters",
                 "function_with_deployment_preference_multiple_combinations",
+                "function_with_deployment_preference_alarms_intrinsic_if",
                 "function_with_alias_and_event_sources",
                 "function_with_resource_refs",
                 "function_with_deployment_and_custom_role",
@@ -310,7 +311,8 @@ class TestTranslatorEndToEnd(TestCase):
                 "state_machine_with_api_resource_policy",
                 "state_machine_with_api_auth_default_scopes",
                 "state_machine_with_condition_and_events",
-                "state_machine_with_xray",
+                "state_machine_with_xray_policies",
+                "state_machine_with_xray_role",
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
             ],
@@ -348,6 +350,14 @@ class TestTranslatorEndToEnd(TestCase):
                 "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
                 "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
             }
+            if partition == "aws":
+                mock_policy_loader.load.return_value[
+                    "AWSXrayWriteOnlyAccess"
+                ] = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+            else:
+                mock_policy_loader.load.return_value[
+                    "AWSXRayDaemonWriteAccess"
+                ] = "arn:{}:iam::aws:policy/AWSXRayDaemonWriteAccess".format(partition)
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
@@ -621,6 +631,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_no_codeuri",
         "error_function_no_handler",
         "error_function_no_runtime",
+        "error_function_with_deployment_preference_invalid_alarms",
         "error_function_with_deployment_preference_missing_alias",
         "error_function_with_invalid_deployment_preference_hook_property",
         "error_function_invalid_request_parameters",
@@ -673,6 +684,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_http_api_invalid_openapi",
         "error_http_api_tags",
         "error_http_api_tags_def_uri",
+        "error_implicit_http_api_properties",
         "error_implicit_http_api_method",
         "error_implicit_http_api_path",
         "error_http_api_event_multiple_same_path",

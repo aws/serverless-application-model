@@ -25,12 +25,13 @@ from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
+from samtranslator.translator.arn_generator import ArnGenerator
 
 
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None):
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -41,6 +42,9 @@ class Translator:
         self.plugins = plugins
         self.sam_parser = sam_parser
         self.feature_toggle = None
+        self.boto_session = boto_session
+
+        ArnGenerator.class_boto_session = self.boto_session
 
     def _get_function_names(self, resource_dict, intrinsics_resolver):
         """
@@ -92,7 +96,7 @@ class Translator:
         self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
-        sam_parameter_values.add_pseudo_parameter_values()
+        sam_parameter_values.add_pseudo_parameter_values(self.boto_session)
         parameter_values = sam_parameter_values.parameter_values
         # Create & Install plugins
         sam_plugins = prepare_plugins(self.plugins, parameter_values)
@@ -152,7 +156,12 @@ class Translator:
                 template["Resources"].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
-                template["Resources"].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
+                try:
+                    template["Resources"].update(
+                        deployment_preference_collection.deployment_group(logical_id).to_dict()
+                    )
+                except InvalidResourceException as e:
+                    document_errors.append(e)
 
         # Run the after-transform plugin target
         try:
