@@ -17,7 +17,7 @@ def load_yaml(file_path):
     """
     with open(file_path) as f:
         data = f.read()
-    return yaml.load(data, Loader=yaml.FullLoader)
+    return yaml.safe_load(data)
 
 
 def dump_yaml(file_path, yaml_doc):
