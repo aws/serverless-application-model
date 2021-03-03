@@ -18,8 +18,22 @@ class FeatureToggle:
     SAM is executing or not.
     """
 
-    def __init__(self, config_provider):
+    def __init__(self, config_provider, stage="beta", account_id=None, region="default"):
         self.feature_config = config_provider.config
+        self.stage = stage
+        self.account_id = account_id
+        self.region = region
+
+    def is_enabled(self, feature_name):
+        """
+        To check if feature is available
+
+        :param feature_name: name of feature
+        """
+        if self.account_id is None:
+            LOG.warning("Account ID is missing. Feature not enabled.")
+            return False
+        return self.is_enabled_for_account_in_region(feature_name, self.stage, self.account_id, self.region)
 
     def is_enabled_for_stage_in_region(self, feature_name, stage, region="default"):
         """
@@ -78,9 +92,11 @@ class FeatureToggle:
 
         if "enabled-%" in region_config:
             # Percentage-based enablement
-            bound = region_config.get("enabled-%")
+            # account_id is calculated into one of 100 partitions (0-99)
+            # if partition < enabled_percent, we consider the feature is enabled for this given account_id
+            enabled_percent = region_config.get("enabled-%")
             partition = int(account_id) % 100
-            is_enabled = partition < bound
+            is_enabled = partition < enabled_percent
         else:
             is_enabled = region_config.get("enabled", False)
 

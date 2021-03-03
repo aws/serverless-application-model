@@ -28,6 +28,7 @@ class TestFeatureToggle(TestCase):
             FeatureToggleLocalConfigProvider(os.path.join(my_path, "input", "feature_toggle_config.json"))
         )
         self.assertEqual(feature_toggle.is_enabled_for_stage_in_region(feature_name, stage, region), expected)
+        self.assertFalse(feature_toggle.is_enabled(feature_name))
 
     @parameterized.expand(
         [
@@ -42,11 +43,15 @@ class TestFeatureToggle(TestCase):
     )
     def test_feature_toggle_with_local_provider_for_account_id(self, feature_name, stage, region, account_id, expected):
         feature_toggle = FeatureToggle(
-            FeatureToggleLocalConfigProvider(os.path.join(my_path, "input", "feature_toggle_config.json"))
+            FeatureToggleLocalConfigProvider(os.path.join(my_path, "input", "feature_toggle_config.json")),
+            stage=stage,
+            region=region,
+            account_id=account_id,
         )
         self.assertEqual(
             feature_toggle.is_enabled_for_account_in_region(feature_name, stage, account_id, region), expected
         )
+        self.assertEqual(feature_toggle.is_enabled(feature_name), expected)
 
 
 class TestFeatureToggleAppConfig(TestCase):
@@ -107,10 +112,13 @@ class TestFeatureToggleAppConfig(TestCase):
         feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
             "test_app_id", "test_env_id", "test_conf_id"
         )
-        feature_toggle = FeatureToggle(feature_toggle_config_provider)
+        feature_toggle = FeatureToggle(
+            feature_toggle_config_provider, stage=stage, region=region, account_id=account_id
+        )
         self.assertEqual(
             feature_toggle.is_enabled_for_account_in_region(feature_name, stage, account_id, region), expected
         )
+        self.assertEqual(feature_toggle.is_enabled(feature_name), expected)
 
 
 class TestFeatureToggleAppConfigConfigProvider(TestCase):
