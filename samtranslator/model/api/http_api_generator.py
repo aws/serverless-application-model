@@ -14,7 +14,7 @@ from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.tags.resource_tagging import get_tag_list
-from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
 
 _CORS_WILDCARD = "*"
@@ -466,6 +466,15 @@ class HttpApiGenerator(object):
         """
         if not default_authorizer:
             return
+
+        if is_intrinsic_no_value(default_authorizer):
+            return
+
+        if is_intrinsic(default_authorizer):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set DefaultAuthorizer because intrinsic functions are not supported for this field.",
+            )
 
         if not authorizers.get(default_authorizer):
             raise InvalidResourceException(

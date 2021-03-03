@@ -128,6 +128,10 @@ will not work in Python3.6). If you want to test in many versions, you can creat
 each version and flip between them (sourcing the activate script). Typically, we run all tests in
 one python version locally and then have our ci (appveyor) run all supported versions.
 
+### Integration tests
+
+Integration tests are covered in detail in the [INTEGRATION_TESTS.md file](INTEGRATION_TESTS.md) of this repository.
+
 Code Conventions
 ----------------
 

@@ -1,0 +1,4 @@
+[
+    { "LogicalResourceId":"MyStateMachine", "ResourceType":"AWS::StepFunctions::StateMachine"},
+    { "LogicalResourceId":"MyStateMachineRole", "ResourceType":"AWS::IAM::Role" }
+]
