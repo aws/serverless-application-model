@@ -83,18 +83,17 @@ class FeatureToggle:
             return False
 
         if account_id in stage_config:
-            account_config = stage_config.get(account_id)
-            region_config = (
-                account_config.get(region, {}) if region in account_config else account_config.get("default", {})
-            )
+            account_config = stage_config[account_id]
+            region_config = account_config[region] if region in account_config else account_config.get("default", {})
         else:
-            region_config = stage_config.get(region, {}) if region in stage_config else stage_config.get("default", {})
+            region_config = stage_config[region] if region in stage_config else stage_config.get("default", {})
 
         if "enabled-%" in region_config:
             # Percentage-based enablement
+            # Assumption: account_id is uniformly distributed
             # account_id is calculated into one of 100 partitions (0-99)
             # if partition < enabled_percent, we consider the feature is enabled for this given account_id
-            enabled_percent = region_config.get("enabled-%")
+            enabled_percent = region_config["enabled-%"]
             partition = int(account_id) % 100
             is_enabled = partition < enabled_percent
         else:
