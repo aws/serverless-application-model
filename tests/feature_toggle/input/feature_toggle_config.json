@@ -3,6 +3,7 @@
     "feature-1": {
         "beta": {
             "us-west-2": {"enabled": true},
+            "us-east-1": {"enabled-%": 10},
             "default": {"enabled": false},
             "123456789123": {"us-west-2": {"enabled": true}, "default": {"enabled": false}}
         },

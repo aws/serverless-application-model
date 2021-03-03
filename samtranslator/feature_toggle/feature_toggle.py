@@ -37,6 +37,16 @@ class FeatureToggle:
             LOG.info("Stage '{}' not enabled for Feature '{}'.".format(stage, feature_name))
             return False
         region_config = stage_config.get(region, {}) if region in stage_config else stage_config.get("default", {})
+        if "enabled-%" in region_config:
+            LOG.warning(
+                """
+            Percentage-based enablement is configured for Feature '{}' in Stage '{}' in Region '{}'. 
+            Please use is_enabled_for_account_in_region() instead. Feature not enabled.
+            """.format(
+                    feature_name, stage, region
+                )
+            )
+            return False
         is_enabled = region_config.get("enabled", False)
         LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
         return is_enabled
@@ -57,11 +67,23 @@ class FeatureToggle:
         if not stage_config:
             LOG.info("Stage '{}' not enabled for Feature '{}'.".format(stage, feature_name))
             return False
-        account_config = stage_config.get(account_id) if account_id in stage_config else stage_config.get("default", {})
-        region_config = (
-            account_config.get(region, {}) if region in account_config else account_config.get("default", {})
-        )
-        is_enabled = region_config.get("enabled", False)
+
+        if account_id in stage_config:
+            account_config = stage_config.get(account_id)
+            region_config = (
+                account_config.get(region, {}) if region in account_config else account_config.get("default", {})
+            )
+        else:
+            region_config = stage_config.get(region, {}) if region in stage_config else stage_config.get("default", {})
+
+        if "enabled-%" in region_config:
+            # Percentage-based enablement
+            bound = region_config.get("enabled-%")
+            partition = int(account_id) % 100
+            is_enabled = partition < bound
+        else:
+            is_enabled = region_config.get("enabled", False)
+
         LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
         return is_enabled
 

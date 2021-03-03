@@ -19,6 +19,8 @@ class TestFeatureToggle(TestCase):
             param("feature-1", "beta", "default", False),
             param("feature-1", "beta", "us-west-2", True),
             param("feature-2", "beta", "us-west-2", False),  # because feature is missing
+            param("feature-1", "beta", "us-east-1", False),  # because percentage-based enablement is configured
+            param("feature-1", "alpha", "us-east-1", False),  # non-exist stage
         ]
     )
     def test_feature_toggle_with_local_provider_for_stage(self, feature_name, stage, region, expected):
@@ -31,7 +33,11 @@ class TestFeatureToggle(TestCase):
         [
             param("feature-1", "beta", "default", "123456789123", False),
             param("feature-1", "beta", "us-west-2", "123456789123", True),
-            param("feature-2", "beta", "us-west-2", "123456789124", False),  # because feature is missing
+            param("feature-2", "beta", "us-west-2", "123456789123", False),  # because feature is missing
+            param("feature-1", "beta", "ap-south-1", "123456789124", False),  # because default is used
+            param("feature-1", "beta", "us-east-1", "123456789109", True),
+            param("feature-1", "beta", "us-east-1", "123456789123", False),  # account_id is not within defined %
+            param("feature-1", "alpha", "us-east-1", "123456789123", False),  # non-exist stage
         ]
     )
     def test_feature_toggle_with_local_provider_for_account_id(self, feature_name, stage, region, account_id, expected):
@@ -51,6 +57,7 @@ class TestFeatureToggleAppConfig(TestCase):
         "feature-1": {
             "beta": {
                 "us-west-2": {"enabled": true},
+                "us-east-1": {"enabled-%": 10},
                 "default": {"enabled": false},
                 "123456789123": {"us-west-2": {"enabled": true}, "default": {"enabled": false}}
             },
@@ -70,6 +77,8 @@ class TestFeatureToggleAppConfig(TestCase):
             param("feature-1", "beta", "default", False),
             param("feature-1", "beta", "us-west-2", True),
             param("feature-2", "beta", "us-west-2", False),  # because feature is missing
+            param("feature-1", "beta", "us-east-1", False),  # because percentage-based enablement is configured
+            param("feature-1", "alpha", "us-east-1", False),  # non-exist stage
         ]
     )
     @patch("samtranslator.feature_toggle.feature_toggle.boto3")
@@ -85,13 +94,15 @@ class TestFeatureToggleAppConfig(TestCase):
         [
             param("feature-1", "beta", "default", "123456789123", False),
             param("feature-1", "beta", "us-west-2", "123456789123", True),
-            param("feature-2", "beta", "us-west-2", "123456789124", False),  # because feature is missing
+            param("feature-2", "beta", "us-west-2", "123456789123", False),  # because feature is missing
+            param("feature-1", "beta", "ap-south-1", "123456789124", False),  # because default is used
+            param("feature-1", "beta", "us-east-1", "123456789109", True),
+            param("feature-1", "beta", "us-east-1", "123456789123", False),  # account_id is not within defined %
+            param("feature-1", "alpha", "us-east-1", "123456789123", False),  # non-exist stage
         ]
     )
     @patch("samtranslator.feature_toggle.feature_toggle.boto3")
-    def test_feature_toggle_with_local_provider_for_account_id(
-        self, feature_name, stage, region, account_id, expected, boto3_mock
-    ):
+    def test_feature_toggle_for_account_id(self, feature_name, stage, region, account_id, expected, boto3_mock):
         boto3_mock.client.return_value = self.app_config_mock
         feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
             "test_app_id", "test_env_id", "test_conf_id"
@@ -100,3 +111,13 @@ class TestFeatureToggleAppConfig(TestCase):
         self.assertEqual(
             feature_toggle.is_enabled_for_account_in_region(feature_name, stage, account_id, region), expected
         )
+
+
+class TestFeatureToggleAppConfigConfigProvider(TestCase):
+    @patch("samtranslator.feature_toggle.feature_toggle.boto3")
+    def test_feature_toggle_with_exception(self, boto3_mock):
+        boto3_mock.client.raiseError.side_effect = Exception()
+        feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
+            "test_app_id", "test_env_id", "test_conf_id"
+        )
+        self.assertEqual(feature_toggle_config_provider.config, {})
