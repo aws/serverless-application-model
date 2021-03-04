@@ -18,7 +18,7 @@ class FeatureToggle:
     SAM is executing or not.
     """
 
-    def __init__(self, config_provider, stage="beta", account_id=None, region="default"):
+    def __init__(self, config_provider, stage, account_id, region):
         self.feature_config = config_provider.config
         self.stage = stage
         self.account_id = account_id
@@ -30,13 +30,17 @@ class FeatureToggle:
 
         :param feature_name: name of feature
         """
-        stage = self.stage
-        region = self.region
-        account_id = self.account_id
-
         if feature_name not in self.feature_config:
             LOG.warning("Feature '{}' not available in Feature Toggle Config.".format(feature_name))
             return False
+
+        stage = self.stage
+        region = self.region
+        account_id = self.account_id
+        if not stage or not region or not account_id:
+            LOG.warning("One or more of stage, region and account_id is not properly set. Feature not enabled.")
+            return False
+
         stage_config = self.feature_config.get(feature_name, {}).get(stage, {})
         if not stage_config:
             LOG.info("Stage '{}' not enabled for Feature '{}'.".format(stage, feature_name))

@@ -23,6 +23,11 @@ class TestFeatureToggle(TestCase):
             param("feature-1", "beta", "us-east-1", "123456789109", True),
             param("feature-1", "beta", "us-east-1", "123456789123", False),  # account_id is not within defined %
             param("feature-1", "alpha", "us-east-1", "123456789123", False),  # non-exist stage
+            # any None for stage, region and account_id should return False
+            param("feature-1", None, None, None, False),
+            param("feature-1", "beta", None, None, False),
+            param("feature-1", "beta", "us-west-2", None, False),
+            param("feature-1", "beta", None, "123456789123", False),
         ]
     )
     def test_feature_toggle_with_local_provider(self, feature_name, stage, region, account_id, expected):
@@ -67,6 +72,11 @@ class TestFeatureToggleAppConfig(TestCase):
             param("feature-1", "beta", "us-east-1", "123456789109", True),
             param("feature-1", "beta", "us-east-1", "123456789123", False),  # account_id is not within defined %
             param("feature-1", "alpha", "us-east-1", "123456789123", False),  # non-exist stage
+            # any None for stage, region and account_id returns False
+            param("feature-1", None, None, None, False),
+            param("feature-1", "beta", None, None, False),
+            param("feature-1", "beta", "us-west-2", None, False),
+            param("feature-1", "beta", None, "123456789123", False),
         ]
     )
     @patch("samtranslator.feature_toggle.feature_toggle.boto3")
