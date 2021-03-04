@@ -70,7 +70,9 @@ class TestFeatureToggleAppConfig(TestCase):
         ]
     )
     @patch("samtranslator.feature_toggle.feature_toggle.boto3")
-    def test_feature_toggle_with_appconfig_provider(self, feature_name, stage, region, account_id, expected, boto3_mock):
+    def test_feature_toggle_with_appconfig_provider(
+        self, feature_name, stage, region, account_id, expected, boto3_mock
+    ):
         boto3_mock.client.return_value = self.app_config_mock
         feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
             "test_app_id", "test_env_id", "test_conf_id"
