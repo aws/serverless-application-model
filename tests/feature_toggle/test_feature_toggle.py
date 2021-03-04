@@ -25,7 +25,7 @@ class TestFeatureToggle(TestCase):
             param("feature-1", "alpha", "us-east-1", "123456789123", False),  # non-exist stage
         ]
     )
-    def test_feature_toggle_with_local_provider_for_account_id(self, feature_name, stage, region, account_id, expected):
+    def test_feature_toggle_with_local_provider(self, feature_name, stage, region, account_id, expected):
         feature_toggle = FeatureToggle(
             FeatureToggleLocalConfigProvider(os.path.join(my_path, "input", "feature_toggle_config.json")),
             stage=stage,
@@ -70,7 +70,7 @@ class TestFeatureToggleAppConfig(TestCase):
         ]
     )
     @patch("samtranslator.feature_toggle.feature_toggle.boto3")
-    def test_feature_toggle_for_account_id(self, feature_name, stage, region, account_id, expected, boto3_mock):
+    def test_feature_toggle_with_appconfig_provider(self, feature_name, stage, region, account_id, expected, boto3_mock):
         boto3_mock.client.return_value = self.app_config_mock
         feature_toggle_config_provider = FeatureToggleAppConfigConfigProvider(
             "test_app_id", "test_env_id", "test_conf_id"
