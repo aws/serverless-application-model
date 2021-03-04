@@ -938,6 +938,84 @@
         ]
       }
     },
+    "KMSSignPolicy": {
+      "Description": "Gives permission to sign messages with this KMS Key",
+      "Parameters": {
+        "KeyId": {
+          "Description": "ID of the KMS Key"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "kms:Sign",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                {
+                  "keyId": {
+                    "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "KMSVerifyPolicy": {
+      "Description": "Gives permission to verify signatures with this KMS Key",
+      "Parameters": {
+        "KeyId": {
+          "Description": "ID of the KMS Key"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "kms:Verify",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                {
+                  "keyId": {
+                    "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "KMSGetPublicKeyPolicy": {
+      "Description": "Gives permission to download the public key of the asymmetric KMS CMK",
+      "Parameters": {
+        "KeyId": {
+          "Description": "ID of the KMS Key"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Action": "kms:GetPublicKey",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}",
+                {
+                  "keyId": {
+                    "Ref": "KeyId"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "PollyFullAccessPolicy": {
       "Description": "Gives full access permissions to Polly lexicon resources",
       "Parameters": {
