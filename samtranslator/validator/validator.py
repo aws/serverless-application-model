@@ -38,7 +38,8 @@ class SamTemplateValidator(object):
             schema_content = self._read_json(schema_path)
 
         # Helps resolve the $Ref to external files
-        resolver = jsonschema.RefResolver("file://" + sam_schema.SCHEMA_DIR + "/", None)
+        # schema_content must be passed to resolve local (#/def...) references
+        resolver = jsonschema.RefResolver("file://" + sam_schema.SCHEMA_DIR + "/", schema_content)
 
         self.validator = jsonschema.Draft7Validator(schema_content, resolver=resolver)
 
