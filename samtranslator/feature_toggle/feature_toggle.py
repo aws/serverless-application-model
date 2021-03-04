@@ -30,50 +30,10 @@ class FeatureToggle:
 
         :param feature_name: name of feature
         """
-        if self.account_id is None:
-            LOG.warning("Account ID is missing. Feature not enabled.")
-            return False
-        return self.is_enabled_for_account_in_region(feature_name, self.stage, self.account_id, self.region)
+        stage = self.stage
+        region = self.region
+        account_id = self.account_id
 
-    def is_enabled_for_stage_in_region(self, feature_name, stage, region="default"):
-        """
-        To check if feature is available for a particular stage or not.
-        :param feature_name: name of feature
-        :param stage: stage where SAM is running
-        :param region: region in which SAM is running
-        :return:
-        """
-        if feature_name not in self.feature_config:
-            LOG.warning("Feature '{}' not available in Feature Toggle Config.".format(feature_name))
-            return False
-        stage_config = self.feature_config.get(feature_name, {}).get(stage, {})
-        if not stage_config:
-            LOG.info("Stage '{}' not enabled for Feature '{}'.".format(stage, feature_name))
-            return False
-        region_config = stage_config.get(region, {}) if region in stage_config else stage_config.get("default", {})
-        if "enabled-%" in region_config:
-            LOG.warning(
-                """
-            Percentage-based enablement is configured for Feature '{}' in Stage '{}' in Region '{}'. 
-            Please use is_enabled_for_account_in_region() instead. Feature not enabled.
-            """.format(
-                    feature_name, stage, region
-                )
-            )
-            return False
-        is_enabled = region_config.get("enabled", False)
-        LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
-        return is_enabled
-
-    def is_enabled_for_account_in_region(self, feature_name, stage, account_id, region="default"):
-        """
-        To check if feature is available for a particular account or not.
-        :param feature_name: name of feature
-        :param stage: stage where SAM is running
-        :param account_id: account_id who is executing SAM template
-        :param region: region in which SAM is running
-        :return:
-        """
         if feature_name not in self.feature_config:
             LOG.warning("Feature '{}' not available in Feature Toggle Config.".format(feature_name))
             return False
