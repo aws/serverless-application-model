@@ -38,7 +38,9 @@ class FeatureToggle:
         region = self.region
         account_id = self.account_id
         if not stage or not region or not account_id:
-            LOG.warning("One or more of stage, region and account_id is not properly set. Feature not enabled.")
+            LOG.warning(
+                "One or more of stage, region and account_id is not set. Feature '{}' not enabled.".format(feature_name)
+            )
             return False
 
         stage_config = self.feature_config.get(feature_name, {}).get(stage, {})
