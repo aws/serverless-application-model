@@ -105,28 +105,21 @@
     "StateMachine": {
       "Type": "AWS::StepFunctions::StateMachine",
       "Properties": {
-        "DefinitionString": {
-          "Fn::Join": [
-            "\n",
-            [
-              "{",
-              "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",",
-              "    \"StartAt\": \"Hello\",",
-              "    \"States\": {",
-              "        \"Hello\": {",
-              "            \"Next\": \"World\",",
-              "            \"Result\": \"Hello\",",
-              "            \"Type\": \"Pass\"",
-              "        },",
-              "        \"World\": {",
-              "            \"End\": true,",
-              "            \"Resource\": \"${definition_substitution_1}\",",
-              "            \"Type\": \"Task\"",
-              "        }",
-              "    }",
-              "}"
-            ]
-          ]
+        "Definition": {
+          "Comment": "A Hello World example of the Amazon States Language using Pass states",
+          "StartAt": "Hello",
+          "States": {
+            "Hello": {
+              "Next": "World",
+              "Result": "Hello",
+              "Type": "Pass"
+            },
+            "World": {
+              "End": true,
+              "Resource": "${definition_substitution_1}",
+              "Type": "Task"
+            }
+          }
         },
         "Tags": [
           {

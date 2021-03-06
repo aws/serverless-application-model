@@ -124,7 +124,7 @@ class StateMachineGenerator(object):
                     self.state_machine.DefinitionSubstitutions.update(substitutions)
                 else:
                     self.state_machine.DefinitionSubstitutions = substitutions
-            self.state_machine.DefinitionString = self._build_definition_string(processed_definition)
+            self.state_machine.Definition = processed_definition
         elif self.definition_uri:
             self.state_machine.DefinitionS3Location = self._construct_definition_uri()
         else:
@@ -187,22 +187,6 @@ class StateMachineGenerator(object):
         if "Version" in s3_pointer:
             definition_s3["Version"] = s3_pointer["Version"]
         return definition_s3
-
-    def _build_definition_string(self, definition_dict):
-        """
-        Builds a CloudFormation definition string from a definition dictionary. The definition string constructed is
-        a Fn::Join intrinsic function to make it readable.
-
-        :param definition_dict: State machine definition as a dictionary
-
-        :returns: the state machine definition.
-        :rtype: dict
-        """
-        # Indenting and then splitting the JSON-encoded string for readability of the state machine definition in the CloudFormation translated resource.
-        # Separators are passed explicitly to maintain trailing whitespace consistency across Py2 and Py3
-        definition_lines = json.dumps(definition_dict, sort_keys=True, indent=4, separators=(",", ": ")).split("\n")
-        definition_string = fnJoin("\n", definition_lines)
-        return definition_string
 
     def _construct_role(self):
         """

@@ -1,32 +1,32 @@
 {
     "Resources": {
         "MyStateMachineGetHtmlRole": {
-            "Type": "AWS::IAM::Role", 
+            "Type": "AWS::IAM::Role",
             "Properties": {
                 "Policies": [
                     {
-                        "PolicyName": "MyStateMachineGetHtmlRoleStartExecutionPolicy", 
+                        "PolicyName": "MyStateMachineGetHtmlRoleStartExecutionPolicy",
                         "PolicyDocument": {
                             "Statement": [
                                 {
-                                    "Action": "states:StartExecution", 
+                                    "Action": "states:StartExecution",
                                     "Resource": {
                                         "Ref": "MyStateMachine"
-                                    }, 
+                                    },
                                     "Effect": "Allow"
                                 }
                             ]
                         }
                     }
-                ], 
+                ],
                 "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
+                    "Version": "2012-10-17",
                     "Statement": [
                         {
                             "Action": [
                                 "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
+                            ],
+                            "Effect": "Allow",
                             "Principal": {
                                 "Service": [
                                     "apigateway.amazonaws.com"
@@ -36,17 +36,17 @@
                     ]
                 }
             }
-        }, 
+        },
         "ExplicitApi": {
-            "Type": "AWS::ApiGateway::RestApi", 
+            "Type": "AWS::ApiGateway::RestApi",
             "Properties": {
                 "Body": {
                     "info": {
-                        "version": "1.0", 
+                        "version": "1.0",
                         "title": {
                             "Ref": "AWS::StackName"
                         }
-                    }, 
+                    },
                     "paths": {
                         "/one": {
                             "get": {
@@ -54,281 +54,281 @@
                                     "responses": {
                                         "200": {
                                             "statusCode": "200"
-                                        }, 
+                                        },
                                         "400": {
                                             "statusCode": "400"
                                         }
-                                    }, 
+                                    },
                                     "uri": {
                                         "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
+                                    },
+                                    "httpMethod": "POST",
                                     "requestTemplates": {
                                         "application/json": {
                                             "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
-                                    }, 
+                                    },
                                     "credentials": {
                                         "Fn::GetAtt": [
-                                            "MyStateMachineGetHtmlRole", 
+                                            "MyStateMachineGetHtmlRole",
                                             "Arn"
                                         ]
-                                    }, 
+                                    },
                                     "type": "aws"
-                                }, 
+                                },
                                 "responses": {
                                     "200": {
                                         "description": "OK"
-                                    }, 
+                                    },
                                     "400": {
                                         "description": "Bad Request"
                                     }
                                 }
                             }
-                        }, 
+                        },
                         "/three": {
                             "put": {
                                 "x-amazon-apigateway-integration": {
                                     "responses": {
                                         "200": {
                                             "statusCode": "200"
-                                        }, 
+                                        },
                                         "400": {
                                             "statusCode": "400"
                                         }
-                                    }, 
+                                    },
                                     "uri": {
                                         "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
+                                    },
+                                    "httpMethod": "POST",
                                     "requestTemplates": {
                                         "application/json": {
                                             "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
-                                    }, 
+                                    },
                                     "credentials": {
                                         "Fn::GetAtt": [
-                                            "MyStateMachinePutHtmlRole", 
+                                            "MyStateMachinePutHtmlRole",
                                             "Arn"
                                         ]
-                                    }, 
+                                    },
                                     "type": "aws"
-                                }, 
+                                },
                                 "responses": {
                                     "200": {
                                         "description": "OK"
-                                    }, 
+                                    },
                                     "400": {
                                         "description": "Bad Request"
                                     }
                                 }
                             }
-                        }, 
+                        },
                         "/two": {
                             "post": {
                                 "x-amazon-apigateway-integration": {
                                     "responses": {
                                         "200": {
                                             "statusCode": "200"
-                                        }, 
+                                        },
                                         "400": {
                                             "statusCode": "400"
                                         }
-                                    }, 
+                                    },
                                     "uri": {
                                         "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
+                                    },
+                                    "httpMethod": "POST",
                                     "requestTemplates": {
                                         "application/json": {
                                             "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
-                                    }, 
+                                    },
                                     "credentials": {
                                         "Fn::GetAtt": [
-                                            "MyStateMachinePostHtmlRole", 
+                                            "MyStateMachinePostHtmlRole",
                                             "Arn"
                                         ]
-                                    }, 
+                                    },
                                     "type": "aws"
-                                }, 
+                                },
                                 "responses": {
                                     "200": {
                                         "description": "OK"
-                                    }, 
+                                    },
                                     "400": {
                                         "description": "Bad Request"
                                     }
                                 }
                             }
                         }
-                    }, 
-                    "swagger": "2.0", 
+                    },
+                    "swagger": "2.0",
                     "x-amazon-apigateway-policy": {
-                        "Version": "2012-10-17", 
+                        "Version": "2012-10-17",
                         "Statement": [
                             {
-                                "Action": "execute-api:Invoke", 
+                                "Action": "execute-api:Invoke",
                                 "Resource": [
                                     {
                                         "Fn::Sub": [
-                                            "execute-api:/${__Stage__}/GET/one", 
+                                            "execute-api:/${__Stage__}/GET/one",
                                             {
                                                 "__Stage__": null
                                             }
                                         ]
                                     }
-                                ], 
-                                "Effect": "Allow", 
+                                ],
+                                "Effect": "Allow",
                                 "Principal": "*"
-                            }, 
+                            },
                             {
-                                "Action": "execute-api:Invoke", 
+                                "Action": "execute-api:Invoke",
                                 "Resource": [
                                     {
                                         "Fn::Sub": [
-                                            "execute-api:/${__Stage__}/GET/one", 
+                                            "execute-api:/${__Stage__}/GET/one",
                                             {
                                                 "__Stage__": null
                                             }
                                         ]
                                     }
-                                ], 
-                                "Effect": "Deny", 
+                                ],
+                                "Effect": "Deny",
                                 "Condition": {
                                     "NotIpAddress": {
                                         "aws:SourceIp": [
                                             "1.2.3.4"
                                         ]
                                     }
-                                }, 
+                                },
                                 "Principal": "*"
-                            }, 
+                            },
                             {
-                                "Action": "execute-api:Invoke", 
+                                "Action": "execute-api:Invoke",
                                 "Resource": [
                                     {
                                         "Fn::Sub": [
-                                            "execute-api:/${__Stage__}/GET/one", 
+                                            "execute-api:/${__Stage__}/GET/one",
                                             {
                                                 "__Stage__": null
                                             }
                                         ]
                                     }
-                                ], 
-                                "Effect": "Deny", 
+                                ],
+                                "Effect": "Deny",
                                 "Condition": {
                                     "IpAddress": {
                                         "aws:SourceIp": [
                                             "1.2.3.4"
                                         ]
                                     }
-                                }, 
+                                },
                                 "Principal": "*"
-                            }, 
+                            },
                             {
-                                "Action": "execute-api:Invoke", 
+                                "Action": "execute-api:Invoke",
                                 "Resource": [
                                     {
                                         "Fn::Sub": [
-                                            "execute-api:/${__Stage__}/POST/two", 
+                                            "execute-api:/${__Stage__}/POST/two",
                                             {
                                                 "__Stage__": null
                                             }
                                         ]
                                     }
-                                ], 
-                                "Effect": "Allow", 
+                                ],
+                                "Effect": "Allow",
                                 "Principal": "*"
-                            }, 
+                            },
                             {
-                                "Action": "execute-api:Invoke", 
+                                "Action": "execute-api:Invoke",
                                 "Resource": [
                                     {
                                         "Fn::Sub": [
-                                            "execute-api:/${__Stage__}/POST/two", 
+                                            "execute-api:/${__Stage__}/POST/two",
                                             {
                                                 "__Stage__": null
                                             }
                                         ]
                                     }
-                                ], 
-                                "Effect": "Deny", 
+                                ],
+                                "Effect": "Deny",
                                 "Condition": {
                                     "NotIpAddress": {
                                         "aws:SourceIp": [
                                             "1.2.3.4"
                                         ]
                                     }
-                                }, 
+                                },
                                 "Principal": "*"
-                            }, 
+                            },
                             {
-                                "Action": "execute-api:Invoke", 
+                                "Action": "execute-api:Invoke",
                                 "Resource": [
                                     {
                                         "Fn::Sub": [
-                                            "execute-api:/${__Stage__}/POST/two", 
+                                            "execute-api:/${__Stage__}/POST/two",
                                             {
                                                 "__Stage__": null
                                             }
                                         ]
                                     }
-                                ], 
-                                "Effect": "Deny", 
+                                ],
+                                "Effect": "Deny",
                                 "Condition": {
                                     "IpAddress": {
                                         "aws:SourceIp": [
                                             "1.2.3.4"
                                         ]
                                     }
-                                }, 
+                                },
                                 "Principal": "*"
                             }
                         ]
                     }
                 }
             }
-        }, 
+        },
         "ExplicitApiProdStage": {
-            "Type": "AWS::ApiGateway::Stage", 
+            "Type": "AWS::ApiGateway::Stage",
             "Properties": {
                 "DeploymentId": {
                     "Ref": "ExplicitApiDeployment17065a95ba"
-                }, 
+                },
                 "RestApiId": {
                     "Ref": "ExplicitApi"
-                }, 
+                },
                 "StageName": "Prod"
             }
-        }, 
+        },
         "MyStateMachinePutHtmlRole": {
-            "Type": "AWS::IAM::Role", 
+            "Type": "AWS::IAM::Role",
             "Properties": {
                 "Policies": [
                     {
-                        "PolicyName": "MyStateMachinePutHtmlRoleStartExecutionPolicy", 
+                        "PolicyName": "MyStateMachinePutHtmlRoleStartExecutionPolicy",
                         "PolicyDocument": {
                             "Statement": [
                                 {
-                                    "Action": "states:StartExecution", 
+                                    "Action": "states:StartExecution",
                                     "Resource": {
                                         "Ref": "MyStateMachine"
-                                    }, 
+                                    },
                                     "Effect": "Allow"
                                 }
                             ]
                         }
                     }
-                ], 
+                ],
                 "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
+                    "Version": "2012-10-17",
                     "Statement": [
                         {
                             "Action": [
                                 "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
+                            ],
+                            "Effect": "Allow",
                             "Principal": {
                                 "Service": [
                                     "apigateway.amazonaws.com"
@@ -338,69 +338,62 @@
                     ]
                 }
             }
-        }, 
+        },
         "MyStateMachine": {
-            "Type": "AWS::StepFunctions::StateMachine", 
+            "Type": "AWS::StepFunctions::StateMachine",
             "Properties": {
                 "RoleArn": {
                     "Fn::GetAtt": [
-                        "MyStateMachineRole", 
+                        "MyStateMachineRole",
                         "Arn"
                     ]
-                }, 
-                "StateMachineName": "MyStateMachine", 
-                "DefinitionString": {
-                    "Fn::Join": [
-                        "\n", 
-                        [
-                            "{", 
-                            "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",", 
-                            "    \"StartAt\": \"Hello\",", 
-                            "    \"States\": {", 
-                            "        \"Hello\": {", 
-                            "            \"Next\": \"World\",", 
-                            "            \"Result\": \"Hello\",", 
-                            "            \"Type\": \"Pass\"", 
-                            "        },", 
-                            "        \"World\": {", 
-                            "            \"End\": true,", 
-                            "            \"Result\": \"World\",", 
-                            "            \"Type\": \"Pass\"", 
-                            "        }", 
-                            "    }", 
-                            "}"
-                        ]
-                    ]
-                }, 
+                },
+                "StateMachineName": "MyStateMachine",
+                "Definition": {
+                    "Comment": "A Hello World example of the Amazon States Language using Pass states",
+                    "StartAt": "Hello",
+                    "States": {
+                        "Hello": {
+                            "Next": "World",
+                            "Result": "Hello",
+                            "Type": "Pass"
+                        },
+                        "World": {
+                            "End": true,
+                            "Result": "World",
+                            "Type": "Pass"
+                        }
+                    }
+                },
                 "Tags": [
                     {
-                        "Value": "SAM", 
+                        "Value": "SAM",
                         "Key": "stateMachine:createdBy"
                     }
                 ]
             }
-        }, 
+        },
         "ExplicitApiDeployment17065a95ba": {
-            "Type": "AWS::ApiGateway::Deployment", 
+            "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
                 "RestApiId": {
                     "Ref": "ExplicitApi"
-                }, 
-                "Description": "RestApi deployment id: 17065a95bac1ac0e3dc22fef2ff7aa228539b1d2", 
+                },
+                "Description": "RestApi deployment id: 17065a95bac1ac0e3dc22fef2ff7aa228539b1d2",
                 "StageName": "Stage"
             }
-        }, 
+        },
         "MyStateMachineRole": {
-            "Type": "AWS::IAM::Role", 
+            "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
+                    "Version": "2012-10-17",
                     "Statement": [
                         {
                             "Action": [
                                 "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
+                            ],
+                            "Effect": "Allow",
                             "Principal": {
                                 "Service": [
                                     "states.amazonaws.com"
@@ -408,58 +401,58 @@
                             }
                         }
                     ]
-                }, 
-                "ManagedPolicyArns": [], 
+                },
+                "ManagedPolicyArns": [],
                 "Policies": [
                     {
-                        "PolicyName": "MyStateMachineRolePolicy0", 
+                        "PolicyName": "MyStateMachineRolePolicy0",
                         "PolicyDocument": {
-                            "Version": "2012-10-17", 
+                            "Version": "2012-10-17",
                             "Statement": [
                                 {
-                                    "Action": "*", 
-                                    "Resource": "*", 
+                                    "Action": "*",
+                                    "Resource": "*",
                                     "Effect": "Deny"
                                 }
                             ]
                         }
                     }
-                ], 
+                ],
                 "Tags": [
                     {
-                        "Value": "SAM", 
+                        "Value": "SAM",
                         "Key": "stateMachine:createdBy"
                     }
                 ]
             }
-        }, 
+        },
         "MyStateMachinePostHtmlRole": {
-            "Type": "AWS::IAM::Role", 
+            "Type": "AWS::IAM::Role",
             "Properties": {
                 "Policies": [
                     {
-                        "PolicyName": "MyStateMachinePostHtmlRoleStartExecutionPolicy", 
+                        "PolicyName": "MyStateMachinePostHtmlRoleStartExecutionPolicy",
                         "PolicyDocument": {
                             "Statement": [
                                 {
-                                    "Action": "states:StartExecution", 
+                                    "Action": "states:StartExecution",
                                     "Resource": {
                                         "Ref": "MyStateMachine"
-                                    }, 
+                                    },
                                     "Effect": "Allow"
                                 }
                             ]
                         }
                     }
-                ], 
+                ],
                 "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
+                    "Version": "2012-10-17",
                     "Statement": [
                         {
                             "Action": [
                                 "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
+                            ],
+                            "Effect": "Allow",
                             "Principal": {
                                 "Service": [
                                     "apigateway.amazonaws.com"
