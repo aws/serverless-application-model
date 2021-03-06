@@ -20,9 +20,9 @@ class TestFeatureToggle(TestCase):
             param("feature-1", "beta", "us-west-2", "123456789123", True),
             param("feature-2", "beta", "us-west-2", "123456789123", False),  # because feature is missing
             param("feature-1", "beta", "ap-south-1", "123456789124", False),  # because default is used
-            param("feature-1", "beta", "us-east-1", "123456789109", True),
-            param("feature-1", "beta", "us-east-1", "123456789123", False),  # account_id is not within defined %
             param("feature-1", "alpha", "us-east-1", "123456789123", False),  # non-exist stage
+            param("feature-1", "beta", "us-east-1", "123456789100", True),
+            param("feature-1", "beta", "us-east-1", "123456789123", False),
             # any None for stage, region and account_id should return False
             param("feature-1", None, None, None, False),
             param("feature-1", "beta", None, None, False),
@@ -38,6 +38,23 @@ class TestFeatureToggle(TestCase):
             account_id=account_id,
         )
         self.assertEqual(feature_toggle.is_enabled(feature_name), expected)
+
+    @parameterized.expand(
+        [
+            param("123456789123", "feature-1"),
+            param("000000000000", "feature-2"),
+            param("432187654321", "feature-3"),
+            param("111222333444", "feature-4"),
+        ]
+    )
+    def test__get_account_percentile(self, account_id, feature_name):
+        feature_toggle = FeatureToggle(
+            FeatureToggleLocalConfigProvider(os.path.join(my_path, "input", "feature_toggle_config.json")),
+            stage=None,
+            region=None,
+            account_id=account_id,
+        )
+        self.assertTrue(0 <= feature_toggle._get_account_percentile(feature_name) < 100)
 
 
 class TestFeatureToggleAppConfig(TestCase):
@@ -69,9 +86,9 @@ class TestFeatureToggleAppConfig(TestCase):
             param("feature-1", "beta", "us-west-2", "123456789123", True),
             param("feature-2", "beta", "us-west-2", "123456789123", False),  # because feature is missing
             param("feature-1", "beta", "ap-south-1", "123456789124", False),  # because default is used
-            param("feature-1", "beta", "us-east-1", "123456789109", True),
-            param("feature-1", "beta", "us-east-1", "123456789123", False),  # account_id is not within defined %
             param("feature-1", "alpha", "us-east-1", "123456789123", False),  # non-exist stage
+            param("feature-1", "beta", "us-east-1", "123456789100", True),
+            param("feature-1", "beta", "us-east-1", "123456789123", False),
             # any None for stage, region and account_id returns False
             param("feature-1", None, None, None, False),
             param("feature-1", "beta", None, None, False),

@@ -3,6 +3,7 @@ import sys
 import json
 import boto3
 import logging
+import hashlib
 
 from botocore.config import Config
 
@@ -56,17 +57,27 @@ class FeatureToggle:
 
         if "enabled-%" in region_config:
             # Percentage-based enablement
-            # Assumption: account_id is uniformly distributed
-            # account_id is calculated into one of 100 partitions (0-99)
-            # if partition < enabled_percent, we consider the feature is enabled for this given account_id
-            enabled_percent = region_config["enabled-%"]
-            partition = int(account_id) % 100
-            is_enabled = partition < enabled_percent
+            # if target_percentile = 10 => account_percentile < 10 means the account is the selected 10%
+            target_percentile = region_config["enabled-%"]
+            account_percentile = self._get_account_percentile(feature_name)
+            is_enabled = account_percentile < target_percentile
         else:
             is_enabled = region_config.get("enabled", False)
 
         LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
         return is_enabled
+
+    def _get_account_percentile(self, feature_name):
+        """
+        Get account percentile based on sha256 hash of account ID and feature_name
+
+        :param feature_name: name of feature
+        :returns: integer n, where 0 <= n < 100
+        """
+        m = hashlib.sha256()
+        m.update(self.account_id.encode())
+        m.update(feature_name.encode())
+        return int(m.hexdigest(), 16) % 100
 
 
 class FeatureToggleConfigProvider:
