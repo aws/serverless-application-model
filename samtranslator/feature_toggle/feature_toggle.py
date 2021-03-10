@@ -55,14 +55,7 @@ class FeatureToggle:
         else:
             region_config = stage_config[region] if region in stage_config else stage_config.get("default", {})
 
-        if "enabled-%" in region_config:
-            # Percentage-based enablement
-            # if target_percentile = 10 => account_percentile < 10 means the account is the selected 10%
-            target_percentile = region_config["enabled-%"]
-            account_percentile = self._get_account_percentile(feature_name)
-            is_enabled = account_percentile < target_percentile
-        else:
-            is_enabled = region_config.get("enabled", False)
+        is_enabled = self._is_feature_enabled_for_region_config(feature_name, region_config)
 
         LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
         return is_enabled
@@ -78,6 +71,25 @@ class FeatureToggle:
         m.update(self.account_id.encode())
         m.update(feature_name.encode())
         return int(m.hexdigest(), 16) % 100
+
+    def _is_feature_enabled_for_region_config(self, feature_name, region_config):
+        """
+        returns if a feature is enabled for a given config
+
+        :params feature_name: name of feature
+        :params region_config: region config obtained from stage_config or account_config
+        :returns: bool is_enabled
+        """
+        if "enabled-%" in region_config:
+            # Percentage-based enablement
+            # if target_percentile = 10 => account_percentile < 10 means the account is the selected 10%
+            target_percentile = region_config["enabled-%"]
+            account_percentile = self._get_account_percentile(feature_name)
+            is_enabled = account_percentile < target_percentile
+        else:
+            is_enabled = region_config.get("enabled", False)
+
+        return is_enabled
 
 
 class FeatureToggleConfigProvider:

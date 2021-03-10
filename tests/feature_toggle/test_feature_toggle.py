@@ -56,6 +56,27 @@ class TestFeatureToggle(TestCase):
         )
         self.assertTrue(0 <= feature_toggle._get_account_percentile(feature_name) < 100)
 
+    @parameterized.expand(
+        [
+            param({"enabled": True}, 0, True),
+            param({"enabled-%": 10}, 0, True),
+            param({"enabled": False}, 0, False),
+            param({"enabled-%": 10}, 20, False),
+        ]
+    )
+    @patch.object(FeatureToggle, "_get_account_percentile")
+    def test__is_feature_enabled_for_region_config(
+        self, region_config, account_percentile, expected, get_account_percentile_mock
+    ):
+        feature_toggle = FeatureToggle(
+            FeatureToggleLocalConfigProvider(os.path.join(my_path, "input", "feature_toggle_config.json")),
+            stage=None,
+            region=None,
+            account_id="123456789",
+        )
+        get_account_percentile_mock.return_value = account_percentile
+        self.assertEqual(feature_toggle._is_feature_enabled_for_region_config("feature", region_config), expected)
+
 
 class TestFeatureToggleAppConfig(TestCase):
     def setUp(self):
