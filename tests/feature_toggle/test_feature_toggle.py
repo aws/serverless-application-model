@@ -8,6 +8,7 @@ from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggleLocalConfigProvider,
     FeatureToggleAppConfigConfigProvider,
 )
+from samtranslator.feature_toggle.dialup import ToggleDialup, SimpleAccountPercentileDialup, NeverEnabledDialup
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
@@ -41,62 +42,48 @@ class TestFeatureToggle(TestCase):
 
     @parameterized.expand(
         [
-            param("123456789123", "feature-1"),
-            param("000000000000", "feature-2"),
-            param("432187654321", "feature-3"),
-            param("111222333444", "feature-4"),
+            param("toggle", ToggleDialup),
+            param("account-percentile", SimpleAccountPercentileDialup),
+            param("something-else", NeverEnabledDialup),
         ]
     )
-    def test__get_account_percentile(self, account_id, feature_name):
+    def test__get_dialup(self, dialup_type, expected_class):
         feature_toggle = FeatureToggle(
             FeatureToggleLocalConfigProvider(os.path.join(my_path, "input", "feature_toggle_config.json")),
             stage=None,
             region=None,
-            account_id=account_id,
+            account_id=None,
         )
-        self.assertTrue(0 <= feature_toggle._get_account_percentile(feature_name) < 100)
-
-    @parameterized.expand(
-        [
-            param({"enabled": True}, 0, True),
-            param({"enabled-%": 10}, 0, True),
-            param({"enabled": False}, 0, False),
-            param({"enabled-%": 10}, 20, False),
-        ]
-    )
-    @patch.object(FeatureToggle, "_get_account_percentile")
-    def test__is_feature_enabled_for_region_config(
-        self, region_config, account_percentile, expected, get_account_percentile_mock
-    ):
-        feature_toggle = FeatureToggle(
-            FeatureToggleLocalConfigProvider(os.path.join(my_path, "input", "feature_toggle_config.json")),
-            stage=None,
-            region=None,
-            account_id="123456789",
-        )
-        get_account_percentile_mock.return_value = account_percentile
-        self.assertEqual(feature_toggle._is_feature_enabled_for_region_config("feature", region_config), expected)
+        region_config = {"type": dialup_type}
+        dialup = feature_toggle._get_dialup(region_config, "some-feature")
+        self.assertIsInstance(dialup, expected_class)
 
 
 class TestFeatureToggleAppConfig(TestCase):
     def setUp(self):
         self.content_stream_mock = Mock()
         self.content_stream_mock.read.return_value = b"""
-            {
-        "feature-1": {
-            "beta": {
-                "us-west-2": {"enabled": true},
-                "us-east-1": {"enabled-%": 10},
-                "default": {"enabled": false},
-                "123456789123": {"us-west-2": {"enabled": true}, "default": {"enabled": false}}
-            },
-            "gamma": {
-                "default": {"enabled": false},
-                "123456789123": {"us-east-1": {"enabled": false}, "default": {"enabled": false}}
-            },
-            "prod": {"default": {"enabled": false}}
+        {
+            "feature-1": {
+                "beta": {
+                    "us-west-2": {"type": "toggle", "enabled": true},
+                    "us-east-1": {"type": "account-percentile", "enabled-%": 10},
+                    "default": {"type": "toggle", "enabled": false},
+                    "123456789123": {
+                        "us-west-2": {"type": "toggle", "enabled": true},
+                        "default": {"type": "toggle", "enabled": false}
+                    }
+                },
+                "gamma": {
+                    "default": {"type": "toggle", "enabled": false},
+                    "123456789123": {
+                        "us-east-1": {"type": "toggle", "enabled": false},
+                        "default": {"type": "toggle", "enabled": false}
+                    }
+                },
+                "prod": {"default": {"type": "toggle", "enabled": false}}
+            }
         }
-    }
         """
         self.app_config_mock = Mock()
         self.app_config_mock.get_configuration.return_value = {"Content": self.content_stream_mock}

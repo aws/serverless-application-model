@@ -6,6 +6,11 @@ import logging
 import hashlib
 
 from botocore.config import Config
+from samtranslator.feature_toggle.dialup import (
+    NeverEnabledDialup,
+    ToggleDialup,
+    SimpleAccountPercentileDialup,
+)
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
@@ -19,11 +24,34 @@ class FeatureToggle:
     SAM is executing or not.
     """
 
+    DIALUP_RESOLVER = {
+        "toggle": ToggleDialup,
+        "account-percentile": SimpleAccountPercentileDialup,
+    }
+
     def __init__(self, config_provider, stage, account_id, region):
         self.feature_config = config_provider.config
         self.stage = stage
         self.account_id = account_id
         self.region = region
+
+    def _get_dialup(self, region_config, feature_name):
+        """
+        get the right dialup instance
+        if no dialup type is provided or the specified dialup is not supported,
+        an instance of NeverEnabledDialup will be returned
+
+        :param region_config: region config
+        :param feature_name: feature_name
+        :return: an instance of
+        """
+        dialup_type = region_config.get("type")
+        if dialup_type in FeatureToggle.DIALUP_RESOLVER:
+            return FeatureToggle.DIALUP_RESOLVER[dialup_type](
+                region_config, account_id=self.account_id, feature_name=feature_name
+            )
+        LOG.warning("Dialup type '{}' is None or is not supported.".format(dialup_type))
+        return NeverEnabledDialup(region_config)
 
     def is_enabled(self, feature_name):
         """
@@ -55,40 +83,11 @@ class FeatureToggle:
         else:
             region_config = stage_config[region] if region in stage_config else stage_config.get("default", {})
 
-        is_enabled = self._is_feature_enabled_for_region_config(feature_name, region_config)
+        dialup = self._get_dialup(region_config, feature_name=feature_name)
+        LOG.info("Using Dialip {}".format(dialup))
+        is_enabled = dialup.is_enabled()
 
         LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
-        return is_enabled
-
-    def _get_account_percentile(self, feature_name):
-        """
-        Get account percentile based on sha256 hash of account ID and feature_name
-
-        :param feature_name: name of feature
-        :returns: integer n, where 0 <= n < 100
-        """
-        m = hashlib.sha256()
-        m.update(self.account_id.encode())
-        m.update(feature_name.encode())
-        return int(m.hexdigest(), 16) % 100
-
-    def _is_feature_enabled_for_region_config(self, feature_name, region_config):
-        """
-        returns if a feature is enabled for a given config
-
-        :params feature_name: name of feature
-        :params region_config: region config obtained from stage_config or account_config
-        :returns: bool is_enabled
-        """
-        if "enabled-%" in region_config:
-            # Percentage-based enablement
-            # if target_percentile = 10 => account_percentile < 10 means the account is the selected 10%
-            target_percentile = region_config["enabled-%"]
-            account_percentile = self._get_account_percentile(feature_name)
-            is_enabled = account_percentile < target_percentile
-        else:
-            is_enabled = region_config.get("enabled", False)
-
         return is_enabled
 
 
