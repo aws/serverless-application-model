@@ -2,10 +2,15 @@ import hashlib
 
 
 class BaseDialup(object):
+    """BaseDialup class to provide an interface for all dialup classes"""
+
     def __init__(self, region_config, **kwargs):
         self.region_config = region_config
 
     def is_enabled(self):
+        """
+        Returns a bool on whether this dialup is enabled or not
+        """
         raise NotImplementedError
 
     def __str__(self):
@@ -61,5 +66,9 @@ class SimpleAccountPercentileDialup(BaseDialup):
         return int(m.hexdigest(), 16) % 100
 
     def is_enabled(self):
+        """
+        Enable when account_percentile falls within target_percentile
+        Meaning only (target_percentile)% of accounts will be enabled
+        """
         target_percentile = self.region_config.get("enabled-%", 0)
         return self._get_account_percentile() < target_percentile
