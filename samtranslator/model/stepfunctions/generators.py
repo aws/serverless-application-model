@@ -17,6 +17,7 @@ from samtranslator.model.intrinsics import fnJoin
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
 
 
@@ -210,8 +211,12 @@ class StateMachineGenerator(object):
         :returns: the generated IAM Role
         :rtype: model.iam.IAMRole
         """
+        policies = self.policies[:]
+        if self.tracing and self.tracing.get("Enabled") is True:
+            policies.append(get_xray_managed_policy_name())
+
         state_machine_policies = ResourcePolicies(
-            {"Policies": self.policies},
+            {"Policies": policies},
             # No support for policy templates in the "core"
             policy_template_processor=None,
         )

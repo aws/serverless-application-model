@@ -156,12 +156,14 @@ class ServerlessAppPlugin(BasePlugin):
         :param string key: The dictionary key consisting of (ApplicationId, SemanticVersion)
         :param string logical_id: the logical_id of this application resource
         """
+        LOG.info("Getting application {}/{} from serverless application repo...".format(app_id, semver))
         get_application = lambda app_id, semver: self._sar_client.get_application(
             ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
         )
         try:
             self._sar_service_call(get_application, logical_id, app_id, semver)
             self._applications[key] = {"Available"}
+            LOG.info("Finished getting application {}/{}.".format(app_id, semver))
         except EndpointConnectionError as e:
             # No internet connection. Don't break verification, but do show a warning.
             warning_message = "{}. Unable to verify access to {}/{}.".format(e, app_id, semver)
@@ -177,10 +179,12 @@ class ServerlessAppPlugin(BasePlugin):
         :param string key: The dictionary key consisting of (ApplicationId, SemanticVersion)
         :param string logical_id: the logical_id of this application resource
         """
+        LOG.info("Requesting to create CFN template {}/{} in serverless application repo...".format(app_id, semver))
         create_cfn_template = lambda app_id, semver: self._sar_client.create_cloud_formation_template(
             ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
         )
         response = self._sar_service_call(create_cfn_template, logical_id, app_id, semver)
+        LOG.info("Requested to create CFN template {}/{} in serverless application repo.".format(app_id, semver))
         self._applications[key] = response[self.TEMPLATE_URL_KEY]
         if response["Status"] != "ACTIVE":
             self._in_progress_templates.append((response[self.APPLICATION_ID_KEY], response["TemplateId"]))
@@ -293,6 +297,7 @@ class ServerlessAppPlugin(BasePlugin):
                 self._in_progress_templates = []
 
                 # Check each resource to make sure it's active
+                LOG.info("Checking resources in serverless application repo...")
                 for application_id, template_id in temp:
                     get_cfn_template = (
                         lambda application_id, template_id: self._sar_client.get_cloud_formation_template(
@@ -302,6 +307,7 @@ class ServerlessAppPlugin(BasePlugin):
                     )
                     response = self._sar_service_call(get_cfn_template, application_id, application_id, template_id)
                     self._handle_get_cfn_template_response(response, application_id, template_id)
+                LOG.info("Finished checking resources in serverless application repo.")
 
                 # Don't sleep if there are no more templates with PREPARING status
                 if len(self._in_progress_templates) == 0:

@@ -11,6 +11,11 @@ pytest~=4.6.11; python_version < '3.6' # pytest dropped python 2 support after 4
 mock>=3.0.5,<4.0.0  # 4.0.0 drops Python 2 support
 parameterized~=0.7.4
 
+# Integration tests
+pathlib2>=2.3.5; python_version < '3'
+click~=7.1
+dateparser~=0.7
+
 # Requirements for examples
 requests~=2.24.0
 
