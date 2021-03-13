@@ -17,13 +17,13 @@ class BaseDialup(object):
         return self.__class__.__name__
 
 
-class NeverEnabledDialup(BaseDialup):
+class DisabledDialup(BaseDialup):
     """
     A dialup that is never enabled
     """
 
     def __init__(self, region_config, **kwargs):
-        super(NeverEnabledDialup, self).__init__(region_config)
+        super(DisabledDialup, self).__init__(region_config)
 
     def is_enabled(self):
         return False

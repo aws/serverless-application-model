@@ -8,7 +8,7 @@ from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggleLocalConfigProvider,
     FeatureToggleAppConfigConfigProvider,
 )
-from samtranslator.feature_toggle.dialup import ToggleDialup, SimpleAccountPercentileDialup, NeverEnabledDialup
+from samtranslator.feature_toggle.dialup import ToggleDialup, SimpleAccountPercentileDialup, DisabledDialup
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
@@ -44,7 +44,7 @@ class TestFeatureToggle(TestCase):
         [
             param("toggle", ToggleDialup),
             param("account-percentile", SimpleAccountPercentileDialup),
-            param("something-else", NeverEnabledDialup),
+            param("something-else", DisabledDialup),
         ]
     )
     def test__get_dialup(self, dialup_type, expected_class):

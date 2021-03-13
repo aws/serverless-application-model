@@ -11,10 +11,10 @@ class TestBaseDialup(TestCase):
         self.assertEqual(str(dialup), "BaseDialup")
 
 
-class TestNeverEnabledDialup(TestCase):
+class TestDisabledDialup(TestCase):
     def test_is_enabled(self):
         region_config = {}
-        dialup = NeverEnabledDialup(region_config)
+        dialup = DisabledDialup(region_config)
         self.assertFalse(dialup.is_enabled())
 
 

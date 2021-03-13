@@ -7,7 +7,7 @@ import hashlib
 
 from botocore.config import Config
 from samtranslator.feature_toggle.dialup import (
-    NeverEnabledDialup,
+    DisabledDialup,
     ToggleDialup,
     SimpleAccountPercentileDialup,
 )
@@ -39,7 +39,7 @@ class FeatureToggle:
         """
         get the right dialup instance
         if no dialup type is provided or the specified dialup is not supported,
-        an instance of NeverEnabledDialup will be returned
+        an instance of DisabledDialup will be returned
 
         :param region_config: region config
         :param feature_name: feature_name
@@ -51,7 +51,7 @@ class FeatureToggle:
                 region_config, account_id=self.account_id, feature_name=feature_name
             )
         LOG.warning("Dialup type '{}' is None or is not supported.".format(dialup_type))
-        return NeverEnabledDialup(region_config)
+        return DisabledDialup(region_config)
 
     def is_enabled(self, feature_name):
         """
