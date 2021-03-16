@@ -478,9 +478,7 @@
             "Action": [
               "ec2:DescribeImages"
             ],
-            "Resource": {
-              "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/*"
-            }
+            "Resource": "*"
           }
         ]
       }
@@ -2302,6 +2300,62 @@
                   ]
                 }
               }
+            }
+          }
+        ]
+      }
+    },
+    "AcmGetCertificatePolicy": {
+      "Description": "Gives permission to retrieve a certificate and its certificate chain from ACM",
+      "Parameters": {
+        "CertificateArn": {
+          "Description": "The ARN of the certificate to grant access to"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "acm:GetCertificate"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "${certificateArn}",
+                {
+                  "certificateArn": {
+                    "Ref": "CertificateArn"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "Route53ChangeResourceRecordSetsPolicy": {
+      "Description": "Gives permission to change resource record sets in Route 53",
+      "Parameters": {
+        "HostedZoneId": {
+          "Description": "ID of the hosted zone"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "route53:ChangeResourceRecordSets"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:route53:::hostedzone/${HostedZoneId}",
+                {
+                  "HostedZoneId": {
+                    "Ref": "HostedZoneId"
+                  }
+                }
+              ]
             }
           }
         ]

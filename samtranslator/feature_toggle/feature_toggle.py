@@ -4,6 +4,8 @@ import json
 import boto3
 import logging
 
+from botocore.config import Config
+
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
 
@@ -105,8 +107,12 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
 
     def __init__(self, application_id, environment_id, configuration_profile_id):
         FeatureToggleConfigProvider.__init__(self)
-        self.app_config_client = boto3.client("appconfig")
         try:
+            LOG.info("Loading feature toggle config from AppConfig...")
+            # Lambda function has 120 seconds limit
+            # (5 + 25) * 2, 60 seconds maximum timeout duration
+            client_config = Config(connect_timeout=5, read_timeout=25, retries={"total_max_attempts": 2})
+            self.app_config_client = boto3.client("appconfig", config=client_config)
             response = self.app_config_client.get_configuration(
                 Application=application_id,
                 Environment=environment_id,
@@ -115,6 +121,7 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
             )
             binary_config_string = response["Content"].read()
             self.feature_toggle_config = json.loads(binary_config_string.decode("utf-8"))
+            LOG.info("Finished loading feature toggle config from AppConfig.")
         except Exception as ex:
             LOG.error("Failed to load config from AppConfig: {}. Using empty config.".format(ex))
             # There is chance that AppConfig is not available in a particular region.

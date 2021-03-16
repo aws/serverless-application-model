@@ -20,6 +20,8 @@ class OpenApiEditor(object):
     _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
     _X_APIGW_TAG_VALUE = "x-amazon-apigateway-tag-value"
     _X_APIGW_CORS = "x-amazon-apigateway-cors"
+    _X_APIGW_ENDPOINT_CONFIG = "x-amazon-apigateway-endpoint-configuration"
+    _SERVERS = "servers"
     _CONDITIONAL_IF = "Fn::If"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -44,6 +46,7 @@ class OpenApiEditor(object):
         self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
         self.definitions = self._doc.get("definitions", {})
         self.tags = self._doc.get("tags", [])
+        self.info = self._doc.get("info", {})
 
     def get_path(self, path):
         """
@@ -99,7 +102,14 @@ class OpenApiEditor(object):
 
         # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
         regex = "([A-Za-z0-9]+\.Arn)"
-        match = re.findall(regex, arn)[0].split(".Arn")[0]
+        matches = re.findall(regex, arn)
+        # Prevent IndexError when integration URI doesn't contain .Arn (e.g. a Function with
+        # AutoPublishAlias translates to AWS::Lambda::Alias, which make_shorthand represents
+        # as LogicalId instead of LogicalId.Arn).
+        # TODO: Consistent handling of Functions with and without AutoPublishAlias (see #1901)
+        if not matches:
+            return False
+        match = matches[0].split(".Arn")[0]
         return match
 
     def method_has_integration(self, method):
@@ -334,6 +344,14 @@ class OpenApiEditor(object):
             if normalized_method_name != "options":
                 normalized_method_name = self._normalize_method_name(method_name)
                 # It is possible that the method could have two definitions in a Fn::If block.
+                if normalized_method_name not in self.get_path(path):
+                    raise InvalidDocumentException(
+                        [
+                            InvalidTemplateException(
+                                "Could not find {} in {} within DefinitionBody.".format(normalized_method_name, path)
+                            )
+                        ]
+                    )
                 for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                     if not self.method_definition_has_integration(method_definition):
@@ -427,6 +445,27 @@ class OpenApiEditor(object):
                 tag = {"name": name, self._X_APIGW_TAG_VALUE: value}
                 self.tags.append(tag)
 
+    def add_endpoint_config(self, disable_execute_api_endpoint):
+        """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG header in open api definition
+
+        Following this guide:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableexecuteapiendpoint
+
+        :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
+
+        """
+
+        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
+
+        servers_configurations = self._doc.get(self._SERVERS, [{}])
+        for config in servers_configurations:
+            endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, dict())
+            endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
+            config[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
+
+        self._doc[self._SERVERS] = servers_configurations
+
     def add_cors(
         self,
         allow_origins,
@@ -490,6 +529,15 @@ class OpenApiEditor(object):
 
         self._doc[self._X_APIGW_CORS] = cors_configuration
 
+    def add_description(self, description):
+        """Add description in open api definition, if it is not already defined
+
+        :param string description: Description of the API
+        """
+        if self.info.get("description"):
+            return
+        self.info["description"] = description
+
     def has_api_gateway_cors(self):
         if self._doc.get(self._X_APIGW_CORS):
             return True
@@ -512,6 +560,9 @@ class OpenApiEditor(object):
         if self.security_schemes:
             self._doc.setdefault("components", {})
             self._doc["components"]["securitySchemes"] = self.security_schemes
+
+        if self.info:
+            self._doc["info"] = self.info
 
         return copy.deepcopy(self._doc)
 

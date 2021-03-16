@@ -1,0 +1,22 @@
+Resources:
+  MyFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyBasicStateMachine
+      Type: STANDARD
+      DefinitionUri: s3://sam-demo-bucket/my-state-machine.asl.json
+      Tracing:
+        Enabled: true
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource: !GetAtt MyFunction.Arn

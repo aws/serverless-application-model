@@ -79,6 +79,22 @@ Resources:
             Topic:
               Ref: Notifications
 
+        SNSTopicWithSQSSubscription:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: Notifications
+            SqsSubscription:
+              QueueArn: !GetAtt Queue.Arn
+              QueueUrl: !Ref Queue
+
+        AnotherSNSWithSQSSubscription:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: Notifications
+            SqsSubscription: true
+
         KinesisStream:
           Type: Kinesis
           Properties:
@@ -99,3 +115,7 @@ Resources:
 
   Images:
     Type: AWS::S3::Bucket
+
+  Queue:
+    Condition: MyCondition
+    Type: AWS::SQS::Queue

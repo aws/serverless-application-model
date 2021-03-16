@@ -162,6 +162,24 @@ def is_intrinsic_if(input):
     return key == "Fn::If"
 
 
+def validate_intrinsic_if_items(items):
+    """
+    Validates Fn::If items
+
+    Parameters
+    ----------
+    items : list
+        Fn::If items
+
+    Raises
+    ------
+    ValueError
+        If the items are invalid
+    """
+    if not isinstance(items, list) or len(items) != 3:
+        raise ValueError("Fn::If requires 3 arguments")
+
+
 def is_intrinsic_no_value(input):
     """
     Is the given input an intrinsic Ref: AWS::NoValue? Intrinsic function is a dictionary with single

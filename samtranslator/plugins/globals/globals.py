@@ -41,6 +41,7 @@ class Globals(object):
             "AssumeRolePolicyDocument",
             "EventInvokeConfig",
             "FileSystemConfigs",
+            "CodeSigningConfigArn",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries

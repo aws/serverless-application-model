@@ -8,6 +8,7 @@ from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of
 from samtranslator.model.intrinsics import fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
+from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
@@ -81,6 +82,8 @@ class Schedule(EventSource):
         "Enabled": PropertyType(False, is_type(bool)),
         "Name": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
     def to_cloudformation(self, resource, **kwargs):
@@ -107,11 +110,18 @@ class Schedule(EventSource):
 
         role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
-        events_rule.Targets = [self._construct_target(resource, role)]
+
+        source_arn = events_rule.get_runtime_attr("arn")
+        dlq_queue_arn = None
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            resources.extend(dlq_resources)
+        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
 
         return resources
 
-    def _construct_target(self, resource, role):
+    def _construct_target(self, resource, role, dead_letter_queue_arn=None):
         """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
@@ -124,6 +134,12 @@ class Schedule(EventSource):
         }
         if self.Input is not None:
             target["Input"] = self.Input
+
+        if self.DeadLetterConfig is not None:
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
+
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
 
         return target
 
@@ -138,6 +154,8 @@ class CloudWatchEvent(EventSource):
         "Pattern": PropertyType(False, is_type(dict)),
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
     def to_cloudformation(self, resource, **kwargs):
@@ -162,11 +180,19 @@ class CloudWatchEvent(EventSource):
 
         role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
-        events_rule.Targets = [self._construct_target(resource, role)]
+
+        source_arn = events_rule.get_runtime_attr("arn")
+        dlq_queue_arn = None
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            resources.extend(dlq_resources)
+
+        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
 
         return resources
 
-    def _construct_target(self, resource, role):
+    def _construct_target(self, resource, role, dead_letter_queue_arn=None):
         """Constructs the Target property for the CloudWatch Events/EventBridge Rule.
 
         :returns: the Target property
@@ -182,6 +208,13 @@ class CloudWatchEvent(EventSource):
 
         if self.InputPath is not None:
             target["InputPath"] = self.InputPath
+
+        if self.DeadLetterConfig is not None:
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
+
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
+
         return target
 
 
