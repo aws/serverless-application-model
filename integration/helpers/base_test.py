@@ -35,10 +35,8 @@ class BaseTest(TestCase):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
-        #TODO: compatible with combination
         cls.template_dir = Path(cls.resources_dir, "templates")
         cls.output_dir = Path(cls.tests_integ_dir, "tmp")
-        # TODO: compatible with combination
         cls.expected_dir = Path(cls.resources_dir, "expected")
         cls.code_dir = Path(cls.resources_dir, "code")
         cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
