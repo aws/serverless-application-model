@@ -1,0 +1,7 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyLambdaFunctionCWEvent", "ResourceType":"AWS::Events::Rule" },
+  { "LogicalResourceId":"MyLambdaFunctionCWEventPermission", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"MyDeadLetterQueue", "ResourceType":"AWS::SQS::Queue" }
+]

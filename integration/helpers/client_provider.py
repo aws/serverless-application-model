@@ -11,6 +11,11 @@ class ClientProvider:
         self._iam_client = None
         self._api_v2_client = None
         self._sfn_client = None
+        self._cloudwatch_log_client = None
+        self._cloudwatch_event_client = None
+        self._sqs_client = None
+        self._dynamoDB_streams_client = None
+        self._kinesis_client = None
 
     @property
     def cfn_client(self):
@@ -75,3 +80,48 @@ class ClientProvider:
         if not self._sfn_client:
             self._sfn_client = boto3.client("stepfunctions")
         return self._sfn_client
+
+    @property
+    def cloudwatch_log_client(self):
+        """
+        CloudWatch Log Client
+        """
+        if not self._cloudwatch_log_client:
+            self._cloudwatch_log_client = boto3.client("logs")
+        return self._cloudwatch_log_client
+
+    @property
+    def cloudwatch_event_client(self):
+        """
+        CloudWatch Event Client
+        """
+        if not self._cloudwatch_event_client:
+            self._cloudwatch_event_client = boto3.client("events")
+        return self._cloudwatch_event_client
+
+    @property
+    def sqs_client(self):
+        """
+        SQS Client
+        """
+        if not self._sqs_client:
+            self._sqs_client = boto3.client("sqs")
+        return self._sqs_client
+
+    @property
+    def dynamodb_streams_client(self):
+        """
+        DynamoDB Stream Client
+        """
+        if not self._dynamoDB_streams_client:
+            self._dynamoDB_streams_client = boto3.client("dynamodbstreams")
+        return self._dynamoDB_streams_client
+
+    @property
+    def kinesis_client(self):
+        """
+        DynamoDB Stream Client
+        """
+        if not self._kinesis_client:
+            self._kinesis_client = boto3.client("kinesis")
+        return self._kinesis_client
