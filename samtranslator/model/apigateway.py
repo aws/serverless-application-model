@@ -240,7 +240,11 @@ class ApiGatewayAuthorizer(object):
             )
 
         if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):
-            identity = {}
+            raise InvalidResourceException(
+                api_logical_id,
+                name + " Authorizer must specify Identity with at least one "
+                "of Headers, QueryStrings, StageVariables, or Context.",
+            )
 
         if authorization_scopes is not None and not isinstance(authorization_scopes, list):
             raise InvalidResourceException(api_logical_id, "AuthorizationScopes must be a list.")
@@ -263,8 +267,9 @@ class ApiGatewayAuthorizer(object):
         query_strings = identity.get("QueryStrings")
         stage_variables = identity.get("StageVariables")
         context = identity.get("Context")
+        ttl = identity.get("ReauthorizeEvery")
 
-        if not headers and not query_strings and not stage_variables and not context:
+        if (ttl is None or int(ttl) > 0) and not headers and not query_strings and not stage_variables and not context:
             return True
 
         return False
@@ -307,7 +312,9 @@ class ApiGatewayAuthorizer(object):
                 swagger[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role
 
             if self._get_function_payload_type() == "REQUEST":
-                swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
+                identity_source = self._get_identity_source()
+                if identity_source:
+                    swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
 
         # Authorizer Validation Expression is only allowed on COGNITO_USER_POOLS and LAMBDA_TOKEN
         is_lambda_token_authorizer = authorizer_type == "LAMBDA" and self._get_function_payload_type() == "TOKEN"
