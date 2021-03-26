@@ -1,3 +1,5 @@
+import boto3
+
 from .translator.arn_generator import ArnGenerator
 
 
@@ -21,4 +23,10 @@ class RegionConfiguration(object):
             "aws-iso",
             "aws-iso-b",
             "aws-cn",
+        ]
+
+    @classmethod
+    def is_sar_supported(cls):
+        return boto3.Session().region_name not in [
+            "af-south-1",
         ]
