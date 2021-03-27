@@ -1,3 +1,4 @@
+import logging
 from collections import namedtuple
 from six import string_types
 from samtranslator.model.intrinsics import ref, fnGetAtt
@@ -23,6 +24,8 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
+
+LOG = logging.getLogger(__name__)
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple(
@@ -640,6 +643,7 @@ class ApiGenerator(object):
 
         # create a usage plan for all the Apis
         elif create_usage_plan == "SHARED":
+            LOG.info("Creating SHARED usage plan for all the Apis")
             usage_plan_logical_id = "ServerlessUsagePlan"
             if self.logical_id not in self.shared_api_usage_plan.depends_on_shared:
                 self.shared_api_usage_plan.depends_on_shared.append(self.logical_id)
@@ -677,6 +681,7 @@ class ApiGenerator(object):
         """
         if create_usage_plan == "SHARED":
             # create an api key resource for all the apis
+            LOG.info("Creating api key resource for all the Apis from SHARED usage plan")
             api_key_logical_id = "ServerlessApiKey"
             api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
             api_key.Enabled = True
