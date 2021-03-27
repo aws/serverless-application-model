@@ -51,12 +51,20 @@ UsagePlanProperties.__new__.__defaults__ = (None, None, None, None, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
+class SharedApiUsagePlan(object):
+    """
+    Collects API information from different API resources in the same template,
+    so that these information can be used in the shared usage plan
+    """
+
+    def __init__(self):
+        self.usage_plan_shared = False
+        self.stage_keys_shared = list()
+        self.api_stages_shared = list()
+        self.depends_on_shared = list()
+
 
 class ApiGenerator(object):
-    usage_plan_shared = False
-    stage_keys_shared = list()
-    api_stages_shared = list()
-    depends_on_shared = list()
 
     def __init__(
         self,
@@ -69,6 +77,7 @@ class ApiGenerator(object):
         definition_uri,
         name,
         stage_name,
+        shared_api_usage_plan,
         tags=None,
         endpoint_configuration=None,
         method_settings=None,
@@ -134,6 +143,7 @@ class ApiGenerator(object):
         self.models = models
         self.domain = domain
         self.description = description
+        self.shared_api_usage_plan = shared_api_usage_plan
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -631,17 +641,17 @@ class ApiGenerator(object):
         # create a usage plan for all the Apis
         elif create_usage_plan == "SHARED":
             usage_plan_logical_id = "ServerlessUsagePlan"
-            if self.logical_id not in ApiGenerator.depends_on_shared:
-                ApiGenerator.depends_on_shared.append(self.logical_id)
+            if self.logical_id not in self.shared_api_usage_plan.depends_on_shared:
+                self.shared_api_usage_plan.depends_on_shared.append(self.logical_id)
             usage_plan = ApiGatewayUsagePlan(
-                logical_id=usage_plan_logical_id, depends_on=ApiGenerator.depends_on_shared
+                logical_id=usage_plan_logical_id, depends_on=self.shared_api_usage_plan.depends_on_shared
             )
             api_stage = dict()
             api_stage["ApiId"] = ref(self.logical_id)
             api_stage["Stage"] = ref(rest_api_stage.logical_id)
-            if api_stage not in ApiGenerator.api_stages_shared:
-                ApiGenerator.api_stages_shared.append(api_stage)
-            usage_plan.ApiStages = ApiGenerator.api_stages_shared
+            if api_stage not in self.shared_api_usage_plan.api_stages_shared:
+                self.shared_api_usage_plan.api_stages_shared.append(api_stage)
+            usage_plan.ApiStages = self.shared_api_usage_plan.api_stages_shared
 
             api_key = self._construct_api_key(usage_plan_logical_id, create_usage_plan, rest_api_stage)
             usage_plan_key = self._construct_usage_plan_key(usage_plan_logical_id, create_usage_plan, api_key)
@@ -673,9 +683,9 @@ class ApiGenerator(object):
             stage_key = dict()
             stage_key["RestApiId"] = ref(self.logical_id)
             stage_key["StageName"] = ref(rest_api_stage.logical_id)
-            if stage_key not in ApiGenerator.stage_keys_shared:
-                ApiGenerator.stage_keys_shared.append(stage_key)
-            api_key.StageKeys = ApiGenerator.stage_keys_shared
+            if stage_key not in self.shared_api_usage_plan.stage_keys_shared:
+                self.shared_api_usage_plan.stage_keys_shared.append(stage_key)
+            api_key.StageKeys = self.shared_api_usage_plan.stage_keys_shared
         # for create_usage_plan = "PER_API"
         else:
             # create an api key resource for this api
