@@ -12,6 +12,7 @@ from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
+from samtranslator.region_configuration import RegionConfiguration
 
 LOG = logging.getLogger(__name__)
 
@@ -104,6 +105,10 @@ class ServerlessAppPlugin(BasePlugin):
 
             if key not in self._applications:
                 try:
+                    if not RegionConfiguration.is_sar_supported():
+                        raise InvalidResourceException(
+                            logical_id, "Serverless Application Repository is not available in this region."
+                        )
                     # Lazy initialization of the client- create it when it is needed
                     if not self._sar_client:
                         self._sar_client = boto3.client("serverlessrepo")
