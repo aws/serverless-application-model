@@ -247,6 +247,12 @@
                     "type": "string",
                     "name": "id",
                     "in": "path"
+                  },
+                  {
+                    "required": false,
+                    "type": "string",
+                    "name": "full.type",
+                    "in": "query"
                   }
                 ]
               }

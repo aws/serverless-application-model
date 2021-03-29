@@ -1134,7 +1134,10 @@ class SwaggerEditor(object):
 
                 parameter_name = request_parameter["Name"]
                 location_name = parameter_name.replace("method.request.", "")
-                location, name = location_name.split(".")
+
+                parameter_name_parts = location_name.split(".")
+                location = parameter_name_parts[0]
+                name = ".".join(parameter_name_parts[1:])
 
                 if location == "querystring":
                     location = "query"
