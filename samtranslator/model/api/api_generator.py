@@ -26,6 +26,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.INFO)
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple(
