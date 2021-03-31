@@ -46,6 +46,7 @@ class OpenApiEditor(object):
         self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
         self.definitions = self._doc.get("definitions", {})
         self.tags = self._doc.get("tags", [])
+        self.info = self._doc.get("info", {})
 
     def get_path(self, path):
         """
@@ -101,7 +102,14 @@ class OpenApiEditor(object):
 
         # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
         regex = "([A-Za-z0-9]+\.Arn)"
-        match = re.findall(regex, arn)[0].split(".Arn")[0]
+        matches = re.findall(regex, arn)
+        # Prevent IndexError when integration URI doesn't contain .Arn (e.g. a Function with
+        # AutoPublishAlias translates to AWS::Lambda::Alias, which make_shorthand represents
+        # as LogicalId instead of LogicalId.Arn).
+        # TODO: Consistent handling of Functions with and without AutoPublishAlias (see #1901)
+        if not matches:
+            return False
+        match = matches[0].split(".Arn")[0]
         return match
 
     def method_has_integration(self, method):
@@ -521,6 +529,15 @@ class OpenApiEditor(object):
 
         self._doc[self._X_APIGW_CORS] = cors_configuration
 
+    def add_description(self, description):
+        """Add description in open api definition, if it is not already defined
+
+        :param string description: Description of the API
+        """
+        if self.info.get("description"):
+            return
+        self.info["description"] = description
+
     def has_api_gateway_cors(self):
         if self._doc.get(self._X_APIGW_CORS):
             return True
@@ -543,6 +560,9 @@ class OpenApiEditor(object):
         if self.security_schemes:
             self._doc.setdefault("components", {})
             self._doc["components"]["securitySchemes"] = self.security_schemes
+
+        if self.info:
+            self._doc["info"] = self.info
 
         return copy.deepcopy(self._doc)
 

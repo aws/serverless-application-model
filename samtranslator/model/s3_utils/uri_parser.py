@@ -45,6 +45,24 @@ def to_s3_uri(code_dict):
     return uri
 
 
+def construct_image_code_object(image_uri, logical_id, property_name):
+    """Constructs a Lambda `Code` or `Content` property, from the SAM `ImageUri` property.
+    This follows the current scheme for Lambda Functions.
+
+    :param string image_uri: string
+    :param string logical_id: logical_id of the resource calling this function
+    :param string property_name: name of the property which is used as an input to this function.
+    :returns: a Code dict, containing the ImageUri.
+    :rtype: dict
+    """
+    if not image_uri:
+        raise InvalidResourceException(
+            logical_id, "'{}' requires that a image hosted at a registry be specified.".format(property_name)
+        )
+
+    return {"ImageUri": image_uri}
+
+
 def construct_s3_location_object(location_uri, logical_id, property_name):
     """Constructs a Lambda `Code` or `Content` property, from the SAM `CodeUri` or `ContentUri` property.
     This follows the current scheme for Lambda Functions and LayerVersions.

@@ -14,7 +14,7 @@ from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.tags.resource_tagging import get_tag_list
-from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
 
 _CORS_WILDCARD = "*"
@@ -112,6 +112,8 @@ class HttpApiGenerator(object):
         if self.disable_execute_api_endpoint is not None:
             self._add_endpoint_configuration()
 
+        self._add_description()
+
         if self.definition_uri:
             http_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
@@ -123,9 +125,6 @@ class HttpApiGenerator(object):
                 "'AWS::Serverless::HttpApi'. Add a value for one of these properties or "
                 "add a 'HttpApi' event to an 'AWS::Serverless::Function'.",
             )
-
-        if self.description:
-            http_api.Description = self.description
 
         return http_api
 
@@ -468,6 +467,15 @@ class HttpApiGenerator(object):
         if not default_authorizer:
             return
 
+        if is_intrinsic_no_value(default_authorizer):
+            return
+
+        if is_intrinsic(default_authorizer):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set DefaultAuthorizer because intrinsic functions are not supported for this field.",
+            )
+
         if not authorizers.get(default_authorizer):
             raise InvalidResourceException(
                 self.logical_id,
@@ -585,6 +593,27 @@ class HttpApiGenerator(object):
         stage.RouteSettings = self.route_settings
 
         return stage
+
+    def _add_description(self):
+        """Add description to DefinitionBody if Description property is set in SAM"""
+        if not self.description:
+            return
+
+        if not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Description works only with inline OpenApi specified in the 'DefinitionBody' property.",
+            )
+        if self.definition_body.get("info", {}).get("description"):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Unable to set Description because it is already defined within inline OpenAPI specified in the "
+                "'DefinitionBody' property.",
+            )
+
+        open_api_editor = OpenApiEditor(self.definition_body)
+        open_api_editor.add_description(self.description)
+        self.definition_body = open_api_editor.openapi
 
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM HTTP API resource
