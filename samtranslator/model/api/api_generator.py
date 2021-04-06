@@ -55,6 +55,7 @@ UsagePlanProperties.__new__.__defaults__ = (None, None, None, None, None, None)
 
 GatewayResponseProperties = ["ResponseParameters", "ResponseTemplates", "StatusCode"]
 
+
 class SharedApiUsagePlan(object):
     """
     Collects API information from different API resources in the same template,
@@ -69,7 +70,6 @@ class SharedApiUsagePlan(object):
 
 
 class ApiGenerator(object):
-
     def __init__(
         self,
         logical_id,
@@ -954,8 +954,7 @@ class ApiGenerator(object):
 
         if not isinstance(default_authorizer, string_types):
             raise InvalidResourceException(
-                self.logical_id,
-                "DefaultAuthorizer is not a string.",
+                self.logical_id, "DefaultAuthorizer is not a string.",
             )
 
         if not authorizers.get(default_authorizer) and default_authorizer != "AWS_IAM":
