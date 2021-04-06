@@ -63,7 +63,19 @@
         }, 
         "StageName": "Prod"
       }
-    }, 
+    },
+    "MyApiWithNotCachedLambdaRequestAuthProdStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiWithNotCachedLambdaRequestAuthDeployment444f67cd7c"
+        },
+        "RestApiId": {
+          "Ref": "MyApiWithNotCachedLambdaRequestAuth"
+        },
+        "StageName": "Prod"
+      }
+    },
     "MyApiWithLambdaTokenAuthMyLambdaTokenAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -205,7 +217,30 @@
           ]
         }
       }
-    }, 
+    },
+    "MyApiWithNotCachedLambdaRequestAuthMyLambdaRequestAuthAuthorizerPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyAuthFn",
+            "Arn"
+          ]
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
+            {
+              "__ApiId__": {
+                "Ref": "MyApiWithNotCachedLambdaRequestAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
     "MyFnLambdaTokenPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -236,7 +271,17 @@
         "Description": "RestApi deployment id: 6e52add211cda52ae10a7cc0e0afcf4afc682f9f", 
         "StageName": "Stage"
       }
-    }, 
+    },
+    "MyApiWithNotCachedLambdaRequestAuthDeployment444f67cd7c": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApiWithNotCachedLambdaRequestAuth"
+        },
+        "Description": "RestApi deployment id: 444f67cd7c6475a698a0101480ba99b498325e90",
+        "StageName": "Stage"
+      }
+    },
     "MyFnLambdaRequestPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -257,7 +302,28 @@
           ]
         }
       }
-    }, 
+    },
+    "MyFnLambdaNotCachedRequestPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "MyFn"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/not-cached-lambda-request",
+            {
+              "__Stage__": "*",
+              "__ApiId__": {
+                "Ref": "MyApiWithNotCachedLambdaRequestAuth"
+              }
+            }
+          ]
+        }
+      }
+    },
     "MyApiWithLambdaTokenAuth": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -463,6 +529,64 @@
                   ]
                 }
               }, 
+              "x-amazon-apigateway-authtype": "custom"
+            }
+          }
+        }
+      }
+    },
+    "MyApiWithNotCachedLambdaRequestAuth": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {
+            "/not-cached-lambda-request": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                  }
+                },
+                "security": [
+                  {
+                    "MyLambdaRequestAuth": []
+                  }
+                ],
+                "responses": {}
+              }
+            }
+          },
+          "swagger": "2.0",
+          "securityDefinitions": {
+            "MyLambdaRequestAuth": {
+              "in": "header",
+              "type": "apiKey",
+              "name": "Unused",
+              "x-amazon-apigateway-authorizer": {
+                "type": "request",
+                "authorizerUri": {
+                  "Fn::Sub": [
+                    "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    {
+                      "__FunctionArn__": {
+                        "Fn::GetAtt": [
+                          "MyAuthFn",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "authorizerResultTtlInSeconds": 0
+              },
               "x-amazon-apigateway-authtype": "custom"
             }
           }
