@@ -129,7 +129,7 @@ AWS::Lambda::Permission            MyFunction\ **ThumbnailApi**\ Permission\ **P
   NOTE: ``ServerlessRestApi*`` resources are generated one per stack.
 
 HTTP API
-^^^
+^^^^
 This is called an "Implicit HTTP API". There can be many functions in the template that define these APIs. Behind the 
 scenes, SAM will collect all implicit HTTP APIs from all Functions in the template, generate an OpenApi doc, and create an 
 implicit ``AWS::Serverless::HttpApi`` using this OpenApi. This API defaults to a StageName called "$default" that cannot be
