@@ -38,10 +38,7 @@
         "UsagePlanId": {
           "Ref": "MyApiTwoUsagePlan"
         }
-      },
-      "DependsOn": [
-        "MyApiTwoApiKey"
-      ]
+      }
     },
     "MyApiOneUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
@@ -56,10 +53,7 @@
             }
           }
         ]
-      },
-      "DependsOn": [
-        "MyApiOne"
-      ]
+      }
     },
     "MyApiTwoUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
@@ -74,10 +68,7 @@
             }
           }
         ]
-      },
-      "DependsOn": [
-        "MyApiTwo"
-      ]
+      }
     },
     "MyApiTwoDeploymenta997b9e562": {
       "Type": "AWS::ApiGateway::Deployment",
@@ -98,10 +89,7 @@
         "UsagePlanId": {
           "Ref": "MyApiOneUsagePlan"
         }
-      },
-      "DependsOn": [
-        "MyApiOneApiKey"
-      ]
+      }
     },
     "MyApiTwoProdStage": {
       "Type": "AWS::ApiGateway::Stage",

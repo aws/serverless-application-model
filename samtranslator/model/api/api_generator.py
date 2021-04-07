@@ -617,7 +617,7 @@ class ApiGenerator(object):
         # create usage plan for this api only
         elif usage_plan_properties.get("CreateUsagePlan") == "PER_API":
             usage_plan_logical_id = self.logical_id + "UsagePlan"
-            usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id, depends_on=[self.logical_id])
+            usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id)
             api_stages = list()
             api_stage = dict()
             api_stage["ApiId"] = ref(self.logical_id)
@@ -631,8 +631,6 @@ class ApiGenerator(object):
         # create a usage plan for all the Apis
         elif create_usage_plan == "SHARED":
             usage_plan_logical_id = "ServerlessUsagePlan"
-            if self.logical_id not in ApiGenerator.depends_on_shared:
-                ApiGenerator.depends_on_shared.append(self.logical_id)
             usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id, depends_on=ApiGenerator.depends_on_shared
             )
@@ -705,7 +703,7 @@ class ApiGenerator(object):
             # create a mapping between api key and the usage plan
             usage_plan_key_logical_id = self.logical_id + "UsagePlanKey"
 
-        usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id, depends_on=[api_key.logical_id])
+        usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id)
         usage_plan_key.KeyId = ref(api_key.logical_id)
         usage_plan_key.KeyType = "API_KEY"
         usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)

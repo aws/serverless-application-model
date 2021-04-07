@@ -90,10 +90,7 @@
         "UsagePlanId": {
           "Ref": "MyApiTwoUsagePlan"
         }
-      },
-      "DependsOn": [
-        "MyApiTwoApiKey"
-      ]
+      }
     },
     "MyApiThree": {
       "Type": "AWS::ApiGateway::RestApi",
@@ -398,11 +395,7 @@
             }
           }
         ]
-      },
-      "DependsOn": [
-        "MyApiThree",
-        "ServerlessRestApi"
-      ]
+      }
     },
     "ServerlessApiKey": {
       "Type": "AWS::ApiGateway::ApiKey",
@@ -465,10 +458,7 @@
           "BurstLimit": 1000
         },
         "UsagePlanName": "SomeRandomName"
-      },
-      "DependsOn": [
-        "MyApiTwo"
-      ]
+      }
     },
     "ServerlessRestApiDeploymentd197b03bdf": {
       "Type": "AWS::ApiGateway::Deployment",
@@ -567,10 +557,7 @@
         "UsagePlanId": {
           "Ref": "ServerlessUsagePlan"
         }
-      },
-      "DependsOn": [
-        "ServerlessApiKey"
-      ]
+      }
     },
     "MyApiOne": {
       "Type": "AWS::ApiGateway::RestApi",
