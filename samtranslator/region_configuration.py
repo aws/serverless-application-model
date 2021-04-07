@@ -1,3 +1,5 @@
+import boto3
+
 from .translator.arn_generator import ArnGenerator
 
 
@@ -21,4 +23,16 @@ class RegionConfiguration(object):
             "aws-iso",
             "aws-iso-b",
             "aws-cn",
+        ]
+
+    @classmethod
+    def is_sar_supported(cls):
+        """
+        SAR is not supported in af-south-1 at the moment.
+        https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
+
+        :return: True, if SAR is supported in current region.
+        """
+        return boto3.Session().region_name not in [
+            "af-south-1",
         ]
