@@ -1729,6 +1729,34 @@
         ]
       }
     },
+	"StepFunctionsSyncExecutionPolicy": {
+      "Description": "Gives permission to start a synchronous Step Functions state machine execution. Only supported for Express workflows.",
+      "Parameters": {
+        "StateMachineName": {
+          "Description":"The name of the state machine to execute."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "states:StartSyncExecution"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  "stateMachineName": {
+                    "Ref": "StateMachineName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "CodeCommitCrudPolicy": {
       "Description": "Gives permissions to create/read/update/delete objects within a specific codecommit repository",
       "Parameters": {

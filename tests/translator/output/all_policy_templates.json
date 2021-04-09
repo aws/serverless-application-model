@@ -1610,6 +1610,27 @@
                 }
               ]
             }
+          }, 
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy60", 
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "states:StartSyncExecution"
+                  ], 
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}", 
+                      {
+                        "stateMachineName": "name"
+                      }
+                    ]
+                  }, 
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "Tags": [
