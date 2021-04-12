@@ -24,6 +24,7 @@ from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
+from samtranslator.plugins.resource_attributes.resource_attributes_plugin import ResourceAttributesPlugin
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
 
@@ -132,6 +133,8 @@ class Translator:
                 kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
                 translated = macro.to_cloudformation(**kwargs)
 
+                # sam_plugins.act(LifeCycleEvents.after_transform_resource, template, macro.logical_id, translated)
+
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
 
                 # Some resources mutate their logical ids. Track those to change all references to them:
@@ -239,6 +242,7 @@ def prepare_plugins(plugins, parameters={}):
         make_implicit_http_api_plugin(),
         GlobalsPlugin(),
         make_policy_template_for_function_plugin(),
+        # ResourceAttributesPlugin(),
     ]
 
     plugins = [] if not plugins else plugins

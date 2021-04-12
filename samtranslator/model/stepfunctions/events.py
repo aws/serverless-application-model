@@ -97,7 +97,7 @@ class Schedule(EventSource):
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
-        events_rule = EventsRule(self.logical_id)
+        events_rule = EventsRule(self.logical_id, attributes=resource.get_passthrough_resource_attributes())
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
@@ -105,8 +105,6 @@ class Schedule(EventSource):
             events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
         events_rule.Name = self.Name
         events_rule.Description = self.Description
-        if CONDITION in resource.resource_attributes:
-            events_rule.set_resource_attribute(CONDITION, resource.resource_attributes[CONDITION])
 
         role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
@@ -170,11 +168,9 @@ class CloudWatchEvent(EventSource):
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
-        events_rule = EventsRule(self.logical_id)
+        events_rule = EventsRule(self.logical_id, attributes=resource.get_passthrough_resource_attributes())
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
-        if CONDITION in resource.resource_attributes:
-            events_rule.set_resource_attribute(CONDITION, resource.resource_attributes[CONDITION])
 
         resources.append(events_rule)
 

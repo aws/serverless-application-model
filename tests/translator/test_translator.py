@@ -368,7 +368,7 @@ class TestTranslatorEndToEnd(TestCase):
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
 
-        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+        self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
     @parameterized.expand(
         itertools.product(
@@ -451,7 +451,7 @@ class TestTranslatorEndToEnd(TestCase):
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
 
-        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+        self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
     @parameterized.expand(
         itertools.product(
@@ -509,7 +509,8 @@ class TestTranslatorEndToEnd(TestCase):
         if sys.version_info.major >= 3:
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
-        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+
+        self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
     def _update_logical_id_hash(self, resources):
         """
