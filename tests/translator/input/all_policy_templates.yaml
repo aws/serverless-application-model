@@ -148,9 +148,6 @@ Resources:
         - StepFunctionsExecutionPolicy:
             StateMachineName: name
 
-        - StepFunctionsSyncExecutionPolicy:
-            StateMachineName: name
-
         - CodeCommitCrudPolicy:
             RepositoryName: name
 
@@ -177,3 +174,6 @@ Resources:
 
         - Route53ChangeResourceRecordSetsPolicy:
             HostedZoneId: test
+
+        - StepFunctionsSyncExecutionPolicy:
+            StateMachineName: name
