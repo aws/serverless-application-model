@@ -24,7 +24,7 @@ from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
-from samtranslator.model.iam import IAMRole, IAMRolePolicies
+from samtranslator.model.iam import IAMRole, IAMPolicy, IAMRolePolicies, IAMPolicies
 from samtranslator.model.lambda_ import (
     LambdaFunction,
     LambdaVersion,
@@ -182,6 +182,10 @@ class SamFunction(SamResourceMacro):
             execution_role = self._construct_role(managed_policy_map, event_invoke_policies)
             lambda_function.Role = execution_role.get_runtime_attr("arn")
             resources.append(execution_role)
+
+        if self.KmsKeyArn and execution_role:
+            env_vars_policy = self._construct_environment_variables_decrypt_policy(lambda_function, execution_role)
+            resources.append(env_vars_policy)
 
         try:
             resources += self._generate_event_resources(
@@ -492,6 +496,21 @@ class SamFunction(SamResourceMacro):
             tags=self._construct_tag_list(self.Tags),
         )
         return execution_role
+
+    def _construct_environment_variables_decrypt_policy(self, lambda_function, execution_role):
+        """Constructs a Lambda policy for reading encrypted environment variables
+        based on this SAM function's KmsKeyArn property.
+
+        :returns: the generated IAM Policy
+        :rtype: model.iam.IAMPolicy
+        """
+        policy = IAMPolicies.lambda_decrypt_environment_variables_policy(
+            self.logical_id,
+            lambda_function.KmsKeyArn,
+            lambda_function.get_runtime_attr("arn"),
+            execution_role.get_runtime_attr("name"),
+        )
+        return policy
 
     def _validate_package_type(self, lambda_function):
         """
