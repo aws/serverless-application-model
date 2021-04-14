@@ -734,7 +734,8 @@ class SamFunction(SamResourceMacro):
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
             attributes = {}
-        attributes["DeletionPolicy"] = "Retain"
+        if "DeletionPolicy" not in attributes:
+            attributes["DeletionPolicy"] = "Retain"
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
@@ -1162,12 +1163,16 @@ class SamLayerVersion(SamResourceMacro):
             intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
         )
 
+        # If nothing defined, this will be set to Retain
         retention_policy_value = self._get_retention_policy_value()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
             attributes = {}
-        attributes["DeletionPolicy"] = retention_policy_value
+        if "DeletionPolicy" not in attributes:
+            attributes["DeletionPolicy"] = self.RETAIN
+        if retention_policy_value is not None:
+            attributes["DeletionPolicy"] = retention_policy_value
 
         old_logical_id = self.logical_id
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
@@ -1202,7 +1207,9 @@ class SamLayerVersion(SamResourceMacro):
         :return: value for the DeletionPolicy attribute.
         """
 
-        if self.RetentionPolicy is None or self.RetentionPolicy.lower() == self.RETAIN.lower():
+        if self.RetentionPolicy is None:
+            return None
+        elif self.RetentionPolicy.lower() == self.RETAIN.lower():
             return self.RETAIN
         elif self.RetentionPolicy.lower() == self.DELETE.lower():
             return self.DELETE

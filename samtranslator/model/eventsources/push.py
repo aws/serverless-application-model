@@ -430,7 +430,7 @@ class SNS(PushEventSource):
         # SNS -> SQS(Create New) -> Lambda
         if isinstance(self.SqsSubscription, bool):
             resources = []
-            queue = self._inject_sqs_queue()
+            queue = self._inject_sqs_queue(function)
             queue_arn = queue.get_runtime_attr("arn")
             queue_url = queue.get_runtime_attr("queue_url")
 
@@ -484,11 +484,11 @@ class SNS(PushEventSource):
 
         return subscription
 
-    def _inject_sqs_queue(self):
-        return SQSQueue(self.logical_id + "Queue")
+    def _inject_sqs_queue(self, function):
+        return SQSQueue(self.logical_id + "Queue", attributes=function.get_passthrough_resource_attributes())
 
     def _inject_sqs_event_source_mapping(self, function, role, queue_arn, batch_size=None, enabled=None):
-        event_source = SQS(self.logical_id + "EventSourceMapping")
+        event_source = SQS(self.logical_id + "EventSourceMapping", attributes=function.get_passthrough_resource_attributes())
         event_source.Queue = queue_arn
         event_source.BatchSize = batch_size or 10
         event_source.Enabled = enabled or True
@@ -944,11 +944,15 @@ class Cognito(PushEventSource):
 
         resources = []
         source_arn = fnGetAtt(userpool_id, "Arn")
-        resources.append(
-            self._construct_permission(function, source_arn=source_arn, prefix=function.logical_id + "Cognito")
-        )
+        lambda_permission = self._construct_permission(function, source_arn=source_arn, prefix=function.logical_id + "Cognito")
+        for attribute, value in function.get_passthrough_resource_attributes().items():
+            lambda_permission.set_resource_attribute(attribute, value)
+        resources.append(lambda_permission)
 
         self._inject_lambda_config(function, userpool)
+        userpool_resource = CognitoUserPool.from_dict(userpool_id, userpool)
+        for attribute, value in function.get_passthrough_resource_attributes().items():
+            userpool_resource.set_resource_attribute(attribute, value)
         resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
         return resources
 

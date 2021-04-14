@@ -24,7 +24,6 @@ from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
-from samtranslator.plugins.resource_attributes.resource_attributes_plugin import ResourceAttributesPlugin
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
 
