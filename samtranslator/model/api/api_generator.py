@@ -652,7 +652,7 @@ class ApiGenerator(object):
                 self.shared_api_usage_plan.depends_on_shared.append(self.logical_id)
             usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id,
-                depends_on=ApiGenerator.depends_on_shared,
+                depends_on=self.shared_api_usage_plan.depends_on_shared
                 attributes=self.passthrough_resource_attributes
             )
             api_stage = dict()
