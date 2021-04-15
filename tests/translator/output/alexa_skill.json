@@ -4,6 +4,9 @@
   "Resources": {
     "AlexaSkillFuncRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -34,6 +37,9 @@
     }, 
     "AlexaSkillFuncAlexaSkillEventPermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "FunctionName": {
@@ -44,6 +50,9 @@
     }, 
     "AlexaSkillFunc": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

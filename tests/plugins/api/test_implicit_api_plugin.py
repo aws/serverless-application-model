@@ -96,9 +96,9 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
         self.plugin._get_api_events.assert_has_calls([call(function1), call(function2), call(function3)])
         self.plugin._process_api_events.assert_has_calls(
             [
-                call(function1, ["event1", "event2"], sam_template, None),
-                call(function2, ["event1", "event2"], sam_template, None),
-                call(function3, ["event1", "event2"], sam_template, None),
+                call(function1, ["event1", "event2"], sam_template, None, None, None),
+                call(function2, ["event1", "event2"], sam_template, None, None, None),
+                call(function3, ["event1", "event2"], sam_template, None, None, None),
             ]
         )
 
@@ -133,9 +133,9 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
         self.plugin._get_api_events.assert_has_calls([call(statemachine1), call(statemachine2), call(statemachine3)])
         self.plugin._process_api_events.assert_has_calls(
             [
-                call(statemachine1, ["event1", "event2"], sam_template, None),
-                call(statemachine2, ["event1", "event2"], sam_template, None),
-                call(statemachine3, ["event1", "event2"], sam_template, None),
+                call(statemachine1, ["event1", "event2"], sam_template, None, None, None),
+                call(statemachine2, ["event1", "event2"], sam_template, None, None, None),
+                call(statemachine3, ["event1", "event2"], sam_template, None, None, None),
             ]
         )
 

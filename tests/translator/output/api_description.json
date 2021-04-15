@@ -2,6 +2,9 @@
   "Resources": {
     "FunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -32,6 +35,9 @@
     }, 
     "ApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "DeploymentId": {
           "Ref": "ApiDeploymentf117c932f7"
@@ -44,6 +50,9 @@
     }, 
     "FunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -63,6 +72,9 @@
     },
     "ApiDeploymentf117c932f7": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "RestApiId": {
           "Ref": "Api"
@@ -73,6 +85,9 @@
     }, 
     "Api": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "BodyS3Location": {
           "Bucket": "sam-demo-bucket", 
@@ -83,6 +98,9 @@
     }, 
     "Function": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket", 

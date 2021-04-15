@@ -27,6 +27,8 @@ Resources:
             Path: /iam
             Auth:
               Authorizer: AWS_IAM
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
 
 
   HtmlApi:
@@ -40,3 +42,5 @@ Resources:
           properties:
             username:
               type: string
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain

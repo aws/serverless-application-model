@@ -12,6 +12,9 @@ Resources:
             RestApiId: Api
             Path: /
             Method: get
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Condition: Condition1
 
   Api:
     Type: AWS::Serverless::Api
@@ -19,3 +22,6 @@ Resources:
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
       Description: my description
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Condition: Condition1

@@ -2,6 +2,8 @@
   "Resources": {
     "HtmlFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -32,6 +34,8 @@
     },
     "HtmlApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "HtmlApiDeploymenta488cfa4f9"
@@ -44,6 +48,8 @@
     },
     "HtmlFunctionIamPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -65,6 +71,8 @@
     },
     "HtmlApi": {
       "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -159,6 +167,8 @@
     },
     "HtmlApiDeploymenta488cfa4f9": {
       "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -168,6 +178,8 @@
     },
     "HtmlFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -187,6 +199,8 @@
     },
     "HtmlFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.gethtml",
         "Code": {

@@ -2,6 +2,9 @@
   "Resources": {
     "KitchenSinkFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -25,6 +28,9 @@
     }, 
     "KitchenSinkFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
+      "Condition": "Condition1",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
