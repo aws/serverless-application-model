@@ -60,8 +60,9 @@ class PullEventSource(ResourceMacro):
 
         resources = []
 
-        lambda_eventsourcemapping = LambdaEventSourceMapping(self.logical_id,
-                                                            attributes=function.get_passthrough_resource_attributes())
+        lambda_eventsourcemapping = LambdaEventSourceMapping(
+            self.logical_id, attributes=function.get_passthrough_resource_attributes()
+        )
         resources.append(lambda_eventsourcemapping)
 
         try:

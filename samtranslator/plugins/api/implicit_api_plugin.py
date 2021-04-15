@@ -129,8 +129,9 @@ class ImplicitApiPlugin(BasePlugin):
 
         return api_events
 
-    def _process_api_events(self, resource, api_events, template, condition=None,
-                            deletion_policy=None, update_replace_policy=None):
+    def _process_api_events(
+        self, resource, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
+    ):
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
         resource from the template
@@ -278,7 +279,7 @@ class ImplicitApiPlugin(BasePlugin):
         one_resource_method_contains_deletion_policy = False
         contains_retain = False
         contains_delete = False
-        # If multiple functions with multiple different policies reference the Implicit Api, 
+        # If multiple functions with multiple different policies reference the Implicit Api,
         # we set DeletionPolicy to Retain if Retain is present in one of the functions,
         # else Delete if Delete is present
         for iterated_policy in all_resource_method_deletion_policies:
@@ -318,7 +319,7 @@ class ImplicitApiPlugin(BasePlugin):
         contains_retain = False
         contains_snapshot = False
         contains_delete = False
-        # If multiple functions with multiple different policies reference the Implicit Api, 
+        # If multiple functions with multiple different policies reference the Implicit Api,
         # we set UpdateReplacePolicy to Retain if Retain is present in one of the functions,
         # Snapshot if Snapshot is present, else Delete if Delete is present
         for iterated_policy in all_resource_method_update_replace_policies:

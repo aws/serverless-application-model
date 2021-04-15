@@ -1,6 +1,8 @@
 Resources:
   HtmlFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
@@ -18,6 +20,8 @@ Resources:
 
   HtmlApi:
     Type: AWS::Serverless::Api
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Models:

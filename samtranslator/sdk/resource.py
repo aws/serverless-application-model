@@ -46,12 +46,16 @@ class SamResource(object):
         if self.deletion_policy:
 
             if not is_str()(self.deletion_policy, should_raise=False):
-                raise InvalidDocumentException([InvalidTemplateException("Every DeletionPolicy member must be a string.")])
+                raise InvalidDocumentException(
+                    [InvalidTemplateException("Every DeletionPolicy member must be a string.")]
+                )
 
         if self.update_replace_policy:
 
             if not is_str()(self.update_replace_policy, should_raise=False):
-                raise InvalidDocumentException([InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")])
+                raise InvalidDocumentException(
+                    [InvalidTemplateException("Every UpdateReplacePolicy member must be a string.")]
+                )
 
         return SamResourceType.has_value(self.type)
 

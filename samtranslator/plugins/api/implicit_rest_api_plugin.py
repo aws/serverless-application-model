@@ -46,8 +46,9 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
         self.api_id_property = "RestApiId"
         self.editor = SwaggerEditor
 
-    def _process_api_events(self, function, api_events, template, condition=None,
-                            deletion_policy=None, update_replace_policy=None):
+    def _process_api_events(
+        self, function, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
+    ):
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
         resource from the template
@@ -91,7 +92,7 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
             api_dict_condition = self.api_conditions.setdefault(api_id, {})
             method_conditions = api_dict_condition.setdefault(path, {})
             method_conditions[method] = condition
-            
+
             api_dict_deletion = self.api_deletion_policies.setdefault(api_id, {})
             method_deletion_policies = api_dict_deletion.setdefault(path, {})
             method_deletion_policies[method] = deletion_policy

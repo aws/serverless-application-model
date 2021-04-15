@@ -43,8 +43,9 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         self.api_id_property = "ApiId"
         self.editor = OpenApiEditor
 
-    def _process_api_events(self, function, api_events, template, condition=None, 
-                            deletion_policy=None, update_replace_policy=None):
+    def _process_api_events(
+        self, function, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
+    ):
         """
         Actually process given HTTP API events. Iteratively adds the APIs to OpenApi JSON in the respective
         AWS::Serverless::HttpApi resource from the template

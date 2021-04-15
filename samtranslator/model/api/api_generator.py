@@ -631,8 +631,11 @@ class ApiGenerator(object):
         # create usage plan for this api only
         elif usage_plan_properties.get("CreateUsagePlan") == "PER_API":
             usage_plan_logical_id = self.logical_id + "UsagePlan"
-            usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id, depends_on=[self.logical_id], 
-                                            attributes=self.passthrough_resource_attributes)
+            usage_plan = ApiGatewayUsagePlan(
+                logical_id=usage_plan_logical_id,
+                depends_on=[self.logical_id],
+                attributes=self.passthrough_resource_attributes,
+            )
             # usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id, depends_on=[self.logical_id])
             api_stages = list()
             api_stage = dict()
@@ -653,7 +656,7 @@ class ApiGenerator(object):
             usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id,
                 depends_on=self.shared_api_usage_plan.depends_on_shared,
-                attributes=self.passthrough_resource_attributes
+                attributes=self.passthrough_resource_attributes,
             )
             api_stage = dict()
             api_stage["ApiId"] = ref(self.logical_id)
@@ -688,8 +691,11 @@ class ApiGenerator(object):
             # create an api key resource for all the apis
             LOG.info("Creating api key resource for all the Apis from SHARED usage plan")
             api_key_logical_id = "ServerlessApiKey"
-            api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id],
-                                        attributes=self.passthrough_resource_attributes)
+            api_key = ApiGatewayApiKey(
+                logical_id=api_key_logical_id,
+                depends_on=[usage_plan_logical_id],
+                attributes=self.passthrough_resource_attributes,
+            )
             # api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
             api_key.Enabled = True
             stage_key = dict()
@@ -702,8 +708,11 @@ class ApiGenerator(object):
         else:
             # create an api key resource for this api
             api_key_logical_id = self.logical_id + "ApiKey"
-            api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id],
-                                        attributes=self.passthrough_resource_attributes)
+            api_key = ApiGatewayApiKey(
+                logical_id=api_key_logical_id,
+                depends_on=[usage_plan_logical_id],
+                attributes=self.passthrough_resource_attributes,
+            )
             # api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
             api_key.Enabled = True
             stage_keys = list()
@@ -729,8 +738,11 @@ class ApiGenerator(object):
             # create a mapping between api key and the usage plan
             usage_plan_key_logical_id = self.logical_id + "UsagePlanKey"
 
-        usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id, depends_on=[api_key.logical_id],
-                                                attributes=self.passthrough_resource_attributes)
+        usage_plan_key = ApiGatewayUsagePlanKey(
+            logical_id=usage_plan_key_logical_id,
+            depends_on=[api_key.logical_id],
+            attributes=self.passthrough_resource_attributes,
+        )
         # usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id, depends_on=[api_key.logical_id])
         usage_plan_key.KeyId = ref(api_key.logical_id)
         usage_plan_key.KeyType = "API_KEY"

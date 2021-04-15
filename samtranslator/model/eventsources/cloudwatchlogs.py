@@ -43,8 +43,11 @@ class CloudWatchLogs(PushEventSource):
         )
 
     def get_subscription_filter(self, function, permission):
-        subscription_filter = SubscriptionFilter(self.logical_id, depends_on=[permission.logical_id],
-                                                attributes=function.get_passthrough_resource_attributes())
+        subscription_filter = SubscriptionFilter(
+            self.logical_id,
+            depends_on=[permission.logical_id],
+            attributes=function.get_passthrough_resource_attributes(),
+        )
         subscription_filter.LogGroupName = self.LogGroupName
         subscription_filter.FilterPattern = self.FilterPattern
         subscription_filter.DestinationArn = function.get_runtime_attr("arn")

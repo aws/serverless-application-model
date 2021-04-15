@@ -283,11 +283,13 @@ class SamFunction(SamResourceMacro):
             )
             if dest_config.get("Type") in auto_inject_list:
                 if dest_config.get("Type") == "SQS":
-                    resource = SQSQueue(resource_logical_id + "Queue",
-                                        attributes=self.get_passthrough_resource_attributes())
+                    resource = SQSQueue(
+                        resource_logical_id + "Queue", attributes=self.get_passthrough_resource_attributes()
+                    )
                 if dest_config.get("Type") == "SNS":
-                    resource = SNSTopic(resource_logical_id + "Topic",
-                                        attributes=self.get_passthrough_resource_attributes())
+                    resource = SNSTopic(
+                        resource_logical_id + "Topic", attributes=self.get_passthrough_resource_attributes()
+                    )
                 if combined_condition:
                     resource.set_resource_attribute("Condition", combined_condition)
                 if property_condition:
@@ -318,9 +320,7 @@ class SamFunction(SamResourceMacro):
             return resource_condition
 
         and_condition = make_and_condition([{"Condition": resource_condition}, {"Condition": property_condition}])
-        condition_name = self._make_gen_condition_name(
-            resource_condition + "AND" + property_condition, self.logical_id
-        )
+        condition_name = self._make_gen_condition_name(resource_condition + "AND" + property_condition, self.logical_id)
         conditions[condition_name] = and_condition
 
         return condition_name

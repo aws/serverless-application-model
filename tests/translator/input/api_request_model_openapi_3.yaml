@@ -1,6 +1,8 @@
 Resources:
   HtmlFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
@@ -27,12 +29,12 @@ Resources:
             Path: /iam
             Auth:
               Authorizer: AWS_IAM
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
 
 
   HtmlApi:
     Type: AWS::Serverless::Api
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       OpenApiVersion: 3.0
@@ -42,5 +44,3 @@ Resources:
           properties:
             username:
               type: string
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain

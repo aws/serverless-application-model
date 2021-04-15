@@ -460,9 +460,7 @@ class SNS(PushEventSource):
         queue_policy = self._inject_sqs_queue_policy(
             self.Topic, queue_arn, queue_url, function, queue_policy_logical_id
         )
-        subscription = self._inject_subscription(
-            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function
-        )
+        subscription = self._inject_subscription("sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function)
         event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)
 
         resources = resources + event_source
@@ -488,14 +486,18 @@ class SNS(PushEventSource):
         return SQSQueue(self.logical_id + "Queue", attributes=function.get_passthrough_resource_attributes())
 
     def _inject_sqs_event_source_mapping(self, function, role, queue_arn, batch_size=None, enabled=None):
-        event_source = SQS(self.logical_id + "EventSourceMapping", attributes=function.get_passthrough_resource_attributes())
+        event_source = SQS(
+            self.logical_id + "EventSourceMapping", attributes=function.get_passthrough_resource_attributes()
+        )
         event_source.Queue = queue_arn
         event_source.BatchSize = batch_size or 10
         event_source.Enabled = enabled or True
         return event_source.to_cloudformation(function=function, role=role)
 
     def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, function, logical_id=None):
-        policy = SQSQueuePolicy(logical_id or self.logical_id + "QueuePolicy", attributes=function.get_passthrough_resource_attributes())
+        policy = SQSQueuePolicy(
+            logical_id or self.logical_id + "QueuePolicy", attributes=function.get_passthrough_resource_attributes()
+        )
 
         policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(topic_arn, queue_arn)
         policy.Queues = [queue_url]
@@ -944,7 +946,9 @@ class Cognito(PushEventSource):
 
         resources = []
         source_arn = fnGetAtt(userpool_id, "Arn")
-        lambda_permission = self._construct_permission(function, source_arn=source_arn, prefix=function.logical_id + "Cognito")
+        lambda_permission = self._construct_permission(
+            function, source_arn=source_arn, prefix=function.logical_id + "Cognito"
+        )
         for attribute, value in function.get_passthrough_resource_attributes().items():
             lambda_permission.set_resource_attribute(attribute, value)
         resources.append(lambda_permission)
