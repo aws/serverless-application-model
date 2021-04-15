@@ -2,6 +2,7 @@ import requests
 
 from integration.helpers.base_test import BaseTest
 from integration.helpers.deployer.utils.retry import retry
+from integration.helpers.exception import StatusCodeError
 
 
 class TestApiWithAuthorizers(BaseTest):
@@ -42,7 +43,7 @@ class TestApiWithAuthorizers(BaseTest):
             "lambdaTokenAuthorizer: authorizer URI must be the Lambda Function Authorizer's URI",
         )
         self.assertIsNone(
-            lambda_token_authorizer.get("authorizerResultTtlInSeconds"), "lambdaTokenAuthorizer: TTL must be null"
+            lambda_token_authorizer.get("authorizerResultTtlInSeconds"), "lambdaTokenAuthorizer: TTL must not be set"
         )
 
         lambda_request_authorizer = get_authorizer_by_name(authorizers, "MyLambdaRequestAuth")
@@ -62,7 +63,8 @@ class TestApiWithAuthorizers(BaseTest):
             "lambdaRequestAuthorizer: authorizer URI must be the Lambda Function Authorizer's URI",
         )
         self.assertIsNone(
-            lambda_request_authorizer.get("authorizerResultTtlInSeconds"), "lambdaRequestAuthorizer: TTL must be null"
+            lambda_request_authorizer.get("authorizerResultTtlInSeconds"),
+            "lambdaRequestAuthorizer: TTL must not be set",
         )
 
         cognito_authorizer = get_authorizer_by_name(authorizers, "MyCognitoAuthorizer")
@@ -390,7 +392,7 @@ class TestApiWithAuthorizers(BaseTest):
 
         api_key_id = stack_outputs["ApiKeyId"]
         key = apigw_client.get_api_key(apiKey=api_key_id, includeValue=True)
-        # TODO, this method need to use retry mechanism
+
         self.verify_authorized_request(base_url + "apikey", 200, "x-api-key", key["value"])
         self.verify_authorized_request(base_url + "apikey", 403)
 
@@ -420,7 +422,7 @@ class TestApiWithAuthorizers(BaseTest):
         auth_type_for_api_event_without_auth = api_event_with_out_auth["authorizationType"]
         self.assertEqual(auth_type_for_api_event_without_auth, "NONE")
 
-    @retry(ConnectionRefusedError, 10)
+    @retry(StatusCodeError, 10)
     def verify_authorized_request(
         self,
         url,
@@ -436,7 +438,7 @@ class TestApiWithAuthorizers(BaseTest):
             response = requests.get(url, headers=headers)
         status = response.status_code
         if status != expected_status_code:
-            raise ConnectionRefusedError(
+            raise StatusCodeError(
                 "Request to {} failed with status: {}, expected status: {}".format(url, status, expected_status_code)
             )
 

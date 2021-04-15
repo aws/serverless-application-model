@@ -1,7 +1,10 @@
 import requests
+
 from integration.helpers.base_test import BaseTest
 from integration.helpers.deployer.utils.retry import retry
 from parameterized import parameterized
+
+from integration.helpers.exception import StatusCodeError
 
 ALL_METHODS = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT"
 
@@ -75,14 +78,12 @@ class TestApiWithCors(BaseTest):
         self.verify_options_request(base_url + "/apione", ALL_METHODS, allow_origin, allow_headers, max_age)
         self.verify_options_request(base_url + "/apitwo", "OPTIONS,POST", allow_origin, allow_headers, max_age)
 
-    @retry(ConnectionRefusedError, 3)
+    @retry(StatusCodeError, 3)
     def verify_options_request(self, url, allow_methods, allow_origin, allow_headers, max_age):
         response = requests.options(url)
         status = response.status_code
         if status != 200:
-            raise ConnectionRefusedError(
-                "Request to {} failed with status: {}, expected status: 200".format(url, status)
-            )
+            raise StatusCodeError("Request to {} failed with status: {}, expected status: 200".format(url, status))
 
         self.assertEqual(status, 200, "Options request must be successful and return HTTP 200")
         headers = response.headers

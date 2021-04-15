@@ -23,9 +23,9 @@ class TestFunctionWithApi(BaseTest):
 
         self.assertTrue(
             get_api_policy_expectation in policy,
-            "{} should be preset in policy {}".format(get_api_policy_expectation, policy),
+            "{} should be present in policy {}".format(get_api_policy_expectation, policy),
         )
         self.assertTrue(
             post_api_policy_expectation in policy,
-            "{} should be preset in policy {}".format(post_api_policy_expectation, policy),
+            "{} should be present in policy {}".format(post_api_policy_expectation, policy),
         )

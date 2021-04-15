@@ -1,5 +1,9 @@
 from io import BytesIO
-from pathlib import Path
+
+try:
+    from pathlib import Path
+except ImportError:
+    from pathlib2 import Path
 
 import requests
 from parameterized import parameterized
@@ -26,7 +30,7 @@ class TestApiSettings(BaseTest):
         print(wildcard_path_setting)
         self.assertTrue(wildcard_path_setting["metricsEnabled"], "Metrics must be enabled")
         self.assertTrue(wildcard_path_setting["dataTraceEnabled"], "DataTrace must be enabled")
-        self.assertEqual(wildcard_path_setting["loggingLevel"], "INFO", "DataTrace must be enabled")
+        self.assertEqual(wildcard_path_setting["loggingLevel"], "INFO", "LoggingLevel must be INFO")
 
     @parameterized.expand(
         [
@@ -35,7 +39,7 @@ class TestApiSettings(BaseTest):
         ]
     )
     def test_binary_media_types(self, file_name):
-        self.create_and_verify_stack(file_name, self.get_parameters())
+        self.create_and_verify_stack(file_name, self.get_default_test_template_parameters())
 
         rest_api_id = self.get_physical_id_by_type("AWS::ApiGateway::RestApi")
         apigw_client = self.client_provider.api_client
@@ -93,7 +97,7 @@ class TestApiSettings(BaseTest):
         self.assertTrue(path_settings["cachingEnabled"], "Caching must be enabled")
 
     def test_binary_media_types_with_definition_body_openapi(self):
-        parameters = self.get_parameters()
+        parameters = self.get_default_test_template_parameters()
         binary_media = {
             "ParameterKey": "BinaryMediaCodeKey",
             "ParameterValue": "binary-media.zip",
@@ -121,7 +125,7 @@ class TestApiSettings(BaseTest):
         ]
     )
     def test_end_point_configuration(self, file_name):
-        self.create_and_verify_stack(file_name, self.get_parameters())
+        self.create_and_verify_stack(file_name, self.get_default_test_template_parameters())
 
         rest_api_id = self.get_physical_id_by_type("AWS::ApiGateway::RestApi")
         apigw_client = self.client_provider.api_client
@@ -147,7 +151,7 @@ class TestApiSettings(BaseTest):
         print(wildcard_path_setting)
         self.assertTrue(wildcard_path_setting["metricsEnabled"], "Metrics must be enabled")
         self.assertTrue(wildcard_path_setting["dataTraceEnabled"], "DataTrace must be enabled")
-        self.assertEqual(wildcard_path_setting["loggingLevel"], "INFO", "DataTrace must be enabled")
+        self.assertEqual(wildcard_path_setting["loggingLevel"], "INFO", "LoggingLevel must be INFO")
 
         response = apigw_client.get_rest_api(restApiId=rest_api_id)
         endpoint_config = response["endpointConfiguration"]

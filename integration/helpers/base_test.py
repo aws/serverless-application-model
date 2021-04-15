@@ -287,6 +287,8 @@ class BaseTest(TestCase):
 
         Parameters
         ----------
+        folder : string
+            The combination/single folder which contains the template
         file_name : string
             Template file name
         """
@@ -332,7 +334,7 @@ class BaseTest(TestCase):
             property name
         """
         yaml_doc = load_yaml(self.sub_input_file_path)
-        del(yaml_doc["Resources"][resource_name]["Properties"][property_name])
+        del yaml_doc["Resources"][resource_name]["Properties"][property_name]
         dump_yaml(self.sub_input_file_path, yaml_doc)
 
     def get_template_resource_property(self, resource_name, property_name):
@@ -371,13 +373,26 @@ class BaseTest(TestCase):
         if error:
             self.fail(error)
 
-    def verify_response(self, url, expected_status_code):
+    def verify_get_request_response(self, url, expected_status_code):
+        """
+        Verify if the get request to a certain url return the expected status code
+
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        expected_status_code : string
+            the expected status code
+        """
         print("Making request to " + url)
         response = requests.get(url)
         self.assertEqual(response.status_code, expected_status_code, " must return HTTP " + str(expected_status_code))
         return response
 
-    def get_parameters(self):
+    def get_default_test_template_parameters(self):
+        """
+        get the default template parameters
+        """
         parameters = [
             {
                 "ParameterKey": "Bucket",

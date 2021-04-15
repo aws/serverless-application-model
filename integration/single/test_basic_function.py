@@ -158,7 +158,7 @@ class TestBasicFunction(BaseTest):
         """
         Creates a basic lambda function with tracing
         """
-        self.create_and_verify_stack("single/basic_function_with_tracing", self.get_parameters())
+        self.create_and_verify_stack("single/basic_function_with_tracing", self.get_default_test_template_parameters())
 
         active_tracing_function_id = self.get_physical_id_by_logical_id("ActiveTracingFunction")
         pass_through_tracing_function_id = self.get_physical_id_by_logical_id("PassThroughTracingFunction")
