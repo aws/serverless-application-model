@@ -2,6 +2,8 @@
   "Resources": {
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
@@ -25,6 +27,8 @@
     }, 
     "ImplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -55,6 +59,8 @@
     },
     "ImplicitApiFunctionPostHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -76,6 +82,8 @@
     }, 
     "ServerlessRestApiDeployment9467cf1cd5": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -86,6 +94,8 @@
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment9467cf1cd5"
@@ -98,6 +108,8 @@
     }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -234,6 +246,8 @@
     }, 
     "ExplicitApiDeployment03e65d7ea2": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -244,6 +258,8 @@
     }, 
     "ImplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -265,6 +281,8 @@
     },
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ExplicitApiDeployment03e65d7ea2"
@@ -277,6 +295,8 @@
     }, 
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {

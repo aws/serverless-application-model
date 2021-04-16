@@ -3,6 +3,8 @@
   "Resources": {
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -24,6 +26,8 @@
     },
     "ImplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -52,6 +56,8 @@
     },
     "ImplicitApiFunctionPostHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -73,6 +79,8 @@
     },
     "ImplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -94,6 +102,8 @@
     },
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -180,6 +190,8 @@
     },
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ExplicitApiDeploymentc934a493f3"
@@ -192,6 +204,8 @@
     },
     "ExplicitApiDeploymentc934a493f3": {
       "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"

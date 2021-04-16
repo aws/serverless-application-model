@@ -2,6 +2,8 @@
   "Resources": {
     "ServerlessApi": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -123,6 +125,8 @@
     }, 
     "ApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -153,6 +157,8 @@
     },
     "ServerlessApiDeployment0aae939ae6": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessApi"
@@ -163,6 +169,8 @@
     }, 
     "ServerlessApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessApiDeployment0aae939ae6"
@@ -175,6 +183,8 @@
     }, 
     "ApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -196,6 +206,8 @@
     },
     "ApiFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.gethtml", 
         "Code": {
@@ -219,6 +231,8 @@
     }, 
     "MyAuthFn": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler", 
         "Code": {
@@ -242,6 +256,8 @@
     }, 
     "ApiFunctionPostHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -263,6 +279,8 @@
     }, 
     "MyAuthFnRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -293,6 +311,8 @@
     }, 
     "ServerlessApiMyLambdaRequestAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
