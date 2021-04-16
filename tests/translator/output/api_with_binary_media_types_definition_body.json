@@ -8,6 +8,8 @@
   "Resources": {
     "ExplicitApiManagedSwaggerProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ExplicitApiManagedSwaggerDeploymentfe9c2c09a2"
@@ -20,6 +22,8 @@
     }, 
     "ExplicitApiManagedSwaggerDeploymentfe9c2c09a2": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApiManagedSwagger"
@@ -30,6 +34,8 @@
     }, 
     "ExplicitApiDefinitionBody": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "paths": {}, 
@@ -67,6 +73,8 @@
     }, 
     "ExplicitApiDefinitionBodyDeployment1f26996adb": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApiDefinitionBody"
@@ -77,6 +85,8 @@
     }, 
     "ExplicitApiDefinitionBodyProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ExplicitApiDefinitionBodyDeployment1f26996adb"
@@ -89,6 +99,8 @@
     }, 
     "ExplicitApiManagedSwagger": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {

@@ -12,6 +12,8 @@
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler", 
         "Code": {
@@ -34,6 +36,8 @@
     }, 
     "MyFunctionAnotherGetPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com", 
@@ -55,6 +59,8 @@
     }, 
     "ApiGatewayDomainName23cdccdf9c": {
       "Type": "AWS::ApiGateway::DomainName", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "CertificateArn": "my-api-cert-arn", 
         "EndpointConfiguration": {
@@ -72,6 +78,8 @@
     }, 
     "MyFunctionImplicitGetPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com", 
@@ -93,6 +101,8 @@
     }, 
     "MyAnotherApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyAnotherApiDeployment48a61be119"
@@ -105,6 +115,8 @@
     }, 
     "MyFunctionFetchPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com", 
@@ -126,6 +138,8 @@
     }, 
     "MyAnotherApi": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -154,6 +168,8 @@
     }, 
     "MyApifetchBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BasePath": "fetch", 
         "DomainName": {
@@ -169,6 +185,8 @@
     }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -199,6 +217,8 @@
     }, 
     "MyApigetBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BasePath": "get", 
         "DomainName": {
@@ -214,6 +234,8 @@
     }, 
     "MyApi": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -254,6 +276,8 @@
     }, 
     "MyAnotherApiBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DomainName": {
           "Ref": "ApiGatewayDomainNameeab65c1531"
@@ -268,6 +292,8 @@
     }, 
     "ApiGatewayDomainNameeab65c1531": {
       "Type": "AWS::ApiGateway::DomainName", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "EndpointConfiguration": {
           "Types": [
@@ -280,6 +306,8 @@
     }, 
     "ServerlessRestApiDeployment3c44da8ffd": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -290,6 +318,8 @@
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment3c44da8ffd"
@@ -302,6 +332,8 @@
     }, 
     "MyApiDeployment347043ff9e": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
@@ -311,6 +343,8 @@
     }, 
     "ServerlessRestApiBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DomainName": {
           "Ref": "ApiGatewayDomainNameeab65c1531"
@@ -325,6 +359,8 @@
     }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiDeployment347043ff9e"
@@ -337,6 +373,8 @@
     }, 
     "MyAnotherApiDeployment48a61be119": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyAnotherApi"
@@ -346,6 +384,8 @@
     }, 
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -374,6 +414,8 @@
     }, 
     "MyFunctionApiPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com", 

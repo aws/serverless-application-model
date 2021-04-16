@@ -28,6 +28,8 @@
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler", 
         "Code": {
@@ -51,6 +53,8 @@
     }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "MyApi"
@@ -65,6 +69,8 @@
     }, 
     "ServerlessHttpApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -125,6 +131,8 @@
     }, 
     "MyFunctionImplicitGetPermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -147,6 +155,8 @@
     }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -178,6 +188,8 @@
     }, 
     "ApiGatewayDomainNameV29c93aac102": {
       "Type": "AWS::ApiGatewayV2::DomainName", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DomainName": {
           "Fn::Sub": "example-us-gov-west-1.com"
@@ -201,6 +213,8 @@
     }, 
     "MyFunctionApiPermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -223,6 +237,8 @@
     }, 
     "MyApigetApiMapping": {
       "Type": "AWS::ApiGatewayV2::ApiMapping", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "MyApi"
@@ -239,6 +255,8 @@
     }, 
     "ServerlessHttpApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "ServerlessHttpApi"
@@ -253,6 +271,8 @@
     }, 
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -320,6 +340,8 @@
     }, 
     "MyApifetchApiMapping": {
       "Type": "AWS::ApiGatewayV2::ApiMapping", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "MyApi"

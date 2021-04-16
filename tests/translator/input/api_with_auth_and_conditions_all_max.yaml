@@ -6,6 +6,8 @@ Conditions:
 Resources:
   MyApi:
     Type: "AWS::Serverless::Api"
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -57,6 +59,8 @@ Resources:
   
   MyFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
       Handler: index.handler
@@ -89,6 +93,8 @@ Resources:
 
   MyFunctionWithConditional:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: PathCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
