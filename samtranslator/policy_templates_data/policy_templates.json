@@ -1797,8 +1797,17 @@
                   "states:DescribeExecution",
                   "states:StopExecution"
               ],
-              "Resource": "*"
-          },
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${stateMachineName}:*",
+                  {
+                    "stateMachineName": {
+                      "Ref": "StateMachineName"
+                    }
+                  }
+                ]
+              }
+            },
           {
               "Effect": "Allow",
               "Action": [
