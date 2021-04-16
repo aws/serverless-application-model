@@ -1,0 +1,11 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyLambdaFunctionSNSEventPermission", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"MySnsTopic", "ResourceType":"AWS::SNS::Topic" },
+  { "LogicalResourceId":"MyLambdaFunctionSQSSubscriptionEvent", "ResourceType":"AWS::SNS::Subscription" },
+  { "LogicalResourceId":"MyLambdaFunctionSQSSubscriptionEventQueue", "ResourceType":"AWS::SQS::Queue" },
+  { "LogicalResourceId":"MyLambdaFunctionSQSSubscriptionEventEventSourceMapping", "ResourceType":"AWS::Lambda::EventSourceMapping" },
+  { "LogicalResourceId":"MyLambdaFunctionSQSSubscriptionEventQueuePolicy", "ResourceType":"AWS::SQS::QueuePolicy" },
+  { "LogicalResourceId":"MyLambdaFunctionSNSEvent", "ResourceType":"AWS::SNS::Subscription" }
+]

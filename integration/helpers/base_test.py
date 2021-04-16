@@ -149,6 +149,19 @@ class BaseTest(TestCase):
         self.deploy_stack(parameters)
         self.verify_stack()
 
+    def update_stack(self, file_name, parameters=None):
+        if os.path.exists(self.output_file_path):
+            os.remove(self.output_file_path)
+        if os.path.exists(self.sub_input_file_path):
+            os.remove(self.sub_input_file_path)
+
+        folder, file_name = file_name.split("/")
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
+
+        self._fill_template(folder, file_name)
+        self.transform_template()
+        self.deploy_stack(parameters)
+
     def transform_template(self):
         transform_template(self.sub_input_file_path, self.output_file_path)
 

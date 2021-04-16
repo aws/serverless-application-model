@@ -1,0 +1,39 @@
+Conditions:
+  TrueCondition:
+    Fn::Equals:
+      - true
+      - true
+  FalseCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MyLambdaFunctionWithLayer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      Layers:
+        - 
+          Ref: MyLambdaLayer
+
+  MyLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Condition: TrueCondition
+    Properties:
+      ContentUri: ${contenturi}
+      RetentionPolicy: Delete
+
+  MyLambdaLayerFalseCondition:
+    Type: AWS::Serverless::LayerVersion
+    Condition: FalseCondition
+    Properties:
+      ContentUri: ${contenturi}
+      RetentionPolicy: Delete
+
+Outputs:
+  MyLambdaLayerArn:
+    Value: 
+      Ref: MyLambdaLayer

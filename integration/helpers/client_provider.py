@@ -20,6 +20,8 @@ class ClientProvider:
         self._dynamoDB_streams_client = None
         self._kinesis_client = None
         self._mq_client = None
+        self._iot_client = None
+        self._kafka_client = None
 
     @property
     def cfn_client(self):
@@ -175,3 +177,25 @@ class ClientProvider:
                 if not self._mq_client:
                     self._mq_client = boto3.client("mq")
         return self._mq_client
+
+    @property
+    def iot_client(self):
+        """
+        IOT Client
+        """
+        if not self._iot_client:
+            with self._lock:
+                if not self._iot_client:
+                    self._iot_client = boto3.client("iot")
+        return self._iot_client
+
+    @property
+    def kafka_client(self):
+        """
+        Kafka Client
+        """
+        if not self._kafka_client:
+            with self._lock:
+                if not self._kafka_client:
+                    self._kafka_client = boto3.client("kafka")
+        return self._kafka_client

@@ -6,6 +6,8 @@ FILE_TO_S3_URI_MAP = {
     "swagger2.json": {"type": "s3", "uri": ""},
     "binary-media.zip": {"type": "s3", "uri": ""},
     "template.yaml": {"type": "http", "uri": ""},
+    "MTLSCert.pem": {"type": "s3", "uri": ""},
+    "MTLSCert-Updated.pem": {"type": "s3", "uri": ""},
 }
 
 CODE_KEY_TO_FILE_MAP = {
