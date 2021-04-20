@@ -12,6 +12,8 @@
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler", 
         "Code": {
@@ -34,6 +36,8 @@
     }, 
     "MyFunctionFetchPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com", 
@@ -55,6 +59,8 @@
     }, 
     "ApiGatewayDomainName0caaf24ab1": {
       "Type": "AWS::ApiGateway::DomainName", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "CertificateArn": "cert-arn-in-us-east-1", 
         "EndpointConfiguration": {
@@ -67,6 +73,8 @@
     }, 
     "RecordSetGroupbd00d962a4": {
       "Type": "AWS::Route53::RecordSetGroup", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "HostedZoneId": "ZQ1UAL4EFZVME", 
         "RecordSets": [
@@ -101,6 +109,8 @@
     }, 
     "MyApioneBasePathMapping": {
       "Type": "AWS::ApiGateway::BasePathMapping", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BasePath": "one", 
         "DomainName": {
@@ -116,6 +126,8 @@
     }, 
     "MyApiDeploymentfb330328f1": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
@@ -125,6 +137,8 @@
     }, 
     "MyApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiDeploymentfb330328f1"
@@ -137,6 +151,8 @@
     }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -167,6 +183,8 @@
     }, 
     "MyApi": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {

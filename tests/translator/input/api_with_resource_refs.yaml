@@ -3,6 +3,8 @@
 Resources:
   MyApi:
     Type: 'AWS::Serverless::Api'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       StageName: foo
       DefinitionBody:
@@ -11,6 +13,8 @@ Resources:
 
   MyFunction:
     Type: "AWS::Serverless::Function"
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
