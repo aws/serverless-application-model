@@ -2,6 +2,8 @@
   "Resources": {
     "PreparingApplication": {
       "Type": "AWS::CloudFormation::Stack",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url",
         "Tags": [

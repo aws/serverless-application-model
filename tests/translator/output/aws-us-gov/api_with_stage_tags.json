@@ -8,6 +8,8 @@
   "Resources": {
     "MyApiWithStageTagsDeployment5332c373d4": {
       "Type": "AWS::ApiGateway::Deployment", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithStageTags"
@@ -18,6 +20,8 @@
     }, 
     "MyApiWithStageTags": {
       "Type": "AWS::ApiGateway::RestApi", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -41,6 +45,8 @@
     }, 
     "MyApiWithStageTagsProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiWithStageTagsDeployment5332c373d4"

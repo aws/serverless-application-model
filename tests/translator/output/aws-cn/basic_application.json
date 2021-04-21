@@ -10,6 +10,8 @@
   "Resources": {
     "NormalApplication": {
       "Type": "AWS::CloudFormation::Stack", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "NotificationARNs": [
           "arn:aws:sns:us-east-1:123456789012:sns-arn"
@@ -41,6 +43,8 @@
     }, 
     "BasicApplication": {
       "Type": "AWS::CloudFormation::Stack", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
         "Tags": [
@@ -61,6 +65,8 @@
     }, 
     "ApplicationWithLocationUrl": {
       "Type": "AWS::CloudFormation::Stack", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "TemplateURL": "https://s3-us-east-1.amazonaws.com/demo-bucket/template.yaml", 
         "Tags": [
@@ -77,6 +83,8 @@
     }, 
     "ApplicationWithCondition": {
       "Type": "AWS::CloudFormation::Stack", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "TemplateURL": "https://awsserverlessrepo-changesets-xxx.s3.amazonaws.com/signed-url", 
         "Tags": [

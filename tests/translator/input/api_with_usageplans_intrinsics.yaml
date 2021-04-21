@@ -19,6 +19,8 @@ Globals:
 
 Resources:
    MyApiOne:
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Condition: C1
      Type: AWS::Serverless::Api
      Properties:
@@ -27,11 +29,15 @@ Resources:
 
    MyApiTwo:
      Type: AWS::Serverless::Api
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        StageName: Prod
 
    MyFunctionOne:
      Type: AWS::Serverless::Function
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        Handler: index.handler
        Runtime: nodejs12.x
@@ -54,6 +60,8 @@ Resources:
 
    MyFunctionTwo:
      Type: AWS::Serverless::Function
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        Handler: index.handler
        Runtime: nodejs12.x

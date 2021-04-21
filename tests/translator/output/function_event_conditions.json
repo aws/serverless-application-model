@@ -10,6 +10,8 @@
   "Resources": {
     "MyAwesomeFunctionAliasLive": {
       "Type": "AWS::Lambda::Alias",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "FunctionVersion": {
@@ -26,6 +28,8 @@
     },
     "MyAwesomeFunctionNotificationTopicPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -40,6 +44,8 @@
     },
     "MyAwesomeFunctionCWEventPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -57,6 +63,8 @@
     },
     "MyAwesomeFunctionEBRulePermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -74,6 +82,8 @@
     },
     "MyAwesomeFunctionDDBStream": {
       "Type": "AWS::Lambda::EventSourceMapping",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "BatchSize": 200,
@@ -86,6 +96,8 @@
     },
     "MyAwesomeFunctionIoTRule": {
       "Type": "AWS::IoT::TopicRule",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "TopicRulePayload": {
@@ -106,6 +118,8 @@
     },
     "MyAwesomeFunctionKinesisStream": {
       "Type": "AWS::Lambda::EventSourceMapping",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "BatchSize": 100,
@@ -118,6 +132,8 @@
     },
     "MyAwesomeFunctionIoTRulePermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -142,6 +158,8 @@
     },
     "MyAwesomeFunctionNotificationTopic": {
       "Type": "AWS::SNS::Subscription",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Endpoint": {
@@ -155,6 +173,8 @@
     },
     "MyAwesomeFunctionS3TriggerPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -169,6 +189,8 @@
     },
     "MyAwesomeFunctionCWLogPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -188,6 +210,8 @@
     },
     "MyAwesomeFunctionEBSchedule": {
       "Type": "AWS::Events::Rule",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "ScheduleExpression": "rate(1 minute)",
@@ -203,6 +227,8 @@
     },
     "MyAwesomeFunctionCWLog": {
       "Type": "AWS::Logs::SubscriptionFilter",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "DestinationArn": {
@@ -217,6 +243,8 @@
     },
     "MyAwesomeFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "ManagedPolicyArns": [
@@ -251,6 +279,8 @@
     },
     "MyAwesomeFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Code": {
@@ -275,6 +305,8 @@
     },
     "MyAwesomeFunctionCWEvent": {
       "Type": "AWS::Events::Rule",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "EventPattern": {
@@ -296,6 +328,8 @@
     },
     "MyAwesomeFunctionEBRule": {
       "Type": "AWS::Events::Rule",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "EventPattern": {
@@ -316,7 +350,8 @@
       }
     },
     "MyAwesomeFunctionVersion640128d35d": {
-      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Type": "AWS::Lambda::Version",
       "Condition": "MyCondition",
       "Properties": {
@@ -327,10 +362,14 @@
     },
     "Notifications": {
       "Condition": "MyCondition",
-      "Type": "AWS::SNS::Topic"
+      "Type": "AWS::SNS::Topic",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete"
     },
     "MyAwesomeFunctionEBSchedulePermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -348,6 +387,8 @@
     },
     "FunctionOneImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "SourceAccount": {
@@ -361,6 +402,8 @@
     },
     "FunctionOneRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -391,6 +434,8 @@
     },
     "FunctionOne": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -414,6 +459,8 @@
     },
     "Images": {
       "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "NotificationConfiguration": {
           "LambdaConfigurations": [
@@ -463,6 +510,8 @@
     },
     "MyAwesomeFunctionSNSTopicWithSQSSubscription": {
       "Type": "AWS::SNS::Subscription",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Endpoint": {
           "Fn::GetAtt": [
@@ -479,6 +528,8 @@
     },
     "MyAwesomeFunctionSNSTopicWithSQSSubscriptionQueuePolicy": {
       "Type": "AWS::SQS::QueuePolicy",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Queues": [
           {
@@ -513,6 +564,8 @@
     },
     "MyAwesomeFunctionSNSTopicWithSQSSubscriptionEventSourceMapping": {
       "Type": "AWS::Lambda::EventSourceMapping",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BatchSize": 10,
         "Enabled": true,
@@ -531,10 +584,14 @@
     "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue": {
       "Condition": "MyCondition",
       "Type": "AWS::SQS::Queue",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {}
     },
     "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionEventSourceMapping": {
       "Type": "AWS::Lambda::EventSourceMapping",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BatchSize": 10,
         "Enabled": true,
@@ -552,6 +609,8 @@
     },
     "MyAwesomeFunctionAnotherSNSWithSQSSubscription": {
       "Type": "AWS::SNS::Subscription",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Endpoint": {
           "Fn::GetAtt": [
@@ -568,6 +627,8 @@
     },
     "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueuePolicy": {
       "Type": "AWS::SQS::QueuePolicy",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Queues": [
           {
@@ -602,6 +663,8 @@
     },
     "Queue": {
       "Type": "AWS::SQS::Queue",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Condition": "MyCondition"
     }
   }

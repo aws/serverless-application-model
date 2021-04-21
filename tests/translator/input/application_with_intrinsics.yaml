@@ -21,6 +21,8 @@ Mappings:
 Resources:
   ApplicationRefParameter:
     Type: 'AWS::Serverless::Application'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Location:
         ApplicationId: !Ref ApplicationIdParam
@@ -28,6 +30,8 @@ Resources:
 
   ApplicationFindInMap:
     Type: 'AWS::Serverless::Application'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Location:
         ApplicationId: !FindInMap
@@ -42,3 +46,5 @@ Resources:
         - !Ref Sns
   Sns:
     Type: AWS::SNS::Topic
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain

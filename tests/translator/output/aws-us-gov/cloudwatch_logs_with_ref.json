@@ -13,6 +13,8 @@
   "Resources": {
     "TriggeredFunctionCWLogEvent": {
       "Type": "AWS::Logs::SubscriptionFilter",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DestinationArn": {
           "Fn::GetAtt": [
@@ -33,6 +35,8 @@
     },
     "TriggeredFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -57,6 +61,8 @@
     },
     "TriggeredFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -87,6 +93,8 @@
     },
     "TriggeredFunctionCWLogEventPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "logs.amazonaws.com",

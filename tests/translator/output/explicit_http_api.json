@@ -2,6 +2,8 @@
   "Resources": {
     "MyApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "MyApi"
@@ -15,6 +17,8 @@
     },
     "MyApi2ApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "MyApi2"
@@ -28,6 +32,8 @@
     },
     "HttpApiFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.restapi",
         "Code": {
@@ -51,6 +57,8 @@
     },
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -72,6 +80,8 @@
     },
     "MyApi2": {
       "Type": "AWS::ApiGatewayV2::Api",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -144,6 +154,8 @@
     },
     "HttpApiFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -174,6 +186,8 @@
     },
     "HttpApiFunctionBasePathPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -195,6 +209,8 @@
     },
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FailOnWarnings": true,
         "Body": {

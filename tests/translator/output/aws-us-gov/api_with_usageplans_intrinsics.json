@@ -30,6 +30,8 @@
   "Resources": {
     "MyApiTwoUsagePlanKey": {
       "Type": "AWS::ApiGateway::UsagePlanKey",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "KeyType": "API_KEY",
         "KeyId": {
@@ -45,6 +47,8 @@
     },
     "MyApiTwoDeployment802c3b471d": {
       "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -54,6 +58,8 @@
     },
     "MyApiOneUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiStages": [
           {
@@ -73,6 +79,8 @@
     },
     "MyApiOneDeployment8b73115419": {
       "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiOne"
@@ -83,6 +91,8 @@
     },
     "MyApiTwoUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiStages": [
           {
@@ -101,6 +111,8 @@
     },
     "MyApiTwoProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiTwoDeployment802c3b471d"
@@ -113,6 +125,8 @@
     },
     "MyApiOneProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiOneDeployment8b73115419"
@@ -126,6 +140,8 @@
     },
     "MyApiOneApiKey": {
       "Type": "AWS::ApiGateway::ApiKey",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Enabled": true,
         "StageKeys": [
@@ -146,6 +162,8 @@
     },
     "MyFunctionTwoRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -176,6 +194,8 @@
     },
     "MyApiOneUsagePlanKey": {
       "Type": "AWS::ApiGateway::UsagePlanKey",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "KeyType": "API_KEY",
         "KeyId": {
@@ -192,6 +212,8 @@
     },
     "MyApiTwoApiKey": {
       "Type": "AWS::ApiGateway::ApiKey",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Enabled": true,
         "StageKeys": [
@@ -211,6 +233,8 @@
     },
     "MyFunctionOneApiKeyPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -232,6 +256,8 @@
     },
     "MyFunctionTwo": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler",
         "Code": {
@@ -254,6 +280,8 @@
     },
     "MyFunctionTwoApiKeyPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -275,6 +303,8 @@
     },
     "MyFunctionOneRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -305,6 +335,8 @@
     },
     "MyApiTwo": {
       "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -355,6 +387,8 @@
     },
     "MyApiOne": {
       "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -406,6 +440,8 @@
     },
     "MyFunctionOne": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler",
         "Code": {

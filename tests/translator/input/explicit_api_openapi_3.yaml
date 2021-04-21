@@ -9,6 +9,8 @@ Parameters:
 Resources:
   GetHtmlFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri:
         Bucket: sam-demo-bucket
@@ -27,6 +29,8 @@ Resources:
 
   GetHtmlApi:
     Type: AWS::Serverless::Api
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Name: MyGetApi
       StageName:
@@ -41,6 +45,8 @@ Resources:
 
   ApiWithInlineSwagger:
     Type: AWS::Serverless::Api
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       StageName:
         Ref: MyStageName

@@ -6,6 +6,8 @@ Parameters:
 Resources:
   MyApiWithStageTags:
       Type: "AWS::Serverless::Api"
+      DeletionPolicy: Delete
+      UpdateReplacePolicy: Retain
       Properties:
         StageName: Prod
         Tags:

@@ -8,6 +8,8 @@ Globals:
 Resources:
    MyApiOne:
      Type: AWS::Serverless::Api
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        StageName: Prod
        Auth:
@@ -16,6 +18,8 @@ Resources:
 
    MyApiTwo:
      Type: AWS::Serverless::Api
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        StageName: Prod
        Auth:
@@ -39,11 +43,15 @@ Resources:
 
    MyApiThree:
      Type: AWS::Serverless::Api
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        StageName: Prod
 
    MyFunctionOne:
      Type: AWS::Serverless::Function
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        Handler: index.handler
        Runtime: nodejs12.x
@@ -66,6 +74,8 @@ Resources:
 
    MyFunctionTwo:
      Type: AWS::Serverless::Function
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        Handler: index.handler
        Runtime: nodejs12.x
@@ -93,6 +103,8 @@ Resources:
 
    MyFunctionThree:
      Type: AWS::Serverless::Function
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        Handler: index.handler
        Runtime: nodejs12.x

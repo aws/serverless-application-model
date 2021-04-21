@@ -7,11 +7,15 @@ Conditions:
 Resources:
   MinimalLayer:
     Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
 
   LayerWithContentUriObject:
     Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri:
         Bucket: somebucket
@@ -21,6 +25,8 @@ Resources:
 
   CompleteLayer:
     Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       LayerName: MyAwesomeLayer
       ContentUri: s3://sam-demo-bucket/layer.zip
@@ -33,6 +39,8 @@ Resources:
 
   LayerWithCondition:
     Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: TestCondition    
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip  

@@ -6,6 +6,8 @@ Conditions:
 Resources:
   BasicApplication:
     Type: 'AWS::Serverless::Application'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
@@ -13,6 +15,8 @@ Resources:
 
   NormalApplication:
     Type: 'AWS::Serverless::Application'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Location:
         ApplicationId: arn:aws:serverlessrepo:us-east-1:123456789012:applications/hello-world
@@ -27,6 +31,8 @@ Resources:
 
   ApplicationWithLocationUrl:
     Type: 'AWS::Serverless::Application'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Location: https://s3-us-east-1.amazonaws.com/demo-bucket/template.yaml
       Tags:
@@ -34,6 +40,8 @@ Resources:
 
   ApplicationWithCondition:
     Type: 'AWS::Serverless::Application'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: TestCondition   
     Properties:
       Location:

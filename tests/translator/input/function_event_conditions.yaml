@@ -9,6 +9,8 @@ Resources:
 # S3 Event without condition, using same bucket
   FunctionOne:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
       Handler: index.generate_thumbails
@@ -24,6 +26,8 @@ Resources:
 # All Event Types
   MyAwesomeFunction:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: MyCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -112,10 +116,16 @@ Resources:
   Notifications:
     Condition: MyCondition
     Type: AWS::SNS::Topic
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
 
   Images:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
 
   Queue:
     Condition: MyCondition
     Type: AWS::SQS::Queue
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain

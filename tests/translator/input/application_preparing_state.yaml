@@ -1,6 +1,8 @@
 Resources:
   PreparingApplication:
     Type: 'AWS::Serverless::Application'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Location:
         ApplicationId: preparing
