@@ -113,7 +113,8 @@ class Schedule(PushEventSource):
 
         resources = []
 
-        events_rule = EventsRule(self.logical_id, attributes=function.get_passthrough_resource_attributes())
+        passthrough_resource_attributes = function.get_passthrough_resource_attributes()
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
@@ -126,7 +127,9 @@ class Schedule(PushEventSource):
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+                self, source_arn, passthrough_resource_attributes
+            )
             resources.extend(dlq_resources)
 
         events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
@@ -184,7 +187,8 @@ class CloudWatchEvent(PushEventSource):
 
         resources = []
 
-        events_rule = EventsRule(self.logical_id, attributes=function.get_passthrough_resource_attributes())
+        passthrough_resource_attributes = function.get_passthrough_resource_attributes()
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
         source_arn = events_rule.get_runtime_attr("arn")
@@ -192,7 +196,9 @@ class CloudWatchEvent(PushEventSource):
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+                self, source_arn, passthrough_resource_attributes
+            )
             resources.extend(dlq_resources)
 
         events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
