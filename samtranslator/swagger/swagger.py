@@ -698,7 +698,7 @@ class SwaggerEditor(object):
         if method_apikey_required is not None:
             self._set_method_apikey_handling(path, method_name, method_apikey_required)
 
-    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers={}, method_scopes=None):
+    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers=None, method_scopes=None):
         """
         Adds the authorizer_name to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -708,6 +708,8 @@ class SwaggerEditor(object):
         :param string authorizer_name: Name of the authorizer to use. Must be a key in the
             authorizers param.
         """
+        if authorizers is None:
+            authorizers = {}
         normalized_method_name = self._normalize_method_name(method_name)
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
