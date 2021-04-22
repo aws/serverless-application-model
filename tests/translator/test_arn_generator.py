@@ -1,13 +1,13 @@
 from unittest import TestCase
 from parameterized import parameterized
-from mock import Mock, patch
+from mock import patch
 
 from samtranslator.translator.arn_generator import ArnGenerator, NoRegionFound
 
 
 class TestArnGenerator(TestCase):
     def setUp(self):
-        ArnGenerator.class_boto_session = None
+        ArnGenerator.BOTO_SESSION_REGION_NAME = None
 
     @parameterized.expand(
         [("us-east-1", "aws"), ("cn-east-1", "aws-cn"), ("us-gov-west-1", "aws-us-gov"), ("US-EAST-1", "aws")]
@@ -23,13 +23,10 @@ class TestArnGenerator(TestCase):
             ArnGenerator.get_partition_name(None)
 
     def test_get_partition_name_from_boto_session(self):
-        boto_session_mock = Mock()
-        boto_session_mock.region_name = "us-east-1"
-
-        ArnGenerator.class_boto_session = boto_session_mock
+        ArnGenerator.BOTO_SESSION_REGION_NAME = "us-east-1"
 
         actual = ArnGenerator.get_partition_name()
 
         self.assertEqual(actual, "aws")
 
-        ArnGenerator.class_boto_session = None
+        ArnGenerator.BOTO_SESSION_REGION_NAME = None
