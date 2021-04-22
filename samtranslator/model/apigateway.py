@@ -231,8 +231,10 @@ class ApiGatewayAuthorizer(object):
         function_payload_type=None,
         function_invoke_role=None,
         is_aws_iam_authorizer=False,
-        authorization_scopes=[],
+        authorization_scopes=None,
     ):
+        if authorization_scopes is None:
+            authorization_scopes = []
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(
                 api_logical_id,
