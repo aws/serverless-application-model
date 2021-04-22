@@ -8,7 +8,7 @@ DEFAULT_SUPPORTED_INTRINSICS = {action.intrinsic_name: action() for action in [R
 
 
 class IntrinsicsResolver(object):
-    def __init__(self, parameters, supported_intrinsics=DEFAULT_SUPPORTED_INTRINSICS):
+    def __init__(self, parameters, supported_intrinsics=None):
         """
         Instantiate the resolver
         :param dict parameters: Map of parameter names to their values
@@ -17,6 +17,8 @@ class IntrinsicsResolver(object):
         :raises TypeError: If parameters or the supported_intrinsics arguments are invalid
         """
 
+        if supported_intrinsics is None:
+            supported_intrinsics = DEFAULT_SUPPORTED_INTRINSICS
         if parameters is None or not isinstance(parameters, dict):
             raise InvalidDocumentException(
                 [InvalidTemplateException("'Mappings' or 'Parameters' is either null or not a valid dictionary.")]
