@@ -45,7 +45,8 @@ class Translator:
         self.feature_toggle = None
         self.boto_session = boto_session
 
-        ArnGenerator.class_boto_session = self.boto_session
+        if self.boto_session:
+            ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
     def _get_function_names(self, resource_dict, intrinsics_resolver):
         """
@@ -226,7 +227,7 @@ class Translator:
         return functions + statemachines + apis + others
 
 
-def prepare_plugins(plugins, parameters={}):
+def prepare_plugins(plugins, parameters=None):
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
@@ -236,6 +237,8 @@ def prepare_plugins(plugins, parameters={}):
     :return samtranslator.plugins.SamPlugins: Instance of `SamPlugins`
     """
 
+    if parameters is None:
+        parameters = {}
     required_plugins = [
         DefaultDefinitionBodyPlugin(),
         make_implicit_rest_api_plugin(),

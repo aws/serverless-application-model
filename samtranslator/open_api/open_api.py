@@ -391,7 +391,7 @@ class OpenApiEditor(object):
         if method_authorizer:
             self._set_method_authorizer(path, method_name, method_authorizer, authorizers, authorization_scopes)
 
-    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers, authorization_scopes=[]):
+    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers, authorization_scopes=None):
         """
         Adds the authorizer_name to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -402,6 +402,8 @@ class OpenApiEditor(object):
             authorizers param.
         :param list authorization_scopes: list of strings that are the auth scopes for this method
         """
+        if authorization_scopes is None:
+            authorization_scopes = []
         normalized_method_name = self._normalize_method_name(method_name)
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):

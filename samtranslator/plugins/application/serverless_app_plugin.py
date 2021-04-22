@@ -42,7 +42,7 @@ class ServerlessAppPlugin(BasePlugin):
     LOCATION_KEY = "Location"
     TEMPLATE_URL_KEY = "TemplateUrl"
 
-    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False, parameters={}):
+    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False, parameters=None):
         """
         Initialize the plugin.
 
@@ -52,6 +52,8 @@ class ServerlessAppPlugin(BasePlugin):
         :param bool validate_only: Flag to only validate application access (uses get_application API instead)
         """
         super(ServerlessAppPlugin, self).__init__(ServerlessAppPlugin.__name__)
+        if parameters is None:
+            parameters = {}
         self._applications = {}
         self._in_progress_templates = []
         self._sar_client = sar_client
