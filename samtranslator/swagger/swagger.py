@@ -915,11 +915,6 @@ class SwaggerEditor(object):
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
-        # if (
-        #     (source_vpc_blacklist is not None)
-        #     or (source_vpc_intrinsic_blacklist is not None)
-        #     or (source_vpce_intrinsic_blacklist is not None)
-        # ):
         if source_vpc_blacklist is not None and not all(isinstance(x, string_types) for x in source_vpc_blacklist):
             raise InvalidDocumentException([InvalidTemplateException("SourceVpcBlacklist must be a list of strings. Use IntrinsicVpcBlacklist instead for values that use Intrinsic Functions")])
 
