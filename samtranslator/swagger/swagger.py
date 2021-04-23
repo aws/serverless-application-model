@@ -934,7 +934,6 @@ class SwaggerEditor(object):
             "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
             "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
         }
-        resource_list = self._get_method_path_uri_list(path, api_id, stage)
         self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
