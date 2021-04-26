@@ -1,6 +1,8 @@
 Resources:
   MyFunction:
     Type: "AWS::Serverless::Function"
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -9,6 +11,8 @@ Resources:
 
   StateMachine:
     Type: AWS::Serverless::StateMachine
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Name: MyBasicStateMachine
       Type: STANDARD

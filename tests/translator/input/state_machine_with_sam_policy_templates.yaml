@@ -1,6 +1,8 @@
 Resources:
   StarterLambda:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/starter.zip
       Handler: starter.handler
@@ -8,9 +10,13 @@ Resources:
   
   ProcessingQueue:
     Type: AWS::SQS::Queue
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
   
   ResolverLambda:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/resolver.zip
       Handler: resolver.handler
@@ -18,6 +24,8 @@ Resources:
   
   NestedWorkflow:
     Type: AWS::Serverless::StateMachine
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Type: STANDARD
       Definition:
@@ -37,11 +45,15 @@ Resources:
 
   OutputStore:
     Type: AWS::Serverless::SimpleTable
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: MySimpleTable
 
   ProcessingWorkflow:
     Type: AWS::Serverless::StateMachine
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Type: STANDARD
       Definition:

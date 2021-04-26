@@ -2,6 +2,8 @@
   "Resources": {
     "ResolverLambda": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "resolver.handler",
         "Code": {
@@ -25,6 +27,8 @@
     },
     "NestedWorkflow": {
       "Type": "AWS::StepFunctions::StateMachine",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DefinitionSubstitutions": {
           "definition_substitution_1": {
@@ -71,6 +75,8 @@
     },
     "StarterLambda": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "starter.handler",
         "Code": {
@@ -94,6 +100,8 @@
     },
     "ProcessingWorkflow": {
       "Type": "AWS::StepFunctions::StateMachine",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DefinitionSubstitutions": {
           "definition_substitution_4": {
@@ -242,6 +250,8 @@
     },
     "StarterLambdaRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -272,6 +282,8 @@
     },
     "ProcessingWorkflowRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -437,6 +449,8 @@
     },
     "OutputStore": {
       "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "KeySchema": [
           {
@@ -455,10 +469,14 @@
       }
     },
     "ProcessingQueue": {
-      "Type": "AWS::SQS::Queue"
+      "Type": "AWS::SQS::Queue",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete"
     },
     "ResolverLambdaRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",

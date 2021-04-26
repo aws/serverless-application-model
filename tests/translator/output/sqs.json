@@ -2,6 +2,8 @@
   "Resources": {
     "SQSFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -31,6 +33,8 @@
     },
     "SQSFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -52,6 +56,8 @@
     },
     "SQSFunctionMySqsQueue": {
       "Type": "AWS::Lambda::EventSourceMapping",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BatchSize": 10,
         "Enabled": false,

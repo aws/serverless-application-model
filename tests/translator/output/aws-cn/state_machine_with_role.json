@@ -2,6 +2,8 @@
   "Resources": {
     "StateMachine": {
       "Type": "AWS::StepFunctions::StateMachine", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
         "StateMachineName": "MyStateMachineWithRole", 

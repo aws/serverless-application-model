@@ -2,6 +2,8 @@
     "Resources": {
         "MyApiWithCognitoAuth": {
             "Type": "AWS::ApiGateway::RestApi", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Body": {
                     "info": {
@@ -367,6 +369,8 @@
         }, 
         "MyStateMachineCognitoWithAuthNoneRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -404,6 +408,8 @@
         }, 
         "MyStateMachineCognitoDefaultScopesNoneRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -441,6 +447,8 @@
         }, 
         "MyStateMachineCognitoDefaultAuthDefaultScopesNoneRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -478,6 +486,8 @@
         }, 
         "MyStateMachineCognitoDefaultScopesWithOverwrittenRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -515,6 +525,8 @@
         }, 
         "MyApiWithCognitoAuthProdStage": {
             "Type": "AWS::ApiGateway::Stage", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "DeploymentId": {
                     "Ref": "MyApiWithCognitoAuthDeployment57b57dfc88"
@@ -527,6 +539,8 @@
         }, 
         "MyApiWithCognitoAuthDeployment57b57dfc88": {
             "Type": "AWS::ApiGateway::Deployment", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "RestApiId": {
                     "Ref": "MyApiWithCognitoAuth"
@@ -536,6 +550,8 @@
         }, 
         "MyStateMachineCognitoDefaultScopesDefaultAuthorizerRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -573,6 +589,8 @@
         }, 
         "MyStateMachine": {
             "Type": "AWS::StepFunctions::StateMachine", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "RoleArn": {
                     "Fn::GetAtt": [
@@ -614,6 +632,8 @@
         }, 
         "MyStateMachineCognitoAuthorizerWithDefaultScopesRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -651,6 +671,8 @@
         }, 
         "MyStateMachineCognitoAuthorizerScopesOverwrittenRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -688,6 +710,8 @@
         }, 
         "MyStateMachineRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17", 

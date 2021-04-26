@@ -2,6 +2,8 @@
     "Resources": {
         "MyStateMachineGetHtmlRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -39,6 +41,8 @@
         }, 
         "ExplicitApi": {
             "Type": "AWS::ApiGateway::RestApi", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Body": {
                     "info": {
@@ -300,6 +304,8 @@
         }, 
         "ExplicitApiProdStage": {
             "Type": "AWS::ApiGateway::Stage", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "DeploymentId": {
                     "Ref": "ExplicitApiDeployment17065a95ba"
@@ -312,6 +318,8 @@
         }, 
         "MyStateMachinePutHtmlRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -349,6 +357,8 @@
         }, 
         "MyStateMachine": {
             "Type": "AWS::StepFunctions::StateMachine", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "RoleArn": {
                     "Fn::GetAtt": [
@@ -390,6 +400,8 @@
         }, 
         "ExplicitApiDeployment17065a95ba": {
             "Type": "AWS::ApiGateway::Deployment", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "RestApiId": {
                     "Ref": "ExplicitApi"
@@ -400,6 +412,8 @@
         }, 
         "MyStateMachineRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17", 
@@ -443,6 +457,8 @@
         }, 
         "MyStateMachinePostHtmlRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {

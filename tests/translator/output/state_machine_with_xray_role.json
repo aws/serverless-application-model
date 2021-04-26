@@ -2,6 +2,8 @@
     "Resources": {
         "StateMachine": {
             "Type": "AWS::StepFunctions::StateMachine",
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Tags": [
                     {

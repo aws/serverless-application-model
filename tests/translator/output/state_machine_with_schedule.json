@@ -2,6 +2,8 @@
   "Resources": {
     "StateMachineScheduleEvent": {
       "Type": "AWS::Events::Rule", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "State": "DISABLED", 
         "ScheduleExpression": "rate(1 minute)", 
@@ -25,6 +27,8 @@
     }, 
     "StateMachineScheduleEventRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Policies": [
           {
@@ -62,6 +66,8 @@
     }, 
     "StateMachine": {
       "Type": "AWS::StepFunctions::StateMachine", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
         "DefinitionS3Location": {

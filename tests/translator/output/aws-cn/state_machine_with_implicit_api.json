@@ -2,6 +2,8 @@
     "Resources": {
         "StateMachineMyApiEventRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -39,6 +41,8 @@
         }, 
         "StateMachine": {
             "Type": "AWS::StepFunctions::StateMachine", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "RoleArn": {
                     "Fn::GetAtt": [
@@ -81,6 +85,8 @@
         }, 
         "ServerlessRestApiProdStage": {
             "Type": "AWS::ApiGateway::Stage", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "DeploymentId": {
                     "Ref": "ServerlessRestApiDeployment05bc9f394c"
@@ -93,6 +99,8 @@
         }, 
         "ServerlessRestApiDeployment05bc9f394c": {
             "Type": "AWS::ApiGateway::Deployment", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "RestApiId": {
                     "Ref": "ServerlessRestApi"
@@ -103,6 +111,8 @@
         }, 
         "StateMachineRole": {
             "Type": "AWS::IAM::Role", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17", 
@@ -146,6 +156,8 @@
         }, 
         "ServerlessRestApi": {
             "Type": "AWS::ApiGateway::RestApi", 
+            "UpdateReplacePolicy": "Retain",
+            "DeletionPolicy": "Delete",
             "Properties": {
                 "Body": {
                     "info": {
