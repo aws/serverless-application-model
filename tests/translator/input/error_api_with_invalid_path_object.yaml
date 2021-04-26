@@ -1,15 +1,13 @@
 Globals:
   Api:
     Name: "some api"
-    CacheClusterEnabled: True
-    CacheClusterSize: "1.6"
+    Variables:
+      SomeVar: Value
     Auth:
       DefaultAuthorizer: MyCognitoAuth
       Authorizers:
         MyCognitoAuth:
           UserPoolArn: !GetAtt MyUserPool.Arn
-    Variables:
-      SomeVar: Value
 
 Resources:
   ImplicitApiFunction:
@@ -18,12 +16,6 @@ Resources:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
       Runtime: nodejs12.x
-      Events:
-        GetHtml:
-          Type: Api
-          Properties:
-            Path: /
-            Method: get
 
   ExplicitApi:
     Type: AWS::Serverless::Api
@@ -31,20 +23,9 @@ Resources:
       StageName: SomeStage
       DefinitionBody:
         swagger: 2.0
-        info:
-          version: '1.0'
-          title: !Ref AWS::StackName
         paths:
-          "/":
-            parameters:
-              - name: domain
-                in: path
-                description: Application domain
-                type: string
-                required: true
-            options:
-              - InvalidMethodDefinition
-            get:
+          "/a":
+            SomeInvalidKey:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
