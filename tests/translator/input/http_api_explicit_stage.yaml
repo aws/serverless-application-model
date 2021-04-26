@@ -16,6 +16,8 @@ Globals:
 Resources:
   HttpApiFunction: 
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
       Handler: index.restapi
@@ -32,6 +34,8 @@ Resources:
 
   MyApi:
     Type: AWS::Serverless::HttpApi
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       StageVariables:

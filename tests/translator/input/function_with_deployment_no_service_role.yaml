@@ -9,6 +9,8 @@ Resources:
 
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -16,6 +18,8 @@ Resources:
 
   OtherFunction:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -23,6 +27,8 @@ Resources:
 
   DeploymentRole:
     Type: AWS::IAM::Role
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole

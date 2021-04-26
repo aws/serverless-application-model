@@ -10,6 +10,8 @@
   "Resources": {
     "FunctionWithConditionalPolicy": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -34,6 +36,8 @@
     },
     "FunctionWithConditionalPolicyRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",

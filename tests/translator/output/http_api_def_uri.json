@@ -2,6 +2,8 @@
   "Resources": {
     "Function": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler", 
         "Code": {
@@ -25,6 +27,8 @@
     }, 
     "FunctionApiPermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -44,6 +48,8 @@
     }, 
     "MyApiStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AutoDeploy": true, 
         "ApiId": {
@@ -66,6 +72,8 @@
     }, 
     "FunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -96,6 +104,8 @@
     }, 
     "MyApi2ApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AutoDeploy": true, 
         "ApiId": {
@@ -109,6 +119,8 @@
     }, 
     "MyApi2": {
       "Type": "AWS::ApiGatewayV2::Api", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BodyS3Location": {
           "Version": "version", 
@@ -119,6 +131,8 @@
     }, 
     "FunctionApi2Permission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -140,6 +154,8 @@
     }, 
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BodyS3Location": {
           "Bucket": "bucket", 

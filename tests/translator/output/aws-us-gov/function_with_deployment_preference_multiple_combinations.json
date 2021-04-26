@@ -2,6 +2,8 @@
   "Resources": {
     "MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarms": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
@@ -25,6 +27,8 @@
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -55,6 +59,8 @@
     }, 
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
@@ -78,6 +84,8 @@
     }, 
     "MinimalFunctionWithMinimalDeploymentPreferenceRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -108,6 +116,8 @@
     }, 
     "MyCloudWatchAlarm": {
       "Type": "AWS::CloudWatch::Alarm", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "EvaluationPeriods": 1, 
         "Namespace": "AWS/EC2", 
@@ -119,6 +129,8 @@
     }, 
     "MinimalFunctionWithMinimalDeploymentPreferenceAliaslivewithdeployment": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -187,8 +199,9 @@
       }
     }, 
     "MinimalFunctionWithMinimalDeploymentPreferenceVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunctionWithMinimalDeploymentPreference"
@@ -197,6 +210,8 @@
     }, 
     "MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarmsRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -227,6 +242,8 @@
     }, 
     "MySanityTestFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -257,6 +274,8 @@
     }, 
     "MinimalFunctionWithMinimalDeploymentPreference": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
@@ -280,6 +299,8 @@
     }, 
     "MySanityTestFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "my-bucket", 
@@ -302,8 +323,9 @@
       }
     }, 
     "MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarmsVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarms"
@@ -375,8 +397,9 @@
       }
     }, 
     "MinimalFunctionVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
@@ -385,6 +408,8 @@
     }, 
     "MyValidationTestFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -415,6 +440,8 @@
     }, 
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionVersion": {
           "Fn::GetAtt": [
@@ -430,6 +457,8 @@
     }, 
     "MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarmsAliaslivewithdeploymentwithhooksandalarms": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -461,6 +490,8 @@
     }, 
     "MyValidationTestFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "my-bucket", 

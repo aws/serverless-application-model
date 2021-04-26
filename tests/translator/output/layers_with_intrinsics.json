@@ -17,9 +17,10 @@
     }
   },
   "Resources": {
-    "LayerWithNameIntrinsiccf8baed8b9": {
-      "DeletionPolicy": "Retain",
+    "LayerWithNameIntrinsic1935b50dbd": {
       "Type": "AWS::Lambda::LayerVersion",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",
@@ -28,9 +29,10 @@
         "LayerName": "SomeLayerName"
       }
     },
-    "LayerWithRefNameIntrinsicRegion32bf7198a5": {
-      "DeletionPolicy": "Retain",
+    "LayerWithRefNameIntrinsicRegion472f836e5f": {
       "Type": "AWS::Lambda::LayerVersion",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",
@@ -39,9 +41,10 @@
         "LayerName": "ap-southeast-1"
       }
     },
-    "LayerWithSubNameIntrinsicRegiond71326de24": {
-      "DeletionPolicy": "Retain",
+    "LayerWithSubNameIntrinsicRegionf4ccaf8dcb": {
       "Type": "AWS::Lambda::LayerVersion",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",
@@ -52,9 +55,10 @@
         }
       }
     },
-    "LayerWithRuntimesIntrinsic1a006faa85": {
-      "DeletionPolicy": "Retain",
+    "LayerWithRuntimesIntrinsic15bceab8a8": {
       "Type": "AWS::Lambda::LayerVersion",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",
@@ -66,8 +70,7 @@
         }
       }
     },
-    "LayerWithSingleListRefRuntimesIntrinsic9d7a72f24a": {
-      "DeletionPolicy": "Retain",
+    "LayerWithSingleListRefRuntimesIntrinsic3243ec999b": {
       "Properties": {
         "CompatibleRuntimes": [
           {
@@ -80,10 +83,11 @@
         },
         "LayerName": "LayerWithSingleListRefRuntimesIntrinsic"
       },
-      "Type": "AWS::Lambda::LayerVersion"
+      "Type": "AWS::Lambda::LayerVersion",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete"
     },
-    "LayerWithMixedListRefRuntimesIntrinsic71fd80f592": {
-      "DeletionPolicy": "Retain",
+    "LayerWithMixedListRefRuntimesIntrinsicbd637a121f": {
       "Properties": {
         "CompatibleRuntimes": [
           {
@@ -97,11 +101,14 @@
         },
         "LayerName": "LayerWithMixedListRefRuntimesIntrinsic"
       },
-      "Type": "AWS::Lambda::LayerVersion"
-    },
-    "LayerWithLicenseIntrinsic965c8d0c9b": {
-      "DeletionPolicy": "Retain",
       "Type": "AWS::Lambda::LayerVersion",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete"
+    },
+    "LayerWithLicenseIntrinsicf158772ce9": {
+      "Type": "AWS::Lambda::LayerVersion",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",
@@ -111,9 +118,10 @@
         "LicenseInfo": "MIT-0 License"
       }
     },
-    "LayerWithSubNameIntrinsic6e9b477102": {
+    "LayerWithSubNameIntrinsic8566d42a51": {
       "Type": "AWS::Lambda::LayerVersion",
-      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket",

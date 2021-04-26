@@ -20,6 +20,8 @@ Conditions:
 Resources:
   MyTestFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       EventInvokeConfig:
         MaximumEventAgeInSeconds: 70
@@ -52,6 +54,8 @@ Resources:
       MemorySize: 1024
   MyTestFunction2:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       EventInvokeConfig:
         MaximumEventAgeInSeconds: 70
@@ -85,6 +89,8 @@ Resources:
 
   DestinationLambda:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       InlineCode: |
         exports.handler = async (event) => {
@@ -99,6 +105,8 @@ Resources:
       MemorySize: 1024
   SNSSubscription:
     Type: AWS::SNS::Subscription
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: TopicCreationEnabled
     Properties: 
       Endpoint: example@example.com

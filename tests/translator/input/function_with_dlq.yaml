@@ -2,6 +2,8 @@ Transform: "AWS::Serverless-2016-10-31"
 Resources:
   MySnsDlqLambdaFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Handler: index.handler
       Runtime: python2.7
@@ -12,6 +14,8 @@ Resources:
 
   MySqsDlqLambdaFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Handler: index.handler
       Runtime: python2.7

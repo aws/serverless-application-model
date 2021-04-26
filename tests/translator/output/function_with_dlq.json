@@ -2,6 +2,8 @@
   "Resources": {
     "MySnsDlqLambdaFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -47,6 +49,8 @@
     },
     "MySqsDlqLambdaFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -92,6 +96,8 @@
     },
     "MySqsDlqLambdaFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -118,6 +124,8 @@
     },
     "MySnsDlqLambdaFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

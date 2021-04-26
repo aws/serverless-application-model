@@ -2,6 +2,8 @@
   "Resources": {
     "ApiParameterFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.gethtml",
         "Code": {
@@ -25,6 +27,8 @@
     },
     "NoApiParameterFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -55,6 +59,8 @@
     },
     "ServerlessRestApiDeploymentbe3a929cf9": {
       "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -65,6 +71,8 @@
     },
     "ApiDeployment5e67eb8be3": {
       "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "Api"
@@ -75,6 +83,8 @@
     },
     "ApiParameterFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -105,6 +115,8 @@
     },
     "NoApiParameterFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -126,6 +138,8 @@
     },
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeploymentbe3a929cf9"
@@ -138,6 +152,8 @@
     },
     "Api": {
       "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -185,6 +201,8 @@
     },
     "ApiParameterFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -204,6 +222,8 @@
     },
     "ApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ApiDeployment5e67eb8be3"
@@ -216,6 +236,8 @@
     },
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -272,6 +294,8 @@
     },
     "NoApiParameterFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.gethtml",
         "Code": {

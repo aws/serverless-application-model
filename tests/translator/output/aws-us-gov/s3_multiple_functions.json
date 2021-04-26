@@ -2,6 +2,8 @@
   "Resources": {
     "FunctionOneRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -32,6 +34,8 @@
     },
     "FunctionTwoImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "SourceAccount": {
@@ -45,6 +49,8 @@
     },
     "Images": {
       "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "NotificationConfiguration": {
           "LambdaConfigurations": [
@@ -82,6 +88,8 @@
     },
     "FunctionTwoRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -112,6 +120,8 @@
     },
     "FunctionOneImageBucketPermission": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "SourceAccount": {
@@ -125,6 +135,8 @@
     },
     "FunctionTwo": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -148,6 +160,8 @@
     },
     "FunctionOne": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

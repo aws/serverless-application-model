@@ -7,6 +7,8 @@ Resources:
   HttpApiFunction: 
     Condition: condition
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
       Handler: index.restapi
@@ -35,6 +37,8 @@ Resources:
             ApiId: !Ref MyApi
   MyApi:
     Type: AWS::Serverless::HttpApi
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Tags:
         Tag1: value1

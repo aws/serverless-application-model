@@ -63,6 +63,8 @@
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -93,6 +95,8 @@
     }, 
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -145,8 +149,9 @@
       }
     }, 
     "MinimalFunctionVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
@@ -155,6 +160,8 @@
     }, 
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {

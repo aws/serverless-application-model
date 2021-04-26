@@ -27,6 +27,8 @@ Conditions:
 Resources:
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -37,6 +39,8 @@ Resources:
 
   CustomWithFindInMap: # Doesn't work
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -47,6 +51,8 @@ Resources:
 
   CustomWithCondition: # Works
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -57,6 +63,8 @@ Resources:
 
   CustomWithCondition2:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -67,6 +75,8 @@ Resources:
 
   NormalWithSub:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -77,6 +87,8 @@ Resources:
 
   CustomWithSub:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -87,6 +99,8 @@ Resources:
 
   NormalWithRef:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

@@ -14,12 +14,16 @@ Parameters:
 Resources:
   LayerWithLicenseIntrinsic:
     Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LicenseInfo: !Ref LayerLicenseInfo
 
   LayerWithRuntimesIntrinsic:
     Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       CompatibleRuntimes:
@@ -27,6 +31,8 @@ Resources:
 
   LayerWithSingleListRefRuntimesIntrinsic:
     Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       CompatibleRuntimes:
@@ -34,6 +40,8 @@ Resources:
 
   LayerWithMixedListRefRuntimesIntrinsic:
     Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       CompatibleRuntimes:
@@ -42,24 +50,32 @@ Resources:
 
   LayerWithNameIntrinsic:
     Type: AWS::Serverless::LayerVersion
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LayerName: !Ref LayerNameParam
 
   LayerWithSubNameIntrinsic:
     Type: AWS::Serverless::LayerVersion
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LayerName: !Sub layer-${LayerNameParam}
 
   LayerWithRefNameIntrinsicRegion:
     Type: AWS::Serverless::LayerVersion
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LayerName: !Ref 'AWS::Region'
 
   LayerWithSubNameIntrinsicRegion:
     Type: AWS::Serverless::LayerVersion
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LayerName: !Sub 'layer-${AWS::Region}'

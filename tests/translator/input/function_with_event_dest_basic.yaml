@@ -18,6 +18,8 @@ Globals:
 Resources:
   MyTestFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       InlineCode: |
         exports.handler = function(event, context, callback) {

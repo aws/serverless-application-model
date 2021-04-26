@@ -2,6 +2,8 @@
   "Resources": {
     "FunctionWithSigningProfile": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.gethtml",
         "Code": {
@@ -28,6 +30,8 @@
     },
     "FunctionWithSigningProfileRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -58,6 +62,8 @@
     },
     "MySignedFunctionCodeSigningConfig": {
       "Type": "AWS::Lambda::CodeSigningConfig",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "CodeSigningPolicies": {
           "UntrustedArtifactOnDeployment": "Enforce"
@@ -77,6 +83,8 @@
     },
     "SigningProfile": {
       "Type": "AWS::Signer::SigningProfile",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "PlatformId": "AWSLambda-SHA384-ECDSA"
       }

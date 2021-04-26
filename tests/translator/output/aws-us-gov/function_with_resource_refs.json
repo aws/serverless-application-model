@@ -53,6 +53,8 @@
   "Resources": {
     "FunctionWithoutAlias": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -76,6 +78,8 @@
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -106,6 +110,8 @@
     }, 
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -129,6 +135,8 @@
     }, 
     "FunctionWithoutAliasRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -158,8 +166,9 @@
       }
     }, 
     "MinimalFunctionVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::Version", 
+      "Type": "AWS::Lambda::Version",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete", 
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
@@ -168,6 +177,8 @@
     }, 
     "MyBucket": {
       "Type": "AWS::S3::Bucket", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Name": {
           "Fn::GetAtt": [
@@ -179,6 +190,8 @@
     }, 
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionVersion": {
           "Fn::GetAtt": [

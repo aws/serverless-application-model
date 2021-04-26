@@ -1,6 +1,8 @@
 Resources:
   RestApiFunction: 
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
       Handler: index.restapi
@@ -25,6 +27,8 @@ Resources:
 
   GetHtmlFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
       Handler: index.gethtml
@@ -39,6 +43,8 @@ Resources:
 
   ServerlessRestApi:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

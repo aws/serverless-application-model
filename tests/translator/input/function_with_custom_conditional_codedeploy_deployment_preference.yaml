@@ -10,6 +10,8 @@ Conditions:
 Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Handler: index.handler
       Runtime: nodejs12.x

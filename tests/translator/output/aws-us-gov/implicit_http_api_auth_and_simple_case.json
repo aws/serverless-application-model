@@ -2,6 +2,8 @@
   "Resources": {
     "ServerlessHttpApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "ServerlessHttpApi"
@@ -15,6 +17,8 @@
     }, 
     "RestApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -46,6 +50,8 @@
     }, 
     "RestApiFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.restapi", 
         "Code": {
@@ -69,6 +75,8 @@
     }, 
     "RestApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -90,6 +98,8 @@
     }, 
     "ServerlessHttpApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {

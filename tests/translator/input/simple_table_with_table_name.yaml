@@ -6,17 +6,23 @@ Parameters:
 Resources:
   MinimalTableWithTableName:
     Type: 'AWS::Serverless::SimpleTable'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: MySimpleTable
 
   MinimalTableWithRefTableName:
     Type: 'AWS::Serverless::SimpleTable'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       TableName:
         Ref: MySimpleTableParameter
 
   MinimalTableWithSubTableName:
     Type: 'AWS::Serverless::SimpleTable'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       TableName:
         Fn::Sub: "${AWS::StackName}MySimpleTable"

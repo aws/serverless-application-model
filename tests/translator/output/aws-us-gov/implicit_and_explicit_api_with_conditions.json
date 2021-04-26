@@ -39,6 +39,8 @@
   "Resources": {
     "explicithello2": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -64,6 +66,8 @@
     },
     "implicithello2Role": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -95,6 +99,8 @@
     },
     "explicithello1": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -120,6 +126,8 @@
     },
     "explicitapiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "explicitapiDeploymentc8f1a3b6da"
@@ -132,6 +140,8 @@
     },
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment0270cbc16b"
@@ -145,6 +155,8 @@
     },
     "explicithello2Role": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -176,6 +188,8 @@
     },
     "explicithello1ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -198,6 +212,8 @@
     },
     "implicithello2": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -223,6 +239,8 @@
     },
     "implicithello1ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -245,6 +263,8 @@
     },
     "ServerlessRestApiDeployment0270cbc16b": {
       "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -256,6 +276,8 @@
     },
     "implicithello1": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -281,6 +303,8 @@
     },
     "explicithello2ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -303,6 +327,8 @@
     },
     "explicitapiDeploymentc8f1a3b6da": {
       "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "explicitapi"
@@ -313,6 +339,8 @@
     },
     "explicitapi": {
       "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -409,6 +437,8 @@
     },
     "implicithello2ApiEventPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -431,6 +461,8 @@
     },
     "explicithello1Role": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -462,6 +494,8 @@
     },
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -559,6 +593,8 @@
     },
     "implicithello1Role": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

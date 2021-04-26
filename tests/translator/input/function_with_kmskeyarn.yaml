@@ -1,6 +1,8 @@
 Resources:
   FunctionWithKeyArn:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -9,6 +11,8 @@ Resources:
 
   FunctionWithReferenceToKeyArn:
      Type: 'AWS::Serverless::Function'
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        CodeUri: s3://sam-demo-bucket/hello.zip
        Handler: hello.handler
@@ -18,6 +22,8 @@ Resources:
 
   myKey:
      Type: "AWS::KMS::Key"
+     DeletionPolicy: Delete
+     UpdateReplacePolicy: Retain
      Properties:
        Description: "A sample key"
        KeyPolicy:

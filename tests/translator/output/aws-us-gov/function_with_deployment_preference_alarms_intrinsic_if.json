@@ -10,6 +10,8 @@
   "Resources": {
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -33,7 +35,8 @@
     },
     "MinimalFunctionVersion640128d35d": {
       "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
@@ -42,6 +45,8 @@
     },
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -67,6 +72,8 @@
     },
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",

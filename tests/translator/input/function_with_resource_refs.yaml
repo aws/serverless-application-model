@@ -7,6 +7,8 @@
 Resources:
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -15,6 +17,8 @@ Resources:
 
   FunctionWithoutAlias:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -22,6 +26,8 @@ Resources:
 
   MyBucket:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       Name:
         Fn::GetAtt: ["MinimalFunction.Alias", "Name"]

@@ -76,6 +76,8 @@ Conditions:
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: FunctionCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
@@ -91,6 +93,8 @@ Resources:
               Authorizer: NONE
   MyFunction2:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: FunctionCondition2
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
@@ -106,6 +110,8 @@ Resources:
               Authorizer: MyCognitoAuthMultipleUserPools
   MyFunction3:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: FunctionCondition3
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
@@ -121,6 +127,8 @@ Resources:
               Authorizer: MyLambdaTokenAuth
   MyFunction4:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: FunctionCondition4
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
@@ -136,6 +144,8 @@ Resources:
               Authorizer: MyLambdaTokenAuthNoneFunctionInvokeRole
   MyFunction5:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: FunctionCondition5
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
@@ -151,6 +161,8 @@ Resources:
               Authorizer: MyLambdaRequestAuth
   MyFunction6:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: FunctionCondition6
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip

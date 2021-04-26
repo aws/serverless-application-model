@@ -9,13 +9,19 @@
   },
   "Resources": {
     "MySqsQueue": {
-      "Type": "AWS::SQS::Queue"
+      "Type": "AWS::SQS::Queue",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete"
     },
     "MySnsTopic": {
-        "Type": "AWS::SNS::Topic"
+        "Type": "AWS::SNS::Topic",
+        "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete"
     },
     "MyFunctionForBatchingExampleStream": {
       "Type": "AWS::Lambda::EventSourceMapping",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "MaximumBatchingWindowInSeconds": 20,
         "EventSourceArn": {
@@ -32,6 +38,8 @@
     },
     "DynamoDBTable": {
       "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "KeySchema": [
           {
@@ -56,6 +64,8 @@
     },
     "MyFunctionForBatchingExampleRole": {
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -147,12 +157,16 @@
     },
     "KinesisStream1": {
       "Type": "AWS::Kinesis::Stream",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ShardCount": 1
       }
     },
     "MyFunctionForBatchingExampleDynamoDBStreamEvent": {
       "Type": "AWS::Lambda::EventSourceMapping",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "MaximumBatchingWindowInSeconds": {
           "Ref": "MyBatchingWindowParam"
@@ -188,6 +202,8 @@
     },
     "MyFunctionForBatchingExample": {
       "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler",
         "Code": {
@@ -210,6 +226,8 @@
     },
     "MyFunctionForBatchingExampleStreamEvent": {
       "Type": "AWS::Lambda::EventSourceMapping",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "MaximumBatchingWindowInSeconds": {
           "Ref": "MyBatchingWindowParam"
@@ -235,6 +253,8 @@
     },
     "KinesisStream": {
       "Type": "AWS::Kinesis::Stream",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ShardCount": 1
       }

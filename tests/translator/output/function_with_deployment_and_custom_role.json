@@ -2,6 +2,8 @@
   "Resources": {
     "FunctionWithRole": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -25,6 +27,8 @@
     }, 
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -48,6 +52,8 @@
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -78,6 +84,8 @@
     }, 
     "DeploymentRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
@@ -101,8 +109,9 @@
       }
     }, 
     "FunctionWithRoleVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "FunctionWithRole"
@@ -208,8 +217,9 @@
       }
     }, 
     "MinimalFunctionVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
@@ -218,6 +228,8 @@
     }, 
     "FunctionWithRoleAliaslive": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -243,6 +255,8 @@
     }, 
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {

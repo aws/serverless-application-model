@@ -1,8 +1,9 @@
 {
   "Resources": {
-    "MyLayera5167acaba": {
-      "DeletionPolicy": "Retain", 
+    "MyLayer43a7918434": {
       "Type": "AWS::Lambda::LayerVersion", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket", 
@@ -13,6 +14,8 @@
     }, 
     "ManyLayersFuncRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -43,6 +46,8 @@
     }, 
     "ManyLayersFunc": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           "arn:aws:lambda:us-east-1:123456789101:layer:z:1", 
@@ -54,7 +59,7 @@
             "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:123456789101:layer:c:1"
           }, 
           {
-            "Ref": "MyLayera5167acaba"
+            "Ref": "MyLayer43a7918434"
           }
         ], 
         "Code": {

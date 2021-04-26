@@ -2,6 +2,8 @@
   "Resources": {
     "FunctionWithOverridesRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -43,6 +45,8 @@
     }, 
     "FunctionWithOverrides": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           {
@@ -104,6 +108,8 @@
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -141,6 +147,8 @@
     }, 
     "FunctionWithOverridesAliasprod": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionVersion": {
           "Fn::GetAtt": [
@@ -156,6 +164,8 @@
     }, 
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           {
@@ -208,6 +218,8 @@
     }, 
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionVersion": {
           "Fn::GetAtt": [
@@ -222,8 +234,9 @@
       }
     }, 
     "FunctionWithOverridesVersion096ed3b52b": {
-      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "FunctionWithOverrides"
@@ -231,8 +244,9 @@
       }
     }, 
     "MinimalFunctionVersion0a06fc8fb1": {
-      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"

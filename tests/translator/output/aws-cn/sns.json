@@ -1,10 +1,14 @@
 {
   "Resources": {
     "Notifications": {
-      "Type": "AWS::SNS::Topic"
+      "Type": "AWS::SNS::Topic",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete"
     }, 
     "SaveNotificationFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -35,6 +39,8 @@
     }, 
     "SaveNotificationFunctionNotificationTopicPermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "sns.amazonaws.com", 
@@ -48,6 +54,8 @@
     }, 
     "SaveNotificationFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -71,6 +79,8 @@
     }, 
     "SaveNotificationFunctionNotificationTopic": {
       "Type": "AWS::SNS::Subscription", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Endpoint": {
           "Fn::GetAtt": [

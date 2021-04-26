@@ -2,7 +2,7 @@
   "Outputs": {
     "LayerSub": {
       "Value": {
-        "Fn::Sub": "${MyLayerd04062b365}"
+        "Fn::Sub": "${MyLayerf16259d4b8}"
       }
     }, 
     "FunctionAtt": {
@@ -15,7 +15,7 @@
     }, 
     "LayerName": {
       "Value": {
-        "Ref": "MyLayerd04062b365"
+        "Ref": "MyLayerf16259d4b8"
       }
     }, 
     "FunctionSub": {
@@ -38,10 +38,12 @@
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           {
-            "Ref": "MyLayerd04062b365"
+            "Ref": "MyLayerf16259d4b8"
           }
         ], 
         "Code": {
@@ -64,9 +66,10 @@
         "Runtime": "python3.6"
       }
     }, 
-    "MyLayerd04062b365": {
-      "DeletionPolicy": "Delete", 
+    "MyLayerf16259d4b8": {
       "Type": "AWS::Lambda::LayerVersion", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "bucket", 
@@ -75,9 +78,10 @@
         "LayerName": "MyLayer"
       }
     }, 
-    "MyLayerWithANamefda8c9ec8c": {
-      "DeletionPolicy": "Retain", 
+    "MyLayerWithAName0c99fc75b5": {
       "Type": "AWS::Lambda::LayerVersion", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "bucket", 
@@ -88,6 +92,8 @@
     }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

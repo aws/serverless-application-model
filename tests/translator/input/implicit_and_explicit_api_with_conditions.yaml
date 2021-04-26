@@ -22,6 +22,8 @@ Conditions:
 Resources:
   implicithello1:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: implicithello1condition
     Properties:
       Handler: index.handler
@@ -38,6 +40,8 @@ Resources:
             Method: get
   implicithello2:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: implicithello2condition
     Properties:
       Handler: index.handler
@@ -55,10 +59,14 @@ Resources:
 
   explicitapi:
     Type: 'AWS::Serverless::Api'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
   explicithello1:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: explicithello1condition
     Properties:
       Handler: index.handler
@@ -76,6 +84,8 @@ Resources:
             Method: get
   explicithello2:
     Type: 'AWS::Serverless::Function'
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Condition: explicithello2condition
     Properties:
       Handler: index.handler

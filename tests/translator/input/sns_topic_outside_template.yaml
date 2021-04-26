@@ -4,6 +4,8 @@ Parameters:
 Resources:
   SaveNotificationFunction:
     Type: AWS::Serverless::Function
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/notifications.zip
       Handler: index.save_notification

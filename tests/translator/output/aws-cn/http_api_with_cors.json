@@ -10,6 +10,8 @@
   "Resources": {
     "MyApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "MyApi"
@@ -23,6 +25,8 @@
     }, 
     "ServerlessHttpApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "ServerlessHttpApi"
@@ -36,6 +40,8 @@
     }, 
     "ServerlessHttpApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -92,6 +98,8 @@
     }, 
     "HttpApiFunction": {
       "Type": "AWS::Lambda::Function", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler", 
         "Code": {
@@ -114,6 +122,8 @@
     }, 
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -135,6 +145,8 @@
     }, 
     "HttpApiFunctionImplicitApiPermission": {
       "Type": "AWS::Lambda::Permission", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -156,6 +168,8 @@
     }, 
     "HttpApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -186,6 +200,8 @@
     }, 
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {

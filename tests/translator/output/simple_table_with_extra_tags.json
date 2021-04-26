@@ -8,6 +8,8 @@
   "Resources": {
     "MinimalTableWithTags": {
       "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "BillingMode": "PAY_PER_REQUEST",
         "AttributeDefinitions": [
