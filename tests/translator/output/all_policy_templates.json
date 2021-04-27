@@ -1610,6 +1610,27 @@
                 }
               ]
             }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy60",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "qldb:sendCommand"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${LedgerName}",
+                      {
+                        "LedgerName": "name"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
           }
         ], 
         "Tags": [
