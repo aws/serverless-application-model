@@ -537,7 +537,9 @@ class SwaggerEditor(object):
                     raise InvalidDocumentException(
                         [
                             InvalidTemplateException(
-                                "Path '{}' contains method '{}' which is not a supported method {}".format(path, method_name, self._ALL_HTTP_METHODS)
+                                "Path '{}' contains method '{}' which is not a supported method {}".format(
+                                    path, method_name, self._ALL_HTTP_METHODS
+                                )
                             )
                         ]
                     )
