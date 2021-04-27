@@ -1621,7 +1621,7 @@
                   ],
                   "Resource": {
                     "Fn::Sub": [
-                      "arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${LedgerName}",
+                      "arn:${AWS::Partition}:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${LedgerName}",
                       {
                         "LedgerName": "name"
                       }
