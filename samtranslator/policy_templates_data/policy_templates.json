@@ -2360,6 +2360,34 @@
           }
         ]
       }
+    },
+    "QLDBSendCommandPolicy": {
+      "Description": "Gives permission to send command to Amazon QLDB Ledger",
+      "Parameters": {
+        "LedgerName": {
+          "Description": "Name of the Ledger from Amazon QLDB"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "qldb:sendCommand"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:aws:qldb:${AWS::Region}:${AWS::AccountId}:ledger/${LedgerName}",
+                {
+                  "LedgerName": {
+                    "Ref": "LedgerName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   }
 }
