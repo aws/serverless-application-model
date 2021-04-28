@@ -448,15 +448,13 @@ class OpenApiEditor(object):
                 self.tags.append(tag)
 
     def add_endpoint_config(self, disable_execute_api_endpoint):
-        """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG header in open api definition
+        "disable_execute_api_endpoint": true
+         
+                                        
+       
 
-        Following this guide:
-        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
-        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigatewayv2-api.html#cfn-apigatewayv2-api-disableexecuteapiendpoint
-
-        :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
-
-        """
+        
+        
 
         DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
 
