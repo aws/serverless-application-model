@@ -26,6 +26,7 @@ class OpenApiEditor(object):
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
     _DEFAULT_PATH = "$default"
+    _DOMAIN_NAME = "DomainName"
 
     def __init__(self, doc):
         """
@@ -448,15 +449,10 @@ class OpenApiEditor(object):
                 self.tags.append(tag)
 
     def add_endpoint_config(self, disable_execute_api_endpoint):
-        "disable_execute_api_endpoint": true
-         
-                                        
-       
-
-        
-        
-
-        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
+        if _DOMAIN_NAME:
+            disable_execute_api_endpoint = {"disableExecuteApiEndpoint": true}
+            else:
+                disable_execute_api_endpoint = {"disableExecuteApiEndpoint": false}
 
         servers_configurations = self._doc.get(self._SERVERS, [{}])
         for config in servers_configurations:
