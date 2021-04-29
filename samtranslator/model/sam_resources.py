@@ -1,5 +1,6 @@
 ﻿""" SAM macro definitions """
 from six import string_types
+import copy
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -1177,7 +1178,15 @@ class SamLayerVersion(SamResourceMacro):
             attributes["DeletionPolicy"] = retention_policy_value
 
         old_logical_id = self.logical_id
-        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
+
+        # This is to prevent the passthrough resource attributes to be included for hashing
+        hash_dict = copy.deepcopy(self.to_dict())
+        if "DeletionPolicy" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["DeletionPolicy"]
+        if "UpdateReplacePolicy" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["UpdateReplacePolicy"]
+
+        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, hash_dict).gen()
         self.logical_id = new_logical_id
 
         lambda_layer = LambdaLayerVersion(self.logical_id, depends_on=self.depends_on, attributes=attributes)
