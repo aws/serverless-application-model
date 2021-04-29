@@ -268,6 +268,7 @@ class TestTranslatorEndToEnd(TestCase):
                 "simple_table_with_extra_tags",
                 "explicit_api_with_invalid_events_config",
                 "no_implicit_api_with_serverless_rest_api_resource",
+                "implicit_api_deletion_policy_precedence",
                 "implicit_api_with_serverless_rest_api_resource",
                 "implicit_api_with_auth_and_conditions_max",
                 "implicit_api_with_many_conditions",
