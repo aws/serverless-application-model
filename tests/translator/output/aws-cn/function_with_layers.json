@@ -28,7 +28,7 @@
         "Runtime": "python2.7"
       }
     }, 
-    "MyLayer43a7918434": {
+    "MyLayera5167acaba": {
       "Type": "AWS::Lambda::LayerVersion", 
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
@@ -47,7 +47,7 @@
       "Properties": {
         "Layers": [
           {
-            "Ref": "MyLayer43a7918434"
+            "Ref": "MyLayera5167acaba"
           }
         ], 
         "Code": {

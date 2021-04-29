@@ -1,6 +1,6 @@
 {
   "Resources": {
-    "MyLayer43a7918434": {
+    "MyLayera5167acaba": {
       "Type": "AWS::Lambda::LayerVersion", 
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
@@ -59,7 +59,7 @@
             "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:123456789101:layer:c:1"
           }, 
           {
-            "Ref": "MyLayer43a7918434"
+            "Ref": "MyLayera5167acaba"
           }
         ], 
         "Code": {

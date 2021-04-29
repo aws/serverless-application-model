@@ -8,7 +8,7 @@
     }
   }, 
   "Resources": {
-    "LayerWithConditionec24995757": {
+    "LayerWithCondition7c655e10ea": {
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete", 
       "Type": "AWS::Lambda::LayerVersion", 
@@ -21,7 +21,7 @@
       }, 
       "Condition": "TestCondition"
     }, 
-    "MinimalLayer7d49517128": {
+    "MinimalLayer0c7f96cce7": {
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete", 
       "Type": "AWS::Lambda::LayerVersion", 
@@ -33,7 +33,7 @@
         "LayerName": "MinimalLayer"
       }
     }, 
-    "CompleteLayer01b64931e6": {
+    "CompleteLayer5d71a60e81": {
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::LayerVersion", 
@@ -51,7 +51,7 @@
         ]
       }
     }, 
-    "LayerWithContentUriObject678c9b5427": {
+    "LayerWithContentUriObjectbdbf1b82ac": {
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete", 
       "Type": "AWS::Lambda::LayerVersion", 

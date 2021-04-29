@@ -17,7 +17,7 @@
     }
   },
   "Resources": {
-    "LayerWithNameIntrinsic1935b50dbd": {
+    "LayerWithNameIntrinsiccf8baed8b9": {
       "Type": "AWS::Lambda::LayerVersion",
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
@@ -29,7 +29,7 @@
         "LayerName": "SomeLayerName"
       }
     },
-    "LayerWithRefNameIntrinsicRegion8bb3f168f3": {
+    "LayerWithRefNameIntrinsicRegion186db7e435": {
       "Type": "AWS::Lambda::LayerVersion",
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
@@ -41,7 +41,7 @@
         "LayerName": "cn-north-1"
       }
     },
-    "LayerWithSubNameIntrinsicRegion33dad6e41a": {
+    "LayerWithSubNameIntrinsicRegionfbc3f9f13d": {
       "Type": "AWS::Lambda::LayerVersion",
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
@@ -55,7 +55,7 @@
         }
       }
     },
-    "LayerWithRuntimesIntrinsic15bceab8a8": {
+    "LayerWithRuntimesIntrinsic1a006faa85": {
       "Type": "AWS::Lambda::LayerVersion",
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
@@ -70,7 +70,7 @@
         }
       }
     },
-    "LayerWithSingleListRefRuntimesIntrinsic3243ec999b": {
+    "LayerWithSingleListRefRuntimesIntrinsic9d7a72f24a": {
       "Properties": {
         "CompatibleRuntimes": [
           {
@@ -87,7 +87,7 @@
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete"
     },
-    "LayerWithMixedListRefRuntimesIntrinsicbd637a121f": {
+    "LayerWithMixedListRefRuntimesIntrinsic71fd80f592": {
       "Properties": {
         "CompatibleRuntimes": [
           {
@@ -105,7 +105,7 @@
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete"
     },
-    "LayerWithLicenseIntrinsicf158772ce9": {
+    "LayerWithLicenseIntrinsic965c8d0c9b": {
       "Type": "AWS::Lambda::LayerVersion",
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
@@ -118,7 +118,7 @@
         "LicenseInfo": "MIT-0 License"
       }
     },
-    "LayerWithSubNameIntrinsic8566d42a51": {
+    "LayerWithSubNameIntrinsic6e9b477102": {
       "Type": "AWS::Lambda::LayerVersion",
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",

@@ -2,7 +2,7 @@
   "Outputs": {
     "LayerSub": {
       "Value": {
-        "Fn::Sub": "${MyLayerf16259d4b8}"
+        "Fn::Sub": "${MyLayerd04062b365}"
       }
     }, 
     "FunctionAtt": {
@@ -15,7 +15,7 @@
     }, 
     "LayerName": {
       "Value": {
-        "Ref": "MyLayerf16259d4b8"
+        "Ref": "MyLayerd04062b365"
       }
     }, 
     "FunctionSub": {
@@ -43,7 +43,7 @@
       "Properties": {
         "Layers": [
           {
-            "Ref": "MyLayerf16259d4b8"
+            "Ref": "MyLayerd04062b365"
           }
         ], 
         "Code": {
@@ -66,7 +66,7 @@
         "Runtime": "python3.6"
       }
     }, 
-    "MyLayerf16259d4b8": {
+    "MyLayerd04062b365": {
       "Type": "AWS::Lambda::LayerVersion", 
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
@@ -78,7 +78,7 @@
         "LayerName": "MyLayer"
       }
     }, 
-    "MyLayerWithAName0c99fc75b5": {
+    "MyLayerWithANamefda8c9ec8c": {
       "Type": "AWS::Lambda::LayerVersion", 
       "UpdateReplacePolicy": "Retain",
       "DeletionPolicy": "Delete",
