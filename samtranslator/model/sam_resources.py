@@ -1185,6 +1185,8 @@ class SamLayerVersion(SamResourceMacro):
             del hash_dict[old_logical_id]["DeletionPolicy"]
         if "UpdateReplacePolicy" in hash_dict.get(old_logical_id):
             del hash_dict[old_logical_id]["UpdateReplacePolicy"]
+        if "Metadata" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["Metadata"]
 
         new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, hash_dict).gen()
         self.logical_id = new_logical_id
