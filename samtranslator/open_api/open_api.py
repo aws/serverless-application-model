@@ -1,5 +1,7 @@
 import copy
 import re
+from typing import ValuesView
+
 from six import string_types
 
 from samtranslator.model.intrinsics import ref
@@ -26,7 +28,6 @@ class OpenApiEditor(object):
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
     _DEFAULT_PATH = "$default"
-    _DOMAIN_NAME = "DomainName"
 
     def __init__(self, doc):
         """
@@ -448,18 +449,21 @@ class OpenApiEditor(object):
                 tag = {"name": name, self._X_APIGW_TAG_VALUE: value}
                 self.tags.append(tag)
 
-    def add_endpoint_config(self, disable_execute_api_endpoint):
-        if self._DOMAIN_NAME:
-            disable_execute_api_endpoint = {"disableExecuteApiEndpoint": True}
-        else:
-            disable_execute_api_endpoint = {"disableExecuteApiEndpoint": False}
+    def add_endpoint_config(self, method, disable_execute_api_endpoint):
+        integration = method.get(self._X_APIGW_INTEGRATION, {})
+        uri = integration.get("uri")
 
-        DISABLE_EXECUTE_API_ENDPOINT = disable_execute_api_endpoint.values()
+        if "amazonaws.com" not in uri:
+            disable_execute_api_endpoint = True
+        else:
+            disable_execute_api_endpoint = False
+
+        DISABLE_EXECUTE_API_ENDPOINT = disable_execute_api_endpoint
 
         servers_configurations = self._doc.get(self._SERVERS, [{}])
         for config in servers_configurations:
             endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, dict())
-            endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint.values()
+            endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
             config[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
 
         self._doc[self._SERVERS] = servers_configurations
