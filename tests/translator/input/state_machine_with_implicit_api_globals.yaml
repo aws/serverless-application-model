@@ -6,8 +6,6 @@ Globals:
 Resources:
   StateMachine:
     Type: AWS::Serverless::StateMachine
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Name: MyStateMachine
       Type: STANDARD

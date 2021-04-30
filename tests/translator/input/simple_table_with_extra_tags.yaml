@@ -6,8 +6,6 @@ Parameters:
 Resources:
   MinimalTableWithTags:
       Type: 'AWS::Serverless::SimpleTable'
-      DeletionPolicy: Delete
-      UpdateReplacePolicy: Retain
       Properties:
         Tags:
           TagKey1: TagValue1

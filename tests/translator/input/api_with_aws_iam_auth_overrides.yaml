@@ -1,8 +1,6 @@
 Resources:
   MyApiWithAwsIamAuthNoCallerCredentials:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -10,8 +8,6 @@ Resources:
         InvokeRole: NONE
   MyApiWithAwsIamAuth:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -22,8 +18,6 @@ Resources:
         InvokeRole: arn:aws:iam::123:role/AUTH_AWS_IAM
   MyFunctionMyCognitoAuth:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -39,8 +33,6 @@ Resources:
               Authorizer: MyCognitoAuth
   MyFunctionWithoutAuth:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -54,8 +46,6 @@ Resources:
             Path: /MyFunctionWithoutAuth
   MyFunctionNoneAuth:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -71,8 +61,6 @@ Resources:
               Authorizer: NONE
   MyFunctionDefaultInvokeRole:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -89,8 +77,6 @@ Resources:
               InvokeRole: CALLER_CREDENTIALS
   MyFunctionCustomInvokeRole:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -107,8 +93,6 @@ Resources:
               InvokeRole: arn:aws:iam::456::role/something-else
   MyFunctionNONEInvokeRole:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -125,8 +109,6 @@ Resources:
               InvokeRole: NONE
   MyFunctionNullInvokeRole:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -143,8 +125,6 @@ Resources:
               InvokeRole: null
   MyFunctionCallerCredentialsOverride:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -161,8 +141,6 @@ Resources:
               InvokeRole: CALLER_CREDENTIALS
   MyFunctionNoCallerCredentials:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler

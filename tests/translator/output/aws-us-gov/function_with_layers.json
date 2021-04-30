@@ -2,8 +2,6 @@
   "Resources": {
     "MinimalLayerFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           "arn:aws:lambda:us-east-1:123456789101:layer:CorpXLayer:1"
@@ -29,9 +27,8 @@
       }
     }, 
     "MyLayera5167acaba": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::LayerVersion", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "sam-demo-bucket", 
@@ -42,8 +39,6 @@
     }, 
     "FunctionReferencesLayer": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           {
@@ -72,8 +67,6 @@
     }, 
     "MinimalLayerFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -104,8 +97,6 @@
     }, 
     "FunctionReferencesLayerRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -136,8 +127,6 @@
     }, 
     "FunctionLayerWithSubIntrinsic": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           {
@@ -169,8 +158,6 @@
     }, 
     "FunctionNoLayerVersion": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           "arn:aws:lambda:us-east-1:123456789101:layer:CorpXLayer:1"
@@ -197,8 +184,6 @@
     }, 
     "FunctionNoLayerVersionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -229,8 +214,6 @@
     }, 
     "FunctionLayerWithSubIntrinsicRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

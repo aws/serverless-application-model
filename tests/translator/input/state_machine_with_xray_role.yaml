@@ -1,8 +1,6 @@
 Resources:
   StateMachine:
     Type: AWS::Serverless::StateMachine
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Name: MyStateMachineWithXRayTracing
       Type: STANDARD

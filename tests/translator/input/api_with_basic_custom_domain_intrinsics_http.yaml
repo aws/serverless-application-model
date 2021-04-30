@@ -24,8 +24,6 @@ Resources:
   MyFunction:
     Condition: C1
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       InlineCode: |
         exports.handler = async (event) => {
@@ -53,8 +51,6 @@ Resources:
   MyApi:
     Condition: C1
     Type: AWS::Serverless::HttpApi
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       DisableExecuteApiEndpoint: False

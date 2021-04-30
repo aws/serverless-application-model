@@ -1,8 +1,6 @@
 Resources:
   HyphenFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
@@ -20,8 +18,6 @@ Resources:
 
   HyphenApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: hoge-fuga
       Models:
@@ -33,8 +29,6 @@ Resources:
   
   UnderscoreFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
@@ -52,8 +46,6 @@ Resources:
 
   UnderscoreApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: hoge_fuga
       Models:

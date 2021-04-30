@@ -116,8 +116,6 @@
   "Resources": {
     "helloworld9HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -140,8 +138,6 @@
     }, 
     "helloworld9Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -173,8 +169,6 @@
     }, 
     "helloworld2HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -197,8 +191,6 @@
     }, 
     "ServerlessHttpApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -691,8 +683,6 @@
     }, 
     "helloworld6HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -715,8 +705,6 @@
     }, 
     "helloworld1Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -748,8 +736,6 @@
     }, 
     "helloworld7": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -775,8 +761,6 @@
     }, 
     "helloworld6": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -802,8 +786,6 @@
     }, 
     "helloworld5": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -829,8 +811,6 @@
     }, 
     "helloworld1099Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -862,8 +842,6 @@
     }, 
     "helloworld3": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -889,8 +867,6 @@
     }, 
     "helloworld2": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -916,8 +892,6 @@
     }, 
     "helloworld1": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -943,8 +917,6 @@
     }, 
     "helloworld9": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -970,8 +942,6 @@
     }, 
     "hello": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -997,8 +967,6 @@
     }, 
     "helloRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -1030,8 +998,6 @@
     }, 
     "helloworld7HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -1054,8 +1020,6 @@
     }, 
     "helloHttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -1078,8 +1042,6 @@
     }, 
     "helloworld1HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -1102,8 +1064,6 @@
     }, 
     "helloworld5Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -1135,8 +1095,6 @@
     }, 
     "helloworld4Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -1168,8 +1126,6 @@
     }, 
     "helloworld1099HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -1192,8 +1148,6 @@
     }, 
     "helloworld5HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -1216,8 +1170,6 @@
     }, 
     "helloworld7Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -1249,8 +1201,6 @@
     }, 
     "helloworld2Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -1282,8 +1232,6 @@
     }, 
     "helloworld8Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -1315,8 +1263,6 @@
     }, 
     "helloworld4": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -1342,8 +1288,6 @@
     }, 
     "helloworld1099": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -1369,8 +1313,6 @@
     }, 
     "helloworld8HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -1393,8 +1335,6 @@
     }, 
     "ServerlessHttpApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AutoDeploy": true, 
         "ApiId": {
@@ -1433,8 +1373,6 @@
     }, 
     "helloworld3Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -1466,8 +1404,6 @@
     }, 
     "helloworld8": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async () => \u2018Hello World!'\n"
@@ -1493,8 +1429,6 @@
     }, 
     "helloworld4HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -1517,8 +1451,6 @@
     }, 
     "helloworld6Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -1550,8 +1482,6 @@
     }, 
     "helloworld3HttpApiEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 

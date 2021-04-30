@@ -1,12 +1,8 @@
 Resources:
   MinimalTable:
     Type: 'AWS::Serverless::SimpleTable'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
   CompleteTable:
     Type: 'AWS::Serverless::SimpleTable'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       PrimaryKey:
         Name: member-number

@@ -2,8 +2,6 @@
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -27,8 +25,6 @@
     }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -59,8 +55,6 @@
     }, 
     "StateMachineRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -132,14 +126,10 @@
       }
     }, 
     "ExpressLogGroup": {
-      "Type": "AWS::Logs::LogGroup",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete"
+      "Type": "AWS::Logs::LogGroup"
     }, 
     "StateMachine": {
       "Type": "AWS::StepFunctions::StateMachine", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Tags": [
           {

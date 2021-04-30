@@ -23,8 +23,6 @@ Globals:
 Resources:
   ExplicitApiFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
@@ -40,8 +38,6 @@ Resources:
 
   ExplicitApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: !Ref StageName
       DefinitionBody:
@@ -66,8 +62,6 @@ Resources:
               Service: 'lambda.amazonaws.com'
   AnotherApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: !Ref StageName
       Auth:

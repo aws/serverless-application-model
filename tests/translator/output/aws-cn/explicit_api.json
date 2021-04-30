@@ -12,8 +12,6 @@
   "Resources": {
     "GetHtmlFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.gethtml", 
         "Code": {
@@ -37,8 +35,6 @@
     }, 
     "ApiWithInlineSwaggerStage": {
       "Type": "AWS::ApiGateway::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ApiWithInlineSwaggerDeployment09cda3d97b"
@@ -53,8 +49,6 @@
     },
     "GetHtmlApiDeploymentf117c932f7": {
       "Type": "AWS::ApiGateway::Deployment", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "GetHtmlApi"
@@ -65,8 +59,6 @@
     }, 
     "GetHtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
@@ -99,8 +91,6 @@
     }, 
     "ApiWithInlineSwagger": {
       "Type": "AWS::ApiGateway::RestApi", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "this": "is", 
@@ -118,8 +108,6 @@
     }, 
     "GetHtmlFunctionGetHtmlPermissionStage": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -141,8 +129,6 @@
     }, 
     "GetHtmlApi": {
       "Type": "AWS::ApiGateway::RestApi", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "EndpointConfiguration": {
           "Types": [
@@ -161,8 +147,6 @@
     }, 
     "GetHtmlApiStage": {
       "Type": "AWS::ApiGateway::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "GetHtmlApiDeploymentf117c932f7"
@@ -183,8 +167,6 @@
     }, 
     "ApiWithInlineSwaggerDeployment09cda3d97b": {
       "Type": "AWS::ApiGateway::Deployment", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"

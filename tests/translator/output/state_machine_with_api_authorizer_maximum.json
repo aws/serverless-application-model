@@ -2,8 +2,6 @@
     "Resources": {
         "MyApiDeploymentde088eafc3": {
             "Type": "AWS::ApiGateway::Deployment", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "RestApiId": {
                     "Ref": "MyApi"
@@ -14,8 +12,6 @@
         }, 
         "MyApiMyLambdaRequestAuthAuthorizerPermission": {
             "Type": "AWS::Lambda::Permission", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Action": "lambda:InvokeFunction", 
                 "Principal": "apigateway.amazonaws.com", 
@@ -34,8 +30,6 @@
         }, 
         "StateMachineWithLambdaRequestAuthorizerRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -73,8 +67,6 @@
         }, 
         "StateMachine": {
             "Type": "AWS::StepFunctions::StateMachine", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "RoleArn": {
                     "Fn::GetAtt": [
@@ -117,8 +109,6 @@
         }, 
         "StateMachineWithDefaultAuthorizerRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -156,8 +146,6 @@
         }, 
         "MyApi": {
             "Type": "AWS::ApiGateway::RestApi", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Body": {
                     "info": {
@@ -490,8 +478,6 @@
         }, 
         "MyApiMyLambdaTokenAuthAuthorizerPermission": {
             "Type": "AWS::Lambda::Permission", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Action": "lambda:InvokeFunction", 
                 "Principal": "apigateway.amazonaws.com", 
@@ -510,8 +496,6 @@
         }, 
         "StateMachineRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17", 
@@ -555,8 +539,6 @@
         }, 
         "StateMachineWithLambdaTokenAuthorizerRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -594,8 +576,6 @@
         }, 
         "MyApiMyLambdaTokenAuthNoneFunctionInvokeRoleAuthorizerPermission": {
             "Type": "AWS::Lambda::Permission", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Action": "lambda:InvokeFunction", 
                 "Principal": "apigateway.amazonaws.com", 
@@ -614,8 +594,6 @@
         }, 
         "MyApiProdStage": {
             "Type": "AWS::ApiGateway::Stage", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "DeploymentId": {
                     "Ref": "MyApiDeploymentde088eafc3"
@@ -628,8 +606,6 @@
         }, 
         "StateMachineWithCognitoMultipleUserPoolsAuthorizerRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -667,8 +643,6 @@
         }, 
         "StateMachineWithNoAuthorizerRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {

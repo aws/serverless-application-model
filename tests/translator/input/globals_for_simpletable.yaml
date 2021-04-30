@@ -6,5 +6,3 @@ Globals:
 Resources:
   MinimalTable:
     Type: AWS::Serverless::SimpleTable
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain

@@ -1,8 +1,6 @@
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       InlineCode: |
         exports.handler = async (event) => {

@@ -2,14 +2,10 @@
   "Resources": {
     "TestDLQ": {
       "Type": "AWS::SQS::Queue", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {}
     }, 
     "StateMachineCWEvent": {
       "Type": "AWS::Events::Rule", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "EventPattern": {
           "detail": {
@@ -44,8 +40,6 @@
     }, 
     "StateMachineCWEventQueuePolicy": {
       "Type": "AWS::SQS::QueuePolicy", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Queues": [
           {
@@ -84,8 +78,6 @@
     }, 
     "StateMachine": {
       "Type": "AWS::StepFunctions::StateMachine", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
         "DefinitionS3Location": {
@@ -102,8 +94,6 @@
     }, 
     "StateMachineCWEventRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Policies": [
           {

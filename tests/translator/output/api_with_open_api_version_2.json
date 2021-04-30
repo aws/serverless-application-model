@@ -2,8 +2,6 @@
   "Resources": {
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.gethtml", 
         "Code": {
@@ -27,8 +25,6 @@
     }, 
     "ImplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -59,8 +55,6 @@
     },
     "ImplicitApiFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -82,8 +76,6 @@
     }, 
     "ExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -99,8 +91,6 @@
     }, 
     "ExplicitApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ExplicitApiDeployment4154e1c30c"
@@ -113,8 +103,6 @@
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment32f05a472e"
@@ -127,8 +115,6 @@
     }, 
     "ServerlessRestApiDeployment32f05a472e": {
       "Type": "AWS::ApiGateway::Deployment", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -138,8 +124,6 @@
     }, 
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -208,8 +192,6 @@
     }, 
     "ExplicitApiDeployment4154e1c30c": {
       "Type": "AWS::ApiGateway::Deployment", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ExplicitApi"

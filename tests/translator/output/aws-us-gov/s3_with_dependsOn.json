@@ -1,14 +1,10 @@
 {
   "Resources": {
     "Topic": {
-      "Type": "AWS::SNS::Topic",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete"
+      "Type": "AWS::SNS::Topic"
     },
     "Images": {
       "Type": "AWS::S3::Bucket",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "DependsOn": [
         "ThumbnailFunctionImageBucketPermission",
         "Topic"
@@ -31,8 +27,6 @@
     }, 
     "ThumbnailFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -63,8 +57,6 @@
     }, 
     "ThumbnailFunctionImageBucketPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
@@ -78,8 +70,6 @@
     }, 
     "ThumbnailFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

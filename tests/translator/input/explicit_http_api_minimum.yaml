@@ -1,12 +1,8 @@
 Resources:
   Api:
     Type: AWS::Serverless::HttpApi
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
   Function:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Handler: index.handler
       CodeUri: s3://bucket/key

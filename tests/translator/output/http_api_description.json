@@ -2,8 +2,6 @@
   "Resources": {
     "Function": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler", 
         "Code": {
@@ -27,8 +25,6 @@
     }, 
     "FunctionApiPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -48,8 +44,6 @@
     },
     "FunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -80,8 +74,6 @@
     }, 
     "HttpApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AutoDeploy": true, 
         "ApiId": {
@@ -95,8 +87,6 @@
     }, 
     "HttpApi": {
       "Type": "AWS::ApiGatewayV2::Api", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "openapi": "3.0.1",

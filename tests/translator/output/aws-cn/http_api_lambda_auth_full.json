@@ -2,8 +2,6 @@
   "Resources": {
     "HttpApiFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -27,8 +25,6 @@
     },
     "HttpApiFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -59,8 +55,6 @@
     },
     "HttpApiFunctionSimpleCasePermission": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -82,8 +76,6 @@
     },
     "MyAuthFn": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "bucket",
@@ -107,8 +99,6 @@
     },
     "MyAuthFnRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -139,8 +129,6 @@
     },
     "MyApi": {
       "Type": "AWS::ApiGatewayV2::Api",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "openapi": "3.0.1",
@@ -264,8 +252,6 @@
     },
     "MyApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ApiId": {
           "Ref": "MyApi"

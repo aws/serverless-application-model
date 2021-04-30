@@ -8,8 +8,6 @@ Parameters:
 Resources:
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -17,8 +15,6 @@ Resources:
 
   FunctionWithTracing:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -27,8 +23,6 @@ Resources:
 
   FunctionWithInlineCode:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       InlineCode: "hello world"
       Handler: hello.handler
@@ -37,8 +31,6 @@ Resources:
 
   FunctionWithCodeUriObject:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri:
         Bucket: somebucket
@@ -49,8 +41,6 @@ Resources:
 
   CompleteFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       FunctionName: MyAwesomeFunction
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -73,8 +63,6 @@ Resources:
           Name2: Value2
   FunctionWithPolicies:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -82,8 +70,6 @@ Resources:
       Policies: AmazonDynamoDBFullAccess
   FunctionWithPolicyDocument:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -95,8 +81,6 @@ Resources:
           Resource: '*'
   FunctionWithRoleRef:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -107,8 +91,6 @@ Resources:
   MyFunctionRole:
     # This is just some role. Actual role definition might be wrong
     Type: "AWS::IAM::Role"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"

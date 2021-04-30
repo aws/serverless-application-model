@@ -2,8 +2,6 @@
   "Resources": {
     "MyApiWithAuthDeployment084855ab6d": {
       "Type": "AWS::ApiGateway::Deployment",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithAuth"
@@ -14,8 +12,6 @@
     },
     "MyFunctionWithApiKeyRequiredTrueMyApiWithApiKeyRequiredTruePermissionProd": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -37,8 +33,6 @@
     },
     "MyFunctionWithApiKeyRequiredFalseMyApiWithApiKeyRequiredFalsePermissionProd": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -60,8 +54,6 @@
     },
     "MyApiWithAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiWithAuthDeployment084855ab6d"
@@ -74,8 +66,6 @@
     },
     "MyFunctionWithApiKeyRequiredTrue": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler",
         "Code": {
@@ -99,8 +89,6 @@
     },
     "MyFunctionWithApiKeyRequiredDefault": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler",
         "Code": {
@@ -124,8 +112,6 @@
     },
     "MyFunctionWithApiKeyRequiredDefaultMyApiWithApiKeyRequiredDefaultPermissionProd": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -147,8 +133,6 @@
     },
     "MyFunctionWithApiKeyRequiredFalse": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler",
         "Code": {
@@ -172,8 +156,6 @@
     },
     "MyFunctionWithApiKeyRequiredFalseRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -204,8 +186,6 @@
     },
     "MyFunctionWithApiKeyRequiredDefaultRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -236,8 +216,6 @@
     },
     "MyFunctionWithApiKeyRequiredTrueRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -268,8 +246,6 @@
     },
     "MyApiWithAuth": {
       "Type": "AWS::ApiGateway::RestApi",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {

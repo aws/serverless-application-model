@@ -1,8 +1,6 @@
 Resources:
   MyApi:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -20,8 +18,6 @@ Resources:
 
   StateMachine:
     Type: AWS::Serverless::StateMachine
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Name: MyStateMachine
       Type: STANDARD

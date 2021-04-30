@@ -24,8 +24,6 @@
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -49,8 +47,6 @@
     }, 
     "MyApiDeployment359f256a3b": {
       "Type": "AWS::ApiGateway::Deployment", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
@@ -61,8 +57,6 @@
     }, 
     "MyApifooStage": {
       "Type": "AWS::ApiGateway::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiDeployment359f256a3b"
@@ -75,8 +69,6 @@
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment2657ea030d"
@@ -89,8 +81,6 @@
     }, 
     "MyFunctionGetHtmlPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -112,8 +102,6 @@
     }, 
     "ServerlessRestApiDeployment2657ea030d": {
       "Type": "AWS::ApiGateway::Deployment", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -124,8 +112,6 @@
     },
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -156,8 +142,6 @@
     }, 
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -194,8 +178,6 @@
     }, 
     "MyApi": {
       "Type": "AWS::ApiGateway::RestApi", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "this": "is", 

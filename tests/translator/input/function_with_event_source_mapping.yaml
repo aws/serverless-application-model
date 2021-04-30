@@ -10,8 +10,6 @@ Parameters:
 Resources:
   MyFunctionForBatchingExample:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Handler: index.handler
       InlineCode: |
@@ -64,21 +62,15 @@ Resources:
 
   KinesisStream:
     Type: AWS::Kinesis::Stream
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ShardCount: 1
 
   KinesisStream1:
     Type: AWS::Kinesis::Stream
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ShardCount: 1
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       AttributeDefinitions:
         - AttributeName: id
@@ -94,9 +86,5 @@ Resources:
 
   MySqsQueue:
     Type: AWS::SQS::Queue
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
   MySnsTopic:
     Type: AWS::SNS::Topic
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain

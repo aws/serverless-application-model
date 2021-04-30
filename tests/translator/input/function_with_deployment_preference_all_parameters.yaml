@@ -1,8 +1,6 @@
 Resources:
   MinimalFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -25,8 +23,6 @@ Resources:
 
   MySanityTestFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Handler: hello.handler
       Runtime: python2.7
@@ -36,8 +32,6 @@ Resources:
 
   MyValidationTestFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Handler: hello.handler
       Runtime: python2.7
@@ -47,8 +41,6 @@ Resources:
 
   MyCloudWatchAlarm:
     Type: AWS::CloudWatch::Alarm
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
      ComparisonOperator: GreaterThanThreshold
      EvaluationPeriods: 1
@@ -58,6 +50,4 @@ Resources:
      Threshold: 10
 
   MySNSTopic:
-    Type: AWS::SNS::Topic
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
+      Type: AWS::SNS::Topic

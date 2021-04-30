@@ -15,8 +15,6 @@ Conditions:
 Resources:
   MyTestFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: FunctionCondition
     Properties:
       EventInvokeConfig:
@@ -50,8 +48,6 @@ Resources:
       MemorySize: 1024
   DestinationLambda:
     Condition: FunctionInlineEnabled
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Type: AWS::Serverless::Function
     Properties:
       InlineCode: |

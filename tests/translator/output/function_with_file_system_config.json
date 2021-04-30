@@ -1,14 +1,10 @@
 {
   "Resources": {
     "EfsFileSystem": {
-      "Type": "AWS::EFS::FileSystem",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete"
+      "Type": "AWS::EFS::FileSystem"
     }, 
     "LambdaFunctionWithEfs": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "const fs = require('fs')\nconst path = require('path')\nconst efsMountPath = '/mnt/efs'\n\nexports.handler = async (event, context, callback) => {\nconst directory = path.join(efsMountPath, event.body)\nconst files = fs.readdirSync(directory)\nreturn files\n}\n"
@@ -52,8 +48,6 @@
     }, 
     "MountTarget": {
       "Type": "AWS::EFS::MountTarget", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "SubnetId": "subnet-abc123", 
         "FileSystemId": {
@@ -66,8 +60,6 @@
     }, 
     "LambdaFunctionWithEfsRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -99,8 +91,6 @@
     }, 
     "AccessPoint": {
       "Type": "AWS::EFS::AccessPoint", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FileSystemId": {
           "Ref": "EfsFileSystem"

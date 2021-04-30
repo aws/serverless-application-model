@@ -7,8 +7,6 @@
   "Resources": {
     "OnePolicyTemplate": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -32,8 +30,6 @@
     },
     "MultiplePolicyTemplates": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -57,8 +53,6 @@
     },
     "OnePolicyTemplateRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -124,8 +118,6 @@
     },
     "MultiplePolicyTemplatesRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -205,8 +197,6 @@
     },
     "AllCombinations": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -230,8 +220,6 @@
     },
     "AllCombinationsRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaRole",

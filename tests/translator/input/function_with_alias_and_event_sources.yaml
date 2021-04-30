@@ -8,8 +8,6 @@ Parameters:
 Resources:
   MyAwesomeFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -94,18 +92,12 @@ Resources:
 
   Notifications:
     Type: AWS::SNS::Topic
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
 
   Images:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
 
   GetHtmlApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Name: MyGetApi
       StageName:

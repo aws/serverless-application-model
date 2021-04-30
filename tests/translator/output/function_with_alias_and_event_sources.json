@@ -8,8 +8,6 @@
   "Resources": {
     "MyAwesomeFunctionAliasLive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionVersion": {
           "Fn::GetAtt": [
@@ -25,8 +23,6 @@
     }, 
     "MyAwesomeFunctionNotificationTopicPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "sns.amazonaws.com", 
@@ -40,8 +36,6 @@
     }, 
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment79e6116109"
@@ -54,8 +48,6 @@
     }, 
     "GetHtmlApiDeploymentf117c932f7": {
       "Type": "AWS::ApiGateway::Deployment", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "GetHtmlApi"
@@ -66,8 +58,6 @@
     }, 
     "MyAwesomeFunctionCWEventPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
@@ -84,8 +74,6 @@
     },
     "MyAwesomeFunctionEBRulePermission": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "events.amazonaws.com",
@@ -102,8 +90,6 @@
     },
     "MyAwesomeFunctionDDBStream": {
       "Type": "AWS::Lambda::EventSourceMapping", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "BatchSize": 200, 
         "EventSourceArn": "arn:aws:dynamodb:us-west-2:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291", 
@@ -115,8 +101,6 @@
     },
     "MyAwesomeFunctionIoTRule": {
       "Type": "AWS::IoT::TopicRule", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "TopicRulePayload": {
           "AwsIotSqlVersion": "beta", 
@@ -136,8 +120,6 @@
     }, 
     "MyAwesomeFunctionKinesisStream": {
       "Type": "AWS::Lambda::EventSourceMapping", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "BatchSize": 100, 
         "EventSourceArn": "arn:aws:kinesis:us-west-2:012345678901:stream/my-stream", 
@@ -149,8 +131,6 @@
     }, 
     "MyAwesomeFunctionImplicitApiPermissionProd": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 
@@ -172,8 +152,6 @@
     }, 
     "MyAwesomeFunctionIoTRulePermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
@@ -197,8 +175,6 @@
     }, 
     "MyAwesomeFunctionNotificationTopic": {
       "Type": "AWS::SNS::Subscription", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Endpoint": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -211,8 +187,6 @@
     }, 
     "MyAwesomeFunctionS3TriggerPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
@@ -226,8 +200,6 @@
     }, 
     "GetHtmlApi": {
       "Type": "AWS::ApiGateway::RestApi", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "BodyS3Location": {
           "Bucket": "sam-demo-bucket", 
@@ -238,8 +210,6 @@
     },
     "ServerlessRestApiDeployment79e6116109": {
       "Type": "AWS::ApiGateway::Deployment", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ServerlessRestApi"
@@ -250,8 +220,6 @@
     }, 
     "MyAwesomeFunctionCWLogPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "logs.amazonaws.com", 
@@ -270,8 +238,6 @@
     }, 
     "MyAwesomeFunctionEBSchedule": {
       "Type": "AWS::Events::Rule", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ScheduleExpression": "rate(1 minute)", 
         "Targets": [
@@ -286,8 +252,6 @@
     }, 
     "MyAwesomeFunctionCWLog": {
       "Type": "AWS::Logs::SubscriptionFilter", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DestinationArn": {
           "Ref": "MyAwesomeFunctionAliasLive"
@@ -301,8 +265,6 @@
     }, 
     "MyAwesomeFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
@@ -335,8 +297,6 @@
     }, 
     "MyAwesomeFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -360,8 +320,6 @@
     }, 
     "MyAwesomeFunctionCWEvent": {
       "Type": "AWS::Events::Rule", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "EventPattern": {
           "detail": {
@@ -382,8 +340,6 @@
     },
     "MyAwesomeFunctionEBRule": {
       "Type": "AWS::Events::Rule",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "EventPattern": {
           "detail": {
@@ -403,9 +359,8 @@
       }
     },
     "MyAwesomeFunctionVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MyAwesomeFunction"
@@ -414,8 +369,6 @@
     }, 
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -443,14 +396,10 @@
       }
     }, 
     "Notifications": {
-      "Type": "AWS::SNS::Topic",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete"
+      "Type": "AWS::SNS::Topic"
     }, 
     "MyAwesomeFunctionEBSchedulePermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "events.amazonaws.com", 
@@ -467,8 +416,6 @@
     }, 
     "Images": {
       "Type": "AWS::S3::Bucket", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "NotificationConfiguration": {
           "LambdaConfigurations": [
@@ -487,8 +434,6 @@
     }, 
     "GetHtmlApiStage": {
       "Type": "AWS::ApiGateway::Stage", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "GetHtmlApiDeploymentf117c932f7"
@@ -508,8 +453,6 @@
     }, 
     "MyAwesomeFunctionExplicitApiPermissionStage": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com", 

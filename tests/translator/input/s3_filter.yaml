@@ -1,8 +1,6 @@
 Resources:
   ThumbnailFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
       Handler: index.generate_thumbails
@@ -22,5 +20,3 @@ Resources:
 
   Images:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain

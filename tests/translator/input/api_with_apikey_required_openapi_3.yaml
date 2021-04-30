@@ -1,16 +1,12 @@
 Resources:
   MyApiWithoutAuth:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       OpenApiVersion: '3.0.1'
       
   MyFunctionWithApiKeyRequired:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler

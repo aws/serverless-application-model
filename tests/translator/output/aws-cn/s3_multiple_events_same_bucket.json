@@ -2,8 +2,6 @@
   "Resources": {
     "ThumbnailFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -34,8 +32,6 @@
     }, 
     "ThumbnailFunctionImageBucketCreatesPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
@@ -49,8 +45,6 @@
     }, 
     "Images": {
       "Type": "AWS::S3::Bucket",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "DependsOn": ["ThumbnailFunctionImageBucketDeletesPermission", "ThumbnailFunctionImageBucketCreatesPermission"],
       "Properties": {
         "NotificationConfiguration": {
@@ -89,8 +83,6 @@
     }, 
     "ThumbnailFunctionImageBucketDeletesPermission": {
       "Type": "AWS::Lambda::Permission", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "SourceAccount": {
@@ -104,8 +96,6 @@
     }, 
     "ThumbnailFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

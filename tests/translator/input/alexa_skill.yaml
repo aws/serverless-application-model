@@ -16,6 +16,4 @@ Resources:
       MemorySize: 1024
       Runtime: nodejs12.x
       Timeout: 3
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
-    Condition: Condition1
+

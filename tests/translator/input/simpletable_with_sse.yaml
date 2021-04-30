@@ -1,8 +1,6 @@
 Resources:
   TableWithSSE:
     Type: 'AWS::Serverless::SimpleTable'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
         SSESpecification:
           SSEEnabled: true

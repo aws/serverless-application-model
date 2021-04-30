@@ -2,8 +2,6 @@
   "Resources": {
     "NotificationB": {
       "Type": "AWS::SQS::QueuePolicy",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Queues": [
           "https://sqs.us-east-1.amazonaws.com/123456789012/MyQueue"
@@ -29,14 +27,10 @@
       }
     },
     "Notifications": {
-      "Type": "AWS::SNS::Topic",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete"
+      "Type": "AWS::SNS::Topic"
     },
     "SaveNotificationFunctionNotificationTopic": {
       "Type": "AWS::SNS::Subscription",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FilterPolicy": {
           "price_usd": [
@@ -60,8 +54,6 @@
     },
     "SaveNotificationFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -93,8 +85,6 @@
     },
     "SaveNotificationFunctionNotificationTopicEventSourceMapping": {
       "Type": "AWS::Lambda::EventSourceMapping",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "BatchSize": 8,
         "Enabled": true,
@@ -106,8 +96,6 @@
     },
     "SaveNotificationFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.save_notification",
         "Code": {

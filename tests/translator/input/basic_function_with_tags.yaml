@@ -9,8 +9,6 @@ Parameters:
 Resources:
   AlexaSkillFunc:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Description: Created by SAM

@@ -1,8 +1,6 @@
 Resources:
   KinesisFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/streams.zip
       Handler: stream.kinesis_handler
@@ -17,8 +15,6 @@ Resources:
             Enabled: false
   DynamoDBFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/streams.zip
       Handler: stream.ddb_handler
@@ -32,8 +28,6 @@ Resources:
             StartingPosition: LATEST
   MSKFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/streams.zip
       Handler: stream.msk_handler

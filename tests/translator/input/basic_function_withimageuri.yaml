@@ -8,16 +8,12 @@ Parameters:
 Resources:
   MinimalImageFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
 
   MinimalImageFunctionPackageTypeAndImageConfig:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
@@ -28,8 +24,6 @@ Resources:
 
   CompleteImageFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       FunctionName: MyAwesomeFunction
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
@@ -56,8 +50,6 @@ Resources:
 
   FunctionWithPolicies:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
@@ -65,8 +57,6 @@ Resources:
 
   FunctionWithPolicyDocument:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
@@ -78,8 +68,6 @@ Resources:
 
   FunctionWithRoleRef:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ImageUri: 123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest
       PackageType: Image
@@ -89,8 +77,6 @@ Resources:
   MyFunctionRole:
     # This is just some role. Actual role definition might be wrong
     Type: "AWS::IAM::Role"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"

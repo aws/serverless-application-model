@@ -1,8 +1,6 @@
 Resources:
   MyApiWithCognitoAuth:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -13,8 +11,6 @@ Resources:
 
   MyApiWithLambdaTokenAuth:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -25,8 +21,6 @@ Resources:
 
   MyApiWithLambdaRequestAuth:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -41,8 +35,6 @@ Resources:
 
   MyApiWithNotCachedLambdaRequestAuth:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -56,16 +48,12 @@ Resources:
 
   MyAuthFn:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
       Runtime: nodejs12.x
   MyFn:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -97,8 +85,6 @@ Resources:
             Path: /not-cached-lambda-request
   MyUserPool:
     Type: AWS::Cognito::UserPool
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       UserPoolName: UserPoolName
       Policies:

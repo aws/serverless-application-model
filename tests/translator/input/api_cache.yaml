@@ -12,9 +12,6 @@ Resources:
             RestApiId: HtmlApi
             Path: /
             Method: get
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
-    Condition: Condition1
 
   HtmlApi:
     Type: AWS::Serverless::Api
@@ -23,6 +20,3 @@ Resources:
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
       CacheClusterEnabled: true
       CacheClusterSize: "1.6"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
-    Condition: Condition1

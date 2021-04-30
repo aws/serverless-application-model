@@ -1,8 +1,6 @@
 Resources:
   HttpApi:
     Type: AWS::Serverless::HttpApi
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       DefinitionBody:
         openapi: "3.0.1"
@@ -12,8 +10,6 @@ Resources:
 
   Function:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Runtime: python3.7
       Handler: index.handler

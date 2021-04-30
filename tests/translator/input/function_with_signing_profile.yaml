@@ -2,8 +2,6 @@ Resources:
 
   FunctionWithSigningProfile:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
       Handler: index.gethtml
@@ -12,8 +10,6 @@ Resources:
 
   MySignedFunctionCodeSigningConfig:
     Type: AWS::Lambda::CodeSigningConfig
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Description: "Code Signing for MySignedLambdaFunction"
       AllowedPublishers:
@@ -24,7 +20,5 @@ Resources:
 
   SigningProfile:
     Type: AWS::Signer::SigningProfile
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       PlatformId: AWSLambda-SHA384-ECDSA

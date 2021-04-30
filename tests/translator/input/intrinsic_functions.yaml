@@ -26,8 +26,6 @@ Conditions:
 Resources:
   MyFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       FunctionName:
         Fn::Sub: ${FunctionName}
@@ -62,8 +60,6 @@ Resources:
 
   MyExplicitApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Name:
         Ref: MyExplicitApiName
@@ -77,8 +73,6 @@ Resources:
 
   FunctionWithExplicitS3Uri:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Handler: stream.ddb_handler
       Runtime: python2.7
@@ -89,8 +83,6 @@ Resources:
 
   ApiWithExplicitS3Uri:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: TrueCondition
     Properties:
       StageName: dev
@@ -101,8 +93,6 @@ Resources:
 
   DynamoDBFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/streams.zip
       Handler: stream.ddb_handler
@@ -118,8 +108,6 @@ Resources:
 
   MyTable:
     Type: AWS::DynamoDB::Table
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
 
       AttributeDefinitions:
@@ -137,8 +125,6 @@ Resources:
 
   MySqsDlqLambdaFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Handler: index.handler
       Runtime: python2.7
@@ -152,13 +138,9 @@ Resources:
 
   SqsDlqQueue:
     Type: AWS::SQS::Queue
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
 
   MySnsDlqLambdaFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Handler: index.handler
       Runtime: python2.7
@@ -170,13 +152,9 @@ Resources:
 
   SnsDlqQueue:
     Type: AWS::SNS::Topic
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
 
   MyNewRole:
     Type: AWS::IAM::Role
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       AssumeRolePolicyDocument:
         Statement:

@@ -6,24 +6,18 @@ Parameters:
 Resources:
   MyLayer:
     Type: 'AWS::Serverless::LayerVersion'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://bucket/key
       RetentionPolicy: !Ref LayerDeleteParam
 
   MyLayerWithAName:
     Type: 'AWS::Serverless::LayerVersion'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ContentUri: s3://bucket/key
       LayerName: DifferentLayerName
 
   MyFunction:
     Type: "AWS::Serverless::Function"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: app.handler

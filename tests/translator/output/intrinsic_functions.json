@@ -32,8 +32,6 @@
   "Resources": {
     "MyExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "BodyS3Location": {
           "Bucket": "sam-demo-bucket",
@@ -46,8 +44,6 @@
     },
     "MyTable": {
       "Type": "AWS::DynamoDB::Table",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "KeySchema": [
           {
@@ -71,14 +67,10 @@
       }
     },
     "SnsDlqQueue": {
-      "Type": "AWS::SNS::Topic",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete"
+      "Type": "AWS::SNS::Topic"
     },
     "MySqsDlqLambdaFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -109,14 +101,10 @@
       }
     },
     "SqsDlqQueue": {
-      "Type": "AWS::SQS::Queue",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete"
+      "Type": "AWS::SQS::Queue"
     },
     "ApiWithExplicitS3Uri": {
       "Type": "AWS::ApiGateway::RestApi",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "BodyS3Location": {
           "Version": "myversion",
@@ -128,8 +116,6 @@
     },
     "MyExplicitApiDeployment7145dd00ce": {
       "Type": "AWS::ApiGateway::Deployment",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyExplicitApi"
@@ -140,8 +126,6 @@
     },
     "FunctionWithExplicitS3Uri": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "stream.ddb_handler",
         "Code": {
@@ -166,8 +150,6 @@
     },
     "MySnsDlqLambdaFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -215,8 +197,6 @@
     },
     "MyFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "TracingConfig": {
           "Mode": {
@@ -276,8 +256,6 @@
     },
     "FunctionWithExplicitS3UriRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -308,8 +286,6 @@
     },
     "DynamoDBFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -341,8 +317,6 @@
     },
     "MySnsDlqLambdaFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -371,8 +345,6 @@
     },
     "MyNewRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Policies": [
           {
@@ -412,8 +384,6 @@
     },
     "DynamoDBFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "stream.ddb_handler",
         "Code": {
@@ -437,8 +407,6 @@
     },
     "ApiWithExplicitS3UridevStage": {
       "Type": "AWS::ApiGateway::Stage",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "ApiWithExplicitS3UriDeploymenta227798f00"
@@ -452,8 +420,6 @@
     },
     "DynamoDBFunctionMyDDBStream": {
       "Type": "AWS::Lambda::EventSourceMapping",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "BatchSize": 200,
         "EventSourceArn": {
@@ -470,8 +436,6 @@
     },
     "ApiWithExplicitS3UriDeploymenta227798f00": {
       "Type": "AWS::ApiGateway::Deployment",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "ApiWithExplicitS3Uri"
@@ -483,8 +447,6 @@
     },
     "MySqsDlqLambdaFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -535,8 +497,6 @@
     },
     "MyExplicitApidevStage": {
       "Type": "AWS::ApiGateway::Stage",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyExplicitApiDeployment7145dd00ce"
@@ -563,8 +523,6 @@
     },
     "MyFunctionMyApiPermissiondev": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction", 
         "Principal": "apigateway.amazonaws.com",

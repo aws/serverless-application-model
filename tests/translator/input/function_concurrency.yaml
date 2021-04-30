@@ -5,8 +5,6 @@ Parameters:
 Resources:
   ConcurrentFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -15,8 +13,6 @@ Resources:
 
   AnotherFunction:
     Type: "AWS::Serverless::Function"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

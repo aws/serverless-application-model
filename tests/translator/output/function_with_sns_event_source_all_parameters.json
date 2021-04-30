@@ -2,8 +2,6 @@
   "Resources": {
     "MyAwesomeFunctionNotificationTopic": {
       "Type": "AWS::SNS::Subscription",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FilterPolicy": {
           "store": [
@@ -41,8 +39,6 @@
     },
     "MyAwesomeFunctionNotificationTopicPermission": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "sns.amazonaws.com",
@@ -54,8 +50,6 @@
     },
     "MyAwesomeFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -86,8 +80,6 @@
     },
     "MyAwesomeFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
