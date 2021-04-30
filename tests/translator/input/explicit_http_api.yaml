@@ -1,8 +1,6 @@
 Resources:
   HttpApiFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/todo_list.zip
       Handler: index.restapi
@@ -20,8 +18,6 @@ Resources:
             Method: get
   MyApi:
     Type: AWS::Serverless::HttpApi
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       FailOnWarnings: True
       Auth:
@@ -38,8 +34,6 @@ Resources:
 
   MyApi2:
     Type: AWS::Serverless::HttpApi
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Auth:
         Authorizers:

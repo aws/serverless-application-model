@@ -11,8 +11,6 @@ Parameters:
 Resources:
   MinimalTableRefParamLongForm:
     Type: 'AWS::Serverless::SimpleTable'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       ProvisionedThroughput:
         ReadCapacityUnits:

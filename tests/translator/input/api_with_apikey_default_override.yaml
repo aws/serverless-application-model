@@ -1,8 +1,6 @@
 Resources:
   MyApiWithAuth:
     Type: "AWS::Serverless::Api"
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       Auth:
@@ -10,8 +8,6 @@ Resources:
 
   MyFunctionWithApiKeyRequiredDefault:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -25,8 +21,6 @@ Resources:
             Method: get
   MyFunctionWithApiKeyRequiredTrue:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler
@@ -42,8 +36,6 @@ Resources:
               ApiKeyRequired: true
   MyFunctionWithApiKeyRequiredFalse:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://bucket/key
       Handler: index.handler

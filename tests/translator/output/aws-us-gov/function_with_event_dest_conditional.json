@@ -59,8 +59,6 @@
   "Resources": {
     "DestinationLambdaRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
@@ -92,15 +90,11 @@
     }, 
     "MyTestFunctionEventInvokeConfigOnSuccessQueue": {
       "Type": "AWS::SQS::Queue", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {}, 
       "Condition": "FunctionConditionANDNOTQueueCreationDisabled2da03e5b6fe547d4e2d6"
     }, 
     "MyTestFunctionEventInvokeConfig": {
       "Type": "AWS::Lambda::EventInvokeConfig", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "MaximumEventAgeInSeconds": 70, 
         "MaximumRetryAttempts": 1, 
@@ -143,8 +137,6 @@
     }, 
     "MyTestFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = function(event, context, callback) {\n  var event_received_at = new Date().toISOString();\n  console.log('Event received at: ' + event_received_at);\n  console.log('Received event:', JSON.stringify(event, null, 2));\n\n  if (event.Success) {\n      console.log(\"Success\");\n      context.callbackWaitsForEmptyEventLoop = false;\n      callback(null);\n  } else {\n      console.log(\"Failure\");\n      context.callbackWaitsForEmptyEventLoop = false;\n      callback(new Error(\"Failure from event, Success = false, I am failing!\"), 'Destination Function Error Thrown');\n  }\n};      \n"
@@ -169,8 +161,6 @@
     }, 
     "DestinationLambda": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ZipFile": "exports.handler = async (event) => {\n  const response = {\n    statusCode: 200,\n    body: JSON.stringify('Hello from Lambda!'),\n  };\n  return response;\n};\n"
@@ -195,8 +185,6 @@
     }, 
     "MyTestFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 

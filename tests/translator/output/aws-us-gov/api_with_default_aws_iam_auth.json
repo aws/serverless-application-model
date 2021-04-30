@@ -2,8 +2,6 @@
   "Resources": {
     "MyFunctionWithAwsIamAuth": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler",
         "Code": {
@@ -27,8 +25,6 @@
     },
     "MyApiWithAwsIamAuthDeploymentf9a4964a7d": {
       "Type": "AWS::ApiGateway::Deployment",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuth"
@@ -39,8 +35,6 @@
     },
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthPermissionProd": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -62,8 +56,6 @@
     },
     "MyApiWithAwsIamAuthProdStage": {
       "Type": "AWS::ApiGateway::Stage",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiWithAwsIamAuthDeploymentf9a4964a7d"
@@ -76,8 +68,6 @@
     },
     "MyApiWithAwsIamAuthAndDefaultInvokeRoleProdStage": {
       "Type": "AWS::ApiGateway::Stage",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentce2dead7de"
@@ -90,8 +80,6 @@
     },
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthAndDefaultInvokeRolePermissionProd": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -113,8 +101,6 @@
     },
     "MyApiWithAwsIamAuthAndDefaultInvokeRoleDeploymentce2dead7de": {
       "Type": "AWS::ApiGateway::Deployment",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuthAndDefaultInvokeRole"
@@ -125,8 +111,6 @@
     },
     "MyApiWithAwsIamAuthAndCustomInvokeRoleDeploymentb31aa75bb2": {
       "Type": "AWS::ApiGateway::Deployment",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RestApiId": {
           "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRole"
@@ -137,8 +121,6 @@
     },
     "MyApiWithAwsIamAuthAndCustomInvokeRole": {
       "Type": "AWS::ApiGateway::RestApi",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -189,8 +171,6 @@
     },
     "MyApiWithAwsIamAuthAndCustomInvokeRoleProdStage": {
       "Type": "AWS::ApiGateway::Stage",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiWithAwsIamAuthAndCustomInvokeRoleDeploymentb31aa75bb2"
@@ -203,8 +183,6 @@
     },
     "MyApiWithAwsIamAuthAndDefaultInvokeRole": {
       "Type": "AWS::ApiGateway::RestApi",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -255,8 +233,6 @@
     },
     "MyApiWithAwsIamAuth": {
       "Type": "AWS::ApiGateway::RestApi",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Body": {
           "info": {
@@ -307,8 +283,6 @@
     },
     "MyFunctionWithAwsIamAuthMyApiWithAwsIamAuthAndCustomInvokeRolePermissionProd": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
@@ -330,8 +304,6 @@
     },
     "MyFunctionWithAwsIamAuthRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

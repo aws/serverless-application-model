@@ -2,8 +2,6 @@
   "Resources": {
     "UserPool": {
       "Type": "AWS::Cognito::UserPool",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "LambdaConfig": {
           "PreSignUp": {
@@ -29,8 +27,6 @@
     },
     "ImplicitApiFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.gethtml", 
         "Code": {
@@ -54,8 +50,6 @@
     },
     "ImplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -86,8 +80,6 @@
     },    
     "ImplicitApiFunctionCognitoPermission": {
       "Type": "AWS::Lambda::Permission",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {

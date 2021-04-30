@@ -333,13 +333,22 @@ class TestTranslatorEndToEnd(TestCase):
         partition = partition_with_region[0]
         region = partition_with_region[1]
 
+        manifest = self._read_input(testcase)
+        expected = self._read_expected_output(testcase, partition)
+
+        self._compare_transform(manifest, expected, partition, region)
+
+    def _read_input(self, testcase):
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
-        manifest = json.loads(json.dumps(manifest))
+        return json.loads(json.dumps(manifest))
+
+    def _read_expected_output(self, testcase, partition):
         partition_folder = partition if partition != "aws" else ""
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
-        expected = json.load(open(expected_filepath, "r"))
+        return json.load(open(expected_filepath, "r"))
 
+    def _compare_transform(self, manifest, expected, partition, region):
         with patch("boto3.session.Session.region_name", region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()

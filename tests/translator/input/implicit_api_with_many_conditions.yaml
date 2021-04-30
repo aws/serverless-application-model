@@ -50,8 +50,6 @@ Conditions:
 Resources:
   hello:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: MyCondition
     Properties:
       Handler: index.handler
@@ -68,8 +66,6 @@ Resources:
             Method: get
   helloworld:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond
     Properties:
       Handler: index.handler
@@ -86,8 +82,6 @@ Resources:
             Method: post 
   helloworld1:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond1
     Properties:
       Handler: index.handler
@@ -104,8 +98,6 @@ Resources:
             Method: post 
   helloworld2:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond2
     Properties:
       Handler: index.handler
@@ -122,8 +114,6 @@ Resources:
             Method: post 
   helloworld3:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond3
     Properties:
       Handler: index.handler
@@ -140,8 +130,6 @@ Resources:
             Method: post 
   helloworld4:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond4
     Properties:
       Handler: index.handler
@@ -158,8 +146,6 @@ Resources:
             Method: post 
   helloworld5:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond5
     Properties:
       Handler: index.handler
@@ -176,8 +162,6 @@ Resources:
             Method: post 
   helloworld6:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond6
     Properties:
       Handler: index.handler
@@ -194,8 +178,6 @@ Resources:
             Method: post 
   helloworld7:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond7
     Properties:
       Handler: index.handler
@@ -212,8 +194,6 @@ Resources:
             Method: post 
   helloworld8:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond8
     Properties:
       Handler: index.handler
@@ -230,8 +210,6 @@ Resources:
             Method: post 
   helloworld9:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: Cond9
     Properties:
       Handler: index.handler

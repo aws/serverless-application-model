@@ -16,8 +16,6 @@
   "Resources": {
     "MinimalTableRefParamLongForm": {
       "Type": "AWS::DynamoDB::Table",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ProvisionedThroughput": {
           "WriteCapacityUnits": {

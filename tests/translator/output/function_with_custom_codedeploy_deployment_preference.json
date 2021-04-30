@@ -34,8 +34,6 @@
   "Resources": {
     "NormalWithRefAliaslive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -60,9 +58,8 @@
       }
     }, 
     "CustomWithFindInMapVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "CustomWithFindInMap"
@@ -111,8 +108,6 @@
     }, 
     "CustomWithFindInMapAliaslive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -138,8 +133,6 @@
     }, 
     "MinimalFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -163,8 +156,6 @@
     }, 
     "CustomWithSubAliaslive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -190,8 +181,6 @@
     }, 
     "NormalWithSub": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -214,9 +203,8 @@
       }
     }, 
     "CustomWithConditionVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "CustomWithCondition"
@@ -253,9 +241,8 @@
       }
     }, 
     "CustomWithCondition2Version640128d35d": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "CustomWithCondition2"
@@ -264,8 +251,6 @@
     }, 
     "CustomWithCondition": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -289,8 +274,6 @@
     }, 
     "CustomWithSub": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -319,9 +302,8 @@
       }
     }, 
     "NormalWithRefVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "NormalWithRef"
@@ -422,8 +404,6 @@
     }, 
     "NormalWithSubAliaslive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -448,9 +428,8 @@
       }
     }, 
     "CustomWithSubVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "CustomWithSub"
@@ -459,8 +438,6 @@
     }, 
     "CustomWithSubRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -491,8 +468,6 @@
     }, 
     "CustomWithConditionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -563,8 +538,6 @@
     }, 
     "MinimalFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -595,8 +568,6 @@
     }, 
     "CustomWithFindInMap": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -619,9 +590,8 @@
       }
     }, 
     "NormalWithSubVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "NormalWithSub"
@@ -630,8 +600,6 @@
     }, 
     "CustomWithConditionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -657,8 +625,6 @@
     }, 
     "CustomWithFindInMapRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -689,8 +655,6 @@
     }, 
     "NormalWithRef": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -714,8 +678,6 @@
     }, 
     "CustomWithCondition2": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "hello.handler", 
         "Code": {
@@ -766,8 +728,6 @@
     }, 
     "NormalWithRefRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -798,8 +758,6 @@
     }, 
     "CustomWithCondition2Aliaslive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -825,8 +783,6 @@
     }, 
     "NormalWithSubRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -856,9 +812,8 @@
       }
     }, 
     "MinimalFunctionVersion640128d35d": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
@@ -894,8 +849,6 @@
     }, 
     "MinimalFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -921,8 +874,6 @@
     }, 
     "CustomWithCondition2Role": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

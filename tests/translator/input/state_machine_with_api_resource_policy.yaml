@@ -1,15 +1,11 @@
 Resources:
   ExplicitApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
 
   MyStateMachine:
     Type: AWS::Serverless::StateMachine
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Name: MyStateMachine
       Definition:

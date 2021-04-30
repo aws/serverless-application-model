@@ -12,8 +12,6 @@
   "Resources": {
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -51,8 +49,6 @@
     },
     "MinimalImageFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ImageUri": "123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest"
@@ -74,8 +70,6 @@
     },
     "MinimalImageFunctionRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -106,8 +100,6 @@
     },
     "MinimalImageFunctionPackageTypeAndImageConfig": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ImageUri": "123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest"
@@ -134,8 +126,6 @@
     },
     "MinimalImageFunctionPackageTypeAndImageConfigRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -166,8 +156,6 @@
     },
     "CompleteImageFunction": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ImageUri": "123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest"
@@ -213,8 +201,6 @@
     },
     "FunctionWithPolicies": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ImageUri": "123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest"
@@ -236,8 +222,6 @@
     },
     "FunctionWithPoliciesRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -269,8 +253,6 @@
     },
     "FunctionWithPolicyDocument": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ImageUri": "123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest"
@@ -292,8 +274,6 @@
     },
     "FunctionWithPolicyDocumentRole": {
       "Type": "AWS::IAM::Role",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
@@ -340,8 +320,6 @@
     },
     "FunctionWithRoleRef": {
       "Type": "AWS::Lambda::Function",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Code": {
           "ImageUri": "123456789.dkr.ecr.region.amazonaws.suffix/myimage:latest"

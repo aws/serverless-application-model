@@ -8,8 +8,6 @@
   "Resources": {
     "MinimalTableWithTableName": {
       "Type": "AWS::DynamoDB::Table",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "TableName": "MySimpleTable",
         "BillingMode": "PAY_PER_REQUEST",
@@ -29,8 +27,6 @@
     },
     "MinimalTableWithRefTableName": {
       "Type": "AWS::DynamoDB::Table",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "TableName": {
           "Ref": "MySimpleTableParameter"
@@ -52,8 +48,6 @@
     },
     "MinimalTableWithSubTableName": {
       "Type": "AWS::DynamoDB::Table",
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "TableName": {
           "Fn::Sub": "${AWS::StackName}MySimpleTable"

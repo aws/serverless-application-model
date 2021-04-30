@@ -1,8 +1,6 @@
 Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       InlineCode: |
         "def lambda_handler():

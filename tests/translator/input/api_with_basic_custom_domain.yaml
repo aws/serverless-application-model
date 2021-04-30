@@ -16,8 +16,6 @@ Globals:
 Resources:
   MyFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       InlineCode: |
         exports.handler = async (event) => {
@@ -56,8 +54,6 @@ Resources:
 
   MyApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       OpenApiVersion: 3.0.1
       StageName: Prod
@@ -74,8 +70,6 @@ Resources:
 
   MyAnotherApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       OpenApiVersion: 3.0.1
       StageName: Prod

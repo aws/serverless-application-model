@@ -1,8 +1,6 @@
 Resources:
   ThumbnailFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
       Handler: index.generate_thumbails
@@ -17,8 +15,6 @@ Resources:
 
   ServerlessRestApi:
     Type: AWS::ApiGateway::RestApi
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Body:
         info:
@@ -62,13 +58,9 @@ Resources:
 
   Images:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
 
   RestApiFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -76,8 +68,6 @@ Resources:
 
   GetHtmlFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler

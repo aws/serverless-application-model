@@ -10,8 +10,6 @@
     "Resources": {
         "StateMachineMyApiEventRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -50,8 +48,6 @@
         }, 
         "StateMachine": {
             "Type": "AWS::StepFunctions::StateMachine", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
                 "StateMachineName": "MyStateMachine", 
@@ -71,8 +67,6 @@
         }, 
         "StateMachineScheduleEventRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {
@@ -111,8 +105,6 @@
         }, 
         "ServerlessRestApiProdStage": {
             "Type": "AWS::ApiGateway::Stage", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "DeploymentId": {
                     "Ref": "ServerlessRestApiDeploymentaeae651245"
@@ -126,8 +118,6 @@
         }, 
         "StateMachineScheduleEvent": {
             "Type": "AWS::Events::Rule", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "ScheduleExpression": "rate(1 minute)", 
                 "Targets": [
@@ -150,8 +140,6 @@
         }, 
         "StateMachineCWEvent": {
             "Type": "AWS::Events::Rule", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "EventPattern": {
                     "detail": {
@@ -179,8 +167,6 @@
         }, 
         "ServerlessRestApi": {
             "Type": "AWS::ApiGateway::RestApi", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Body": {
                     "info": {
@@ -268,8 +254,6 @@
         }, 
         "ServerlessRestApiDeploymentaeae651245": {
             "Type": "AWS::ApiGateway::Deployment", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "RestApiId": {
                     "Ref": "ServerlessRestApi"
@@ -281,8 +265,6 @@
         }, 
         "StateMachineCWEventRole": {
             "Type": "AWS::IAM::Role", 
-            "UpdateReplacePolicy": "Retain",
-            "DeletionPolicy": "Delete",
             "Properties": {
                 "Policies": [
                     {

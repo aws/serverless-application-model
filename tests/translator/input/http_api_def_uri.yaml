@@ -6,8 +6,6 @@ Globals:
 Resources:
   MyApi:
     Type: AWS::Serverless::HttpApi
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       DefinitionUri: s3://bucket/key
       StageName: !Join ["", ["Stage", "Name"]]
@@ -16,8 +14,6 @@ Resources:
 
   MyApi2:
     Type: AWS::Serverless::HttpApi
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       DefinitionUri:
         Bucket: bucket
@@ -26,8 +22,6 @@ Resources:
 
   Function:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Runtime: python3.7
       Handler: index.handler

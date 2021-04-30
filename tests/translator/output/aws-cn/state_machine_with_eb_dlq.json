@@ -2,8 +2,6 @@
   "Resources": {
     "StateMachineCWEvent": {
       "Type": "AWS::Events::Rule", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "EventPattern": {
           "detail": {
@@ -33,8 +31,6 @@
     }, 
     "StateMachine": {
       "Type": "AWS::StepFunctions::StateMachine", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
         "DefinitionS3Location": {
@@ -51,8 +47,6 @@
     }, 
     "StateMachineCWEventRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Policies": [
           {

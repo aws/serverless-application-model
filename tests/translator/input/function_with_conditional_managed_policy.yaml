@@ -5,8 +5,6 @@ Conditions:
 Resources:
   FunctionWithConditionalPolicy:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       Description: A function that has Fn::If in the policies property
       Handler: hello.handler

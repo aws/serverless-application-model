@@ -33,8 +33,6 @@
     }, 
     "HelloWorldFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -141,9 +139,8 @@
       }
     }, 
     "HelloWorldFunctionVersionfb53d5c2e6": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::Version", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "FunctionName": {
           "Ref": "HelloWorldFunction"
@@ -152,8 +149,6 @@
     }, 
     "HelloWorldFunctionAliaslive": {
       "Type": "AWS::Lambda::Alias", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "UpdatePolicy": {
         "CodeDeployLambdaAliasUpdate": {
           "ApplicationName": {
@@ -179,8 +174,6 @@
     }, 
     "HelloWorldFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Handler": "index.handler", 
         "Code": {

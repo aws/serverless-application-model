@@ -6,8 +6,6 @@ Conditions:
 Resources:
   StateMachine:
     Type: AWS::Serverless::StateMachine
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: "TestCondition"
     Properties:
       Name: MyStateMachine

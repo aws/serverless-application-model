@@ -38,8 +38,6 @@
   "Resources": {
     "MyFunction": {
       "Type": "AWS::Lambda::Function", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Layers": [
           {
@@ -67,9 +65,8 @@
       }
     }, 
     "MyLayerd04062b365": {
+      "DeletionPolicy": "Delete", 
       "Type": "AWS::Lambda::LayerVersion", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "bucket", 
@@ -79,9 +76,8 @@
       }
     }, 
     "MyLayerWithANamefda8c9ec8c": {
+      "DeletionPolicy": "Retain", 
       "Type": "AWS::Lambda::LayerVersion", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "Content": {
           "S3Bucket": "bucket", 
@@ -92,8 +88,6 @@
     }, 
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role", 
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

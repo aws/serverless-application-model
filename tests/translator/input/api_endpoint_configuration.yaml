@@ -22,8 +22,6 @@ Resources:
           Properties:
             Path: /
             Method: get
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
 
   ExplicitApi:
     Type: AWS::Serverless::Api
@@ -31,5 +29,3 @@ Resources:
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
       EndpointConfiguration: SomeValue
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain

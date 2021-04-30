@@ -3,8 +3,6 @@
 Resources:
   MyFunction:
     Type: 'AWS::Serverless::Function'
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     DependsOn: ["MyExplicitApi", "MySamTable"]
     Properties:
       CodeUri: s3://sam-demo-bucket/code.zip
@@ -20,8 +18,6 @@ Resources:
 
   MyExplicitApi:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     DependsOn: "MySamTable"
     Properties:
       DefinitionUri: s3://sam-translator-tests-dont-delete/swagger-http.json
@@ -30,15 +26,11 @@ Resources:
 
   MySamTable:
     Type: AWS::Serverless::SimpleTable
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
 
 
   MyOtherTable:
     # Test DependsOn property a non-SAM resource
     Type: AWS::DynamoDB::Table
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     DependsOn: "MySamTable"
     Properties:
 

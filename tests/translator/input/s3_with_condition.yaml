@@ -6,8 +6,6 @@ Conditions:
 Resources:
   ThumbnailFunction:
     Type: AWS::Serverless::Function
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Condition: MyCondition
     Properties:
       CodeUri: s3://sam-demo-bucket/thumbnails.zip
@@ -23,5 +21,3 @@ Resources:
 
   Images:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain

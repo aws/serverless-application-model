@@ -12,8 +12,6 @@ Globals:
 Resources:
   ExplicitApiManagedSwagger:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       BinaryMediaTypes:
@@ -21,8 +19,6 @@ Resources:
 
   ExplicitApiDefinitionBody:
     Type: AWS::Serverless::Api
-    DeletionPolicy: Delete
-    UpdateReplacePolicy: Retain
     Properties:
       StageName: Prod
       BinaryMediaTypes:
