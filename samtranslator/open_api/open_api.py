@@ -163,9 +163,9 @@ class OpenApiEditor(object):
 
         path_dict = self.get_path(path)
         return (
-            self.has_path(path, method)
-            and isinstance(path_dict[method], dict)
-            and self.method_has_integration(path_dict[method])
+                self.has_path(path, method)
+                and isinstance(path_dict[method], dict)
+                and self.method_has_integration(path_dict[method])
         )  # Integration present and non-empty
 
     def add_path(self, path, method=None):
@@ -196,7 +196,7 @@ class OpenApiEditor(object):
         path_dict.setdefault(method, {})
 
     def add_lambda_integration(
-        self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
+            self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
     ):
         """
         Adds aws_proxy APIGW integration to the given path+method.
@@ -450,32 +450,30 @@ class OpenApiEditor(object):
                 self.tags.append(tag)
 
     def add_endpoint_config(self, method, disable_execute_api_endpoint):
-        integration = method.get(self._X_APIGW_INTEGRATION, {})
-        uri = integration.get("uri")
+        url_data = method.get(self._X_APIGW_CORS, {})
+        uri = url_data.get("uri")
 
-        if "amazonaws.com" not in uri:
+        if "amazon" or "aws" not in uri:
             disable_execute_api_endpoint = True
         else:
             disable_execute_api_endpoint = False
 
-        DISABLE_EXECUTE_API_ENDPOINT = disable_execute_api_endpoint
-
         servers_configurations = self._doc.get(self._SERVERS, [{}])
         for config in servers_configurations:
             endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, dict())
-            endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
+            endpoint_configuration["disableExecuteApiEndpoint"] = disable_execute_api_endpoint
             config[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
 
         self._doc[self._SERVERS] = servers_configurations
 
     def add_cors(
-        self,
-        allow_origins,
-        allow_headers=None,
-        allow_methods=None,
-        expose_headers=None,
-        max_age=None,
-        allow_credentials=None,
+            self,
+            allow_origins,
+            allow_headers=None,
+            allow_methods=None,
+            expose_headers=None,
+            max_age=None,
+            allow_credentials=None,
     ):
         """
         Add CORS configuration to this Api to _X_APIGW_CORS header in open api definition
@@ -602,8 +600,8 @@ class OpenApiEditor(object):
         """
         if authorizers is not None:
             if (
-                authorizers[default_authorizer]
-                and authorizers[default_authorizer].get("AuthorizationScopes") is not None
+                    authorizers[default_authorizer]
+                    and authorizers[default_authorizer].get("AuthorizationScopes") is not None
             ):
                 return authorizers[default_authorizer].get("AuthorizationScopes")
         return []
