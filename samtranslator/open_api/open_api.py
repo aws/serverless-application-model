@@ -450,14 +450,16 @@ class OpenApiEditor(object):
 
     def add_endpoint_config(self, disable_execute_api_endpoint):
         if self._DOMAIN_NAME:
-            disable_execute_api_endpoint = {"disableExecuteApiEndpoint": true}
-            else:
-                disable_execute_api_endpoint = {"disableExecuteApiEndpoint": false}
+            disable_execute_api_endpoint = {"disableExecuteApiEndpoint": True}
+        else:
+            disable_execute_api_endpoint = {"disableExecuteApiEndpoint": False}
+
+        DISABLE_EXECUTE_API_ENDPOINT = disable_execute_api_endpoint.values()
 
         servers_configurations = self._doc.get(self._SERVERS, [{}])
         for config in servers_configurations:
             endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, dict())
-            endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint.get("disableExecuteApiEndpoint")
+            endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint.values()
             config[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
 
         self._doc[self._SERVERS] = servers_configurations
