@@ -1,0 +1,29 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # CacheClusterEnabled empty
+  ApiCacheClusterEnabledEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CacheClusterEnabled:
+
+  # CacheClusterEnabled not boolean
+  ApiCacheClusterEnabledNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CacheClusterEnabled: "true"
+
+  # CacheClusterSize empty
+  ApiCacheClusterSizeEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CacheClusterSize:
+
+  # CacheClusterSize not string
+  ApiCacheClusterSizeNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CacheClusterSize: 3

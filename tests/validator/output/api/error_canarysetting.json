@@ -1,0 +1,16 @@
+[
+  "[Resources/ApiCanarySettingEmpty/Properties/CanarySetting] Must not be empty",
+  "[Resources/ApiCanarySettingNotObject/Properties/CanarySetting] 3 is not of type 'object'",
+  "[Resources/ApiDeploymentIdEmpty/Properties/CanarySetting/DeploymentId] Must not be empty",
+  "[Resources/ApiDeploymentIdNotString/Properties/CanarySetting/DeploymentId] 3 is not of type 'string'",
+  "[Resources/ApiPercentTrafficEmpty/Properties/CanarySetting/PercentTraffic] Must not be empty",
+  "[Resources/ApiPercentTrafficNotNumber/Properties/CanarySetting/PercentTraffic] '3.5' is not of type 'number'",
+  "[Resources/ApiPercentTrafficTooHigh/Properties/CanarySetting/PercentTraffic] 101 is greater than the maximum of 100",
+  "[Resources/ApiPercentTrafficTooLow/Properties/CanarySetting/PercentTraffic] -1 is less than the minimum of 0",
+  "[Resources/ApiStageVariableOverridesEmpty/Properties/CanarySetting/StageVariableOverrides] Must not be empty",
+  "[Resources/ApiStageVariableOverridesItemEmpty/Properties/CanarySetting/StageVariableOverrides/MyOverride] Must not be empty",
+  "[Resources/ApiStageVariableOverridesItemNotString/Properties/CanarySetting/StageVariableOverrides/MyOverride] 3 is not of type 'string'",
+  "[Resources/ApiStageVariableOverridesNotObject/Properties/CanarySetting/StageVariableOverrides] 'My override' is not of type 'object'",
+  "[Resources/ApiUseStageCacheEmpty/Properties/CanarySetting/UseStageCache] Must not be empty",
+  "[Resources/ApiUseStageCacheNotBoolean/Properties/CanarySetting/UseStageCache] 'true' is not of type 'boolean'"
+]

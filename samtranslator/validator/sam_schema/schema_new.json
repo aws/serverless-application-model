@@ -74,9 +74,12 @@
       "additionalProperties": false,
       "patternProperties": {
         "^[a-zA-Z0-9]+$": {
-          "anyOf": [
+          "allOf": [
             {
               "$ref": "file:definitions/api.json#/definitions/AWS::Serverless::Api"
+            },
+            {
+              "$ref": "file:definitions/function.json#/definitions/AWS::Serverless::Function"
             }
           ]
         }

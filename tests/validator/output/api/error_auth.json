@@ -1,0 +1,10 @@
+[
+  "[Resources/ApiAuthEmpty/Properties/Auth] Must not be empty",
+  "[Resources/ApiAddDefaultAuthorizerToCorsPreflightEmpty/Properties/Auth/AddDefaultAuthorizerToCorsPreflight] Must not be empty",
+  "[Resources/ApiAddDefaultAuthorizerToCorsPreflightNotBoolean/Properties/Auth/AddDefaultAuthorizerToCorsPreflight] 'true' is not of type 'boolean'",
+  "[Resources/ApiApiKeyRequiredEmpty/Properties/Auth/ApiKeyRequired] Must not be empty",
+  "[Resources/ApiApiKeyRequiredNotBoolean/Properties/Auth/ApiKeyRequired] 'true' is not of type 'boolean'",
+  "[Resources/ApiAuthorizersEmpty/Properties/Auth/Authorizers] Must not be empty",
+  "[Resources/ApiAuthorizersItemEmpty/Properties/Auth/Authorizers/EmptyAuth] Must not be empty",
+  "[Resources/ApiAuthorizersNotObject/Properties/Auth/Authorizers] 3 is not of type 'object'"
+]

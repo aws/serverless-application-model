@@ -6,7 +6,7 @@
       "additionalProperties": false,
       "properties": {
         "DestinationArn": {
-          "type": "string"
+          "$ref": "file:intrinsics.json#definitions/StringOrIntrinsicRef"
         },
         "Format": {
           "type": "string"

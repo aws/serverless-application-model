@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "IntrinsicRef": {
+      "additionalProperties": false,
+      "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html",
+      "properties": {
+        "Ref": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "IntrinsicSub": {
+      "additionalProperties": false,
+      "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html",
+      "properties": {
+        "Sub": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object"
+                }
+              ],
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "StringOrIntrinsicRef": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#definitions/IntrinsicRef"
+        }
+      ]
+    }
+  },
+  "type": "object"
+}

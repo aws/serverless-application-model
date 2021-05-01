@@ -115,7 +115,7 @@ def test_validate_template_success(testcase):
     ]
     if testcase in excluded:
         return
-    manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
+    manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml")))
     validation_errors = SamTemplateValidator.validate(manifest)
     has_errors = len(validation_errors)
     if has_errors:
@@ -178,7 +178,7 @@ class TestValidatorBase(TestCase):
         str
             Template content
         """
-        with open(template + ".yaml", "r") as t:
+        with open(template + ".yaml") as t:
             return yaml_parse(t)
 
     def _get_output_content(self, output):
@@ -195,5 +195,5 @@ class TestValidatorBase(TestCase):
         str
             Output file content
         """
-        with open(output + ".json", "r") as t:
+        with open(output + ".json") as t:
             return yaml_parse(t)

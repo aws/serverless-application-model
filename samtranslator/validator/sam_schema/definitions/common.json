@@ -97,26 +97,6 @@
       ],
       "type": "object"
     },
-    "IntrinsicRef": {
-      "additionalProperties": false,
-      "properties": {
-        "Ref": {
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "StringOrIntrinsicRef": {
-      "additionalProperties": false,
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "$ref": "#definitions/IntrinsicRef"
-        }
-      ]
-    },
     "Tag": {
       "additionalProperties": false,
       "properties": {

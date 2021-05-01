@@ -1,0 +1,66 @@
+# Auth tests
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Auth is empty
+  ApiAuthEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+
+  # AddDefaultAuthorizerToCorsPreflight is empty
+  ApiAddDefaultAuthorizerToCorsPreflightEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight:
+
+  # AddDefaultAuthorizerToCorsPreflight is not a boolean
+  ApiAddDefaultAuthorizerToCorsPreflightNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: "true"
+
+  # ApiKeyRequired is empty
+  ApiApiKeyRequiredEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ApiKeyRequired:
+
+  # ApiKeyRequired is not a boolean
+  ApiApiKeyRequiredNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        ApiKeyRequired: "true"
+
+  # Authorizers is empty
+  ApiAuthorizersEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+
+  # Authorizers item is empty
+  ApiAuthorizersItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          EmptyAuth:
+
+  # Authorizers is not an object
+  ApiAuthorizersNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers: 3

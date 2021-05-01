@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import json
 import re
 
@@ -6,20 +7,16 @@ from jsonschema.exceptions import ValidationError
 
 from . import sam_schema
 
-ERRORS_MAPPING = {
-    "None is not of type 'object'": "Must not be empty",
-    "None is not of type 'string'": "Must not be empty",
-    "None is not of type 'boolean'": "Must not be empty",
-    "None is not of type 'integer'": "Must not be empty",
-    "None is not of type 'array'": "Must not be empty",
-    "None is not of type 'number'": "Must not be empty",
-}
-
 
 class SamTemplateValidator(object):
     """
     SAM template validator
     """
+
+    # Useful to find a unicode prefixed string type to replace it with the non unicode version
+    # Example: "u'integer'" -> "'integer'"
+    # The validator returns types in error messages prefixed with 'u' on Python2
+    UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
     def __init__(self, schema_path=None):
         """
@@ -30,8 +27,6 @@ class SamTemplateValidator(object):
         schema_path : str, optional
             Path to a schema to use for validation, by default None, the default schema.json will be used
         """
-        super().__init__()
-
         if not schema_path:
             schema_content = self._read_default_schema()
         else:
@@ -60,33 +55,56 @@ class SamTemplateValidator(object):
             List of validation errors if any, empty otherwise
         """
 
+        # Tree of Error objects
+        # Each object can have a list of child errors in its Context attribute
         validation_errors = self.validator.iter_errors(template_dict)
 
-        # List of
-        # [/Path/To/Element] Error message. Context: additional context (if any)
-        formatted_errors = []
+        # Dicts of "[/Path/To/Element] Error message" -> None
+        # Dicts instead of Lists, for speed
+        formatted_errors = OrderedDict()
+        sibling_errors = OrderedDict()
 
         for e in validation_errors:
-            self._process_error(e, formatted_errors)
+            self._process_error(e, formatted_errors, sibling_errors)
 
-        return formatted_errors
+        return list(formatted_errors.keys())
 
-    def _process_error(self, error, formatted_errors, parent_path=""):
+    def _process_error(self, error, formatted_errors, sibling_errors):
+        """
+        Processes the validation errors recursively
+        Each error can have a list of child errors in its 'context' attribute (Tree or errors)
+
+        Parameters
+        ----------
+        error : Error
+            Error at the head
+        formatted_errors : OrderedDict
+            Final list of formatted errors
+        sibling_errors : OrderedDict
+            List of the current level errors, used to eliminate duplicates on a level
+        """
         if error is None:
             return
 
-        # [/Path/To/Element] Error message
-        error_content = "[{}/{}] {}".format(
-            parent_path, "/".join([str(p) for p in error.path]), self._cleanup_error_message(error.message)
-        )
+        if not error.context:
+            # We only display the leaves
+            # Format the message:
+            # [/Path/To/Element] Error message
+            error_content = "[{}] {}".format(
+                "/".join([str(p) for p in error.absolute_path]), self._cleanup_error_message(error.message)
+            )
 
-        if error_content and error_content not in formatted_errors:
-            # Remove duplicates
-            formatted_errors.append(error_content)
+            if error_content not in sibling_errors:
+                # Not already present in the current level errors
+                # We set the value to None as we don't use it
+                formatted_errors[error_content] = None
+            return
+
+        child_errors = OrderedDict()
 
         for context_error in error.context:
             # Each context item is also a validation error
-            self._process_error(context_error, formatted_errors, "/__" + parent_path)
+            self._process_error(context_error, formatted_errors, child_errors)
 
     def _cleanup_error_message(self, message):
         """
@@ -103,12 +121,12 @@ class SamTemplateValidator(object):
         str
             Cleaned message
         """
-        final_message = message
+        final_message = re.sub(self.UNICODE_TYPE_REGEX, r"\1", message)
 
         if final_message.endswith(" under any of the given schemas"):
-            final_message = "Is not valid"
-
-        final_message = ERRORS_MAPPING.get(final_message, final_message)
+            return "Is not valid"
+        if final_message.startswith("None is not of type "):
+            return "Must not be empty"
 
         return final_message
 
@@ -137,5 +155,5 @@ class SamTemplateValidator(object):
         dict
             Dictionary representing the JSON content
         """
-        with open(filepath, "r") as fp:
+        with open(filepath) as fp:
             return json.load(fp)

@@ -1,0 +1,35 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Variables is empty
+  ApiVariablesEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Variables:
+  # Variables not object
+  ApiVariablesNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Variables: 3
+  # Variable name is not alphanumeric
+  ApiVariableNameNotAlphanumeric:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Variables:
+        My_Variable: "value"
+  # Variable contains an invalid character
+  ApiVariableInvalidCharacter:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Variables:
+        MyVariable: "é"
+  # Variable is not a string
+  ApiVariableNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Variables:
+        MyVariable: 3

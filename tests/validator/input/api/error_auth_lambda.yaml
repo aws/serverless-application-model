@@ -1,0 +1,46 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          # AuthorizationScopes
+          LambdaAuthorizationScopesEmpty:
+            AuthorizationScopes:
+            FunctionArn: Function.arn
+          LambdaAuthorizationScopesItemNotString:
+            AuthorizationScopes:
+              - 3
+            FunctionArn: Function.arn
+          LambdaAuthorizationScopesNotList:
+            AuthorizationScopes: scopes1
+            FunctionArn: Function.arn
+
+          # FunctionArn
+          LambdaFunctionArnEmpty:
+            FunctionArn:
+          LambdaFunctionArnMissing:
+            FunctionInvokeRole: Function invoke role
+          LambdaFunctionArnNotString:
+            FunctionArn: 3
+
+          # FunctionInvokeRole
+          LambdaFunctionInvokeRoleEmpty:
+            FunctionArn: Function.arn
+            FunctionInvokeRole:
+          LambdaFunctionInvokeRoleNotString:
+            FunctionArn: Function.arn
+            FunctionInvokeRole: 3
+
+          # FunctionPayloadType
+          LambdaFunctionPayloadTypeEmpty:
+            FunctionArn: Function.arn
+            FunctionPayloadType:
+          LambdaFunctionPayloadTypeNotString:
+            FunctionArn: Function.arn
+            FunctionPayloadType: 3
+          LambdaFunctionPayloadTypeUnknown:
+            FunctionArn: Function.arn
+            FunctionPayloadType: MyPayloadType

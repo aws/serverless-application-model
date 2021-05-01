@@ -1,0 +1,14 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # TracingEnabled is empty
+  ApiTracingEnabledEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      TracingEnabled:
+  # TracingEnabled not boolean
+  ApiTracingEnabledNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      TracingEnabled: 3

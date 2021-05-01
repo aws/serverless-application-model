@@ -14,106 +14,39 @@ OUTPUT_FOLDER = os.path.join(BASE_PATH, "output", "api")
 class TestValidatorApi(TestValidatorBase):
     @parameterized.expand(
         [
-            "error_properties_empty",
-            "error_properties_missing",
-            "error_accesslogsetting_destinationarn_not_string",
-            "error_accesslogsetting_empty",
-            "error_accesslogsetting_format_not_string",
-            "error_accesslogsetting_unknown_property",
-            "error_auth_adddefaultauthorizertocorspreflight_empty",
-            "error_auth_adddefaultauthorizertocorspreflight_not_boolean",
-            "error_auth_apikeyrequired_empty",
-            "error_auth_apikeyrequired_not_boolean",
-            "error_auth_authorizers_empty",
-            "error_auth_authorizers_item_empty",
-            "error_auth_authorizers_not_object",
-            "error_auth_cognito_authorizationscopes_empty",
-            "error_auth_cognito_authorizationscopes_item_not_string",
-            "error_auth_cognito_authorizationscopes_not_list",
-            "error_auth_cognito_identity_empty",
-            "error_auth_cognito_identity_header_empty",
-            "error_auth_cognito_identity_header_not_string",
-            "error_auth_cognito_identity_reauthaurizeevery_empty",
-            "error_auth_cognito_identity_reauthaurizeevery_not_int",
-            "error_auth_cognito_identity_reauthaurizeevery_too_high",
-            "error_auth_cognito_identity_reauthaurizeevery_too_low",
-            "error_auth_cognito_identity_validationexpression_empty",
-            "error_auth_cognito_identity_validationexpression_not_string",
-            "error_auth_cognito_userpoolarn_empty",
-            "error_auth_cognito_userpoolarn_missing",
-            "error_auth_cognito_userpoolarn_not_string",
-            "error_auth_empty",
-            "error_auth_lambda_authorizationscopes_empty",
-            "error_auth_lambda_authorizationscopes_item_not_string",
-            "error_auth_lambda_authorizationscopes_not_list",
-            "error_auth_lambda_functionarn_empty",
-            "error_auth_lambda_functionarn_missing",
-            "error_auth_lambda_functionarn_not_string",
-            "error_auth_lambda_functioninvokerole_empty",
-            "error_auth_lambda_functioninvokerole_not_string",
-            "error_auth_lambda_functionpayloadtype_not_string",
-            "error_auth_lambda_functionpayloadtype_unknown_value",
+            "error_properties",
+            "error_accesslogsetting",
+            "error_auth",
+            "error_auth_cognito",
+            "error_auth_lambda",
             # Auth LambdaRequest Identity
             # Auth LambdaToken Identity
-            "error_binarymediatypes_empty",
-            "error_binarymediatypes_item_not_string",
-            "error_binarymediatypes_not_list",
-            "error_cacheclusterenabled_empty",
-            "error_cacheclusterenabled_not_boolean",
-            "error_cacheclustersize_empty",
-            "error_cacheclustersize_not_string",
-            "error_canarysetting_deploymentid_empty",
-            "error_canarysetting_deploymentid_not_string",
-            "error_canarysetting_empty",
-            "error_canarysetting_not_object",
-            "error_canarysetting_percenttraffic_empty",
-            "error_canarysetting_percenttraffic_not_number",
-            "error_canarysetting_percenttraffic_too_high",
-            "error_canarysetting_percenttraffic_too_low",
-            "error_canarysetting_stagevariableoverrides_empty",
-            "error_canarysetting_stagevariableoverrides_item_empty",
-            "error_canarysetting_stagevariableoverrides_item_not_string",
-            "error_canarysetting_stagevariableoverrides_not_object",
-            "error_canarysetting_usestagecache_empty",
-            "error_canarysetting_usestagecache_not_boolean",
-            # Cors
-            "error_cors_allowcredentials_empty",
-            "error_cors_allowcredentials_not_boolean",
-            "error_cors_allowheaders_empty",
-            "error_cors_allowheaders_not_string",
-            "error_cors_allowmethods_empty",
-            "error_cors_allowmethods_not_string",
-            "error_cors_alloworigin_missing",
-            "error_cors_empty",
-            "error_cors_maxage_empty",
-            "error_cors_maxage_not_string",
-            "error_cors_not_string_or_object",
+            "error_binarymediatypes",
+            "error_cachecluster",
+            "error_canarysetting",
+            "error_cors",
             # DefinitionBody
             # DefinitionUri
-            "error_description_empty",
-            "error_description_not_string",
+            "error_description",
             # Domain
             # EndpointConfiguration
             # GatewayResponses
             # MethodSettings
             # MinimumCompressionSize
             # Models
-            "error_name_empty",
-            "error_name_not_string",
+            "error_name",
             # OpenApiVersion
-            "error_stagename_empty",
-            "error_stagename_missing",
-            "error_stagename_not_string",
+            "error_stagename",
             # Tags
-            "error_tracingenabled_not_boolean",
-            "error_variables_empty",
-            "error_variables_not_object",
-            "error_variables_variable_name_not_alphanumeric",
-            "error_variables_variable_value_invalid_character",
-            "error_variables_variable_value_not_string",
+            "error_tracingenabled",
+            "error_variables",
         ],
     )
     def test_validator_api_errors(self, template):
+        self._test_validator_error(os.path.join(INPUT_FOLDER, template), os.path.join(OUTPUT_FOLDER, template))
+
+    @parameterized.expand(["error_variables"])
+    def test_validator_api_errors_debug(self, template):
         self._test_validator_error(os.path.join(INPUT_FOLDER, template), os.path.join(OUTPUT_FOLDER, template))
 
     @parameterized.expand(

@@ -1,0 +1,72 @@
+# Auth Cognito authorizer tests
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          # AuthorizationScopes
+          CognitoAuthorizationScopesEmpty:
+            AuthorizationScopes:
+            UserPoolArn: User.pool.arn
+          CognitoAuthorizationScopesItemNotString:
+            AuthorizationScopes:
+              - 3
+            UserPoolArn: User.pool.arn
+          CognitoAuthorizationScopesNotList:
+            AuthorizationScopes: scopes1
+            UserPoolArn: User.pool.arn
+
+          # Identity
+          CognitoIdentityEmpty:
+            Identity:
+            UserPoolArn: User.pool.arn
+
+          # Identity Header
+          CognitoIdentityHeaderEmpty:
+            Identity:
+              Header:
+            UserPoolArn: User.pool.arn
+          CognitoIdentityHeaderNotString:
+            Identity:
+              Header: 3
+            UserPoolArn: User.pool.arn
+
+          # ReauthorizeEvery
+          CognitoIdentityReauthorizeEveryEmpty:
+            Identity:
+              ReauthorizeEvery:
+            UserPoolArn: User.pool.arn
+          CognitoIdentityReauthorizeEveryNotInt:
+            Identity:
+              ReauthorizeEvery: "3"
+            UserPoolArn: User.pool.arn
+          CognitoIdentityReauthorizeEveryTooHigh:
+            Identity:
+              ReauthorizeEvery: 3601
+            UserPoolArn: User.pool.arn
+          CognitoIdentityReauthorizeEveryTooLow:
+            Identity:
+              ReauthorizeEvery: 0
+            UserPoolArn: User.pool.arn
+
+          # ValidationExpression
+          CognitoIdentityValidationExpressionEmpty:
+            Identity:
+              ValidationExpression:
+            UserPoolArn: User.pool.arn
+          CognitoIdentityValidationExpressionNotString:
+            Identity:
+              ValidationExpression: 3
+            UserPoolArn: User.pool.arn
+
+          # UserPoolArn
+          CognitoUserPoolArnEmpty:
+            UserPoolArn:
+          CognitoUserPoolArnMissing:
+            Identity:
+              Header: Identity header
+          CognitoUserPoolArnNotString:
+            UserPoolArn: 3

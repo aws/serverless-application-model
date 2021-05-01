@@ -1,5 +1,0 @@
-[
-  "[/Resources/MyApi] Is not valid",
-  "[/__/Properties/Auth/Authorizers/MyCognitoAuth] 'UserPoolArn' is a required property",
-  "[/__/Properties/Auth/Authorizers/MyCognitoAuth] 'FunctionArn' is a required property"
-]
