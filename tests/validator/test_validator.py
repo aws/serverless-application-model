@@ -152,7 +152,12 @@ class TestValidatorBase(TestCase):
 
         errors = self._get_output_content(output)
 
-        self.assertEqual(len(validation_errors), len(errors))
+        if len(validation_errors) != len(errors):
+            self.fail(
+                "Expected {} errors, found {}:\n{}".format(
+                    len(errors), len(validation_errors), "\n".join(validation_errors)
+                )
+            )
 
         for i, v in enumerate(validation_errors):
             self.assertEqual(v, errors[i])

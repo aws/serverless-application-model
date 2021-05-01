@@ -6,12 +6,14 @@ Resources:
     Properties:
       Cors:
       StageName: Stage name
-  # Cors not object
-  ApiCorsNotObject:
+
+  # Cors not object or string
+  ApiCorsNotObjectOrString:
     Type: AWS::Serverless::Api
     Properties:
       Cors: 3
       StageName: Stage name
+
   # AllowCredentials is empty
   ApiAllowCredentialsEmpty:
     Type: AWS::Serverless::Api
@@ -20,6 +22,7 @@ Resources:
         AllowCredentials:
         AllowOrigin: "*"
       StageName: Stage name
+
   # AllowCredentials is not boolean
   ApiAllowCredentialsNotBoolean:
     Type: AWS::Serverless::Api
@@ -28,6 +31,7 @@ Resources:
         AllowCredentials: 3
         AllowOrigin: "*"
       StageName: Stage name
+
   # AllowHeaders is empty
   ApiAllowHeadersEmpty:
     Type: AWS::Serverless::Api
@@ -36,6 +40,7 @@ Resources:
         AllowHeaders:
         AllowOrigin: "*"
       StageName: Stage name
+
   # AllowHeaders is not a string
   ApiAllowHeadersNotString:
     Type: AWS::Serverless::Api
@@ -44,6 +49,7 @@ Resources:
         AllowHeaders: 3
         AllowOrigin: "*"
       StageName: Stage name
+
   # AllowMethods is empty
   ApiAllowMethodsEmpty:
     Type: AWS::Serverless::Api
@@ -52,6 +58,7 @@ Resources:
         AllowMethods:
         AllowOrigin: "*"
       StageName: Stage name
+
   # AllowMethods not string
   ApiAllowMethodsNotString:
     Type: AWS::Serverless::Api
@@ -60,6 +67,7 @@ Resources:
         AllowMethods: 3
         AllowOrigin: "*"
       StageName: Stage name
+
   # AllowOrigin missing
   ApiAllowOriginMissing:
     Type: AWS::Serverless::Api
@@ -67,6 +75,7 @@ Resources:
       Cors:
         AllowCredentials: true
       StageName: Stage name
+
   # MaxAge empty
   ApiMaxAgeEmpty:
     Type: AWS::Serverless::Api
@@ -75,6 +84,7 @@ Resources:
         AllowOrigin: "*"
         MaxAge:
       StageName: Stage name
+
   # MaxAge not string
   ApiMaxAgeNotString:
     Type: AWS::Serverless::Api

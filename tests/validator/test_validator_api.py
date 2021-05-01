@@ -25,7 +25,7 @@ class TestValidatorApi(TestValidatorBase):
             "error_cachecluster",
             "error_canarysetting",
             "error_cors",
-            # DefinitionBody
+            "error_definitionbody",
             # DefinitionUri
             "error_description",
             # Domain

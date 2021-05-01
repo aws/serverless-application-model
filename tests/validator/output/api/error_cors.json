@@ -1,6 +1,6 @@
 [
   "[Resources/ApiCorsEmpty/Properties/Cors] Must not be empty",
-  "[Resources/ApiCorsNotObject/Properties/Cors] 3 is not of type 'object'",
+  "[Resources/ApiCorsNotObjectOrString/Properties/Cors] 3 is not of type 'object'",
   "[Resources/ApiAllowCredentialsEmpty/Properties/Cors/AllowCredentials] Must not be empty",
   "[Resources/ApiAllowCredentialsNotBoolean/Properties/Cors/AllowCredentials] 3 is not of type 'boolean'",
   "[Resources/ApiAllowHeadersEmpty/Properties/Cors/AllowHeaders] Must not be empty",
