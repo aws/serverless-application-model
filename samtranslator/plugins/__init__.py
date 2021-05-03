@@ -155,7 +155,6 @@ class LifeCycleEvents(Enum):
     before_transform_template = "before_transform_template"
     before_transform_resource = "before_transform_resource"
     after_transform_template = "after_transform_template"
-    after_transform_resource = "after_transform_resource"
 
 
 class BasePlugin(object):
@@ -231,18 +230,5 @@ class BasePlugin(object):
         :return: nothing
         :raises InvalidDocumentException: If the hook decides that the SAM template is invalid.
         :raises InvalidResourceException: If the hook decides that a SAM resource is invalid.
-        """
-        pass
-
-    def on_after_transform_resource(self, template, logical_id, transformed_resources):
-        """
-        Hook method to execute on `after_transform_resource` life cycle event. Plugins are free to modify the
-        whole template or properties of the resource.
-
-        :param string logical_id: LogicalId of the resource that is being processed
-        :param string resource_type: Type of the resource being processed
-        :param list transformed_resources: List of the resources being generated.
-        :return: Nothing
-        :raises InvalidResourceException: If the hook decides throw this exception on validation failures
         """
         pass
