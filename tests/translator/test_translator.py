@@ -338,6 +338,7 @@ class TestTranslatorEndToEnd(TestTranslator):
                 "iot_rule",
                 "layers_with_intrinsics",
                 "layers_all_properties",
+                "layer_deletion_policy_precedence",
                 "function_managed_inline_policy",
                 "unsupported_resources",
                 "intrinsic_functions",
@@ -431,6 +432,7 @@ class TestTranslatorEndToEnd(TestTranslator):
                 "state_machine_with_xray_role",
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
+                "version_deletion_policy_precedence",
             ],
             [
                 ("aws", "ap-southeast-1"),
