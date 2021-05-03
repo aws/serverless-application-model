@@ -813,3 +813,30 @@ class TestImplicitRestApiPlugin_maybe_remove_implicit_api(TestCase):
 
         # Must restore original resource
         template.set.assert_called_with(IMPLICIT_API_LOGICAL_ID, resource)
+
+
+class TestImplicitApiPlugin_generate_resource_attributes(TestCase):
+    def setUp(self):
+        self.plugin = ImplicitRestApiPlugin()
+        self.plugin.api_conditions = {}
+
+    def test_maybe_add_condition(self):
+        template_dict = {'Resources': {'ServerlessRestApi': {'Type': 'AWS::Serverless::Api'}}}
+        self.plugin.api_conditions = {'ServerlessRestApi': {'/{proxy+}': {'any': 'C1'}}}
+        self.plugin._maybe_add_condition_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(template_dict, {'Resources': {'ServerlessRestApi': {'Type': 'AWS::Serverless::Api', 'Condition': 'C1'}}})
+
+    def test_maybe_add_deletion_policies(self):
+        template_dict = {'Resources': {'ServerlessRestApi': {'Type': 'AWS::Serverless::Api'}}}
+        self.plugin.api_deletion_policies = {'ServerlessRestApi': {'/{proxy+}': {'any': 'Delete'}, '/{proxy++}': {'any': 'Retain'}}}
+        self.plugin._maybe_add_deletion_policy_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(template_dict, {'Resources': {'ServerlessRestApi': {'Type': 'AWS::Serverless::Api', 'DeletionPolicy': 'Retain'}}})
+
+    def test_maybe_add_update_replace_policies(self):
+        template_dict = {'Resources': {'ServerlessRestApi': {'Type': 'AWS::Serverless::Api'}}}
+        self.plugin.api_update_replace_policies = {'ServerlessRestApi': {'/{proxy+}': {'any': 'Snapshot'}, '/{proxy++}': {'any': 'Retain'}}}
+        self.plugin._maybe_add_update_replace_policy_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(template_dict, {'Resources': {'ServerlessRestApi': {'Type': 'AWS::Serverless::Api', 'UpdateReplacePolicy': 'Retain'}}})
