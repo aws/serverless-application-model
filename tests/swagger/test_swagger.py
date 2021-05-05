@@ -1457,6 +1457,7 @@ class TestSwaggerEditor_add_authorization_scopes(TestCase):
         self.editor.add_auth_to_method("/cognito", "get", auth, self.api)
         self.assertEqual([{"NONE": []}], self.editor.swagger["paths"]["/cognito"]["get"]["security"])
 
+
 class TestSwaggerEditor_set_path_default_authorizer(TestCase):
     def setUp(self):
         self.api = api = {
@@ -1488,4 +1489,6 @@ class TestSwaggerEditor_set_path_default_authorizer(TestCase):
 
     def test_should_fail_when_path_methods_are_invalid(self):
         with self.assertRaises(InvalidDocumentException):
-            self.editor.set_path_default_authorizer("/cognito", "MyCognitoAuth", {"MyOtherCognitoAuth": {}, "MyCognitoAuth": {}})
+            self.editor.set_path_default_authorizer(
+                "/cognito", "MyCognitoAuth", {"MyOtherCognitoAuth": {}, "MyCognitoAuth": {}}
+            )
