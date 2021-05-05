@@ -22,6 +22,7 @@ class ClientProvider:
         self._mq_client = None
         self._iot_client = None
         self._kafka_client = None
+        self._code_deploy_client = None
 
     @property
     def cfn_client(self):
@@ -199,3 +200,14 @@ class ClientProvider:
                 if not self._kafka_client:
                     self._kafka_client = boto3.client("kafka")
         return self._kafka_client
+
+    @property
+    def code_deploy_client(self):
+        """
+        Kafka Client
+        """
+        if not self._code_deploy_client:
+            with self._lock:
+                if not self._code_deploy_client:
+                    self._code_deploy_client = boto3.client("codedeploy")
+        return self._code_deploy_client

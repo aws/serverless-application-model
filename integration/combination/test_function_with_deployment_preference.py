@@ -50,6 +50,18 @@ class TestFunctionWithDeploymentPreference(BaseTest):
         self.create_and_verify_stack("combination/function_with_deployment_alarms_and_hooks")
         self._verify_no_deployment_then_update_and_verify_deployment()
 
+    def test_deployment_preference_in_globals(self):
+        self.create_and_verify_stack("combination/function_with_deployment_globals")
+        application_name = self.get_physical_id_by_type("AWS::CodeDeploy::Application")
+        self.assertTrue(application_name in self._get_code_deploy_application())
+
+        deployment_groups = self._get_deployment_groups(application_name)
+        self.assertEqual(len(deployment_groups), 1)
+
+        deployment_group_name = deployment_groups[0]
+        deployment_config_name = self._get_deployment_group_configuration_name(deployment_group_name, application_name)
+        self.assertEqual(deployment_config_name, "CodeDeployDefault.LambdaAllAtOnce")
+
     def _verify_no_deployment_then_update_and_verify_deployment(self, parameters=None):
         application_name = self.get_physical_id_by_type("AWS::CodeDeploy::Application")
         self.assertTrue(application_name in self._get_code_deploy_application())
