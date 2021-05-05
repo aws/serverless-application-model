@@ -27,7 +27,7 @@ class TestApiSettings(BaseTest):
         self.assertTrue(wildcard_path in method_settings, "MethodSettings for the wildcard path must be present")
 
         wildcard_path_setting = method_settings[wildcard_path]
-        print(wildcard_path_setting)
+
         self.assertTrue(wildcard_path_setting["metricsEnabled"], "Metrics must be enabled")
         self.assertTrue(wildcard_path_setting["dataTraceEnabled"], "DataTrace must be enabled")
         self.assertEqual(wildcard_path_setting["loggingLevel"], "INFO", "LoggingLevel must be INFO")
