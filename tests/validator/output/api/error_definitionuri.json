@@ -1,0 +1,18 @@
+[
+  "[Resources/ApiDefinitionUriEmpty/Properties/DefinitionUri] Must not be empty",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
+  "[Resources/ApiDefinitionBodyEmpty/Properties/DefinitionBody] Must not be empty",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
+  "[Resources/ApiDefinitionBodyEmpty/Properties/DefinitionBody] Must not be empty",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
+  "[Resources/ApiDefinitionBodyEmpty/Properties/DefinitionBody] Must not be empty",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
+  "[Resources/ApiDefinitionBodyEmpty/Properties/DefinitionBody] Must not be empty",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
+  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
+  ""
+]

@@ -16,3 +16,15 @@ Resources:
               ReauthorizeEvery: 3
               ValidationExpression: "[a-z]+"
             UserPoolArn: User.pool.arn
+          MyCognitoAuthWithIntrinsics:
+            AuthorizationScopes:
+              - Scope1
+              - Scope2
+            Identity:
+              Header: Identity header
+              ReauthorizeEvery: 3
+              ValidationExpression: "[a-z]+"
+            UserPoolArn:
+              Fn::GetAtt:
+                - MyCognitoUserPool
+                - Arn

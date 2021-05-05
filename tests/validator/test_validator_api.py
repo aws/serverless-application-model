@@ -26,18 +26,18 @@ class TestValidatorApi(TestValidatorBase):
             "error_canarysetting",
             "error_cors",
             "error_definitionbody",
-            # DefinitionUri
+            "error_definitionuri",
             "error_description",
-            # Domain
-            # EndpointConfiguration
-            # GatewayResponses
-            # MethodSettings
-            # MinimumCompressionSize
-            # Models
+            # "error_domain",
+            # "error_endpointconfiguration",
+            # "error_gatewayresponses",
+            # "error_methodsettings",
+            # "error_minimumcompressionsize",
+            # "error_models",
             "error_name",
             # OpenApiVersion
             "error_stagename",
-            # Tags
+            # "error_tags",
             "error_tracingenabled",
             "error_variables",
         ],

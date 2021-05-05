@@ -36,7 +36,13 @@ class SamTemplateValidator(object):
         # schema_content must be passed to resolve local (#/def...) references
         resolver = jsonschema.RefResolver("file://" + sam_schema.SCHEMA_DIR + "/", schema_content)
 
-        self.validator = jsonschema.Draft7Validator(schema_content, resolver=resolver)
+        SAMValidator = jsonschema.validators.extend(
+            jsonschema.Draft7Validator,
+            type_checker=jsonschema.Draft7Validator.TYPE_CHECKER.redefine_many(
+                {"object": is_object, "intrinsic": is_intrinsic}
+            ),
+        )
+        self.validator = SAMValidator(schema_content, resolver=resolver)
 
     def validate(self, template_dict):
         """
@@ -65,6 +71,7 @@ class SamTemplateValidator(object):
         sibling_errors = OrderedDict()
 
         for e in validation_errors:
+            # breakpoint()
             self._process_error(e, formatted_errors, sibling_errors)
 
         return list(formatted_errors.keys())
@@ -157,3 +164,35 @@ class SamTemplateValidator(object):
         """
         with open(filepath) as fp:
             return json.load(fp)
+
+
+# Type definition redefinitions
+INTRINSIC_ATTR = [
+    "Fn::Base64",
+    "Fn::Cidr",
+    "Fn::FindInMap",
+    "Fn::GetAtt",
+    "Fn::GetAZs",
+    "Fn::ImportValue",
+    "Fn::Join",
+    "Fn::Select",
+    "Fn::Split",
+    "Fn::Sub",
+    "Fn::Transform",
+    "Ref",
+]
+
+
+def is_object(checker, instance):
+    return isinstance(instance, dict) and not has_intrinsic_attr(instance)
+
+
+def is_intrinsic(checker, instance):
+    return isinstance(instance, dict) and has_intrinsic_attr(instance)
+
+
+def has_intrinsic_attr(dict):
+    for k in dict:
+        if k in INTRINSIC_ATTR:
+            return True
+    return False

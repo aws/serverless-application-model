@@ -12,5 +12,6 @@
   "[Resources/MyApi/Properties/Auth/Authorizers/CognitoIdentityValidationExpressionEmpty/Identity/ValidationExpression] Must not be empty",
   "[Resources/MyApi/Properties/Auth/Authorizers/CognitoIdentityValidationExpressionNotString/Identity/ValidationExpression] 3 is not of type 'string'",
   "[Resources/MyApi/Properties/Auth/Authorizers/CognitoUserPoolArnEmpty/UserPoolArn] Must not be empty",
-  "[Resources/MyApi/Properties/Auth/Authorizers/CognitoUserPoolArnNotString/UserPoolArn] 3 is not of type 'string'"
+  "[Resources/MyApi/Properties/Auth/Authorizers/CognitoUserPoolArnNotString/UserPoolArn] 3 is not of type 'string', 'intrinsic'",
+  "[Resources/MyApi/Properties/Auth/Authorizers/CognitoUserPoolArnNotIntrinsic/UserPoolArn] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'"
 ]

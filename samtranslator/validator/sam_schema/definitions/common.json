@@ -97,6 +97,14 @@
       ],
       "type": "object"
     },
+    "String": {
+      "if": {
+        "type": "string"
+      },
+      "then": {
+        "minLength": 1
+      }
+    },
     "Tag": {
       "additionalProperties": false,
       "properties": {

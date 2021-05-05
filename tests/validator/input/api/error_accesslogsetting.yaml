@@ -7,6 +7,21 @@ Resources:
       StageName: Stage name
       AccessLogSetting:
 
+  # AccessLogSetting is not an object
+  ApiAccessLogSettingNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      AccessLogSetting: 3
+
+  # AccessLogSetting is not an object
+  ApiAccessLogSettingIntrinsicRef:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      AccessLogSetting:
+        Ref: test
+
   # DestinationArn is not a string
   ApiAccessLogSettingDestinationArnNotString:
     Type: AWS::Serverless::Api

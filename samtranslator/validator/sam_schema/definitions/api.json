@@ -41,15 +41,14 @@
                 "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.CanarySetting"
               },
               "Cors": {
-                "if": {
-                  "type": "string"
-                },
-                "then": {
-                  "minLength": 1
-                },
-                "else": {
-                  "$ref": "#definitions/AWS::Serverless::Api.CorsConfiguration"
-                }
+                "allOf": [
+                  {
+                    "$ref": "file:common.json#definitions/String"
+                  },
+                  {
+                    "$ref": "#definitions/AWS::Serverless::Api.CorsConfiguration"
+                  }
+                ]
               },
               "DefinitionBody": {
                 "anyOf": [
@@ -62,9 +61,9 @@
                 ]
               },
               "DefinitionUri": {
-                "anyOf": [
+                "allOf": [
                   {
-                    "type": "string"
+                    "$ref": "file:common.json#definitions/String"
                   },
                   {
                     "$ref": "#definitions/AWS::Serverless::Api.S3Location"
@@ -237,7 +236,18 @@
             "$ref": "#definitions/AWS::Serverless::Api.CognitoAuthorizationIdentity"
           },
           "UserPoolArn": {
-            "type": "string"
+            "type": [
+              "string",
+              "intrinsic"
+            ],
+            "allOf": [
+              {
+                "$ref": "file:common.json#definitions/String"
+              },
+              {
+                "$ref": "file:intrinsics.json#definitions/Intrinsic"
+              }
+            ]
           }
         },
         "required": [

@@ -1,5 +1,6 @@
 [
   "[Resources/ApiAccessLogSettingEmpty/Properties/AccessLogSetting] Must not be empty",
+  "[Resources/ApiAccessLogSettingNotObject/Properties/AccessLogSetting] 3 is not of type 'object', 'intrinsic'",
   "[Resources/ApiAccessLogSettingDestinationArnNotString/Properties/AccessLogSetting/DestinationArn] 3 is not of type 'string'",
   "[Resources/ApiAccessLogSettingDestinationArnNotString/Properties/AccessLogSetting/DestinationArn] 3 is not of type 'object'",
   "[Resources/ApiAccessLogSettingFormatNotString/Properties/AccessLogSetting/Format] 3 is not of type 'string'",

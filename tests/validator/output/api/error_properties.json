@@ -1,4 +1,5 @@
 [
   "[Resources/ApiPropertiesMissing] 'Properties' is a required property",
-  "[Resources/ApiPropertiesEmpty/Properties] Must not be empty"
+  "[Resources/ApiPropertiesEmpty/Properties] Must not be empty",
+  "[Resources/ApiPropertiesNotObject/Properties] 'MyProps' is not of type 'object'"
 ]

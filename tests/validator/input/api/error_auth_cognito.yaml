@@ -70,3 +70,6 @@ Resources:
               Header: Identity header
           CognitoUserPoolArnNotString:
             UserPoolArn: 3
+          CognitoUserPoolArnNotIntrinsic:
+            UserPoolArn:
+              Not: Intrinsic

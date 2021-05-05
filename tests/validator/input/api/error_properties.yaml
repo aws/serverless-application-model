@@ -7,3 +7,7 @@ Resources:
   ApiPropertiesEmpty:
     Type: AWS::Serverless::Api
     Properties:
+  # Properties not object
+  ApiPropertiesNotObject:
+    Type: AWS::Serverless::Api
+    Properties: MyProps

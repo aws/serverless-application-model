@@ -1,41 +1,251 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "additionalProperties": false,
   "definitions": {
-    "IntrinsicRef": {
-      "additionalProperties": false,
-      "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html",
-      "properties": {
-        "Ref": {
-          "type": "string"
-        }
+    "Intrinsic": {
+      "if": {
+        "type": "object"
       },
-      "type": "object"
+      "then": {
+        "allOf": [
+          {
+            "$ref": "#definitions/IntrinsicGetAtt"
+          },
+          {
+            "$ref": "#definitions/IntrinsicRef"
+          }
+        ]
+      }
+    },
+    "IntrinsicBase64": {
+      "if": {
+        "required": [
+          "Fn::Base64"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-base64.html",
+        "properties": {
+          "Fn::Base64": {
+            "type": [
+              "string",
+              "object"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicCidr": {
+      "if": {
+        "required": [
+          "Fn::Cidr"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-cidr.html",
+        "properties": {
+          "Fn::Cidr": {
+            "type": [
+              "array"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicFindInMap": {
+      "if": {
+        "required": [
+          "Fn::FindInMap"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-findinmap.html",
+        "properties": {
+          "Fn::FindInMap": {
+            "type": [
+              "array"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicGetAtt": {
+      "if": {
+        "required": [
+          "Fn::GetAtt"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html",
+        "properties": {
+          "Fn::GetAtt": {
+            "type": [
+              "array"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicGetAZs": {
+      "if": {
+        "required": [
+          "Fn::GetAZs"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getavailabilityzones.html",
+        "properties": {
+          "Fn::GetAZs": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicImportValue": {
+      "if": {
+        "required": [
+          "Fn::ImportValue"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html",
+        "properties": {
+          "Fn::ImportValue": {
+            "type": [
+              "object"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicJoin": {
+      "if": {
+        "required": [
+          "Fn::Join"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-join.html",
+        "properties": {
+          "Fn::Join": {
+            "type": [
+              "array"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicRef": {
+      "if": {
+        "required": [
+          "Ref"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html",
+        "properties": {
+          "Ref": {
+            "type": [
+              "string",
+              "object"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicSelect": {
+      "if": {
+        "required": [
+          "Fn::Select"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-select.html",
+        "properties": {
+          "Fn::Select": {
+            "type": [
+              "array"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicSplit": {
+      "if": {
+        "required": [
+          "Fn::Split"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-split.html",
+        "properties": {
+          "Fn::Split": {
+            "type": [
+              "array"
+            ]
+          }
+        },
+        "type": "object"
+      }
     },
     "IntrinsicSub": {
-      "additionalProperties": false,
-      "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html",
-      "properties": {
-        "Sub": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "items": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object"
-                }
-              ],
-              "type": "array"
-            }
-          ]
-        }
+      "if": {
+        "required": [
+          "Fn::Sub"
+        ]
       },
-      "type": "object"
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html",
+        "properties": {
+          "Fn::Sub": {
+            "type": [
+              "string",
+              "array"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "IntrinsicTransform": {
+      "if": {
+        "required": [
+          "Fn::Transform"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "docUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-sub.html",
+        "properties": {
+          "Fn::Transform": {
+            "type": [
+              "object"
+            ]
+          }
+        },
+        "type": "object"
+      }
     },
     "StringOrIntrinsicRef": {
       "anyOf": [
@@ -47,6 +257,5 @@
         }
       ]
     }
-  },
-  "type": "object"
+  }
 }

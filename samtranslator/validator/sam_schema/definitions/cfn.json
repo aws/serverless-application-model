@@ -12,7 +12,10 @@
           "type": "string"
         }
       },
-      "type": "object"
+      "type": [
+        "object",
+        "intrinsic"
+      ]
     },
     "AWS::ApiGateway::Stage.CanarySetting": {
       "additionalProperties": false,
