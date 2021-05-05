@@ -43,7 +43,10 @@ class Resource(object):
     property_types = None
     _keywords = ["logical_id", "relative_id", "depends_on", "resource_attributes"]
 
+    # For attributes in this list, they will be passed into the translated template for the same resource itself.
     _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition", "UpdateReplacePolicy", "Metadata"]
+    # For attributes in this list, they will be passed into the translated template for the same resource,
+    # as well as all the auto-generated resources that are created from this resource.
     _pass_through_attributes = ["Condition", "DeletionPolicy", "UpdateReplacePolicy"]
 
     # Runtime attributes that can be qureied resource. They are CloudFormation attributes like ARN, Name etc that
