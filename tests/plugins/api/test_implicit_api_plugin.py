@@ -831,9 +831,7 @@ class TestImplicitApiPlugin_generate_resource_attributes(TestCase):
 
     def test_maybe_add_deletion_policies(self):
         template_dict = {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api"}}}
-        self.plugin.api_deletion_policies = {
-            "ServerlessRestApi": {"Delete", "Retain"}
-        }
+        self.plugin.api_deletion_policies = {"ServerlessRestApi": {"Delete", "Retain"}}
         self.plugin._maybe_add_deletion_policy_to_implicit_api(template_dict)
         print(template_dict)
         self.assertEqual(
@@ -843,9 +841,7 @@ class TestImplicitApiPlugin_generate_resource_attributes(TestCase):
 
     def test_maybe_add_update_replace_policies(self):
         template_dict = {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api"}}}
-        self.plugin.api_update_replace_policies = {
-            "ServerlessRestApi": {"Snapshot", "Retain"}
-        }
+        self.plugin.api_update_replace_policies = {"ServerlessRestApi": {"Snapshot", "Retain"}}
         self.plugin._maybe_add_update_replace_policy_to_implicit_api(template_dict)
         print(template_dict)
         self.assertEqual(
