@@ -1,0 +1,42 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        DdbStream:
+          Type: DynamoDB
+          Properties:
+            Stream:
+              # Connect with the table we have created in this template
+              Fn::GetAtt: [MyTable, StreamArn]
+
+            BatchSize: 10
+            StartingPosition: TRIM_HORIZON
+            TumblingWindowInSeconds: 120
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+
+      AttributeDefinitions:
+        - { AttributeName : id, AttributeType : S }
+
+      KeySchema:
+        - { "AttributeName" : "id", "KeyType" : "HASH"}
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+      StreamSpecification:
+        StreamViewType: "NEW_IMAGE"
+
+
+

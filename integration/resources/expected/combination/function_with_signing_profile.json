@@ -1,0 +1,6 @@
+[
+  { "LogicalResourceId":"MyUnsignedLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyUnsignedLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MySigningProfile", "ResourceType":"AWS::Signer::SigningProfile" },
+  { "LogicalResourceId":"MySignedFunctionCodeSigningConfig", "ResourceType":"AWS::Lambda::CodeSigningConfig" }
+]

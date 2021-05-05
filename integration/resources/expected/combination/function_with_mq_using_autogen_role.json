@@ -1,0 +1,15 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"PublicSubnetRouteTableAssociation", "ResourceType":"AWS::EC2::SubnetRouteTableAssociation" },
+  { "LogicalResourceId":"AttachGateway", "ResourceType":"AWS::EC2::VPCGatewayAttachment" },
+  { "LogicalResourceId":"MQSecurityGroup", "ResourceType":"AWS::EC2::SecurityGroup" },
+  { "LogicalResourceId":"MyVpc", "ResourceType":"AWS::EC2::VPC" },
+  { "LogicalResourceId":"MyMqBroker", "ResourceType":"AWS::AmazonMQ::Broker" },
+  { "LogicalResourceId":"PublicSubnet", "ResourceType":"AWS::EC2::Subnet" },
+  { "LogicalResourceId":"RouteTable", "ResourceType":"AWS::EC2::RouteTable" },
+  { "LogicalResourceId":"MQBrokerUserSecret", "ResourceType":"AWS::SecretsManager::Secret" },
+  { "LogicalResourceId":"MyLambdaFunctionMyMqEvent", "ResourceType":"AWS::Lambda::EventSourceMapping" },
+  { "LogicalResourceId":"InternetGateway", "ResourceType":"AWS::EC2::InternetGateway" },
+  { "LogicalResourceId":"Route", "ResourceType":"AWS::EC2::Route" }
+]

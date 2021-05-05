@@ -1,0 +1,20 @@
+Resources:
+  MyLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      Events:
+        LogProcessor:
+          Type: CloudWatchLogs
+          Properties:
+            LogGroupName:
+              Ref: CloudWatchLambdaLogsGroup
+            FilterPattern: My filter pattern
+            
+  CloudWatchLambdaLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7

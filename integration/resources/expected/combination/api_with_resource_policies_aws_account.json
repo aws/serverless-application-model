@@ -1,0 +1,8 @@
+[
+  { "LogicalResourceId":"ServerlessRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"ServerlessRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"ServerlessRestApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionApiPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" }
+]

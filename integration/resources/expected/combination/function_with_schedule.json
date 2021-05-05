@@ -1,0 +1,6 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyLambdaFunctionRepeat", "ResourceType":"AWS::Events::Rule" },
+  { "LogicalResourceId":"MyLambdaFunctionRepeatPermission", "ResourceType":"AWS::Lambda::Permission" }
+]

@@ -1,0 +1,6 @@
+[
+  { "LogicalResourceId":"FunctionOne", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"FunctionOneRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"FunctionOneImageBucketPermission", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"Images", "ResourceType":"AWS::S3::Bucket" }
+]

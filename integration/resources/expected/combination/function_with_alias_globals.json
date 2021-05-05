@@ -1,0 +1,10 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyLambdaFunctionAliasprod", "ResourceType":"AWS::Lambda::Alias" },
+  { "LogicalResourceId":"MyLambdaFunctionVersion", "ResourceType":"AWS::Lambda::Version" },
+  { "LogicalResourceId":"FunctionWithOverride", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"FunctionWithOverrideRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"FunctionWithOverrideAliasLive", "ResourceType":"AWS::Lambda::Alias" },
+  { "LogicalResourceId":"FunctionWithOverrideVersion", "ResourceType":"AWS::Lambda::Version" }
+]

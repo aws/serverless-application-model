@@ -1,0 +1,37 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      Events:
+        Repeat:
+          Type: Schedule
+          Properties:
+              Schedule: 'rate(5 minutes)'
+              Input: '{"Hello": "world!"}'
+              Name:
+                Fn::Sub:
+                  - TestSchedule${__StackName__}
+                  - __StackName__: 
+                      Fn::Select:
+                        - 3
+                        - Fn::Split:
+                          - "-"
+                          - Ref: AWS::StackName
+              Description: test schedule
+              Enabled: True
+Outputs:
+  ScheduleName:
+    Description: "Name of the cw schedule"
+    Value:
+      Fn::Sub:
+        - TestSchedule${__StackName__}
+        - __StackName__: 
+            Fn::Select:
+              - 3
+              - Fn::Split:
+                - "-"
+                - Ref: AWS::StackName

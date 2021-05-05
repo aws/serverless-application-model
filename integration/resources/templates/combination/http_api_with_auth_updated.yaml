@@ -1,0 +1,53 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.7
+      InlineCode: |
+        def handler(event, context):
+            return {'body': 'Hello World!', 'statusCode': 200}
+      MemorySize: 128
+      Events:
+        PostApi:
+          Type: HttpApi
+          Properties:
+            Auth:
+              Authorizer: MyLambdaAuthUpdated
+            ApiId: 
+              Ref: MyApi
+            Method: POST
+            Path: /post
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        print("hello")
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
+      Auth:
+        Authorizers:
+          MyLambdaAuthUpdated:
+            FunctionArn: 
+              Fn::GetAtt:
+                - MyAuthFn
+                - Arn
+            FunctionInvokeRole:
+              Fn::GetAtt:
+                - MyAuthFnRole
+                - Arn
+            Identity:
+              Headers:
+                - Authorization
+              ReauthorizeEvery: 37
+            EnableSimpleResponses: false
+            AuthorizerPayloadFormatVersion: 1.0
+        DefaultAuthorizer: MyLambdaAuthUpdated

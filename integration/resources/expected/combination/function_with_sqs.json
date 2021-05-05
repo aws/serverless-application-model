@@ -1,0 +1,6 @@
+[
+  { "LogicalResourceId":"MySqsQueueFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MySqsQueueFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MySqsQueue", "ResourceType":"AWS::SQS::Queue" },
+  { "LogicalResourceId":"MySqsQueueFunctionMySqsEvent", "ResourceType":"AWS::Lambda::EventSourceMapping" }
+]

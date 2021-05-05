@@ -1,0 +1,118 @@
+Parameters:
+  Bucket:
+    Type: String
+  CodeKey:
+    Type: String
+  SwaggerKey:
+    Type: String
+  MyStageName:
+    Type: String
+    Default: devstage
+  CacheClusterEnabled:
+    Type: String
+    Default: "true"
+
+Conditions:
+  TrueCondition:
+    Fn::Equals:
+      - true
+      - true
+  FalseCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /pathget
+            Method: get
+            RestApiId:
+              Ref: MyApi
+
+        PostApi:
+          Type: Api
+          Properties:
+            Path: /pathpost
+            Method: post
+            RestApiId:
+              Ref: MyApi
+
+      Tags:
+        TagKey1:
+          Ref: MyStageName
+
+  MyLambdaFunctionFalseCondition:
+    Type: AWS::Serverless::Function
+    Condition: FalseCondition
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /pathget
+            Method: get
+            RestApiId:
+              Ref: MyApi
+
+        PostApi:
+          Type: Api
+          Properties:
+            Path: /pathpost
+            Method: post
+            RestApiId:
+              Ref: MyApi
+
+      Tags:
+        TagKey1:
+          Ref: MyStageName
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Condition: TrueCondition
+    Properties:
+      StageName:
+        Ref: MyStageName
+      DefinitionUri:
+        Bucket:
+          Ref: Bucket
+        Key:
+          Ref: SwaggerKey
+      Variables:
+        Var1:
+          "Fn::Join": ["", ["a", "b"]]
+        Var2:
+          "Fn::Join": ["", ["1", "2"]]
+
+  MyApiFalseCondition:
+    Type: AWS::Serverless::Api
+    Condition: FalseCondition
+    Properties:
+      StageName:
+        Ref: MyStageName
+      DefinitionUri:
+        Bucket:
+          Ref: Bucket
+        Key:
+          Ref: SwaggerKey
+      Variables:
+        Var1:
+          "Fn::Join": ["", ["a", "b"]]
+        Var2:
+          "Fn::Join": ["", ["1", "2"]]
+

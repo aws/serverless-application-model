@@ -151,3 +151,23 @@ def current_region_does_not_support(services):
 
     # check if any one of the services is in the excluded services for current testing region
     return bool(set(services).intersection(set(region_exclude_services["regions"][region])))
+
+
+def first_item_in_dict(dictionary):
+    """
+    return the first key-value pair in dictionary
+
+    Parameters
+    ----------
+    dictionary : Dictionary
+        the dictionary used to grab the first tiem
+
+    Returns
+    -------
+    Tuple
+        the first key-value pair in the dictionary
+    """
+    if not dictionary:
+        return None
+    first_key = list(dictionary.keys())[0]
+    return first_key, dictionary[first_key]

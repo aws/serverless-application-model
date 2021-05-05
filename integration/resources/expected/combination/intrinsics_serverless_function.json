@@ -1,0 +1,7 @@
+[
+  { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyNewRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyVpc", "ResourceType":"AWS::EC2::VPC" },
+  { "LogicalResourceId":"MySecurityGroup", "ResourceType":"AWS::EC2::SecurityGroup" },
+  { "LogicalResourceId":"MySubnet", "ResourceType":"AWS::EC2::Subnet" }
+]

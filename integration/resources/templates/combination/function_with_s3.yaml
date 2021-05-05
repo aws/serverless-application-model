@@ -1,0 +1,18 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: MyBucket
+            Events: s3:ObjectCreated:*
+  MyBucket:
+    Type: AWS::S3::Bucket

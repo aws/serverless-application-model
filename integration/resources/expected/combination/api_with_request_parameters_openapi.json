@@ -1,0 +1,9 @@
+[
+  { "LogicalResourceId":"ServerlessRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"ServerlessRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"ServerlessRestApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
+  { "LogicalResourceId":"ApiParameterFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"ApiParameterFunctionGetHtmlPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"ApiParameterFunctionAnotherGetHtmlPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"ApiParameterFunctionRole", "ResourceType":"AWS::IAM::Role" }
+]

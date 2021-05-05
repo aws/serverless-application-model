@@ -1,0 +1,77 @@
+Parameters:
+  Bucket:
+    Type: String
+  CodeKey:
+    Type: String
+  BinaryMediaCodeKey:
+    Type: String
+  SwaggerKey:
+    Type: String
+  ImageType:
+    Type: String
+    Default: image~1gif
+Globals:
+  Api:
+    # Send/receive binary data through the APIs
+    BinaryMediaTypes:
+      # These are equivalent to image/gif and image/png when deployed
+      - image~1jpg
+      - image~1gif
+      - image~1png
+      - application~1octet-stream
+    OpenApiVersion: 3.0.1
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        # Simple HTTP Proxy API
+        openapi: "3.0.1"
+        info:
+          version: "2016-09-23T22:23:23Z"
+          title: "Simple Api"
+        basePath: "/none"
+        schemes:
+          - "https"
+        paths:
+          "/none":
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                contentHandling: CONVERT_TO_BINARY
+                passthroughBehavior: NEVER
+                uri:
+                  Fn::Sub: arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambda.Arn}/invocations
+              responses: {}
+
+  MyLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri:
+        Bucket:
+          Ref: Bucket
+        Key:
+          Ref: BinaryMediaCodeKey
+      Events:
+        None:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /none
+
+Outputs:
+  ApiUrl:
+    Description: "API endpoint URL for Prod environment"
+    Value:
+      Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+  MyLambda:
+    Description: MyLambda Function ARN
+    Value:
+      Fn::GetAtt: MyLambda.Arn

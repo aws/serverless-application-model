@@ -1,0 +1,127 @@
+Parameters:
+  Bucket:
+    Type: String
+  CodeKey:
+    Type: String
+  SwaggerKey:
+    Type: String
+  MemorySize:
+    Type: Number
+    Default: 1024
+  Timeout:
+    Type: Number
+    Default: 30
+  AutoPublishSha:
+    Type: String
+    Default: AnyRandomStringWillActuallyDo
+
+Conditions:
+  TrueCondition:
+    Fn::Equals:
+      - true
+      - true
+  FalseCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MyFunction:
+    Type: 'AWS::Serverless::Function'
+    Condition: TrueCondition
+    Properties:
+      CodeUri:
+        Bucket:
+          Ref: Bucket
+        Key:
+          "Fn::Sub": ["${CodeKey}${extn}", {extn: ""}]
+
+      Handler:
+        "Fn::Sub": ["${filename}.handler", {filename: "index"}]
+
+      Runtime:
+        "Fn::Join": ["", ["nodejs", "12.x"]]
+
+      Role:
+        "Fn::GetAtt": ["MyNewRole", "Arn"]
+
+      Description: "Some description"
+
+      MemorySize:
+        Ref: MemorySize
+
+      Timeout:
+        Ref: Timeout
+      
+      AutoPublishCodeSha256:
+        Ref: AutoPublishSha
+
+      Environment:
+        Variables:
+          MyRoleArn:
+            "Fn::GetAtt": ["MyNewRole", "Arn"]
+
+          InputParameter:
+            Ref: CodeKey
+
+      VpcConfig:
+        SecurityGroupIds:
+          - "Fn::GetAtt": ["MySecurityGroup", "GroupId"]
+        SubnetIds:
+          - Ref: "MySubnet"
+
+  # Additional resources to reference inside the Function resource
+  MyNewRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+      - {"Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"}
+      - {"Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+
+
+  MyVpc:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+
+  MySecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "my test group"
+      VpcId:
+        Ref: MyVpc
+
+  MySubnet:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: MyVpc
+      CidrBlock: "10.0.0.0/24"
+
+  # False condition, shouldn't be created
+  MyFunctionFalseCondition:
+    Type: 'AWS::Serverless::Function'
+    Condition: FalseCondition
+    Properties:
+      CodeUri:
+        Bucket:
+          Ref: Bucket
+        Key:
+          "Fn::Sub": ["${CodeKey}${extn}", {extn: ""}]
+
+      Handler:
+        "Fn::Sub": ["${filename}.handler", {filename: "index"}]
+
+      Runtime:
+        "Fn::Join": ["", ["nodejs", "12.x"]]
+
+

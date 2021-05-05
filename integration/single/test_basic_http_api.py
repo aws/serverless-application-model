@@ -14,7 +14,7 @@ class TestBasicHttpApi(BaseTest):
         """
         Creates a HTTP API
         """
-        self.create_and_verify_stack("basic_http_api")
+        self.create_and_verify_stack("single/basic_http_api")
 
         stages = self.get_api_v2_stack_stages()
 

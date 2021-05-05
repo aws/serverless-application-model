@@ -1,0 +1,29 @@
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+    BinaryMediaTypes:
+      - image~1jpg
+      - image~1png
+    MethodSettings: [{
+        "LoggingLevel": "INFO",
+        "MetricsEnabled": True,
+        "DataTraceEnabled": True,
+        "ResourcePath": "/*",
+        "HttpMethod": "*"
+    }]
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /pathget
+            Method: get

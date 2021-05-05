@@ -1,0 +1,106 @@
+# Testing Alias Invoke with ALL event sources supported by Lambda
+# We are looking to check if the event sources and their associated Lambda::Permission resources are
+# connect to the Alias and *not* the function
+
+Resources:
+  MyAwesomeFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+      AutoPublishAlias: Live
+
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+
+        CWEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - terminated
+
+        ExplicitApi:
+          Type: Api
+          Properties:
+            Path: /pathget
+            Method: get
+            RestApiId:
+              Ref: ExistingRestApi
+
+        ImplicitApi:
+          Type: Api
+          Properties:
+            Path: /add
+            Method: post
+
+        S3Trigger:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*
+
+        NotificationTopic:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: Notifications
+
+        KinesisStream:
+          Type: Kinesis
+          Properties:
+            Stream:
+              Fn::GetAtt: ["Stream", "Arn"]
+            BatchSize: 100
+            StartingPosition: TRIM_HORIZON
+
+        DDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream:
+              Fn::GetAtt: ["MyTable", "StreamArn"]
+            BatchSize: 200
+            StartingPosition: LATEST
+
+  Notifications:
+    Type: AWS::SNS::Topic
+
+  Images:
+    Type: AWS::S3::Bucket
+
+  ExistingRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: "Dev"
+      DefinitionUri: ${definitionuri}
+
+  Stream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
+
+  # What an irony the I can't use AWS::Serverless::SimpleTable here because it doesn't support streams specification
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      # Enable DDB streams
+      StreamSpecification:
+        StreamViewType: KEYS_ONLY
+
+      ProvisionedThroughput:
+        WriteCapacityUnits: 5
+        ReadCapacityUnits: 5
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - KeyType: HASH
+        AttributeName: id
+

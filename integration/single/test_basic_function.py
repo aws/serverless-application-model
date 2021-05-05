@@ -14,9 +14,9 @@ class TestBasicFunction(BaseTest):
 
     @parameterized.expand(
         [
-            "basic_function",
-            "basic_function_no_envvar",
-            "basic_function_openapi",
+            "single/basic_function",
+            "single/basic_function_no_envvar",
+            "single/basic_function_openapi",
         ]
     )
     def test_basic_function(self, file_name):
@@ -33,8 +33,8 @@ class TestBasicFunction(BaseTest):
 
     @parameterized.expand(
         [
-            "function_with_http_api_events",
-            "function_alias_with_http_api_events",
+            "single/function_with_http_api_events",
+            "single/function_alias_with_http_api_events",
         ]
     )
     def test_function_with_http_api_events(self, file_name):
@@ -45,12 +45,12 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(requests.get(endpoint).text, self.FUNCTION_OUTPUT)
 
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
-        self.create_and_verify_stack("function_with_deployment_preference_alarms_intrinsic_if")
+        self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")
 
     @parameterized.expand(
         [
-            ("basic_function_with_sns_dlq", "sns:Publish"),
-            ("basic_function_with_sqs_dlq", "sqs:SendMessage"),
+            ("single/basic_function_with_sns_dlq", "sns:Publish"),
+            ("single/basic_function_with_sqs_dlq", "sqs:SendMessage"),
         ]
     )
     def test_basic_function_with_dlq(self, file_name, action):
@@ -83,7 +83,7 @@ class TestBasicFunction(BaseTest):
         """
         Creates a basic lambda function with KMS key arn
         """
-        self.create_and_verify_stack("basic_function_with_kmskeyarn")
+        self.create_and_verify_stack("single/basic_function_with_kmskeyarn")
 
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         function_configuration = self.client_provider.lambda_client.get_function_configuration(
@@ -97,7 +97,7 @@ class TestBasicFunction(BaseTest):
         """
         Creates a basic lambda function with tags
         """
-        self.create_and_verify_stack("basic_function_with_tags")
+        self.create_and_verify_stack("single/basic_function_with_tags")
         lambda_function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
         get_function_result = self.client_provider.lambda_client.get_function(FunctionName=lambda_function_name)
         tags = get_function_result["Tags"]
@@ -114,7 +114,7 @@ class TestBasicFunction(BaseTest):
         """
         Creates a basic lambda function with event destinations
         """
-        self.create_and_verify_stack("basic_function_event_destinations")
+        self.create_and_verify_stack("single/basic_function_event_destinations")
 
         test_function_1 = self.get_physical_id_by_logical_id("MyTestFunction")
         test_function_2 = self.get_physical_id_by_logical_id("MyTestFunction2")
@@ -158,27 +158,7 @@ class TestBasicFunction(BaseTest):
         """
         Creates a basic lambda function with tracing
         """
-        parameters = [
-            {
-                "ParameterKey": "Bucket",
-                "ParameterValue": self.s3_bucket_name,
-                "UsePreviousValue": False,
-                "ResolvedValue": "string",
-            },
-            {
-                "ParameterKey": "CodeKey",
-                "ParameterValue": "code.zip",
-                "UsePreviousValue": False,
-                "ResolvedValue": "string",
-            },
-            {
-                "ParameterKey": "SwaggerKey",
-                "ParameterValue": "swagger1.json",
-                "UsePreviousValue": False,
-                "ResolvedValue": "string",
-            },
-        ]
-        self.create_and_verify_stack("basic_function_with_tracing", parameters)
+        self.create_and_verify_stack("single/basic_function_with_tracing", self.get_default_test_template_parameters())
 
         active_tracing_function_id = self.get_physical_id_by_logical_id("ActiveTracingFunction")
         pass_through_tracing_function_id = self.get_physical_id_by_logical_id("PassThroughTracingFunction")

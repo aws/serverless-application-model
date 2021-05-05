@@ -1,0 +1,5 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"LambdaRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"LambdaRolePolicy", "ResourceType":"AWS::IAM::Policy" }
+]

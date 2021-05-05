@@ -1,0 +1,59 @@
+Parameters:
+  MyDomainName:
+    Type: String
+    Default: httpapi.sam-gamma-regional.com
+  MyDomainCert:
+    Type: String
+    Default: arn:aws:acm:us-east-1:830899278857:certificate/ae8c894b-4e41-42a6-8817-85d05665d043
+
+Globals:
+  HttpApi:
+    Domain:
+      DomainName:
+        Ref: MyDomainName
+      CertificateArn:
+        Ref: MyDomainCert
+      EndpointConfiguration: REGIONAL
+      MutualTlsAuthentication:
+        TruststoreUri: ${mtlsuri}
+        TruststoreVersion: 0
+      SecurityPolicy: TLS_1_2
+      BasePath:
+        - /get
+        - /post
+      Route53:
+        HostedZoneId: Z1DTV8GVAVOHDR
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        ImplicitGet:
+          Type: HttpApi
+          Properties:
+            Method: Get
+            Path: /get
+            ApiId: 
+              Ref: MyApi
+        ImplicitPost:
+          Type: HttpApi
+          Properties:
+            Method: Post
+            Path: /post
+            ApiId: 
+              Ref: MyApi
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod

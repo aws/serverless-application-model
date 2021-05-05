@@ -13,14 +13,14 @@ class TestBasicLayerVersion(BaseTest):
         """
         Creates a State Machine from inline definition
         """
-        self.create_and_verify_stack("basic_state_machine_inline_definition")
+        self.create_and_verify_stack("single/basic_state_machine_inline_definition")
 
     @skipIf(current_region_does_not_support(["XRay"]), "XRay is not supported in this testing region")
     def test_basic_state_machine_with_tags(self):
         """
         Creates a State Machine with tags
         """
-        self.create_and_verify_stack("basic_state_machine_with_tags")
+        self.create_and_verify_stack("single/basic_state_machine_with_tags")
 
         tags = self.get_stack_tags("MyStateMachineArn")
 

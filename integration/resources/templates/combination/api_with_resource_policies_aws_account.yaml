@@ -1,0 +1,33 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Auth:
+              ResourcePolicy:
+                AwsAccountWhitelist: 
+                  - Ref: 'AWS::AccountId'
+            Method: get
+            Path: /get
+
+Outputs:
+  Region:
+    Description: "Region"
+    Value: 
+      Ref: AWS::Region
+
+  AccountId:
+    Description: "Account Id"
+    Value: 
+      Ref: AWS::AccountId
+
+  Partition:
+    Description: "Partition"
+    Value: 
+      Ref: AWS::Partition

@@ -1,0 +1,6 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyTable", "ResourceType":"AWS::DynamoDB::Table" },
+  { "LogicalResourceId":"MyLambdaFunctionDdbStream", "ResourceType":"AWS::Lambda::EventSourceMapping" }
+]

@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Conditions:
+  MyCondition:
+    Fn::Equals:
+      - true
+      - true
+
+Resources:
+
+# S3 Event without condition, using same bucket
+  FunctionOne:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        ImageBucket:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectRemoved:*
+
+# All Event Types
+  MyAwesomeFunction:
+    Type: 'AWS::Serverless::Function'
+    Condition: MyCondition
+    Properties:
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Handler: index.handler
+      Runtime: nodejs12.x
+      AutoPublishAlias: Live
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+            Name:
+              Fn::Sub:
+                - TestSchedule${__StackName__}
+                - __StackName__: 
+                    Fn::Select:
+                      - 3
+                      - Fn::Split:
+                        - "-"
+                        - Ref: AWS::StackName
+            Description: test schedule
+            Enabled: False
+
+        CWEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - terminated
+
+        CWLog:
+          Type: CloudWatchLogs
+          Properties:
+            LogGroupName:
+              Ref: CloudWatchLambdaLogsGroup
+            FilterPattern: My pattern
+
+        IoTRule:
+          Type: IoTRule
+          Properties:
+            Sql: SELECT * FROM 'topic/test'
+            AwsIotSqlVersion: beta
+
+        S3Trigger:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*
+
+        NotificationTopic:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: Notifications
+
+        KinesisStream:
+          Type: Kinesis
+          Properties:
+            Stream:
+              Fn::GetAtt: [MyStream, Arn]
+            BatchSize: 100
+            MaximumBatchingWindowInSeconds: 20
+            StartingPosition: TRIM_HORIZON
+
+        DDBStream:
+          Type: DynamoDB
+          Properties:
+            Stream:
+              Fn::GetAtt: [MyDynamoDB, StreamArn]
+            BatchSize: 200
+            MaximumBatchingWindowInSeconds: 20
+            StartingPosition: LATEST
+
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+
+  Notifications:
+    Condition: MyCondition
+    Type: AWS::SNS::Topic
+
+  Images:
+    Type: AWS::S3::Bucket
+
+  CloudWatchLambdaLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: MyCondition
+    Properties:
+      RetentionInDays: 7
+
+  MyStream:
+    Type: AWS::Kinesis::Stream
+    Condition: MyCondition
+    Properties:
+      ShardCount: 1
+
+  MyDynamoDB:
+    Type: 'AWS::DynamoDB::Table'
+    Condition: MyCondition
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+Outputs:
+  ScheduleName:
+    Description: "Name of the cw schedule"
+    Value:
+      Fn::Sub:
+        - TestSchedule${__StackName__}
+        - __StackName__: 
+            Fn::Select:
+              - 3
+              - Fn::Split:
+                - "-"
+                - Ref: AWS::StackName

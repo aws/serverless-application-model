@@ -1,0 +1,71 @@
+Description: SAM + Lambda + EFS
+
+Resources:
+  EfsFileSystem:
+    Type: AWS::EFS::FileSystem
+
+  MountTarget:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId:
+        Ref: EfsFileSystem
+      SubnetId:
+        Ref: MySubnet
+      SecurityGroups:
+        -
+          Fn::GetAtt: MySecurityGroup.GroupId
+
+  AccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId:
+        Ref: EfsFileSystem
+
+  LambdaFunctionWithEfs:
+    Type: AWS::Serverless::Function
+    DependsOn: MountTarget
+    Properties:
+      InlineCode: |
+        const fs = require('fs')
+        const path = require('path')
+        const efsMountPath = '/mnt/efs'
+
+        exports.handler = async (event, context, callback) => {
+        const directory = path.join(efsMountPath, event.body)
+        const files = fs.readdirSync(directory)
+        return files
+        }
+      Handler: index.handler
+      MemorySize: 128
+      Runtime: nodejs12.x
+      Timeout: 3
+      VpcConfig:
+        SecurityGroupIds:
+          -
+            Fn::GetAtt: MySecurityGroup.GroupId
+        SubnetIds:
+          -
+            Ref: MySubnet
+      FileSystemConfigs:
+        - Arn:
+            Fn::GetAtt: AccessPoint.Arn
+          LocalMountPath: /mnt/EFS
+
+  MyVpc:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+
+  MySecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "my test group"
+      VpcId:
+        Ref: MyVpc
+
+  MySubnet:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: MyVpc
+      CidrBlock: "10.0.0.0/24"

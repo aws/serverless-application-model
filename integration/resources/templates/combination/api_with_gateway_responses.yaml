@@ -1,0 +1,39 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Events:
+        Iam:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /iam
+            Auth:
+              Authorizer: AWS_IAM
+
+Outputs:
+    ApiUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
