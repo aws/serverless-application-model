@@ -4,10 +4,10 @@ from unittest.mock import patch
 from parameterized import parameterized
 
 from tests.plugins.application.test_serverless_app_plugin import mock_get_region
-from tests.translator.test_translator import mock_sar_service_call, TestTranslator
+from tests.translator.test_translator import mock_sar_service_call, AbstractTestTranslator
 
 
-class TestResourceLevelAttributes(TestTranslator):
+class TestResourceLevelAttributes(AbstractTestTranslator):
     @parameterized.expand(
         itertools.product(
             [

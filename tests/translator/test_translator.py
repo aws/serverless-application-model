@@ -138,7 +138,7 @@ def mock_sar_service_call(self, service_call_function, logical_id, *args):
 # api and s3 location for explicit api.
 
 
-class TestTranslator(TestCase):
+class AbstractTestTranslator(TestCase):
     def _read_input(self, testcase):
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
@@ -253,7 +253,7 @@ class TestTranslator(TestCase):
         rest_api_to_swagger_hash[logical_id] = data_hash
 
 
-class TestTranslatorEndToEnd(TestTranslator):
+class TestTranslatorEndToEnd(AbstractTestTranslator):
     @parameterized.expand(
         itertools.product(
             [

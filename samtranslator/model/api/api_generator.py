@@ -635,7 +635,6 @@ class ApiGenerator(object):
                 depends_on=[self.logical_id],
                 attributes=self.passthrough_resource_attributes,
             )
-            # usage_plan = ApiGatewayUsagePlan(logical_id=usage_plan_logical_id, depends_on=[self.logical_id])
             api_stages = list()
             api_stage = dict()
             api_stage["ApiId"] = ref(self.logical_id)
@@ -695,7 +694,6 @@ class ApiGenerator(object):
                 depends_on=[usage_plan_logical_id],
                 attributes=self.passthrough_resource_attributes,
             )
-            # api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
             api_key.Enabled = True
             stage_key = dict()
             stage_key["RestApiId"] = ref(self.logical_id)
