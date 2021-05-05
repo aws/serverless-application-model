@@ -267,22 +267,15 @@ class ImplicitApiPlugin(BasePlugin):
             return
 
         # Add a deletion policy to the API resource if its resources contains DeletionPolicy.
-        implicit_api_deletion_policies = self.api_deletion_policies[self.implicit_api_logical_id]
-        all_resource_method_deletion_policies = set(
-            [
-                deletion_policy
-                for path, method_deletion_policies in implicit_api_deletion_policies.items()
-                for method, deletion_policy in method_deletion_policies.items()
-            ]
-        )
-        at_least_one_resource_method = len(all_resource_method_deletion_policies) > 0
+        implicit_api_deletion_policies = self.api_deletion_policies.get(self.implicit_api_logical_id)
+        at_least_one_resource_method = len(implicit_api_deletion_policies) > 0
         one_resource_method_contains_deletion_policy = False
         contains_retain = False
         contains_delete = False
         # If multiple functions with multiple different policies reference the Implicit Api,
         # we set DeletionPolicy to Retain if Retain is present in one of the functions,
         # else Delete if Delete is present
-        for iterated_policy in all_resource_method_deletion_policies:
+        for iterated_policy in implicit_api_deletion_policies:
             if iterated_policy:
                 one_resource_method_contains_deletion_policy = True
                 if iterated_policy == "Retain":
@@ -306,15 +299,8 @@ class ImplicitApiPlugin(BasePlugin):
             return
 
         # Add a update replace policy to the API resource if its resources contains UpdateReplacePolicy.
-        implicit_api_update_replace_policies = self.api_update_replace_policies[self.implicit_api_logical_id]
-        all_resource_method_update_replace_policies = set(
-            [
-                update_replace_policy
-                for path, method_update_replace_policies in implicit_api_update_replace_policies.items()
-                for method, update_replace_policy in method_update_replace_policies.items()
-            ]
-        )
-        at_least_one_resource_method = len(all_resource_method_update_replace_policies) > 0
+        implicit_api_update_replace_policies = self.api_update_replace_policies.get(self.implicit_api_logical_id)
+        at_least_one_resource_method = len(implicit_api_update_replace_policies) > 0
         one_resource_method_contains_update_replace_policy = False
         contains_retain = False
         contains_snapshot = False
@@ -322,7 +308,7 @@ class ImplicitApiPlugin(BasePlugin):
         # If multiple functions with multiple different policies reference the Implicit Api,
         # we set UpdateReplacePolicy to Retain if Retain is present in one of the functions,
         # Snapshot if Snapshot is present, else Delete if Delete is present
-        for iterated_policy in all_resource_method_update_replace_policies:
+        for iterated_policy in implicit_api_update_replace_policies:
             if iterated_policy:
                 one_resource_method_contains_update_replace_policy = True
                 if iterated_policy == "Retain":
