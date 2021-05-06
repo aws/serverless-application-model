@@ -93,13 +93,11 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
             method_conditions = api_dict_condition.setdefault(path, {})
             method_conditions[method] = condition
 
-            api_dict_deletion = self.api_deletion_policies.setdefault(api_id, [])
-            if deletion_policy not in api_dict_deletion:
-                api_dict_deletion.append(deletion_policy)
+            api_dict_deletion = self.api_deletion_policies.setdefault(api_id, set())
+            api_dict_deletion.add(deletion_policy)
 
-            api_dict_update_replace = self.api_update_replace_policies.setdefault(api_id, [])
-            if update_replace_policy not in api_dict_update_replace:
-                api_dict_update_replace.append(update_replace_policy)
+            api_dict_update_replace = self.api_update_replace_policies.setdefault(api_id, set())
+            api_dict_update_replace.add(update_replace_policy)
 
             self._add_api_to_swagger(logicalId, event_properties, template)
 
