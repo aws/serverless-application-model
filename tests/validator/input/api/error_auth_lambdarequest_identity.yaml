@@ -1,4 +1,3 @@
-# Complete LambdaRequest auth
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,7 +6,110 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyLambdaRequestAuth:
+          LambdaRequestIdentityEmpty:
             FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+          LambdaRequestIdentityNotObject:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity: 3
+          LambdaRequestIdentityUnknown:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Unknown: Property
+
+          # Context
+          LambdaRequestIdentityContextEmpty:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
             Identity:
               Context:
+          LambdaRequestIdentityContextNotList:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Context: 3
+          LambdaRequestIdentityContextItemNotString:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Context:
+                - 3
+
+          # Headers
+          LambdaRequestIdentityHeadersEmpty:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Headers:
+          LambdaRequestIdentityHeadersNotList:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Headers: 3
+          LambdaRequestIdentityHeadersItemNotString:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              Headers:
+                - 3
+
+          # QueryStrings
+          LambdaRequestIdentityQueryStringsEmpty:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              QueryStrings:
+          LambdaRequestIdentityQueryStringsNotList:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              QueryStrings: 3
+          LambdaRequestIdentityQueryStringsItemNotString:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              QueryStrings:
+                - 3
+
+          # ReauthorizeEvery
+          LambdaRequestIdentityReauthorizeEveryEmpty:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              ReauthorizeEvery:
+          LambdaRequestIdentityReauthorizeEveryNotInt:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              ReauthorizeEvery: "3"
+          LambdaRequestIdentityReauthorizeEveryTooLow:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              ReauthorizeEvery: 0
+          LambdaRequestIdentityReauthorizeEveryTooHigh:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              ReauthorizeEvery: 3601
+
+          # StageVariables
+          LambdaRequestIdentityStageVariablesEmpty:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              StageVariables:
+          LambdaRequestIdentityStageVariablesNotList:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              StageVariables: 3
+          LambdaRequestIdentityStageVariablesItemNotString:
+            FunctionArn: Function.Arn
+            FunctionPayloadType: REQUEST
+            Identity:
+              StageVariables:
+                - 3

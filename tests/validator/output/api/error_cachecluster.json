@@ -1,6 +1,8 @@
 [
   "[Resources/ApiCacheClusterEnabledEmpty/Properties/CacheClusterEnabled] Must not be empty",
-  "[Resources/ApiCacheClusterEnabledNotBoolean/Properties/CacheClusterEnabled] 'true' is not of type 'boolean'",
+  "[Resources/ApiCacheClusterEnabledNotBoolean/Properties/CacheClusterEnabled] 'true' is not of type 'boolean', 'intrinsic'",
+  "[Resources/ApiCacheClusterEnabledNotIntrinsic/Properties/CacheClusterEnabled] {'Not': 'Intrinsic'} is not of type 'boolean', 'intrinsic'",
   "[Resources/ApiCacheClusterSizeEmpty/Properties/CacheClusterSize] Must not be empty",
-  "[Resources/ApiCacheClusterSizeNotString/Properties/CacheClusterSize] 3 is not of type 'string'"
+  "[Resources/ApiCacheClusterSizeNotString/Properties/CacheClusterSize] 3 is not of type 'string', 'intrinsic'",
+  "[Resources/ApiCacheClusterSizeNotIntrinsic/Properties/CacheClusterSize] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'"
 ]

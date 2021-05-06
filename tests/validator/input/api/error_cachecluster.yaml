@@ -14,6 +14,14 @@ Resources:
       StageName: Stage name
       CacheClusterEnabled: "true"
 
+  # CacheClusterEnabled not intrinsic
+  ApiCacheClusterEnabledNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CacheClusterEnabled:
+        Not: Intrinsic
+
   # CacheClusterSize empty
   ApiCacheClusterSizeEmpty:
     Type: AWS::Serverless::Api
@@ -27,3 +35,11 @@ Resources:
     Properties:
       StageName: Stage name
       CacheClusterSize: 3
+
+  # CacheClusterSize not intrinsic
+  ApiCacheClusterSizeNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CacheClusterSize:
+        Not: Intrinsic

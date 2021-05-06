@@ -167,7 +167,7 @@ class SamTemplateValidator(object):
 
 
 # Type definition redefinitions
-INTRINSIC_ATTR = [
+INTRINSIC_ATTR = {
     "Fn::Base64",
     "Fn::Cidr",
     "Fn::FindInMap",
@@ -180,7 +180,7 @@ INTRINSIC_ATTR = [
     "Fn::Sub",
     "Fn::Transform",
     "Ref",
-]
+}
 
 
 def is_object(checker, instance):
@@ -192,7 +192,4 @@ def is_intrinsic(checker, instance):
 
 
 def has_intrinsic_attr(dict):
-    for k in dict:
-        if k in INTRINSIC_ATTR:
-            return True
-    return False
+    return len(dict) == 1 and next(iter(dict)) in INTRINSIC_ATTR

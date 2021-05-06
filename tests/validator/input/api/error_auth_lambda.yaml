@@ -25,6 +25,9 @@ Resources:
             FunctionInvokeRole: Function invoke role
           LambdaFunctionArnNotString:
             FunctionArn: 3
+          LambdaFunctionArnNotIntrinsic:
+            FunctionArn:
+              Not: Intrinsic
 
           # FunctionInvokeRole
           LambdaFunctionInvokeRoleEmpty:
@@ -33,6 +36,10 @@ Resources:
           LambdaFunctionInvokeRoleNotString:
             FunctionArn: Function.arn
             FunctionInvokeRole: 3
+          LambdaFunctionInvokeRoleNotIntrinsic:
+            FunctionArn: Function.arn
+            FunctionInvokeRole:
+              Not: Intrinsic
 
           # FunctionPayloadType
           LambdaFunctionPayloadTypeEmpty:

@@ -20,22 +20,33 @@
             "additionalProperties": false,
             "properties": {
               "AccessLogSetting": {
-                "$ref": "file:cfn.json#definitions/AccessLogSetting"
+                "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.AccessLogSetting"
               },
               "Auth": {
                 "$ref": "#definitions/AWS::Serverless::Api.Auth"
               },
               "BinaryMediaTypes": {
                 "items": {
-                  "type": "string"
+                  "type": [
+                    "string"
+                  ]
                 },
-                "type": "array"
+                "type": [
+                  "array",
+                  "intrinsic"
+                ]
               },
               "CacheClusterEnabled": {
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "intrinsic"
+                ]
               },
               "CacheClusterSize": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "intrinsic"
+                ]
               },
               "CanarySetting": {
                 "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.CanarySetting"
@@ -191,6 +202,30 @@
                 },
                 {
                   "$ref": "#definitions/AWS::Serverless::Api.LambdaAuthorizer"
+                },
+                {
+                  "if": {
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "UserPoolArn"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "FunctionArn"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "UserPoolArn",
+                      "FunctionArn"
+                    ]
+                  }
                 }
               ]
             }
@@ -239,14 +274,6 @@
             "type": [
               "string",
               "intrinsic"
-            ],
-            "allOf": [
-              {
-                "$ref": "file:common.json#definitions/String"
-              },
-              {
-                "$ref": "file:intrinsics.json#definitions/Intrinsic"
-              }
             ]
           }
         },
@@ -362,7 +389,6 @@
         ]
       },
       "then": {
-        "additionalProperties": false,
         "properties": {
           "AuthorizationScopes": {
             "items": {
@@ -371,10 +397,16 @@
             "type": "array"
           },
           "FunctionArn": {
-            "type": "string"
+            "type": [
+              "string",
+              "intrinsic"
+            ]
           },
           "FunctionInvokeRole": {
-            "type": "string"
+            "type": [
+              "string",
+              "intrinsic"
+            ]
           },
           "FunctionPayloadType": {
             "enum": [
@@ -382,16 +414,27 @@
               "REQUEST"
             ],
             "type": "string"
-          },
-          "Identity": {
-            "oneOf": [
-              {
-                "$ref": "#definitions/AWS::Serverless::Api.LambdaRequestAuthorizationIdentity"
-              },
-              {
-                "$ref": "#definitions/AWS::Serverless::Api.LambdaTokenAuthorizationIdentity"
-              }
-            ]
+          }
+        },
+        "if": {
+          "properties": {
+            "FunctionPayloadType": {
+              "const": "TOKEN"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "Identity": {
+              "$ref": "#definitions/AWS::Serverless::Api.LambdaTokenAuthorizationIdentity"
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "Identity": {
+              "$ref": "#definitions/AWS::Serverless::Api.LambdaRequestAuthorizationIdentity"
+            }
           }
         },
         "required": [
@@ -433,6 +476,33 @@
           "type": "array"
         }
       },
+      "anyOf": [
+        {
+          "required": [
+            "Context"
+          ]
+        },
+        {
+          "required": [
+            "Headers"
+          ]
+        },
+        {
+          "required": [
+            "QueryStrings"
+          ]
+        },
+        {
+          "required": [
+            "ReauthorizeEvery"
+          ]
+        },
+        {
+          "required": [
+            "StageVariables"
+          ]
+        }
+      ],
       "type": "object"
     },
     "AWS::Serverless::Api.LambdaTokenAuthorizationIdentity": {
@@ -478,19 +548,28 @@
         },
         "IntrinsicVpcWhitelist": {
           "items": {
-            "$ref": "file:common.js#definitions/StringOrIntrinsicRef"
+            "type": [
+              "string",
+              "intrinsic"
+            ]
           },
           "type": "array"
         },
         "IntrinsicVpceBlacklist": {
           "items": {
-            "$ref": "file:common.js#definitions/StringOrIntrinsicRef"
+            "type": [
+              "string",
+              "intrinsic"
+            ]
           },
           "type": "array"
         },
         "IntrinsicVpceWhitelist": {
           "items": {
-            "$ref": "file:common.js#definitions/StringOrIntrinsicRef"
+            "type": [
+              "string",
+              "intrinsic"
+            ]
           },
           "type": "array"
         },

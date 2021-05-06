@@ -19,8 +19,8 @@ class TestValidatorApi(TestValidatorBase):
             "error_auth",
             "error_auth_cognito",
             "error_auth_lambda",
-            # Auth LambdaRequest Identity
-            # Auth LambdaToken Identity
+            "error_auth_lambdarequest_identity",
+            "error_auth_lambdatoken_identity",
             "error_binarymediatypes",
             "error_cachecluster",
             "error_canarysetting",
@@ -43,10 +43,6 @@ class TestValidatorApi(TestValidatorBase):
         ],
     )
     def test_validator_api_errors(self, template):
-        self._test_validator_error(os.path.join(INPUT_FOLDER, template), os.path.join(OUTPUT_FOLDER, template))
-
-    @parameterized.expand(["error_variables"])
-    def test_validator_api_errors_debug(self, template):
         self._test_validator_error(os.path.join(INPUT_FOLDER, template), os.path.join(OUTPUT_FOLDER, template))
 
     @parameterized.expand(

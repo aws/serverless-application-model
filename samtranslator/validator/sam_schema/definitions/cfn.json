@@ -2,19 +2,21 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
   "definitions": {
-    "AccessLogSetting": {
+    "AWS::ApiGateway::Stage.AccessLogSetting": {
       "additionalProperties": false,
       "properties": {
         "DestinationArn": {
-          "$ref": "file:intrinsics.json#definitions/StringOrIntrinsicRef"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "Format": {
           "type": "string"
         }
       },
       "type": [
-        "object",
-        "intrinsic"
+        "object"
       ]
     },
     "AWS::ApiGateway::Stage.CanarySetting": {

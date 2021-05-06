@@ -64,3 +64,15 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers: 3
+
+  # Authorizers is unknown (missing both required properties)
+  ApiAuthorizersUnknown:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          Unknown:
+            AuthorizationScopes:
+              - scope1
+              - scope2

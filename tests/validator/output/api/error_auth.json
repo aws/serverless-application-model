@@ -6,5 +6,7 @@
   "[Resources/ApiApiKeyRequiredNotBoolean/Properties/Auth/ApiKeyRequired] 'true' is not of type 'boolean'",
   "[Resources/ApiAuthorizersEmpty/Properties/Auth/Authorizers] Must not be empty",
   "[Resources/ApiAuthorizersItemEmpty/Properties/Auth/Authorizers/EmptyAuth] Must not be empty",
-  "[Resources/ApiAuthorizersNotObject/Properties/Auth/Authorizers] 3 is not of type 'object'"
+  "[Resources/ApiAuthorizersNotObject/Properties/Auth/Authorizers] 3 is not of type 'object'",
+  "[Resources/ApiAuthorizersUnknown/Properties/Auth/Authorizers/Unknown] 'UserPoolArn' is a required property",
+  "[Resources/ApiAuthorizersUnknown/Properties/Auth/Authorizers/Unknown] 'FunctionArn' is a required property"
 ]
