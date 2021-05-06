@@ -6,7 +6,31 @@
         true
       ]
     }
-  }, 
+  },
+  "Mappings": {
+    "RegionMap": {
+      "us-west-2": {
+        "exposeHeaders": [
+          "header2"
+        ]
+      },
+      "cn-north-1": {
+        "exposeHeaders": [
+          "header1"
+        ]
+      },
+      "us-gov-west-1": {
+        "exposeHeaders": [
+          "header3"
+        ]
+      },
+      "ap-southeast-1": {
+        "exposeHeaders": [
+          "header4"
+        ]
+      }
+    }
+  },
   "Resources": {
     "MyApiApiGatewayDefaultStage": {
       "Type": "AWS::ApiGatewayV2::Stage", 
@@ -70,12 +94,24 @@
                 "allowMethods": [
                   "GET"
                 ], 
-                "allowOrigins": [
-                  "https://foo.com"
-                ], 
-                "exposeHeaders": [
-                  "x-amzn-header"
-                ]
+                "allowOrigins": {
+                  "Fn::If": [
+                    "C1",
+                    [
+                      "https://foo.com"
+                    ],
+                    [
+                      "*"
+                    ]
+                  ]
+                },
+                "exposeHeaders": {
+                  "Fn::FindInMap": [
+                    "RegionMap",
+                    "ap-southeast-1",
+                    "exposeHeaders"
+                  ]
+                }
               }, 
               "AWS::NoValue"
             ]
@@ -220,12 +256,24 @@
                 "allowMethods": [
                   "GET"
                 ], 
-                "allowOrigins": [
-                  "https://foo.com"
-                ], 
-                "exposeHeaders": [
-                  "x-amzn-header"
-                ]
+                "allowOrigins": {
+                  "Fn::If": [
+                    "C1",
+                    [
+                      "https://foo.com"
+                    ],
+                    [
+                      "*"
+                    ]
+                  ]
+                },
+                "exposeHeaders": {
+                  "Fn::FindInMap": [
+                    "RegionMap",
+                    "ap-southeast-1",
+                    "exposeHeaders"
+                  ]
+                }
               }, 
               "AWS::NoValue"
             ]

@@ -4,6 +4,20 @@ Conditions:
       - true
       - true
 
+Mappings:
+  RegionMap:
+    cn-north-1:
+      exposeHeaders:
+        - header1
+    us-west-2:
+      exposeHeaders:
+        - header2
+    us-gov-west-1:
+      exposeHeaders:
+        - header3
+    ap-southeast-1:
+      exposeHeaders:
+        - header4
 Globals:
   HttpApi:
     CorsConfiguration:
@@ -14,9 +28,14 @@ Globals:
           AllowMethods:
             - GET
           AllowOrigins:
-            - https://foo.com
-          ExposeHeaders:
-            - x-amzn-header
+            Fn::If:
+              - C1
+              - - https://foo.com
+              - - '*'
+          ExposeHeaders: !FindInMap
+            - RegionMap
+            - !Ref 'AWS::Region'
+            - exposeHeaders
         - AWS::NoValue
 
 Resources:
@@ -55,3 +74,7 @@ Resources:
             x-amazon-apigateway-any-method:
               isDefaultRoute: true
         openapi: 3.0.1
+        # When intrinsics are given cors overrides open api with the `CorsConfiguration`
+        x-amazon-apigateway-cors:
+          allowOrigins:
+            - "https://overridden.com"
