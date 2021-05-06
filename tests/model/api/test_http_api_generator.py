@@ -1,6 +1,7 @@
 from unittest import TestCase
 from mock import patch
 import pytest
+import json
 from functools import reduce
 
 from samtranslator.model import InvalidResourceException
@@ -75,6 +76,57 @@ class TestHttpApiGenerator(TestCase):
         self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
         with pytest.raises(InvalidResourceException):
             HttpApiGenerator(**self.kwargs)._construct_http_api()
+
+    def test_auth_iam_enabled(self):
+        self.kwargs["auth"] = {
+            "EnableIamAuthorizer": True,
+        }
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
+        self.assertEqual(
+            http_api.Body["components"]["securitySchemes"],
+            {
+                "AWS_IAM": {
+                    "type": "apiKey",
+                    "name": "Authorization",
+                    "in": "header",
+                    "x-amazon-apigateway-authtype": "awsSigv4",
+                }
+            },
+        )
+
+    def test_auth_iam_enabled_with_default(self):
+        self.kwargs["auth"] = {
+            "DefaultAuthorizer": "AWS_IAM",
+            "EnableIamAuthorizer": True,
+        }
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
+        self.assertEqual(
+            http_api.Body["components"]["securitySchemes"],
+            {
+                "AWS_IAM": {
+                    "type": "apiKey",
+                    "name": "Authorization",
+                    "in": "header",
+                    "x-amazon-apigateway-authtype": "awsSigv4",
+                }
+            },
+        )
+
+    def test_auth_missing_iam_enablement(self):
+        self.kwargs["auth"] = {
+            "DefaultAuthorizer": "AWS_IAM",
+            "EnableIamAuthorizer": False,
+        }
+        self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        with pytest.raises(InvalidResourceException) as e:
+            HttpApiGenerator(**self.kwargs)._construct_http_api()
+        self.assertEqual(
+            e.value.message,
+            "Resource with id [HttpApiId] is invalid. "
+            + "Unable to set DefaultAuthorizer because 'AWS_IAM' was not defined in 'Authorizers'.",
+        )
 
     def test_auth_novalue_default_does_not_raise(self):
         self.kwargs["auth"] = self.authorizers

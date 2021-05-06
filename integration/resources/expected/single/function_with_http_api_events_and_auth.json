@@ -1,0 +1,62 @@
+[
+  {
+    "LogicalResourceId": "MyDefaultIamAuthHttpApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "MyDefaultIamAuthHttpApiApiGatewayDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  },
+  {
+    "LogicalResourceId": "MyIamAuthEnabledHttpApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "MyIamAuthEnabledHttpApiApiGatewayDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionImplicitApiDefaultAuthEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionImplicitApiIamAuthEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionMyDefaultIamAuthHttpApiDefaultAuthEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionMyDefaultIamAuthHttpApiIamAuthEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionMyDefaultIamAuthHttpApiNoAuthEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionMyIamAuthEnabledHttpApiDefaultAuthEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionMyIamAuthEnabledHttpApiIamAuthEventPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "ServerlessHttpApi",
+    "ResourceType": "AWS::ApiGatewayV2::Api"
+  },
+  {
+    "LogicalResourceId": "ServerlessHttpApiApiGatewayDefaultStage",
+    "ResourceType": "AWS::ApiGatewayV2::Stage"
+  }
+]

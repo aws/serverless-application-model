@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Unable to set Authorizer [AWS_IAM] on API method [x-amazon-apigateway-any-method] for path [$default] because the related API does not have the IAM authorizer enabled."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [Function1] is invalid. Event with id [Api] is invalid. Unable to set Authorizer [AWS_IAM] on API method [x-amazon-apigateway-any-method] for path [$default] because the related API does not have the IAM authorizer enabled."
+}

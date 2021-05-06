@@ -1,0 +1,37 @@
+Resources:
+  Function1:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.7
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi1
+            Auth:
+              Authorizer: AWS_IAM
+  MyApi1:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        EnableIamAuthorizer: False
+  Function2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.7
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi2
+            Auth:
+              Authorizer: AWS_IAM
+  MyApi2:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        EnableIamAuthorizer: True

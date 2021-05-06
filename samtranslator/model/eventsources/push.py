@@ -1167,36 +1167,51 @@ class HttpApi(PushEventSource):
         # Default auth should already be applied, so apply any other auth here or scope override to default
         api_authorizers = api_auth and api_auth.get("Authorizers")
 
-        if method_authorizer != "NONE" and not api_authorizers:
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                "because the related API does not define any Authorizers.".format(
-                    authorizer=method_authorizer, method=self.Method, path=self.Path
-                ),
-            )
+        # The IAM authorizer is built-in and not defined as a regular Authorizer.
+        enable_iam_authorizer = api_auth and api_auth.get("EnableIamAuthorizer")
 
-        if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                "because it wasn't defined in the API's Authorizers.".format(
-                    authorizer=method_authorizer, method=self.Method, path=self.Path
-                ),
-            )
+        if method_authorizer == "AWS_IAM":
+            if not enable_iam_authorizer:
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because the related API does not have the IAM authorizer enabled.".format(
+                        authorizer=method_authorizer, method=self.Method, path=self.Path
+                    ),
+                )
+        else:
+            if method_authorizer != "NONE" and not api_authorizers:
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because the related API does not define any Authorizers.".format(
+                        authorizer=method_authorizer, method=self.Method, path=self.Path
+                    ),
+                )
 
-        if method_authorizer == "NONE" and not api_auth.get("DefaultAuthorizer"):
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
-                "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                    method=self.Method, path=self.Path
-                ),
-            )
+            if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because it wasn't defined in the API's Authorizers.".format(
+                        authorizer=method_authorizer, method=self.Method, path=self.Path
+                    ),
+                )
+
+            if method_authorizer == "NONE" and not api_auth.get("DefaultAuthorizer"):
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
+                    "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
+                        method=self.Method, path=self.Path
+                    ),
+                )
+
         if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
             raise InvalidEventException(
                 self.relative_id,
                 "Unable to set Authorizer on API method [{method}] for path [{path}] because "
                 "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
             )
+
         editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)

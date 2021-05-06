@@ -693,6 +693,7 @@ class TestTranslatorEndToEnd(TestCase):
         "error_api_with_usage_plan_invalid_parameter",
         "error_http_api_with_cors_def_uri",
         "error_http_api_invalid_lambda_auth",
+        "error_http_api_invalid_iam_auth",
         "error_api_mtls_configuration_invalid_field",
         "error_api_mtls_configuration_invalid_type",
         "error_httpapi_mtls_configuration_invalid_field",

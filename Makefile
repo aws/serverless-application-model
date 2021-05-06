@@ -1,7 +1,7 @@
 target:
 	$(info ${HELP_MESSAGE})
 	@exit 0
-	
+
 init:
 	pip install -e '.[dev]'
 
