@@ -139,6 +139,7 @@ class TestResourceAttributes(TestCase):
             "Type": "foo",
             "Properties": {},
             "UpdatePolicy": "update",
+            "UpdateReplacePolicy": "Retain",
             "DeletionPolicy": [1, 2, 3],
         }
 
@@ -148,6 +149,7 @@ class TestResourceAttributes(TestCase):
         r = self.MyResource.from_dict("id", resource_dict=all_supported_attributes)
         self.assertEqual(r.get_resource_attribute("DeletionPolicy"), [1, 2, 3])
         self.assertEqual(r.get_resource_attribute("UpdatePolicy"), "update")
+        self.assertEqual(r.get_resource_attribute("UpdateReplacePolicy"), "Retain")
 
 
 class TestResourceRuntimeAttributes(TestCase):
