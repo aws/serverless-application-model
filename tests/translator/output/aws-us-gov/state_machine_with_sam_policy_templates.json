@@ -35,30 +35,23 @@
           }
         },
         "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
-        "DefinitionString": {
-          "Fn::Join": [
-            "\n",
-            [
-              "{",
-              "    \"Comment\": \"An example ASL file for nested workflows\",",
-              "    \"StartAt\": \"NestedStateOne\",",
-              "    \"States\": {",
-              "        \"NestedStateOne\": {",
-              "            \"Next\": \"NestedStateTwo\",",
-              "            \"Result\": {",
-              "                \"Value\": \"MyValue\"",
-              "            },",
-              "            \"Type\": \"Pass\"",
-              "        },",
-              "        \"NestedStateTwo\": {",
-              "            \"End\": true,",
-              "            \"Resource\": \"${definition_substitution_1}\",",
-              "            \"Type\": \"Task\"",
-              "        }",
-              "    }",
-              "}"
-            ]
-          ]
+        "Definition": {
+          "Comment": "An example ASL file for nested workflows",
+          "StartAt": "NestedStateOne",
+          "States": {
+            "NestedStateOne": {
+              "Next": "NestedStateTwo",
+              "Result": {
+                "Value": "MyValue"
+              },
+              "Type": "Pass"
+            },
+            "NestedStateTwo": {
+              "End": true,
+              "Resource": "${definition_substitution_1}",
+              "Type": "Task"
+            }
+          }
         },
         "StateMachineType": "STANDARD",
         "Tags": [
@@ -121,115 +114,108 @@
             "Arn"
           ]
         },
-        "DefinitionString": {
-          "Fn::Join": [
-            "\n",
-            [
-              "{",
-              "    \"Comment\": \"An example ASL file with parallel states\",",
-              "    \"StartAt\": \"StateOne\",",
-              "    \"States\": {",
-              "        \"StateOne\": {",
-              "            \"Next\": \"StateTwo\",",
-              "            \"Result\": {",
-              "                \"Value\": \"MyValue\"",
-              "            },",
-              "            \"Type\": \"Pass\"",
-              "        },",
-              "        \"StateTwo\": {",
-              "            \"Branches\": [",
-              "                {",
-              "                    \"StartAt\": \"BranchOne_StateOne\",",
-              "                    \"States\": {",
-              "                        \"BranchOne_StateFour\": {",
-              "                            \"Choices\": [",
-              "                                {",
-              "                                    \"Next\": \"ValueIsZero\",",
-              "                                    \"NumericEquals\": 0,",
-              "                                    \"Variable\": \"$.value\"",
-              "                                },",
-              "                                {",
-              "                                    \"Next\": \"ValueIsOne\",",
-              "                                    \"NumericEquals\": 1,",
-              "                                    \"Variable\": \"$.value\"",
-              "                                }",
-              "                            ],",
-              "                            \"Type\": \"Choice\"",
-              "                        },",
-              "                        \"BranchOne_StateOne\": {",
-              "                            \"Next\": \"BranchOne_StateTwo\",",
-              "                            \"Resource\": \"${definition_substitution_1}\",",
-              "                            \"Type\": \"Task\"",
-              "                        },",
-              "                        \"BranchOne_StateThree\": {",
-              "                            \"Next\": \"BranchOne_StateFour\",",
-              "                            \"Parameters\": {",
-              "                                \"FunctionName\": \"${definition_substitution_2}\"",
-              "                            },",
-              "                            \"Resource\": \"arn:aws:states:::lambda:invoke\",",
-              "                            \"Type\": \"Task\"",
-              "                        },",
-              "                        \"BranchOne_StateTwo\": {",
-              "                            \"Next\": \"BranchOne_StateThree\",",
-              "                            \"Parameters\": {",
-              "                                \"MessageBody.$\": \"$.input.message\",",
-              "                                \"QueueUrl\": \"${definition_substitution_3}\"",
-              "                            },",
-              "                            \"Resource\": \"arn:aws:states:::sqs:sendMessage.waitForTaskToken\",",
-              "                            \"Type\": \"Task\"",
-              "                        },",
-              "                        \"ValueIsOne\": {",
-              "                            \"Type\": \"Succeed\"",
-              "                        },",
-              "                        \"ValueIsZero\": {",
-              "                            \"Type\": \"Fail\"",
-              "                        }",
-              "                    }",
-              "                },",
-              "                {",
-              "                    \"StartAt\": \"BranchTwo_StateOne\",",
-              "                    \"States\": {",
-              "                        \"BranchTwo_StateOne\": {",
-              "                            \"Next\": \"BranchTwo_StateTwo\",",
-              "                            \"Parameters\": {",
-              "                                \"Input\": {",
-              "                                    \"KeyA\": \"ValueA\",",
-              "                                    \"KeyC\": \"ValueC\"",
-              "                                },",
-              "                                \"StateMachineArn\": \"${definition_substitution_4}\"",
-              "                            },",
-              "                            \"Resource\": \"arn:aws:states:::states:startExecution.sync\",",
-              "                            \"Type\": \"Task\"",
-              "                        },",
-              "                        \"BranchTwo_StateThree\": {",
-              "                            \"Type\": \"Succeed\"",
-              "                        },",
-              "                        \"BranchTwo_StateTwo\": {",
-              "                            \"Next\": \"BranchTwo_StateThree\",",
-              "                            \"Parameters\": {",
-              "                                \"Item\": {",
-              "                                    \"Body\": {",
-              "                                        \"S.$\": \"$.MessageDetails.Body\"",
-              "                                    },",
-              "                                    \"MessageId\": {",
-              "                                        \"S.$\": \"$.MessageDetails.MessageId\"",
-              "                                    }",
-              "                                },",
-              "                                \"TableName\": \"${definition_substitution_5}\"",
-              "                            },",
-              "                            \"Resource\": \"arn:aws:states:::dynamodb:putItem\",",
-              "                            \"Type\": \"Task\"",
-              "                        }",
-              "                    }",
-              "                }",
-              "            ],",
-              "            \"End\": true,",
-              "            \"Type\": \"Parallel\"",
-              "        }",
-              "    }",
-              "}"
-            ]
-          ]
+        "Definition": {
+          "Comment": "An example ASL file with parallel states",
+          "StartAt": "StateOne",
+          "States": {
+            "StateOne": {
+              "Next": "StateTwo",
+              "Result": {
+                "Value": "MyValue"
+              },
+              "Type": "Pass"
+            },
+            "StateTwo": {
+              "Branches": [
+                {
+                  "StartAt": "BranchOne_StateOne",
+                  "States": {
+                    "BranchOne_StateFour": {
+                      "Choices": [
+                        {
+                          "Next": "ValueIsZero",
+                          "NumericEquals": 0,
+                          "Variable": "$.value"
+                        },
+                        {
+                          "Next": "ValueIsOne",
+                          "NumericEquals": 1,
+                          "Variable": "$.value"
+                        }
+                      ],
+                      "Type": "Choice"
+                    },
+                    "BranchOne_StateOne": {
+                      "Next": "BranchOne_StateTwo",
+                      "Resource": "${definition_substitution_1}",
+                      "Type": "Task"
+                    },
+                    "BranchOne_StateThree": {
+                      "Next": "BranchOne_StateFour",
+                      "Parameters": {
+                        "FunctionName": "${definition_substitution_2}"
+                      },
+                      "Resource": "arn:aws:states:::lambda:invoke",
+                      "Type": "Task"
+                    },
+                    "BranchOne_StateTwo": {
+                      "Next": "BranchOne_StateThree",
+                      "Parameters": {
+                        "MessageBody.$": "$.input.message",
+                        "QueueUrl": "${definition_substitution_3}"
+                      },
+                      "Resource": "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
+                      "Type": "Task"
+                    },
+                    "ValueIsOne": {
+                      "Type": "Succeed"
+                    },
+                    "ValueIsZero": {
+                      "Type": "Fail"
+                    }
+                  }
+                },
+                {
+                  "StartAt": "BranchTwo_StateOne",
+                  "States": {
+                    "BranchTwo_StateOne": {
+                      "Next": "BranchTwo_StateTwo",
+                      "Parameters": {
+                        "Input": {
+                          "KeyA": "ValueA",
+                          "KeyC": "ValueC"
+                        },
+                        "StateMachineArn": "${definition_substitution_4}"
+                      },
+                      "Resource": "arn:aws:states:::states:startExecution.sync",
+                      "Type": "Task"
+                    },
+                    "BranchTwo_StateThree": {
+                      "Type": "Succeed"
+                    },
+                    "BranchTwo_StateTwo": {
+                      "Next": "BranchTwo_StateThree",
+                      "Parameters": {
+                        "Item": {
+                          "Body": {
+                            "S.$": "$.MessageDetails.Body"
+                          },
+                          "MessageId": {
+                            "S.$": "$.MessageDetails.MessageId"
+                          }
+                        },
+                        "TableName": "${definition_substitution_5}"
+                      },
+                      "Resource": "arn:aws:states:::dynamodb:putItem",
+                      "Type": "Task"
+                    }
+                  }
+                }
+              ],
+              "End": true,
+              "Type": "Parallel"
+            }
+          }
         },
         "StateMachineType": "STANDARD",
         "Tags": [

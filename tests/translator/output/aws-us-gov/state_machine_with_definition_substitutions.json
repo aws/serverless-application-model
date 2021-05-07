@@ -120,28 +120,21 @@
             "Arn"
           ]
         },
-        "DefinitionString": {
-          "Fn::Join": [
-            "\n",
-            [
-              "{",
-              "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",",
-              "    \"StartAt\": \"Hello\",",
-              "    \"States\": {",
-              "        \"Hello\": {",
-              "            \"Next\": \"World\",",
-              "            \"Result\": \"Hello\",",
-              "            \"Type\": \"${my_state_var_1}\"",
-              "        },",
-              "        \"World\": {",
-              "            \"End\": true,",
-              "            \"Resource\": \"${definition_substitution_1}\",",
-              "            \"Type\": \"${my_state_var_2}\"",
-              "        }",
-              "    }",
-              "}"
-            ]
-          ]
+        "Definition": {
+          "Comment": "A Hello World example of the Amazon States Language using Pass states",
+          "StartAt": "Hello",
+          "States": {
+            "Hello": {
+              "Next": "World",
+              "Result": "Hello",
+              "Type": "${my_state_var_1}"
+            },
+            "World": {
+              "End": true,
+              "Resource": "${definition_substitution_1}",
+              "Type": "${my_state_var_2}"
+            }
+          }
         },
         "Tags": [
           {
