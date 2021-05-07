@@ -54,6 +54,23 @@ class SnsEventSource(TestCase):
         subscription = resources[1]
         self.assertEqual(subscription.FilterPolicy, filterPolicy)
 
+    def test_to_cloudformation_passes_redrive_policy(self):
+        redrivePolicy = {"deadLetterTargetArn": "value1"}
+        self.sns_event_source.RedrivePolicy = redrivePolicy
+
+        resources = self.sns_event_source.to_cloudformation(function=self.function)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[1].resource_type, "AWS::SNS::Subscription")
+        subscription = resources[1]
+        self.assertEqual(subscription.RedrivePolicy, redrivePolicy)
+
+    def test_to_cloudformation_when_redrive_policy(self):
+        redrivePolicy = {"attribute1": "value1"}
+        self.sns_event_source.RedrivePolicy = redrivePolicy
+
+        with self.assertRaises(TypeError):
+            self.sns_event_source.to_cloudformation(function=self.function)
+
     def test_to_cloudformation_throws_when_no_function(self):
         self.assertRaises(TypeError, self.sns_event_source.to_cloudformation)
 

@@ -11,6 +11,7 @@ class SNSSubscription(Resource):
         "TopicArn": PropertyType(True, is_str()),
         "Region": PropertyType(False, is_str()),
         "FilterPolicy": PropertyType(False, is_type(dict)),
+        "RedrivePolicy": PropertyType(False, is_type(dict)),
     }
 
 
