@@ -1,21 +1,21 @@
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  # TracingEnabled is empty
-  ApiTracingEnabledEmpty:
+  # Models is empty
+  ApiModelsEmpty:
     Type: AWS::Serverless::Api
     Properties:
+      Models:
       StageName: Stage name
-      TracingEnabled:
-  # TracingEnabled not boolean
-  ApiTracingEnabledNotBoolean:
+  # Models not an object
+  ApiModelsNotObject:
     Type: AWS::Serverless::Api
     Properties:
+      Models: 3
       StageName: Stage name
-      TracingEnabled: 3
-  # TracingEnabled not intrinsic
-  ApiTracingEnabledNotIntrinsic:
+  # Models not an object
+  ApiModelsPropertyNotObject:
     Type: AWS::Serverless::Api
     Properties:
+      Models:
+        Test: 3
       StageName: Stage name
-      TracingEnabled:
-        Not: Intrinsic

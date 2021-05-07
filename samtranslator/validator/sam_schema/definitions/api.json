@@ -62,24 +62,18 @@
                 ]
               },
               "DefinitionBody": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "object"
-                  }
+                "type": [
+                  "string",
+                  "object",
+                  "intrinsic"
                 ]
               },
               "DefinitionUri": {
-                "allOf": [
-                  {
-                    "$ref": "file:common.json#definitions/String"
-                  },
-                  {
-                    "$ref": "#definitions/AWS::Serverless::Api.S3Location"
-                  }
-                ]
+                "type": [
+                  "string",
+                  "object"
+                ],
+                "$ref": "#definitions/AWS::Serverless::Api.S3Location"
               },
               "Description": {
                 "type": "string"
@@ -100,30 +94,48 @@
                 "items": {
                   "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.MethodSetting"
                 },
-                "type": "array"
+                "type": [
+                  "array",
+                  "intrinsic"
+                ]
               },
               "MinimumCompressionSize": {
+                "type": [
+                  "integer",
+                  "intrinsic",
+                  "null"
+                ],
                 "maximum": 10485760,
-                "minimum": 0,
-                "type": "integer"
+                "minimum": 0
               },
               "Models": {
+                "additionalProperties": {
+                  "type": "object"
+                },
                 "type": "object"
               },
               "Name": {
                 "type": "string"
               },
               "OpenApiVersion": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^[2-3](\\.\\d)(\\.\\d)?$",
+                "patternError": "2.x or 3.x.x"
               },
               "StageName": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "intrinsic"
+                ]
               },
               "Tags": {
                 "$ref": "file:common.json#definitions/TagsMap"
               },
               "TracingEnabled": {
-                "type": "boolean"
+                "type": [
+                  "boolean",
+                  "intrinsic"
+                ]
               },
               "Variables": {
                 "additionalProperties": false,
@@ -334,10 +346,16 @@
           "type": "array"
         },
         "CertificateArn": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "DomainName": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "EndpointConfiguration": {
           "enum": [
@@ -347,7 +365,7 @@
           "type": "string"
         },
         "MutualTlsAuthentication": {
-          "$ref": "file:common.json#definitions/AWS::ApiGatewayV2::DomainName.MutualTlsAuthentication"
+          "$ref": "file:cfn.json#definitions/AWS::ApiGatewayV2::DomainName.MutualTlsAuthentication"
         },
         "Route53": {
           "$ref": "#definitions/AWS::Serverless::Api.Route53Configuration"
@@ -366,18 +384,29 @@
       "additionalProperties": false,
       "properties": {
         "Type": {
-          "enum": [
-            "REGIONAL",
-            "EDGE",
-            "PRIVATE"
-          ],
-          "type": "string"
+          "if": {
+            "type": "string"
+          },
+          "then": {
+            "enum": [
+              "REGIONAL",
+              "EDGE",
+              "PRIVATE"
+            ]
+          },
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "VPCEndpointIds": {
           "items": {
             "type": "string"
           },
-          "type": "array"
+          "type": [
+            "array",
+            "intrinsic"
+          ]
         }
       },
       "type": "object"
@@ -604,43 +633,64 @@
       "additionalProperties": false,
       "properties": {
         "DistributionDomainName": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "EvaluateTargetHealth": {
-          "type": "boolean"
-        },
-        "oneOf": {
-          "HostedZoneId": {
-            "type": "string"
-          },
-          "HostedZoneName": {
-            "type": "string"
-          }
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
         },
         "IpV6": {
           "type": "boolean"
+        },
+        "HostedZoneId": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "HostedZoneName": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         }
       },
       "type": "object"
     },
     "AWS::Serverless::Api.S3Location": {
-      "additionalProperties": false,
-      "properties": {
-        "Bucket": {
-          "type": "string"
-        },
-        "Key": {
-          "type": "string"
-        },
-        "Version": {
-          "type": "number"
-        }
+      "if": {
+        "type": "object"
       },
-      "required": [
-        "Bucket",
-        "Key"
-      ],
-      "type": "object"
+      "then": {
+        "additionalProperties": false,
+        "properties": {
+          "Bucket": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "Key": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "Version": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "Bucket",
+          "Key"
+        ],
+        "type": "object"
+      }
     }
   },
   "type": "object"

@@ -1,0 +1,10 @@
+[
+  "[Resources/ApiEndpointConfigurationEmpty/Properties/EndpointConfiguration] Must not be empty",
+  "[Resources/ApiEndpointConfigurationNotObject/Properties/EndpointConfiguration] 3 is not of type 'object'",
+  "[Resources/ApiEndpointConfigurationTypeNotString/Properties/EndpointConfiguration/Type] 3 is not of type 'string', 'intrinsic'",
+  "[Resources/ApiEndpointConfigurationTypeNotIntrinsic/Properties/EndpointConfiguration/Type] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'",
+  "[Resources/ApiEndpointConfigurationTypeUnknown/Properties/EndpointConfiguration/Type] 'Unknown' is not one of ['REGIONAL', 'EDGE', 'PRIVATE']",
+  "[Resources/ApiEndpointConfigurationVPCEndpointIdsNotList/Properties/EndpointConfiguration/VPCEndpointIds] 3 is not of type 'array', 'intrinsic'",
+  "[Resources/ApiEndpointConfigurationVPCEndpointIdsNotIntrinsic/Properties/EndpointConfiguration/VPCEndpointIds] {'Not': 'Intrinsic'} is not of type 'array', 'intrinsic'",
+  "[Resources/ApiEndpointConfigurationVPCEndpointIdsItemNotString/Properties/EndpointConfiguration/VPCEndpointIds/0] 3 is not of type 'string'"
+]

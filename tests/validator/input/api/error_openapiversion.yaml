@@ -1,21 +1,20 @@
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  # TracingEnabled is empty
-  ApiTracingEnabledEmpty:
+  # OpenApiVersion is empty
+  ApiOpenApiVersionEmpty:
     Type: AWS::Serverless::Api
     Properties:
+      OpenApiVersion:
       StageName: Stage name
-      TracingEnabled:
-  # TracingEnabled not boolean
-  ApiTracingEnabledNotBoolean:
+  # OpenApiVersion not string
+  ApiOpenApiVersionNotString:
     Type: AWS::Serverless::Api
     Properties:
+      OpenApiVersion: 3
       StageName: Stage name
-      TracingEnabled: 3
-  # TracingEnabled not intrinsic
-  ApiTracingEnabledNotIntrinsic:
+  # OpenApiVersion incorrect format
+  ApiOpenApiVersionIncorrectFormat:
     Type: AWS::Serverless::Api
     Properties:
+      OpenApiVersion: "a"
       StageName: Stage name
-      TracingEnabled:
-        Not: Intrinsic

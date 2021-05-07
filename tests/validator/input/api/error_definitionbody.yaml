@@ -7,7 +7,7 @@ Resources:
       DefinitionBody:
       StageName: Stage name
 
-  # DefinitionBody is not a string
+  # DefinitionBody is not a string, object, intrinsic
   ApiDefinitionBodyNotString:
     Type: AWS::Serverless::Api
     Properties:

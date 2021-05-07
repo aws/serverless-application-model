@@ -113,10 +113,16 @@
       "additionalProperties": false,
       "properties": {
         "TruststoreUri": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "TruststoreVersion": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         }
       },
       "type": "object"

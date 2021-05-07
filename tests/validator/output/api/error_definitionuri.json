@@ -1,18 +1,9 @@
 [
-  "[Resources/ApiDefinitionUriEmpty/Properties/DefinitionUri] Must not be empty",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
-  "[Resources/ApiDefinitionBodyEmpty/Properties/DefinitionBody] Must not be empty",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
-  "[Resources/ApiDefinitionBodyEmpty/Properties/DefinitionBody] Must not be empty",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
-  "[Resources/ApiDefinitionBodyEmpty/Properties/DefinitionBody] Must not be empty",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
-  "[Resources/ApiDefinitionBodyEmpty/Properties/DefinitionBody] Must not be empty",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'string'",
-  "[Resources/ApiDefinitionBodyNotString/Properties/DefinitionBody] 3 is not of type 'object'",
-  ""
+  "[Resources/ApiDefinitionUriBucketMissing/Properties/DefinitionUri] 'Bucket' is a required property",
+  "[Resources/ApiDefinitionUriBucketEmpty/Properties/DefinitionUri/Bucket] Must not be empty",
+  "[Resources/ApiDefinitionUriBucketNotString/Properties/DefinitionUri/Bucket] 3 is not of type 'string', 'intrinsic'",
+  "[Resources/ApiDefinitionUriBucketNotIntrinsic/Properties/DefinitionUri/Bucket] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'",
+  "[Resources/ApiDefinitionUriKeyMissing/Properties/DefinitionUri] 'Key' is a required property",
+  "[Resources/ApiDefinitionUriKeyEmpty/Properties/DefinitionUri/Key] Must not be empty",
+  "[Resources/ApiDefinitionUriKeyNotString/Properties/DefinitionUri/Key] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'"
 ]

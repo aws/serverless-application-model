@@ -98,7 +98,7 @@ class SamTemplateValidator(object):
             # Format the message:
             # [/Path/To/Element] Error message
             error_content = "[{}] {}".format(
-                "/".join([str(p) for p in error.absolute_path]), self._cleanup_error_message(error.message)
+                "/".join([str(p) for p in error.absolute_path]), self._cleanup_error_message(error)
             )
 
             if error_content not in sibling_errors:
@@ -113,27 +113,29 @@ class SamTemplateValidator(object):
             # Each context item is also a validation error
             self._process_error(context_error, formatted_errors, child_errors)
 
-    def _cleanup_error_message(self, message):
+    def _cleanup_error_message(self, error):
         """
         Cleans an error message up to remove unecessary clutter or replace
         it with a more meaningful one
 
         Parameters
         ----------
-        message : str
-            Message to clean
+        error : Error
+            Error message to clean
 
         Returns
         -------
         str
             Cleaned message
         """
-        final_message = re.sub(self.UNICODE_TYPE_REGEX, r"\1", message)
+        final_message = re.sub(self.UNICODE_TYPE_REGEX, r"\1", error.message)
 
         if final_message.endswith(" under any of the given schemas"):
             return "Is not valid"
-        if final_message.startswith("None is not of type "):
+        if final_message.startswith("None is not of type ") or final_message.startswith("None is not one of "):
             return "Must not be empty"
+        if " does not match " in final_message and "patternError" in error.schema:
+            return re.sub(" does not match .+", " does not match " + error.schema.get("patternError"), final_message)
 
         return final_message
 

@@ -1,6 +1,6 @@
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  # Desfinition is empty
+  # Description is empty
   ApiDescriptionEmpty:
     Type: AWS::Serverless::Api
     Properties:

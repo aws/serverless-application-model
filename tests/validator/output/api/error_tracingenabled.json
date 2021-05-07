@@ -1,4 +1,5 @@
 [
   "[Resources/ApiTracingEnabledEmpty/Properties/TracingEnabled] Must not be empty",
-  "[Resources/ApiTracingEnabledNotBoolean/Properties/TracingEnabled] 3 is not of type 'boolean'"
+  "[Resources/ApiTracingEnabledNotBoolean/Properties/TracingEnabled] 3 is not of type 'boolean', 'intrinsic'",
+  "[Resources/ApiTracingEnabledNotIntrinsic/Properties/TracingEnabled] {'Not': 'Intrinsic'} is not of type 'boolean', 'intrinsic'"
 ]

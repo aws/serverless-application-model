@@ -5,15 +5,25 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       CacheClusterSize: "32"
+
   # StageName empty
   ApiStageNameEmpty:
     Type: AWS::Serverless::Api
     Properties:
       CacheClusterSize: "32"
       StageName:
+
   # StageName not string
   ApiStageNameNotString:
     Type: AWS::Serverless::Api
     Properties:
       CacheClusterSize: "32"
       StageName: 3
+
+  # StageName not intrinsic
+  ApiStageNameNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      CacheClusterSize: "32"
+      StageName:
+        Not: Intrinsic

@@ -1,0 +1,15 @@
+[
+  "[Resources/ApiGatewayResponsesEmpty/Properties/GatewayResponses] Must not be empty",
+  "[Resources/ApiGatewayResponsesNotObject/Properties/GatewayResponses] 3 is not of type 'object'",
+  "[Resources/ApiGatewayResponsesResponseUnknown/Properties/GatewayResponses] Additional properties are not allowed ('UNKNOWN' was unexpected)",
+  "[Resources/ApiGatewayResponsesResponseEmpty/Properties/GatewayResponses/DEFAULT_4XX] Must not be empty",
+  "[Resources/ApiGatewayResponsesResponseNotObject/Properties/GatewayResponses/DEFAULT_4XX] 3 is not of type 'object'",
+  "[Resources/ApiGatewayResponsesResponseUnknownProperty/Properties/GatewayResponses/DEFAULT_4XX] Additional properties are not allowed ('Unknown' was unexpected)",
+  "[Resources/ApiGatewayResponsesResponseParametersEmpty/Properties/GatewayResponses/DEFAULT_4XX/ResponseParameters] Must not be empty",
+  "[Resources/ApiGatewayResponsesResponseParametersNotObject/Properties/GatewayResponses/DEFAULT_4XX/ResponseParameters] 3 is not of type 'object', 'intrinsic'",
+  "[Resources/ApiGatewayResponsesResponseTemplatesEmpty/Properties/GatewayResponses/DEFAULT_4XX/ResponseTemplates] Must not be empty",
+  "[Resources/ApiGatewayResponsesResponseTemplatesNotObject/Properties/GatewayResponses/DEFAULT_4XX/ResponseTemplates] 3 is not of type 'object', 'intrinsic'",
+  "[Resources/ApiGatewayResponsesStatusCodeEmpty/Properties/GatewayResponses/DEFAULT_4XX/StatusCode] Must not be empty",
+  "[Resources/ApiGatewayResponsesStatusCodeNotString/Properties/GatewayResponses/DEFAULT_4XX/StatusCode] 3 is not of type 'string', 'intrinsic'",
+  "[Resources/ApiGatewayResponsesStatusCodeNotIntrinsic/Properties/GatewayResponses/DEFAULT_4XX/StatusCode] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'"
+]

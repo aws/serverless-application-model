@@ -14,13 +14,22 @@
       "additionalProperties": false,
       "properties": {
         "ResponseParameters": {
-          "type": "object"
+          "type": [
+            "object",
+            "intrinsic"
+          ]
         },
         "ResponseTemplates": {
-          "type": "object"
+          "type": [
+            "object",
+            "intrinsic"
+          ]
         },
         "StatusCode": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         }
       },
       "references": [
