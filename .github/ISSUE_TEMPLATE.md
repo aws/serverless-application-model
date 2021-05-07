@@ -6,7 +6,7 @@ existing issue instead of creating a new one. If you are reporting a bug,
 make sure to include relevant information asked below to help with debugging.
 
 ## GENERAL HELP QUESTIONS ##
-Github Issues is for bug reports and feature requests. If you have general support
+GitHub Issues is for bug reports and feature requests. If you have general support
 questions, the following locations are a good place:
 
 - Post a question in StackOverflow  with "aws-sam" tag
