@@ -3,8 +3,14 @@ import sys
 import json
 import boto3
 import logging
+import hashlib
 
 from botocore.config import Config
+from samtranslator.feature_toggle.dialup import (
+    DisabledDialup,
+    ToggleDialup,
+    SimpleAccountPercentileDialup,
+)
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
@@ -18,50 +24,69 @@ class FeatureToggle:
     SAM is executing or not.
     """
 
-    def __init__(self, config_provider):
+    DIALUP_RESOLVER = {
+        "toggle": ToggleDialup,
+        "account-percentile": SimpleAccountPercentileDialup,
+    }
+
+    def __init__(self, config_provider, stage, account_id, region):
         self.feature_config = config_provider.config
+        self.stage = stage
+        self.account_id = account_id
+        self.region = region
 
-    def is_enabled_for_stage_in_region(self, feature_name, stage, region="default"):
+    def _get_dialup(self, region_config, feature_name):
         """
-        To check if feature is available for a particular stage or not.
+        get the right dialup instance
+        if no dialup type is provided or the specified dialup is not supported,
+        an instance of DisabledDialup will be returned
+
+        :param region_config: region config
+        :param feature_name: feature_name
+        :return: an instance of
+        """
+        dialup_type = region_config.get("type")
+        if dialup_type in FeatureToggle.DIALUP_RESOLVER:
+            return FeatureToggle.DIALUP_RESOLVER[dialup_type](
+                region_config, account_id=self.account_id, feature_name=feature_name
+            )
+        LOG.warning("Dialup type '{}' is None or is not supported.".format(dialup_type))
+        return DisabledDialup(region_config)
+
+    def is_enabled(self, feature_name):
+        """
+        To check if feature is available
+
         :param feature_name: name of feature
-        :param stage: stage where SAM is running
-        :param region: region in which SAM is running
-        :return:
         """
         if feature_name not in self.feature_config:
             LOG.warning("Feature '{}' not available in Feature Toggle Config.".format(feature_name))
             return False
-        stage_config = self.feature_config.get(feature_name, {}).get(stage, {})
-        if not stage_config:
-            LOG.info("Stage '{}' not enabled for Feature '{}'.".format(stage, feature_name))
-            return False
-        region_config = stage_config.get(region, {}) if region in stage_config else stage_config.get("default", {})
-        is_enabled = region_config.get("enabled", False)
-        LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
-        return is_enabled
 
-    def is_enabled_for_account_in_region(self, feature_name, stage, account_id, region="default"):
-        """
-        To check if feature is available for a particular account or not.
-        :param feature_name: name of feature
-        :param stage: stage where SAM is running
-        :param account_id: account_id who is executing SAM template
-        :param region: region in which SAM is running
-        :return:
-        """
-        if feature_name not in self.feature_config:
-            LOG.warning("Feature '{}' not available in Feature Toggle Config.".format(feature_name))
+        stage = self.stage
+        region = self.region
+        account_id = self.account_id
+        if not stage or not region or not account_id:
+            LOG.warning(
+                "One or more of stage, region and account_id is not set. Feature '{}' not enabled.".format(feature_name)
+            )
             return False
+
         stage_config = self.feature_config.get(feature_name, {}).get(stage, {})
         if not stage_config:
             LOG.info("Stage '{}' not enabled for Feature '{}'.".format(stage, feature_name))
             return False
-        account_config = stage_config.get(account_id) if account_id in stage_config else stage_config.get("default", {})
-        region_config = (
-            account_config.get(region, {}) if region in account_config else account_config.get("default", {})
-        )
-        is_enabled = region_config.get("enabled", False)
+
+        if account_id in stage_config:
+            account_config = stage_config[account_id]
+            region_config = account_config[region] if region in account_config else account_config.get("default", {})
+        else:
+            region_config = stage_config[region] if region in stage_config else stage_config.get("default", {})
+
+        dialup = self._get_dialup(region_config, feature_name=feature_name)
+        LOG.info("Using Dialip {}".format(dialup))
+        is_enabled = dialup.is_enabled()
+
         LOG.info("Feature '{}' is enabled: '{}'".format(feature_name, is_enabled))
         return is_enabled
 

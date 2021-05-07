@@ -2,13 +2,20 @@
     "__note__": "This is a dummy config for local testing. Any change here need to be migrated to SAM service.",
     "feature-1": {
         "beta": {
-            "us-west-2": {"enabled": true},
-            "default": {"enabled": false},
-            "123456789123": {"us-west-2": {"enabled": true}, "default": {"enabled": false}}
+            "us-west-2": {"type": "toggle", "enabled": true},
+            "us-east-1": {"type": "account-percentile", "enabled-%": 10},
+            "default": {"type": "toggle", "enabled": false},
+            "123456789123": {
+                "us-west-2": {"type": "toggle", "enabled": true},
+                "default": {"type": "toggle", "enabled": false}
+            }
         },
         "gamma": {
-            "default": {"enabled": false},
-            "123456789123": {"us-east-1": {"enabled": false}, "default": {"enabled": false}}
+            "default": {"type": "toggle", "enabled": false},
+            "123456789123": {
+                "us-east-1": {"type": "toggle", "enabled": false},
+                "default": {"type": "toggle", "enabled": false}
+            }
         },
         "prod": {"default": {"enabled": false}}
     }
