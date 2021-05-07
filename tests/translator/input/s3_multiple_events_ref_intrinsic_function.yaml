@@ -1,0 +1,36 @@
+Parameters:
+  CreateEvents:
+    Type: CommaDelimitedList
+    Default: s3:ObjectCreated:Post,s3:ObjectCreated:Copy
+  DeleteEvents:
+    Type: CommaDelimitedList
+    Default: s3:ObjectRemoved:*
+
+Resources:
+  ThumbnailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.generate_thumbails
+      Runtime: nodejs12.x
+      Events:
+        ImageBucketCreates:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: !Ref CreateEvents
+        ImageBucketDeletes:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: !Ref DeleteEvents
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .jpg
+
+  Images:
+    Type: AWS::S3::Bucket
