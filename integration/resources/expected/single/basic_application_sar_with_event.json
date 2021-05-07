@@ -1,0 +1,5 @@
+[
+    { "LogicalResourceId":"Images", "ResourceType":"AWS::S3::Bucket" },
+    { "LogicalResourceId":"NestedApp", "ResourceType":"AWS::CloudFormation::Stack" },
+    { "LogicalResourceId":"NestedAppAPILambdaPermission", "ResourceType":"AWS::Lambda::Permission" }
+]

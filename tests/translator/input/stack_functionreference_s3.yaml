@@ -1,0 +1,23 @@
+Resources: 
+  NestedStack: 
+    Type: AWS::CloudFormation::Stack
+    Properties: 
+      TemplateURL: "https://s3.amazonaws.com/cloudformation-templates-us-east-2/EC2ChooseAMI.template"
+      Parameters: 
+        InstanceType: "t1.micro"
+        KeyName: "mykey"
+
+  ThumbnailFunction:
+    Type: AWS::Serverless::FunctionReference
+    Properties:
+      FunctionName: !GetAtt NestedStack.Outputs.ThumbnailFunction  
+      Events:
+        ImageBucket:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*    
+                  
+  Images:
+    Type: AWS::S3::Bucket        

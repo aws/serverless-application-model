@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+   API for integrating  quickly and easily
+Resources:
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: "exports.handler = async(event, context) => { console.log('te1st'); };"
+      Handler: app.handler
+      Runtime: nodejs12.x
+      MemorySize: 128
+Outputs:
+  FunctionName:
+    Value: !Ref TestFunction

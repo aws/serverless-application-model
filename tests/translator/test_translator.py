@@ -315,6 +315,8 @@ class TestTranslatorEndToEnd(TestCase):
                 "state_machine_with_xray_role",
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
+                "functionreference_s3",
+                "application_with_event",
             ],
             [
                 ("aws", "ap-southeast-1"),

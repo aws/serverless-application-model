@@ -1,0 +1,23 @@
+Resources: 
+  NestedStack: 
+    Type: AWS::CloudFormation::Stack
+    Properties: 
+      TemplateURL: ${stackurl}
+
+  ThumbnailFunction:
+    Type: AWS::Serverless::FunctionReference
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+          - NestedStack
+          - Outputs.FunctionName
+      Events:
+        ImageBucket:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*    
+                  
+  Images:
+    Type: AWS::S3::Bucket       
