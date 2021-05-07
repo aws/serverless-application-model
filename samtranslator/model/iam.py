@@ -17,6 +17,17 @@ class IAMRole(Resource):
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
 
+class IAMPolicy(Resource):
+    resource_type = "AWS::IAM::Policy"
+    property_types = {
+        "PolicyDocument": PropertyType(True, is_type(object)),
+        "PolicyName": PropertyType(True, is_str()),
+        "Roles": PropertyType(True, is_type(list)),
+    }
+
+    runtime_attrs = {"name": lambda self: ref(self.logical_id)}
+
+
 class IAMRolePolicies:
     @classmethod
     def construct_assume_role_policy_for_service_principal(cls, service_principal):
@@ -129,3 +140,27 @@ class IAMRolePolicies:
             },
         }
         return document
+
+
+class IAMPolicies:
+    @classmethod
+    def lambda_decrypt_environment_variables_policy(cls, logical_id, kms_key_arn, function_arn, role_arn):
+        policy_name = "DecryptEnvironmentVariablesPolicy"
+        policy = IAMPolicy(logical_id + policy_name)
+        policy.PolicyName = policy_name
+        policy.PolicyDocument = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "kms:Decrypt",
+                    "Effect": "Allow",
+                    "Resource": kms_key_arn,
+                    "Condition": {
+                        "StringEquals": {"kms:ViaService": "lambda.amazonaws.com"},
+                        "ForAnyValue:ArnEquals": {"kms:EncryptionContext:aws:lambda:FunctionArn": function_arn},
+                    },
+                }
+            ],
+        }
+        policy.Roles = [role_arn]
+        return policy

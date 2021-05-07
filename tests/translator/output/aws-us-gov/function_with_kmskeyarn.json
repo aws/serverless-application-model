@@ -1,60 +1,23 @@
 {
   "Resources": {
-    "FunctionWithKeyArnRole": {
-      "Type": "AWS::IAM::Role",
+    "myKey": {
+      "Type": "AWS::KMS::Key",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
+        "Description": "A sample key",
+        "KeyPolicy": {
           "Version": "2012-10-17",
+          "Id": "key-default-1",
           "Statement": [
             {
-              "Action": [
-                "sts:AssumeRole"
-              ],
+              "Sid": "Allow administration of the key",
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    },
-    "FunctionWithReferenceToKeyArnRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
+                "AWS": "arn:aws:iam::123456789012:user/Alice"
+              },
               "Action": [
-                "sts:AssumeRole"
+                "kms:Create*"
               ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
+              "Resource": "*"
             }
           ]
         }
@@ -67,13 +30,6 @@
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
         },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "KmsKeyArn": "thisIsaKey",
         "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
@@ -81,30 +37,78 @@
             "Arn"
           ]
         },
-        "Runtime": "python2.7"
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "KmsKeyArn": "thisIsaKey"
       }
     },
-    "myKey": {
-      "Type": "AWS::KMS::Key",
+    "FunctionWithKeyArnRole": {
+      "Type": "AWS::IAM::Role",
       "Properties": {
-        "KeyPolicy": {
+        "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
-          "Id": "key-default-1",
           "Statement": [
             {
               "Action": [
-                "kms:Create*"
+                "sts:AssumeRole"
               ],
-              "Sid": "Allow administration of the key",
-              "Resource": "*",
               "Effect": "Allow",
               "Principal": {
-                "AWS": "arn:aws:iam::123456789012:user/Alice"
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ]
         },
-        "Description": "A sample key"
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "FunctionWithKeyArnDecryptEnvironmentVariablesPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "kms:Decrypt",
+              "Effect": "Allow",
+              "Resource": "thisIsaKey",
+              "Condition": {
+                "StringEquals": {
+                  "kms:ViaService": "lambda.amazonaws.com"
+                },
+                "ForAnyValue:ArnEquals": {
+                  "kms:EncryptionContext:aws:lambda:FunctionArn": {
+                    "Fn::GetAtt": [
+                      "FunctionWithKeyArn",
+                      "Arn"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "PolicyName": "DecryptEnvironmentVariablesPolicy",
+        "Roles": [
+          {
+            "Ref": "FunctionWithKeyArnRole"
+          }
+        ]
       }
     },
     "FunctionWithReferenceToKeyArn": {
@@ -114,15 +118,6 @@
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
         },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "KmsKeyArn": {
-          "Ref": "myKey"
-        },
         "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
@@ -130,7 +125,82 @@
             "Arn"
           ]
         },
-        "Runtime": "python2.7"
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "KmsKeyArn": {
+          "Ref": "myKey"
+        }
+      }
+    },
+    "FunctionWithReferenceToKeyArnRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "FunctionWithReferenceToKeyArnDecryptEnvironmentVariablesPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "kms:Decrypt",
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "myKey"
+              },
+              "Condition": {
+                "StringEquals": {
+                  "kms:ViaService": "lambda.amazonaws.com"
+                },
+                "ForAnyValue:ArnEquals": {
+                  "kms:EncryptionContext:aws:lambda:FunctionArn": {
+                    "Fn::GetAtt": [
+                      "FunctionWithReferenceToKeyArn",
+                      "Arn"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "PolicyName": "DecryptEnvironmentVariablesPolicy",
+        "Roles": [
+          {
+            "Ref": "FunctionWithReferenceToKeyArnRole"
+          }
+        ]
       }
     }
   }

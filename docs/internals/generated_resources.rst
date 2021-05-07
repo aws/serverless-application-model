@@ -86,6 +86,31 @@ AWS::IAM::Role                     CodeDeployServiceRole
 
   NOTE: ``AWS::IAM::Role`` resources are only generated if no Role parameter is supplied for DeploymentPreference
 
+
+With KmsKeyArn Property
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Example:
+
+.. code:: yaml
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      ...
+      KmsKeyArn: !GetAtt MyKmsKey.Arn
+      ...
+
+
+Additional generated resources:
+
+================================== ================================
+CloudFormation Resource Type       Logical ID 
+================================== ================================
+AWS::IAM::Poilicy                  MyFunction\ **DecryptEnvironmentVariablesPolicy**
+================================== ================================
+
+
 With Events
 ~~~~~~~~~~~
 
