@@ -83,7 +83,7 @@ class DeploymentPreferenceCollection(object):
         service role altogether.
         :return: True, if we can skip creating service role. False otherwise
         """
-        return all(preference.role for preference in self._resource_preferences.values())
+        return all(preference.role or not preference.enabled for preference in self._resource_preferences.values())
 
     def enabled_logical_ids(self):
         """
