@@ -1,5 +1,5 @@
 import itertools
-from unittest.mock import patch
+from mock import patch
 
 from parameterized import parameterized
 
