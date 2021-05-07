@@ -1701,6 +1701,41 @@
         ]
       }
     },
+    "SSMParameterWritePolicy": {
+      "Description": "Gives access to write values to a parameter in this account. If not using default key, KMSEncryptPolicy will also be needed.",
+      "Parameters": {
+        "ParameterName": {
+          "Description":"The name of the secret to be stored in SSM in your account."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:DescribeParameters"
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:PutParameter"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${parameterName}",
+                {
+                  "parameterName": {
+                    "Ref": "ParameterName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "StepFunctionsExecutionPolicy": {
       "Description": "Gives permission to start a Step Functions state machine execution",
       "Parameters": {
@@ -1725,6 +1760,62 @@
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    "StepFunctionsSyncExecutionPolicy": {
+      "Description": "Gives permission to start a synchronous (.sync[:2]) Step Functions state machine execution",
+      "Parameters": {
+        "StateMachineName": {
+          "Description":"The name of the state machine to execute."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "states:StartExecution"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  "stateMachineName": {
+                    "Ref": "StateMachineName"
+                  }
+                }
+              ]
+            }
+          },
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "states:DescribeExecution",
+                  "states:StopExecution"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${stateMachineName}:*",
+                  {
+                    "stateMachineName": {
+                      "Ref": "StateMachineName"
+                    }
+                  }
+                ]
+              }
+            },
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "events:PutTargets",
+                  "events:PutRule",
+                  "events:DescribeRule"
+              ],
+              "Resource": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+              ]
           }
         ]
       }
