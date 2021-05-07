@@ -1,0 +1,74 @@
+Resources:
+  MyApi:
+    Type: "AWS::Serverless::HttpApi"
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          LambdaAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            AuthorizerPayloadFormatVersion: 1.0
+          OAuthAuth:
+            AuthorizationScopes:
+              - scope4
+            JwtConfiguration:
+              issuer: "https://www.example.com/v1/connect/oidc"
+              audience:
+                - MyApi
+            IdentitySource: "$request.querystring.param"
+        DefaultAuthorizer: LambdaAuth
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachine
+      Type: STANDARD
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Deny
+              Action: "*"
+              Resource: "*"
+      Events:
+        WithNoAuthorizer:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+            Path: /
+            Method: get
+            Auth:
+              Authorizer: NONE
+        WithLambdaAuthorizer:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+            Path: /users
+            Method: post
+            Auth:
+              Authorizer: LambdaAuth
+        WithOAuthAuthorizer:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+            Path: /users
+            Method: get
+            Auth:
+              Authorizer: OAuthAuth
+        WithDefaultAuthorizer:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+            Path: /users
+            Method: put

@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, is_str, list_of
-from samtranslator.model.intrinsics import ref, fnGetAtt
+from samtranslator.model.intrinsics import ref, fnGetAtt, fnSub
 
 
 class IAMRole(Resource):
@@ -38,6 +38,32 @@ class IAMRolePolicies:
             "PolicyName": logical_id + "StartExecutionPolicy",
             "PolicyDocument": {
                 "Statement": [{"Action": "states:StartExecution", "Effect": "Allow", "Resource": state_machine_arn}]
+            },
+        }
+        return document
+
+    @classmethod
+    def step_functions_execution_role_policy(cls, state_machine_arn, state_machine_name, logical_id):
+        document = {
+            "PolicyName": logical_id + "StartExecutionPolicy",
+            "PolicyDocument": {
+                "Statement": [
+                    {
+                        "Action": ["states:StartExecution", "states:StartSyncExecution"],
+                        "Effect": "Allow",
+                        "Resource": state_machine_arn,
+                    },
+                    {
+                        "Action": "states:StopExecution",
+                        "Effect": "Allow",
+                        "Resource": [
+                            fnSub(
+                                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${__Name__}:*",
+                                {"__Name__": state_machine_name},
+                            )
+                        ],
+                    },
+                ]
             },
         }
         return document

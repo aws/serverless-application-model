@@ -1,0 +1,18 @@
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      DefinitionUri: s3://bucket/key
+      DefinitionSubstitutions:
+        MyFunction: !GetAtt MyFunction.Arn
+      Events:
+        HttpAPIGateway:
+          Type: HttpApi
+          Properties:
+            Path: /inbound
+            Method: post
+            Action: stop
+      Policies: 
+        - LambdaInvokePolicy:
+            FunctionName: TestFunctionName

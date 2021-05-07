@@ -1,0 +1,52 @@
+Resources:
+  MyStandardStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: s3://bucket/key
+      DefinitionSubstitutions:
+        MyFunction: !GetAtt MyFunction.Arn
+      Events:
+        ApiStart:
+          Type: HttpApi
+          Properties:
+            Path: /start
+            Method: post
+        ApiStop:
+          Type: HttpApi
+          Properties:
+            Path: /stop
+            Action: stop
+            Method: post
+        ApiStartExpl:
+          Type: HttpApi
+          Properties:
+            Path: /startExpl
+            Method: post
+            Action: start
+      Policies: 
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MyFunction
+
+  MyExpressStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      DefinitionUri: s3://bucket/key
+      DefinitionSubstitutions:
+        MyFunction: !GetAtt MyFunction.Arn
+      Events:
+        ApiExprStart:
+          Type: HttpApi
+          Properties:
+            Path: /exprstart
+            Method: post
+        ApiExprStartSync:
+          Type: HttpApi
+          Properties:
+            Path: /exprsync
+            Action: startSync
+            Method: post
+      PermissionsBoundary: arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary
+      Policies: 
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MyFunction            

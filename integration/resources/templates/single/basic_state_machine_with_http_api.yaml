@@ -1,0 +1,52 @@
+Resources:
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: "exports.handler = async(event, context) => { console.log('te1st'); };"
+      Handler: app.handler
+      Runtime: nodejs12.x
+      MemorySize: 128
+
+  APIGatewayDeployment:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: 'dev'
+    DefinitionBody:
+        info:
+          title:
+            Ref: AWS::StackName
+          version: "1.0"
+        openapi: 3.0.1
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: ${statemachineurl}
+      Events:
+        NormalPost:
+          Type: HttpApi
+          Properties:
+            Path: /normal
+            Method: post
+            ApiId: 
+              Ref: APIGatewayDeployment  
+        StopPost:
+          Type: HttpApi
+          Properties:
+            Path: /stop
+            Method: post
+            Action: stop
+            ApiId: 
+              Ref: APIGatewayDeployment  
+        SyncPost:
+          Type: HttpApi
+          Properties:
+            Path: /sync
+            Method: post
+            Action: startSync
+            ApiId: 
+              Ref: APIGatewayDeployment          
+      Policies: 
+        - LambdaInvokePolicy:
+            FunctionName: 
+              Ref: TestFunction

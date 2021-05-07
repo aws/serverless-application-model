@@ -70,6 +70,34 @@ class EventSource(ResourceMacro):
 
         return event_role
 
+    def _construct_full_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):
+        """Constructs the IAM Role resource allowing the event service to invoke
+        the StartExecution API of the state machine resource it is associated with.
+
+        :param model.stepfunctions.StepFunctionsStateMachine resource: The state machine resource associated with the event
+        :param string permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
+        :param string prefix: Prefix to use for the logical ID of the IAM role
+        :param string suffix: Suffix to add for the logical ID of the IAM role
+
+        :returns: the IAM Role resource
+        :rtype: model.iam.IAMRole
+        """
+        role_logical_id = self._generate_logical_id(prefix=prefix, suffix=suffix, resource_type="Role")
+        event_role = IAMRole(role_logical_id, attributes=resource.get_passthrough_resource_attributes())
+        event_role.AssumeRolePolicyDocument = IAMRolePolicies.construct_assume_role_policy_for_service_principal(
+            self.principal
+        )
+        state_machine_arn = resource.get_runtime_attr("arn")
+        state_machine_name = resource.get_runtime_attr("name")
+        event_role.Policies = [
+            IAMRolePolicies.step_functions_execution_role_policy(state_machine_arn, state_machine_name, role_logical_id)
+        ]
+
+        if permissions_boundary:
+            event_role.PermissionsBoundary = permissions_boundary
+
+        return event_role
+
 
 class Schedule(EventSource):
     """Scheduled executions for SAM State Machine."""
@@ -236,6 +264,7 @@ class Api(EventSource):
         "RestApiId": PropertyType(True, is_str()),
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
+        "Action": PropertyType(False, is_str()),
     }
 
     def resources_to_link(self, resources):
@@ -346,6 +375,7 @@ class Api(EventSource):
             self.Path,
             self.Method,
             integration_uri,
+            self.Action,  # added for symmetry between swagger and openapi, it is for now ignored by editor
             role.get_runtime_attr("arn"),
             self._generate_request_template(resource),
             condition=condition,
@@ -441,3 +471,128 @@ class Api(EventSource):
             )
         }
         return request_templates
+
+
+class HttpApi(EventSource):
+    """HttpApi method event source for SAM State Machines."""
+
+    resource_type = "HttpApi"
+    principal = "apigateway.amazonaws.com"
+    property_types = {
+        "Path": PropertyType(True, is_str()),
+        "Method": PropertyType(True, is_str()),
+        # Api Event sources must "always" be paired with a Serverless::Api
+        "ApiId": PropertyType(True, is_str()),
+        "Stage": PropertyType(False, is_str()),
+        "Auth": PropertyType(False, is_type(dict)),
+        "Action": PropertyType(False, is_str()),
+        "Parameters": PropertyType(False, is_type(dict)),  # Name, Cause, Error, TraceHeader, Input
+        # "Responses": PropertyType(False, is_type(dict)), # 200: target method source
+        "TimeoutInMillis": PropertyType(False, is_type(int)),
+    }
+
+    def resources_to_link(self, resources):
+        """
+        If this API Event Source refers to an explicit API resource, resolve the reference and grab
+        necessary data from the explicit API
+        """
+
+        api_id = self.ApiId
+        if isinstance(api_id, dict) and "Ref" in api_id:
+            api_id = api_id["Ref"]
+
+        explicit_api = resources[api_id].get("Properties")
+
+        return {"explicit_api": explicit_api, "api_id": api_id}
+
+    def to_cloudformation(self, resource, **kwargs):
+        """If the Api event source has a RestApi property, then simply return the IAM role resource
+        allowing API Gateway to start the state machine execution. If no RestApi is provided, then
+        additionally inject the path, method, and the x-amazon-apigateway-integration into the
+        Swagger body for a provided implicit API.
+
+        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine \
+             resource to which the Api event source must be associated
+        :param dict kwargs: a dict containing the implicit RestApi to be modified, should no \
+            explicit RestApi be provided.
+
+        :returns: a list of vanilla CloudFormation Resources, to which this Api event expands
+        :rtype: list
+        """
+        resources = []
+
+        intrinsics_resolver = kwargs.get("intrinsics_resolver")
+        permissions_boundary = kwargs.get("permissions_boundary")
+
+        if self.Method is not None:
+            # Convert to lower case so that user can specify either GET or get
+            self.Method = self.Method.lower()
+
+        explicit_api = kwargs["explicit_api"]
+
+        role = self._construct_full_role(resource, permissions_boundary, kwargs["api_id"] + resource.logical_id)
+        resources.append(role)
+
+        self._add_swagger_integration(
+            explicit_api, resource, role, intrinsics_resolver, explicit_api.get("__MANAGE_SWAGGER")
+        )
+
+        return resources
+
+    def _add_swagger_integration(self, api, resource, role, intrinsics_resolver, manage_swagger=False):
+        """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
+
+        :param model.apigateway.ApiGatewayRestApi rest_api: the RestApi to which the path and method should be added.
+        """
+        swagger_body = api.get("DefinitionBody")
+        if swagger_body is None:
+            return
+
+        resource_arn = resource.get_runtime_attr("arn")
+
+        editor = OpenApiEditor(swagger_body)
+
+        if manage_swagger and editor.has_integration(self.Path, self.Method):
+            # Cannot add the integration, if it is already present
+            raise InvalidEventException(
+                self.relative_id,
+                'API method "{method}" defined multiple times for path "{path}".'.format(
+                    method=self.Method, path=self.Path
+                ),
+            )
+
+        if resource.StateMachineType == "EXPRESS" and self.Action == "stop":
+            raise InvalidEventException(
+                self.relative_id,
+                'Action "stop" cannot be used on StateMachines of type EXPRESS',
+            )
+
+        if (
+            resource.StateMachineType is None or resource.StateMachineType == "STANDARD"
+        ) and self.Action == "startSync":
+            raise InvalidEventException(
+                self.relative_id,
+                'Action "startSync" cannot be used on StateMachines of type STANDARD',
+            )
+
+        condition = None
+        if CONDITION in resource.resource_attributes:
+            condition = resource.resource_attributes[CONDITION]
+
+        editor.add_state_machine_integration(
+            self.Path,
+            self.Method,
+            resource_arn,  # was integration_uri
+            self.Action,
+            self.Parameters,
+            role.get_runtime_attr("arn"),
+            request_templates=None,
+            condition=condition,
+        )
+
+        editor.add_auth_to_integration(
+            api=api, path=self.Path, method=self.Method, auth=self.Auth, relative_id=self.relative_id
+        )
+        if self.TimeoutInMillis:
+            editor.add_timeout_to_method(api=api, path=self.Path, method_name=self.Method, timeout=self.TimeoutInMillis)
+        api["DefinitionBody"] = editor.openapi

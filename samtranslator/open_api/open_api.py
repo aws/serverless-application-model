@@ -5,7 +5,7 @@ from six import string_types
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.intrinsics import is_intrinsic
-from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidEventException
 import json
 
 
@@ -234,6 +234,92 @@ class OpenApiEditor(object):
         if condition:
             path_dict[method] = make_conditional(condition, path_dict[method])
 
+    def _get_integration_subtype(self, action):
+        if action is None:
+            return "StepFunctions-StartExecution"
+        if action == "start":
+            return "StepFunctions-StartExecution"
+        if action == "stop":
+            return "StepFunctions-StopExecution"
+        if action == "startSync":
+            return "StepFunctions-StartSyncExecution"
+        raise InvalidDocumentException([InvalidTemplateException("Action should be start, stop or startSync.")])
+
+    def add_state_machine_integration(
+        self,
+        path,
+        method,
+        integration_uri,
+        action,
+        parameters,
+        # responseParameters
+        credentials,
+        request_templates=None,  # this param is ignored (only used in Swagger)
+        condition=None,
+    ):
+        """
+        Adds aws APIGW integration to the given path+method.
+
+        :param string path: Path name
+        :param string method: HTTP Method
+        :param string integration_uri: URI for the integration
+        :param string credentials: Credentials for the integration
+        :param dict request_templates: A map of templates that are applied on the request payload.
+        :param bool condition: Condition for the integration
+        """
+
+        method = self._normalize_method_name(method)
+        if self.has_integration(path, method):
+            # Not throwing an error- we will add lambda integrations to existing swagger if not present
+            return
+
+        integration_subtype = self._get_integration_subtype(action)
+
+        self.add_path(path, method)
+
+        # Wrap the integration_uri in a Condition if one exists on that state machine
+        # This is necessary so CFN doesn't try to resolve the integration reference.
+        if condition:
+            integration_uri = make_conditional(condition, integration_uri)
+
+        path_dict = self.get_path(path)
+
+        # Responses
+        default_method_responses = {
+            "default": {"description": "Default response for Method={} Path={}".format(method, path)}
+        }
+
+        param = "StateMachineArn"
+        if action == "stop":
+            param = "ExecutionArn"
+            integration_uri = "$request.body.ExecutionArn"
+
+        request_parameters = parameters
+        if request_parameters is None:
+            request_parameters = {}
+
+        request_parameters[param] = integration_uri
+
+        path_dict[method][self._X_APIGW_INTEGRATION] = {
+            "type": "aws_proxy",
+            # responseParameters:
+            #    200:
+            #    - overwrite:header.test_test: "$response.header.test_test"
+            "requestParameters": request_parameters,
+            "payloadFormatVersion": "1.0",
+            "credentials": credentials,
+            "integrationSubtype": integration_subtype,
+            "connectionType": "INTERNET",
+            # timeoutInMillis
+        }
+
+        # If 'responses' key is *not* present, add it with an empty dict as value
+        path_dict[method].setdefault("responses", default_method_responses)
+
+        # If a condition is present, wrap all method contents up into the condition
+        if condition:
+            path_dict[method] = make_conditional(condition, path_dict[method])
+
     def make_path_conditional(self, path, condition):
         """
         Wrap entire API path definition in a CloudFormation if condition.
@@ -359,37 +445,81 @@ class OpenApiEditor(object):
                     existing_security = method_definition.get("security", [])
                     if existing_security:
                         return
-                    authorizer_list = []
-                    if authorizers:
-                        authorizer_list.extend(authorizers.keys())
                     security_dict = dict()
                     security_dict[default_authorizer] = self._get_authorization_scopes(
                         api_authorizers, default_authorizer
                     )
-                    authorizer_security = [security_dict]
+                    security = [security_dict]
 
-                    security = authorizer_security
+                    method_definition["security"] = security
 
-                    if security:
-                        method_definition["security"] = security
-
-    def add_auth_to_method(self, path, method_name, auth, api):
-        """
-        Adds auth settings for this path/method. Auth settings currently consist of Authorizers
-        but this method will eventually include setting other auth settings such as Resource Policy, etc.
-        This is used to configure the security for individual functions.
-
+    def add_auth_to_integration(self, api, path, method, auth, relative_id):
+        """Adds authorization to the lambda integration
+        :param api: api object
         :param string path: Path name
         :param string method_name: Method name
         :param dict auth: Auth configuration such as Authorizers
-        :param dict api: Reference to the related Api's properties as defined in the template.
+        :relative_id: Relative id of the event source for which the authorisation is added
         """
+        api_auth = api.get("Auth", {})
+
         method_authorizer = auth and auth.get("Authorizer")
-        authorization_scopes = auth.get("AuthorizationScopes", [])
-        api_auth = api and api.get("Auth")
-        authorizers = api_auth and api_auth.get("Authorizers")
+        if method_authorizer is None:
+            if api_auth.get("DefaultAuthorizer"):
+                method_authorizer = api_auth.get("DefaultAuthorizer")
+
+        if auth and method_authorizer is None:
+            # currently, we require either a default auth or auth in the method
+            raise InvalidEventException(
+                relative_id,
+                "'Auth' section requires either "
+                "an explicit 'Authorizer' set or a 'DefaultAuthorizer' "
+                "configured on the HttpApi.",
+            )
+
+        if method_authorizer is None:
+            return
+
+        api_authorizers = api_auth and api_auth.get("Authorizers")
+
+        if method_authorizer != "AWS_IAM":
+            if method_authorizer != "NONE" and not api_authorizers:
+                raise InvalidEventException(
+                    relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because the related API does not define any Authorizers.".format(
+                        authorizer=method_authorizer, method=method, path=path
+                    ),
+                )
+
+            if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
+                raise InvalidEventException(
+                    relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because it wasn't defined in the API's Authorizers.".format(
+                        authorizer=method_authorizer, method=method, path=path
+                    ),
+                )
+
+            if method_authorizer == "NONE" and not api_auth.get("DefaultAuthorizer"):
+                raise InvalidEventException(
+                    relative_id,
+                    "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
+                    "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
+                        method=method, path=path
+                    ),
+                )
+
+        if auth and auth.get("AuthorizationScopes") and not isinstance(auth.get("AuthorizationScopes"), list):
+            raise InvalidEventException(
+                relative_id,
+                "Unable to set Authorizer on API method [{method}] for path [{path}] because "
+                "'AuthorizationScopes' must be a list of strings.".format(method=method, path=path),
+            )
+
+        authorization_scopes = auth and auth.get("AuthorizationScopes", [])
         if method_authorizer:
-            self._set_method_authorizer(path, method_name, method_authorizer, authorizers, authorization_scopes)
+            self._set_method_authorizer(path, method, method_authorizer, api_authorizers, authorization_scopes)
 
     def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers, authorization_scopes=None):
         """
@@ -539,11 +669,6 @@ class OpenApiEditor(object):
         if self.info.get("description"):
             return
         self.info["description"] = description
-
-    def has_api_gateway_cors(self):
-        if self._doc.get(self._X_APIGW_CORS):
-            return True
-        return False
 
     @property
     def openapi(self):
