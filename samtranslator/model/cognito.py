@@ -20,7 +20,7 @@ class CognitoUserPool(Resource):
         "Policies": PropertyType(False, is_type(dict)),
         "Schema": PropertyType(False, list_of(dict)),
         "SmsAuthenticationMessage": PropertyType(False, is_str()),
-        "SmsConfiguration": PropertyType(False, list_of(dict)),
+        "SmsConfiguration": PropertyType(False, is_type(dict)),
         "SmsVerificationMessage": PropertyType(False, is_str()),
         "UsernameAttributes": PropertyType(False, list_of(is_str())),
         "UsernameConfiguration": PropertyType(False, is_type(dict)),
