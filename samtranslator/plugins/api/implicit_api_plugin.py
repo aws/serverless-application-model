@@ -39,6 +39,8 @@ class ImplicitApiPlugin(BasePlugin):
         # dict containing condition (or None) for each resource path+method for all APIs. dict format:
         # {api_id: {path: {method: condition_name_or_None}}}
         self.api_conditions = {}
+        self.api_deletion_policies = {}
+        self.api_update_replace_policies = {}
         self._setup_api_properties()
 
     def _setup_api_properties(self):
@@ -75,16 +77,22 @@ class ImplicitApiPlugin(BasePlugin):
 
             api_events = self._get_api_events(resource)
             condition = resource.condition
+            deletion_policy = resource.deletion_policy
+            update_replace_policy = resource.update_replace_policy
             if len(api_events) == 0:
                 continue
 
             try:
-                self._process_api_events(resource, api_events, template, condition)
+                self._process_api_events(
+                    resource, api_events, template, condition, deletion_policy, update_replace_policy
+                )
 
             except InvalidEventException as ex:
                 errors.append(InvalidResourceException(logicalId, ex.message))
 
         self._maybe_add_condition_to_implicit_api(template_dict)
+        self._maybe_add_deletion_policy_to_implicit_api(template_dict)
+        self._maybe_add_update_replace_policy_to_implicit_api(template_dict)
         self._maybe_add_conditions_to_implicit_api_paths(template)
         self._maybe_remove_implicit_api(template)
 
@@ -121,7 +129,9 @@ class ImplicitApiPlugin(BasePlugin):
 
         return api_events
 
-    def _process_api_events(self, resource, api_events, template, condition=None):
+    def _process_api_events(
+        self, resource, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
+    ):
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
         resource from the template
@@ -246,6 +256,75 @@ class ImplicitApiPlugin(BasePlugin):
                 self._add_combined_condition_to_template(
                     template_dict, self.implicit_api_condition, all_resource_method_conditions
                 )
+
+    def _maybe_add_deletion_policy_to_implicit_api(self, template_dict):
+        """
+        Decides whether to add a deletion policy to the implicit api resource.
+        :param dict template_dict: SAM template dictionary
+        """
+        # Short-circuit if template doesn't have any functions with implicit API events
+        if not self.api_deletion_policies.get(self.implicit_api_logical_id, {}):
+            return
+
+        # Add a deletion policy to the API resource if its resources contains DeletionPolicy.
+        implicit_api_deletion_policies = self.api_deletion_policies.get(self.implicit_api_logical_id)
+        at_least_one_resource_method = len(implicit_api_deletion_policies) > 0
+        one_resource_method_contains_deletion_policy = False
+        contains_retain = False
+        contains_delete = False
+        # If multiple functions with multiple different policies reference the Implicit Api,
+        # we set DeletionPolicy to Retain if Retain is present in one of the functions,
+        # else Delete if Delete is present
+        for iterated_policy in implicit_api_deletion_policies:
+            if iterated_policy:
+                one_resource_method_contains_deletion_policy = True
+                if iterated_policy == "Retain":
+                    contains_retain = True
+                if iterated_policy == "Delete":
+                    contains_delete = True
+        if at_least_one_resource_method and one_resource_method_contains_deletion_policy:
+            implicit_api_resource = template_dict.get("Resources").get(self.implicit_api_logical_id)
+            if contains_retain:
+                implicit_api_resource["DeletionPolicy"] = "Retain"
+            elif contains_delete:
+                implicit_api_resource["DeletionPolicy"] = "Delete"
+
+    def _maybe_add_update_replace_policy_to_implicit_api(self, template_dict):
+        """
+        Decides whether to add an update replace policy to the implicit api resource.
+        :param dict template_dict: SAM template dictionary
+        """
+        # Short-circuit if template doesn't have any functions with implicit API events
+        if not self.api_update_replace_policies.get(self.implicit_api_logical_id, {}):
+            return
+
+        # Add a update replace policy to the API resource if its resources contains UpdateReplacePolicy.
+        implicit_api_update_replace_policies = self.api_update_replace_policies.get(self.implicit_api_logical_id)
+        at_least_one_resource_method = len(implicit_api_update_replace_policies) > 0
+        one_resource_method_contains_update_replace_policy = False
+        contains_retain = False
+        contains_snapshot = False
+        contains_delete = False
+        # If multiple functions with multiple different policies reference the Implicit Api,
+        # we set UpdateReplacePolicy to Retain if Retain is present in one of the functions,
+        # Snapshot if Snapshot is present, else Delete if Delete is present
+        for iterated_policy in implicit_api_update_replace_policies:
+            if iterated_policy:
+                one_resource_method_contains_update_replace_policy = True
+                if iterated_policy == "Retain":
+                    contains_retain = True
+                if iterated_policy == "Snapshot":
+                    contains_snapshot = True
+                if iterated_policy == "Delete":
+                    contains_delete = True
+        if at_least_one_resource_method and one_resource_method_contains_update_replace_policy:
+            implicit_api_resource = template_dict.get("Resources").get(self.implicit_api_logical_id)
+            if contains_retain:
+                implicit_api_resource["UpdateReplacePolicy"] = "Retain"
+            elif contains_snapshot:
+                implicit_api_resource["UpdateReplacePolicy"] = "Snapshot"
+            elif contains_delete:
+                implicit_api_resource["UpdateReplacePolicy"] = "Delete"
 
     def _add_combined_condition_to_template(self, template_dict, condition_name, conditions_to_combine):
         """
