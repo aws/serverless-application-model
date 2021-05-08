@@ -332,3 +332,11 @@ class TestHttpApiDescription(TestCase):
         resources = sam_http_api.to_cloudformation(**self.kwargs)
         http_api = [x for x in resources if isinstance(x, ApiGatewayV2HttpApi)]
         self.assertEqual(http_api[0].Body.get("info", {}).get("description"), "new description")
+
+
+class TestPassthroughResourceAttributes(TestCase):
+    def test_with_passthrough_resource_attributes(self):
+        expected = {"DeletionPolicy": "Delete", "UpdateReplacePolicy": "Retain", "Condition": "C1"}
+        function = SamFunction("foo", attributes=expected)
+        attributes = function.get_passthrough_resource_attributes()
+        self.assertEqual(attributes, expected)
