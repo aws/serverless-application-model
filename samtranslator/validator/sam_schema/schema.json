@@ -6,11 +6,12 @@
       "additionalProperties": false,
       "properties": {
         "DeletionPolicy": {
-          "enum": [
-            "Delete",
-            "Retain",
-            "Snapshot"
-          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "type": "string"
+        },
+        "Condition": {
           "type": "string"
         },
         "DependsOn": {
@@ -132,11 +133,12 @@
       "additionalProperties": false,
       "properties": {
         "DeletionPolicy": {
-          "enum": [
-            "Delete",
-            "Retain",
-            "Snapshot"
-          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "type": "string"
+        },
+        "Condition": {
           "type": "string"
         },
         "DependsOn": {
@@ -838,11 +840,12 @@
       "additionalProperties": false,
       "properties": {
         "DeletionPolicy": {
-          "enum": [
-            "Delete",
-            "Retain",
-            "Snapshot"
-          ],
+          "type": "string"
+        },
+        "UpdateReplacePolicy": {
+          "type": "string"
+        },
+        "Condition": {
           "type": "string"
         },
         "DependsOn": {

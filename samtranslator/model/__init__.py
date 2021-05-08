@@ -43,7 +43,11 @@ class Resource(object):
     property_types = None
     _keywords = ["logical_id", "relative_id", "depends_on", "resource_attributes"]
 
-    _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition"]
+    # For attributes in this list, they will be passed into the translated template for the same resource itself.
+    _supported_resource_attributes = ["DeletionPolicy", "UpdatePolicy", "Condition", "UpdateReplacePolicy", "Metadata"]
+    # For attributes in this list, they will be passed into the translated template for the same resource,
+    # as well as all the auto-generated resources that are created from this resource.
+    _pass_through_attributes = ["Condition", "DeletionPolicy", "UpdateReplacePolicy"]
 
     # Runtime attributes that can be qureied resource. They are CloudFormation attributes like ARN, Name etc that
     # will be resolvable at runtime. This map will be implemented by sub-classes to express list of attributes they
@@ -75,6 +79,22 @@ class Resource(object):
         if attributes is not None:
             for attr, value in attributes.items():
                 self.set_resource_attribute(attr, value)
+
+    @classmethod
+    def get_supported_resource_attributes(cls):
+        """
+        A getter method for the supported resource attributes
+        returns: a tuple that contains the name of all supported resource attributes
+        """
+        return tuple(cls._supported_resource_attributes)
+
+    @classmethod
+    def get_pass_through_attributes(cls):
+        """
+        A getter method for the resource attributes to be passed to auto-generated resources
+        returns: a tuple that contains the name of all pass through attributes
+        """
+        return tuple(cls._pass_through_attributes)
 
     @classmethod
     def from_dict(cls, logical_id, resource_dict, relative_id=None, sam_plugins=None):
@@ -318,9 +338,10 @@ class Resource(object):
 
         :return: Dictionary of resource attributes.
         """
-        attributes = None
-        if "Condition" in self.resource_attributes:
-            attributes = {"Condition": self.resource_attributes["Condition"]}
+        attributes = {}
+        for resource_attribute in self.get_pass_through_attributes():
+            if resource_attribute in self.resource_attributes:
+                attributes[resource_attribute] = self.resource_attributes.get(resource_attribute)
         return attributes
 
 
