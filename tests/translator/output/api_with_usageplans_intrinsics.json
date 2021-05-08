@@ -68,7 +68,8 @@
       },
       "DependsOn": [
         "MyApiOne"
-      ]
+      ],
+      "Condition": "C1"
     },
     "MyApiTwoUsagePlan": {
       "Type": "AWS::ApiGateway::UsagePlan",
@@ -140,7 +141,8 @@
       },
       "DependsOn": [
         "MyApiOneUsagePlan"
-      ]
+      ],
+      "Condition": "C1"
     },
     "MyFunctionTwoRole": {
       "Type": "AWS::IAM::Role",
@@ -185,7 +187,8 @@
       },
       "DependsOn": [
         "MyApiOneApiKey"
-      ]
+      ],
+      "Condition": "C1"
     },
     "MyApiTwoApiKey": {
       "Type": "AWS::ApiGateway::ApiKey",

@@ -4,15 +4,15 @@ from samtranslator.model.exceptions import InvalidEventException
 
 class EventBridgeRuleUtils:
     @staticmethod
-    def create_dead_letter_queue_with_policy(rule_logical_id, rule_arn, queue_logical_id=None):
+    def create_dead_letter_queue_with_policy(rule_logical_id, rule_arn, queue_logical_id=None, attributes=None):
         resources = []
 
-        queue = SQSQueue(queue_logical_id or rule_logical_id + "Queue")
+        queue = SQSQueue(queue_logical_id or rule_logical_id + "Queue", attributes=attributes)
         dlq_queue_arn = queue.get_runtime_attr("arn")
         dlq_queue_url = queue.get_runtime_attr("queue_url")
 
         # grant necessary permission to Eventbridge Rule resource for sending messages to dead-letter queue
-        policy = SQSQueuePolicy(rule_logical_id + "QueuePolicy")
+        policy = SQSQueuePolicy(rule_logical_id + "QueuePolicy", attributes=attributes)
         policy.PolicyDocument = SQSQueuePolicies.eventbridge_dlq_send_message_resource_based_policy(
             rule_arn, dlq_queue_arn
         )
@@ -41,14 +41,14 @@ class EventBridgeRuleUtils:
             raise InvalidEventException(source_logical_id, "No 'Arn' or 'Type' property provided for DeadLetterConfig")
 
     @staticmethod
-    def get_dlq_queue_arn_and_resources(cw_event_source, source_arn):
+    def get_dlq_queue_arn_and_resources(cw_event_source, source_arn, attributes):
         """returns dlq queue arn and dlq_resources, assuming cw_event_source.DeadLetterConfig has been validated"""
         dlq_queue_arn = cw_event_source.DeadLetterConfig.get("Arn")
         if dlq_queue_arn is not None:
             return dlq_queue_arn, []
         queue_logical_id = cw_event_source.DeadLetterConfig.get("QueueLogicalId")
         dlq_resources = EventBridgeRuleUtils.create_dead_letter_queue_with_policy(
-            cw_event_source.logical_id, source_arn, queue_logical_id
+            cw_event_source.logical_id, source_arn, queue_logical_id, attributes
         )
         dlq_queue_arn = dlq_resources[0].get_runtime_attr("arn")
         return dlq_queue_arn, dlq_resources
