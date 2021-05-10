@@ -915,7 +915,7 @@ class SwaggerEditor(object):
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
-        if not self._validate_list_property_is_resolved(source_vpc_blacklist):
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_blacklist):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
@@ -932,7 +932,7 @@ class SwaggerEditor(object):
         resource_list = self._get_method_path_uri_list(path, api_id, stage)
         self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
 
-        if not self._validate_list_property_is_resolved(source_vpc_whitelist):
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
@@ -949,19 +949,6 @@ class SwaggerEditor(object):
         self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
-
-    def _validate_list_property_is_resolved(self, property_list):
-        """
-
-        :param property_list:
-        :return:
-        """
-
-        if property_list is not None and not all(isinstance(x, string_types) for x in property_list):
-            return False
-
-        return True
-
 
     def add_custom_statements(self, custom_statements):
         self._add_custom_statement(custom_statements)
@@ -1290,3 +1277,17 @@ class SwaggerEditor(object):
     def get_path_without_trailing_slash(path):
         # convert greedy paths to such as {greedy+}, {proxy+} to "*"
         return re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
+
+    @staticmethod
+    def _validate_list_property_is_resolved(property_list):
+        """
+        Validate if the values of a Property List are all of type string
+
+        :param property_list: Value of a Property List
+        :return bool: True if the property_list is all of type string otherwise False
+        """
+
+        if property_list is not None and not all(isinstance(x, string_types) for x in property_list):
+            return False
+
+        return True
