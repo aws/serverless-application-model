@@ -1188,9 +1188,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         ]
     )
     def test_must_fail_when_vpc_whitelist_is_non_string(self, resource_policy_key):
-        resource_policy = {
-            resource_policy_key: [{"sub": "somevalue"}]
-        }
+        resource_policy = {resource_policy_key: [{"sub": "somevalue"}]}
 
         with self.assertRaises(InvalidDocumentException):
             self.editor.add_resource_policy(resource_policy, "/foo", "123", "prod")
