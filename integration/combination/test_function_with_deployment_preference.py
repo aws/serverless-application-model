@@ -14,7 +14,6 @@ class TestFunctionWithDeploymentPreference(BaseTest):
         custom_deployment_config_name = "CustomLambdaDeploymentConfiguration"
         # Want to delete / recreate custom deployment resource to make sure it exists and hasn't changed
         if self._has_custom_deployment_configuration(custom_deployment_config_name):
-            print("Deleting old CustomLambdaDeploymentConfiguration resource.")
             self._delete_deployment_configuration(custom_deployment_config_name)
 
         self._create_deployment_configuration(custom_deployment_config_name)
@@ -32,7 +31,7 @@ class TestFunctionWithDeploymentPreference(BaseTest):
         )
         # When disabled, there should be no CodeDeploy resources created. This was already verified above
 
-    def test_flip_from_diasble_to_enable(self):
+    def test_flip_from_disable_to_enable(self):
         self.create_and_verify_stack(
             "combination/function_with_deployment_disabled", self.get_default_test_template_parameters()
         )

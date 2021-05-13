@@ -430,7 +430,6 @@ class TestApiWithAuthorizers(BaseTest):
         header_key=None,
         header_value=None,
     ):
-        print("Making request to " + url)
         if not header_key or not header_value:
             response = requests.get(url)
         else:
