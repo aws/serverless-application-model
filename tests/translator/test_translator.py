@@ -498,6 +498,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
             ],  # Run all the above tests against each of the list of partitions to test against
         )
     )
+    @pytest.mark.slow
     @patch(
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,

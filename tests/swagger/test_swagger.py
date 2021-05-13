@@ -1468,39 +1468,3 @@ class TestSwaggerEditor_add_authorization_scopes(TestCase):
 
         self.editor.add_auth_to_method("/cognito", "get", auth, self.api)
         self.assertEqual([{"NONE": []}], self.editor.swagger["paths"]["/cognito"]["get"]["security"])
-
-
-class TestSwaggerEditor_set_path_default_authorizer(TestCase):
-    def setUp(self):
-        self.api = api = {
-            "Auth": {
-                "Authorizers": {"MyOtherCognitoAuth": {}, "MyCognitoAuth": {}},
-                "DefaultAuthorizer": "MyCognitoAuth",
-            }
-        }
-        self.editor = SwaggerEditor(
-            {
-                "swagger": "2.0",
-                "paths": {
-                    "/cognito": {
-                        "nonMethod": {
-                            "x-amazon-apigateway-integration": {
-                                "httpMethod": "POST",
-                                "type": "aws_proxy",
-                                "uri": {
-                                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
-                                },
-                            },
-                            "security": [],
-                            "responses": {},
-                        }
-                    }
-                },
-            }
-        )
-
-    def test_should_fail_when_path_methods_are_invalid(self):
-        with self.assertRaises(InvalidDocumentException):
-            self.editor.set_path_default_authorizer(
-                "/cognito", "MyCognitoAuth", {"MyOtherCognitoAuth": {}, "MyCognitoAuth": {}}
-            )

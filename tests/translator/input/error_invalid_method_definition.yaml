@@ -42,7 +42,7 @@ Resources:
                 description: Application domain
                 type: string
                 required: true
-            options:
+            tags:
               - InvalidMethodDefinition
             get:
               x-amazon-apigateway-integration:

@@ -1,3 +1,0 @@
-{
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Path '/a' contains method 'SomeInvalidKey' which is not a supported method ['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH']"
-}
