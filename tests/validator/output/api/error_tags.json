@@ -1,0 +1,9 @@
+[
+  "[Resources/ApiTagsEmpty/Properties/Tags] Must not be empty",
+  "[Resources/ApiTagsNotObject/Properties/Tags] 3 is not of type 'object'",
+  "[Resources/ApiTagsItemEmpty/Properties/Tags/MyTag] Must not be empty",
+  "[Resources/ApiTagsItemNotAlphanumeric/Properties/Tags] 'My_Tag' can only contain alphanumeric characters (max length 127)",
+  "[Resources/ApiTagsItemTooLong/Properties/Tags] 'MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTag' can only contain alphanumeric characters (max length 127)",
+  "[Resources/ApiTagsItemValueNotString/Properties/Tags/MyTag] 3 is not of type 'string'",
+  "[Resources/ApiTagsItemValueTooLong/Properties/Tags/MyTag] 'MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongValue' is too long"
+]

@@ -9,7 +9,10 @@
           "Type": {
             "const": "AWS::Serverless::Function"
           }
-        }
+        },
+        "required": [
+          "Type"
+        ]
       },
       "then": {
         "additionalProperties": false,
@@ -166,16 +169,9 @@
             ]
           },
           "Type": {
-            "enum": [
-              "AWS::Serverless::Function"
-            ],
-            "type": "string"
+            "const": "AWS::Serverless::Function"
           }
         },
-        "required": [
-          "Type",
-          "Properties"
-        ],
         "type": "object"
       }
     },

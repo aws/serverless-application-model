@@ -14,15 +14,18 @@ OUTPUT_FOLDER = os.path.join(BASE_PATH, "output", "root")
 class TestValidatorRoot(TestValidatorBase):
     @parameterized.expand(
         [
+            "error_awstemplateformatversion_unknown",
             "error_empty_template",
             "error_resources_empty",
             "error_resources_missing",
             "error_resources_not_object",
-            "error_transform_missing",
             "error_resources_one_empty",
-            "error_resources_one_missing_type_element",
+            "error_resources_one_missing_properties",
+            "error_resources_one_missing_type",
+            "error_transform_empty",
+            "error_transform_missing",
+            "error_transform_sam_missing",
             "error_transform_unknown",
-            "error_awstemplateformatversion_unknown",
         ],
     )
     def test_validator_root_errors(self, template):

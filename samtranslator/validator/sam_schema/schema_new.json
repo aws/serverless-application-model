@@ -1,21 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
-  "definitions": {
-    "CloudFormationResource": {
-      "additionalProperties": true,
-      "properties": {
-        "Type": {
-          "pattern": "^(?!^AWS::Serverless).*",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Type"
-      ],
-      "type": "object"
-    }
-  },
   "properties": {
     "AWSTemplateFormatVersion": {
       "enum": [
@@ -77,20 +62,39 @@
           "allOf": [
             {
               "$ref": "file:definitions/api.json#/definitions/AWS::Serverless::Api"
-            },
-            {
-              "$ref": "file:definitions/function.json#/definitions/AWS::Serverless::Function"
             }
+          ],
+          "type": "object",
+          "required": [
+            "Type",
+            "Properties"
           ]
         }
       },
       "type": "object"
     },
     "Transform": {
-      "enum": [
-        "AWS::Serverless-2016-10-31"
-      ],
-      "type": "string"
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1,
+        "contains": {
+          "const": "AWS::Serverless-2016-10-31"
+        }
+      },
+      "else": {
+        "enum": [
+          "AWS::Serverless-2016-10-31"
+        ]
+      },
+      "type": [
+        "string",
+        "array"
+      ]
     },
     "Globals": {
       "type": "object"

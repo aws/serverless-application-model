@@ -142,6 +142,7 @@
           "type": "string"
         }
       },
+      "patternError": "can only contain alphanumeric characters (max length 127)",
       "type": "object"
     },
     "TagsList": {

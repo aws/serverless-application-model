@@ -1,0 +1,49 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Tags is empty
+  ApiTagsEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Tags:
+  # Tags not object
+  ApiTagsNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Tags: 3
+  # Tags item empty
+  ApiTagsItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Tags:
+        MyTag:
+  # Tags item name not alphanumeric
+  ApiTagsItemNotAlphanumeric:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Tags:
+        My_Tag: MyValue
+  # Tags item name too long
+  ApiTagsItemTooLong:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Tags:
+        MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTag: MyValue
+  # Tags item value not string
+  ApiTagsItemValueNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Tags:
+        MyTag: 3
+  # Tags item value too long
+  ApiTagsItemValueTooLong:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Tags:
+        MyTag: MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongValue

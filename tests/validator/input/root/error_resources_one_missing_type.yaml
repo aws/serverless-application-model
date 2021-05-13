@@ -1,0 +1,6 @@
+# Missing Type element
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Properties:
+      Dummy: Prop

@@ -1,4 +1,3 @@
 [
-  "[/Resources/MyApi] Is not valid",
-  "[/__/] Must not be empty"
+  "[Resources/MyApi] Must not be empty"
 ]

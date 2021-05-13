@@ -13,7 +13,7 @@ Resources:
               - Scope2
             FunctionArn: Function.Arn
             FunctionInvokeRole: My function invoke role
-            FunctionPayloadType: TOKEN
+            FunctionPayloadType: REQUEST
             Identity:
               Context:
                 - Context1

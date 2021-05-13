@@ -14,7 +14,6 @@ OUTPUT_FOLDER = os.path.join(BASE_PATH, "output", "api")
 class TestValidatorApi(TestValidatorBase):
     @parameterized.expand(
         [
-            "error_properties",
             "error_accesslogsetting",
             "error_auth",
             "error_auth_cognito",
@@ -36,8 +35,9 @@ class TestValidatorApi(TestValidatorBase):
             "error_models",
             "error_name",
             "error_openapiversion",
+            "error_properties",
             "error_stagename",
-            # "error_tags",
+            "error_tags",
             "error_tracingenabled",
             "error_variables",
         ],

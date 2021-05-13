@@ -2,6 +2,19 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
   "definitions": {
+    "CloudFormationResource": {
+      "additionalProperties": true,
+      "properties": {
+        "Type": {
+          "pattern": "^(?!^AWS::Serverless).*",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "type": "object"
+    },
     "AWS::ApiGateway::Stage.AccessLogSetting": {
       "additionalProperties": false,
       "properties": {

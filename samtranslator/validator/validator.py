@@ -14,8 +14,8 @@ class SamTemplateValidator(object):
     """
 
     # Useful to find a unicode prefixed string type to replace it with the non unicode version
+    # On Python2, the validator returns types in error messages prefixed with 'u'
     # Example: "u'integer'" -> "'integer'"
-    # The validator returns types in error messages prefixed with 'u' on Python2
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
     def __init__(self, schema_path=None):
@@ -97,9 +97,9 @@ class SamTemplateValidator(object):
             # We only display the leaves
             # Format the message:
             # [/Path/To/Element] Error message
-            error_content = "[{}] {}".format(
-                "/".join([str(p) for p in error.absolute_path]), self._cleanup_error_message(error)
-            )
+            error_path = "/".join([str(p) for p in error.absolute_path]) if error.absolute_path else "/"
+
+            error_content = "[{}] {}".format(error_path, self._cleanup_error_message(error))
 
             if error_content not in sibling_errors:
                 # Not already present in the current level errors
@@ -135,7 +135,7 @@ class SamTemplateValidator(object):
         if final_message.startswith("None is not of type ") or final_message.startswith("None is not one of "):
             return "Must not be empty"
         if " does not match " in final_message and "patternError" in error.schema:
-            return re.sub(" does not match .+", " does not match " + error.schema.get("patternError"), final_message)
+            return re.sub("does not match .+", error.schema.get("patternError"), final_message)
 
         return final_message
 
@@ -170,13 +170,18 @@ class SamTemplateValidator(object):
 
 # Type definition redefinitions
 INTRINSIC_ATTR = {
+    "Fn::And",
     "Fn::Base64",
     "Fn::Cidr",
+    "Fn::Equals",
     "Fn::FindInMap",
     "Fn::GetAtt",
     "Fn::GetAZs",
+    "Fn::If",
     "Fn::ImportValue",
     "Fn::Join",
+    "Fn::Not",
+    "Fn::Or",
     "Fn::Select",
     "Fn::Split",
     "Fn::Sub",
@@ -186,12 +191,57 @@ INTRINSIC_ATTR = {
 
 
 def is_object(checker, instance):
+    """
+    'object' type definition
+    Overloaded to exclude intrinsic functions
+
+    Parameters
+    ----------
+    checker : dict
+        Checker
+    instance : element
+        Template element
+
+    Returns
+    -------
+    boolean
+        True if an object, False otherwise
+    """
     return isinstance(instance, dict) and not has_intrinsic_attr(instance)
 
 
 def is_intrinsic(checker, instance):
+    """
+    'intrinsic' type definition
+
+    Parameters
+    ----------
+    checker : dict
+        [description]
+    instance : [type]
+        [description]
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
     return isinstance(instance, dict) and has_intrinsic_attr(instance)
 
 
 def has_intrinsic_attr(dict):
+    """
+    Returns a value indicating whether the dict has an intrinsic attribute
+    Only one attribute which must be one of the intrinsics
+
+    Parameters
+    ----------
+    dict : dict
+        Dictionary
+
+    Returns
+    -------
+    boolean
+        True if only has one intrinsic attribute, False otherwise
+    """
     return len(dict) == 1 and next(iter(dict)) in INTRINSIC_ATTR

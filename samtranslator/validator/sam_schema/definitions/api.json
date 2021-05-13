@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
+  "type": "object",
   "definitions": {
     "AWS::Serverless::Api": {
       "if": {
@@ -8,7 +9,10 @@
           "Type": {
             "const": "AWS::Serverless::Api"
           }
-        }
+        },
+        "required": [
+          "Type"
+        ]
       },
       "then": {
         "additionalProperties": false,
@@ -52,13 +56,15 @@
                 "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.CanarySetting"
               },
               "Cors": {
-                "allOf": [
-                  {
-                    "$ref": "file:common.json#definitions/String"
-                  },
-                  {
-                    "$ref": "#definitions/AWS::Serverless::Api.CorsConfiguration"
-                  }
+                "if": {
+                  "type": "object"
+                },
+                "then": {
+                  "$ref": "#definitions/AWS::Serverless::Api.CorsConfiguration"
+                },
+                "type": [
+                  "string",
+                  "object"
                 ]
               },
               "DefinitionBody": {
@@ -91,11 +97,14 @@
                 ]
               },
               "MethodSettings": {
-                "items": {
+                "if": {
+                  "type": "object"
+                },
+                "then": {
                   "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.MethodSetting"
                 },
                 "type": [
-                  "array",
+                  "object",
                   "intrinsic"
                 ]
               },
@@ -120,7 +129,7 @@
               "OpenApiVersion": {
                 "type": "string",
                 "pattern": "^[2-3](\\.\\d)(\\.\\d)?$",
-                "patternError": "2.x or 3.x.x"
+                "patternError": "must match 2.x or 3.x.x"
               },
               "StageName": {
                 "type": [
@@ -156,12 +165,7 @@
           "Type": {
             "const": "AWS::Serverless::Api"
           }
-        },
-        "required": [
-          "Type",
-          "Properties"
-        ],
-        "type": "object"
+        }
       }
     },
     "AWS::Serverless::Api.ApiUsagePlan": {
@@ -262,7 +266,10 @@
           "$ref": "#definitions/AWS::Serverless::Api.ApiUsagePlan"
         }
       },
-      "type": "object"
+      "type": [
+        "object",
+        "intrinsic"
+      ]
     },
     "AWS::Serverless::Api.CognitoAuthorizer": {
       "if": {
@@ -571,7 +578,10 @@
         },
         "IntrinsicVpcBlacklist": {
           "items": {
-            "$ref": "file:common.js#definitions/StringOrIntrinsicRef"
+            "type": [
+              "string",
+              "intrinsic"
+            ]
           },
           "type": "array"
         },
@@ -692,6 +702,5 @@
         "type": "object"
       }
     }
-  },
-  "type": "object"
+  }
 }
