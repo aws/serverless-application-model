@@ -531,19 +531,6 @@ class SwaggerEditor(object):
             if add_default_auth_to_preflight or normalized_method_name != "options":
                 normalized_method_name = self._normalize_method_name(method_name)
                 # It is possible that the method could have two definitions in a Fn::If block.
-
-                # check for valid methods
-                if normalized_method_name.upper() not in self._ALL_HTTP_METHODS:
-                    raise InvalidDocumentException(
-                        [
-                            InvalidTemplateException(
-                                "Path '{}' contains method '{}' which is not a supported method {}".format(
-                                    path, method_name, self._ALL_HTTP_METHODS
-                                )
-                            )
-                        ]
-                    )
-
                 for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
