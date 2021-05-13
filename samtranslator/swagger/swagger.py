@@ -622,12 +622,22 @@ class SwaggerEditor(object):
 
         for method_name, _ in self.get_path(path).items():
             # Excluding parameters section
-            if method_name == "parameters":
+            if method_name in ["parameters", "summary", "description", "$ref", "servers"]:
                 continue
 
             normalized_method_name = self._normalize_method_name(method_name)
             # It is possible that the method could have two definitions in a Fn::If block.
             for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+                if not isinstance(method_definition, dict):
+                    raise InvalidDocumentException(
+                        [
+                            InvalidTemplateException(
+                                f"Invalid swagger definition; '{method_name}' of {path} "
+                                f"has invalid content {method_definition}"
+                            )
+                        ]
+                    )
 
                 # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                 if not self.method_definition_has_integration(method_definition):
