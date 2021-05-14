@@ -793,19 +793,17 @@ class SwaggerEditor(object):
         """
 
         normalized_method_name = self._normalize_method_name(method_name)
-        validator_name = f"{normalized_method_name}-{self.get_path_without_trailing_slash(path)}-validator"
+        normalized_path_name = SwaggerEditor.get_path_name_normalized(path)
+        validator_name = f"{normalized_path_name}-{normalized_method_name}-validator"
 
         # Creating validator
         request_validator_definition = {
-            _X_APIGW_REQUEST_VALIDATOR: {
-                validator_name: {
-                    "validateRequestBody": validate_body,
-                    "validateRequestParameters": validate_request
-                }
-            }
+            validator_name: {"validateRequestBody": validate_body, "validateRequestParameters": validate_request}
         }
-        self._doc[validator_name] = request_validator_definition
-
+        if self._doc.get(self._X_APIGW_REQUEST_VALIDATOR):
+            self._doc[self._X_APIGW_REQUEST_VALIDATOR].update(request_validator_definition)
+        else:
+            self._doc[self._X_APIGW_REQUEST_VALIDATOR] = request_validator_definition
 
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
@@ -814,9 +812,7 @@ class SwaggerEditor(object):
             if not self.method_definition_has_integration(method_definition):
                 continue
 
-            set_validator_to_method = {
-                "x-amazon-apigateway-request-validator": validator_name
-            }
+            set_validator_to_method = {"x-amazon-apigateway-request-validator": validator_name}
             # Setting validator to the given method
             method_definition.update(set_validator_to_method)
 
@@ -1303,6 +1299,11 @@ class SwaggerEditor(object):
     def get_path_without_trailing_slash(path):
         # convert greedy paths to such as {greedy+}, {proxy+} to "*"
         return re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
+
+    @staticmethod
+    def get_path_name_normalized(path):
+        # convert greedy paths to such as {greedy+}, {proxy+}, "/foo" to a normal string
+        return re.sub(r"[^A-Za-z0-9]+|{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "", path)
 
     @staticmethod
     def _validate_list_property_is_resolved(property_list):
