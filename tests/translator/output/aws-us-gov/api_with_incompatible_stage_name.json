@@ -1,15 +1,13 @@
 {
   "Resources": {
-    "UnderscoreApiStageb34d3ad84e": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "UnderscoreApiDeployment0a3eb8ded3": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "UnderscoreApiDeployment94459366c6"
-        }, 
         "RestApiId": {
           "Ref": "UnderscoreApi"
         }, 
-        "StageName": "hoge_fuga"
+        "Description": "RestApi deployment id: 0a3eb8ded3d6e81cf392bf9122e05abcff9e8286", 
+        "StageName": "Stage"
       }
     }, 
     "UnderscoreApi": {
@@ -31,8 +29,8 @@
                   "uri": {
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnderscoreFunction.Arn}/invocations"
                   }
-                },
-                "x-amazon-apigateway-request-validator": "root-get-validator",
+                }, 
+                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -46,14 +44,14 @@
                 ]
               }
             }
-          },
+          }, 
+          "swagger": "2.0", 
           "x-amazon-apigateway-request-validators": {
             "root-get-validator": {
-              "validateRequestBody": true,
-              "validateRequestParameters": true
+              "validateRequestParameters": true, 
+              "validateRequestBody": true
             }
-          },
-          "swagger": "2.0", 
+          }, 
           "definitions": {
             "user": {
               "type": "object", 
@@ -78,15 +76,6 @@
     "UnderscoreFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -102,123 +91,16 @@
               }
             }
           ]
-        }
-      }
-    },
-    "HyphenFunctionGetHtmlPermission0c8ecc62cb": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "HyphenFunction"
         }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*",
-              "__ApiId__": "HyphenApi"
-            }
-          ]
-        }
-      }
-    }, 
-    "HyphenApiStage0c8ecc62cb": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "HyphenApiDeploymente60ebb9f56"
-        }, 
-        "RestApiId": {
-          "Ref": "HyphenApi"
-        }, 
-        "StageName": "hoge-fuga"
-      }
-    }, 
-    "UnderscoreFunction": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Handler": "index.gethtml", 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "member_portal.zip"
-        }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "UnderscoreFunctionRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "nodejs12.x",
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
         "Tags": [
           {
             "Value": "SAM", 
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "UnderscoreFunctionGetHtmlPermissionb34d3ad84e": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "UnderscoreFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*",
-              "__ApiId__": "UnderscoreApi"
-            }
-          ]
-        }
-      }
-    },
-    "HyphenFunction": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Handler": "index.gethtml", 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "member_portal.zip"
-        }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "HyphenFunctionRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "nodejs12.x",
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    }, 
-    "HyphenApiDeploymente60ebb9f56": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HyphenApi"
-        }, 
-        "Description": "RestApi deployment id: e60ebb9f56220ac12550230674d09ed8085afc74", 
-        "StageName": "Stage"
-      }
-    }, 
-    "UnderscoreApiDeployment94459366c6": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "UnderscoreApi"
-        }, 
-        "Description": "RestApi deployment id: 94459366c6f9a344235ddf7db2a7cd5115d60da4", 
-        "StageName": "Stage"
       }
     }, 
     "HyphenApi": {
@@ -240,8 +122,8 @@
                   "uri": {
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HyphenFunction.Arn}/invocations"
                   }
-                },
-                "x-amazon-apigateway-request-validator": "root-get-validator",
+                }, 
+                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -255,14 +137,14 @@
                 ]
               }
             }
-          },
+          }, 
+          "swagger": "2.0", 
           "x-amazon-apigateway-request-validators": {
             "root-get-validator": {
-              "validateRequestBody": true,
-              "validateRequestParameters": true
+              "validateRequestParameters": true, 
+              "validateRequestBody": true
             }
-          },
-          "swagger": "2.0", 
+          }, 
           "definitions": {
             "user": {
               "type": "object", 
@@ -284,18 +166,127 @@
         }
       }
     }, 
+    "HyphenFunctionGetHtmlPermission0c8ecc62cb": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "HyphenFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": "HyphenApi"
+            }
+          ]
+        }
+      }
+    }, 
+    "HyphenApiStage0c8ecc62cb": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "HyphenApiDeploymentd5f789a736"
+        }, 
+        "RestApiId": {
+          "Ref": "HyphenApi"
+        }, 
+        "StageName": "hoge-fuga"
+      }
+    }, 
+    "UnderscoreApiStageb34d3ad84e": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "UnderscoreApiDeployment0a3eb8ded3"
+        }, 
+        "RestApiId": {
+          "Ref": "UnderscoreApi"
+        }, 
+        "StageName": "hoge_fuga"
+      }
+    }, 
+    "UnderscoreFunctionGetHtmlPermissionb34d3ad84e": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "UnderscoreFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": "UnderscoreApi"
+            }
+          ]
+        }
+      }
+    }, 
+    "HyphenFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "HyphenFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "HyphenApiDeploymentd5f789a736": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HyphenApi"
+        }, 
+        "Description": "RestApi deployment id: d5f789a73679937aa1f649354a02639c7cdfb319", 
+        "StageName": "Stage"
+      }
+    }, 
+    "UnderscoreFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "UnderscoreFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
     "HyphenFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -311,7 +302,16 @@
               }
             }
           ]
-        }
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }
   }
