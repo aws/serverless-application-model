@@ -91,6 +91,10 @@ class SwaggerEditor(object):
         :param dict method_definition: method definition dictionary
         :return: True if an integration exists
         """
+        if not isinstance(method_definition, dict):
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Invalid swagger API operation definition: {}".format(method_definition))]
+            )
         if method_definition.get(self._X_APIGW_INTEGRATION):
             return True
         return False
@@ -620,25 +624,15 @@ class SwaggerEditor(object):
         :param string path: Path name
         """
 
+        valid_non_http_method_sections = ["parameters", "summary", "description", "$ref", "servers"]
         for method_name, _ in self.get_path(path).items():
-            # Excluding parameters section
-            if method_name in ["parameters", "summary", "description", "$ref", "servers"]:
+            # Excluding non-http-method sections https://swagger.io/specification/
+            if method_name in valid_non_http_method_sections:
                 continue
 
             normalized_method_name = self._normalize_method_name(method_name)
             # It is possible that the method could have two definitions in a Fn::If block.
             for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
-
-                if not isinstance(method_definition, dict):
-                    raise InvalidDocumentException(
-                        [
-                            InvalidTemplateException(
-                                f"Invalid swagger definition; '{method_name}' of {path} "
-                                f"has invalid content {method_definition}"
-                            )
-                        ]
-                    )
-
                 # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                 if not self.method_definition_has_integration(method_definition):
                     continue

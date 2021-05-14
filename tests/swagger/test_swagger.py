@@ -1,7 +1,7 @@
 import copy
 
 from unittest import TestCase
-from mock import Mock
+from mock import Mock, patch
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -881,6 +881,66 @@ class TestSwaggerEditor_add_auth(TestCase):
         self.assertEqual([], self.editor.swagger["paths"][path]["apikeyfalse"]["security"])
         self.assertEqual(api_key_exists, self.editor.swagger["paths"][path]["apikeytrue"]["security"])
         self.assertEqual(api_key_exists, self.editor.swagger["paths"][path]["apikeydefault"]["security"])
+
+    @patch("samtranslator.swagger.swagger.SwaggerEditor.get_method_contents")
+    def test_set_path_default_apikey_required_ignores_valid_non_http_method_properties(self, get_method_contents_mock):
+        get_method_contents_mock.return_value = []
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    "parameters": "ANY_VALUE",
+                    "summary": "ANY_VALUE",
+                    "description": "ANY_VALUE",
+                    "$ref": "ANY_VALUE",
+                    "servers": "ANY_VALUE",
+                    "apikeyfalse": {_X_INTEGRATION: {"a": "b"}, "security": [{"api_key_false": []}]},
+                    "apikeytrue": {_X_INTEGRATION: {"a": "b"}, "security": [{"api_key": []}]},
+                    "apikeydefault": {_X_INTEGRATION: {"a": "b"}},
+                }
+            },
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+        self.editor.set_path_default_apikey_required("/foo")
+        # Assert not called for parameters, summary, description and $ref sections
+        self.assertEqual(get_method_contents_mock.call_count, 3)
+        get_method_contents_mock.has_call(self.original_swagger["paths"]["/foo"]["apikeyfalse"])
+        get_method_contents_mock.has_call(self.original_swagger["paths"]["/foo"]["apikeytrue"])
+        get_method_contents_mock.has_call(self.original_swagger["paths"]["/foo"]["apikeydefault"])
+
+    def test_method_definition_has_integration(self):
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    "get": {
+                        "summary": "Valid Swagger API operation with amazon integration",
+                        "requestBody": {},
+                        _X_INTEGRATION: {"a": "b"},
+                        "security": [{"api_key_false": []}],
+                        "responses": {},
+                        "parameters": [],
+                    },
+                    "post": {
+                        "summary": "Valid Swagger API operation without amazon integration",
+                        _X_INTEGRATION: {},
+                        "requestBody": {},
+                        "responses": {},
+                        "parameters": [],
+                    },
+                    "put": "Invalid Value; String instead of swagger API operation",
+                }
+            },
+        }
+        self.editor = SwaggerEditor(self.original_swagger)
+        get_method_definition = self.original_swagger["paths"]["/foo"]["get"]
+        post_method_definition = self.original_swagger["paths"]["/foo"]["post"]
+        put_method_definition = self.original_swagger["paths"]["/foo"]["put"]
+        self.assertTrue(self.editor.method_definition_has_integration(get_method_definition))
+        self.assertFalse(self.editor.method_definition_has_integration(post_method_definition))
+        with self.assertRaises(InvalidDocumentException):
+            self.assertTrue(self.editor.method_definition_has_integration(put_method_definition))
 
     def test_set_method_apikey_handling_apikeyrequired_false(self):
         expected = [{"api_key_false": []}]
