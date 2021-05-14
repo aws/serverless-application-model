@@ -284,7 +284,7 @@ class Deployer:
         :param stack_name:   Stack name
         :return: Latest status of the create-change-set operation
         """
-        sys.stdout.write("\nWaiting for changeset to be created..\n")
+        sys.stdout.write("\nWaiting for changeset to be created...\n")
         sys.stdout.flush()
 
         # Wait for changeset to be created
