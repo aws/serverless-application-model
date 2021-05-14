@@ -794,7 +794,9 @@ class SwaggerEditor(object):
 
         normalized_method_name = self._normalize_method_name(method_name)
         normalized_path_name = SwaggerEditor.get_path_name_normalized(path)
-        validator_name = f"{normalized_path_name}-{normalized_method_name}-validator"
+        validator_name = "{normalized_path_name}-{normalized_method_name}-validator".format(
+            normalized_path_name=normalized_path_name, normalized_method_name=normalized_method_name
+        )
 
         # Creating validator
         request_validator_definition = {
