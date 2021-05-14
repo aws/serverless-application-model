@@ -40,8 +40,8 @@ class TestFunctionWithScheduleDlqGenerated(BaseTest):
         dlq_policy_statement = dlq_policy[0]
 
         # checking policy action
-        self.assertEqual(
-            type(dlq_policy_statement["Action"]), str, "Only one action must be in dead-letter queue policy"
+        self.assertFalse(
+            isinstance(dlq_policy_statement["Action"], list), "Only one action must be in dead-letter queue policy"
         )  # if it is an array, it means has more than one action
         self.assertEqual(
             dlq_policy_statement["Action"],
