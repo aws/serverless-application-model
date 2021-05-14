@@ -523,7 +523,6 @@ class Api(PushEventSource):
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
         "RequestModel": PropertyType(False, is_type(dict)),
-        "RequestValidator": PropertyType(False, is_type(dict)),
         "RequestParameters": PropertyType(False, is_type(list)),
     }
 
