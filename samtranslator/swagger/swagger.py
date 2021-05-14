@@ -23,6 +23,7 @@ class SwaggerEditor(object):
     _X_APIGW_GATEWAY_RESPONSES = "x-amazon-apigateway-gateway-responses"
     _X_APIGW_POLICY = "x-amazon-apigateway-policy"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
+    _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validators"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -780,6 +781,44 @@ class SwaggerEditor(object):
 
             if security != existing_security:
                 method_definition["security"] = security
+
+    def add_request_validator_to_method(self, path, method_name, validate_body=False, validate_request=False):
+        """
+        Adds request model body parameter for this path/method.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param bool validate_body: Add validator parameter on the body
+        :param bool validate_request: Validate request
+        """
+
+        normalized_method_name = self._normalize_method_name(method_name)
+        validator_name = f"{normalized_method_name}-{self.get_path_without_trailing_slash(path)}-validator"
+
+        # Creating validator
+        request_validator_definition = {
+            _X_APIGW_REQUEST_VALIDATOR: {
+                validator_name: {
+                    "validateRequestBody": validate_body,
+                    "validateRequestParameters": validate_request
+                }
+            }
+        }
+        self._doc[validator_name] = request_validator_definition
+
+
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+
+            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+            if not self.method_definition_has_integration(method_definition):
+                continue
+
+            set_validator_to_method = {
+                "x-amazon-apigateway-request-validator": validator_name
+            }
+            # Setting validator to the given method
+            method_definition.update(set_validator_to_method)
 
     def add_request_model_to_method(self, path, method_name, request_model):
         """
