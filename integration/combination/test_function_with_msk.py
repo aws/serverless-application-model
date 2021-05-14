@@ -6,7 +6,7 @@ class TestFunctionWithMsk(BaseTest):
         self._common_validations_for_MSK("combination/function_with_msk")
 
     def test_function_with_msk_trigger_using_manage_policy(self):
-        self._common_validations_for_MSK("combination/function_with_msk_using_managed_policy") 3
+        self._common_validations_for_MSK("combination/function_with_msk_using_managed_policy")
 
     def _common_validations_for_MSK(self, file_name):
         self.create_and_verify_stack(file_name)
