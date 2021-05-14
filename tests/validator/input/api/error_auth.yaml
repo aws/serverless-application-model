@@ -1,22 +1,19 @@
-# Auth tests
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  # Auth is empty
+  # Auth
   ApiAuthEmpty:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
       Auth:
 
-  # AddDefaultAuthorizerToCorsPreflight is empty
+  # AddDefaultAuthorizerToCorsPreflight
   ApiAddDefaultAuthorizerToCorsPreflightEmpty:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
       Auth:
         AddDefaultAuthorizerToCorsPreflight:
-
-  # AddDefaultAuthorizerToCorsPreflight is not a boolean
   ApiAddDefaultAuthorizerToCorsPreflightNotBoolean:
     Type: AWS::Serverless::Api
     Properties:
@@ -24,15 +21,13 @@ Resources:
       Auth:
         AddDefaultAuthorizerToCorsPreflight: "true"
 
-  # ApiKeyRequired is empty
+  # ApiKeyRequired
   ApiApiKeyRequiredEmpty:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
       Auth:
         ApiKeyRequired:
-
-  # ApiKeyRequired is not a boolean
   ApiApiKeyRequiredNotBoolean:
     Type: AWS::Serverless::Api
     Properties:
@@ -40,15 +35,13 @@ Resources:
       Auth:
         ApiKeyRequired: "true"
 
-  # Authorizers is empty
+  # Authorizers
   ApiAuthorizersEmpty:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
       Auth:
         Authorizers:
-
-  # Authorizers item is empty
   ApiAuthorizersItemEmpty:
     Type: AWS::Serverless::Api
     Properties:
@@ -56,16 +49,12 @@ Resources:
       Auth:
         Authorizers:
           EmptyAuth:
-
-  # Authorizers is not an object
   ApiAuthorizersNotObject:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
       Auth:
         Authorizers: 3
-
-  # Authorizers is unknown (missing both required properties)
   ApiAuthorizersUnknown:
     Type: AWS::Serverless::Api
     Properties:
@@ -76,3 +65,39 @@ Resources:
             AuthorizationScopes:
               - scope1
               - scope2
+
+  # DefaultAuthorizer
+  ApiDefaultAuthorizerEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        DefaultAuthorizer:
+  ApiDefaultAuthorizerNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        DefaultAuthorizer: 3
+
+  # InvokeRole
+  ApiInvokeRoleEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        InvokeRole:
+  ApiInvokeRoleNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        InvokeRole: 3
+  ApiInvokeRoleNotUnknown:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        InvokeRole: UNKNOWN
+  # ResourcePolicy -> error_auth_resourcepolicy.yaml
+  # UsagePlan -> error_auth_usageplan.yaml

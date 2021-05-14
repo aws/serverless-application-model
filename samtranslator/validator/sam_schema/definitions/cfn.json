@@ -95,32 +95,55 @@
       "type": "object"
     },
     "AWS::ApiGateway::UsagePlan.QuotaSettings": {
-      "additionalProperties": false,
-      "properties": {
-        "Limit": {
-          "type": "integer"
-        },
-        "Offset": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "Period": {
-          "$ref": "#definitions/Period"
+      "if": {
+        "type": "object"
+      },
+      "then": {
+        "additionalProperties": false,
+        "properties": {
+          "Limit": {
+            "type": [
+              "integer",
+              "intrinsic"
+            ]
+          },
+          "Offset": {
+            "type": [
+              "integer",
+              "intrinsic"
+            ],
+            "minimum": 0
+          },
+          "Period": {
+            "$ref": "#definitions/Period"
+          }
         }
       },
-      "type": "object"
+      "type": [
+        "object",
+        "intrinsic"
+      ]
     },
     "AWS::ApiGateway::UsagePlan.ThrottleSettings": {
       "additionalProperties": false,
       "properties": {
         "BurstLimit": {
-          "type": "integer"
+          "type": [
+            "integer",
+            "intrinsic"
+          ]
         },
         "RateLimit": {
-          "type": "number"
+          "type": [
+            "number",
+            "intrinsic"
+          ]
         }
       },
-      "type": "object"
+      "type": [
+        "object",
+        "intrinsic"
+      ]
     },
     "AWS::ApiGatewayV2::DomainName.MutualTlsAuthentication": {
       "additionalProperties": false,
@@ -149,7 +172,10 @@
       "references": [
         "https://docs.aws.amazon.com/apigateway/api-reference/resource/usage-plan/"
       ],
-      "type": "string"
+      "type": [
+        "string",
+        "intrinsic"
+      ]
     }
   },
   "type": "object"

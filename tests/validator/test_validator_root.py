@@ -33,7 +33,7 @@ class TestValidatorRoot(TestValidatorBase):
 
     @parameterized.expand(
         [
-            "success_minimum_template",
+            "success_minimal_template",
         ],
     )
     def test_validator_root_success(self, template):

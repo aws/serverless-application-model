@@ -1,5 +1,5 @@
 [
   "[Resources/ApiOpenApiVersionEmpty/Properties/OpenApiVersion] Must not be empty",
-  "[Resources/ApiOpenApiVersionNotString/Properties/OpenApiVersion] 3 is not of type 'string'",
-  "[Resources/ApiOpenApiVersionIncorrectFormat/Properties/OpenApiVersion] 'a' must match 2.x or 3.x.x"
+  "[Resources/ApiOpenApiVersionIncorrectFormat/Properties/OpenApiVersion] 'a' must match 2.x or 3.x.x",
+  "[Resources/ApiOpenApiVersionNotString/Properties/OpenApiVersion] 3 is not of type 'string'"
 ]

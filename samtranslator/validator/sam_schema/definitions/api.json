@@ -98,13 +98,15 @@
               },
               "MethodSettings": {
                 "if": {
-                  "type": "object"
+                  "type": "array"
                 },
                 "then": {
-                  "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.MethodSetting"
+                  "items": {
+                    "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.MethodSetting"
+                  }
                 },
                 "type": [
-                  "object",
+                  "array",
                   "intrinsic"
                 ]
               },
@@ -180,7 +182,10 @@
           "type": "string"
         },
         "Description": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "Quota": {
           "$ref": "file:cfn.json#definitions/AWS::ApiGateway::UsagePlan.QuotaSettings"
@@ -192,12 +197,16 @@
           "$ref": "file:cfn.json#definitions/AWS::ApiGateway::UsagePlan.ThrottleSettings"
         },
         "UsagePlanName": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         }
       },
       "required": [
         "CreateUsagePlan"
-      ]
+      ],
+      "type": "object"
     },
     "AWS::Serverless::Api.Auth": {
       "additionalProperties": false,
@@ -560,21 +569,42 @@
       "properties": {
         "AwsAccountBlacklist": {
           "items": {
-            "type": "string"
+            "type": [
+              "string",
+              "intrinsic"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "object",
+            "intrinsic"
+          ]
         },
         "AwsAccountWhitelist": {
           "items": {
-            "type": "string"
+            "type": [
+              "string",
+              "intrinsic"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "object",
+            "intrinsic"
+          ]
         },
         "CustomStatements": {
           "items": {
-            "type": "object"
+            "type": [
+              "object",
+              "intrinsic"
+            ]
           },
-          "type": "array"
+          "type": [
+            "array",
+            "object",
+            "intrinsic"
+          ]
         },
         "IntrinsicVpcBlacklist": {
           "items": {
@@ -626,13 +656,17 @@
         },
         "SourceVpcBlacklist": {
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^vpce?-",
+            "patternError": "must start with 'vpc-' or 'vpce-'"
           },
           "type": "array"
         },
         "SourceVpcWhitelist": {
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^vpce?-",
+            "patternError": "must start with 'vpc-' or 'vpce-'"
           },
           "type": "array"
         }

@@ -20,6 +20,8 @@ class TestValidatorApi(TestValidatorBase):
             "error_auth_lambda",
             "error_auth_lambdarequest_identity",
             "error_auth_lambdatoken_identity",
+            "error_auth_resourcepolicy",
+            "error_auth_usageplan",
             "error_binarymediatypes",
             "error_cachecluster",
             "error_canarysetting",
@@ -47,15 +49,10 @@ class TestValidatorApi(TestValidatorBase):
 
     @parameterized.expand(
         [
-            "success_auth_cognito_complete",
-            "success_auth_cognito_minimal",
-            "success_auth_lambdarequest_complete",
-            "success_auth_lambdarequest_identity_only_context",
-            "success_auth_lambdarequest_identity_only_headers",
-            "success_auth_lambdarequest_identity_only_querystrings",
-            "success_auth_lambdarequest_identity_only_variables",
+            "success_auth_cognito",
+            "success_auth_lambdarequest",
             "success_complete_api",
-            "success_minimum_api",
+            "success_minimal_api",
         ],
     )
     def test_validator_api_success(self, template):

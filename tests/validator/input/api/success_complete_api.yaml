@@ -1,4 +1,4 @@
-# Complete API (TODO)
+# Complete API
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApiWithValues:
@@ -70,9 +70,9 @@ Resources:
           IpRangeWhitelist:
             - 2.3.4.5
           SourceVpcBlacklist:
-            - Vpc3
+            - vpc-3
           SourceVpcWhitelist:
-            - Vpc4
+            - vpce-4
         UsagePlan:
           CreateUsagePlan: SHARED
           Description: My usage plan description
@@ -135,16 +135,16 @@ Resources:
             Template1: Template1Value
           StatusCode: "403"
       MethodSettings:
-        CacheDataEncrypted: true
-        CacheTtlInSeconds: 3
-        CachingEnabled: true
-        DataTraceEnabled: false
-        HttpMethod: GET
-        LoggingLevel: INFO
-        MetricsEnabled: true
-        ResourcePath: "/"
-        ThrottlingBurstLimit: 45
-        ThrottlingRateLimit: 80.5
+        - CacheDataEncrypted: true
+          CacheTtlInSeconds: 3
+          CachingEnabled: true
+          DataTraceEnabled: false
+          HttpMethod: GET
+          LoggingLevel: INFO
+          MetricsEnabled: true
+          ResourcePath: "/"
+          ThrottlingBurstLimit: 45
+          ThrottlingRateLimit: 80.5
       MinimumCompressionSize: 30
       Models:
         MyModel:

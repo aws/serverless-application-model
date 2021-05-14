@@ -1,9 +1,9 @@
 [
-  "[Resources/ApiDefinitionUriBucketMissing/Properties/DefinitionUri] 'Bucket' is a required property",
   "[Resources/ApiDefinitionUriBucketEmpty/Properties/DefinitionUri/Bucket] Must not be empty",
-  "[Resources/ApiDefinitionUriBucketNotString/Properties/DefinitionUri/Bucket] 3 is not of type 'string', 'intrinsic'",
+  "[Resources/ApiDefinitionUriBucketMissing/Properties/DefinitionUri] 'Bucket' is a required property",
   "[Resources/ApiDefinitionUriBucketNotIntrinsic/Properties/DefinitionUri/Bucket] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'",
-  "[Resources/ApiDefinitionUriKeyMissing/Properties/DefinitionUri] 'Key' is a required property",
+  "[Resources/ApiDefinitionUriBucketNotString/Properties/DefinitionUri/Bucket] 3 is not of type 'string', 'intrinsic'",
   "[Resources/ApiDefinitionUriKeyEmpty/Properties/DefinitionUri/Key] Must not be empty",
+  "[Resources/ApiDefinitionUriKeyMissing/Properties/DefinitionUri] 'Key' is a required property",
   "[Resources/ApiDefinitionUriKeyNotString/Properties/DefinitionUri/Key] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'"
 ]

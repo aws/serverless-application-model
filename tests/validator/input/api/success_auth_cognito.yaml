@@ -1,4 +1,3 @@
-# Complete Cognito auth
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,7 +6,10 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyCognitoAuth:
+          CognitoMinimal:
+            UserPoolArn: User.pool.arn
+
+          CognitoComplete:
             AuthorizationScopes:
               - Scope1
               - Scope2
@@ -16,7 +18,8 @@ Resources:
               ReauthorizeEvery: 3
               ValidationExpression: "[a-z]+"
             UserPoolArn: User.pool.arn
-          MyCognitoAuthWithIntrinsics:
+
+          CognitoCompleteIntrinsics:
             AuthorizationScopes:
               - Scope1
               - Scope2

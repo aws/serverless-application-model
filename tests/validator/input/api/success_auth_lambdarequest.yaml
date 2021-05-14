@@ -1,4 +1,3 @@
-# Complete LambdaRequest auth
 Transform: AWS::Serverless-2016-10-31
 Resources:
   MyApi:
@@ -7,7 +6,10 @@ Resources:
       StageName: Stage name
       Auth:
         Authorizers:
-          MyLambdaRequestAuth:
+          LambdaRequestMinimal:
+            FunctionArn: Function.Arn
+
+          LambdaRequestComplete:
             AuthorizationScopes:
               - Scope1
               - Scope2
@@ -25,6 +27,6 @@ Resources:
                 - QueryString1
                 - QueryString2
               ReauthorizeEvery: 3
-              Variables:
+              StageVariables:
                 - Variable1
                 - Variable2

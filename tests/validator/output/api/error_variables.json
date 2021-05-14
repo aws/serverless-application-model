@@ -1,7 +1,7 @@
 [
-  "[Resources/ApiVariablesEmpty/Properties/Variables] Must not be empty",
-  "[Resources/ApiVariablesNotObject/Properties/Variables] 3 is not of type 'object'",
+  "[Resources/ApiVariableInvalidCharacter/Properties/Variables/MyVariable] '>' does not match '[A-Za-z0-9._~:/?#&=,-]+'",
   "[Resources/ApiVariableNameNotAlphanumeric/Properties/Variables] 'My_Variable' does not match any of the regexes: '^[a-zA-Z0-9]+$'",
-  "[Resources/ApiVariableInvalidCharacter/Properties/Variables/MyVariable] 'é' does not match '[A-Za-z0-9._~:/?#&=,-]+'",
-  "[Resources/ApiVariableNotString/Properties/Variables/MyVariable] 3 is not of type 'string'"
+  "[Resources/ApiVariableNotString/Properties/Variables/MyVariable] 3 is not of type 'string'",
+  "[Resources/ApiVariablesEmpty/Properties/Variables] Must not be empty",
+  "[Resources/ApiVariablesNotObject/Properties/Variables] 3 is not of type 'object'"
 ]

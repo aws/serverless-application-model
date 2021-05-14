@@ -1,11 +1,11 @@
 [
     "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityEmpty/Identity] Must not be empty",
     "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityNotObject/Identity] 3 is not of type 'object'",
-    "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityUnknown/Identity] Additional properties are not allowed ('Unknown' was unexpected)",
     "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityReauthorizeEveryEmpty/Identity/ReauthorizeEvery] Must not be empty",
     "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityReauthorizeEveryNotInt/Identity/ReauthorizeEvery] '3' is not of type 'integer'",
-    "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityReauthorizeEveryTooLow/Identity/ReauthorizeEvery] 0 is less than the minimum of 1",
     "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityReauthorizeEveryTooHigh/Identity/ReauthorizeEvery] 0 is less than the minimum of 1",
+    "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityReauthorizeEveryTooLow/Identity/ReauthorizeEvery] 0 is less than the minimum of 1",
+    "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityUnknown/Identity] Additional properties are not allowed ('Unknown' was unexpected)",
     "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityValidationExpressionEmpty/Identity/ValidationExpression] Must not be empty",
     "[Resources/MyApi/Properties/Auth/Authorizers/LambdaTokenIdentityValidationExpressionNotString/Identity/ValidationExpression] 3 is not of type 'string'"
 ]

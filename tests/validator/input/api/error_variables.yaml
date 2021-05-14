@@ -25,7 +25,7 @@ Resources:
     Properties:
       StageName: Stage name
       Variables:
-        MyVariable: "é"
+        MyVariable: ">"
   # Variable is not a string
   ApiVariableNotString:
     Type: AWS::Serverless::Api

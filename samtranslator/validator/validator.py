@@ -65,18 +65,22 @@ class SamTemplateValidator(object):
         # Each object can have a list of child errors in its Context attribute
         validation_errors = self.validator.iter_errors(template_dict)
 
-        # Dicts of "[/Path/To/Element] Error message" -> None
-        # Dicts instead of Lists, for speed
-        formatted_errors = OrderedDict()
-        sibling_errors = OrderedDict()
+        # List of "[/Path/To/Element] Error message"
+        formatted_errors = []
+
+        # To track error uniqueness, Dict instead of List, for speed
+        errors_set = OrderedDict()
 
         for e in validation_errors:
             # breakpoint()
-            self._process_error(e, formatted_errors, sibling_errors)
+            self._process_error(e, formatted_errors, errors_set)
 
-        return list(formatted_errors.keys())
+        # To be consistent across python versions 2 and 3, we have to sort the final result
+        # It seems that the validator is not receiving the properties in the same order betweem python 2 and 3
+        # It thus returns errors in a different order
+        return sorted(formatted_errors)
 
-    def _process_error(self, error, formatted_errors, sibling_errors):
+    def _process_error(self, error, formatted_errors, errors_set):
         """
         Processes the validation errors recursively
         Each error can have a list of child errors in its 'context' attribute (Tree or errors)
@@ -87,8 +91,6 @@ class SamTemplateValidator(object):
             Error at the head
         formatted_errors : OrderedDict
             Final list of formatted errors
-        sibling_errors : OrderedDict
-            List of the current level errors, used to eliminate duplicates on a level
         """
         if error is None:
             return
@@ -101,17 +103,15 @@ class SamTemplateValidator(object):
 
             error_content = "[{}] {}".format(error_path, self._cleanup_error_message(error))
 
-            if error_content not in sibling_errors:
-                # Not already present in the current level errors
+            if error_content not in errors_set:
                 # We set the value to None as we don't use it
-                formatted_errors[error_content] = None
+                errors_set[error_content] = None
+                formatted_errors.append(error_content)
             return
-
-        child_errors = OrderedDict()
 
         for context_error in error.context:
             # Each context item is also a validation error
-            self._process_error(context_error, formatted_errors, child_errors)
+            self._process_error(context_error, formatted_errors, errors_set)
 
     def _cleanup_error_message(self, error):
         """

@@ -106,14 +106,6 @@
       ],
       "type": "object"
     },
-    "String": {
-      "if": {
-        "type": "string"
-      },
-      "then": {
-        "minLength": 1
-      }
-    },
     "Tag": {
       "additionalProperties": false,
       "properties": {
@@ -121,16 +113,16 @@
           "type": "string"
         },
         "Value": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "object"
-            }
+          "type": [
+            "string",
+            "intrinsic"
           ]
         }
       },
+      "required": [
+        "Key",
+        "Value"
+      ],
       "type": "object"
     },
     "TagsMap": {
@@ -149,7 +141,10 @@
       "items": {
         "$ref": "#definitions/Tag"
       },
-      "type": "array"
+      "type": [
+        "array",
+        "intrinsic"
+      ]
     }
   },
   "type": "object"
