@@ -41,7 +41,8 @@
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnderscoreFunction.Arn}/invocations"
                   }
-                }, 
+                },
+                "x-amazon-apigateway-request-validator": "root-get-validator",
                 "responses": {}, 
                 "parameters": [
                   {
@@ -55,7 +56,13 @@
                 ]
               }
             }
-          }, 
+          },
+          "x-amazon-apigateway-request-validators": {
+            "root-get-validator": {
+              "validateRequestBody": true,
+              "validateRequestParameters": true
+            }
+          },
           "swagger": "2.0", 
           "definitions": {
             "user": {
@@ -226,6 +233,7 @@
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HyphenFunction.Arn}/invocations"
                   }
                 }, 
+                "x-amazon-apigateway-request-validator": "root-get-validator",
                 "responses": {}, 
                 "parameters": [
                   {
@@ -240,6 +248,12 @@
               }
             }
           }, 
+          "x-amazon-apigateway-request-validators": {
+            "root-get-validator": {
+              "validateRequestBody": true,
+              "validateRequestParameters": true
+            }
+          },
           "swagger": "2.0", 
           "definitions": {
             "user": {

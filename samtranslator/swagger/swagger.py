@@ -1302,6 +1302,14 @@ class SwaggerEditor(object):
 
     @staticmethod
     def get_path_name_normalized(path):
+        """
+        Get a readable path name to use as validator name
+
+        :param string path: String with the path definition
+        :return string: Normalized path readeble
+        """
+        if path == "/":
+            return "root"
         # convert greedy paths to such as {greedy+}, {proxy+}, "/foo" to a normal string
         return re.sub(r"[^A-Za-z0-9]+|{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "", path)
 

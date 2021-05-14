@@ -887,6 +887,7 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
             param("/bar", "bar"),
             param("/{foo}/bar", "foobar"),
             param("/{foo}/{bar}/", "foobar"),
+            param("/", "root"),
         ]
     )
     def test_must_normalize_path_names_to_validators(self, path, normalized_path):

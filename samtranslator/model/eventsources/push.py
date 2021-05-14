@@ -788,10 +788,9 @@ class Api(PushEventSource):
                     path=self.Path, method_name=self.Method, request_model=self.RequestModel
                 )
                 if self.RequestModel.get("Required"):
-                    editor.add_request_model_to_method(
+                    editor.add_request_validator_to_method(
                         path=self.Path,
                         method_name=self.Method,
-                        request_model=self.RequestModel,
                         validate_body=True,
                         validate_request=True,
                     )
