@@ -734,7 +734,7 @@ def test_transform_invalid_document(testcase):
     mock_policy_loader = MagicMock()
     parameter_values = get_template_parameter_values()
 
-    with pytest.raises(Exception) as e:
+    with pytest.raises(InvalidDocumentException) as e:
         transform(manifest, parameter_values, mock_policy_loader)
 
     error_message = get_exception_error_message(e)
