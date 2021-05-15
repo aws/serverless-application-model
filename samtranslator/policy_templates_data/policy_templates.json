@@ -1729,8 +1729,8 @@
         ]
       }
     },
-    "StepFunctionsListExecutionPolicy": {
-      "Description": "Gives permission to list state machine executions of a Step Functions",
+    "StepFunctionsReadOnlyPolicy": {
+      "Description": "Gives readonly permission to a Step Functions",
       "Parameters": {
         "StateMachineName": {
           "Description":"The name of the state machine to list its executions."
@@ -1741,7 +1741,14 @@
           {
             "Effect": "Allow",
             "Action": [
-              "states:ListExecutions"
+                "states:ListStateMachines",
+                "states:ListActivities",
+                "states:DescribeStateMachine",
+                "states:DescribeStateMachineForExecution",
+                "states:ListExecutions",
+                "states:DescribeExecution",
+                "states:GetExecutionHistory",
+                "states:DescribeActivity"
             ],
             "Resource": {
               "Fn::Sub": [
