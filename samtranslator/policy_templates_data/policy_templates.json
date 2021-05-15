@@ -1729,6 +1729,34 @@
         ]
       }
     },
+    "StepFunctionsListExecutionPolicy": {
+      "Description": "Gives permission to list state machine executions of a Step Functions",
+      "Parameters": {
+        "StateMachineName": {
+          "Description":"The name of the state machine to list its executions."
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "states:ListExecutions"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${stateMachineName}",
+                {
+                  "stateMachineName": {
+                    "Ref": "StateMachineName"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "CodeCommitCrudPolicy": {
       "Description": "Gives permissions to create/read/update/delete objects within a specific codecommit repository",
       "Parameters": {
