@@ -525,13 +525,14 @@ class SwaggerEditor(object):
         :param bool add_default_auth_to_preflight: Bool of whether to add the default
             authorizer to OPTIONS preflight requests.
         """
-
+        valid_non_http_method_sections = ["parameters", "summary", "description", "$ref", "servers"]
         for method_name, method in self.get_path(path).items():
             normalized_method_name = self._normalize_method_name(method_name)
 
-            # Excluding parameters section
-            if normalized_method_name == "parameters":
+            # Excluding non-http-method sections https://swagger.io/specification/
+            if method_name in valid_non_http_method_sections:
                 continue
+
             if add_default_auth_to_preflight or normalized_method_name != "options":
                 normalized_method_name = self._normalize_method_name(method_name)
                 # It is possible that the method could have two definitions in a Fn::If block.

@@ -1,0 +1,15 @@
+Resources:
+  ApiWithInvalidPathMethod:
+    Type: AWS::Serverless::Api
+    Properties:
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUP: NONE
+      StageName: Prod
+      Cors: "'*'"
+      DefinitionBody:
+        swagger: 2.0
+        paths:
+          /foo:
+            get: "Any non dict value"

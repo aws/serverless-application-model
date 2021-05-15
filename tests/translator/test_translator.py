@@ -707,6 +707,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_function_with_event_dest_type",
         "error_function_with_api_key_false",
         "error_api_with_usage_plan_invalid_parameter",
+        "error_api_with_usage_plan_invalid_path_method",
         "error_http_api_with_cors_def_uri",
         "error_http_api_invalid_lambda_auth",
         "error_api_mtls_configuration_invalid_field",
@@ -733,7 +734,7 @@ def test_transform_invalid_document(testcase):
     mock_policy_loader = MagicMock()
     parameter_values = get_template_parameter_values()
 
-    with pytest.raises(InvalidDocumentException) as e:
+    with pytest.raises(Exception) as e:
         transform(manifest, parameter_values, mock_policy_loader)
 
     error_message = get_exception_error_message(e)

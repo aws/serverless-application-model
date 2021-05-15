@@ -38,6 +38,14 @@ Resources:
         paths:
           "/":
             get:
+              summary: operation summary
+              description: operation description
+              parameters:
+                - name: domain
+                  in: path
+                  description: Application domain
+                  type: string
+                  required: true
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
