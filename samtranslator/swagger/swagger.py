@@ -620,14 +620,13 @@ class SwaggerEditor(object):
         :param string path: Path name
         """
 
-        for method_name, _ in self.get_path(path).items():
+        for method_name, method in self.get_path(path).items():
             # Excluding parameters section
             if method_name == "parameters":
                 continue
 
-            normalized_method_name = self._normalize_method_name(method_name)
             # It is possible that the method could have two definitions in a Fn::If block.
-            for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            for method_definition in self.get_method_contents(method):
 
                 # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                 if not self.method_definition_has_integration(method_definition):
