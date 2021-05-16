@@ -66,6 +66,8 @@
           "paths": {
             "/": {
               "get": {
+                "summary": "operation summary",
+                "description": "operation description",
                 "x-amazon-apigateway-integration": {
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
