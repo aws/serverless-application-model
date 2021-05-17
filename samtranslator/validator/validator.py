@@ -15,6 +15,7 @@ class SamTemplateValidator(object):
 
     # Useful to find a unicode prefixed string type to replace it with the non unicode version
     # On Python2, the validator returns types in error messages prefixed with 'u'
+    # We remove them to be consistent between python versions
     # Example: "u'integer'" -> "'integer'"
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
@@ -65,22 +66,19 @@ class SamTemplateValidator(object):
         # Each object can have a list of child errors in its Context attribute
         validation_errors = self.validator.iter_errors(template_dict)
 
-        # List of "[/Path/To/Element] Error message"
-        formatted_errors = []
-
+        # Set of "[/Path/To/Element] Error message"
         # To track error uniqueness, Dict instead of List, for speed
-        errors_set = OrderedDict()
+        errors_set = {}
 
         for e in validation_errors:
-            # breakpoint()
-            self._process_error(e, formatted_errors, errors_set)
+            self._process_error(e, errors_set)
 
         # To be consistent across python versions 2 and 3, we have to sort the final result
-        # It seems that the validator is not receiving the properties in the same order betweem python 2 and 3
+        # It seems that the validator is not receiving the properties in the same order between python 2 and 3
         # It thus returns errors in a different order
-        return sorted(formatted_errors)
+        return sorted(errors_set.keys())
 
-    def _process_error(self, error, formatted_errors, errors_set):
+    def _process_error(self, error, errors_set):
         """
         Processes the validation errors recursively
         Each error can have a list of child errors in its 'context' attribute (Tree or errors)
@@ -89,8 +87,8 @@ class SamTemplateValidator(object):
         ----------
         error : Error
             Error at the head
-        formatted_errors : OrderedDict
-            Final list of formatted errors
+        errors_set : Dict
+            Set of formatted errors
         """
         if error is None:
             return
@@ -106,12 +104,11 @@ class SamTemplateValidator(object):
             if error_content not in errors_set:
                 # We set the value to None as we don't use it
                 errors_set[error_content] = None
-                formatted_errors.append(error_content)
             return
 
         for context_error in error.context:
             # Each context item is also a validation error
-            self._process_error(context_error, formatted_errors, errors_set)
+            self._process_error(context_error, errors_set)
 
     def _cleanup_error_message(self, error):
         """

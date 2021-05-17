@@ -2,19 +2,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
   "definitions": {
-    "CloudFormationResource": {
-      "additionalProperties": true,
-      "properties": {
-        "Type": {
-          "pattern": "^(?!^AWS::Serverless).*",
-          "type": "string"
-        }
-      },
-      "required": [
-        "Type"
-      ],
-      "type": "object"
-    },
     "AWS::ApiGateway::Stage.AccessLogSetting": {
       "additionalProperties": false,
       "properties": {
@@ -36,10 +23,16 @@
       "additionalProperties": false,
       "properties": {
         "DeploymentId": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "PercentTraffic": {
-          "type": "number",
+          "type": [
+            "number",
+            "intrinsic"
+          ],
           "minimum": 0,
           "maximum": 100
         },
@@ -47,13 +40,22 @@
           "additionalProperties": true,
           "patternProperties": {
             "^[a-zA-Z0-9]+$": {
-              "type": "string"
+              "type": [
+                "string",
+                "intrinsic"
+              ]
             }
           },
-          "type": "object"
+          "type": [
+            "object",
+            "intrinsic"
+          ]
         },
         "UseStageCache": {
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
         }
       },
       "type": "object"
@@ -62,34 +64,64 @@
       "additionalProperties": false,
       "properties": {
         "CacheDataEncrypted": {
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
         },
         "CacheTtlInSeconds": {
-          "type": "integer"
+          "type": [
+            "integer",
+            "intrinsic"
+          ]
         },
         "CachingEnabled": {
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
         },
         "DataTraceEnabled": {
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
         },
         "HttpMethod": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "LoggingLevel": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "MetricsEnabled": {
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
         },
         "ResourcePath": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "ThrottlingBurstLimit": {
-          "type": "integer"
+          "type": [
+            "integer",
+            "intrinsic"
+          ]
         },
         "ThrottlingRateLimit": {
-          "type": "number"
+          "type": [
+            "number",
+            "intrinsic"
+          ]
         }
       },
       "type": "object"

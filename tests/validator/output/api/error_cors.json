@@ -1,13 +1,13 @@
 [
   "[Resources/ApiAllowCredentialsEmpty/Properties/Cors/AllowCredentials] Must not be empty",
-  "[Resources/ApiAllowCredentialsNotBoolean/Properties/Cors/AllowCredentials] 3 is not of type 'boolean'",
+  "[Resources/ApiAllowCredentialsNotBoolean/Properties/Cors/AllowCredentials] 3 is not of type 'boolean', 'intrinsic'",
   "[Resources/ApiAllowHeadersEmpty/Properties/Cors/AllowHeaders] Must not be empty",
-  "[Resources/ApiAllowHeadersNotString/Properties/Cors/AllowHeaders] 3 is not of type 'string'",
+  "[Resources/ApiAllowHeadersNotString/Properties/Cors/AllowHeaders] 3 is not of type 'string', 'intrinsic'",
   "[Resources/ApiAllowMethodsEmpty/Properties/Cors/AllowMethods] Must not be empty",
-  "[Resources/ApiAllowMethodsNotString/Properties/Cors/AllowMethods] 3 is not of type 'string'",
+  "[Resources/ApiAllowMethodsNotString/Properties/Cors/AllowMethods] 3 is not of type 'string', 'intrinsic'",
   "[Resources/ApiAllowOriginMissing/Properties/Cors] 'AllowOrigin' is a required property",
   "[Resources/ApiCorsEmpty/Properties/Cors] Must not be empty",
-  "[Resources/ApiCorsNotObjectOrString/Properties/Cors] 3 is not of type 'string', 'object'",
+  "[Resources/ApiCorsNotObjectOrString/Properties/Cors] 3 is not of type 'string', 'object', 'intrinsic'",
   "[Resources/ApiMaxAgeEmpty/Properties/Cors/MaxAge] Must not be empty",
-  "[Resources/ApiMaxAgeNotString/Properties/Cors/MaxAge] 3 is not of type 'string'"
+  "[Resources/ApiMaxAgeNotString/Properties/Cors/MaxAge] 3 is not of type 'string', 'intrinsic'"
 ]

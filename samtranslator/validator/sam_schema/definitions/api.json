@@ -32,7 +32,8 @@
               "BinaryMediaTypes": {
                 "items": {
                   "type": [
-                    "string"
+                    "string",
+                    "intrinsic"
                   ]
                 },
                 "type": [
@@ -64,7 +65,8 @@
                 },
                 "type": [
                   "string",
-                  "object"
+                  "object",
+                  "intrinsic"
                 ]
               },
               "DefinitionBody": {
@@ -82,7 +84,10 @@
                 "$ref": "#definitions/AWS::Serverless::Api.S3Location"
               },
               "Description": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "intrinsic"
+                ]
               },
               "Domain": {
                 "$ref": "#definitions/AWS::Serverless::Api.DomainConfiguration"
@@ -126,7 +131,10 @@
                 "type": "object"
               },
               "Name": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "intrinsic"
+                ]
               },
               "OpenApiVersion": {
                 "type": "string",
@@ -153,10 +161,16 @@
                 "patternProperties": {
                   "^[a-zA-Z0-9]+$": {
                     "pattern": "[A-Za-z0-9._~:/?#&=,-]+",
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "intrinsic"
+                    ]
                   }
                 },
-                "type": "object"
+                "type": [
+                  "object",
+                  "intrinsic"
+                ]
               }
             },
             "required": [
@@ -332,19 +346,34 @@
       "additionalProperties": false,
       "properties": {
         "AllowCredentials": {
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
         },
         "AllowHeaders": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "AllowMethods": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "AllowOrigin": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         },
         "MaxAge": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         }
       },
       "required": [
@@ -387,7 +416,10 @@
           "$ref": "#definitions/AWS::Serverless::Api.Route53Configuration"
         },
         "SecurityPolicy": {
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         }
       },
       "required": [
