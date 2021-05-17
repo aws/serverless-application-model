@@ -12,7 +12,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "^[a-zA-Z0-9]+$": {
-          "type": "object"
+          "type": "intrinsic"
         }
       },
       "type": "object"
@@ -50,7 +50,7 @@
       "maxProperties": 50,
       "patternProperties": {
         "^[a-zA-Z0-9]+$": {
-          "$ref": "#/definitions/Parameter"
+          "$ref": "file:definitions/parameter.json#/definitions/Parameter"
         }
       },
       "type": "object"
@@ -64,11 +64,7 @@
               "$ref": "file:definitions/api.json#/definitions/AWS::Serverless::Api"
             }
           ],
-          "type": "object",
-          "required": [
-            "Type",
-            "Properties"
-          ]
+          "type": "object"
         }
       },
       "type": "object"

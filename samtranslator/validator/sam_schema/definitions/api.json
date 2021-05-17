@@ -11,7 +11,8 @@
           }
         },
         "required": [
-          "Type"
+          "Type",
+          "Properties"
         ]
       },
       "then": {

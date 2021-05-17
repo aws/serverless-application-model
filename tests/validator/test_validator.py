@@ -5,7 +5,7 @@ from samtranslator.yaml_helper import yaml_parse
 from samtranslator.validator.validator import SamTemplateValidator, sam_schema
 
 BASE_PATH = os.path.dirname(__file__)
-INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input")
+INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "translator", "input")
 
 
 @pytest.mark.parametrize(
@@ -78,45 +78,8 @@ INPUT_FOLDER = os.path.join(BASE_PATH, os.pardir, "input")
     ],
 )
 def test_validate_template_success(testcase):
-    # These templates are failing validation, will fix schema one at a time
-    excluded = [
-        "api_endpoint_configuration",
-        "api_endpoint_configuration_with_vpcendpoint",
-        "api_with_binary_media_types",
-        "api_with_minimum_compression_size",
-        "api_with_cors",
-        "cloudwatch_logs_with_ref",
-        "sns",
-        "sns_existing_other_subscription",
-        "sns_topic_outside_template",
-        "alexa_skill",
-        "iot_rule",
-        "function_managed_inline_policy",
-        "unsupported_resources",
-        "intrinsic_functions",
-        "basic_function_with_tags",
-        "function_with_kmskeyarn",
-        "function_with_alias",
-        "function_with_alias_intrinsics",
-        "function_with_disabled_deployment_preference",
-        "function_with_deployment_preference",
-        "function_with_deployment_preference_all_parameters",
-        "function_with_deployment_preference_from_parameters",
-        "function_with_deployment_preference_multiple_combinations",
-        "function_with_alias_and_event_sources",
-        "function_with_resource_refs",
-        "function_with_policy_templates",
-        "globals_for_function",
-        "all_policy_templates",
-        "simple_table_ref_parameter_intrinsic",
-        "simple_table_with_table_name",
-        "function_concurrency",
-        "simple_table_with_extra_tags",
-    ]
-    if testcase in excluded:
-        return
     manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml")))
-    validation_errors = SamTemplateValidator.validate(manifest)
+    validation_errors = TestValidatorProvider.get().validate(manifest)
     has_errors = len(validation_errors)
     if has_errors:
         print("\nFailing template: {0}\n".format(testcase))
