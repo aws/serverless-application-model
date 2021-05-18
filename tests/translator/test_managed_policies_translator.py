@@ -32,4 +32,4 @@ def test_load():
     assert actual == expected
 
     iam.get_paginator.assert_called_once_with("list_policies")
-    paginator.paginate.assert_called_once_with(Scope="AWS")
+    paginator.paginate.assert_called_once_with(Scope="AWS", PaginationConfig={"PageSize": 1000})
