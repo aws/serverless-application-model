@@ -11,7 +11,7 @@
   "[Resources/MyApi/Properties/Auth/Authorizers/LambdaRequestIdentityQueryStringsItemNotString/Identity/QueryStrings/0] 3 is not of type 'string'",
   "[Resources/MyApi/Properties/Auth/Authorizers/LambdaRequestIdentityQueryStringsNotList/Identity/QueryStrings] 3 is not of type 'array'",
   "[Resources/MyApi/Properties/Auth/Authorizers/LambdaRequestIdentityReauthorizeEveryEmpty/Identity/ReauthorizeEvery] Must not be empty",
-  "[Resources/MyApi/Properties/Auth/Authorizers/LambdaRequestIdentityReauthorizeEveryNotInt/Identity/ReauthorizeEvery] '3' is not of type 'integer'",
+  "[Resources/MyApi/Properties/Auth/Authorizers/LambdaRequestIdentityReauthorizeEveryNotInt/Identity/ReauthorizeEvery] '3' is not of type 'integer', 'intrinsic'",
   "[Resources/MyApi/Properties/Auth/Authorizers/LambdaRequestIdentityReauthorizeEveryTooHigh/Identity/ReauthorizeEvery] 3601 is greater than the maximum of 3600",
   "[Resources/MyApi/Properties/Auth/Authorizers/LambdaRequestIdentityReauthorizeEveryTooLow/Identity/ReauthorizeEvery] 0 is less than the minimum of 1",
   "[Resources/MyApi/Properties/Auth/Authorizers/LambdaRequestIdentityStageVariablesEmpty/Identity/StageVariables] Must not be empty",

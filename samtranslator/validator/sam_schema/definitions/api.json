@@ -9,11 +9,7 @@
           "Type": {
             "const": "AWS::Serverless::Api"
           }
-        },
-        "required": [
-          "Type",
-          "Properties"
-        ]
+        }
       },
       "then": {
         "additionalProperties": false,
@@ -182,7 +178,11 @@
           "Type": {
             "const": "AWS::Serverless::Api"
           }
-        }
+        },
+        "required": [
+          "Type",
+          "Properties"
+        ]
       }
     },
     "AWS::Serverless::Api.ApiUsagePlan": {
@@ -543,7 +543,10 @@
           "type": "array"
         },
         "ReauthorizeEvery": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "intrinsic"
+          ],
           "maximum": 3600,
           "minimum": 1
         },
@@ -587,7 +590,10 @@
       "additionalProperties": false,
       "properties": {
         "ReauthorizeEvery": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "intrinsic"
+          ],
           "maximum": 3600,
           "minimum": 1
         },
