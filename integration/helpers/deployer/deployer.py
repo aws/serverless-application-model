@@ -43,7 +43,7 @@ from integration.helpers.deployer.utils.table_print import (
     MIN_OFFSET,
 )
 from integration.helpers.deployer.utils.artifact_exporter import mktempfile, parse_s3_url
-from integration.helpers.deployer.utils.time import utc_to_timestamp
+from integration.helpers.deployer.utils.time_util import utc_to_timestamp
 
 LOG = logging.getLogger(__name__)
 
