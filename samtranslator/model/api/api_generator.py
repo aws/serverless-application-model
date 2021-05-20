@@ -1,7 +1,8 @@
 import logging
 from collections import namedtuple
+
 from six import string_types
-from samtranslator.model.intrinsics import ref, fnGetAtt
+from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
     ApiGatewayRestApi,
@@ -15,7 +16,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -61,11 +62,91 @@ class SharedApiUsagePlan(object):
     so that these information can be used in the shared usage plan
     """
 
+    SHARED_USAGE_PLAN_CONDITION_NAME = "SharedUsagePlanCondition"
+
     def __init__(self):
         self.usage_plan_shared = False
         self.stage_keys_shared = list()
         self.api_stages_shared = list()
         self.depends_on_shared = list()
+
+        # shared resource level attributes
+        self.conditions = set()
+        self.any_api_without_condition = False
+        self.deletion_policy = None
+        self.update_replace_policy = None
+
+    def get_combined_resource_attributes(self, resource_attributes, conditions):
+        """
+        This method returns a dictionary which combines 'DeletionPolicy', 'UpdateReplacePolicy' and 'Condition'
+        values of API definitions that could be used in Shared Usage Plan resources.
+
+        Parameters
+        ----------
+        resource_attributes: Dict[str]
+            A dictionary of resource level attributes of the API resource
+        conditions: Dict[str]
+            Conditions section of the template
+        """
+        self._set_deletion_policy(resource_attributes.get("DeletionPolicy"))
+        self._set_update_replace_policy(resource_attributes.get("UpdateReplacePolicy"))
+        self._set_condition(resource_attributes.get("Condition"), conditions)
+
+        combined_resource_attributes = dict()
+        if self.deletion_policy:
+            combined_resource_attributes["DeletionPolicy"] = self.deletion_policy
+        if self.update_replace_policy:
+            combined_resource_attributes["UpdateReplacePolicy"] = self.update_replace_policy
+        # do not set Condition if any of the API resource does not have Condition in it
+        if self.conditions and not self.any_api_without_condition:
+            combined_resource_attributes["Condition"] = SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME
+
+        return combined_resource_attributes
+
+    def _set_deletion_policy(self, deletion_policy):
+        if deletion_policy:
+            if self.deletion_policy:
+                # update only if new deletion policy is Retain
+                if deletion_policy == "Retain":
+                    self.deletion_policy = deletion_policy
+            else:
+                self.deletion_policy = deletion_policy
+
+    def _set_update_replace_policy(self, update_replace_policy):
+        if update_replace_policy:
+            if self.update_replace_policy:
+                # if new value is Retain or
+                # new value is retain and current value is Delete then update its value
+                if (update_replace_policy == "Retain") or (
+                    update_replace_policy == "Snapshot" and self.update_replace_policy == "Delete"
+                ):
+                    self.update_replace_policy = update_replace_policy
+            else:
+                self.update_replace_policy = update_replace_policy
+
+    def _set_condition(self, condition, template_conditions):
+        # if there are any API without condition, then skip
+        if self.any_api_without_condition:
+            return
+
+        if condition and condition not in self.conditions:
+
+            if template_conditions is None:
+                raise InvalidTemplateException(
+                    "Can't have condition without having 'Conditions' section in the template"
+                )
+
+            if self.conditions:
+                self.conditions.add(condition)
+                or_condition = make_or_condition(self.conditions)
+                template_conditions[SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME] = or_condition
+            else:
+                self.conditions.add(condition)
+                template_conditions[SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME] = condition
+        elif condition is None:
+            self.any_api_without_condition = True
+            if template_conditions and SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME in template_conditions:
+                del template_conditions[SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME]
 
 
 class ApiGenerator(object):
@@ -81,6 +162,7 @@ class ApiGenerator(object):
         name,
         stage_name,
         shared_api_usage_plan,
+        template_conditions,
         tags=None,
         endpoint_configuration=None,
         method_settings=None,
@@ -147,6 +229,7 @@ class ApiGenerator(object):
         self.domain = domain
         self.description = description
         self.shared_api_usage_plan = shared_api_usage_plan
+        self.template_conditions = template_conditions
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -654,7 +737,9 @@ class ApiGenerator(object):
             usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id,
                 depends_on=self.shared_api_usage_plan.depends_on_shared,
-                attributes=self.passthrough_resource_attributes,
+                attributes=self.shared_api_usage_plan.get_combined_resource_attributes(
+                    self.passthrough_resource_attributes, self.template_conditions
+                ),
             )
             api_stage = dict()
             api_stage["ApiId"] = ref(self.logical_id)
@@ -692,7 +777,9 @@ class ApiGenerator(object):
             api_key = ApiGatewayApiKey(
                 logical_id=api_key_logical_id,
                 depends_on=[usage_plan_logical_id],
-                attributes=self.passthrough_resource_attributes,
+                attributes=self.shared_api_usage_plan.get_combined_resource_attributes(
+                    self.passthrough_resource_attributes, self.template_conditions
+                ),
             )
             api_key.Enabled = True
             stage_key = dict()
@@ -710,7 +797,6 @@ class ApiGenerator(object):
                 depends_on=[usage_plan_logical_id],
                 attributes=self.passthrough_resource_attributes,
             )
-            # api_key = ApiGatewayApiKey(logical_id=api_key_logical_id, depends_on=[usage_plan_logical_id])
             api_key.Enabled = True
             stage_keys = list()
             stage_key = dict()
@@ -730,17 +816,20 @@ class ApiGenerator(object):
         if create_usage_plan == "SHARED":
             # create a mapping between api key and the usage plan
             usage_plan_key_logical_id = "ServerlessUsagePlanKey"
+            resource_attributes = self.shared_api_usage_plan.get_combined_resource_attributes(
+                self.passthrough_resource_attributes, self.template_conditions
+            )
         # for create_usage_plan = "PER_API"
         else:
             # create a mapping between api key and the usage plan
             usage_plan_key_logical_id = self.logical_id + "UsagePlanKey"
+            resource_attributes = self.passthrough_resource_attributes
 
         usage_plan_key = ApiGatewayUsagePlanKey(
             logical_id=usage_plan_key_logical_id,
             depends_on=[api_key.logical_id],
-            attributes=self.passthrough_resource_attributes,
+            attributes=resource_attributes,
         )
-        # usage_plan_key = ApiGatewayUsagePlanKey(logical_id=usage_plan_key_logical_id, depends_on=[api_key.logical_id])
         usage_plan_key.KeyId = ref(api_key.logical_id)
         usage_plan_key.KeyType = "API_KEY"
         usage_plan_key.UsagePlanId = ref(usage_plan_logical_id)

@@ -400,6 +400,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_event_dest_basic",
                 "function_with_event_dest_conditional",
                 "api_with_usageplans",
+                "api_with_usageplans_shared_attributes_two",
+                "api_with_usageplans_shared_attributes_three",
                 "api_with_usageplans_intrinsics",
                 "state_machine_with_inline_definition",
                 "state_machine_with_tags",
