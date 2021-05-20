@@ -220,12 +220,12 @@
         }
       }
     },
-    "MyApiOneDeploymented8916593e": {
+    "MyApiOneDeployment7997029260": {
       "Type": "AWS::ApiGateway::Deployment",
       "Condition": "C1",
       "DeletionPolicy": "Delete",
       "Properties": {
-        "Description": "RestApi deployment id: ed8916593eee3d5996ff3d7912710b8fac532e60",
+        "Description": "RestApi deployment id: 79970292604071da8105ffd8503f82af32b30550",
         "RestApiId": {
           "Ref": "MyApiOne"
         },
@@ -238,7 +238,7 @@
       "DeletionPolicy": "Delete",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiOneDeploymented8916593e"
+          "Ref": "MyApiOneDeployment7997029260"
         },
         "RestApiId": {
           "Ref": "MyApiOne"
@@ -371,12 +371,12 @@
         }
       }
     },
-    "MyApiTwoDeployment17dd9ed926": {
+    "MyApiTwoDeployment03730b64c4": {
       "Type": "AWS::ApiGateway::Deployment",
       "Condition": "C2",
       "DeletionPolicy": "Retain",
       "Properties": {
-        "Description": "RestApi deployment id: 17dd9ed92642dde88467fc566c4a64befb1d3a2d",
+        "Description": "RestApi deployment id: 03730b64c486cc490deefb3b8225244b0fe85d34",
         "RestApiId": {
           "Ref": "MyApiTwo"
         },
@@ -389,7 +389,7 @@
       "DeletionPolicy": "Retain",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeployment17dd9ed926"
+          "Ref": "MyApiTwoDeployment03730b64c4"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"

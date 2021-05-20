@@ -283,12 +283,12 @@
         }
       }
     },
-    "MyApiOneDeploymented8916593e": {
+    "MyApiOneDeployment7997029260": {
       "Type": "AWS::ApiGateway::Deployment",
       "Condition": "C1",
       "UpdateReplacePolicy": "Delete",
       "Properties": {
-        "Description": "RestApi deployment id: ed8916593eee3d5996ff3d7912710b8fac532e60",
+        "Description": "RestApi deployment id: 79970292604071da8105ffd8503f82af32b30550",
         "RestApiId": {
           "Ref": "MyApiOne"
         },
@@ -301,7 +301,7 @@
       "UpdateReplacePolicy": "Delete",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiOneDeploymented8916593e"
+          "Ref": "MyApiOneDeployment7997029260"
         },
         "RestApiId": {
           "Ref": "MyApiOne"
@@ -448,12 +448,12 @@
         }
       }
     },
-    "MyApiTwoDeployment17dd9ed926": {
+    "MyApiTwoDeployment03730b64c4": {
       "Type": "AWS::ApiGateway::Deployment",
       "Condition": "C2",
       "UpdateReplacePolicy": "Snapshot",
       "Properties": {
-        "Description": "RestApi deployment id: 17dd9ed92642dde88467fc566c4a64befb1d3a2d",
+        "Description": "RestApi deployment id: 03730b64c486cc490deefb3b8225244b0fe85d34",
         "RestApiId": {
           "Ref": "MyApiTwo"
         },
@@ -466,7 +466,7 @@
       "UpdateReplacePolicy": "Snapshot",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiTwoDeployment17dd9ed926"
+          "Ref": "MyApiTwoDeployment03730b64c4"
         },
         "RestApiId": {
           "Ref": "MyApiTwo"
@@ -522,10 +522,10 @@
         }
       }
     },
-    "MyApiThreeDeployment0ac39d26ff": {
+    "MyApiThreeDeploymentfa9f73f027": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 0ac39d26ffc79dae8849daf66e76214028279104",
+        "Description": "RestApi deployment id: fa9f73f0272017527c24cc93cc4440dd4476b9f4",
         "RestApiId": {
           "Ref": "MyApiThree"
         },
@@ -536,7 +536,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiThreeDeployment0ac39d26ff"
+          "Ref": "MyApiThreeDeploymentfa9f73f027"
         },
         "RestApiId": {
           "Ref": "MyApiThree"
