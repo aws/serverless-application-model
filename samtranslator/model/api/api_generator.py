@@ -78,21 +78,33 @@ class SharedApiUsagePlan(object):
         self.update_replace_policy = None
 
     def get_combined_resource_attributes(self, resource_attributes, conditions):
-        self.set_deletion_policy(resource_attributes.get("DeletionPolicy"))
-        self.set_update_replace_policy(resource_attributes.get("UpdateReplacePolicy"))
-        self.set_condition(resource_attributes.get("Condition"), conditions)
+        """
+        This method returns a dictionary which combines 'DeletionPolicy', 'UpdateReplacePolicy' and 'Condition'
+        values of API definitions that could be used in Shared Usage Plan resources.
 
-        combined_resource_attributes = deepcopy(resource_attributes)
+        Parameters
+        ----------
+        resource_attributes: Dict[str]
+            A dictionary of resource level attributes of the API resource
+        conditions: Dict[str]
+            Conditions section of the template
+        """
+        self._set_deletion_policy(resource_attributes.get("DeletionPolicy"))
+        self._set_update_replace_policy(resource_attributes.get("UpdateReplacePolicy"))
+        self._set_condition(resource_attributes.get("Condition"), conditions)
+
+        combined_resource_attributes = dict()
         if self.deletion_policy:
             combined_resource_attributes["DeletionPolicy"] = self.deletion_policy
         if self.update_replace_policy:
             combined_resource_attributes["UpdateReplacePolicy"] = self.update_replace_policy
+        # do not set Condition if any of the API resource does not have Condition in it
         if self.conditions and not self.any_api_without_condition:
             combined_resource_attributes["Condition"] = SharedApiUsagePlan.SHARED_USAGE_PLAN_CONDITION_NAME
 
         return combined_resource_attributes
 
-    def set_deletion_policy(self, deletion_policy):
+    def _set_deletion_policy(self, deletion_policy):
         if deletion_policy:
             if self.deletion_policy:
                 # update only if new deletion policy is Retain
@@ -101,7 +113,7 @@ class SharedApiUsagePlan(object):
             else:
                 self.deletion_policy = deletion_policy
 
-    def set_update_replace_policy(self, update_replace_policy):
+    def _set_update_replace_policy(self, update_replace_policy):
         if update_replace_policy:
             if self.update_replace_policy:
                 # if new value is Retain or
@@ -113,7 +125,7 @@ class SharedApiUsagePlan(object):
             else:
                 self.update_replace_policy = update_replace_policy
 
-    def set_condition(self, condition, template_conditions):
+    def _set_condition(self, condition, template_conditions):
         # if there are any API without condition, then skip
         if self.any_api_without_condition:
             return
