@@ -862,6 +862,7 @@ class SamApi(SamResourceMacro):
         self.Auth = intrinsics_resolver.resolve_parameter_refs(self.Auth)
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
         shared_api_usage_plan = kwargs.get("shared_api_usage_plan")
+        template_conditions = kwargs.get("conditions")
 
         api_generator = ApiGenerator(
             self.logical_id,
@@ -874,6 +875,7 @@ class SamApi(SamResourceMacro):
             self.Name,
             self.StageName,
             shared_api_usage_plan,
+            template_conditions,
             tags=self.Tags,
             endpoint_configuration=self.EndpointConfiguration,
             method_settings=self.MethodSettings,

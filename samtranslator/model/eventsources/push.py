@@ -960,9 +960,6 @@ class Cognito(PushEventSource):
         resources.append(lambda_permission)
 
         self._inject_lambda_config(function, userpool)
-        userpool_resource = CognitoUserPool.from_dict(userpool_id, userpool)
-        for attribute, value in function.get_passthrough_resource_attributes().items():
-            userpool_resource.set_resource_attribute(attribute, value)
         resources.append(CognitoUserPool.from_dict(userpool_id, userpool))
         return resources
 
