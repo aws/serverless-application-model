@@ -79,6 +79,8 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
+        sam_template.resources = Mock()
+        sam_template.resources.keys.return_value = ("id1", "id2", "id3")
         sam_template.set = Mock()
         sam_template.iterate = Mock()
         sam_template.iterate.return_value = function_resources
@@ -116,6 +118,8 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
+        sam_template.resources = Mock()
+        sam_template.resources.keys.return_value = ("id1", "id2", "id3")
         sam_template.set = Mock()
         sam_template.iterate = Mock()
         sam_template.iterate.return_value = statemachine_resources
@@ -154,6 +158,8 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
+        sam_template.resources = Mock()
+        sam_template.resources.keys.return_value = ("id1", "id2", "id3")
         sam_template.set = Mock()
         sam_template.iterate = Mock()
         sam_template.iterate.return_value = function_resources
@@ -179,6 +185,8 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
+        sam_template.resources = Mock()
+        sam_template.resources.keys.return_value = ("id1", "id2", "id3")
         sam_template.set = Mock()
         sam_template.iterate = Mock()
         sam_template.iterate.return_value = statemachine_resources
@@ -200,6 +208,8 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
+        sam_template.resources = Mock()
+        sam_template.resources.keys.return_value = ()
         sam_template.set = Mock()
         sam_template.iterate = Mock()
         sam_template.iterate.return_value = function_resources
@@ -229,6 +239,8 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
 
         sam_template = Mock()
         SamTemplateMock.return_value = sam_template
+        sam_template.resources = Mock()
+        sam_template.resources.keys.return_value = ("id1", "id2", "id3")
         sam_template.set = Mock()
         sam_template.iterate = Mock()
         sam_template.iterate.return_value = function_resources
@@ -252,6 +264,33 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
             self.assertEqual(api_event_errors[index].message, cause._message)
 
         # Must cleanup even if there an exception
+        self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
+
+    @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
+    def test_must_not_override_api_with_same_logical_id_as_implicit_api(self, SamTemplateMock):
+        template_dict = {"a": "b"}
+        function1 = SamResource({"Type": "AWS::Serverless::Function"})
+        rest_api_1 = SamResource({"Type": "AWS::Serverless::Api"})
+        rest_api_2 = SamResource({"Type": "AWS::Serverless::Api"})
+        resources = [("id1", function1), ("ServerlessRestApi", rest_api_1), ("ServerlessRestApi2", rest_api_2)]
+        api_events = ["event1", "event2"]
+
+        expected_rest_api_logical_id = "ServerlessRestApi3"
+
+        sam_template = Mock()
+        SamTemplateMock.return_value = sam_template
+        sam_template.resources = Mock()
+        sam_template.resources.keys.return_value = ("id1", "ServerlessRestApi", "ServerlessRestApi2")
+        sam_template.set = Mock()
+        sam_template.iterate = Mock()
+        sam_template.iterate.return_value = resources
+        self.plugin._get_api_events.return_value = api_events
+
+        self.plugin.on_before_transform_template(template_dict)
+
+        SamTemplateMock.assert_called_with(template_dict)
+        sam_template.set.assert_called_with(expected_rest_api_logical_id, ImplicitApiResource().to_dict())
+
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
 
 

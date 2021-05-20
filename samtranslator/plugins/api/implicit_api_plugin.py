@@ -1,10 +1,13 @@
 import copy
+import logging
 
 from samtranslator.model.intrinsics import make_combined_condition
 from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
+
+LOG = logging.getLogger(__name__)
 
 
 class ImplicitApiPlugin(BasePlugin):
@@ -58,6 +61,16 @@ class ImplicitApiPlugin(BasePlugin):
         """
 
         template = SamTemplate(template_dict)
+
+        # Adjust self.implicit_api_logical_id if the template already contains a resource with the same logical ID
+        # Appending a number (2) to it. If it is still not unique, increment the number until the logical ID is unique.
+        resource_logical_ids = set(template.resources.keys())
+        if self.implicit_api_logical_id in resource_logical_ids:
+            suffix = 2
+            while (self.implicit_api_logical_id + str(suffix)) in resource_logical_ids:
+                suffix = suffix + 1
+            self.implicit_api_logical_id = self.implicit_api_logical_id + str(suffix)
+            LOG.debug('Adjust implicit API logical ID to "%s"', self.implicit_api_logical_id)
 
         # Temporarily add Serverless::Api resource corresponding to Implicit API to the template.
         # This will allow the processing code to work the same way for both Implicit & Explicit APIs
