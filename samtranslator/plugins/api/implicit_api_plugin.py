@@ -38,7 +38,6 @@ class ImplicitApiPlugin(BasePlugin):
         """
         super(ImplicitApiPlugin, self).__init__(name)
 
-        self.existing_implicit_api_resource = None
         # dict containing condition (or None) for each resource path+method for all APIs. dict format:
         # {api_id: {path: {method: condition_name_or_None}}}
         self.api_conditions = {}
@@ -75,11 +74,6 @@ class ImplicitApiPlugin(BasePlugin):
         # Temporarily add Serverless::Api resource corresponding to Implicit API to the template.
         # This will allow the processing code to work the same way for both Implicit & Explicit APIs
         # If there are no implicit APIs, we will remove from the template later.
-
-        # If the customer has explicitly defined a resource with the id of "ServerlessRestApi",
-        # capture it.  If the template ends up not defining any implicit api's, instead of just
-        # removing the "ServerlessRestApi" resource, we just restore what the author defined.
-        self.existing_implicit_api_resource = copy.deepcopy(template.get(self.implicit_api_logical_id))
 
         template.set(self.implicit_api_logical_id, self._generate_implicit_api_resource())
 
@@ -426,12 +420,7 @@ class ImplicitApiPlugin(BasePlugin):
         implicit_api_resource = template.get(self.implicit_api_logical_id)
 
         if implicit_api_resource and len(implicit_api_resource.properties["DefinitionBody"]["paths"]) == 0:
-            # If there's no implicit api and the author defined a "ServerlessRestApi"
-            # resource, restore it
-            if self.existing_implicit_api_resource:
-                template.set(self.implicit_api_logical_id, self.existing_implicit_api_resource)
-            else:
-                template.delete(self.implicit_api_logical_id)
+            template.delete(self.implicit_api_logical_id)
 
     def _generate_implicit_api_resource(self):
         """

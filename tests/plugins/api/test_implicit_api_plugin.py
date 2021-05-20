@@ -839,20 +839,6 @@ class TestImplicitRestApiPlugin_maybe_remove_implicit_api(TestCase):
         # Must not delete
         template.delete.assert_not_called()
 
-    def test_must_restore_if_existing_resource_present(self):
-        resource = SamResource({"Type": "AWS::Serverless::Api", "Properties": {"DefinitionBody": {"paths": {}}}})
-        template = Mock()
-        template.get = Mock()
-        template.set = Mock()
-        template.get.return_value = resource
-
-        self.plugin.existing_implicit_api_resource = resource
-        self.plugin._maybe_remove_implicit_api(template)
-        template.get.assert_called_with(IMPLICIT_API_LOGICAL_ID)
-
-        # Must restore original resource
-        template.set.assert_called_with(IMPLICIT_API_LOGICAL_ID, resource)
-
 
 class TestImplicitApiPlugin_generate_resource_attributes(TestCase):
     def setUp(self):
