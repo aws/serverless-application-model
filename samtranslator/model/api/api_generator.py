@@ -1,6 +1,5 @@
 import logging
 from collections import namedtuple
-from copy import deepcopy
 
 from six import string_types
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
