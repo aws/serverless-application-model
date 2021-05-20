@@ -113,7 +113,8 @@ class Schedule(PushEventSource):
 
         resources = []
 
-        events_rule = EventsRule(self.logical_id)
+        passthrough_resource_attributes = function.get_passthrough_resource_attributes()
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
@@ -126,13 +127,13 @@ class Schedule(PushEventSource):
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+                self, source_arn, passthrough_resource_attributes
+            )
             resources.extend(dlq_resources)
 
         events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
 
-        if CONDITION in function.resource_attributes:
-            events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
         resources.append(self._construct_permission(function, source_arn=source_arn))
 
         return resources
@@ -186,7 +187,8 @@ class CloudWatchEvent(PushEventSource):
 
         resources = []
 
-        events_rule = EventsRule(self.logical_id)
+        passthrough_resource_attributes = function.get_passthrough_resource_attributes()
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
         source_arn = events_rule.get_runtime_attr("arn")
@@ -194,12 +196,12 @@ class CloudWatchEvent(PushEventSource):
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+                self, source_arn, passthrough_resource_attributes
+            )
             resources.extend(dlq_resources)
 
         events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
-        if CONDITION in function.resource_attributes:
-            events_rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         resources.append(events_rule)
         resources.append(self._construct_permission(function, source_arn=source_arn))
@@ -427,20 +429,20 @@ class SNS(PushEventSource):
                 self.Topic,
                 self.Region,
                 self.FilterPolicy,
-                function.resource_attributes,
+                function,
             )
             return [self._construct_permission(function, source_arn=self.Topic), subscription]
 
         # SNS -> SQS(Create New) -> Lambda
         if isinstance(self.SqsSubscription, bool):
             resources = []
-            queue = self._inject_sqs_queue()
+            queue = self._inject_sqs_queue(function)
             queue_arn = queue.get_runtime_attr("arn")
             queue_url = queue.get_runtime_attr("queue_url")
 
-            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function.resource_attributes)
+            queue_policy = self._inject_sqs_queue_policy(self.Topic, queue_arn, queue_url, function)
             subscription = self._inject_subscription(
-                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
+                "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function
             )
             event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn)
 
@@ -462,11 +464,9 @@ class SNS(PushEventSource):
         enabled = self.SqsSubscription.get("Enabled", None)
 
         queue_policy = self._inject_sqs_queue_policy(
-            self.Topic, queue_arn, queue_url, function.resource_attributes, queue_policy_logical_id
+            self.Topic, queue_arn, queue_url, function, queue_policy_logical_id
         )
-        subscription = self._inject_subscription(
-            "sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function.resource_attributes
-        )
+        subscription = self._inject_subscription("sqs", queue_arn, self.Topic, self.Region, self.FilterPolicy, function)
         event_source = self._inject_sqs_event_source_mapping(function, role, queue_arn, batch_size, enabled)
 
         resources = resources + event_source
@@ -474,35 +474,36 @@ class SNS(PushEventSource):
         resources.append(subscription)
         return resources
 
-    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, resource_attributes):
-        subscription = SNSSubscription(self.logical_id)
+    def _inject_subscription(self, protocol, endpoint, topic, region, filterPolicy, function):
+        subscription = SNSSubscription(self.logical_id, attributes=function.get_passthrough_resource_attributes())
         subscription.Protocol = protocol
         subscription.Endpoint = endpoint
         subscription.TopicArn = topic
+
         if region is not None:
             subscription.Region = region
-        if CONDITION in resource_attributes:
-            subscription.set_resource_attribute(CONDITION, resource_attributes[CONDITION])
 
         if filterPolicy is not None:
             subscription.FilterPolicy = filterPolicy
 
         return subscription
 
-    def _inject_sqs_queue(self):
-        return SQSQueue(self.logical_id + "Queue")
+    def _inject_sqs_queue(self, function):
+        return SQSQueue(self.logical_id + "Queue", attributes=function.get_passthrough_resource_attributes())
 
     def _inject_sqs_event_source_mapping(self, function, role, queue_arn, batch_size=None, enabled=None):
-        event_source = SQS(self.logical_id + "EventSourceMapping")
+        event_source = SQS(
+            self.logical_id + "EventSourceMapping", attributes=function.get_passthrough_resource_attributes()
+        )
         event_source.Queue = queue_arn
         event_source.BatchSize = batch_size or 10
         event_source.Enabled = enabled or True
         return event_source.to_cloudformation(function=function, role=role)
 
-    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, resource_attributes, logical_id=None):
-        policy = SQSQueuePolicy(logical_id or self.logical_id + "QueuePolicy")
-        if CONDITION in resource_attributes:
-            policy.set_resource_attribute(CONDITION, resource_attributes[CONDITION])
+    def _inject_sqs_queue_policy(self, topic_arn, queue_arn, queue_url, function, logical_id=None):
+        policy = SQSQueuePolicy(
+            logical_id or self.logical_id + "QueuePolicy", attributes=function.get_passthrough_resource_attributes()
+        )
 
         policy.PolicyDocument = SQSQueuePolicies.sns_topic_send_message_role_policy(topic_arn, queue_arn)
         policy.Queues = [queue_url]
@@ -895,7 +896,7 @@ class IoTRule(PushEventSource):
         return resources
 
     def _construct_iot_rule(self, function):
-        rule = IotTopicRule(self.logical_id)
+        rule = IotTopicRule(self.logical_id, attributes=function.get_passthrough_resource_attributes())
 
         payload = {
             "Sql": self.Sql,
@@ -907,8 +908,6 @@ class IoTRule(PushEventSource):
             payload["AwsIotSqlVersion"] = self.AwsIotSqlVersion
 
         rule.TopicRulePayload = payload
-        if CONDITION in function.resource_attributes:
-            rule.set_resource_attribute(CONDITION, function.resource_attributes[CONDITION])
 
         return rule
 
@@ -953,9 +952,12 @@ class Cognito(PushEventSource):
 
         resources = []
         source_arn = fnGetAtt(userpool_id, "Arn")
-        resources.append(
-            self._construct_permission(function, source_arn=source_arn, prefix=function.logical_id + "Cognito")
+        lambda_permission = self._construct_permission(
+            function, source_arn=source_arn, prefix=function.logical_id + "Cognito"
         )
+        for attribute, value in function.get_passthrough_resource_attributes().items():
+            lambda_permission.set_resource_attribute(attribute, value)
+        resources.append(lambda_permission)
 
         self._inject_lambda_config(function, userpool)
         resources.append(CognitoUserPool.from_dict(userpool_id, userpool))

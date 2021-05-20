@@ -1,0 +1,75 @@
+Globals:
+  Api:
+    Auth:
+      ApiKeyRequired: true
+      UsagePlan:
+        CreateUsagePlan: SHARED
+
+Conditions:
+  C1:
+    Fn::Equals:
+      - test
+      - test
+  C2:
+    Fn::Equals:
+      - test
+      - test  
+
+Resources:
+  MyApiOne:
+    Type: AWS::Serverless::Api
+    DeletionPolicy: Delete
+    Condition: C1
+    Properties:
+      StageName: Prod
+
+  MyApiTwo:
+    Type: AWS::Serverless::Api
+    DeletionPolicy: Retain
+    Condition: C2
+    Properties:
+      StageName: Prod
+
+  MyFunctionOne:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiOne
+            Method: get
+            Path: /path/one
+
+  MyFunctionTwo:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiTwo
+            Method: get
+            Path: /path/two
