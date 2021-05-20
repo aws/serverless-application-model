@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 
@@ -71,24 +72,24 @@ def test_redeploy_implicit_api():
         },
     }
 
-    original_deployment_ids = translate_and_find_deployment_ids(manifest)
+    original_deployment_ids = translate_and_find_deployment_ids(copy.deepcopy(manifest))
 
     # Update API of one Lambda function should redeploy API
     manifest["Resources"]["FirstLambdaFunction"]["Properties"]["Events"]["MyApi"]["Properties"]["Method"] = "post"
-    first_updated_deployment_ids = translate_and_find_deployment_ids(manifest)
+    first_updated_deployment_ids = translate_and_find_deployment_ids(copy.deepcopy(manifest))
     assert original_deployment_ids != first_updated_deployment_ids
 
     # Update API of second Lambda function should redeploy API
     manifest["Resources"]["SecondLambdaFunction"]["Properties"]["Events"]["MyApi"]["Properties"]["Method"] = "post"
-    second_updated_deployment_ids = translate_and_find_deployment_ids(manifest)
+    second_updated_deployment_ids = translate_and_find_deployment_ids(copy.deepcopy(manifest))
     assert first_updated_deployment_ids != second_updated_deployment_ids
 
     # Now, update an unrelated property. This should NOT generate a new deploymentId
     manifest["Resources"]["SecondLambdaFunction"]["Properties"]["Runtime"] = "java"
-    assert second_updated_deployment_ids == translate_and_find_deployment_ids(manifest)
+    assert second_updated_deployment_ids == translate_and_find_deployment_ids(copy.deepcopy(manifest))
 
     manifest["Resources"]["FirstLambdaFunction"]["Properties"]["FunctionName"] = "ChangedFunctionName"
-    fourth_updated_deployment_ids = translate_and_find_deployment_ids(manifest)
+    fourth_updated_deployment_ids = translate_and_find_deployment_ids(copy.deepcopy(manifest))
     assert fourth_updated_deployment_ids != second_updated_deployment_ids
 
 

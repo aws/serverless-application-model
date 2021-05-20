@@ -45,7 +45,7 @@
             {
               "__Stage__": "*",
               "__ApiId__": {
-                "Ref": "ServerlessRestApi"
+                "Ref": "ServerlessRestApi2"
               }
             }
           ]
@@ -66,21 +66,21 @@
             {
               "__Stage__": "*",
               "__ApiId__": {
-                "Ref": "ServerlessRestApi"
+                "Ref": "ServerlessRestApi2"
               }
             }
           ]
         }
       }
     }, 
-    "ServerlessRestApiProdStage": {
+    "ServerlessRestApi2ProdStage": {
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment127e3fb911"
+          "Ref": "ServerlessRestApi2Deployment127e3fb911"
         }, 
         "RestApiId": {
-          "Ref": "ServerlessRestApi"
+          "Ref": "ServerlessRestApi2"
         }, 
         "StageName": "Prod"
       }
@@ -162,11 +162,11 @@
         ]
       }
     }, 
-    "ServerlessRestApiDeployment127e3fb911": {
+    "ServerlessRestApi2Deployment127e3fb911": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
-          "Ref": "ServerlessRestApi"
+          "Ref": "ServerlessRestApi2"
         }, 
         "Description": "RestApi deployment id: 127e3fb91142ab1ddc5f5446adb094442581a90d", 
         "StageName": "Stage"
@@ -186,14 +186,67 @@
             {
               "__Stage__": "*",
               "__ApiId__": {
-                "Ref": "ServerlessRestApi"
+                "Ref": "ServerlessRestApi2"
               }
             }
           ]
         }
       }
-    }, 
+    },
     "ServerlessRestApi": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ServerlessRestApiRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "ServerlessRestApiRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "ServerlessRestApi2": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
@@ -271,7 +324,7 @@
             {
               "__Stage__": "*",
               "__ApiId__": {
-                "Ref": "ServerlessRestApi"
+                "Ref": "ServerlessRestApi2"
               }
             }
           ]
