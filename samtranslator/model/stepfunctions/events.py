@@ -439,7 +439,7 @@ class Api(EventSource):
                         # escapeJavaScript escapes single quotes, which is unnecessary and invalid
                         # in JSON, so have to unescape afterwards.
                         # See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#util-template-reference
-                        "input": r'''$util.escapeJavaScript($input.json('$')).replaceAll("\\'","'")''',
+                        "input": r"""$util.escapeJavaScript($input.json('$')).replaceAll("\'","'")""",
                         "stateMachineArn": "${" + resource.logical_id + "}",
                     }
                 )
