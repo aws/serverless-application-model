@@ -1,0 +1,85 @@
+Resources:
+  HtmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody: true
+              ValidateRequest: true
+
+  HtmlFunctionNoValidation:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /no-validation
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody: false
+              ValidateRequest: false
+
+  HtmlFunctionMixinValidation:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /mixin
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody: true
+              ValidateRequest: false
+
+  HtmlFunctionNotDefinedValidation:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /not-defined
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+
+  HtmlApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string

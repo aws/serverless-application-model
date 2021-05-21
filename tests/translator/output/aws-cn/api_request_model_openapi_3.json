@@ -1,5 +1,14 @@
 {
   "Resources": {
+    "HtmlApiDeployment5ae7e42cea": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "Description": "RestApi deployment id: 5ae7e42cea0640a3318bf508535850cd792a52dc"
+      }
+    }, 
     "HtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -34,7 +43,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment8aa5f09263"
+          "Ref": "HtmlApiDeployment5ae7e42cea"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -92,7 +101,6 @@
                   }, 
                   "credentials": "arn:aws:iam::*:user/*"
                 }, 
-                "x-amazon-apigateway-request-validator": "iam-get-validator", 
                 "security": [
                   {
                     "AWS_IAM": []
@@ -120,7 +128,6 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}
               }
             }
@@ -144,16 +151,6 @@
                   }
                 }
               }
-            }
-          }, 
-          "x-amazon-apigateway-request-validators": {
-            "iam-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }, 
-            "root-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
             }
           }
         }, 
@@ -186,15 +183,6 @@
             }
           ]
         }
-      }
-    }, 
-    "HtmlApiDeployment8aa5f09263": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: 8aa5f092633f759fbf788b37a835fac8de9b2560"
       }
     }, 
     "HtmlFunction": {

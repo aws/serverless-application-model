@@ -1,15 +1,5 @@
 {
   "Resources": {
-    "HtmlApiDeployment0c93071add": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: 0c93071add5c034b9c7c949420aa36f1b98d553a", 
-        "StageName": "Stage"
-      }
-    }, 
     "HtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -44,7 +34,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment0c93071add"
+          "Ref": "HtmlApiDeployment3744537077"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -91,7 +81,6 @@
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -107,12 +96,6 @@
             }
           }, 
           "swagger": "2.0", 
-          "x-amazon-apigateway-request-validators": {
-            "root-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }
-          }, 
           "definitions": {
             "user": {
               "type": "object", 
@@ -132,6 +115,16 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    }, 
+    "HtmlApiDeployment3744537077": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "Description": "RestApi deployment id: 374453707756d2ce5439fb8f0995a4ced3659a0e", 
+        "StageName": "Stage"
       }
     }, 
     "HtmlFunction": {

@@ -802,7 +802,13 @@ class Api(PushEventSource):
                     # If not type None but any other type it should explicitly invalidate the Spec
                     # Those fields should be only a boolean
                     if not isinstance(validate_body, bool) or not isinstance(validate_request, bool):
-                        raise TypeError("ValidateBody and ValidateRequest must be a boolean type, strings or intrinsics are not supported")
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Unable to set Validator to RequestModel [{model}] on API method [{method}] for path [{path}] "
+                            "ValidateBody and ValidateRequest must be a boolean type, strings or intrinsics are not supported.".format(
+                                model=method_model, method=self.Method, path=self.Path
+                            ),
+                        )
 
                     editor.add_request_validator_to_method(
                         path=self.Path,

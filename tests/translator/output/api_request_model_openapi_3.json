@@ -34,7 +34,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment7bcc9b1f76"
+          "Ref": "HtmlApiDeployment59eeb787ee"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -92,7 +92,6 @@
                   }, 
                   "credentials": "arn:aws:iam::*:user/*"
                 }, 
-                "x-amazon-apigateway-request-validator": "iam-get-validator", 
                 "security": [
                   {
                     "AWS_IAM": []
@@ -120,7 +119,6 @@
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}
               }
             }
@@ -145,27 +143,17 @@
                 }
               }
             }
-          }, 
-          "x-amazon-apigateway-request-validators": {
-            "iam-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }, 
-            "root-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }
           }
         }
       }
     }, 
-    "HtmlApiDeployment7bcc9b1f76": {
+    "HtmlApiDeployment59eeb787ee": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
         }, 
-        "Description": "RestApi deployment id: 7bcc9b1f76a65d06d9a112661419d20d44564dac"
+        "Description": "RestApi deployment id: 59eeb787ee1561329a07e10162ac3718998e9f91"
       }
     }, 
     "HtmlFunctionIamPermissionProd": {

@@ -1,0 +1,3 @@
+{
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [HtmlFunction] is invalid. Event with id [GetHtml] is invalid. Unable to set Validator to RequestModel [User] on API method [get] for path [/] ValidateBody and ValidateRequest must be a boolean type, strings or intrinsics are not supported."
+}

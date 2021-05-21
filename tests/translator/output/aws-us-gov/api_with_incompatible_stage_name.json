@@ -1,13 +1,26 @@
 {
   "Resources": {
-    "UnderscoreApiDeployment0a3eb8ded3": {
-      "Type": "AWS::ApiGateway::Deployment", 
+    "UnderscoreFunction": {
+      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "RestApiId": {
-          "Ref": "UnderscoreApi"
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
         }, 
-        "Description": "RestApi deployment id: 0a3eb8ded3d6e81cf392bf9122e05abcff9e8286", 
-        "StageName": "Stage"
+        "Role": {
+          "Fn::GetAtt": [
+            "UnderscoreFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "UnderscoreApi": {
@@ -30,7 +43,6 @@
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnderscoreFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -46,12 +58,6 @@
             }
           }, 
           "swagger": "2.0", 
-          "x-amazon-apigateway-request-validators": {
-            "root-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }
-          }, 
           "definitions": {
             "user": {
               "type": "object", 
@@ -103,69 +109,6 @@
         ]
       }
     }, 
-    "HyphenApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0", 
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          }, 
-          "paths": {
-            "/": {
-              "get": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
-                  "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HyphenFunction.Arn}/invocations"
-                  }
-                }, 
-                "x-amazon-apigateway-request-validator": "root-get-validator", 
-                "responses": {}, 
-                "parameters": [
-                  {
-                    "required": true, 
-                    "in": "body", 
-                    "name": "user", 
-                    "schema": {
-                      "$ref": "#/definitions/user"
-                    }
-                  }
-                ]
-              }
-            }
-          }, 
-          "swagger": "2.0", 
-          "x-amazon-apigateway-request-validators": {
-            "root-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }
-          }, 
-          "definitions": {
-            "user": {
-              "type": "object", 
-              "properties": {
-                "username": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }, 
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        }
-      }
-    }, 
     "HyphenFunctionGetHtmlPermission0c8ecc62cb": {
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
@@ -189,7 +132,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HyphenApiDeploymentd5f789a736"
+          "Ref": "HyphenApiDeploymente60ebb9f56"
         }, 
         "RestApiId": {
           "Ref": "HyphenApi"
@@ -201,7 +144,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "UnderscoreApiDeployment0a3eb8ded3"
+          "Ref": "UnderscoreApiDeployment94459366c6"
         }, 
         "RestApiId": {
           "Ref": "UnderscoreApi"
@@ -251,37 +194,80 @@
         ]
       }
     }, 
-    "HyphenApiDeploymentd5f789a736": {
+    "HyphenApiDeploymente60ebb9f56": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "HyphenApi"
         }, 
-        "Description": "RestApi deployment id: d5f789a73679937aa1f649354a02639c7cdfb319", 
+        "Description": "RestApi deployment id: e60ebb9f56220ac12550230674d09ed8085afc74", 
         "StageName": "Stage"
       }
     }, 
-    "UnderscoreFunction": {
-      "Type": "AWS::Lambda::Function", 
+    "UnderscoreApiDeployment94459366c6": {
+      "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
-        "Handler": "index.gethtml", 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "member_portal.zip"
+        "RestApiId": {
+          "Ref": "UnderscoreApi"
         }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "UnderscoreFunctionRole", 
-            "Arn"
+        "Description": "RestApi deployment id: 94459366c6f9a344235ddf7db2a7cd5115d60da4", 
+        "StageName": "Stage"
+      }
+    }, 
+    "HyphenApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HyphenFunction.Arn}/invocations"
+                  }
+                }, 
+                "responses": {}, 
+                "parameters": [
+                  {
+                    "required": true, 
+                    "in": "body", 
+                    "name": "user", 
+                    "schema": {
+                      "$ref": "#/definitions/user"
+                    }
+                  }
+                ]
+              }
+            }
+          }, 
+          "swagger": "2.0", 
+          "definitions": {
+            "user": {
+              "type": "object", 
+              "properties": {
+                "username": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }, 
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
           ]
         }, 
-        "Runtime": "nodejs12.x", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
       }
     }, 
     "HyphenFunctionRole": {

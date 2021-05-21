@@ -1,15 +1,5 @@
 {
   "Resources": {
-    "HtmlApiDeploymenteb26cef1e4": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: eb26cef1e440491180b8c8502a6e29d73e6d1a97", 
-        "StageName": "Stage"
-      }
-    }, 
     "HtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
@@ -44,7 +34,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeploymenteb26cef1e4"
+          "Ref": "HtmlApiDeploymentd7bcfbe715"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -91,7 +81,6 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -107,12 +96,6 @@
             }
           }, 
           "swagger": "2.0", 
-          "x-amazon-apigateway-request-validators": {
-            "root-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }
-          }, 
           "definitions": {
             "user": {
               "type": "object", 
@@ -132,6 +115,16 @@
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
+      }
+    }, 
+    "HtmlApiDeploymentd7bcfbe715": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "Description": "RestApi deployment id: d7bcfbe7157513b0b1a2debffbe44655fb332d60", 
+        "StageName": "Stage"
       }
     }, 
     "HtmlFunction": {

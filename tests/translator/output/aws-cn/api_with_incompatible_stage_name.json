@@ -1,15 +1,5 @@
 {
   "Resources": {
-    "UnderscoreApiDeployment48245dc1b3": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "UnderscoreApi"
-        }, 
-        "Description": "RestApi deployment id: 48245dc1b3d5704750d4a348341ab7c3df0abc48", 
-        "StageName": "Stage"
-      }
-    }, 
     "UnderscoreFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -53,7 +43,6 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UnderscoreFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -69,12 +58,6 @@
             }
           }, 
           "swagger": "2.0", 
-          "x-amazon-apigateway-request-validators": {
-            "root-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }
-          }, 
           "definitions": {
             "user": {
               "type": "object", 
@@ -126,13 +109,13 @@
         ]
       }
     }, 
-    "HyphenApiDeploymentf250ed3085": {
+    "UnderscoreApiDeploymentd4074182ff": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
-          "Ref": "HyphenApi"
+          "Ref": "UnderscoreApi"
         }, 
-        "Description": "RestApi deployment id: f250ed3085d6cbf9f7aee3dbb6c719f4e2e18331", 
+        "Description": "RestApi deployment id: d4074182ff399887934824aa702b5573c9ad3f7c", 
         "StageName": "Stage"
       }
     }, 
@@ -159,7 +142,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HyphenApiDeploymentf250ed3085"
+          "Ref": "HyphenApiDeployment52a312db45"
         }, 
         "RestApiId": {
           "Ref": "HyphenApi"
@@ -171,7 +154,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "UnderscoreApiDeployment48245dc1b3"
+          "Ref": "UnderscoreApiDeploymentd4074182ff"
         }, 
         "RestApiId": {
           "Ref": "UnderscoreApi"
@@ -221,6 +204,16 @@
         ]
       }
     }, 
+    "HyphenApiDeployment52a312db45": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HyphenApi"
+        }, 
+        "Description": "RestApi deployment id: 52a312db455cee5b3a5fca6c9c078593381e179b", 
+        "StageName": "Stage"
+      }
+    }, 
     "HyphenApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -241,7 +234,6 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HyphenFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "root-get-validator", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -257,12 +249,6 @@
             }
           }, 
           "swagger": "2.0", 
-          "x-amazon-apigateway-request-validators": {
-            "root-get-validator": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
-            }
-          }, 
           "definitions": {
             "user": {
               "type": "object", 

@@ -1,0 +1,44 @@
+Parameters:
+  validateRequestBody:
+    Type: String
+  validateRequestParameters:
+    Type: String
+
+Resources:
+  RequestValidator:
+    Type: AWS::ApiGateway::RequestValidator
+    Properties:
+      Name: "validator"
+      RestApiId: !Ref HtmlApi
+      ValidateRequestBody: true
+      ValidateRequestParameters: true
+
+  HtmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody: !Ref validateRequestBody
+              ValidateRequest: !Ref validateRequestParameters
+
+  HtmlApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string
