@@ -600,20 +600,26 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
     @parameterized.expand(
-        [
-            (
-                "usage_plans",
-                ("api_with_usageplans_shared_no_side_effect_1", "api_with_usageplans_shared_no_side_effect_2"),
-            ),
-        ]
+        itertools.product(
+            [
+                (
+                    "usage_plans",
+                    ("api_with_usageplans_shared_no_side_effect_1", "api_with_usageplans_shared_no_side_effect_2"),
+                ),
+            ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],
+        )
     )
     @patch(
         "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
         mock_sar_service_call,
     )
     @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    @patch("boto3.session.Session.region_name", "ap-southeast-1")
-    def test_transform_success_no_side_effect(self, _, templates):
+    def test_transform_success_no_side_effect(self, testcase, partition_with_region):
         """
         Tests that the transform does not leak/leave data in shared caches/lists between executions
         Performs the transform of the templates in a row without reinitialization
@@ -621,39 +627,20 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
 
         Parameters
         ----------
-        _ : str
-            Test name (unused)
+        testcase : Tuple
+            Test name (unused) and Templates
         templates : List
             List of templates to transform
         """
-        parameter_values = get_template_parameter_values()
-        mock_policy_loader = MagicMock()
-        mock_policy_loader.load.return_value = {
-            "AWSLambdaBasicExecutionRole": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-            "AmazonDynamoDBFullAccess": "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
-            "AmazonDynamoDBReadOnlyAccess": "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess",
-            "AWSLambdaRole": "arn:aws:iam::aws:policy/service-role/AWSLambdaRole",
-            "AWSXrayWriteOnlyAccess": "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess",
-        }
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
 
-        for template in templates:
-            manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, template + ".yaml")))
-            # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
-            manifest = json.loads(json.dumps(manifest))
-            expected_filepath = os.path.join(OUTPUT_FOLDER, template + ".json")
-            expected = json.load(open(expected_filepath))
+        for template in testcase[1]:
+            print(template, partition, region)
+            manifest = self._read_input(template)
+            expected = self._read_expected_output(template, partition)
 
-            output_fragment = transform(manifest, parameter_values, mock_policy_loader)
-
-            print(template)
-            print(json.dumps(output_fragment, indent=2))
-
-            # Only update the deployment Logical Id hash in Py3.
-            if sys.version_info.major >= 3:
-                self._update_logical_id_hash(expected)
-                self._update_logical_id_hash(output_fragment)
-
-            self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
+            self._compare_transform(manifest, expected, partition, region)
 
 
 @pytest.mark.parametrize(
