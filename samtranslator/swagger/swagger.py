@@ -274,7 +274,7 @@ class SwaggerEditor(object):
 
     def _get_invoke_role(self, invoke_role):
         partition = ArnGenerator.get_partition_name()
-        CALLER_CREDENTIALS_ARN = f"arn:{partition}:iam::*:user/*"
+        CALLER_CREDENTIALS_ARN = "arn:{}:iam::*:user/*".format(partition)
         return invoke_role if invoke_role and invoke_role != "CALLER_CREDENTIALS" else CALLER_CREDENTIALS_ARN
 
     def iter_on_path(self):
