@@ -6,6 +6,7 @@ from six import string_types
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.translator.arn_generator import ArnGenerator
 
 
 class SwaggerEditor(object):
@@ -272,7 +273,8 @@ class SwaggerEditor(object):
         return self._get_invoke_role(method_invoke_role or api_invoke_role)
 
     def _get_invoke_role(self, invoke_role):
-        CALLER_CREDENTIALS_ARN = "arn:aws:iam::*:user/*"
+        partition = ArnGenerator.get_partition_name()
+        CALLER_CREDENTIALS_ARN = f"arn:{partition}:iam::*:user/*"
         return invoke_role if invoke_role and invoke_role != "CALLER_CREDENTIALS" else CALLER_CREDENTIALS_ARN
 
     def iter_on_path(self):
