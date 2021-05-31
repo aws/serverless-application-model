@@ -60,7 +60,9 @@ class PullEventSource(ResourceMacro):
 
         resources = []
 
-        lambda_eventsourcemapping = LambdaEventSourceMapping(self.logical_id)
+        lambda_eventsourcemapping = LambdaEventSourceMapping(
+            self.logical_id, attributes=function.get_passthrough_resource_attributes()
+        )
         resources.append(lambda_eventsourcemapping)
 
         try:
@@ -121,9 +123,6 @@ class PullEventSource(ResourceMacro):
                         sns_topic_arn, self.logical_id
                     )
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
-
-        if "Condition" in function.resource_attributes:
-            lambda_eventsourcemapping.set_resource_attribute("Condition", function.resource_attributes["Condition"])
 
         if "role" in kwargs:
             self._link_policy(kwargs["role"], destination_config_policy)

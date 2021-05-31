@@ -529,6 +529,7 @@
       "Condition": "MyCondition"
     },
     "MyAwesomeFunctionAnotherSNSWithSQSSubscriptionQueue": {
+      "Condition": "MyCondition",
       "Type": "AWS::SQS::Queue",
       "Properties": {}
     },
