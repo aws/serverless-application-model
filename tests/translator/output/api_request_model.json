@@ -3,6 +3,15 @@
     "HtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -18,16 +27,7 @@
               }
             }
           ]
-        }, 
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        }
       }
     }, 
     "HtmlApiProdStage": {
@@ -54,11 +54,21 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": "HtmlApi"
             }
           ]
         }
+      }
+    },
+    "HtmlApiDeploymentdd6198efe6": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "Description": "RestApi deployment id: dd6198efe68d8db17c8bf6b680a8a6763e4f36b5",
+        "StageName": "Stage"
       }
     }, 
     "HtmlApi": {
@@ -66,27 +76,27 @@
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
+            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
           "paths": {
             "/": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
-                }, 
-                "responses": {}, 
+                },
+                "responses": {},
                 "parameters": [
                   {
-                    "required": true, 
-                    "in": "body", 
-                    "name": "user", 
+                    "required": true,
+                    "in": "body",
+                    "name": "user",
                     "schema": {
                       "$ref": "#/definitions/user"
                     }
@@ -94,11 +104,11 @@
                 ]
               }
             }
-          }, 
-          "swagger": "2.0", 
+          },
+          "swagger": "2.0",
           "definitions": {
             "user": {
-              "type": "object", 
+              "type": "object",
               "properties": {
                 "username": {
                   "type": "string"
@@ -109,31 +119,21 @@
         }
       }
     }, 
-    "HtmlApiDeploymentdd6198efe6": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: dd6198efe68d8db17c8bf6b680a8a6763e4f36b5", 
-        "StageName": "Stage"
-      }
-    }, 
     "HtmlFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "Handler": "index.gethtml", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "member_portal.zip"
         }, 
+        "Handler": "index.gethtml", 
         "Role": {
           "Fn::GetAtt": [
             "HtmlFunctionRole", 
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs12.x", 
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
             "Value": "SAM", 

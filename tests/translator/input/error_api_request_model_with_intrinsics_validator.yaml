@@ -2,17 +2,11 @@ Parameters:
   validateRequestBody:
     Type: String
   validateRequestParameters:
+    Type: String  
+  envParameter:
     Type: String
 
 Resources:
-  RequestValidator:
-    Type: AWS::ApiGateway::RequestValidator
-    Properties:
-      Name: "validator"
-      RestApiId: !Ref HtmlApi
-      ValidateRequestBody: true
-      ValidateRequestParameters: true
-
   HtmlFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -31,6 +25,41 @@ Resources:
               Required: true
               ValidateBody: !Ref validateRequestBody
               ValidateRequest: !Ref validateRequestParameters
+
+  HtmlFunctionNoValue:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /novalue
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody: AWS::NoValue
+
+  HtmlFunctionWithIfIntrinsics:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /if/intrinics
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
 
   HtmlApi:
     Type: AWS::Serverless::Api

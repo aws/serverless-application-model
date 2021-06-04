@@ -10,27 +10,16 @@
         "StageName": "Stage"
       }
     }, 
-    "UnderscoreFunction": {
-      "Type": "AWS::Lambda::Function", 
+    "UnderscoreApiStageb34d3ad84e": {
+      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
-        "Handler": "index.gethtml", 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "member_portal.zip"
+        "DeploymentId": {
+          "Ref": "UnderscoreApiDeploymentc6c2bbcee6"
         }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "UnderscoreFunctionRole", 
-            "Arn"
-          ]
+        "RestApiId": {
+          "Ref": "UnderscoreApi"
         }, 
-        "Runtime": "nodejs12.x", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        "StageName": "hoge_fuga"
       }
     }, 
     "UnderscoreApi": {
@@ -84,6 +73,15 @@
     "UnderscoreFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -99,18 +97,9 @@
               }
             }
           ]
-        }, 
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        }
       }
-    }, 
+    },
     "UnderscoreApiDeploymentc6c2bbcee6": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
@@ -133,7 +122,7 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": "HyphenApi"
             }
           ]
@@ -152,16 +141,27 @@
         "StageName": "hoge-fuga"
       }
     }, 
-    "UnderscoreApiStageb34d3ad84e": {
-      "Type": "AWS::ApiGateway::Stage", 
+    "UnderscoreFunction": {
+      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "DeploymentId": {
-          "Ref": "UnderscoreApiDeploymentc6c2bbcee6"
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
         }, 
-        "RestApiId": {
-          "Ref": "UnderscoreApi"
+        "Role": {
+          "Fn::GetAtt": [
+            "UnderscoreFunctionRole", 
+            "Arn"
+          ]
         }, 
-        "StageName": "hoge_fuga"
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
       }
     }, 
     "UnderscoreFunctionGetHtmlPermissionb34d3ad84e": {
@@ -176,13 +176,13 @@
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": "UnderscoreApi"
             }
           ]
         }
       }
-    }, 
+    },
     "HyphenFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -197,7 +197,7 @@
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs12.x", 
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
             "Value": "SAM", 
@@ -257,6 +257,15 @@
     "HyphenFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -272,16 +281,7 @@
               }
             }
           ]
-        }, 
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        }
       }
     }
   }

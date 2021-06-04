@@ -802,10 +802,10 @@ class SwaggerEditor(object):
         request_validator_definition = {
             validator_name: {"validateRequestBody": validate_body, "validateRequestParameters": validate_request}
         }
-        if self._doc.get(self._X_APIGW_REQUEST_VALIDATOR):
-            self._doc[self._X_APIGW_REQUEST_VALIDATOR].update(request_validator_definition)
-        else:
-            self._doc[self._X_APIGW_REQUEST_VALIDATOR] = request_validator_definition
+        if not self._doc.get(self._X_APIGW_REQUEST_VALIDATOR):
+            self._doc[self._X_APIGW_REQUEST_VALIDATOR] = {}
+
+        self._doc[self._X_APIGW_REQUEST_VALIDATOR].update(request_validator_definition)
 
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
