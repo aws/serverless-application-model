@@ -796,8 +796,8 @@ class Api(PushEventSource):
 
                     # as we are setting two different fields we are here setting as default False
                     # In case one of them are not defined
-                    validate_body = False if type(validate_body) is None else validate_body
-                    validate_request = False if type(validate_request) is None else validate_request
+                    validate_body = False if type(validate_body) is type(None) else validate_body
+                    validate_request = False if type(validate_request) is type(None) else validate_request
 
                     # If not type None but any other type it should explicitly invalidate the Spec
                     # Those fields should be only a boolean

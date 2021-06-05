@@ -1,10 +1,19 @@
 Parameters:
   validateRequestBody:
     Type: String
+    default: true
+    AllowedValues: [true, false]
   validateRequestParameters:
-    Type: String  
-  envParameter:
     Type: String
+    default: true
+    AllowedValues: [true, false]
+
+Conditions:
+  CreateBodyValidator:
+    Fn::Equals:
+      - false
+      - true
+
 
 Resources:
   HtmlFunction:
@@ -60,6 +69,12 @@ Resources:
             RequestModel:
               Model: User
               Required: true
+              ValidateBody:
+                Fn::If:
+                  - CreateBodyValidator
+                  - !Ref validateRequestBody
+                  - false
+
 
   HtmlApi:
     Type: AWS::Serverless::Api

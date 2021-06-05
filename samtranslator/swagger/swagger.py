@@ -793,10 +793,7 @@ class SwaggerEditor(object):
         """
 
         normalized_method_name = self._normalize_method_name(method_name)
-        normalized_path_name = SwaggerEditor.get_path_name_normalized(path)
-        validator_name = "{normalized_path_name}-{normalized_method_name}-validator".format(
-            normalized_path_name=normalized_path_name, normalized_method_name=normalized_method_name
-        )
+        validator_name = SwaggerEditor.get_validator_name(validate_body, validate_request)
 
         # Creating validator
         request_validator_definition = {
@@ -805,7 +802,9 @@ class SwaggerEditor(object):
         if not self._doc.get(self._X_APIGW_REQUEST_VALIDATOR):
             self._doc[self._X_APIGW_REQUEST_VALIDATOR] = {}
 
-        self._doc[self._X_APIGW_REQUEST_VALIDATOR].update(request_validator_definition)
+        if not self._doc[self._X_APIGW_REQUEST_VALIDATOR].get(validator_name):
+            # Adding only if the validator hasn't been defined already
+            self._doc[self._X_APIGW_REQUEST_VALIDATOR].update(request_validator_definition)
 
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
@@ -1303,17 +1302,24 @@ class SwaggerEditor(object):
         return re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
 
     @staticmethod
-    def get_path_name_normalized(path):
+    def get_validator_name(validate_body, validate_request):
         """
         Get a readable path name to use as validator name
 
-        :param string path: String with the path definition
-        :return string: Normalized path readeble
+        :param boolean validate_body: Boolean if validate body
+        :param boolean validate_request: Boolean if validate request
+        :return string: Normalized validator name
         """
-        if path == "/":
-            return "root"
-        # convert greedy paths to such as {greedy+}, {proxy+}, "/foo" to a normal string
-        return re.sub(r"[^A-Za-z0-9]+|{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "", path)
+        if validate_body and validate_request:
+            return "FULL"
+
+        if validate_body and not validate_request:
+            return "BODY"
+
+        if not validate_body and validate_request:
+            return "REQUEST"
+
+        return "NO_VALIDATE"
 
     @staticmethod
     def _validate_list_property_is_resolved(property_list):
