@@ -18,6 +18,7 @@ Resources:
               ValidateBody: true
               ValidateRequest: true
 
+
   HtmlApi:
     Type: AWS::Serverless::Api
     Properties:
