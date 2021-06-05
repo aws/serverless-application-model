@@ -1,7 +1,0 @@
-# SAM Transform is unknown
-Transform: AWS::Serverless-2021-01-26
-Resources:
-  MyApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Stage Name

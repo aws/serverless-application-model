@@ -15,29 +15,24 @@
         "ConstraintDescription": {
           "type": "string"
         },
-        "Default": {
-          "type": "string"
-        },
+        "Default": {},
         "Description": {
           "type": "string"
         },
         "MaxLength": {
-          "type": "string"
+          "type": "integer"
         },
         "MaxValue": {
-          "type": "string"
+          "type": "number"
         },
         "MinLength": {
-          "type": "string"
+          "type": "integer"
         },
         "MinValue": {
-          "type": "string"
+          "type": "number"
         },
         "NoEcho": {
-          "type": [
-            "string",
-            "boolean"
-          ]
+          "type": "boolean"
         },
         "Type": {
           "enum": [

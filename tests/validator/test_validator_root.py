@@ -21,11 +21,7 @@ class TestValidatorRoot(TestValidatorBase):
             "error_resources_not_object",
             "error_resources_one_empty",
             "error_resources_one_missing_properties",
-            "error_resources_one_missing_type",
             "error_transform_empty",
-            "error_transform_missing",
-            "error_transform_sam_missing",
-            "error_transform_unknown",
         ],
     )
     def test_validator_root_errors(self, template):

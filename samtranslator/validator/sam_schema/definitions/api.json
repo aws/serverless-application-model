@@ -9,7 +9,10 @@
           "Type": {
             "const": "AWS::Serverless::Api"
           }
-        }
+        },
+        "required": [
+          "Type"
+        ]
       },
       "then": {
         "additionalProperties": false,
@@ -182,7 +185,8 @@
         "required": [
           "Type",
           "Properties"
-        ]
+        ],
+        "type": "object"
       }
     },
     "AWS::Serverless::Api.ApiUsagePlan": {
