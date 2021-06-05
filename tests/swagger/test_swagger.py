@@ -877,21 +877,37 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
         self.assertEqual("BODY", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"])
 
     def test_must_add_validator_parameters_to_method_and_not_duplicate(self):
+        self.original_swagger["paths"].update(
+            {
+                "/bar": {
+                    "get": {
+                        "x-amazon-apigateway-integration": {"test": "must have integration"},
+                        "parameters": [{"test": "existing parameter"}],
+                    }
+                },
+                "/foo-bar": {
+                    "get": {
+                        "x-amazon-apigateway-integration": {"test": "must have integration"},
+                        "parameters": [{"test": "existing parameter"}],
+                    }
+                },
+            }
+        )
 
-        self.editor.add_request_validator_to_method("/foo", "get", True, True)
-        self.editor.add_request_validator_to_method("/bar", "get", True, True)
-        self.editor.add_request_validator_to_method("/foo-bar", "get", True, True)
+        editor = SwaggerEditor(self.original_swagger)
+
+        editor.add_request_validator_to_method("/foo", "get", True, True)
+        editor.add_request_validator_to_method("/bar", "get", True, True)
+        editor.add_request_validator_to_method("/foo-bar", "get", True, True)
 
         expected = {"FULL": {"validateRequestBody": True, "validateRequestParameters": True}}
 
-        self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
-        self.assertEqual("FULL", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"])
-        self.assertEqual("FULL", self.editor.swagger["paths"]["/bar"]["get"]["x-amazon-apigateway-request-validator"])
-        self.assertEqual(
-            "FULL", self.editor.swagger["paths"]["/foo-bar"]["get"]["x-amazon-apigateway-request-validator"]
-        )
+        self.assertEqual(expected, editor.swagger["x-amazon-apigateway-request-validators"])
+        self.assertEqual("FULL", editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"])
+        self.assertEqual("FULL", editor.swagger["paths"]["/bar"]["get"]["x-amazon-apigateway-request-validator"])
+        self.assertEqual("FULL", editor.swagger["paths"]["/foo-bar"]["get"]["x-amazon-apigateway-request-validator"])
 
-        self.assertEqual(1, len(self.editor.swagger["x-amazon-apigateway-request-validators"].keys()))
+        self.assertEqual(1, len(editor.swagger["x-amazon-apigateway-request-validators"].keys()))
 
     @parameterized.expand(
         [

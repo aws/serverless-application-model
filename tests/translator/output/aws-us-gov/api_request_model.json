@@ -3,6 +3,15 @@
     "HtmlFunctionRole": {
       "Type": "AWS::IAM::Role", 
       "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -18,16 +27,7 @@
               }
             }
           ]
-        }, 
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
+        }
       }
     }, 
     "HtmlApiProdStage": {
@@ -52,41 +52,56 @@
         }, 
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
-              "__Stage__": "*", 
+              "__Stage__": "*",
               "__ApiId__": "HtmlApi"
             }
           ]
         }
       }
+    },
+    "HtmlApiDeployment3744537077": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "Description": "RestApi deployment id: 374453707756d2ce5439fb8f0995a4ced3659a0e",
+        "StageName": "Stage"
+      }
     }, 
     "HtmlApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
         "Body": {
           "info": {
-            "version": "1.0", 
+            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
             }
-          }, 
+          },
           "paths": {
             "/": {
               "get": {
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
-                }, 
-                "responses": {}, 
+                },
+                "responses": {},
                 "parameters": [
                   {
-                    "required": true, 
-                    "in": "body", 
-                    "name": "user", 
+                    "required": true,
+                    "in": "body",
+                    "name": "user",
                     "schema": {
                       "$ref": "#/definitions/user"
                     }
@@ -94,11 +109,11 @@
                 ]
               }
             }
-          }, 
-          "swagger": "2.0", 
+          },
+          "swagger": "2.0",
           "definitions": {
             "user": {
-              "type": "object", 
+              "type": "object",
               "properties": {
                 "username": {
                   "type": "string"
@@ -106,42 +121,27 @@
               }
             }
           }
-        }, 
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
+        },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
       }
     }, 
-    "HtmlApiDeployment3744537077": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: 374453707756d2ce5439fb8f0995a4ced3659a0e", 
-        "StageName": "Stage"
-      }
-    }, 
     "HtmlFunction": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "Handler": "index.gethtml", 
         "Code": {
           "S3Bucket": "sam-demo-bucket", 
           "S3Key": "member_portal.zip"
         }, 
+        "Handler": "index.gethtml", 
         "Role": {
           "Fn::GetAtt": [
             "HtmlFunctionRole", 
             "Arn"
           ]
         }, 
-        "Runtime": "nodejs12.x", 
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
             "Value": "SAM", 
