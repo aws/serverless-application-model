@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
+  "type": "object",
   "definitions": {
     "Condition": {
       "type": "string"
@@ -174,7 +175,6 @@
     },
     "UpdateReplacePolicy": {
       "type": "string"
-    },
-  },
-  "type": "object"
+    }
+  }
 }

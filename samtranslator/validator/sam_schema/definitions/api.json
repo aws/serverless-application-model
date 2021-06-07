@@ -17,6 +17,12 @@
       "then": {
         "additionalProperties": false,
         "properties": {
+          "Condition": {
+            "$ref": "file:common.json#definitions/Condition"
+          },
+          "DependsOn": {
+            "$ref": "file:common.json#definitions/DependsOn"
+          },
           "Metadata": {
             "type": "object"
           },
