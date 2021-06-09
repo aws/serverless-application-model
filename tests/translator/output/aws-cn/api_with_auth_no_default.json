@@ -320,10 +320,10 @@
         }
       }
     },
-    "MyApiWithCognitoAuthDeployment8fb5ee873c": {
+    "MyApiWithCognitoAuthDeploymentaa41464509": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 8fb5ee873c77dcbff8cb916f0fc910c0a8c0cde0",
+        "Description": "RestApi deployment id: aa414645093f59df9e1d0461c5d796a1f6bf91a3",
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
         },
@@ -334,7 +334,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithCognitoAuthDeployment8fb5ee873c"
+          "Ref": "MyApiWithCognitoAuthDeploymentaa41464509"
         },
         "RestApiId": {
           "Ref": "MyApiWithCognitoAuth"
@@ -414,10 +414,10 @@
         }
       }
     },
-    "MyApiWithLambdaTokenAuthDeploymentfe8af47ae6": {
+    "MyApiWithLambdaTokenAuthDeployment1e1bd59275": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: fe8af47ae6c4163bdc1ae6558266eefba3e93422",
+        "Description": "RestApi deployment id: 1e1bd59275be76c79386a22ea0f5104f317785b2",
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
         },
@@ -428,7 +428,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaTokenAuthDeploymentfe8af47ae6"
+          "Ref": "MyApiWithLambdaTokenAuthDeployment1e1bd59275"
         },
         "RestApiId": {
           "Ref": "MyApiWithLambdaTokenAuth"
@@ -532,10 +532,10 @@
         }
       }
     },
-    "MyApiWithLambdaRequestAuthDeploymentbcc2a718c7": {
+    "MyApiWithLambdaRequestAuthDeploymenta717d330fe": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: bcc2a718c70d349447ada0703681bc3582601936",
+        "Description": "RestApi deployment id: a717d330fee14ce75f148c4fbf2c3dd4d6a1acf1",
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"
         },
@@ -546,7 +546,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiWithLambdaRequestAuthDeploymentbcc2a718c7"
+          "Ref": "MyApiWithLambdaRequestAuthDeploymenta717d330fe"
         },
         "RestApiId": {
           "Ref": "MyApiWithLambdaRequestAuth"

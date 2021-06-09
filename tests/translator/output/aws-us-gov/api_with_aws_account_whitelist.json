@@ -223,10 +223,10 @@
         }
       }
     },
-    "ServerlessRestApiDeploymentdf4a5edbf7": {
+    "ServerlessRestApiDeploymentada5c7703b": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: df4a5edbf7ca6cb1225f9599b6cc15ffbcaf6dc7",
+        "Description": "RestApi deployment id: ada5c7703b63b68dc786a5c07c597a85018bd2cf",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
@@ -237,7 +237,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentdf4a5edbf7"
+          "Ref": "ServerlessRestApiDeploymentada5c7703b"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"

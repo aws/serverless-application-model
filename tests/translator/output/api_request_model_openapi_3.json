@@ -34,7 +34,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment9996ff6456"
+          "Ref": "HtmlApiDeployment8abd7f79f8"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -198,13 +198,13 @@
         }
       }
     }, 
-    "HtmlApiDeployment9996ff6456": {
+    "HtmlApiDeployment8abd7f79f8": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
         },
-        "Description": "RestApi deployment id: 9996ff64569a31c23eef1c106c74528e127401af"
+        "Description": "RestApi deployment id: 8abd7f79f8fd0aafe51e2201d63602c78a3e0e2a"
       }
     },
     "HtmlFunctionGetHtmlPermissionProd": {

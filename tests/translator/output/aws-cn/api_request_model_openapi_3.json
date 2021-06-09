@@ -1,12 +1,12 @@
 {
   "Resources": {
-    "HtmlApiDeploymentd761bea05e": {
+    "HtmlApiDeploymentf84be626f3": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
         },
-        "Description": "RestApi deployment id: d761bea05e1221c514bcf12db0b54bfb03d09d26"
+        "Description": "RestApi deployment id: f84be626f359fc9697fd8e228c5ffe53e252f82c"
       }
     },
     "HtmlFunctionRole": {
@@ -43,7 +43,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeploymentd761bea05e"
+          "Ref": "HtmlApiDeploymentf84be626f3"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"

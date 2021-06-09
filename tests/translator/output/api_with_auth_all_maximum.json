@@ -645,10 +645,10 @@
         }
       }
     },
-    "MyApiDeployment5aaadd482a": {
+    "MyApiDeployment563edb7c42": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 5aaadd482a561d1df895443d25a1d2441855c5eb",
+        "Description": "RestApi deployment id: 563edb7c42f90929db0861af12bcd8046b8cb057",
         "RestApiId": {
           "Ref": "MyApi"
         },
@@ -659,7 +659,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment5aaadd482a"
+          "Ref": "MyApiDeployment563edb7c42"
         },
         "RestApiId": {
           "Ref": "MyApi"

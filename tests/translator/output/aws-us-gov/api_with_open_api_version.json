@@ -118,10 +118,10 @@
         }
       }
     },
-    "ExplicitApiDeploymentd694169701": {
+    "ExplicitApiDeploymentd9a0f2ae4f": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: d6941697015bc8e2558d60bda950836140860656",
+        "Description": "RestApi deployment id: d9a0f2ae4fe2d97b9b91644934a878b6a08cf1c3",
         "RestApiId": {
           "Ref": "ExplicitApi"
         }
@@ -131,7 +131,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ExplicitApiDeploymentd694169701"
+          "Ref": "ExplicitApiDeploymentd9a0f2ae4f"
         },
         "RestApiId": {
           "Ref": "ExplicitApi"
@@ -263,10 +263,10 @@
         }
       }
     },
-    "ServerlessRestApiDeployment1bfae0f8d7": {
+    "ServerlessRestApiDeploymentcecfa4a1a7": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 1bfae0f8d7986b72abc8ec37737ed7554721b28f",
+        "Description": "RestApi deployment id: cecfa4a1a7d95801494452e34ba03f6e033c8f5a",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         }
@@ -276,7 +276,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeployment1bfae0f8d7"
+          "Ref": "ServerlessRestApiDeploymentcecfa4a1a7"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
