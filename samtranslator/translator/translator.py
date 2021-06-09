@@ -93,7 +93,11 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
-        self.feature_toggle = feature_toggle if feature_toggle else FeatureToggle(FeatureToggleDefaultConfigProvider())
+        self.feature_toggle = (
+            feature_toggle
+            if feature_toggle
+            else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)
+        )
         self.function_names = dict()
         self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
