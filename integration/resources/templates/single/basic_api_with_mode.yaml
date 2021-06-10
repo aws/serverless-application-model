@@ -1,0 +1,34 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: MyNewStageName
+      Mode: overwrite
+
+  TestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: python3.6
+      AutoPublishAlias: live
+      InlineCode: |
+        import json
+        def handler(event, context):
+          return {'statusCode': 200, 'body': json.dumps('Hello World!')}
+      Events:
+        Get:
+          Type: Api
+          Properties:
+            Path: /get
+            Method: get
+            RestApiId: !Ref MyApi
+        Put:
+          Type: Api
+          Properties:
+            Path: /put
+            Method: put
+            RestApiId: !Ref MyApi
+
+Outputs:
+  ApiEndpoint:
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/MyNewStageName"
