@@ -180,7 +180,7 @@ class ApiGenerator(object):
         models=None,
         domain=None,
         description=None,
-        mode=None
+        mode=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 

@@ -33,7 +33,7 @@ class TestBasicApi(BaseTest):
         self.create_and_verify_stack("basic_api_with_mode")
 
         stack_output = self.get_stack_outputs()
-        api_endpoint = stack_output.get('ApiEndpoint')
+        api_endpoint = stack_output.get("ApiEndpoint")
         response = requests.get(f"{api_endpoint}/get")
         self.assertEqual(response.status_code, 200)
 
