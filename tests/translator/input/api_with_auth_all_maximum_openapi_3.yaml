@@ -51,7 +51,7 @@ Resources:
               Context:
                 - Authorization4
               ReauthorizeEvery: 0
-  
+
   MyFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -67,12 +67,28 @@ Resources:
             Method: get
             Auth:
               Authorizer: NONE
+        WithNoAuthorizerAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /any/noauth
+            Method: any
+            Auth:
+              Authorizer: NONE
         WithCognitoMultipleUserPoolsAuthorizer:
           Type: Api
           Properties:
             RestApiId: !Ref MyApi
             Path: /users
             Method: post
+            Auth:
+              Authorizer: MyCognitoAuthMultipleUserPools
+        WithCognitoMultipleUserPoolsAuthorizerAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /any/cognitomultiple
+            Method: any
             Auth:
               Authorizer: MyCognitoAuthMultipleUserPools
         WithLambdaTokenAuthorizer:
@@ -83,12 +99,28 @@ Resources:
             Method: get
             Auth:
               Authorizer: MyLambdaTokenAuth
-        WithLambdaTokenAuthorizer:
+        WithLambdaTokenAuthorizerAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /any/lambdatoken
+            Method: any
+            Auth:
+              Authorizer: MyLambdaTokenAuth
+        WithLambdaTokenNoneAuthorizer:
           Type: Api
           Properties:
             RestApiId: !Ref MyApi
             Path: /users
             Method: patch
+            Auth:
+              Authorizer: MyLambdaTokenAuthNoneFunctionInvokeRole
+        WithLambdaTokenNoneAuthorizerAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /any/lambdatokennone
+            Method: any
             Auth:
               Authorizer: MyLambdaTokenAuthNoneFunctionInvokeRole
         WithLambdaRequestAuthorizer:
@@ -99,9 +131,23 @@ Resources:
             Method: delete
             Auth:
               Authorizer: MyLambdaRequestAuth
+        WithLambdaRequestAuthorizerAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /any/lambdarequest
+            Method: any
+            Auth:
+              Authorizer: MyLambdaRequestAuth
         WithDefaultAuthorizer:
           Type: Api
           Properties:
             RestApiId: !Ref MyApi
             Path: /users
             Method: put
+        WithDefaultAuthorizerAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /any/default
+            Method: any

@@ -12,6 +12,12 @@ Resources:
             RestApiId: HtmlApi
             Path: /{prameter}/resources
             Method: get
+        AnyHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /any/{prameter}/resources
+            Method: any
 
   HtmlApi:
     Type: AWS::Serverless::Api
