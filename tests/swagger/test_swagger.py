@@ -851,30 +851,34 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
     def test_must_add_validator_parameters_to_method_with_validators_true(self):
 
         self.editor.add_request_validator_to_method("/foo", "get", True, True)
-        expected = {"FULL": {"validateRequestBody": True, "validateRequestParameters": True}}
+        expected = {"body-and-params": {"validateRequestBody": True, "validateRequestParameters": True}}
 
         self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
-        self.assertEqual("FULL", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"])
+        self.assertEqual(
+            "body-and-params", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+        )
 
     def test_must_add_validator_parameters_to_method_with_validators_false(self):
 
         self.editor.add_request_validator_to_method("/foo", "get", False, False)
 
-        expected = {"NO_VALIDATE": {"validateRequestBody": False, "validateRequestParameters": False}}
+        expected = {"no-validation": {"validateRequestBody": False, "validateRequestParameters": False}}
 
         self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
         self.assertEqual(
-            "NO_VALIDATE", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+            "no-validation", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
         )
 
     def test_must_add_validator_parameters_to_method_with_validators_mixing(self):
 
         self.editor.add_request_validator_to_method("/foo", "get", True, False)
 
-        expected = {"BODY": {"validateRequestBody": True, "validateRequestParameters": False}}
+        expected = {"body-only": {"validateRequestBody": True, "validateRequestParameters": False}}
 
         self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
-        self.assertEqual("BODY", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"])
+        self.assertEqual(
+            "body-only", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+        )
 
     def test_must_add_validator_parameters_to_method_and_not_duplicate(self):
         self.original_swagger["paths"].update(
@@ -900,24 +904,30 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
         editor.add_request_validator_to_method("/bar", "get", True, True)
         editor.add_request_validator_to_method("/foo-bar", "get", True, True)
 
-        expected = {"FULL": {"validateRequestBody": True, "validateRequestParameters": True}}
+        expected = {"body-and-params": {"validateRequestBody": True, "validateRequestParameters": True}}
 
         self.assertEqual(expected, editor.swagger["x-amazon-apigateway-request-validators"])
-        self.assertEqual("FULL", editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"])
-        self.assertEqual("FULL", editor.swagger["paths"]["/bar"]["get"]["x-amazon-apigateway-request-validator"])
-        self.assertEqual("FULL", editor.swagger["paths"]["/foo-bar"]["get"]["x-amazon-apigateway-request-validator"])
+        self.assertEqual(
+            "body-and-params", editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+        self.assertEqual(
+            "body-and-params", editor.swagger["paths"]["/bar"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+        self.assertEqual(
+            "body-and-params", editor.swagger["paths"]["/foo-bar"]["get"]["x-amazon-apigateway-request-validator"]
+        )
 
         self.assertEqual(1, len(editor.swagger["x-amazon-apigateway-request-validators"].keys()))
 
     @parameterized.expand(
         [
-            param(True, False, "BODY"),
-            param(True, True, "FULL"),
-            param(False, True, "REQUEST"),
-            param(False, False, "NO_VALIDATE"),
+            param(True, False, "body-only"),
+            param(True, True, "body-and-params"),
+            param(False, True, "params-only"),
+            param(False, False, "no-validation"),
         ]
     )
-    def test_must_normalize_validator_names(self, validate_body, validate_request, normalized_name):
+    def test_must_return_validator_names(self, validate_body, validate_request, normalized_name):
         normalized_validator_name_conversion = SwaggerEditor.get_validator_name(validate_body, validate_request)
         self.assertEqual(normalized_validator_name_conversion, normalized_name)
 
@@ -925,11 +935,11 @@ class TestSwaggerEditor_add_request_validator_to_method(TestCase):
 
         self.editor.add_request_validator_to_method("/foo", "get")
 
-        expected = {"NO_VALIDATE": {"validateRequestBody": False, "validateRequestParameters": False}}
+        expected = {"no-validation": {"validateRequestBody": False, "validateRequestParameters": False}}
 
         self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
         self.assertEqual(
-            "NO_VALIDATE", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+            "no-validation", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
         )
 
 

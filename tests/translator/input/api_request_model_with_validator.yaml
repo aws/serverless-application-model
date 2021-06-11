@@ -16,7 +16,7 @@ Resources:
               Model: User
               Required: true
               ValidateBody: true
-              ValidateRequest: true
+              ValidateParameters: true
 
   HtmlFunctionNoValidation:
     Type: AWS::Serverless::Function
@@ -35,7 +35,7 @@ Resources:
               Model: User
               Required: true
               ValidateBody: false
-              ValidateRequest: false
+              ValidateParameters: false
 
   HtmlFunctionMixinValidation:
     Type: AWS::Serverless::Function
@@ -54,7 +54,7 @@ Resources:
               Model: User
               Required: true
               ValidateBody: true
-              ValidateRequest: false
+              ValidateParameters: false
 
   HtmlFunctionOnlyBodyDefinition:
     Type: AWS::Serverless::Function
@@ -90,7 +90,7 @@ Resources:
             RequestModel:
               Model: User
               Required: true
-              ValidateRequest: true
+              ValidateParameters: true
 
   HtmlFunctionOnlyRequestDefinitionFalse:
     Type: AWS::Serverless::Function
@@ -108,7 +108,7 @@ Resources:
             RequestModel:
               Model: User
               Required: true
-              ValidateRequest: false
+              ValidateParameters: false
 
   HtmlFunctionOnlyBodyDefinitionFalse:
     Type: AWS::Serverless::Function

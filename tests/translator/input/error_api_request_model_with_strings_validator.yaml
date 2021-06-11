@@ -4,8 +4,8 @@ Resources:
     Properties:
       Name: "validator"
       RestApiId: !Ref HtmlApi
-      ValidateRequestBody: true
-      ValidateRequestParameters: true
+      ValidateParametersBody: true
+      ValidateParametersParameters: true
 
   HtmlFunction:
     Type: AWS::Serverless::Function
@@ -24,7 +24,7 @@ Resources:
               Model: User
               Required: true
               ValidateBody: "true"
-              ValidateRequest: "true"
+              ValidateParameters: "true"
 
   HtmlApi:
     Type: AWS::Serverless::Api

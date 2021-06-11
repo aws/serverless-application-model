@@ -1,9 +1,9 @@
 Parameters:
-  validateRequestBody:
+  ValidateParametersBody:
     Type: String
     default: true
     AllowedValues: [true, false]
-  validateRequestParameters:
+  ValidateParametersParameters:
     Type: String
     default: true
     AllowedValues: [true, false]
@@ -32,8 +32,8 @@ Resources:
             RequestModel:
               Model: User
               Required: true
-              ValidateBody: !Ref validateRequestBody
-              ValidateRequest: !Ref validateRequestParameters
+              ValidateBody: !Ref ValidateParametersBody
+              ValidateParameters: !Ref ValidateParametersParameters
 
   HtmlFunctionNoValue:
     Type: AWS::Serverless::Function
@@ -72,7 +72,7 @@ Resources:
               ValidateBody:
                 Fn::If:
                   - CreateBodyValidator
-                  - !Ref validateRequestBody
+                  - !Ref ValidateParametersBody
                   - false
 
 

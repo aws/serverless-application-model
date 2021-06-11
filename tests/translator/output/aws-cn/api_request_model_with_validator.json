@@ -238,7 +238,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment79dcb91585"
+          "Ref": "HtmlApiDeploymentdf07d632f4"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -266,7 +266,7 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyRequestDefinition.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "REQUEST", 
+                "x-amazon-apigateway-request-validator": "params-only", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -289,7 +289,7 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "FULL", 
+                "x-amazon-apigateway-request-validator": "body-and-params", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -312,7 +312,7 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionMixinValidation.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "BODY", 
+                "x-amazon-apigateway-request-validator": "body-only", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -335,7 +335,7 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyRequestDefinitionFalse.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "NO_VALIDATE", 
+                "x-amazon-apigateway-request-validator": "no-validation", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -358,7 +358,7 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyBodyDefinition.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "BODY", 
+                "x-amazon-apigateway-request-validator": "body-only", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -403,7 +403,7 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionNoValidation.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "NO_VALIDATE", 
+                "x-amazon-apigateway-request-validator": "no-validation", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -426,7 +426,7 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyBodyDefinitionFalse.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "NO_VALIDATE", 
+                "x-amazon-apigateway-request-validator": "no-validation", 
                 "responses": {}, 
                 "parameters": [
                   {
@@ -443,21 +443,21 @@
           }, 
           "swagger": "2.0", 
           "x-amazon-apigateway-request-validators": {
-            "BODY": {
-              "validateRequestParameters": false, 
-              "validateRequestBody": true
-            }, 
-            "NO_VALIDATE": {
-              "validateRequestParameters": false, 
+            "params-only": {
+              "validateRequestParameters": true, 
               "validateRequestBody": false
             }, 
-            "FULL": {
+            "body-and-params": {
               "validateRequestParameters": true, 
               "validateRequestBody": true
             }, 
-            "REQUEST": {
-              "validateRequestParameters": true, 
+            "no-validation": {
+              "validateRequestParameters": false, 
               "validateRequestBody": false
+            }, 
+            "body-only": {
+              "validateRequestParameters": false, 
+              "validateRequestBody": true
             }
           }, 
           "definitions": {
@@ -595,6 +595,16 @@
         }
       }
     }, 
+    "HtmlApiDeploymentdf07d632f4": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "Description": "RestApi deployment id: df07d632f424a561531bf71d3c41ea245b01d80e", 
+        "StageName": "Stage"
+      }
+    }, 
     "HtmlFunctionOnlyRequestDefinition": {
       "Type": "AWS::Lambda::Function", 
       "Properties": {
@@ -639,16 +649,6 @@
             "Key": "lambda:createdBy"
           }
         ]
-      }
-    }, 
-    "HtmlApiDeployment79dcb91585": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: 79dcb91585790decbc301d2d8126179aa0d3a05f", 
-        "StageName": "Stage"
       }
     }, 
     "HtmlFunctionOnlyBodyDefinition": {

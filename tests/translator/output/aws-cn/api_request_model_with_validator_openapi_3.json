@@ -1,12 +1,12 @@
 {
   "Resources": {
-    "HtmlApiDeployment733538f163": {
+    "HtmlApiDeploymentfa918fe8b6": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
         }, 
-        "Description": "RestApi deployment id: 733538f163922a73a50e4da6dbc52dbccfc8db19"
+        "Description": "RestApi deployment id: fa918fe8b68f65e882542b900cc422005ea1a7f6"
       }
     }, 
     "HtmlFunctionRole": {
@@ -43,7 +43,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment733538f163"
+          "Ref": "HtmlApiDeploymentfa918fe8b6"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -100,7 +100,7 @@
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "FULL", 
+                "x-amazon-apigateway-request-validator": "body-and-params", 
                 "responses": {}
               }
             }
@@ -119,7 +119,7 @@
             }
           }, 
           "x-amazon-apigateway-request-validators": {
-            "FULL": {
+            "body-and-params": {
               "validateRequestParameters": true, 
               "validateRequestBody": true
             }

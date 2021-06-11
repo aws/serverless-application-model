@@ -34,7 +34,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment4258195bc2"
+          "Ref": "HtmlApiDeploymente5c2c7da3d"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -91,7 +91,7 @@
                     "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
-                "x-amazon-apigateway-request-validator": "FULL", 
+                "x-amazon-apigateway-request-validator": "body-and-params", 
                 "responses": {}
               }
             }
@@ -110,7 +110,7 @@
             }
           }, 
           "x-amazon-apigateway-request-validators": {
-            "FULL": {
+            "body-and-params": {
               "validateRequestParameters": true, 
               "validateRequestBody": true
             }
@@ -126,13 +126,13 @@
         }
       }
     }, 
-    "HtmlApiDeployment4258195bc2": {
+    "HtmlApiDeploymente5c2c7da3d": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
         }, 
-        "Description": "RestApi deployment id: 4258195bc2dfed324708e2917e66a169f15b02ea"
+        "Description": "RestApi deployment id: e5c2c7da3d6e36d656af91f88bf7d1e773111a32"
       }
     }, 
     "HtmlFunction": {
