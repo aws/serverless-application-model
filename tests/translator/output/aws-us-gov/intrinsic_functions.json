@@ -2,33 +2,33 @@
   "Conditions": {
     "TrueCondition": {
       "Fn::Equals": [
-        true, 
+        true,
         true
       ]
     }
-  }, 
+  },
   "Parameters": {
     "CodeKey": {
-      "Default": "key", 
+      "Default": "key",
       "Type": "String"
-    }, 
+    },
     "CodeBucket": {
-      "Default": "sam-demo-bucket", 
+      "Default": "sam-demo-bucket",
       "Type": "String"
-    }, 
+    },
     "FunctionName": {
       "Default": "MySuperFunctionName",
       "Type": "String"
-    }, 
+    },
     "MyExplicitApiName": {
-      "Default": "SomeName", 
+      "Default": "SomeName",
       "Type": "String"
-    }, 
+    },
     "TracingConfigParam": {
-      "Default": "PassThrough", 
+      "Default": "PassThrough",
       "Type": "String"
     }
-  }, 
+  },
   "Resources": {
     "MyExplicitApi": {
       "Type": "AWS::ApiGateway::RestApi",
@@ -120,7 +120,7 @@
           ]
         },
         "BodyS3Location": {
-          "Version": "myversion",
+          "Version": 3,
           "Bucket": "mybucket",
           "Key": "mykey"
         },
@@ -540,7 +540,7 @@
     "MyFunctionMyApiPermissiondev": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
+        "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction"
