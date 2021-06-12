@@ -1,4 +1,26 @@
 {
+  "Parameters": {
+    "CodeBucket": {
+      "Type": "String",
+      "Default": "sam-demo-bucket"
+    },
+    "FunctionName": {
+      "Type": "String",
+      "Default": "MySuperFunctionName"
+    },
+    "TracingConfigParam": {
+      "Type": "String",
+      "Default": "PassThrough"
+    },
+    "MyExplicitApiName": {
+      "Type": "String",
+      "Default": "SomeName"
+    },
+    "CodeKey": {
+      "Type": "String",
+      "Default": "key"
+    }
+  },
   "Conditions": {
     "TrueCondition": {
       "Fn::Equals": [
@@ -7,39 +29,79 @@
       ]
     }
   },
-  "Parameters": {
-    "CodeKey": {
-      "Default": "key",
-      "Type": "String"
-    },
-    "CodeBucket": {
-      "Default": "sam-demo-bucket",
-      "Type": "String"
-    },
-    "FunctionName": {
-      "Default": "MySuperFunctionName",
-      "Type": "String"
-    },
-    "MyExplicitApiName": {
-      "Default": "SomeName",
-      "Type": "String"
-    },
-    "TracingConfigParam": {
-      "Default": "PassThrough",
-      "Type": "String"
-    }
-  },
   "Resources": {
+    "MyTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 5,
+          "WriteCapacityUnits": 5
+        },
+        "StreamSpecification": {
+          "StreamViewType": "NEW_IMAGE"
+        }
+      }
+    },
+    "SqsDlqQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "SnsDlqQueue": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MyNewRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "cloudwatch:*",
+                    "logs:*"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "lambdaRole"
+          }
+        ]
+      }
+    },
     "MyFunction": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Type": "AWS::Lambda::Function",
       "Properties": {
-        "TracingConfig": {
-          "Mode": {
-            "Ref": "TracingConfigParam"
-          }
-        },
         "Code": {
           "S3Bucket": {
             "Ref": "CodeBucket"
@@ -60,12 +122,6 @@
         "FunctionName": {
           "Fn::Sub": "${FunctionName}"
         },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "Handler": {
           "Fn::Sub": [
             "${filename}.handler",
@@ -88,12 +144,66 @@
               "4.3"
             ]
           ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfig": {
+          "Mode": {
+            "Ref": "TracingConfigParam"
+          }
         }
       }
     },
+    "MyFunctionMyApiPermissiondev": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            {
+              "__ApiId__": {
+                "Ref": "MyExplicitApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "FunctionWithExplicitS3Uri": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "mybucket",
+          "S3Key": "mykey",
+          "S3ObjectVersion": "MyVersion"
+        },
+        "Handler": "stream.ddb_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionWithExplicitS3UriRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
     "FunctionWithExplicitS3UriRole": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -117,43 +227,36 @@
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       }
     },
-    "ApiWithExplicitS3UriDeployment7ab7044581": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::ApiGateway::Deployment",
+    "DynamoDBFunction": {
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "RestApiId": {
-          "Ref": "ApiWithExplicitS3Uri"
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "streams.zip"
         },
-        "Description": "RestApi deployment id: 7ab7044581d53db4957e668f336b462f099db4af",
-        "StageName": "Stage"
-      },
-      "Condition": "TrueCondition"
-    },
-    "ApiWithExplicitS3UridevStage": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ApiWithExplicitS3UriDeployment7ab7044581"
+        "Handler": "stream.ddb_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "DynamoDBFunctionRole",
+            "Arn"
+          ]
         },
-        "RestApiId": {
-          "Ref": "ApiWithExplicitS3Uri"
-        },
-        "StageName": "dev"
-      },
-      "Condition": "TrueCondition"
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
     },
     "DynamoDBFunctionRole": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -178,123 +281,29 @@
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       }
     },
-    "MySnsDlqLambdaFunction": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::Lambda::Function",
+    "DynamoDBFunctionMyDDBStream": {
+      "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "hello.zip"
-        },
-        "DeadLetterConfig": {
-          "TargetArn": {
-            "Ref": "SnsDlqQueue"
-          }
-        },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "Handler": "index.handler",
-        "Role": {
+        "BatchSize": 200,
+        "EventSourceArn": {
           "Fn::GetAtt": [
-            "MySnsDlqLambdaFunctionRole",
-            "Arn"
+            "MyTable",
+            "StreamArn"
           ]
         },
-        "Runtime": "python2.7"
-      }
-    },
-    "MyExplicitApi": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
+        "FunctionName": {
+          "Ref": "DynamoDBFunction"
         },
-        "BodyS3Location": {
-          "Bucket": "sam-demo-bucket",
-          "Key": "swagger.yaml"
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        },
-        "Name": {
-          "Ref": "MyExplicitApiName"
-        }
-      }
-    },
-    "MyTable": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::DynamoDB::Table",
-      "Properties": {
-        "KeySchema": [
-          {
-            "KeyType": "HASH",
-            "AttributeName": "id"
-          }
-        ],
-        "StreamSpecification": {
-          "StreamViewType": "NEW_IMAGE"
-        },
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "id",
-            "AttributeType": "S"
-          }
-        ],
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": 5,
-          "ReadCapacityUnits": 5
-        }
-      }
-    },
-    "SnsDlqQueue": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::SNS::Topic"
-    },
-    "DynamoDBFunction": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "stream.ddb_handler",
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "streams.zip"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "DynamoDBFunctionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "python2.7",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ]
+        "StartingPosition": "LATEST"
       }
     },
     "MySqsDlqLambdaFunction": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
@@ -309,12 +318,6 @@
             ]
           }
         },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
@@ -322,122 +325,16 @@
             "Arn"
           ]
         },
-        "Runtime": "python2.7"
-      }
-    },
-    "MyExplicitApidevStage": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "MyExplicitApiDeployment7145dd00ce"
-        },
-        "RestApiId": {
-          "Ref": "MyExplicitApi"
-        },
-        "Variables": {
-          "FunctionName": {
-            "Fn::Sub": "${MyFunction}"
-          },
-          "Var2": {
-            "Fn::Join": [
-              "join ",
-              [
-                "some value ",
-                "with some other value"
-              ]
-            ]
-          }
-        },
-        "StageName": "dev"
-      }
-    },
-    "DynamoDBFunctionMyDDBStream": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "BatchSize": 200,
-        "FunctionName": {
-          "Ref": "DynamoDBFunction"
-        },
-        "StartingPosition": "LATEST",
-        "EventSourceArn": {
-          "Fn::GetAtt": [
-            "MyTable",
-            "StreamArn"
-          ]
-        }
-      }
-    },
-    "FunctionWithExplicitS3Uri": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Handler": "stream.ddb_handler",
-        "Code": {
-          "S3Bucket": "mybucket",
-          "S3Key": "mykey",
-          "S3ObjectVersion": "MyVersion"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "FunctionWithExplicitS3UriRole",
-            "Arn"
-          ]
-        },
         "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       }
     },
-    "SqsDlqQueue": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::SQS::Queue"
-    },
-    "MyExplicitApiDeployment7145dd00ce": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyExplicitApi"
-        },
-        "Description": "RestApi deployment id: 7145dd00cea59b4a62b4d7855add490c587f3f62",
-        "StageName": "Stage"
-      }
-    },
-    "ApiWithExplicitS3Uri": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        },
-        "BodyS3Location": {
-          "Version": 3,
-          "Bucket": "mybucket",
-          "Key": "mykey"
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        }
-      },
-      "Condition": "TrueCondition"
-    },
     "MySqsDlqLambdaFunctionRole": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -481,15 +378,41 @@
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "MySnsDlqLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "DeadLetterConfig": {
+          "TargetArn": {
+            "Ref": "SnsDlqQueue"
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MySnsDlqLambdaFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       }
     },
     "MySnsDlqLambdaFunctionRole": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -530,74 +453,109 @@
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       }
     },
-    "MyNewRole": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::IAM::Role",
+    "MyExplicitApi": {
+      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "Policies": [
-          {
-            "PolicyName": "lambdaRole",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Action": [
-                    "cloudwatch:*",
-                    "logs:*"
-                  ],
-                  "Resource": "*",
-                  "Effect": "Allow"
-                }
-              ]
-            }
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
+        "BodyS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "swagger.yaml"
+        },
+        "Name": {
+          "Ref": "MyExplicitApiName"
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
           ]
         }
       }
     },
-    "MyFunctionMyApiPermissiondev": {
-      "UpdateReplacePolicy": "Retain",
-      "DeletionPolicy": "Delete",
-      "Type": "AWS::Lambda::Permission",
+    "MyExplicitApiDeployment152df1b971": {
+      "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunction"
+        "Description": "RestApi deployment id: 152df1b971ca9a92901a08237311b9430df86762",
+        "RestApiId": {
+          "Ref": "MyExplicitApi"
         },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "MyExplicitApi"
-              }
-            }
+        "StageName": "Stage"
+      }
+    },
+    "MyExplicitApidevStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyExplicitApiDeployment152df1b971"
+        },
+        "RestApiId": {
+          "Ref": "MyExplicitApi"
+        },
+        "StageName": "dev",
+        "Variables": {
+          "FunctionName": {
+            "Fn::Sub": "${MyFunction}"
+          },
+          "Var2": {
+            "Fn::Join": [
+              "join ",
+              [
+                "some value ",
+                "with some other value"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "ApiWithExplicitS3Uri": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Condition": "TrueCondition",
+      "Properties": {
+        "BodyS3Location": {
+          "Bucket": "mybucket",
+          "Key": "mykey",
+          "Version": 3
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
           ]
         }
+      }
+    },
+    "ApiWithExplicitS3UriDeploymentf9e1faacb6": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Condition": "TrueCondition",
+      "Properties": {
+        "Description": "RestApi deployment id: f9e1faacb6546a93b8ec6349a559b87df4f473eb",
+        "RestApiId": {
+          "Ref": "ApiWithExplicitS3Uri"
+        },
+        "StageName": "Stage"
+      }
+    },
+    "ApiWithExplicitS3UridevStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Condition": "TrueCondition",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ApiWithExplicitS3UriDeploymentf9e1faacb6"
+        },
+        "RestApiId": {
+          "Ref": "ApiWithExplicitS3Uri"
+        },
+        "StageName": "dev"
       }
     }
   }

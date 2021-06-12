@@ -34,15 +34,6 @@
     "ImplicitApiFunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -58,7 +49,26 @@
               }
             }
           ]
-        }
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "ServerlessRestApiDeployment5b2cb4ba8f": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "Description": "RestApi deployment id: 5b2cb4ba8fce8a9445b1914c6c6fbeef81a9075a",
+        "StageName": "Stage"
       }
     },
     "ImplicitApiFunctionGetHtmlPermissionProd": {
@@ -86,6 +96,11 @@
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "EndpointConfiguration": {
+          "VpcEndpointIds": [
+            {
+              "Ref": "VpcEndpointId"
+            }
+          ],
           "Types": [
             "REGIONAL"
           ]
@@ -111,26 +126,6 @@
         "StageName": "Prod"
       }
     },
-    "ServerlessRestApiDeployment5b2cb4ba8f": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: 5b2cb4ba8fce8a9445b1914c6c6fbeef81a9075a",
-        "StageName": "Stage"
-      }
-    },
-    "ExplicitApiDeploymentf117c932f7": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289",
-        "StageName": "Stage"
-      }
-    },
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
@@ -141,6 +136,16 @@
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Prod"
+      }
+    },
+    "ExplicitApiDeploymentf117c932f7": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "Description": "RestApi deployment id: f117c932f75cfa87d23dfed64e9430d0081ef289",
+        "StageName": "Stage"
       }
     },
     "ServerlessRestApi": {

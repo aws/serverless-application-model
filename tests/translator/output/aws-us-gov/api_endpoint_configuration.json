@@ -1,9 +1,6 @@
 {
   "Parameters": {
-    "VpcEndpointId": {
-      "Type": "String"
-    },
-    "EndpointConfigType": {
+    "EndpointConfig": {
       "Type": "String"
     }
   },
@@ -96,11 +93,6 @@
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "EndpointConfiguration": {
-          "VpcEndpointIds": [
-            {
-              "Ref": "VpcEndpointId"
-            }
-          ],
           "Types": [
             "REGIONAL"
           ]
@@ -175,20 +167,15 @@
           "swagger": "2.0"
         },
         "EndpointConfiguration": {
-          "VpcEndpointIds": [
-            {
-              "Ref": "VpcEndpointId"
-            }
-          ],
           "Types": [
             {
-              "Ref": "EndpointConfigType"
+              "Ref": "EndpointConfig"
             }
           ]
         },
         "Parameters": {
           "endpointConfigurationTypes": {
-            "Ref": "EndpointConfigType"
+            "Ref": "EndpointConfig"
           }
         }
       }
