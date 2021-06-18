@@ -478,9 +478,7 @@
             "Action": [
               "ec2:DescribeImages"
             ],
-            "Resource": {
-              "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/*"
-            }
+            "Resource": "*"
           }
         ]
       }
@@ -2445,6 +2443,34 @@
                 {
                   "certificateArn": {
                     "Ref": "CertificateArn"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "Route53ChangeResourceRecordSetsPolicy": {
+      "Description": "Gives permission to change resource record sets in Route 53",
+      "Parameters": {
+        "HostedZoneId": {
+          "Description": "ID of the hosted zone"
+        }
+      },
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "route53:ChangeResourceRecordSets"
+            ],
+            "Resource": {
+              "Fn::Sub": [
+                "arn:${AWS::Partition}:route53:::hostedzone/${HostedZoneId}",
+                {
+                  "HostedZoneId": {
+                    "Ref": "HostedZoneId"
                   }
                 }
               ]

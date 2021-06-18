@@ -336,9 +336,7 @@
                   "Action": [
                     "ec2:DescribeImages"
                   ], 
-                  "Resource": {
-                    "Fn::Sub": "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/*"
-                  }, 
+                  "Resource": "*", 
                   "Effect": "Allow"
                 }
               ]
@@ -1671,6 +1669,27 @@
                       "${certificateArn}",
                       {
                         "certificateArn": "arn"
+                      }
+                    ]
+                  },
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "KitchenSinkFunctionRolePolicy59",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "route53:ChangeResourceRecordSets"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:route53:::hostedzone/${HostedZoneId}",
+                      {
+                        "HostedZoneId": "test"
                       }
                     ]
                   },

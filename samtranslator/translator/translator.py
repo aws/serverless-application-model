@@ -6,6 +6,7 @@ from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggleDefaultConfigProvider,
 )
 from samtranslator.model import ResourceTypeResolver, sam_resources
+from samtranslator.model.api.api_generator import SharedApiUsagePlan
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.model.exceptions import (
@@ -44,7 +45,8 @@ class Translator:
         self.feature_toggle = None
         self.boto_session = boto_session
 
-        ArnGenerator.class_boto_session = self.boto_session
+        if self.boto_session:
+            ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
     def _get_function_names(self, resource_dict, intrinsics_resolver):
         """
@@ -91,7 +93,11 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
-        self.feature_toggle = feature_toggle if feature_toggle else FeatureToggle(FeatureToggleDefaultConfigProvider())
+        self.feature_toggle = (
+            feature_toggle
+            if feature_toggle
+            else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)
+        )
         self.function_names = dict()
         self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
@@ -111,6 +117,7 @@ class Translator:
         )
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
+        shared_api_usage_plan = SharedApiUsagePlan()
         document_errors = []
         changed_logical_ids = {}
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
@@ -130,6 +137,7 @@ class Translator:
                     resource_dict, intrinsics_resolver
                 )
                 kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
+                kwargs["shared_api_usage_plan"] = shared_api_usage_plan
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
@@ -223,7 +231,7 @@ class Translator:
         return functions + statemachines + apis + others
 
 
-def prepare_plugins(plugins, parameters={}):
+def prepare_plugins(plugins, parameters=None):
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
@@ -233,6 +241,8 @@ def prepare_plugins(plugins, parameters={}):
     :return samtranslator.plugins.SamPlugins: Instance of `SamPlugins`
     """
 
+    if parameters is None:
+        parameters = {}
     required_plugins = [
         DefaultDefinitionBodyPlugin(),
         make_implicit_rest_api_plugin(),

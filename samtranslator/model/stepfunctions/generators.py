@@ -17,6 +17,7 @@ from samtranslator.model.intrinsics import fnJoin
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
 
 
@@ -210,8 +211,12 @@ class StateMachineGenerator(object):
         :returns: the generated IAM Role
         :rtype: model.iam.IAMRole
         """
+        policies = self.policies[:]
+        if self.tracing and self.tracing.get("Enabled") is True:
+            policies.append(get_xray_managed_policy_name())
+
         state_machine_policies = ResourcePolicies(
-            {"Policies": self.policies},
+            {"Policies": policies},
             # No support for policy templates in the "core"
             policy_template_processor=None,
         )
@@ -281,7 +286,7 @@ class StateMachineGenerator(object):
             location[path[-1]] = sub_key
         return substitution_map
 
-    def _get_paths_to_intrinsics(self, input, path=[]):
+    def _get_paths_to_intrinsics(self, input, path=None):
         """
         Returns all paths to dynamic values within a dictionary
 
@@ -289,6 +294,8 @@ class StateMachineGenerator(object):
         :param path: Optional list to keep track of the path to the input dictionary
         :returns list: List of keys that defines the path to a dynamic value within the input dictionary
         """
+        if path is None:
+            path = []
         dynamic_value_paths = []
         if isinstance(input, dict):
             iterator = input.items()

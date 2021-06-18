@@ -302,7 +302,7 @@ class TestSwaggerEditor_iter_on_path(TestCase):
     def test_must_iterate_on_paths(self):
 
         expected = {"/foo", "/bar", "/baz"}
-        actual = set([path for path in self.editor.iter_on_path()])
+        actual = set(list(self.editor.iter_on_path()))
 
         self.assertEqual(expected, actual)
 
@@ -1180,6 +1180,18 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         }
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    @parameterized.expand(
+        [
+            param("SourceVpcWhitelist"),
+            param("SourceVpcBlacklist"),
+        ]
+    )
+    def test_must_fail_when_vpc_whitelist_is_non_string(self, resource_policy_key):
+        resource_policy = {resource_policy_key: [{"sub": "somevalue"}]}
+
+        with self.assertRaises(InvalidDocumentException):
+            self.editor.add_resource_policy(resource_policy, "/foo", "123", "prod")
 
     def test_must_add_vpc_deny_string_only(self):
 

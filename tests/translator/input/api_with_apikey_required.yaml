@@ -19,3 +19,11 @@ Resources:
             Method: get
             Auth:
               ApiKeyRequired: true
+        MyApiWithApiKeyRequiredAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithoutAuth
+            Path: /any/ApiKeyRequiredTrue
+            Method: any
+            Auth:
+              ApiKeyRequired: true

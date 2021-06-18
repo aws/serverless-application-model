@@ -6,7 +6,7 @@ class NoRegionFound(Exception):
 
 
 class ArnGenerator(object):
-    class_boto_session = None
+    BOTO_SESSION_REGION_NAME = None
 
     @classmethod
     def generate_arn(cls, partition, service, resource, include_account_id=True):
@@ -50,10 +50,10 @@ class ArnGenerator(object):
             # Use Boto3 to get the region where code is running. This uses Boto's regular region resolution
             # mechanism, starting from AWS_DEFAULT_REGION environment variable.
 
-            if ArnGenerator.class_boto_session is None:
+            if ArnGenerator.BOTO_SESSION_REGION_NAME is None:
                 region = boto3.session.Session().region_name
             else:
-                region = ArnGenerator.class_boto_session.region_name
+                region = ArnGenerator.BOTO_SESSION_REGION_NAME
 
         # If region is still None, then we could not find the region. This will only happen
         # in the local context. When this is deployed, we will be able to find the region like

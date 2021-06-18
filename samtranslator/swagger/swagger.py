@@ -698,7 +698,7 @@ class SwaggerEditor(object):
         if method_apikey_required is not None:
             self._set_method_apikey_handling(path, method_name, method_apikey_required)
 
-    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers={}, method_scopes=None):
+    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers=None, method_scopes=None):
         """
         Adds the authorizer_name to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -708,6 +708,8 @@ class SwaggerEditor(object):
         :param string authorizer_name: Name of the authorizer to use. Must be a key in the
             authorizers param.
         """
+        if authorizers is None:
+            authorizers = {}
         normalized_method_name = self._normalize_method_name(method_name)
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
@@ -877,6 +879,8 @@ class SwaggerEditor(object):
         ip_range_blacklist = resource_policy.get("IpRangeBlacklist")
         source_vpc_whitelist = resource_policy.get("SourceVpcWhitelist")
         source_vpc_blacklist = resource_policy.get("SourceVpcBlacklist")
+
+        # Intrinsic's supported in these properties
         source_vpc_intrinsic_whitelist = resource_policy.get("IntrinsicVpcWhitelist")
         source_vpce_intrinsic_whitelist = resource_policy.get("IntrinsicVpceWhitelist")
         source_vpc_intrinsic_blacklist = resource_policy.get("IntrinsicVpcBlacklist")
@@ -898,31 +902,38 @@ class SwaggerEditor(object):
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
-        if (
-            (source_vpc_blacklist is not None)
-            or (source_vpc_intrinsic_blacklist is not None)
-            or (source_vpce_intrinsic_blacklist is not None)
-        ):
-            blacklist_dict = {
-                "StringEndpointList": source_vpc_blacklist,
-                "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
-                "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
-            }
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_blacklist):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "SourceVpcBlacklist must be a list of strings. Use IntrinsicVpcBlacklist instead for values that use Intrinsic Functions"
+                    )
+                ]
+            )
 
-        if (
-            (source_vpc_whitelist is not None)
-            or (source_vpc_intrinsic_whitelist is not None)
-            or (source_vpce_intrinsic_whitelist is not None)
-        ):
-            whitelist_dict = {
-                "StringEndpointList": source_vpc_whitelist,
-                "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
-                "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
-            }
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
+        blacklist_dict = {
+            "StringEndpointList": source_vpc_blacklist,
+            "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
+            "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
+        }
+        resource_list = self._get_method_path_uri_list(path, api_id, stage)
+        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
+
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "SourceVpcWhitelist must be a list of strings. Use IntrinsicVpcWhitelist instead for values that use Intrinsic Functions"
+                    )
+                ]
+            )
+
+        whitelist_dict = {
+            "StringEndpointList": source_vpc_whitelist,
+            "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
+            "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
+        }
+        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -1134,7 +1145,8 @@ class SwaggerEditor(object):
 
                 parameter_name = request_parameter["Name"]
                 location_name = parameter_name.replace("method.request.", "")
-                location, name = location_name.split(".")
+
+                location, name = location_name.split(".", 1)
 
                 if location == "querystring":
                     location = "query"
@@ -1252,3 +1264,17 @@ class SwaggerEditor(object):
     def get_path_without_trailing_slash(path):
         # convert greedy paths to such as {greedy+}, {proxy+} to "*"
         return re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
+
+    @staticmethod
+    def _validate_list_property_is_resolved(property_list):
+        """
+        Validate if the values of a Property List are all of type string
+
+        :param property_list: Value of a Property List
+        :return bool: True if the property_list is all of type string otherwise False
+        """
+
+        if property_list is not None and not all(isinstance(x, string_types) for x in property_list):
+            return False
+
+        return True
