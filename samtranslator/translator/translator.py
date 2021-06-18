@@ -1,4 +1,6 @@
 import copy
+import boto3
+from samtranslator.metrics.metrics import CWMetricsPublisher, DummyMetricsPublisher, Metrics
 
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
@@ -32,7 +34,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None):
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -44,6 +46,7 @@ class Translator:
         self.sam_parser = sam_parser
         self.feature_toggle = None
         self.boto_session = boto_session
+        self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
@@ -78,7 +81,7 @@ class Translator:
                                 )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values, feature_toggle=None):
+    def translate(self, sam_template, parameter_values, feature_toggle=None, **kwargs):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
