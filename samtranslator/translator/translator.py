@@ -1,10 +1,8 @@
 import copy
-import boto3
-from samtranslator.metrics.metrics import CWMetricsPublisher, DummyMetricsPublisher, Metrics
+from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
-    FeatureToggleLocalConfigProvider,
     FeatureToggleDefaultConfigProvider,
 )
 from samtranslator.model import ResourceTypeResolver, sam_resources
@@ -81,7 +79,7 @@ class Translator:
                                 )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values, feature_toggle=None, **kwargs):
+    def translate(self, sam_template, parameter_values, feature_toggle=None):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
