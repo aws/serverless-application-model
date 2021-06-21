@@ -7,7 +7,7 @@ from samtranslator.metrics.metrics import (
     CWMetricsPublisher,
     DummyMetricsPublisher,
     Unit,
-    MetricDatum
+    MetricDatum,
 )
 
 
@@ -25,10 +25,20 @@ class MetricPublisherTestHelper(MetricsPublisher):
 class TestMetrics(TestCase):
     @parameterized.expand(
         [
-            param("DummyNamespace", "CountMetric", 12, Unit.Count,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
-            param("DummyNamespace", "IAMError", 59, Unit.Count,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
+            param(
+                "DummyNamespace",
+                "CountMetric",
+                12,
+                Unit.Count,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
+            param(
+                "DummyNamespace",
+                "IAMError",
+                59,
+                Unit.Count,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
         ]
     )
     def test_publishing_count_metric(self, namespace, name, value, unit, dimensions):
@@ -38,16 +48,26 @@ class TestMetrics(TestCase):
         metrics.publish()
         self.assertEqual(len(mock_metrics_publisher.metrics_cache), 1)
         published_metric = mock_metrics_publisher.metrics_cache[0].get_metric_data()
-        self.assertEqual(published_metric['MetricName'], name)
-        self.assertEqual(published_metric['Dimensions'], dimensions)
-        self.assertEqual(published_metric['Value'], value)
+        self.assertEqual(published_metric["MetricName"], name)
+        self.assertEqual(published_metric["Dimensions"], dimensions)
+        self.assertEqual(published_metric["Value"], value)
 
     @parameterized.expand(
         [
-            param("DummyNamespace", "SARLatency", 1200, Unit.Milliseconds,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
-            param("DummyNamespace", "IAMLatency", 400, Unit.Milliseconds,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
+            param(
+                "DummyNamespace",
+                "SARLatency",
+                1200,
+                Unit.Milliseconds,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
+            param(
+                "DummyNamespace",
+                "IAMLatency",
+                400,
+                Unit.Milliseconds,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
         ]
     )
     def test_publishing_latency_metric(self, namespace, name, value, unit, dimensions):
@@ -57,16 +77,26 @@ class TestMetrics(TestCase):
         metrics.publish()
         self.assertEqual(len(mock_metrics_publisher.metrics_cache), 1)
         published_metric = mock_metrics_publisher.metrics_cache[0].get_metric_data()
-        self.assertEqual(published_metric['MetricName'], name)
-        self.assertEqual(published_metric['Dimensions'], dimensions)
-        self.assertEqual(published_metric['Value'], value)
+        self.assertEqual(published_metric["MetricName"], name)
+        self.assertEqual(published_metric["Dimensions"], dimensions)
+        self.assertEqual(published_metric["Value"], value)
 
     @parameterized.expand(
         [
-            param("DummyNamespace", "CountMetric", 12, Unit.Count,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
-            param("DummyNamespace", "LatencyMetric", 1200, Unit.Milliseconds,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
+            param(
+                "DummyNamespace",
+                "CountMetric",
+                12,
+                Unit.Count,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
+            param(
+                "DummyNamespace",
+                "LatencyMetric",
+                1200,
+                Unit.Milliseconds,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
         ]
     )
     def test_publishing_metric_without_calling_publish(self, namespace, name, value, unit, dimensions):
@@ -76,22 +106,42 @@ class TestMetrics(TestCase):
         del metrics
         self.assertEqual(len(mock_metrics_publisher.metrics_cache), 1)
         published_metric = mock_metrics_publisher.metrics_cache[0].get_metric_data()
-        self.assertEqual(published_metric['MetricName'], name)
-        self.assertEqual(published_metric['Dimensions'], dimensions)
-        self.assertEqual(published_metric['Value'], value)
+        self.assertEqual(published_metric["MetricName"], name)
+        self.assertEqual(published_metric["Dimensions"], dimensions)
+        self.assertEqual(published_metric["Value"], value)
 
 
 class TestCWMetricPublisher(TestCase):
     @parameterized.expand(
         [
-            param("DummyNamespace", "CountMetric", 12, Unit.Count,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
-            param("DummyNamespace", "IAMError", 59, Unit.Count,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
-            param("DummyNamespace", "SARLatency", 1200, Unit.Milliseconds,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
-            param("DummyNamespace", "IAMLatency", 400, Unit.Milliseconds,
-                  [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}]),
+            param(
+                "DummyNamespace",
+                "CountMetric",
+                12,
+                Unit.Count,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
+            param(
+                "DummyNamespace",
+                "IAMError",
+                59,
+                Unit.Count,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
+            param(
+                "DummyNamespace",
+                "SARLatency",
+                1200,
+                Unit.Milliseconds,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
+            param(
+                "DummyNamespace",
+                "IAMLatency",
+                400,
+                Unit.Milliseconds,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
         ]
     )
     def test_publish_metric(self, namespace, name, value, unit, dimensions):
@@ -101,12 +151,12 @@ class TestCWMetricPublisher(TestCase):
         metrics = [metric_datum]
         metric_publisher.publish(namespace, metrics)
         call_kwargs = mock_cw_client.put_metric_data.call_args.kwargs
-        published_metric_data = call_kwargs['MetricData'][0]
-        self.assertEqual(call_kwargs['Namespace'], namespace)
-        self.assertEqual(published_metric_data['MetricName'], name)
-        self.assertEqual(published_metric_data['Unit'], unit)
-        self.assertEqual(published_metric_data['Value'], value)
-        self.assertEqual(published_metric_data['Dimensions'], dimensions)
+        published_metric_data = call_kwargs["MetricData"][0]
+        self.assertEqual(call_kwargs["Namespace"], namespace)
+        self.assertEqual(published_metric_data["MetricName"], name)
+        self.assertEqual(published_metric_data["Unit"], unit)
+        self.assertEqual(published_metric_data["Value"], value)
+        self.assertEqual(published_metric_data["Dimensions"], dimensions)
 
     @parameterized.expand(
         [
@@ -126,22 +176,22 @@ class TestCWMetricPublisher(TestCase):
 
         self.assertEqual(mock_cw_client.put_metric_data.call_count, 3)
         # Validating that metrics are published in batches of 20
-        self.assertEqual(len(call_args_list[0].kwargs['MetricData']), min(total_metrics, metric_publisher.BATCH_SIZE))
+        self.assertEqual(len(call_args_list[0].kwargs["MetricData"]), min(total_metrics, metric_publisher.BATCH_SIZE))
         total_metrics -= metric_publisher.BATCH_SIZE
-        self.assertEqual(len(call_args_list[1].kwargs['MetricData']), min(total_metrics, metric_publisher.BATCH_SIZE))
+        self.assertEqual(len(call_args_list[1].kwargs["MetricData"]), min(total_metrics, metric_publisher.BATCH_SIZE))
         total_metrics -= metric_publisher.BATCH_SIZE
-        self.assertEqual(len(call_args_list[2].kwargs['MetricData']), min(total_metrics, metric_publisher.BATCH_SIZE))
+        self.assertEqual(len(call_args_list[2].kwargs["MetricData"]), min(total_metrics, metric_publisher.BATCH_SIZE))
 
     def test_do_not_fail_on_cloudwatch_any_exception(self):
         mock_cw_client = MagicMock()
         mock_cw_client.put_metric_data = MagicMock()
         mock_cw_client.put_metric_data.side_effect = Exception("BOOM!", "FAILED!!")
         metric_publisher = CWMetricsPublisher(mock_cw_client)
-        single_metric = MetricDatum('Name', 20, Unit.Count, [])
-        metric_publisher.publish('SomeNamespace', [single_metric])
+        single_metric = MetricDatum("Name", 20, Unit.Count, [])
+        metric_publisher.publish("SomeNamespace", [single_metric])
         self.assertTrue(True)
 
     def test_for_code_coverage(self):
         dummy_publisher = DummyMetricsPublisher()
-        dummy_publisher.publish('NS', [None])
+        dummy_publisher.publish("NS", [None])
         self.assertTrue(True)
