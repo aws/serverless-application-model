@@ -1,8 +1,6 @@
-from mock import patch, Mock
-from botocore.exceptions import ClientError
 from parameterized import parameterized, param
 from unittest import TestCase
-from mock import MagicMock, patch
+from mock import MagicMock
 from samtranslator.metrics.metrics import (
     Metrics,
     MetricsPublisher,

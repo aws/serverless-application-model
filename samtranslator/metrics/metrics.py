@@ -1,4 +1,3 @@
-from botocore.exceptions import ClientError
 import logging
 
 LOG = logging.getLogger(__name__)
