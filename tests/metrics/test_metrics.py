@@ -185,7 +185,7 @@ class TestCWMetricPublisher(TestCase):
     def test_do_not_fail_on_cloudwatch_any_exception(self):
         mock_cw_client = MagicMock()
         mock_cw_client.put_metric_data = MagicMock()
-        mock_cw_client.put_metric_data.side_effect = Exception("BOOM!", "FAILED!!")
+        mock_cw_client.put_metric_data.side_effect = Exception("BOOM FAILED!!")
         metric_publisher = CWMetricsPublisher(mock_cw_client)
         single_metric = MetricDatum("Name", 20, Unit.Count, [])
         metric_publisher.publish("SomeNamespace", [single_metric])
