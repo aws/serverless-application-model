@@ -808,11 +808,11 @@ class SwaggerEditor(object):
             self._doc[self._X_APIGW_REQUEST_VALIDATORS].update(request_validator_definition)
 
         # It is possible that the method could have two definitions in a Fn::If block.
-        # for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
-        for method_name, method in self.get_path(path).items():
+        for path_method_name, method in self.get_path(path).items():
+            normalized_path_method_name = self._normalize_method_name(path_method_name)
 
             # Adding it to only given method to the path
-            if method_name == normalized_method_name:
+            if normalized_path_method_name == normalized_method_name:
                 for method_definition in self.get_method_contents(method):
 
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
