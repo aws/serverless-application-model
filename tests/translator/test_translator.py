@@ -293,6 +293,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_default_aws_iam_auth_and_no_auth_route",
                 "api_with_method_aws_iam_auth",
                 "api_with_aws_iam_auth_overrides",
+                "api_with_swagger_authorizer_none",
                 "api_with_method_settings",
                 "api_with_binary_media_types",
                 "api_with_binary_media_types_definition_body",
@@ -319,6 +320,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_xray_tracing",
                 "api_request_model",
                 "api_with_stage_tags",
+                "api_with_mode",
                 "s3",
                 "s3_create_remove",
                 "s3_existing_lambda_notification_configuration",
@@ -400,6 +402,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_event_dest_basic",
                 "function_with_event_dest_conditional",
                 "api_with_usageplans",
+                "api_with_usageplans_shared_attributes_two",
+                "api_with_usageplans_shared_attributes_three",
                 "api_with_usageplans_intrinsics",
                 "state_machine_with_inline_definition",
                 "state_machine_with_tags",
@@ -596,6 +600,49 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
             self._update_logical_id_hash(output_fragment)
 
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
+
+    @parameterized.expand(
+        itertools.product(
+            [
+                (
+                    "usage_plans",
+                    ("api_with_usageplans_shared_no_side_effect_1", "api_with_usageplans_shared_no_side_effect_2"),
+                ),
+            ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],
+        )
+    )
+    @patch(
+        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
+        mock_sar_service_call,
+    )
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_transform_success_no_side_effect(self, testcase, partition_with_region):
+        """
+        Tests that the transform does not leak/leave data in shared caches/lists between executions
+        Performs the transform of the templates in a row without reinitialization
+        Data from template X should not leak in template X+1
+
+        Parameters
+        ----------
+        testcase : Tuple
+            Test name (unused) and Templates
+        templates : List
+            List of templates to transform
+        """
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        for template in testcase[1]:
+            print(template, partition, region)
+            manifest = self._read_input(template)
+            expected = self._read_expected_output(template, partition)
+
+            self._compare_transform(manifest, expected, partition, region)
 
 
 @pytest.mark.parametrize(

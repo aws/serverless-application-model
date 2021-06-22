@@ -24,6 +24,11 @@ Resources:
           Properties:
             Path: /
             Method: get
+        GetHtmlAnyMethod:
+          Type: Api
+          Properties:
+            Path: /any
+            Method: any
 
   ExplicitApi:
     Type: AWS::Serverless::Api
