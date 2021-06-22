@@ -807,16 +807,16 @@ class SwaggerEditor(object):
             # Adding only if the validator hasn't been defined already
             self._doc[self._X_APIGW_REQUEST_VALIDATORS].update(request_validator_definition)
 
-        # It is possible that the method could have two definitions in a Fn::If block.
-        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+        for method_name, method in self.get_path(path).items():
+            # It is possible that the method could have two definitions in a Fn::If block.
+            for method_definition in self.get_method_contents(method):
+                # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                if not self.method_definition_has_integration(method_definition):
+                    continue
 
-            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
-            if not self.method_definition_has_integration(method_definition):
-                continue
-
-            set_validator_to_method = {self._X_APIGW_REQUEST_VALIDATOR: validator_name}
-            # Setting validator to the given method
-            method_definition.update(set_validator_to_method)
+                set_validator_to_method = {self._X_APIGW_REQUEST_VALIDATOR: validator_name}
+                # Setting validator to the given method
+                method_definition.update(set_validator_to_method)
 
     def add_request_model_to_method(self, path, method_name, request_model):
         """
