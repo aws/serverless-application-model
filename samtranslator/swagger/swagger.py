@@ -810,7 +810,8 @@ class SwaggerEditor(object):
         # It is possible that the method could have two definitions in a Fn::If block.
         # for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
         for method_name, method in self.get_path(path).items():
-            # Adding it to only given method to the path  
+
+            # Adding it to only given method to the path
             if method_name == normalized_method_name:
                 for method_definition in self.get_method_contents(method):
 
