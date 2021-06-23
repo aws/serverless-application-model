@@ -60,7 +60,7 @@ class DummyMetricsPublisher(MetricsPublisher):
         MetricsPublisher.__init__(self)
 
     def publish(self, namespace, metrics):
-        """Method to actually publish them metric"""
+        """Do not publish any metric, this is a dummy publisher used for offline use."""
         LOG.debug("Dummy publisher ignoring {} metrices".format(len(metrics)))
 
 
@@ -153,6 +153,6 @@ class Metrics:
         self._record_metric(name, value, Unit.Milliseconds, dimensions)
 
     def publish(self):
-        """Method to publish all metrics, do not forget to call this method."""
+        """Calls publish method from the configured metrics publisher to publish metrics"""
         self.metrics_publisher.publish(self.namespace, self.metrics_cache)
         self.metrics_cache = []
