@@ -340,11 +340,8 @@ class HttpApiGenerator(object):
                 if re.search(invalid_regex, path) is not None:
                     raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
 
-                if path == "/":
-                    path = ""
-                else:
-                    # ignore leading and trailing `/` in the path name
-                    path = path.strip("/")
+                # ignore leading and trailing `/` in the path name
+                path = path.strip("/")
 
                 logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-_/]+", "", path), "ApiMapping")
                 basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
