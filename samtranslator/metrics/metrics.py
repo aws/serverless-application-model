@@ -1,3 +1,6 @@
+"""
+Helper classes to publish metrics
+"""
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -49,8 +52,7 @@ class CWMetricsPublisher(MetricsPublisher):
         try:
             self.cloudwatch_client.put_metric_data(Namespace=namespace, MetricData=metric_data)
         except Exception as e:
-            LOG.error("Failed to report {} metrics".format(len(metric_data)))
-            LOG.exception(e)
+            LOG.exception("Failed to report {} metrics".format(len(metric_data)), exc_info=e)
 
 
 class DummyMetricsPublisher(MetricsPublisher):
@@ -59,7 +61,7 @@ class DummyMetricsPublisher(MetricsPublisher):
 
     def publish(self, namespace, metrics):
         """Method to actually publish them metric"""
-        LOG.info("Dummy publisher ignoring {} metrices".format(len(metrics)))
+        LOG.debug("Dummy publisher ignoring {} metrices".format(len(metrics)))
 
 
 class Unit:
@@ -128,7 +130,7 @@ class Metrics:
         """
         self.metrics_cache.append(MetricDatum(name, value, unit, dimensions))
 
-    def record_count(self, name, value, unit=Unit.Count, dimensions=[]):
+    def record_count(self, name, value, dimensions=[]):
         """
         Create metric with unit Count.
 
@@ -137,9 +139,9 @@ class Metrics:
         :param unit: unit of metric (try using values from Unit class)
         :param dimensions: array of dimensions applied to the metric
         """
-        self._record_metric(name, value, unit, dimensions)
+        self._record_metric(name, value, Unit.Count, dimensions)
 
-    def record_latency(self, name, value, unit=Unit.Milliseconds, dimensions=[]):
+    def record_latency(self, name, value, dimensions=[]):
         """
         Create metric with unit Milliseconds.
 
@@ -148,7 +150,7 @@ class Metrics:
         :param unit: unit of metric (try using values from Unit class)
         :param dimensions: array of dimensions applied to the metric
         """
-        self._record_metric(name, value, unit, dimensions)
+        self._record_metric(name, value, Unit.Milliseconds, dimensions)
 
     def publish(self):
         """Method to publish all metrics, do not forget to call this method."""

@@ -29,22 +29,20 @@ class TestMetrics(TestCase):
                 "DummyNamespace",
                 "CountMetric",
                 12,
-                Unit.Count,
                 [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
             ),
             param(
                 "DummyNamespace",
                 "IAMError",
                 59,
-                Unit.Count,
                 [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
             ),
         ]
     )
-    def test_publishing_count_metric(self, namespace, name, value, unit, dimensions):
+    def test_publishing_count_metric(self, namespace, name, value, dimensions):
         mock_metrics_publisher = MetricPublisherTestHelper()
         metrics = Metrics(namespace, mock_metrics_publisher)
-        metrics.record_count(name, value, unit, dimensions)
+        metrics.record_count(name, value, dimensions)
         metrics.publish()
         self.assertEqual(len(mock_metrics_publisher.metrics_cache), 1)
         published_metric = mock_metrics_publisher.metrics_cache[0].get_metric_data()
@@ -58,22 +56,20 @@ class TestMetrics(TestCase):
                 "DummyNamespace",
                 "SARLatency",
                 1200,
-                Unit.Milliseconds,
                 [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
             ),
             param(
                 "DummyNamespace",
                 "IAMLatency",
                 400,
-                Unit.Milliseconds,
                 [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
             ),
         ]
     )
-    def test_publishing_latency_metric(self, namespace, name, value, unit, dimensions):
+    def test_publishing_latency_metric(self, namespace, name, value, dimensions):
         mock_metrics_publisher = MetricPublisherTestHelper()
         metrics = Metrics(namespace, mock_metrics_publisher)
-        metrics.record_latency(name, value, unit, dimensions)
+        metrics.record_latency(name, value, dimensions)
         metrics.publish()
         self.assertEqual(len(mock_metrics_publisher.metrics_cache), 1)
         published_metric = mock_metrics_publisher.metrics_cache[0].get_metric_data()
@@ -87,22 +83,20 @@ class TestMetrics(TestCase):
                 "DummyNamespace",
                 "CountMetric",
                 12,
-                Unit.Count,
                 [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
             ),
             param(
                 "DummyNamespace",
                 "LatencyMetric",
                 1200,
-                Unit.Milliseconds,
                 [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
             ),
         ]
     )
-    def test_publishing_metric_without_calling_publish(self, namespace, name, value, unit, dimensions):
+    def test_publishing_metric_without_calling_publish(self, namespace, name, value, dimensions):
         mock_metrics_publisher = MetricPublisherTestHelper()
         metrics = Metrics(namespace, mock_metrics_publisher)
-        metrics.record_count(name, value, unit, dimensions)
+        metrics.record_count(name, value, dimensions)
         del metrics
         self.assertEqual(len(mock_metrics_publisher.metrics_cache), 1)
         published_metric = mock_metrics_publisher.metrics_cache[0].get_metric_data()
