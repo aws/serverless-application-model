@@ -22,6 +22,7 @@ from samtranslator.model.apigateway import (
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
 from samtranslator.model.cloudformation import NestedStack
+from samtranslator.model.cloudwatch import SyntheticsCanary
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
@@ -802,6 +803,114 @@ class SamFunction(SamResourceMacro):
             )
 
 
+class SamCanary(SamResourceMacro):
+    """SAM canary macro."""
+
+    resource_type = "AWS::Serverless::Canary"
+    property_types = {
+        "FunctionName": PropertyType(True, is_str()),
+        "Handler": PropertyType(True, is_str()),
+        "Runtime": PropertyType(True, is_str()),
+        "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "MemorySize": PropertyType(False, is_type(int)),
+        "Tags": PropertyType(False, is_type(dict)),
+        "Tracing": PropertyType(False, is_type(bool)),
+        "Timeout": PropertyType(False, is_type(int)),
+        "Role": PropertyType(True, is_str()),
+        "Schedule": PropertyType(True, one_of(is_type(dict), is_str())),
+        "StartCanaryAfterCreation": PropertyType(True, is_type(bool)),
+        "ArtifactS3Location": PropertyType(True, one_of(is_type(dict), is_str())),
+        "FailureRetentionPeriod": PropertyType(False, one_of(is_type(dict), is_str())),
+        "SuccessRetentionPeriod": PropertyType(False, one_of(is_type(dict), is_str())),
+        "VpcConfig": PropertyType(False, is_type(dict)),
+        "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
+    }
+
+    def to_cloudformation(self, **kwargs):
+        """Returns the Synthetics Canary to which this SAM Canary corresponds.
+
+        :param dict kwargs: already-converted resources that may need to be modified when converting this \
+        macro to pure CloudFormation
+        :returns: a list of vanilla CloudFormation Resources, to which this Function expands
+        :rtype: list
+        """
+        resources = []
+        syntheticsCanary = self._construct_synthetics_canary()
+        resources.append(syntheticsCanary)
+
+        return resources
+
+    def _construct_synthetics_canary(self):
+        """Constructs a AWS::Synthetics::Canary resource."""
+        canary = SyntheticsCanary(
+            self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()
+        )
+        canary.ArtifactS3Location = self.ArtifactS3Location
+        canary.Code = self._construct_code_dict()
+        canary.ExecutionRoleArn = self.Role
+        canary.FailureRetentionPeriod = self.FailureRetentionPeriod
+        # Make a default for canary name
+        canary.Name = self.FunctionName
+        canary.RuntimeVersion = self.Runtime
+        canary.Schedule = self.Schedule
+        canary.StartCanaryAfterCreation = self.StartCanaryAfterCreation
+        canary.SuccessRetentionPeriod = self.SuccessRetentionPeriod
+        canary.Tags = self._construct_tag_list(self.Tags)
+        canary.VPCConfig = self.VpcConfig
+
+        if self.Tracing or self.Environment or self.MemorySize or self.Timeout:
+            canary.RunConfig = self._construct_run_config()
+        return canary
+
+    def _construct_run_config(self):
+        runconfig = {"ActiveTracing": self.Tracing, "MemoryInMB": self.MemorySize, "TimeoutInSeconds": self.Timeout}
+        if self.Environment:
+            runconfig["EnvironmentVariables"] = self.Environment["Variables"]
+
+        return {k: v for k, v in runconfig.items() if v is not None}
+
+    def _construct_code_dict(self):
+        """Constructs Synthetics Canary Code Dictionary based on the accepted SAM artifact properties such
+        as `InlineCode` and `CodeUri` and also raises errors if more than one of them is
+        defined. `PackageType` determines which artifacts are considered.
+
+        :raises InvalidResourceException when conditions on the SAM artifact properties are not met.
+        """
+        # accepted artifacts
+        artifacts = {"InlineCode": self.InlineCode, "CodeUri": self.CodeUri}
+
+        # Inline function for transformation of inline code.
+        # It accepts arbitrary argumemnts, because the arguments do not matter for the result.
+        def _construct_inline_code(*args, **kwargs):
+            return {"Handler": self.Handler, "Script": self.InlineCode}
+
+        # dispatch mechanism per artifact on how it needs to be transformed.
+        artifact_dispatch = {
+            "InlineCode": _construct_inline_code,
+            "CodeUri": construct_s3_location_object,
+        }
+
+        filtered_artifacts = dict(filter(lambda x: x[1] != None, artifacts.items()))
+
+        # if len(filtered_artifacts) == 0:
+        #     raise InvalidResourceException(self.logical_id, "Only one of 'InlineCode' or 'CodeUri' can be set.")
+
+        filtered_keys = [key for key in filtered_artifacts.keys()]
+
+        if "InlineCode" in filtered_keys:
+            filtered_key = "InlineCode"
+        elif "CodeUri" in filtered_keys:
+            filtered_key = "CodeUri"
+        else:
+            raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
+
+        dispatch_function = artifact_dispatch[filtered_key]
+        code = dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
+        code["Handler"] = self.Handler
+        return code
+
+
 class SamApi(SamResourceMacro):
     """SAM rest API macro."""
 
@@ -1116,8 +1225,8 @@ class SamApplication(SamResourceMacro):
             if self.APPLICATION_ID_KEY in self.Location.keys() and self.Location[self.APPLICATION_ID_KEY] is not None:
                 application_tags[self._SAR_APP_KEY] = self.Location[self.APPLICATION_ID_KEY]
             if (
-                self.SEMANTIC_VERSION_KEY in self.Location.keys()
-                and self.Location[self.SEMANTIC_VERSION_KEY] is not None
+                    self.SEMANTIC_VERSION_KEY in self.Location.keys()
+                    and self.Location[self.SEMANTIC_VERSION_KEY] is not None
             ):
                 application_tags[self._SAR_SEMVER_KEY] = self.Location[self.SEMANTIC_VERSION_KEY]
         return application_tags

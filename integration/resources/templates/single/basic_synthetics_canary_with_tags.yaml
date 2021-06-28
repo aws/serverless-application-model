@@ -1,0 +1,95 @@
+Parameters:
+  CanaryName:
+    Type: String
+    Default: integration-test
+    MaxLength: 21
+Resources:
+  CloudWatchSyntheticsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Sub: CloudWatchSyntheticsRole-${CanaryName}-${AWS::Region}
+      Description: CloudWatch Synthetics lambda execution role for running canaries
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+  RolePermissions:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - Ref: CloudWatchSyntheticsRole
+      PolicyName:
+        Fn::Sub: CloudWatchSyntheticsPolicy-${CanaryName}-${AWS::Region}
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetBucketLocation
+            Resource:
+              - Fn::Sub: arn:aws:s3:::${ResultsBucket}/*
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:CreateLogGroup
+            Resource:
+              - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/cwsyn-test-*
+          - Effect: Allow
+            Action:
+              - s3:ListAllMyBuckets
+              - xray:PutTraceSegments
+            Resource: '*'
+          - Effect: Allow
+            Resource: '*'
+            Action: cloudwatch:PutMetricData
+            Condition:
+              StringEquals:
+                cloudwatch:namespace: CloudWatchSynthetics
+
+  ResultsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub: intg-syn-results-${AWS::AccountId}-${AWS::Region}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+  SyntheticsCanary:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName:
+        Fn::Sub: ${CanaryName}
+      Handler: pageLoadBlueprint.handler
+      InlineCode: |
+        from aws_synthetics.common import synthetics_logger as logger
+
+        def main():
+            logger.info("Canary successfully executed")
+
+        def handler(event, context):
+            logger.info("Selenium Python heartbeat canary")
+            return main()
+      Role:
+        Fn::GetAtt:
+          - CloudWatchSyntheticsRole
+          - Arn
+      Runtime: syn-python-selenium-1.0
+      ArtifactS3Location:
+        Fn::Join:
+          - ''
+          - - s3://
+            - Ref: ResultsBucket
+      StartCanaryAfterCreation: False
+      Schedule:
+        Expression: rate(0 minute)
+      Tags:
+        TagKey1: TagValue1
+        TagKey2: ""

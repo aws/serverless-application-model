@@ -5,6 +5,7 @@ from botocore.config import Config
 class ClientProvider:
     def __init__(self):
         self._cloudformation_client = None
+        self._synthetics_client = None
         self._s3_client = None
         self._api_client = None
         self._lambda_client = None
@@ -21,6 +22,15 @@ class ClientProvider:
             config = Config(retries={"max_attempts": 10, "mode": "standard"})
             self._cloudformation_client = boto3.client("cloudformation", config=config)
         return self._cloudformation_client
+
+    @property
+    def synthetics_client(self):
+        """
+        Synthetics Client
+        """
+        if not self._synthetics_client:
+            self._synthetics_client = boto3.client("synthetics")
+        return self._synthetics_client
 
     @property
     def s3_client(self):
