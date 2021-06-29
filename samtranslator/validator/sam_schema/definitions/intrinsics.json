@@ -3,7 +3,7 @@
   "definitions": {
     "Intrinsic": {
       "if": {
-        "type": "object"
+        "type": "intrinsic"
       },
       "then": {
         "allOf": [
@@ -33,7 +33,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicCidr": {
@@ -52,7 +52,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicFindInMap": {
@@ -71,7 +71,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicGetAtt": {
@@ -90,7 +90,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicGetAZs": {
@@ -109,7 +109,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicImportValue": {
@@ -128,7 +128,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicJoin": {
@@ -147,7 +147,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicRef": {
@@ -167,7 +167,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicSelect": {
@@ -186,7 +186,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicSplit": {
@@ -205,7 +205,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicSub": {
@@ -225,7 +225,7 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
     },
     "IntrinsicTransform": {
@@ -244,18 +244,8 @@
             ]
           }
         },
-        "type": "object"
+        "type": "intrinsic"
       }
-    },
-    "StringOrIntrinsicRef": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "$ref": "#definitions/IntrinsicRef"
-        }
-      ]
     }
   }
 }
