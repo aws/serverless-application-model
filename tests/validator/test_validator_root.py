@@ -24,7 +24,7 @@ class TestValidatorRoot(TestValidatorBase):
             "error_transform_empty",
         ],
     )
-    def test_validator_root_errors(self, template):
+    def test_errors(self, template):
         self._test_validator_error(os.path.join(INPUT_FOLDER, template), os.path.join(OUTPUT_FOLDER, template))
 
     @parameterized.expand(
@@ -32,5 +32,5 @@ class TestValidatorRoot(TestValidatorBase):
             "success_minimal_template",
         ],
     )
-    def test_validator_root_success(self, template):
+    def test_success(self, template):
         self._test_validator_success(os.path.join(INPUT_FOLDER, template))

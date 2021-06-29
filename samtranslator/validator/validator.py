@@ -19,7 +19,7 @@ class SamTemplateValidator(object):
     # Example: "u'integer'" -> "'integer'"
     UNICODE_TYPE_REGEX = re.compile("u('[^']+')")
 
-    def __init__(self, schema_path=None):
+    def __init__(self, schema=None):
         """
         Constructor
 
@@ -28,14 +28,17 @@ class SamTemplateValidator(object):
         schema_path : str, optional
             Path to a schema to use for validation, by default None, the default schema.json will be used
         """
-        if not schema_path:
-            schema_content = self._read_default_schema()
-        else:
-            schema_content = self._read_json(schema_path)
+        # Replaces the static method with the instance method
+        # Otherwise the instance would call the static one
+        # Static one is kept for backward compatibility
+        self.validate = self._validate
+
+        if not schema:
+            schema = self._read_json(sam_schema.SCHEMA_NEW_FILE)
 
         # Helps resolve the $Ref to external files
-        # schema_content must be passed to resolve local (#/def...) references
-        resolver = jsonschema.RefResolver("file://" + sam_schema.SCHEMA_DIR + "/", schema_content)
+        # schema content must be passed to resolve local (#/def...) references
+        resolver = jsonschema.RefResolver("file://" + sam_schema.SCHEMA_DIR + "/", schema)
 
         SAMValidator = jsonschema.validators.extend(
             jsonschema.Draft7Validator,
@@ -43,9 +46,34 @@ class SamTemplateValidator(object):
                 {"object": is_object, "intrinsic": is_intrinsic}
             ),
         )
-        self.validator = SAMValidator(schema_content, resolver=resolver)
+        self.validator = SAMValidator(schema, resolver=resolver)
 
-    def validate(self, template_dict):
+    @staticmethod
+    def validate(template_dict, schema=None):
+        """
+        Validates a SAM Template
+
+        [DEPRECATED]: Instanciate this class and use the instance method instead:
+            validator = SamTemplateValidator()
+            validator.validate(template_dict)
+
+        Parameters
+        ----------
+        template_dict : dict
+            Template
+        schema : dict, optional
+            Schema content, by default None
+
+        Returns
+        -------
+        list[str]
+            List of validation errors
+        """
+        validator = SamTemplateValidator(schema)
+
+        return ", ".join(validator.validate(template_dict))
+
+    def _validate(self, template_dict):
         """
         Validates a SAM Template
 
@@ -81,7 +109,8 @@ class SamTemplateValidator(object):
     def _process_error(self, error, errors_set):
         """
         Processes the validation errors recursively
-        Each error can have a list of child errors in its 'context' attribute (Tree or errors)
+        error is actually a tree of errors
+        Each error can have a list of child errors in its 'context' attribute
 
         Parameters
         ----------
@@ -135,17 +164,6 @@ class SamTemplateValidator(object):
             return re.sub("does not match .+", error.schema.get("patternError"), final_message)
 
         return final_message
-
-    def _read_default_schema(self):
-        """
-        Returns the content of the default schema
-
-        Returns
-        -------
-        dict
-            Content of the default schema
-        """
-        return self._read_json(sam_schema.SCHEMA_FILE)
 
     def _read_json(self, filepath):
         """

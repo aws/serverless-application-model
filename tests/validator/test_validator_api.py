@@ -44,7 +44,7 @@ class TestValidatorApi(TestValidatorBase):
             "error_variables",
         ],
     )
-    def test_validator_api_errors(self, template):
+    def test_errors(self, template):
         self._test_validator_error(os.path.join(INPUT_FOLDER, template), os.path.join(OUTPUT_FOLDER, template))
 
     @parameterized.expand(
@@ -55,5 +55,5 @@ class TestValidatorApi(TestValidatorBase):
             "success_minimal_api",
         ],
     )
-    def test_validator_api_success(self, template):
+    def test_success(self, template):
         self._test_validator_success(os.path.join(INPUT_FOLDER, template))
