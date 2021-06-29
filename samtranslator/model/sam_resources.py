@@ -147,7 +147,7 @@ class SamFunction(SamResourceMacro):
 
         lambda_alias = None
         alias_name = ""
-        if self.AutoPublishAlias:
+        if self.AutoPublishAlias is not None:
             alias_name = self._get_resolved_alias_name("AutoPublishAlias", self.AutoPublishAlias, intrinsics_resolver)
             code_sha256 = None
             if self.AutoPublishCodeSha256:
