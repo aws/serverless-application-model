@@ -35,4 +35,10 @@ Resources:
     Type: 'AWS::Serverless::LayerVersion'
     Condition: TestCondition    
     Properties:
-      ContentUri: s3://sam-demo-bucket/layer.zip  
+      ContentUri: s3://sam-demo-bucket/layer.zip
+
+  LayerWithCaseInsensitiveRetentionPolicy:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      RetentionPolicy: DeleTe
