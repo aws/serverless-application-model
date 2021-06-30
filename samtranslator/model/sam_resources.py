@@ -1230,9 +1230,8 @@ class SamLayerVersion(SamResourceMacro):
             # attribute. And DeletionPolicy attribute does not support intrinsic values.
             raise InvalidResourceException(
                 self.logical_id,
-                "'{}' does not accept intrinsic functions, please use one of the following options: {}".format(
-                    "RetentionPolicy", [self.RETAIN, self.DELETE]
-                ),
+                "'RetentionPolicy' does not accept intrinsic functions, "
+                "please use one of the following options: {}".format([self.RETAIN, self.DELETE]),
             )
 
         if self.RetentionPolicy is None:
@@ -1244,7 +1243,7 @@ class SamLayerVersion(SamResourceMacro):
         elif self.RetentionPolicy.lower() not in self.retention_policy_options:
             raise InvalidResourceException(
                 self.logical_id,
-                "'{}' must be one of the following options: {}.".format("RetentionPolicy", [self.RETAIN, self.DELETE]),
+                "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
             )
 
 
