@@ -5,6 +5,7 @@ class TestBasicCanary(BaseTest):
     """
     Basic AWS::Synthetics::Canary tests
     """
+
     def test_basic_canary(self):
         """
         Creates a basic synthetics canary

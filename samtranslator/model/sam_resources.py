@@ -808,7 +808,7 @@ class SamCanary(SamResourceMacro):
 
     resource_type = "AWS::Serverless::Canary"
     property_types = {
-        "FunctionName": PropertyType(True, is_str()),
+        "FunctionName": PropertyType(False, is_str()),
         "Handler": PropertyType(True, is_str()),
         "Runtime": PropertyType(True, is_str()),
         "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
@@ -817,10 +817,10 @@ class SamCanary(SamResourceMacro):
         "Tags": PropertyType(False, is_type(dict)),
         "Tracing": PropertyType(False, is_type(bool)),
         "Timeout": PropertyType(False, is_type(int)),
-        "Role": PropertyType(True, is_str()),
+        "Role": PropertyType(False, is_str()),
         "Schedule": PropertyType(True, one_of(is_type(dict), is_str())),
         "StartCanaryAfterCreation": PropertyType(True, is_type(bool)),
-        "ArtifactS3Location": PropertyType(True, one_of(is_type(dict), is_str())),
+        "ArtifactS3Location": PropertyType(False, one_of(is_type(dict), is_str())),
         "FailureRetentionPeriod": PropertyType(False, one_of(is_type(dict), is_str())),
         "SuccessRetentionPeriod": PropertyType(False, one_of(is_type(dict), is_str())),
         "VpcConfig": PropertyType(False, is_type(dict)),
@@ -836,8 +836,8 @@ class SamCanary(SamResourceMacro):
         :rtype: list
         """
         resources = []
-        syntheticsCanary = self._construct_synthetics_canary()
-        resources.append(syntheticsCanary)
+        synthetics_canary = self._construct_synthetics_canary()
+        resources.append(synthetics_canary)
 
         return resources
 
@@ -847,11 +847,10 @@ class SamCanary(SamResourceMacro):
             self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()
         )
         canary.ArtifactS3Location = self.ArtifactS3Location
-        canary.Code = self._construct_code_dict()
+        canary.Code = self._construct_code_dict
         canary.ExecutionRoleArn = self.Role
         canary.FailureRetentionPeriod = self.FailureRetentionPeriod
-        # Make a default for canary name
-        canary.Name = self.FunctionName
+        canary.Name = self.FunctionName if self.FunctionName else self.logical_id
         canary.RuntimeVersion = self.Runtime
         canary.Schedule = self.Schedule
         canary.StartCanaryAfterCreation = self.StartCanaryAfterCreation
@@ -863,17 +862,34 @@ class SamCanary(SamResourceMacro):
             canary.RunConfig = self._construct_run_config()
         return canary
 
+    def _extract_not_none_properties(self, dict):
+        """
+        Filters out not None properties
+        """
+        return {k: v for k, v in dict if v is not None}
+
     def _construct_run_config(self):
+        """
+        If the user specifies any of Tracing, MemorySize, TImeout or Environement then the RunConfig resource in the
+        transformed AWS::Synthetics::Canary needs to be added. Note, for Environment property the syntaxt in AWS::Serverless::Canary is
+        Environment:
+            Variables:
+                Var1: Var2
+        while in AWS::Synthetics::Canary its
+        EnvironmentVariables:
+            Var1: Var2
+        so it needs to be transformed accordingly
+        """
         runconfig = {"ActiveTracing": self.Tracing, "MemoryInMB": self.MemorySize, "TimeoutInSeconds": self.Timeout}
         if self.Environment:
             runconfig["EnvironmentVariables"] = self.Environment["Variables"]
 
-        return {k: v for k, v in runconfig.items() if v is not None}
+        return self._extract_not_none_properties(runconfig.items())
 
+    @property
     def _construct_code_dict(self):
         """Constructs Synthetics Canary Code Dictionary based on the accepted SAM artifact properties such
-        as `InlineCode` and `CodeUri` and also raises errors if more than one of them is
-        defined. `PackageType` determines which artifacts are considered.
+        as `InlineCode` and `CodeUri`
 
         :raises InvalidResourceException when conditions on the SAM artifact properties are not met.
         """
@@ -891,22 +907,18 @@ class SamCanary(SamResourceMacro):
             "CodeUri": construct_s3_location_object,
         }
 
-        filtered_artifacts = dict(filter(lambda x: x[1] != None, artifacts.items()))
+        filtered_artifacts = self._extract_not_none_properties(artifacts.items())
+        filtered_artifact_keys = list(filtered_artifacts.keys())
 
-        # if len(filtered_artifacts) == 0:
-        #     raise InvalidResourceException(self.logical_id, "Only one of 'InlineCode' or 'CodeUri' can be set.")
-
-        filtered_keys = [key for key in filtered_artifacts.keys()]
-
-        if "InlineCode" in filtered_keys:
-            filtered_key = "InlineCode"
-        elif "CodeUri" in filtered_keys:
-            filtered_key = "CodeUri"
+        if "InlineCode" in filtered_artifact_keys:
+            set_artifact = "InlineCode"
+        elif "CodeUri" in filtered_artifact_keys:
+            set_artifact = "CodeUri"
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
 
-        dispatch_function = artifact_dispatch[filtered_key]
-        code = dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
+        dispatch_function = artifact_dispatch[set_artifact]
+        code = dispatch_function(artifacts[set_artifact], self.logical_id, set_artifact)
         code["Handler"] = self.Handler
         return code
 
@@ -1225,8 +1237,8 @@ class SamApplication(SamResourceMacro):
             if self.APPLICATION_ID_KEY in self.Location.keys() and self.Location[self.APPLICATION_ID_KEY] is not None:
                 application_tags[self._SAR_APP_KEY] = self.Location[self.APPLICATION_ID_KEY]
             if (
-                    self.SEMANTIC_VERSION_KEY in self.Location.keys()
-                    and self.Location[self.SEMANTIC_VERSION_KEY] is not None
+                self.SEMANTIC_VERSION_KEY in self.Location.keys()
+                and self.Location[self.SEMANTIC_VERSION_KEY] is not None
             ):
                 application_tags[self._SAR_SEMVER_KEY] = self.Location[self.SEMANTIC_VERSION_KEY]
         return application_tags

@@ -353,7 +353,7 @@ class BaseTest(TestCase):
                 stack_name=self.stack_name,
                 cfn_template=cfn_file.read(),
                 parameter_values=[] if parameters is None else parameters,
-                capabilities=["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND", 'CAPABILITY_NAMED_IAM'],
+                capabilities=["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND", "CAPABILITY_NAMED_IAM"],
                 role_arn=None,
                 notification_arns=[],
                 s3_uploader=None,
