@@ -4,6 +4,11 @@ Conditions:
       - beta
       - beta
 
+Parameters:
+  DeletePolicy:
+    Default: Retain
+    Type: String
+
 Resources:
   MinimalLayer:
     Type: 'AWS::Serverless::LayerVersion'
@@ -42,3 +47,9 @@ Resources:
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       RetentionPolicy: DeleTe
+
+  LayerWithRetentionPolicyParam:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      RetentionPolicy: !Ref DeletePolicy

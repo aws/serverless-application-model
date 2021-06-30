@@ -6,7 +6,13 @@
         "beta"
       ]
     }
-  }, 
+  },
+  "Parameters": {
+    "DeletePolicy": {
+      "Default": "Retain",
+      "Type": "String"
+    }
+  },
   "Resources": {
     "LayerWithCondition7c655e10ea": {
       "DeletionPolicy": "Retain", 
@@ -69,6 +75,17 @@
           "S3Key": "layer.zip"
         },
         "LayerName": "LayerWithCaseInsensitiveRetentionPolicy"
+      }
+    },
+    "LayerWithRetentionPolicyParamcc64815342": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithRetentionPolicyParam"
       }
     }
   }
