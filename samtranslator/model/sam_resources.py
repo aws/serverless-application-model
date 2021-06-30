@@ -37,6 +37,7 @@ from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of,
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.intrinsics import (
+    is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
     ref,
@@ -1224,6 +1225,15 @@ class SamLayerVersion(SamResourceMacro):
         :return: value for the DeletionPolicy attribute.
         """
 
+        if is_intrinsic(self.RetentionPolicy):
+            # RetentionPolicy attribute of AWS::Serverless::LayerVersion does set the DeletionPolicy
+            # attribute. And DeletionPolicy attribute does not support intrinsic values.
+            raise InvalidResourceException(
+                self.logical_id,
+                "'RetentionPolicy' does not accept intrinsic functions, "
+                "please use one of the following options: {}".format([self.RETAIN, self.DELETE]),
+            )
+
         if self.RetentionPolicy is None:
             return None
         elif self.RetentionPolicy.lower() == self.RETAIN.lower():
@@ -1233,7 +1243,7 @@ class SamLayerVersion(SamResourceMacro):
         elif self.RetentionPolicy.lower() not in self.retention_policy_options:
             raise InvalidResourceException(
                 self.logical_id,
-                "'{}' must be one of the following options: {}.".format("RetentionPolicy", [self.RETAIN, self.DELETE]),
+                "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
             )
 
 
