@@ -788,6 +788,35 @@ class Api(PushEventSource):
                     path=self.Path, method_name=self.Method, request_model=self.RequestModel
                 )
 
+                validate_body = self.RequestModel.get("ValidateBody")
+                validate_parameters = self.RequestModel.get("ValidateParameters")
+
+                # Checking if any of the fields are defined as it can be false we are checking if the field are not None
+                if validate_body is not None or validate_parameters is not None:
+
+                    # as we are setting two different fields we are here setting as default False
+                    # In case one of them are not defined
+                    validate_body = False if validate_body is None else validate_body
+                    validate_parameters = False if validate_parameters is None else validate_parameters
+
+                    # If not type None but any other type it should explicitly invalidate the Spec
+                    # Those fields should be only a boolean
+                    if not isinstance(validate_body, bool) or not isinstance(validate_parameters, bool):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Unable to set Validator to RequestModel [{model}] on API method [{method}] for path [{path}] "
+                            "ValidateBody and ValidateParameters must be a boolean type, strings or intrinsics are not supported.".format(
+                                model=method_model, method=self.Method, path=self.Path
+                            ),
+                        )
+
+                    editor.add_request_validator_to_method(
+                        path=self.Path,
+                        method_name=self.Method,
+                        validate_body=validate_body,
+                        validate_parameters=validate_parameters,
+                    )
+
         if self.RequestParameters:
 
             default_value = {"Required": False, "Caching": False}
