@@ -22,6 +22,9 @@
       "maxLength": 1024,
       "type": "string"
     },
+    "Globals": {
+      "type": "object"
+    },
     "Mappings": {
       "additionalProperties": false,
       "patternProperties": {
@@ -77,12 +80,6 @@
       "items": {
         "type": "string"
       }
-    },
-    "Globals": {
-      "type": "object"
-    },
-    "Properties": {
-      "type": "object"
     }
   },
   "required": [
