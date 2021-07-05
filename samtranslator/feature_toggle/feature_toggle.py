@@ -12,9 +12,6 @@ from samtranslator.feature_toggle.dialup import (
     SimpleAccountPercentileDialup,
 )
 
-my_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, my_path + "/..")
-
 LOG = logging.getLogger(__name__)
 
 
