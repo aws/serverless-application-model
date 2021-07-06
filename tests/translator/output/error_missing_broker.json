@@ -1,6 +1,6 @@
 {
   "errors": [{
-    "errorMessage": "Resource with id [MQFunction] is invalid. Event with id [MyMQQueue] is invalid. No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for ActiveMQ) provided."
+    "errorMessage": "Resource with id [MQFunction] is invalid. Event with id [MyMQQueue] is invalid. No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided."
   }],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MQFunction] is invalid. Event with id [MyMQQueue] is invalid. No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for ActiveMQ) provided."
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MQFunction] is invalid. Event with id [MyMQQueue] is invalid. No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided."
 }
