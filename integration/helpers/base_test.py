@@ -127,19 +127,19 @@ class BaseTest(TestCase):
         if os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-    def create_and_verify_stack(self, file_name, parameters=None):
+    def create_and_verify_stack(self, file_path, parameters=None):
         """
         Creates the Cloud Formation stack and verifies it against the expected
         result
 
         Parameters
         ----------
-        file_name : string
-            Template file name
+        file_path : string
+            Template file name, format "folder_name/file_name"
         parameters : list
             List of parameters
         """
-        folder, file_name = file_name.split("/")
+        folder, file_name = file_path.split("/")
         # add a folder name before file name to avoid possible collisions between
         # files in the single and combination folder
         self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
@@ -151,14 +151,26 @@ class BaseTest(TestCase):
         self.deploy_stack(parameters)
         self.verify_stack()
 
-    def update_stack(self, file_name, parameters=None):
+    def update_stack(self, file_path, parameters=None):
+        """
+        Updates the Cloud Formation stack
+
+        Parameters
+        ----------
+        file_path : string
+            Template file name, format "folder_name/file_name"
+        parameters : list
+            List of parameters
+        """
         if os.path.exists(self.output_file_path):
             os.remove(self.output_file_path)
         if os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-        folder, file_name = file_name.split("/")
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
+        folder, file_name = file_path.split("/")
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
 
         self._fill_template(folder, file_name)
         self.transform_template()
