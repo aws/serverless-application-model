@@ -835,6 +835,7 @@ class SamApi(SamResourceMacro):
         "Models": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
+        "Mode": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -893,6 +894,7 @@ class SamApi(SamResourceMacro):
             models=self.Models,
             domain=self.Domain,
             description=self.Description,
+            mode=self.Mode,
         )
 
         (

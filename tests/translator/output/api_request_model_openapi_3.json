@@ -34,7 +34,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment59eeb787ee"
+          "Ref": "HtmlApiDeployment8abd7f79f8"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -62,7 +62,28 @@
           ]
         }
       }
-    }, 
+    },
+    "HtmlFunctionAnyIamPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "HtmlFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/any/iam",
+            {
+              "__ApiId__": {
+                "Ref": "HtmlApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
     "HtmlApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -123,6 +144,34 @@
                 }, 
                 "responses": {}
               }
+            },
+            "/any/iam": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
+                  },
+                  "credentials": "arn:aws:iam::*:user/*"
+                },
+                "responses": {},
+                "security": [
+                  {
+                    "AWS_IAM": []
+                  }
+                ],
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/user"
+                      }
+                    }
+                  },
+                  "required": true
+                }
+              }
             }
           }, 
           "openapi": "3.0",
@@ -149,13 +198,13 @@
         }
       }
     }, 
-    "HtmlApiDeployment59eeb787ee": {
+    "HtmlApiDeployment8abd7f79f8": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
         },
-        "Description": "RestApi deployment id: 59eeb787ee1561329a07e10162ac3718998e9f91"
+        "Description": "RestApi deployment id: 8abd7f79f8fd0aafe51e2201d63602c78a3e0e2a"
       }
     },
     "HtmlFunctionGetHtmlPermissionProd": {
