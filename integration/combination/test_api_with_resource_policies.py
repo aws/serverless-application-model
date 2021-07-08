@@ -136,7 +136,7 @@ class TestApiWithResourcePolicies(BaseTest):
         expected_policy = json.loads(expected_policy_str)
         policy = json.loads(policy_str.encode().decode("unicode_escape"))
 
-        self.assertTrue(_compare_two_policies_object(policy, expected_policy))
+        self.assertTrue(self.compare_two_policies_object(policy, expected_policy))
 
     def test_api_resource_policies_aws_account(self):
         self.create_and_verify_stack("combination/api_with_resource_policies_aws_account")
@@ -174,23 +174,23 @@ class TestApiWithResourcePolicies(BaseTest):
 
         self.assertEqual(policy_str, expected_policy_str)
 
+    @staticmethod
+    def compare_two_policies_object(policy_a, policy_b):
+        if len(policy_a) != len(policy_b):
+            return False
 
-def _compare_two_policies_object(policy_a, policy_b):
-    if len(policy_a) != len(policy_b):
-        return False
+        if policy_a["Version"] != policy_b["Version"]:
+            return False
 
-    if policy_a["Version"] != policy_b["Version"]:
-        return False
+        statement_a = policy_a["Statement"]
+        statement_b = policy_b["Statement"]
 
-    statement_a = policy_a["Statement"]
-    statement_b = policy_b["Statement"]
+        if len(statement_a) != len(statement_b):
+            return False
 
-    if len(statement_a) != len(statement_b):
-        return False
-
-    try:
-        for item in statement_a:
-            statement_b.remove(item)
-    except ValueError:
-        return False
-    return not statement_b
+        try:
+            for item in statement_a:
+                statement_b.remove(item)
+        except ValueError:
+            return False
+        return not statement_b
