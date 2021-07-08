@@ -23,4 +23,9 @@ Resources:
           Properties:
             Method: Put
             Path: /get
+        ApiAnyMethod:
+          Type: Api
+          Properties:
+            Method: any
+            Path: /any/get
         

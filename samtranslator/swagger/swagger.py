@@ -23,6 +23,8 @@ class SwaggerEditor(object):
     _X_APIGW_GATEWAY_RESPONSES = "x-amazon-apigateway-gateway-responses"
     _X_APIGW_POLICY = "x-amazon-apigateway-policy"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
+    _X_APIGW_REQUEST_VALIDATORS = "x-amazon-apigateway-request-validators"
+    _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validator"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -698,7 +700,7 @@ class SwaggerEditor(object):
         if method_apikey_required is not None:
             self._set_method_apikey_handling(path, method_name, method_apikey_required)
 
-    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers={}, method_scopes=None):
+    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers=None, method_scopes=None):
         """
         Adds the authorizer_name to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -708,6 +710,8 @@ class SwaggerEditor(object):
         :param string authorizer_name: Name of the authorizer to use. Must be a key in the
             authorizers param.
         """
+        if authorizers is None:
+            authorizers = {}
         normalized_method_name = self._normalize_method_name(method_name)
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
@@ -778,6 +782,46 @@ class SwaggerEditor(object):
 
             if security != existing_security:
                 method_definition["security"] = security
+
+    def add_request_validator_to_method(self, path, method_name, validate_body=False, validate_parameters=False):
+        """
+        Adds request model body parameter for this path/method.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param bool validate_body: Add validator parameter on the body
+        :param bool validate_parameters: Validate request
+        """
+
+        normalized_method_name = self._normalize_method_name(method_name)
+        validator_name = SwaggerEditor.get_validator_name(validate_body, validate_parameters)
+
+        # Creating validator
+        request_validator_definition = {
+            validator_name: {"validateRequestBody": validate_body, "validateRequestParameters": validate_parameters}
+        }
+        if not self._doc.get(self._X_APIGW_REQUEST_VALIDATORS):
+            self._doc[self._X_APIGW_REQUEST_VALIDATORS] = {}
+
+        if not self._doc[self._X_APIGW_REQUEST_VALIDATORS].get(validator_name):
+            # Adding only if the validator hasn't been defined already
+            self._doc[self._X_APIGW_REQUEST_VALIDATORS].update(request_validator_definition)
+
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for path_method_name, method in self.get_path(path).items():
+            normalized_path_method_name = self._normalize_method_name(path_method_name)
+
+            # Adding it to only given method to the path
+            if normalized_path_method_name == normalized_method_name:
+                for method_definition in self.get_method_contents(method):
+
+                    # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                    if not self.method_definition_has_integration(method_definition):
+                        continue
+
+                    set_validator_to_method = {self._X_APIGW_REQUEST_VALIDATOR: validator_name}
+                    # Setting validator to the given method
+                    method_definition.update(set_validator_to_method)
 
     def add_request_model_to_method(self, path, method_name, request_model):
         """
@@ -877,6 +921,8 @@ class SwaggerEditor(object):
         ip_range_blacklist = resource_policy.get("IpRangeBlacklist")
         source_vpc_whitelist = resource_policy.get("SourceVpcWhitelist")
         source_vpc_blacklist = resource_policy.get("SourceVpcBlacklist")
+
+        # Intrinsic's supported in these properties
         source_vpc_intrinsic_whitelist = resource_policy.get("IntrinsicVpcWhitelist")
         source_vpce_intrinsic_whitelist = resource_policy.get("IntrinsicVpceWhitelist")
         source_vpc_intrinsic_blacklist = resource_policy.get("IntrinsicVpcBlacklist")
@@ -898,31 +944,38 @@ class SwaggerEditor(object):
             resource_list = self._get_method_path_uri_list(path, api_id, stage)
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
-        if (
-            (source_vpc_blacklist is not None)
-            or (source_vpc_intrinsic_blacklist is not None)
-            or (source_vpce_intrinsic_blacklist is not None)
-        ):
-            blacklist_dict = {
-                "StringEndpointList": source_vpc_blacklist,
-                "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
-                "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
-            }
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_blacklist):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "SourceVpcBlacklist must be a list of strings. Use IntrinsicVpcBlacklist instead for values that use Intrinsic Functions"
+                    )
+                ]
+            )
 
-        if (
-            (source_vpc_whitelist is not None)
-            or (source_vpc_intrinsic_whitelist is not None)
-            or (source_vpce_intrinsic_whitelist is not None)
-        ):
-            whitelist_dict = {
-                "StringEndpointList": source_vpc_whitelist,
-                "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
-                "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
-            }
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
+        blacklist_dict = {
+            "StringEndpointList": source_vpc_blacklist,
+            "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
+            "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
+        }
+        resource_list = self._get_method_path_uri_list(path, api_id, stage)
+        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
+
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "SourceVpcWhitelist must be a list of strings. Use IntrinsicVpcWhitelist instead for values that use Intrinsic Functions"
+                    )
+                ]
+            )
+
+        whitelist_dict = {
+            "StringEndpointList": source_vpc_whitelist,
+            "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
+            "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
+        }
+        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -1134,7 +1187,8 @@ class SwaggerEditor(object):
 
                 parameter_name = request_parameter["Name"]
                 location_name = parameter_name.replace("method.request.", "")
-                location, name = location_name.split(".")
+
+                location, name = location_name.split(".", 1)
 
                 if location == "querystring":
                     location = "query"
@@ -1252,3 +1306,37 @@ class SwaggerEditor(object):
     def get_path_without_trailing_slash(path):
         # convert greedy paths to such as {greedy+}, {proxy+} to "*"
         return re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
+
+    @staticmethod
+    def get_validator_name(validate_body, validate_parameters):
+        """
+        Get a readable path name to use as validator name
+
+        :param boolean validate_body: Boolean if validate body
+        :param boolean validate_request: Boolean if validate request
+        :return string: Normalized validator name
+        """
+        if validate_body and validate_parameters:
+            return "body-and-params"
+
+        if validate_body and not validate_parameters:
+            return "body-only"
+
+        if not validate_body and validate_parameters:
+            return "params-only"
+
+        return "no-validation"
+
+    @staticmethod
+    def _validate_list_property_is_resolved(property_list):
+        """
+        Validate if the values of a Property List are all of type string
+
+        :param property_list: Value of a Property List
+        :return bool: True if the property_list is all of type string otherwise False
+        """
+
+        if property_list is not None and not all(isinstance(x, string_types) for x in property_list):
+            return False
+
+        return True

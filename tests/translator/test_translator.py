@@ -138,207 +138,18 @@ def mock_sar_service_call(self, service_call_function, logical_id, *args):
 # api and s3 location for explicit api.
 
 
-class TestTranslatorEndToEnd(TestCase):
-    @parameterized.expand(
-        itertools.product(
-            [
-                "cognito_userpool_with_event",
-                "s3_with_condition",
-                "function_with_condition",
-                "basic_function",
-                "basic_function_withimageuri",
-                "basic_application",
-                "application_preparing_state",
-                "application_with_intrinsics",
-                "basic_layer",
-                "cloudwatchevent",
-                "eventbridgerule",
-                "eventbridgerule_with_dlq",
-                "eventbridgerule_with_retry_policy",
-                "eventbridgerule_schedule_properties",
-                "cloudwatch_logs_with_ref",
-                "cloudwatchlog",
-                "streams",
-                "sqs",
-                "function_with_amq",
-                "function_with_amq_kms",
-                "simpletable",
-                "simpletable_with_sse",
-                "implicit_api",
-                "explicit_api",
-                "api_description",
-                "api_endpoint_configuration",
-                "api_endpoint_configuration_with_vpcendpoint",
-                "api_with_auth_all_maximum",
-                "api_with_auth_all_minimum",
-                "api_with_auth_no_default",
-                "api_with_auth_with_default_scopes",
-                "api_with_auth_with_default_scopes_openapi",
-                "api_with_default_aws_iam_auth",
-                "api_with_default_aws_iam_auth_and_no_auth_route",
-                "api_with_method_aws_iam_auth",
-                "api_with_aws_iam_auth_overrides",
-                "api_with_method_settings",
-                "api_with_binary_media_types",
-                "api_with_binary_media_types_definition_body",
-                "api_with_minimum_compression_size",
-                "api_with_resource_refs",
-                "api_with_cors",
-                "api_with_cors_and_auth_no_preflight_auth",
-                "api_with_cors_and_auth_preflight_auth",
-                "api_with_cors_and_only_methods",
-                "api_with_cors_and_only_headers",
-                "api_with_cors_and_only_origins",
-                "api_with_cors_and_only_maxage",
-                "api_with_cors_and_only_credentials_false",
-                "api_with_cors_no_definitionbody",
-                "api_with_incompatible_stage_name",
-                "api_with_gateway_responses",
-                "api_with_gateway_responses_all",
-                "api_with_gateway_responses_minimal",
-                "api_with_gateway_responses_implicit",
-                "api_with_gateway_responses_string_status_code",
-                "api_cache",
-                "api_with_access_log_setting",
-                "api_with_canary_setting",
-                "api_with_xray_tracing",
-                "api_request_model",
-                "api_with_stage_tags",
-                "s3",
-                "s3_create_remove",
-                "s3_existing_lambda_notification_configuration",
-                "s3_existing_other_notification_configuration",
-                "s3_filter",
-                "s3_multiple_events_same_bucket",
-                "s3_multiple_functions",
-                "s3_with_dependsOn",
-                "sns",
-                "sns_sqs",
-                "sns_existing_sqs",
-                "sns_outside_sqs",
-                "sns_existing_other_subscription",
-                "sns_topic_outside_template",
-                "alexa_skill",
-                "alexa_skill_with_skill_id",
-                "iot_rule",
-                "layers_with_intrinsics",
-                "layers_all_properties",
-                "function_managed_inline_policy",
-                "unsupported_resources",
-                "intrinsic_functions",
-                "basic_function_with_tags",
-                "depends_on",
-                "function_event_conditions",
-                "function_with_dlq",
-                "function_with_kmskeyarn",
-                "function_with_alias",
-                "function_with_alias_intrinsics",
-                "function_with_custom_codedeploy_deployment_preference",
-                "function_with_custom_conditional_codedeploy_deployment_preference",
-                "function_with_disabled_deployment_preference",
-                "function_with_deployment_preference",
-                "function_with_deployment_preference_all_parameters",
-                "function_with_deployment_preference_from_parameters",
-                "function_with_deployment_preference_multiple_combinations",
-                "function_with_deployment_preference_alarms_intrinsic_if",
-                "function_with_alias_and_event_sources",
-                "function_with_resource_refs",
-                "function_with_deployment_and_custom_role",
-                "function_with_deployment_no_service_role",
-                "function_with_global_layers",
-                "function_with_layers",
-                "function_with_many_layers",
-                "function_with_permissions_boundary",
-                "function_with_policy_templates",
-                "function_with_sns_event_source_all_parameters",
-                "function_with_conditional_managed_policy",
-                "function_with_conditional_managed_policy_and_ref_no_value",
-                "function_with_conditional_policy_template",
-                "function_with_conditional_policy_template_and_ref_no_value",
-                "function_with_request_parameters",
-                "function_with_signing_profile",
-                "global_handle_path_level_parameter",
-                "globals_for_function",
-                "globals_for_api",
-                "globals_for_simpletable",
-                "all_policy_templates",
-                "simple_table_ref_parameter_intrinsic",
-                "simple_table_with_table_name",
-                "function_concurrency",
-                "simple_table_with_extra_tags",
-                "explicit_api_with_invalid_events_config",
-                "no_implicit_api_with_serverless_rest_api_resource",
-                "implicit_api_with_serverless_rest_api_resource",
-                "implicit_api_with_auth_and_conditions_max",
-                "implicit_api_with_many_conditions",
-                "implicit_and_explicit_api_with_conditions",
-                "inline_precedence",
-                "api_with_cors_and_conditions_no_definitionbody",
-                "api_with_auth_and_conditions_all_max",
-                "api_with_apikey_default_override",
-                "api_with_apikey_required",
-                "api_with_path_parameters",
-                "function_with_event_source_mapping",
-                "function_with_event_dest",
-                "function_with_event_dest_basic",
-                "function_with_event_dest_conditional",
-                "api_with_usageplans",
-                "api_with_usageplans_intrinsics",
-                "state_machine_with_inline_definition",
-                "state_machine_with_tags",
-                "state_machine_with_inline_definition_intrinsics",
-                "state_machine_with_role",
-                "state_machine_with_inline_policies",
-                "state_machine_with_sam_policy_templates",
-                "state_machine_with_definition_S3_string",
-                "state_machine_with_definition_S3_object",
-                "state_machine_with_definition_substitutions",
-                "state_machine_with_standard_logging",
-                "state_machine_with_express_logging",
-                "state_machine_with_managed_policy",
-                "state_machine_with_condition",
-                "state_machine_with_schedule",
-                "state_machine_with_schedule_dlq_retry_policy",
-                "state_machine_with_cwe",
-                "state_machine_with_eb_retry_policy",
-                "state_machine_with_eb_dlq",
-                "state_machine_with_eb_dlq_generated",
-                "state_machine_with_explicit_api",
-                "state_machine_with_implicit_api",
-                "state_machine_with_implicit_api_globals",
-                "state_machine_with_api_authorizer",
-                "state_machine_with_api_authorizer_maximum",
-                "state_machine_with_api_resource_policy",
-                "state_machine_with_api_auth_default_scopes",
-                "state_machine_with_condition_and_events",
-                "state_machine_with_xray_policies",
-                "state_machine_with_xray_role",
-                "function_with_file_system_config",
-                "state_machine_with_permissions_boundary",
-            ],
-            [
-                ("aws", "ap-southeast-1"),
-                ("aws-cn", "cn-north-1"),
-                ("aws-us-gov", "us-gov-west-1"),
-            ],  # Run all the above tests against each of the list of partitions to test against
-        )
-    )
-    @patch(
-        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
-        mock_sar_service_call,
-    )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success(self, testcase, partition_with_region):
-        partition = partition_with_region[0]
-        region = partition_with_region[1]
-
+class AbstractTestTranslator(TestCase):
+    def _read_input(self, testcase):
         manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
         # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
-        manifest = json.loads(json.dumps(manifest))
+        return json.loads(json.dumps(manifest))
+
+    def _read_expected_output(self, testcase, partition):
         partition_folder = partition if partition != "aws" else ""
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
-        expected = json.load(open(expected_filepath, "r"))
+        return json.load(open(expected_filepath, "r"))
 
+    def _compare_transform(self, manifest, expected, partition, region):
         with patch("boto3.session.Session.region_name", region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
@@ -368,148 +179,7 @@ class TestTranslatorEndToEnd(TestCase):
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
 
-        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
-
-    @parameterized.expand(
-        itertools.product(
-            [
-                "explicit_api_openapi_3",
-                "api_with_auth_all_maximum_openapi_3",
-                "api_with_cors_openapi_3",
-                "api_with_gateway_responses_all_openapi_3",
-                "api_with_open_api_version",
-                "api_with_open_api_version_2",
-                "api_with_auth_all_minimum_openapi",
-                "api_with_swagger_and_openapi_with_auth",
-                "api_with_openapi_definition_body_no_flag",
-                "api_request_model_openapi_3",
-                "api_with_apikey_required_openapi_3",
-                "api_with_basic_custom_domain",
-                "api_with_basic_custom_domain_intrinsics",
-                "api_with_custom_domain_route53",
-                "api_with_custom_domain_route53_hosted_zone_name",
-                "api_with_basic_custom_domain_http",
-                "api_with_basic_custom_domain_intrinsics_http",
-                "api_with_custom_domain_route53_http",
-                "api_with_custom_domain_route53_hosted_zone_name_http",
-                "implicit_http_api",
-                "explicit_http_api_minimum",
-                "implicit_http_api_auth_and_simple_case",
-                "http_api_existing_openapi",
-                "http_api_existing_openapi_conditions",
-                "implicit_http_api_with_many_conditions",
-                "http_api_explicit_stage",
-                "http_api_def_uri",
-                "explicit_http_api",
-                "http_api_with_cors",
-                "http_api_description",
-                "http_api_lambda_auth",
-                "http_api_lambda_auth_full",
-            ],
-            [
-                ("aws", "ap-southeast-1"),
-                ("aws-cn", "cn-north-1"),
-                ("aws-us-gov", "us-gov-west-1"),
-            ],  # Run all the above tests against each of the list of partitions to test against
-        )
-    )
-    @pytest.mark.slow
-    @patch(
-        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
-        mock_sar_service_call,
-    )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success_openapi3(self, testcase, partition_with_region):
-        partition = partition_with_region[0]
-        region = partition_with_region[1]
-
-        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
-        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
-        manifest = json.loads(json.dumps(manifest))
-        partition_folder = partition if partition != "aws" else ""
-        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
-        expected = json.load(open(expected_filepath, "r"))
-
-        with patch("boto3.session.Session.region_name", region):
-            parameter_values = get_template_parameter_values()
-            mock_policy_loader = MagicMock()
-            mock_policy_loader.load.return_value = {
-                "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
-                    partition
-                ),
-                "AmazonDynamoDBFullAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess".format(partition),
-                "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
-                "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
-            }
-
-            output_fragment = transform(manifest, parameter_values, mock_policy_loader)
-
-        print(json.dumps(output_fragment, indent=2))
-
-        # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
-
-        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
-
-    @parameterized.expand(
-        itertools.product(
-            [
-                "api_with_aws_account_whitelist",
-                "api_with_aws_account_blacklist",
-                "api_with_ip_range_whitelist",
-                "api_with_ip_range_blacklist",
-                "api_with_source_vpc_whitelist",
-                "api_with_source_vpc_blacklist",
-                "api_with_resource_policy",
-                "api_with_resource_policy_global",
-                "api_with_resource_policy_global_implicit",
-                "api_with_if_conditional_with_resource_policy",
-            ],
-            [
-                ("aws", "ap-southeast-1"),
-                ("aws-cn", "cn-north-1"),
-                ("aws-us-gov", "us-gov-west-1"),
-            ],  # Run all the above tests against each of the list of partitions to test against
-        )
-    )
-    @patch(
-        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
-        mock_sar_service_call,
-    )
-    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
-    def test_transform_success_resource_policy(self, testcase, partition_with_region):
-        partition = partition_with_region[0]
-        region = partition_with_region[1]
-
-        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
-        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
-        manifest = json.loads(json.dumps(manifest))
-        partition_folder = partition if partition != "aws" else ""
-        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
-        expected = json.load(open(expected_filepath, "r"))
-
-        with patch("boto3.session.Session.region_name", region):
-            parameter_values = get_template_parameter_values()
-            mock_policy_loader = MagicMock()
-            mock_policy_loader.load.return_value = {
-                "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
-                    partition
-                ),
-                "AmazonDynamoDBFullAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess".format(partition),
-                "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
-                "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
-            }
-
-            output_fragment = transform(manifest, parameter_values, mock_policy_loader)
-        print(json.dumps(output_fragment, indent=2))
-
-        # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
-        assert deep_sort_lists(output_fragment) == deep_sort_lists(expected)
+        self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
     def _update_logical_id_hash(self, resources):
         """
@@ -583,6 +253,401 @@ class TestTranslatorEndToEnd(TestCase):
         rest_api_to_swagger_hash[logical_id] = data_hash
 
 
+class TestTranslatorEndToEnd(AbstractTestTranslator):
+    @parameterized.expand(
+        itertools.product(
+            [
+                "cognito_userpool_with_event",
+                "s3_with_condition",
+                "function_with_condition",
+                "basic_function",
+                "basic_function_withimageuri",
+                "basic_application",
+                "application_preparing_state",
+                "application_with_intrinsics",
+                "basic_layer",
+                "cloudwatchevent",
+                "eventbridgerule",
+                "eventbridgerule_with_dlq",
+                "eventbridgerule_with_retry_policy",
+                "eventbridgerule_schedule_properties",
+                "cloudwatch_logs_with_ref",
+                "cloudwatchlog",
+                "streams",
+                "sqs",
+                "function_with_amq",
+                "function_with_amq_kms",
+                "function_with_mq_virtual_host",
+                "simpletable",
+                "simpletable_with_sse",
+                "implicit_api",
+                "explicit_api",
+                "api_description",
+                "api_endpoint_configuration",
+                "api_endpoint_configuration_with_vpcendpoint",
+                "api_with_auth_all_maximum",
+                "api_with_auth_all_minimum",
+                "api_with_auth_no_default",
+                "api_with_auth_with_default_scopes",
+                "api_with_auth_with_default_scopes_openapi",
+                "api_with_default_aws_iam_auth",
+                "api_with_default_aws_iam_auth_and_no_auth_route",
+                "api_with_method_aws_iam_auth",
+                "api_with_aws_iam_auth_overrides",
+                "api_with_swagger_authorizer_none",
+                "api_with_method_settings",
+                "api_with_binary_media_types",
+                "api_with_binary_media_types_definition_body",
+                "api_with_minimum_compression_size",
+                "api_with_resource_refs",
+                "api_with_cors",
+                "api_with_cors_and_auth_no_preflight_auth",
+                "api_with_cors_and_auth_preflight_auth",
+                "api_with_cors_and_only_methods",
+                "api_with_cors_and_only_headers",
+                "api_with_cors_and_only_origins",
+                "api_with_cors_and_only_maxage",
+                "api_with_cors_and_only_credentials_false",
+                "api_with_cors_no_definitionbody",
+                "api_with_incompatible_stage_name",
+                "api_with_gateway_responses",
+                "api_with_gateway_responses_all",
+                "api_with_gateway_responses_minimal",
+                "api_with_gateway_responses_implicit",
+                "api_with_gateway_responses_string_status_code",
+                "api_cache",
+                "api_with_access_log_setting",
+                "api_with_canary_setting",
+                "api_with_xray_tracing",
+                "api_request_model",
+                "api_request_model_with_validator",
+                "api_with_stage_tags",
+                "api_with_mode",
+                "s3",
+                "s3_create_remove",
+                "s3_existing_lambda_notification_configuration",
+                "s3_existing_other_notification_configuration",
+                "s3_filter",
+                "s3_multiple_events_same_bucket",
+                "s3_multiple_functions",
+                "s3_with_dependsOn",
+                "sns",
+                "sns_sqs",
+                "sns_existing_sqs",
+                "sns_outside_sqs",
+                "sns_existing_other_subscription",
+                "sns_topic_outside_template",
+                "alexa_skill",
+                "alexa_skill_with_skill_id",
+                "iot_rule",
+                "layers_with_intrinsics",
+                "layers_all_properties",
+                "layer_deletion_policy_precedence",
+                "function_managed_inline_policy",
+                "unsupported_resources",
+                "intrinsic_functions",
+                "basic_function_with_tags",
+                "depends_on",
+                "function_event_conditions",
+                "function_with_dlq",
+                "function_with_kmskeyarn",
+                "function_with_alias",
+                "function_with_alias_intrinsics",
+                "function_with_custom_codedeploy_deployment_preference",
+                "function_with_custom_conditional_codedeploy_deployment_preference",
+                "function_with_disabled_deployment_preference",
+                "function_with_deployment_preference",
+                "function_with_deployment_preference_all_parameters",
+                "function_with_deployment_preference_from_parameters",
+                "function_with_deployment_preference_multiple_combinations",
+                "function_with_deployment_preference_alarms_intrinsic_if",
+                "function_with_alias_and_event_sources",
+                "function_with_resource_refs",
+                "function_with_deployment_and_custom_role",
+                "function_with_deployment_no_service_role",
+                "function_with_global_layers",
+                "function_with_layers",
+                "function_with_many_layers",
+                "function_with_permissions_boundary",
+                "function_with_policy_templates",
+                "function_with_sns_event_source_all_parameters",
+                "function_with_conditional_managed_policy",
+                "function_with_conditional_managed_policy_and_ref_no_value",
+                "function_with_conditional_policy_template",
+                "function_with_conditional_policy_template_and_ref_no_value",
+                "function_with_request_parameters",
+                "function_with_signing_profile",
+                "global_handle_path_level_parameter",
+                "globals_for_function",
+                "globals_for_api",
+                "globals_for_simpletable",
+                "all_policy_templates",
+                "simple_table_ref_parameter_intrinsic",
+                "simple_table_with_table_name",
+                "function_concurrency",
+                "simple_table_with_extra_tags",
+                "explicit_api_with_invalid_events_config",
+                "no_implicit_api_with_serverless_rest_api_resource",
+                "implicit_api_deletion_policy_precedence",
+                "implicit_api_with_serverless_rest_api_resource",
+                "implicit_api_with_auth_and_conditions_max",
+                "implicit_api_with_many_conditions",
+                "implicit_and_explicit_api_with_conditions",
+                "inline_precedence",
+                "api_with_cors_and_conditions_no_definitionbody",
+                "api_with_auth_and_conditions_all_max",
+                "api_with_apikey_default_override",
+                "api_with_apikey_required",
+                "api_with_path_parameters",
+                "function_with_event_source_mapping",
+                "function_with_event_dest",
+                "function_with_event_dest_basic",
+                "function_with_event_dest_conditional",
+                "api_with_usageplans",
+                "api_with_usageplans_shared_attributes_two",
+                "api_with_usageplans_shared_attributes_three",
+                "api_with_usageplans_intrinsics",
+                "state_machine_with_inline_definition",
+                "state_machine_with_tags",
+                "state_machine_with_inline_definition_intrinsics",
+                "state_machine_with_role",
+                "state_machine_with_inline_policies",
+                "state_machine_with_sam_policy_templates",
+                "state_machine_with_definition_S3_string",
+                "state_machine_with_definition_S3_object",
+                "state_machine_with_definition_substitutions",
+                "state_machine_with_standard_logging",
+                "state_machine_with_express_logging",
+                "state_machine_with_managed_policy",
+                "state_machine_with_condition",
+                "state_machine_with_schedule",
+                "state_machine_with_schedule_dlq_retry_policy",
+                "state_machine_with_cwe",
+                "state_machine_with_eb_retry_policy",
+                "state_machine_with_eb_dlq",
+                "state_machine_with_eb_dlq_generated",
+                "state_machine_with_explicit_api",
+                "state_machine_with_implicit_api",
+                "state_machine_with_implicit_api_globals",
+                "state_machine_with_api_authorizer",
+                "state_machine_with_api_authorizer_maximum",
+                "state_machine_with_api_resource_policy",
+                "state_machine_with_api_auth_default_scopes",
+                "state_machine_with_condition_and_events",
+                "state_machine_with_xray_policies",
+                "state_machine_with_xray_role",
+                "function_with_file_system_config",
+                "state_machine_with_permissions_boundary",
+                "version_deletion_policy_precedence",
+            ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],  # Run all the above tests against each of the list of partitions to test against
+        )
+    )
+    @patch(
+        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
+        mock_sar_service_call,
+    )
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_transform_success(self, testcase, partition_with_region):
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        manifest = self._read_input(testcase)
+        expected = self._read_expected_output(testcase, partition)
+
+        self._compare_transform(manifest, expected, partition, region)
+
+    @parameterized.expand(
+        itertools.product(
+            [
+                "explicit_api_openapi_3",
+                "api_with_auth_all_maximum_openapi_3",
+                "api_with_cors_openapi_3",
+                "api_with_gateway_responses_all_openapi_3",
+                "api_with_open_api_version",
+                "api_with_open_api_version_2",
+                "api_with_auth_all_minimum_openapi",
+                "api_with_swagger_and_openapi_with_auth",
+                "api_with_openapi_definition_body_no_flag",
+                "api_request_model_with_validator_openapi_3",
+                "api_request_model_openapi_3",
+                "api_with_apikey_required_openapi_3",
+                "api_with_basic_custom_domain",
+                "api_with_basic_custom_domain_intrinsics",
+                "api_with_custom_domain_route53",
+                "api_with_custom_domain_route53_hosted_zone_name",
+                "api_with_basic_custom_domain_http",
+                "api_with_basic_custom_domain_intrinsics_http",
+                "api_with_custom_domain_route53_http",
+                "api_with_custom_domain_route53_hosted_zone_name_http",
+                "implicit_http_api",
+                "explicit_http_api_minimum",
+                "implicit_http_api_auth_and_simple_case",
+                "http_api_existing_openapi",
+                "http_api_existing_openapi_conditions",
+                "implicit_http_api_with_many_conditions",
+                "http_api_explicit_stage",
+                "http_api_def_uri",
+                "explicit_http_api",
+                "http_api_with_cors",
+                "http_api_description",
+                "http_api_lambda_auth",
+                "http_api_lambda_auth_full",
+            ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],  # Run all the above tests against each of the list of partitions to test against
+        )
+    )
+    @pytest.mark.slow
+    @patch(
+        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
+        mock_sar_service_call,
+    )
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_transform_success_openapi3(self, testcase, partition_with_region):
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
+        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
+        manifest = json.loads(json.dumps(manifest))
+        partition_folder = partition if partition != "aws" else ""
+        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
+        expected = json.load(open(expected_filepath, "r"))
+
+        with patch("boto3.session.Session.region_name", region):
+            parameter_values = get_template_parameter_values()
+            mock_policy_loader = MagicMock()
+            mock_policy_loader.load.return_value = {
+                "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
+                    partition
+                ),
+                "AmazonDynamoDBFullAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess".format(partition),
+                "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
+                "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
+            }
+
+            output_fragment = transform(manifest, parameter_values, mock_policy_loader)
+
+        print(json.dumps(output_fragment, indent=2))
+
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info.major >= 3:
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
+
+        self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
+
+    @parameterized.expand(
+        itertools.product(
+            [
+                "api_with_aws_account_whitelist",
+                "api_with_aws_account_blacklist",
+                "api_with_ip_range_whitelist",
+                "api_with_ip_range_blacklist",
+                "api_with_source_vpc_whitelist",
+                "api_with_source_vpc_blacklist",
+                "api_with_resource_policy",
+                "api_with_resource_policy_global",
+                "api_with_resource_policy_global_implicit",
+                "api_with_if_conditional_with_resource_policy",
+            ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],  # Run all the above tests against each of the list of partitions to test against
+        )
+    )
+    @patch(
+        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
+        mock_sar_service_call,
+    )
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_transform_success_resource_policy(self, testcase, partition_with_region):
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        manifest = yaml_parse(open(os.path.join(INPUT_FOLDER, testcase + ".yaml"), "r"))
+        # To uncover unicode-related bugs, convert dict to JSON string and parse JSON back to dict
+        manifest = json.loads(json.dumps(manifest))
+        partition_folder = partition if partition != "aws" else ""
+        expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
+        expected = json.load(open(expected_filepath, "r"))
+
+        with patch("boto3.session.Session.region_name", region):
+            parameter_values = get_template_parameter_values()
+            mock_policy_loader = MagicMock()
+            mock_policy_loader.load.return_value = {
+                "AWSLambdaBasicExecutionRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole".format(
+                    partition
+                ),
+                "AmazonDynamoDBFullAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBFullAccess".format(partition),
+                "AmazonDynamoDBReadOnlyAccess": "arn:{}:iam::aws:policy/AmazonDynamoDBReadOnlyAccess".format(partition),
+                "AWSLambdaRole": "arn:{}:iam::aws:policy/service-role/AWSLambdaRole".format(partition),
+            }
+
+            output_fragment = transform(manifest, parameter_values, mock_policy_loader)
+        print(json.dumps(output_fragment, indent=2))
+
+        # Only update the deployment Logical Id hash in Py3.
+        if sys.version_info.major >= 3:
+            self._update_logical_id_hash(expected)
+            self._update_logical_id_hash(output_fragment)
+
+        self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
+
+    @parameterized.expand(
+        itertools.product(
+            [
+                (
+                    "usage_plans",
+                    ("api_with_usageplans_shared_no_side_effect_1", "api_with_usageplans_shared_no_side_effect_2"),
+                ),
+            ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],
+        )
+    )
+    @patch(
+        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
+        mock_sar_service_call,
+    )
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_transform_success_no_side_effect(self, testcase, partition_with_region):
+        """
+        Tests that the transform does not leak/leave data in shared caches/lists between executions
+        Performs the transform of the templates in a row without reinitialization
+        Data from template X should not leak in template X+1
+
+        Parameters
+        ----------
+        testcase : Tuple
+            Test name (unused) and Templates
+        templates : List
+            List of templates to transform
+        """
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        for template in testcase[1]:
+            print(template, partition, region)
+            manifest = self._read_input(template)
+            expected = self._read_expected_output(template, partition)
+
+            self._compare_transform(manifest, expected, partition, region)
+
+
 @pytest.mark.parametrize(
     "testcase",
     [
@@ -605,6 +670,8 @@ class TestTranslatorEndToEnd(TestCase):
         "error_api_gateway_responses_nonnumeric_status_code",
         "error_api_gateway_responses_unknown_responseparameter",
         "error_api_gateway_responses_unknown_responseparameter_property",
+        "error_api_request_model_with_intrinsics_validator",
+        "error_api_request_model_with_strings_validator",
         "error_api_invalid_auth",
         "error_api_invalid_path",
         "error_api_invalid_definitionuri",
@@ -643,6 +710,11 @@ class TestTranslatorEndToEnd(TestCase):
         "error_function_with_cwe_missing_dlq_property",
         "error_invalid_logical_id",
         "error_layer_invalid_properties",
+        "error_missing_basic_auth_in_mq",
+        "error_missing_basic_auth_uri_in_mq",
+        "error_multiple_basic_auth_in_mq",
+        "error_missing_sac_in_mq",
+        "error_invalid_config_mq",
         "error_missing_broker",
         "error_missing_queue",
         "error_missing_startingposition",

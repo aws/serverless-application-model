@@ -1,5 +1,6 @@
 ﻿""" SAM macro definitions """
 from six import string_types
+import copy
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -36,6 +37,7 @@ from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of,
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.intrinsics import (
+    is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
     ref,
@@ -279,13 +281,17 @@ class SamFunction(SamResourceMacro):
         )
         if dest_config.get("Destination") is None or property_condition is not None:
             combined_condition = self._make_and_conditions(
-                self.get_passthrough_resource_attributes(), property_condition, conditions
+                self.get_passthrough_resource_attributes().get("Condition"), property_condition, conditions
             )
             if dest_config.get("Type") in auto_inject_list:
                 if dest_config.get("Type") == "SQS":
-                    resource = SQSQueue(resource_logical_id + "Queue")
+                    resource = SQSQueue(
+                        resource_logical_id + "Queue", attributes=self.get_passthrough_resource_attributes()
+                    )
                 if dest_config.get("Type") == "SNS":
-                    resource = SNSTopic(resource_logical_id + "Topic")
+                    resource = SNSTopic(
+                        resource_logical_id + "Topic", attributes=self.get_passthrough_resource_attributes()
+                    )
                 if combined_condition:
                     resource.set_resource_attribute("Condition", combined_condition)
                 if property_condition:
@@ -313,12 +319,10 @@ class SamFunction(SamResourceMacro):
             return property_condition
 
         if property_condition is None:
-            return resource_condition["Condition"]
+            return resource_condition
 
-        and_condition = make_and_condition([resource_condition, {"Condition": property_condition}])
-        condition_name = self._make_gen_condition_name(
-            resource_condition.get("Condition") + "AND" + property_condition, self.logical_id
-        )
+        and_condition = make_and_condition([{"Condition": resource_condition}, {"Condition": property_condition}])
+        condition_name = self._make_gen_condition_name(resource_condition + "AND" + property_condition, self.logical_id)
         conditions[condition_name] = and_condition
 
         return condition_name
@@ -732,7 +736,8 @@ class SamFunction(SamResourceMacro):
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
             attributes = {}
-        attributes["DeletionPolicy"] = "Retain"
+        if "DeletionPolicy" not in attributes:
+            attributes["DeletionPolicy"] = "Retain"
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
@@ -831,6 +836,7 @@ class SamApi(SamResourceMacro):
         "Models": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
+        "Mode": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -857,6 +863,8 @@ class SamApi(SamResourceMacro):
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
         self.Auth = intrinsics_resolver.resolve_parameter_refs(self.Auth)
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
+        shared_api_usage_plan = kwargs.get("shared_api_usage_plan")
+        template_conditions = kwargs.get("conditions")
 
         api_generator = ApiGenerator(
             self.logical_id,
@@ -868,6 +876,8 @@ class SamApi(SamResourceMacro):
             self.DefinitionUri,
             self.Name,
             self.StageName,
+            shared_api_usage_plan,
+            template_conditions,
             tags=self.Tags,
             endpoint_configuration=self.EndpointConfiguration,
             method_settings=self.MethodSettings,
@@ -885,6 +895,7 @@ class SamApi(SamResourceMacro):
             models=self.Models,
             domain=self.Domain,
             description=self.Description,
+            mode=self.Mode,
         )
 
         (
@@ -1160,15 +1171,29 @@ class SamLayerVersion(SamResourceMacro):
             intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
         )
 
+        # If nothing defined, this will be set to Retain
         retention_policy_value = self._get_retention_policy_value()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
             attributes = {}
-        attributes["DeletionPolicy"] = retention_policy_value
+        if "DeletionPolicy" not in attributes:
+            attributes["DeletionPolicy"] = self.RETAIN
+        if retention_policy_value is not None:
+            attributes["DeletionPolicy"] = retention_policy_value
 
         old_logical_id = self.logical_id
-        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
+
+        # This is to prevent the passthrough resource attributes to be included for hashing
+        hash_dict = copy.deepcopy(self.to_dict())
+        if "DeletionPolicy" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["DeletionPolicy"]
+        if "UpdateReplacePolicy" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["UpdateReplacePolicy"]
+        if "Metadata" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["Metadata"]
+
+        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, hash_dict).gen()
         self.logical_id = new_logical_id
 
         lambda_layer = LambdaLayerVersion(self.logical_id, depends_on=self.depends_on, attributes=attributes)
@@ -1200,14 +1225,25 @@ class SamLayerVersion(SamResourceMacro):
         :return: value for the DeletionPolicy attribute.
         """
 
-        if self.RetentionPolicy is None or self.RetentionPolicy.lower() == self.RETAIN.lower():
+        if is_intrinsic(self.RetentionPolicy):
+            # RetentionPolicy attribute of AWS::Serverless::LayerVersion does set the DeletionPolicy
+            # attribute. And DeletionPolicy attribute does not support intrinsic values.
+            raise InvalidResourceException(
+                self.logical_id,
+                "'RetentionPolicy' does not accept intrinsic functions, "
+                "please use one of the following options: {}".format([self.RETAIN, self.DELETE]),
+            )
+
+        if self.RetentionPolicy is None:
+            return None
+        elif self.RetentionPolicy.lower() == self.RETAIN.lower():
             return self.RETAIN
         elif self.RetentionPolicy.lower() == self.DELETE.lower():
             return self.DELETE
         elif self.RetentionPolicy.lower() not in self.retention_policy_options:
             raise InvalidResourceException(
                 self.logical_id,
-                "'{}' must be one of the following options: {}.".format("RetentionPolicy", [self.RETAIN, self.DELETE]),
+                "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
             )
 
 

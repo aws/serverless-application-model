@@ -24,7 +24,9 @@ def fnAnd(argument_list):
     return {"Fn::And": argument_list}
 
 
-def make_conditional(condition, true_data, false_data={"Ref": "AWS::NoValue"}):
+def make_conditional(condition, true_data, false_data=None):
+    if false_data is None:
+        false_data = {"Ref": "AWS::NoValue"}
     return {"Fn::If": [condition, true_data, false_data]}
 
 

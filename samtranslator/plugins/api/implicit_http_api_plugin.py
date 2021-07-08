@@ -43,7 +43,9 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         self.api_id_property = "ApiId"
         self.editor = OpenApiEditor
 
-    def _process_api_events(self, function, api_events, template, condition=None):
+    def _process_api_events(
+        self, function, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
+    ):
         """
         Actually process given HTTP API events. Iteratively adds the APIs to OpenApi JSON in the respective
         AWS::Serverless::HttpApi resource from the template
@@ -89,11 +91,15 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
             if isinstance(api_id, dict):
                 raise InvalidEventException(logicalId, "Api Event must reference an Api in the same template.")
 
-            api_dict = self.api_conditions.setdefault(api_id, {})
-            method_conditions = api_dict.setdefault(path, {})
+            api_dict_condition = self.api_conditions.setdefault(api_id, {})
+            method_conditions = api_dict_condition.setdefault(path, {})
+            method_conditions[method] = condition
 
-            if condition:
-                method_conditions[method] = condition
+            api_dict_deletion = self.api_deletion_policies.setdefault(api_id, set())
+            api_dict_deletion.add(deletion_policy)
+
+            api_dict_update_replace = self.api_update_replace_policies.setdefault(api_id, set())
+            api_dict_update_replace.add(update_replace_policy)
 
             self._add_api_to_swagger(logicalId, event_properties, template)
             if "RouteSettings" in event_properties:
