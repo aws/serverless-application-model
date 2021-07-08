@@ -140,7 +140,9 @@ class BaseTest(TestCase):
             List of parameters
         """
         folder, file_name = file_name.split("/")
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
         self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
         self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
 
@@ -306,7 +308,9 @@ class BaseTest(TestCase):
             Template file name
         """
         input_file_path = str(Path(self.template_dir, folder, file_name + ".yaml"))
-        updated_template_path = str(Path(self.output_dir, "sub_" + file_name + ".yaml"))
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        updated_template_path = str(Path(self.output_dir, "sub_" + folder + "_" + file_name + ".yaml"))
         with open(input_file_path) as f:
             data = f.read()
         for key, _ in self.code_key_to_file.items():
