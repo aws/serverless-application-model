@@ -1,0 +1,41 @@
+Parameters:
+  FunctionNameParam:
+    Type: String
+    Default: "somename"
+
+Conditions:
+  TrueCondition:
+    Fn::Equals: ["true", "true"]
+
+Resources:
+
+  MyFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+        - SQSPollerPolicy:
+            QueueName:
+              Fn::GetAtt: ["MyQueue", "QueueName"]
+        - LambdaInvokePolicy:
+            FunctionName:
+              Ref: FunctionNameParam
+
+        - Fn::If:
+            - TrueCondition
+
+            - CloudWatchPutMetricPolicy: {}
+
+            - EC2DescribePolicy: {}
+
+        - Fn::If:
+            - TrueCondition
+
+            - Ref: "AWS::NoValue"
+
+            - EC2DescribePolicy: {}
+
+  MyQueue:
+    Type: AWS::SQS::Queue

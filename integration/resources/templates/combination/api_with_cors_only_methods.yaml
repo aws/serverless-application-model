@@ -1,0 +1,48 @@
+Conditions:
+  IsChina:
+    Fn::Or:
+      - Fn::Equals:
+        - Ref: "AWS::Region"
+        - "cn-north-1"
+      - Fn::Equals:
+        - Ref: "AWS::Region"
+        - "cn-northwest-1"
+
+Parameters:
+  CorsParam:
+    Type: String
+    Default: "methods"
+
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+    Cors:
+      AllowMethods: {"Fn::Sub": "'${CorsParam}'"}
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        ApiOne:
+          Type: Api
+          Properties:
+            Path: /apione
+            Method: any
+
+        ApiTwo:
+          Type: Api
+          Properties:
+            Path: /apitwo
+            Method: post
+
+Outputs:
+  ApiUrl:
+    Description: URL of your API endpoint
+    Value:
+      Fn::Sub: 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'

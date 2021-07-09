@@ -2,6 +2,8 @@ import json
 import logging
 import os
 
+import requests
+
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
@@ -34,9 +36,9 @@ class BaseTest(TestCase):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
-        cls.template_dir = Path(cls.resources_dir, "templates", "single")
+        cls.template_dir = Path(cls.resources_dir, "templates")
         cls.output_dir = Path(cls.tests_integ_dir, "tmp")
-        cls.expected_dir = Path(cls.resources_dir, "expected", "single")
+        cls.expected_dir = Path(cls.resources_dir, "expected")
         cls.code_dir = Path(cls.resources_dir, "code")
         cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
         cls.session = boto3.session.Session()
@@ -126,28 +128,56 @@ class BaseTest(TestCase):
         if os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-    def create_and_verify_stack(self, file_name, parameters=None):
+    def create_and_verify_stack(self, file_path, parameters=None):
         """
         Creates the Cloud Formation stack and verifies it against the expected
         result
 
         Parameters
         ----------
-        file_name : string
-            Template file name
+        file_path : string
+            Template file name, format "folder_name/file_name"
         parameters : list
             List of parameters
         """
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
-        self.expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
+        folder, file_name = file_path.split("/")
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
+        self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
         self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
 
-        self._fill_template(file_name)
+        self._fill_template(folder, file_name)
         self.transform_template()
         self.deploy_stack(parameters)
         self.verify_stack()
 
-    def update_and_verify_stack(self, file_name, parameters=None):
+    def update_stack(self, file_path, parameters=None):
+        """
+        Updates the Cloud Formation stack
+
+        Parameters
+        ----------
+        file_path : string
+            Template file name, format "folder_name/file_name"
+        parameters : list
+            List of parameters
+        """
+        if os.path.exists(self.output_file_path):
+            os.remove(self.output_file_path)
+        if os.path.exists(self.sub_input_file_path):
+            os.remove(self.sub_input_file_path)
+
+        folder, file_name = file_path.split("/")
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
+
+        self._fill_template(folder, file_name)
+        self.transform_template()
+        self.deploy_stack(parameters)
+
+    def update_and_verify_stack(self, file_path, parameters=None):
         """
         Updates the Cloud Formation stack and verifies it against the expected
         result
@@ -161,10 +191,14 @@ class BaseTest(TestCase):
         """
         if not self.stack_name:
             raise Exception("Stack not created.")
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
-        self.expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
 
-        self._fill_template(file_name)
+        folder, file_name = file_path.split("/")
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
+        self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
+
+        self._fill_template(folder, file_name)
         self.transform_template()
         self.deploy_stack(parameters)
         self.verify_stack(end_state="UPDATE_COMPLETE")
@@ -301,17 +335,21 @@ class BaseTest(TestCase):
 
         return None
 
-    def _fill_template(self, file_name):
+    def _fill_template(self, folder, file_name):
         """
         Replaces the template variables with their value
 
         Parameters
         ----------
+        folder : string
+            The combination/single folder which contains the template
         file_name : string
             Template file name
         """
-        input_file_path = str(Path(self.template_dir, file_name + ".yaml"))
-        updated_template_path = str(Path(self.output_dir, "sub_" + file_name + ".yaml"))
+        input_file_path = str(Path(self.template_dir, folder, file_name + ".yaml"))
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        updated_template_path = str(Path(self.output_dir, "sub_" + folder + "_" + file_name + ".yaml"))
         with open(input_file_path) as f:
             data = f.read()
         for key, _ in self.code_key_to_file.items():
@@ -338,6 +376,21 @@ class BaseTest(TestCase):
         """
         yaml_doc = load_yaml(self.sub_input_file_path)
         yaml_doc["Resources"][resource_name]["Properties"][property_name] = value
+        dump_yaml(self.sub_input_file_path, yaml_doc)
+
+    def remove_template_resource_property(self, resource_name, property_name):
+        """
+        remove a resource property of the current SAM template
+
+        Parameters
+        ----------
+        resource_name: string
+            resource name
+        property_name: string
+            property name
+        """
+        yaml_doc = load_yaml(self.sub_input_file_path)
+        del yaml_doc["Resources"][resource_name]["Properties"][property_name]
         dump_yaml(self.sub_input_file_path, yaml_doc)
 
     def get_template_resource_property(self, resource_name, property_name):
@@ -375,3 +428,45 @@ class BaseTest(TestCase):
         error = verify_stack_resources(self.expected_resource_path, self.stack_resources)
         if error:
             self.fail(error)
+
+    def verify_get_request_response(self, url, expected_status_code):
+        """
+        Verify if the get request to a certain url return the expected status code
+
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        expected_status_code : string
+            the expected status code
+        """
+        print("Making request to " + url)
+        response = requests.get(url)
+        self.assertEqual(response.status_code, expected_status_code, " must return HTTP " + str(expected_status_code))
+        return response
+
+    def get_default_test_template_parameters(self):
+        """
+        get the default template parameters
+        """
+        parameters = [
+            {
+                "ParameterKey": "Bucket",
+                "ParameterValue": self.s3_bucket_name,
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+            {
+                "ParameterKey": "CodeKey",
+                "ParameterValue": "code.zip",
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+            {
+                "ParameterKey": "SwaggerKey",
+                "ParameterValue": "swagger1.json",
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+        ]
+        return parameters

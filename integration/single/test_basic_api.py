@@ -11,7 +11,7 @@ class TestBasicApi(BaseTest):
         """
         Creates an API and updates its DefinitionUri
         """
-        self.create_and_verify_stack("basic_api")
+        self.create_and_verify_stack("single/basic_api")
 
         first_dep_ids = self.get_stack_deployment_ids()
         self.assertEqual(len(first_dep_ids), 1)
@@ -30,7 +30,7 @@ class TestBasicApi(BaseTest):
         Creates an API and updates its DefinitionUri
         """
         # Create an API with get and put
-        self.create_and_verify_stack("basic_api_with_mode")
+        self.create_and_verify_stack("single/basic_api_with_mode")
 
         stack_output = self.get_stack_outputs()
         api_endpoint = stack_output.get("ApiEndpoint")
@@ -38,7 +38,7 @@ class TestBasicApi(BaseTest):
         self.assertEqual(response.status_code, 200)
 
         # Removes get from the API
-        self.update_and_verify_stack("basic_api_with_mode_update")
+        self.update_and_verify_stack("single/basic_api_with_mode_update")
         response = requests.get(f"{api_endpoint}/get")
         # API Gateway by default returns 403 if a path do not exist
         self.assertEqual(response.status_code, 403)
@@ -47,7 +47,7 @@ class TestBasicApi(BaseTest):
         """
         Creates an API with and inline OpenAPI and updates its DefinitionBody basePath
         """
-        self.create_and_verify_stack("basic_api_inline_openapi")
+        self.create_and_verify_stack("single/basic_api_inline_openapi")
 
         first_dep_ids = self.get_stack_deployment_ids()
         self.assertEqual(len(first_dep_ids), 1)
@@ -67,7 +67,7 @@ class TestBasicApi(BaseTest):
         """
         Creates an API with an inline Swagger and updates its DefinitionBody basePath
         """
-        self.create_and_verify_stack("basic_api_inline_swagger")
+        self.create_and_verify_stack("single/basic_api_inline_swagger")
 
         first_dep_ids = self.get_stack_deployment_ids()
         self.assertEqual(len(first_dep_ids), 1)
@@ -87,7 +87,7 @@ class TestBasicApi(BaseTest):
         """
         Creates an API with tags
         """
-        self.create_and_verify_stack("basic_api_with_tags")
+        self.create_and_verify_stack("single/basic_api_with_tags")
 
         stages = self.get_api_stack_stages()
         self.assertEqual(len(stages), 2)

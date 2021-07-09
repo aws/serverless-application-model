@@ -1,0 +1,8 @@
+[
+  { "LogicalResourceId":"MyApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"MyApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
+  { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyFunctionNonePermissionProd", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" }
+]
