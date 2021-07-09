@@ -1,0 +1,13 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: ${definitionuri}
+      MethodSettings: [{
+        "LoggingLevel": "INFO",
+        "MetricsEnabled": True,
+        "DataTraceEnabled": True,
+        "ResourcePath": "/*",
+        "HttpMethod": "*"
+    }]

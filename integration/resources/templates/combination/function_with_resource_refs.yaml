@@ -1,0 +1,44 @@
+# Test to verify that resource references available on the Function are properly resolved
+# Currently supported references are:
+#    - Alias
+#
+# Use them by appending the property to LogicalId of the function
+
+Resources:
+  MyLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: Live
+
+  MyOtherFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ${codeuri}
+      Runtime: python2.7
+      Handler: hello.handler
+      Environment:
+        Variables:
+          # Refer to the Alias in another resource
+          AliasArn:
+            Ref: MyLambdaFunction.Alias
+
+
+Outputs:
+  AliasArn:
+    Value:
+      Ref: MyLambdaFunction.Alias
+
+  AliasInSub:
+    Value:
+      Fn::Sub: ["${MyLambdaFunction.Alias} ${SomeValue}", {"SomeValue": "Alias"}]
+
+  VersionArn:
+    Value:
+      Ref: MyLambdaFunction.Version
+
+  VersionNumber:
+    Value:
+      Fn::GetAtt: ["MyLambdaFunction.Version", "Version"]

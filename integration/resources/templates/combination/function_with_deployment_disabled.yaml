@@ -1,0 +1,59 @@
+Parameters:
+  # The test harness passes theses parameters even though they aren't used. So specify them here
+  Bucket:
+    Type: String
+  CodeKey:
+    Type: String
+  SwaggerKey:
+    Type: String
+  Enabled:
+    Type: String
+    Default: False
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+
+      AutoPublishAlias: Live
+
+      DeploymentPreference:
+        Type: AllAtOnce
+        Role:
+          Fn::GetAtt: [ DeploymentRole, Arn ]
+
+        Enabled:
+          Ref: Enabled
+
+  DeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - codedeploy.amazonaws.com
+
+      Policies:
+        -
+          PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Resource: "*"
+                Action:
+                  - "cloudwatch:DescribeAlarms"
+                  - "lambda:UpdateAlias"
+                  - "lambda:GetAlias"
+                  - "lambda:InvokeFunction"
+                  - "s3:Get*"
+                  - "sns:Publish"

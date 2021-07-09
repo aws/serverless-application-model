@@ -1,0 +1,28 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: MySnsTopic
+        
+        SQSSubscriptionEvent:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: MySnsTopic
+            SqsSubscription: true
+
+
+  # This is a CloudFormation SNS resource
+  MySnsTopic:
+    Type: AWS::SNS::Topic
+

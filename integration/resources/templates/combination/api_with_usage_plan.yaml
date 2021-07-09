@@ -1,0 +1,155 @@
+Parameters:
+  UsagePlanType:
+    Type: String
+    Default: PER_API
+Globals:
+  Api:
+    OpenApiVersion: "2.0"
+    Auth:
+      ApiKeyRequired: True
+      UsagePlan:
+        CreateUsagePlan:
+          Ref: UsagePlanType
+        Description: My test usage plan
+        Quota:
+          Limit: 500
+          Period: MONTH
+        Throttle:
+          BurstLimit: 100
+          RateLimit: 50
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        # Simple HTTP Proxy API
+        swagger: "2.0"
+        info:
+          version: "2016-09-23T22:23:23Z"
+          title: "Simple Api 1"
+        basePath: "/demo"
+        schemes:
+          - "https"
+        paths:
+          /http/{proxy+}:
+            x-amazon-apigateway-any-method:
+              parameters:
+                - name: "proxy"
+                  in: "path"
+              x-amazon-apigateway-integration:
+                type: "http_proxy"
+                uri: "http://httpbin.org/{proxy}"
+                httpMethod: "ANY"
+                passthroughBehavior: "when_no_match"
+                requestParameters:
+                  integration.request.path.proxy: "method.request.path.proxy"
+
+  MyApi2:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      OpenApiVersion: 3.0.1
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: SHARED
+      DefinitionBody:
+        # Simple HTTP Proxy API
+        openapi: "3.0.1"
+        info:
+          version: "2016-09-23T22:23:23Z"
+          title: "Simple Api 2"
+        basePath: "/demo"
+        schemes:
+          - "https"
+        paths:
+          /http/{proxy+}:
+            x-amazon-apigateway-any-method:
+              parameters:
+                - name: "proxy"
+                  in: "path"
+              x-amazon-apigateway-integration:
+                type: "http_proxy"
+                uri: "http://httpbin.org/{proxy}"
+                httpMethod: "ANY"
+                passthroughBehavior: "when_no_match"
+                requestParameters:
+                  integration.request.path.proxy: "method.request.path.proxy"
+
+  MyApi3:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      OpenApiVersion: 3.0.1
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: NONE
+      DefinitionBody:
+        # Simple HTTP Proxy API
+        openapi: "3.0.1"
+        info:
+          version: "2016-09-23T22:23:23Z"
+          title: "Simple Api 3"
+        basePath: "/demo"
+        schemes:
+          - "https"
+        paths:
+          /http/{proxy+}:
+            x-amazon-apigateway-any-method:
+              parameters:
+                - name: "proxy"
+                  in: "path"
+              x-amazon-apigateway-integration:
+                type: "http_proxy"
+                uri: "http://httpbin.org/{proxy}"
+                httpMethod: "ANY"
+                passthroughBehavior: "when_no_match"
+                requestParameters:
+                  integration.request.path.proxy: "method.request.path.proxy"
+
+  MyApi4:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      OpenApiVersion: 3.0.1
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: SHARED
+      DefinitionBody:
+        # Simple HTTP Proxy API
+        openapi: "3.0.1"
+        info:
+          version: "2016-09-23T22:23:23Z"
+          title: "Simple Api 4"
+        basePath: "/demo"
+        schemes:
+          - "https"
+        paths:
+          /http/{proxy+}:
+            x-amazon-apigateway-any-method:
+              parameters:
+                - name: "proxy"
+                  in: "path"
+              x-amazon-apigateway-integration:
+                type: "http_proxy"
+                uri: "http://httpbin.org/{proxy}"
+                httpMethod: "ANY"
+                passthroughBehavior: "when_no_match"
+                requestParameters:
+                  integration.request.path.proxy: "method.request.path.proxy"
+
+Outputs:
+  MyApiUsagePlan:
+    Value:
+      Ref: MyApiUsagePlan
+  MyApiApiKey:
+    Value:
+      Ref: MyApiApiKey
+  ServerlessUsagePlan:
+    Value:
+      Ref: ServerlessUsagePlan
+  ServerlessApiKey:
+    Value:
+      Ref: ServerlessApiKey
+  
