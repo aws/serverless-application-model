@@ -1,0 +1,128 @@
+Resources:
+ MyLambdaFunction:
+   Type: AWS::Serverless::Function
+   Properties:
+     Handler: index.handler
+     Runtime: nodejs12.x
+     CodeUri: ${codeuri}
+
+     AutoPublishAlias: Live
+
+     DeploymentPreference:
+       Role:
+         Fn::GetAtt: [ DeploymentRole, Arn ]
+       Type: Canary10Percent5Minutes
+       Alarms:
+         - {"Ref": "NewVersionErrorsAlarm"}
+         - {"Ref": "AliasErrorsAlarm"}
+         - {"Ref": "FunctionErrorsAlarm"}
+#       Hooks:
+       # These hooks just hang so we're commenting them out for now or the deployment waits on them forever
+#         PreTraffic: {"Ref": "PreTrafficFunction"}
+#         PostTraffic: {"Ref": "PostTrafficFunction"}
+
+ DeploymentRole:
+   Type: AWS::IAM::Role
+   Properties:
+     AssumeRolePolicyDocument:
+       Version: '2012-10-17'
+       Statement:
+       - Action:
+         - sts:AssumeRole
+         Effect: Allow
+         Principal:
+           Service:
+           - codedeploy.amazonaws.com
+
+     Policies:
+       -
+         PolicyName: "root"
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:
+             -
+               Effect: "Allow"
+               Resource: "*"
+               Action:
+                 - "cloudwatch:DescribeAlarms"
+                 - "lambda:UpdateAlias"
+                 - "lambda:GetAlias"
+                 - "lambda:InvokeFunction"
+                 - "s3:Get*"
+                 - "sns:Publish"
+
+ FunctionErrorsAlarm:
+   Type: AWS::CloudWatch::Alarm
+   Properties:
+     Namespace: AWS/Lambda
+     MetricName: Error
+
+     Dimensions:
+       - Name: FunctionName
+         Value:
+           "Fn::GetAtt": ["MyLambdaFunction", "Arn"]
+
+     Statistic: Maximum
+     Period: 60
+     EvaluationPeriods: 5
+     ComparisonOperator: GreaterThanOrEqualToThreshold
+     Threshold: 1.0
+
+ AliasErrorsAlarm:
+   Type: AWS::CloudWatch::Alarm
+   Properties:
+     Namespace: AWS/Lambda
+     MetricName: Error
+
+     Dimensions:
+       - Name: FunctionName
+         Value:
+           "Fn::GetAtt": ["MyLambdaFunction", "Arn"]
+       - Name: Alias
+         Value: Live
+
+     Statistic: Maximum
+     Period: 60
+     EvaluationPeriods: 5
+     ComparisonOperator: GreaterThanOrEqualToThreshold
+     Threshold: 1.0
+
+ # Alarm pointing to the Errors metric on "latest" executed function version
+ # When the deployment is happening, this alarm will point to the new version that ie being deployed
+ NewVersionErrorsAlarm:
+   Type: AWS::CloudWatch::Alarm
+   Properties:
+     Namespace: AWS/Lambda
+     MetricName: Error
+
+     Dimensions:
+       - Name: FunctionName
+         Value:
+           "Fn::GetAtt": ["MyLambdaFunction", "Arn"]
+
+       - Name: Alias
+         Value: Live
+
+       - Name: ExecutedVersion
+         Value:
+           "Fn::GetAtt": ["MyLambdaFunction.Version", "Version"]
+
+     Statistic: Maximum
+     Period: 60
+     EvaluationPeriods: 5
+     ComparisonOperator: GreaterThanOrEqualToThreshold
+     Threshold: 1.0
+
+ PreTrafficFunction:
+   Type: AWS::Serverless::Function
+   Properties:
+     Handler: index.handler
+     Runtime: nodejs12.x
+     CodeUri: ${codeuri}
+
+ PostTrafficFunction:
+   Type: AWS::Serverless::Function
+   Properties:
+     Handler: index.handler
+     Runtime: nodejs12.x
+     CodeUri: ${codeuri}

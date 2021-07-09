@@ -1,0 +1,21 @@
+Globals:
+  Function:
+    AutoPublishAlias: prod
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+
+      # Alias is inherited from globals here
+
+  FunctionWithOverride:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      AutoPublishAlias: Live
