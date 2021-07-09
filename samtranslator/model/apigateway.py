@@ -21,6 +21,7 @@ class ApiGatewayRestApi(Resource):
         "EndpointConfiguration": PropertyType(False, is_type(dict)),
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),
+        "Mode": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
@@ -231,8 +232,10 @@ class ApiGatewayAuthorizer(object):
         function_payload_type=None,
         function_invoke_role=None,
         is_aws_iam_authorizer=False,
-        authorization_scopes=[],
+        authorization_scopes=None,
     ):
+        if authorization_scopes is None:
+            authorization_scopes = []
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(
                 api_logical_id,

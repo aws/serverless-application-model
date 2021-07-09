@@ -1,4 +1,5 @@
 from integration.helpers.base_test import BaseTest
+import requests
 
 
 class TestBasicApi(BaseTest):
@@ -23,6 +24,24 @@ class TestBasicApi(BaseTest):
         self.assertEqual(len(second_dep_ids), 1)
 
         self.assertEqual(len(set(first_dep_ids).intersection(second_dep_ids)), 0)
+
+    def test_basic_api_with_mode(self):
+        """
+        Creates an API and updates its DefinitionUri
+        """
+        # Create an API with get and put
+        self.create_and_verify_stack("basic_api_with_mode")
+
+        stack_output = self.get_stack_outputs()
+        api_endpoint = stack_output.get("ApiEndpoint")
+        response = requests.get(f"{api_endpoint}/get")
+        self.assertEqual(response.status_code, 200)
+
+        # Removes get from the API
+        self.update_and_verify_stack("basic_api_with_mode_update")
+        response = requests.get(f"{api_endpoint}/get")
+        # API Gateway by default returns 403 if a path do not exist
+        self.assertEqual(response.status_code, 403)
 
     def test_basic_api_inline_openapi(self):
         """

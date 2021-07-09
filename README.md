@@ -52,7 +52,7 @@ environment that lets you locally build, test, debug, and deploy applications de
 
 ## What is this Github repository? 💻
 
-This GitHub repository contains the SAM Specification, the Python code that translates SAM templates into AWS CloudFormation stacks and lots of examples applications.
+This GitHub repository contains the SAM Specification, the Python code that translates SAM templates into AWS CloudFormation stacks and lots of example applications.
 In the words of SAM developers:
 
 > SAM Translator is the Python code that deploys SAM templates via AWS CloudFormation. Source code is high quality (95% unit test coverage),

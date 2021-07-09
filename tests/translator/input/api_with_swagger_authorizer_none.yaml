@@ -1,0 +1,141 @@
+Resources:
+  MyApiWithCognitoAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: !GetAtt MyUserPool.Arn
+        DefaultAuthorizer: MyCognitoAuth
+
+  MyApiWithLambdaTokenAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyLambdaTokenAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+        DefaultAuthorizer: MyLambdaTokenAuth
+
+  MyApiWithLambdaRequestAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          version: '1.0'
+          title: !Ref AWS::StackName
+        schemes:
+          - https
+        paths:
+          "/lambda-request":
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations
+                passthroughBehavior: when_no_match
+              responses: {}
+      Auth:
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            Identity:
+              Headers:
+                - Authorization1
+        DefaultAuthorizer: MyLambdaRequestAuth
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+         exports.handler = async (event) => {
+           return {
+           statusCode: 200,
+           body: JSON.stringify(event),
+           headers: {}
+           }
+         }
+      Handler: index.handler
+      Runtime: nodejs8.10
+
+  MyFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+         exports.handler = async (event) => {
+           return {
+           statusCode: 200,
+           body: JSON.stringify(event),
+           headers: {}
+           }
+         }
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Events:
+        Cognito:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: get
+            Auth:
+             Authorizer: NONE
+            Path: /cognito
+        CognitoAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithCognitoAuth
+            Method: any
+            Auth:
+              Authorizer: NONE
+            Path: /any/cognito
+        LambdaToken:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaTokenAuth
+            Method: get
+            Auth:
+             Authorizer: NONE
+            Path: /lambda-token
+        LambdaTokenAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaTokenAuth
+            Method: any
+            Auth:
+              Authorizer: NONE
+            Path: /any/lambda-token
+        LambdaRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaRequestAuth
+            Auth:
+              Authorizer: NONE
+            Method: get
+            Path: /lambda-request
+        LambdaRequestAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithLambdaRequestAuth
+            Auth:
+              Authorizer: NONE
+            Method: any
+            Path: /any/lambda-request
+
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: UserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false

@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -175,6 +176,32 @@ class BaseTest(TestCase):
         self._fill_template(folder, file_name)
         self.transform_template()
         self.deploy_stack(parameters)
+
+    def update_and_verify_stack(self, file_path, parameters=None):
+        """
+        Updates the Cloud Formation stack and verifies it against the expected
+        result
+
+        Parameters
+        ----------
+        file_name : string
+            Template file name
+        parameters : list
+            List of parameters
+        """
+        if not self.stack_name:
+            raise Exception("Stack not created.")
+
+        folder, file_name = file_path.split("/")
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
+        self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
+
+        self._fill_template(folder, file_name)
+        self.transform_template()
+        self.deploy_stack(parameters)
+        self.verify_stack(end_state="UPDATE_COMPLETE")
 
     def transform_template(self):
         transform_template(self.sub_input_file_path, self.output_file_path)
@@ -391,12 +418,12 @@ class BaseTest(TestCase):
         self.stack_description = self.client_provider.cfn_client.describe_stacks(StackName=self.stack_name)
         self.stack_resources = self.client_provider.cfn_client.list_stack_resources(StackName=self.stack_name)
 
-    def verify_stack(self):
+    def verify_stack(self, end_state="CREATE_COMPLETE"):
         """
         Gets and compares the Cloud Formation stack against the expect result file
         """
         # verify if the stack was successfully created
-        self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
+        self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], end_state)
         # verify if the stack contains the expected resources
         error = verify_stack_resources(self.expected_resource_path, self.stack_resources)
         if error:

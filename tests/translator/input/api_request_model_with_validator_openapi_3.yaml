@@ -1,0 +1,32 @@
+Resources:
+  HtmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody: true
+              ValidateParameters: true
+
+
+  HtmlApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      OpenApiVersion: 3.0
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string

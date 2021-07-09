@@ -31,11 +31,21 @@ Resources:
           Properties:
             Method: Put
             Path: /get
+        ApiAnyMethod:
+          Type: Api
+          Properties:
+            Method: any
+            Path: /any/get
         Fetch:
           Type: Api
           Properties:
             Method: Post
             Path: /fetch
+        FetchAnyMethod:
+          Type: Api
+          Properties:
+            Method: any
+            Path: /any/fetch
 
   MyApi:
     Type: AWS::Serverless::Api

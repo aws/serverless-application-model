@@ -96,9 +96,9 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
         self.plugin._get_api_events.assert_has_calls([call(function1), call(function2), call(function3)])
         self.plugin._process_api_events.assert_has_calls(
             [
-                call(function1, ["event1", "event2"], sam_template, None),
-                call(function2, ["event1", "event2"], sam_template, None),
-                call(function3, ["event1", "event2"], sam_template, None),
+                call(function1, ["event1", "event2"], sam_template, None, None, None),
+                call(function2, ["event1", "event2"], sam_template, None, None, None),
+                call(function3, ["event1", "event2"], sam_template, None, None, None),
             ]
         )
 
@@ -133,9 +133,9 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
         self.plugin._get_api_events.assert_has_calls([call(statemachine1), call(statemachine2), call(statemachine3)])
         self.plugin._process_api_events.assert_has_calls(
             [
-                call(statemachine1, ["event1", "event2"], sam_template, None),
-                call(statemachine2, ["event1", "event2"], sam_template, None),
-                call(statemachine3, ["event1", "event2"], sam_template, None),
+                call(statemachine1, ["event1", "event2"], sam_template, None, None, None),
+                call(statemachine2, ["event1", "event2"], sam_template, None, None, None),
+                call(statemachine3, ["event1", "event2"], sam_template, None, None, None),
             ]
         )
 
@@ -813,3 +813,38 @@ class TestImplicitRestApiPlugin_maybe_remove_implicit_api(TestCase):
 
         # Must restore original resource
         template.set.assert_called_with(IMPLICIT_API_LOGICAL_ID, resource)
+
+
+class TestImplicitApiPlugin_generate_resource_attributes(TestCase):
+    def setUp(self):
+        self.plugin = ImplicitRestApiPlugin()
+        self.plugin.api_conditions = {}
+
+    def test_maybe_add_condition(self):
+        template_dict = {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api"}}}
+        self.plugin.api_conditions = {"ServerlessRestApi": {"/{proxy+}": {"any": "C1"}}}
+        self.plugin._maybe_add_condition_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(
+            template_dict, {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api", "Condition": "C1"}}}
+        )
+
+    def test_maybe_add_deletion_policies(self):
+        template_dict = {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api"}}}
+        self.plugin.api_deletion_policies = {"ServerlessRestApi": {"Delete", "Retain"}}
+        self.plugin._maybe_add_deletion_policy_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(
+            template_dict,
+            {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api", "DeletionPolicy": "Retain"}}},
+        )
+
+    def test_maybe_add_update_replace_policies(self):
+        template_dict = {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api"}}}
+        self.plugin.api_update_replace_policies = {"ServerlessRestApi": {"Snapshot", "Retain"}}
+        self.plugin._maybe_add_update_replace_policy_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(
+            template_dict,
+            {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api", "UpdateReplacePolicy": "Retain"}}},
+        )

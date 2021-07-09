@@ -190,7 +190,7 @@ NOTE: Verify that your AWS SDK version supports PutLifecycleEventHookExecutionSt
 
 .. _PutLifecycleEventHookExecutionStatus: https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_PutLifecycleEventHookExecutionStatus.html
 
-.. _Here: https://github.com/awslabs/serverless-application-model/blob/master/examples/2016-10-31/lambda_safe_deployments/src/preTrafficHook.js
+.. _Here: https://github.com/aws/serverless-application-model/blob/d168f371f494196a57032313075db9faae5587e4/examples/2016-10-31/lambda_safe_deployments/src/preTrafficHook.js
 
 Traffic Shifting Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

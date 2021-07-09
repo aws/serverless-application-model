@@ -1,12 +1,12 @@
 {
   "Resources": {
-    "HtmlApiDeployment5ae7e42cea": {
+    "HtmlApiDeploymentf84be626f3": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
         },
-        "Description": "RestApi deployment id: 5ae7e42cea0640a3318bf508535850cd792a52dc"
+        "Description": "RestApi deployment id: f84be626f359fc9697fd8e228c5ffe53e252f82c"
       }
     },
     "HtmlFunctionRole": {
@@ -43,7 +43,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment5ae7e42cea"
+          "Ref": "HtmlApiDeploymentf84be626f3"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -71,7 +71,28 @@
           ]
         }
       }
-    }, 
+    },
+    "HtmlFunctionAnyIamPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "HtmlFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/any/iam",
+            {
+              "__ApiId__": {
+                "Ref": "HtmlApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
     "HtmlApi": {
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
@@ -132,8 +153,36 @@
                 }, 
                 "responses": {}
               }
+            },
+            "/any/iam": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
+                  },
+                  "credentials": "arn:aws:iam::*:user/*"
+                },
+                "responses": {},
+                "security": [
+                  {
+                    "AWS_IAM": []
+                  }
+                ],
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/user"
+                      }
+                    }
+                  },
+                  "required": true
+                }
+              }
             }
-          }, 
+          },
           "openapi": "3.0",
           "components": {
             "securitySchemes": {

@@ -12,6 +12,7 @@ from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
+from samtranslator.region_configuration import RegionConfiguration
 
 LOG = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class ServerlessAppPlugin(BasePlugin):
     LOCATION_KEY = "Location"
     TEMPLATE_URL_KEY = "TemplateUrl"
 
-    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False, parameters={}):
+    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False, parameters=None):
         """
         Initialize the plugin.
 
@@ -51,6 +52,8 @@ class ServerlessAppPlugin(BasePlugin):
         :param bool validate_only: Flag to only validate application access (uses get_application API instead)
         """
         super(ServerlessAppPlugin, self).__init__(ServerlessAppPlugin.__name__)
+        if parameters is None:
+            parameters = {}
         self._applications = {}
         self._in_progress_templates = []
         self._sar_client = sar_client
@@ -104,6 +107,10 @@ class ServerlessAppPlugin(BasePlugin):
 
             if key not in self._applications:
                 try:
+                    if not RegionConfiguration.is_sar_supported():
+                        raise InvalidResourceException(
+                            logical_id, "Serverless Application Repository is not available in this region."
+                        )
                     # Lazy initialization of the client- create it when it is needed
                     if not self._sar_client:
                         self._sar_client = boto3.client("serverlessrepo")
