@@ -1,0 +1,51 @@
+Resources:
+
+  # Classic DependsOn case
+  # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html#gatewayattachment
+  # Template would fail to create stack without DependsOn
+  # https://github.com/awslabs/serverless-application-model/issues/68#issuecomment-276495326
+
+  MyLambdaFunction:
+    Type: "AWS::Serverless::Function"
+    DependsOn: LambdaRolePolicy
+    Properties:
+      Role:
+        "Fn::GetAtt": LambdaRole.Arn
+      Handler: lambda_function.lambda_handler
+      Runtime: python2.7
+      Timeout: 15
+      CodeUri: ${codeuri}
+
+  LambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+
+  LambdaRolePolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: "LambdaRolePolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+            Resource:
+              - "*"
+      Roles:
+        -
+          Ref: "LambdaRole"
+

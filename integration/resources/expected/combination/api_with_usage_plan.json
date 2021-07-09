@@ -1,0 +1,20 @@
+[
+  { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"MyApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"MyApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
+  { "LogicalResourceId":"MyApiUsagePlan", "ResourceType":"AWS::ApiGateway::UsagePlan" },
+  { "LogicalResourceId":"MyApiUsagePlanKey", "ResourceType":"AWS::ApiGateway::UsagePlanKey" },
+  { "LogicalResourceId":"MyApiApiKey", "ResourceType":"AWS::ApiGateway::ApiKey" },
+  { "LogicalResourceId":"MyApi2", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"MyApi2Deployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"MyApi2ProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
+  { "LogicalResourceId":"MyApi3", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"MyApi3Deployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"MyApi3ProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
+  { "LogicalResourceId":"MyApi4", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"MyApi4Deployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"MyApi4ProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
+  { "LogicalResourceId":"ServerlessUsagePlan", "ResourceType":"AWS::ApiGateway::UsagePlan" },
+  { "LogicalResourceId":"ServerlessUsagePlanKey", "ResourceType":"AWS::ApiGateway::UsagePlanKey" },
+  { "LogicalResourceId":"ServerlessApiKey", "ResourceType":"AWS::ApiGateway::ApiKey" }
+]

@@ -1,0 +1,9 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyLambdaFunctionPostApiPermissionDev", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"MyLambdaFunctionGetApiPermissionDev", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"ExistingRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"ExistingRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"ExistingRestApiDevStage", "ResourceType":"AWS::ApiGateway::Stage" }
+]

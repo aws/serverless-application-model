@@ -23,6 +23,8 @@ class SwaggerEditor(object):
     _X_APIGW_GATEWAY_RESPONSES = "x-amazon-apigateway-gateway-responses"
     _X_APIGW_POLICY = "x-amazon-apigateway-policy"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
+    _X_APIGW_REQUEST_VALIDATORS = "x-amazon-apigateway-request-validators"
+    _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validator"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -781,6 +783,46 @@ class SwaggerEditor(object):
             if security != existing_security:
                 method_definition["security"] = security
 
+    def add_request_validator_to_method(self, path, method_name, validate_body=False, validate_parameters=False):
+        """
+        Adds request model body parameter for this path/method.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param bool validate_body: Add validator parameter on the body
+        :param bool validate_parameters: Validate request
+        """
+
+        normalized_method_name = self._normalize_method_name(method_name)
+        validator_name = SwaggerEditor.get_validator_name(validate_body, validate_parameters)
+
+        # Creating validator
+        request_validator_definition = {
+            validator_name: {"validateRequestBody": validate_body, "validateRequestParameters": validate_parameters}
+        }
+        if not self._doc.get(self._X_APIGW_REQUEST_VALIDATORS):
+            self._doc[self._X_APIGW_REQUEST_VALIDATORS] = {}
+
+        if not self._doc[self._X_APIGW_REQUEST_VALIDATORS].get(validator_name):
+            # Adding only if the validator hasn't been defined already
+            self._doc[self._X_APIGW_REQUEST_VALIDATORS].update(request_validator_definition)
+
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for path_method_name, method in self.get_path(path).items():
+            normalized_path_method_name = self._normalize_method_name(path_method_name)
+
+            # Adding it to only given method to the path
+            if normalized_path_method_name == normalized_method_name:
+                for method_definition in self.get_method_contents(method):
+
+                    # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                    if not self.method_definition_has_integration(method_definition):
+                        continue
+
+                    set_validator_to_method = {self._X_APIGW_REQUEST_VALIDATOR: validator_name}
+                    # Setting validator to the given method
+                    method_definition.update(set_validator_to_method)
+
     def add_request_model_to_method(self, path, method_name, request_model):
         """
         Adds request model body parameter for this path/method.
@@ -1264,6 +1306,26 @@ class SwaggerEditor(object):
     def get_path_without_trailing_slash(path):
         # convert greedy paths to such as {greedy+}, {proxy+} to "*"
         return re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
+
+    @staticmethod
+    def get_validator_name(validate_body, validate_parameters):
+        """
+        Get a readable path name to use as validator name
+
+        :param boolean validate_body: Boolean if validate body
+        :param boolean validate_request: Boolean if validate request
+        :return string: Normalized validator name
+        """
+        if validate_body and validate_parameters:
+            return "body-and-params"
+
+        if validate_body and not validate_parameters:
+            return "body-only"
+
+        if not validate_body and validate_parameters:
+            return "params-only"
+
+        return "no-validation"
 
     @staticmethod
     def _validate_list_property_is_resolved(property_list):

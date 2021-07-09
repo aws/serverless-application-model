@@ -24,6 +24,13 @@ Resources:
             Method: post
             RestApiId: !Ref ServerlessApi
 
+        AnyHtml:
+          Type: Api
+          Properties:
+            Path: /any
+            Method: any
+            RestApiId: !Ref ServerlessApi
+
 
   ServerlessApi:
     Type: AWS::Serverless::Api

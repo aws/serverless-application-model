@@ -21,3 +21,18 @@ Resources:
                     Action: 'execute-api:blah', 
                     Resource: ['execute-api:/*/*/*']
                   }]
+        AddItemAnyMethod:
+          Type: Api
+          Properties:
+            Path: /any/add
+            Method: any
+            Auth:
+              ResourcePolicy:
+                CustomStatements: [{
+                                     Action: 'execute-api:Invoke',
+                                     Resource: ['execute-api:/*/*/*']
+                                   },
+                                   {
+                                     Action: 'execute-api:blah',
+                                     Resource: ['execute-api:/*/*/*']
+                                   }]

@@ -34,7 +34,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "HtmlApiDeployment3744537077"
+          "Ref": "HtmlApiDeploymenta918aefe10"
         }, 
         "RestApiId": {
           "Ref": "HtmlApi"
@@ -61,13 +61,32 @@
         }
       }
     },
-    "HtmlApiDeployment3744537077": {
+    "HtmlFunctionAnyPathPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "HtmlFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/any",
+            {
+              "__ApiId__": "HtmlApi",
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "HtmlApiDeploymenta918aefe10": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "HtmlApi"
         }, 
-        "Description": "RestApi deployment id: 374453707756d2ce5439fb8f0995a4ced3659a0e",
+        "Description": "RestApi deployment id: a918aefe10cedb759cd5d8b070774d1e1804de32",
         "StageName": "Stage"
       }
     }, 
@@ -105,6 +124,28 @@
                     "schema": {
                       "$ref": "#/definitions/user"
                     }
+                  }
+                ]
+              }
+            },
+            "/any": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
+                  }
+                },
+                "responses": {},
+                "parameters": [
+                  {
+                    "in": "body",
+                    "name": "user",
+                    "schema": {
+                      "$ref": "#/definitions/user"
+                    },
+                    "required": true
                   }
                 ]
               }

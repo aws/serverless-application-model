@@ -19,11 +19,25 @@ Resources:
             RestApiId: !Ref MyApiWithAwsIamAuth
             Path: /
             Method: post
+        MyApiWithAwsIamAuthAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Path: /any/iam
+            Method: any
         MyApiWithNoAuth:
           Type: Api
           Properties:
             RestApiId: !Ref MyApiWithAwsIamAuth
             Path: /
             Method: get
+            Auth:
+              Authorizer: 'NONE'
+        MyApiWithNoAuthAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithAwsIamAuth
+            Path: /any/none
+            Method: any
             Auth:
               Authorizer: 'NONE'
