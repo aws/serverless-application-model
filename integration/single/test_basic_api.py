@@ -30,7 +30,7 @@ class TestBasicApi(BaseTest):
         Creates an API and updates its DefinitionUri
         """
         # Create an API with get and put
-        self.create_and_verify_stack("basic_api_with_mode")
+        self.create_and_verify_stack("single/basic_api_with_mode")
 
         stack_output = self.get_stack_outputs()
         api_endpoint = stack_output.get("ApiEndpoint")
@@ -38,7 +38,7 @@ class TestBasicApi(BaseTest):
         self.assertEqual(response.status_code, 200)
 
         # Removes get from the API
-        self.update_and_verify_stack("basic_api_with_mode_update")
+        self.update_and_verify_stack("single/basic_api_with_mode_update")
         response = requests.get(f"{api_endpoint}/get")
         # API Gateway by default returns 403 if a path do not exist
         self.assertEqual(response.status_code, 403)
