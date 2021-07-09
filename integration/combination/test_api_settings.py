@@ -161,7 +161,7 @@ class TestApiSettings(BaseTest):
         response = requests.get(url, headers=headers)
 
         status = response.status_code
-        expected_file_path = Path(self.code_dir, "AWS_logo_RGB.png")
+        expected_file_path = str(Path(self.code_dir, "AWS_logo_RGB.png"))
 
         with open(expected_file_path, mode="rb") as file:
             expected_file_content = file.read()
