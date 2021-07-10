@@ -1,4 +1,4 @@
-from io import BytesIO
+import hashlib
 
 try:
     from pathlib import Path
@@ -9,8 +9,6 @@ import requests
 from parameterized import parameterized
 
 from integration.helpers.base_test import BaseTest
-
-from PIL import Image
 
 
 class TestApiSettings(BaseTest):
@@ -163,11 +161,15 @@ class TestApiSettings(BaseTest):
         response = requests.get(url, headers=headers)
 
         status = response.status_code
-        expected = Image.open(Path(self.code_dir, "AWS_logo_RGB.png"))
+        expected_file_path = str(Path(self.code_dir, "AWS_logo_RGB.png"))
+
+        with open(expected_file_path, mode="rb") as file:
+            expected_file_content = file.read()
+        expected_hash = hashlib.sha1(expected_file_content).hexdigest()
 
         if 200 <= status <= 299:
-            actual = Image.open(BytesIO(response.content))
-            self.assertEqual(expected, actual)
+            actual_hash = hashlib.sha1(response.content).hexdigest()
+            self.assertEqual(expected_hash, actual_hash)
 
         self.assertEqual(status, expected_status_code, " must return HTTP " + str(expected_status_code))
 
