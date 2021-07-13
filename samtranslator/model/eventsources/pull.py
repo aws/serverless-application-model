@@ -1,7 +1,8 @@
+from six import integer_types
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
-from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import is_type, is_str
+from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX,  PropertyType
+from samtranslator.model.types import is_type, is_str, list_of
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -39,6 +40,7 @@ class PullEventSource(ResourceMacro):
         "SecretsManagerKmsKeyId": PropertyType(False, is_str()),
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
+        "KafkaBootstrapServers": PropertyType(False, list_of(is_str())),
     }
 
     def get_policy_arn(self):
@@ -98,6 +100,11 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.SourceAccessConfigurations = self.SourceAccessConfigurations
         lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
         lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
+
+        if self.KafkaBootstrapServers:
+            lambda_eventsourcemapping.SelfManagedEventSource = {
+                "Endpoints": {"KafkaBootstrapServers": self.KafkaBootstrapServers}
+            }
 
         destination_config_policy = None
         if self.DestinationConfig:
@@ -286,3 +293,125 @@ class MQ(PullEventSource):
             }
             document["PolicyDocument"]["Statement"].append(kms_policy)
         return [document]
+
+
+class SelfManagedKafka(PullEventSource):
+    """
+    SelfManagedKafka event source
+    """
+
+    resource_type = "SelfManagedKafka"
+    AUTH_MECHANISM = ["SASL_SCRAM_256_AUTH", "SASL_SCRAM_512_AUTH", "BASIC_AUTH"]
+
+    def get_policy_arn(self):
+        return None
+
+    def get_policy_statements(self):
+        if not self.KafkaBootstrapServers:
+            raise InvalidEventException(
+                self.relative_id,
+                "No KafkaBootstrapServers provided for self managed kafka as an event source",
+            )
+
+        if not self.Topics:
+            raise InvalidEventException(
+                self.relative_id,
+                "No Topics provided for self managed kafka as an event source",
+            )
+
+        if not (len(self.Topics) == 1):
+            raise InvalidEventException(
+                self.relative_id,
+                "Topics for self managed kafka only supports single configuration entry.",
+            )
+
+        if not self.SourceAccessConfigurations:
+            raise InvalidEventException(
+                self.relative_id,
+                "No SourceAccessConfigurations for self managed kafka event provided.",
+            )
+
+        authentication_uri = self.get_secret_key()
+
+        document = {
+            "PolicyDocument": {
+                "Statement": [
+                    {"Action": ["secretsmanager:GetSecretValue"], "Effect": "Allow", "Resource": authentication_uri},
+                    {
+                        "Action": [
+                            "ec2:CreateNetworkInterface",
+                            "ec2:DescribeNetworkInterfaces",
+                            "ec2:DeleteNetworkInterface",
+                            "ec2:DescribeVpcs",
+                            "ec2:DescribeSubnets",
+                            "ec2:DescribeSecurityGroups",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": "*",
+                    },
+                    {
+                        "Action": [
+                            "mq:DescribeBroker",
+                        ],
+                        "Effect": "Allow",
+                        "Resource": self.Broker,
+                    },
+                ],
+                "Version": "2012-10-17",
+            },
+            "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+        }
+
+        if self.SecretsManagerKmsKeyId:
+            kms_policy = {
+                "Action": ["kms:Decrypt"],
+                "Effect": "Allow",
+                "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
+                    + self.SecretsManagerKmsKeyId
+                },
+            }
+            document["PolicyDocument"]["Statement"].append(kms_policy)
+        return [document]
+
+    def get_secret_key(self):
+        authentication_uri = None
+        vpc_config_count = 0
+        for config in self.SourceAccessConfigurations:
+            if config["Type"] == "VPC_SUBNET":
+                if not config["URI"]:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "No VPC_SUBNET URI property specified in SourceAccessConfigurations for self managed kafka event.",
+                    )
+                vpc_config_count += 1
+
+            if config["Type"] == "VPC_SECURITY_GROUP":
+                if not config["URI"]:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "No VPC_SECURITY_GROUP URI property specified in SourceAccessConfigurations for self managed kafka event.",
+                    )
+                vpc_config_count += 1
+
+            if config["Type"] in self.AUTH_MECHANISM:
+                if authentication_uri:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Multiple auth mechanism properties specified in SourceAccessConfigurations for self managed kafka event.",
+                    )
+                authentication_uri = config["URI"]
+
+        if vpc_config_count and vpc_config_count != 2:
+            raise InvalidEventException(
+                self.relative_id,
+                "VPC_SUBNET and VPC_SECURITY_GROUP in SourceAccessConfigurations for SelfManagedKafka not provided.",
+            )
+
+        if not authentication_uri:
+            raise InvalidEventException(
+                self.relative_id,
+                "No AUTH URI property specified in SourceAccessConfigurations for self managed kafka event.",
+            )
+
+        return authentication_uri

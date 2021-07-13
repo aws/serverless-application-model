@@ -450,6 +450,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_swagger_integration_with_ref_intrinsic_api_id",
                 "function_with_architectures",
                 "function_with_intrinsic_architecture",
+                "function_with_self_managed_kafka",
+                "function_with_single_auth_for_self_managed_kafka",
             ],
             [
                 ("aws", "ap-southeast-1"),
