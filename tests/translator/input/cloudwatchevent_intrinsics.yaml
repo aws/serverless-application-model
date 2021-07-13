@@ -1,3 +1,25 @@
+Parameters:
+  Param1:
+    Type: EventPattern
+    Default:
+      Pattern:
+        detail:
+          state:
+            - terminated
+  Param2:
+    Type: EventPattern
+    Default:
+      Pattern:
+        detail:
+          state:
+            - terminated
+
+Conditions:
+  FunctionCondition:
+    Fn::Equals:
+      - true
+      - true
+
 Resources:
   FunctionA:
     Type: 'AWS::Serverless::Function'
@@ -25,7 +47,6 @@ Resources:
           Type: CloudWatchEvent
           Properties:
             EventBusName: !Join [ ":", [ "Event", "Bus", "Name" ] ]
-            Pattern: !GetAtt ScheduledFunction.Events.FunctionA.Properties.Pattern
+            Pattern: !If [FunctionCondition, !Ref Param1, !Ref Param2]
             Input: !Sub InputValue
             InputPath: !Sub InputPathValue
-

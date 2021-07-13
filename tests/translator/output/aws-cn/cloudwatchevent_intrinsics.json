@@ -1,4 +1,38 @@
 {
+  "Parameters": {
+    "Param1": {
+      "Type": "EventPattern",
+      "Default": {
+        "Pattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        }
+      }
+    },
+    "Param2": {
+      "Type": "EventPattern",
+      "Default": {
+        "Pattern": {
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Conditions": {
+    "FunctionCondition": {
+      "Fn::Equals": [
+        true,
+        true
+      ]
+    }
+  },
   "Resources": {
     "FunctionA": {
       "Type": "AWS::Lambda::Function",
@@ -162,9 +196,14 @@
           ]
         },
         "EventPattern": {
-          "Fn::GetAtt": [
-            "ScheduledFunction",
-            "Events.FunctionA.Properties.Pattern"
+          "Fn::If": [
+            "FunctionCondition",
+            {
+              "Ref": "Param1"
+            },
+            {
+              "Ref": "Param2"
+            }
           ]
         },
         "Targets": [
