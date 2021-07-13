@@ -1,32 +1,16 @@
 {
   "Parameters": {
-    "Param1": {
-      "Type": "EventPattern",
-      "Default": {
-        "Pattern": {
-          "detail": {
-            "state": [
-              "terminated"
-            ]
-          }
-        }
-      }
+    "PathA": {
+      "Type": "String",
+      "Default": "SomeInputPath"
     },
-    "Param2": {
-      "Type": "EventPattern",
-      "Default": {
-        "Pattern": {
-          "detail": {
-            "state": [
-              "terminated"
-            ]
-          }
-        }
-      }
+    "PathB": {
+      "Type": "String",
+      "Default": "AnotherInputPath"
     }
   },
   "Conditions": {
-    "FunctionCondition": {
+    "PathCondition": {
       "Fn::Equals": [
         true,
         true
@@ -34,18 +18,17 @@
     }
   },
   "Resources": {
-    "FunctionA": {
+    "LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
-          "S3Key": "hello.zip",
-          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
+          "S3Key": "hello.zip"
         },
         "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
-            "FunctionARole",
+            "LambdaFunctionRole",
             "Arn"
           ]
         },
@@ -58,7 +41,7 @@
         ]
       }
     },
-    "FunctionARole": {
+    "LambdaFunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -88,106 +71,12 @@
         ]
       }
     },
-    "FunctionAOnTerminate2": {
-      "Type": "AWS::Events::Rule",
-      "Properties": {
-        "EventBusName": "EventBusName",
-        "EventPattern": {
-          "detail": {
-            "state": [
-              "terminated"
-            ]
-          }
-        },
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "FunctionA",
-                "Arn"
-              ]
-            },
-            "Id": "FunctionAOnTerminate2LambdaTarget"
-          }
-        ]
-      }
-    },
-    "FunctionAOnTerminate2Permission": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "FunctionA"
-        },
-        "Principal": "events.amazonaws.com",
-        "SourceArn": {
-          "Fn::GetAtt": [
-            "FunctionAOnTerminate2",
-            "Arn"
-          ]
-        }
-      }
-    },
-    "FunctionB": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "hello.zip",
-          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
-        },
-        "Handler": "hello.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "FunctionBRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "python2.7",
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "FunctionBRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "FunctionBOnTerminate": {
+    "LambdaFunctionOnTerminate": {
       "Type": "AWS::Events::Rule",
       "Properties": {
         "EventBusName": {
           "Fn::Join": [
-            ":",
+            "",
             [
               "Event",
               "Bus",
@@ -196,46 +85,56 @@
           ]
         },
         "EventPattern": {
-          "Fn::If": [
-            "FunctionCondition",
-            {
-              "Ref": "Param1"
-            },
-            {
-              "Ref": "Param2"
-            }
-          ]
+          "detail": {
+            "state": [
+              "terminated"
+            ]
+          }
         },
         "Targets": [
           {
             "Arn": {
               "Fn::GetAtt": [
-                "FunctionB",
+                "LambdaFunction",
                 "Arn"
               ]
             },
-            "Id": "FunctionBOnTerminateLambdaTarget",
+            "Id": "LambdaFunctionOnTerminateLambdaTarget",
             "Input": {
-              "Fn::Sub": "InputValue"
+              "Fn::Join": [
+                ":",
+                [
+                  "{ Key",
+                  "Value }"
+                ]
+              ]
             },
             "InputPath": {
-              "Fn::Sub": "InputPathValue"
+              "Fn::If": [
+                "PathCondition",
+                {
+                  "Ref": "PathA"
+                },
+                {
+                  "Ref": "PathB"
+                }
+              ]
             }
           }
         ]
       }
     },
-    "FunctionBOnTerminatePermission": {
+    "LambdaFunctionOnTerminatePermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
-          "Ref": "FunctionB"
+          "Ref": "LambdaFunction"
         },
         "Principal": "events.amazonaws.com",
         "SourceArn": {
           "Fn::GetAtt": [
-            "FunctionBOnTerminate",
+            "LambdaFunctionOnTerminate",
             "Arn"
           ]
         }
