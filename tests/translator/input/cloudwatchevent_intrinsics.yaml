@@ -24,9 +24,8 @@ Resources:
           Type: CloudWatchEvent
           Properties:
             EventBusName: !Join [ "", [ "Event", "Bus", "Name" ] ]
+            Input: !Join [ ":", [ "{ Key", "Value }" ] ]
+            InputPath: !If [ PathCondition, !Ref PathA, !Ref PathB ]
             Pattern:
               detail:
-                state:
-                  - terminated
-            Input: !Join [ ":", [ "{ Key", "Value }" ] ]
-            InputPath: !If [PathCondition, !Ref PathA, !Ref PathB]
+                state: !Split [ "," , "terminated,stopped" ]
