@@ -842,6 +842,7 @@ class SamCanary(SamResourceMacro):
         return resources
 
     def _construct_synthetics_canary(self):
+
         """Constructs a AWS::Synthetics::Canary resource."""
         canary = SyntheticsCanary(
             self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()
@@ -850,7 +851,9 @@ class SamCanary(SamResourceMacro):
         canary.Code = self._construct_code_dict
         canary.ExecutionRoleArn = self.Role
         canary.FailureRetentionPeriod = self.FailureRetentionPeriod
-        canary.Name = self.FunctionName if self.FunctionName else self.logical_id
+        # sets the default name as the logical id because Synthetics Canary resource requires Name property,
+        # also requires it be lower case
+        canary.Name = self.FunctionName if self.FunctionName else self.logical_id.lower()
         canary.RuntimeVersion = self.Runtime
         canary.Schedule = self.Schedule
         canary.StartCanaryAfterCreation = self.StartCanaryAfterCreation
@@ -896,31 +899,19 @@ class SamCanary(SamResourceMacro):
         # accepted artifacts
         artifacts = {"InlineCode": self.InlineCode, "CodeUri": self.CodeUri}
 
-        # Inline function for transformation of inline code.
-        # It accepts arbitrary argumemnts, because the arguments do not matter for the result.
-        def _construct_inline_code(*args, **kwargs):
-            return {"Handler": self.Handler, "Script": self.InlineCode}
-
-        # dispatch mechanism per artifact on how it needs to be transformed.
-        artifact_dispatch = {
-            "InlineCode": _construct_inline_code,
-            "CodeUri": construct_s3_location_object,
-        }
-
         filtered_artifacts = self._extract_not_none_properties(artifacts.items())
         filtered_artifact_keys = list(filtered_artifacts.keys())
 
         if "InlineCode" in filtered_artifact_keys:
-            set_artifact = "InlineCode"
+            # Inline function for transformation of inline code.
+            return {"Handler": self.Handler, "Script": self.InlineCode}
         elif "CodeUri" in filtered_artifact_keys:
-            set_artifact = "CodeUri"
+            # extracts Bucket and Key values, adds Handler and extracted values to Code object
+            code = construct_s3_location_object(self.CodeUri, self.logical_id, "CodeUri")
+            code["Handler"] = self.Handler
+            return code
         else:
             raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
-
-        dispatch_function = artifact_dispatch[set_artifact]
-        code = dispatch_function(artifacts[set_artifact], self.logical_id, set_artifact)
-        code["Handler"] = self.Handler
-        return code
 
 
 class SamApi(SamResourceMacro):
