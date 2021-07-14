@@ -86,9 +86,12 @@
         },
         "EventPattern": {
           "detail": {
-            "state": [
-              "terminated"
-            ]
+            "state": {
+              "Fn::Split": [
+                ",",
+                "terminated,stopped"
+              ]
+            }
           }
         },
         "Targets": [
