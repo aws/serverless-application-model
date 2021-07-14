@@ -23,7 +23,6 @@ class SelfManagedKafkaEventSource(TestCase):
         self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
         self.kafka_event_source.Enabled = True
         self.kafka_event_source.BatchSize = 1
-        self.kafka_event_source.Broker = "SECRET_KEY"
 
         policy_statements = self.kafka_event_source.get_policy_statements()
         expected_policy_document = [
@@ -43,13 +42,6 @@ class SelfManagedKafkaEventSource(TestCase):
                             "Effect": "Allow",
                             "Resource": "*",
                         },
-                        {
-                            "Action": [
-                                "mq:DescribeBroker",
-                            ],
-                            "Effect": "Allow",
-                            "Resource": self.kafka_event_source.Broker,
-                        },
                     ],
                     "Version": "2012-10-17",
                 },
@@ -59,15 +51,14 @@ class SelfManagedKafkaEventSource(TestCase):
 
         self.assertEqual(policy_statements, expected_policy_document)
 
-    def test_get_policy_statements_with_required_auth_mechanism(self):
+    def test_get_policy_statements_with_only_auth_mechanism(self):
         self.kafka_event_source.SourceAccessConfigurations = [
-            {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
+            {"Type": "BASIC_AUTH", "URI": "SECRET_URI"},
         ]
         self.kafka_event_source.Topics = ["Topics"]
         self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
         self.kafka_event_source.Enabled = True
         self.kafka_event_source.BatchSize = 1
-        self.kafka_event_source.Broker = "SECRET_KEY"
 
         policy_statements = self.kafka_event_source.get_policy_statements()
         expected_policy_document = [
@@ -75,6 +66,30 @@ class SelfManagedKafkaEventSource(TestCase):
                 "PolicyDocument": {
                     "Statement": [
                         {"Action": ["secretsmanager:GetSecretValue"], "Effect": "Allow", "Resource": "SECRET_URI"},
+                    ],
+                    "Version": "2012-10-17",
+                },
+                "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+            }
+        ]
+
+        self.assertEqual(policy_statements, expected_policy_document)
+
+    def test_get_policy_statements_with_only_vpc_config(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        policy_statements = self.kafka_event_source.get_policy_statements()
+        expected_policy_document = [
+            {
+                "PolicyDocument": {
+                    "Statement": [
                         {
                             "Action": [
                                 "ec2:CreateNetworkInterface",
@@ -87,13 +102,6 @@ class SelfManagedKafkaEventSource(TestCase):
                             "Effect": "Allow",
                             "Resource": "*",
                         },
-                        {
-                            "Action": [
-                                "mq:DescribeBroker",
-                            ],
-                            "Effect": "Allow",
-                            "Resource": self.kafka_event_source.Broker,
-                        },
                     ],
                     "Version": "2012-10-17",
                 },
@@ -103,13 +111,27 @@ class SelfManagedKafkaEventSource(TestCase):
 
         self.assertEqual(policy_statements, expected_policy_document)
 
-    def test_must_raise_for_missing_topic(self):
+    def test_must_raise_for_missing_topics(self):
         self.kafka_event_source.SourceAccessConfigurations = [
             {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
             {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
             {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
         ]
         self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+
+        with self.assertRaises(InvalidEventException):
+            self.kafka_event_source.get_policy_statements()
+
+    def test_must_raise_for_multiple_topics(self):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Topics = ["Topics1", "Topics2"]
         self.kafka_event_source.Enabled = True
         self.kafka_event_source.BatchSize = 1
 

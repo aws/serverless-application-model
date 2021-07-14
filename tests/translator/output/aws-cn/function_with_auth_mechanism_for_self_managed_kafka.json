@@ -45,7 +45,7 @@
           ]
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Policies": [
           {
@@ -57,25 +57,6 @@
                   ],
                   "Effect": "Allow",
                   "Resource": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
-                },
-                {
-                  "Action": [
-                    "ec2:CreateNetworkInterface",
-                    "ec2:DescribeNetworkInterfaces",
-                    "ec2:DeleteNetworkInterface",
-                    "ec2:DescribeVpcs",
-                    "ec2:DescribeSubnets",
-                    "ec2:DescribeSecurityGroups"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*"
-                },
-                {
-                  "Action": [
-                    "mq:DescribeBroker"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "BROKER-ARN"
                 }
               ],
               "Version": "2012-10-17"

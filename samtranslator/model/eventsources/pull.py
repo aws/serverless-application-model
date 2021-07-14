@@ -76,7 +76,7 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if not self.Stream and not self.Queue and not self.Broker:
+        if not (self.resource_type == "SelfManagedKafka") and not self.Stream and not self.Queue and not self.Broker:
             raise InvalidEventException(
                 self.relative_id,
                 "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
@@ -330,53 +330,37 @@ class SelfManagedKafka(PullEventSource):
                 self.relative_id,
                 "No SourceAccessConfigurations for self managed kafka event provided.",
             )
+        document = self.generate_policy_document()
+        return [document]
 
-        authentication_uri = self.get_secret_key()
-
+    def generate_policy_document(self):
         document = {
             "PolicyDocument": {
-                "Statement": [
-                    {"Action": ["secretsmanager:GetSecretValue"], "Effect": "Allow", "Resource": authentication_uri},
-                    {
-                        "Action": [
-                            "ec2:CreateNetworkInterface",
-                            "ec2:DescribeNetworkInterfaces",
-                            "ec2:DeleteNetworkInterface",
-                            "ec2:DescribeVpcs",
-                            "ec2:DescribeSubnets",
-                            "ec2:DescribeSecurityGroups",
-                        ],
-                        "Effect": "Allow",
-                        "Resource": "*",
-                    },
-                    {
-                        "Action": [
-                            "mq:DescribeBroker",
-                        ],
-                        "Effect": "Allow",
-                        "Resource": self.Broker,
-                    },
-                ],
+                "Statement": [],
                 "Version": "2012-10-17",
             },
             "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
         }
 
+        authentication_uri, has_vpc_config = self.get_secret_key()
+        if authentication_uri:
+            secret_manager = self.get_secret_manger_secret(authentication_uri)
+            document["PolicyDocument"]["Statement"].append(secret_manager)
+
+        if has_vpc_config:
+            vpc_permissions = self.get_vpc_permission()
+            document["PolicyDocument"]["Statement"].append(vpc_permissions)
+
         if self.SecretsManagerKmsKeyId:
-            kms_policy = {
-                "Action": ["kms:Decrypt"],
-                "Effect": "Allow",
-                "Resource": {
-                    "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
-                    + self.SecretsManagerKmsKeyId
-                },
-            }
+            kms_policy = self.get_kms_policy()
             document["PolicyDocument"]["Statement"].append(kms_policy)
-        return [document]
+
+        return document
 
     def get_secret_key(self):
         authentication_uri = None
-        vpc_config_count = 0
+        has_vpc_subnet = False
+        has_vpc_security_group = False
         for config in self.SourceAccessConfigurations:
             if config["Type"] == "VPC_SUBNET":
                 if not config["URI"]:
@@ -384,7 +368,7 @@ class SelfManagedKafka(PullEventSource):
                         self.relative_id,
                         "No VPC_SUBNET URI property specified in SourceAccessConfigurations for self managed kafka event.",
                     )
-                vpc_config_count += 1
+                has_vpc_subnet = True
 
             if config["Type"] == "VPC_SECURITY_GROUP":
                 if not config["URI"]:
@@ -392,7 +376,7 @@ class SelfManagedKafka(PullEventSource):
                         self.relative_id,
                         "No VPC_SECURITY_GROUP URI property specified in SourceAccessConfigurations for self managed kafka event.",
                     )
-                vpc_config_count += 1
+                has_vpc_security_group = True
 
             if config["Type"] in self.AUTH_MECHANISM:
                 if authentication_uri:
@@ -402,16 +386,42 @@ class SelfManagedKafka(PullEventSource):
                     )
                 authentication_uri = config["URI"]
 
-        if vpc_config_count and vpc_config_count != 2:
+        if not (has_vpc_subnet == has_vpc_security_group):
             raise InvalidEventException(
                 self.relative_id,
                 "VPC_SUBNET and VPC_SECURITY_GROUP in SourceAccessConfigurations for SelfManagedKafka not provided.",
             )
+        return authentication_uri, (has_vpc_subnet and has_vpc_security_group)
 
-        if not authentication_uri:
-            raise InvalidEventException(
-                self.relative_id,
-                "No AUTH URI property specified in SourceAccessConfigurations for self managed kafka event.",
-            )
+    def get_secret_manger_secret(self, authentication_uri):
+        secret_manager = {
+            "Action": ["secretsmanager:GetSecretValue"],
+            "Effect": "Allow",
+            "Resource": authentication_uri,
+        }
+        return secret_manager
 
-        return authentication_uri
+    def get_vpc_permission(self):
+        vpc_permissions = {
+            "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+        }
+        return vpc_permissions
+
+    def get_kms_policy(self):
+        kms_policy = {
+            "Action": ["kms:Decrypt"],
+            "Effect": "Allow",
+            "Resource": {
+                "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
+                + self.SecretsManagerKmsKeyId
+            },
+        }

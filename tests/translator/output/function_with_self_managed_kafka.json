@@ -69,13 +69,6 @@
                   ],
                   "Effect": "Allow",
                   "Resource": "*"
-                },
-                {
-                  "Action": [
-                    "mq:DescribeBroker"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "BROKER-ARN"
                 }
               ],
               "Version": "2012-10-17"

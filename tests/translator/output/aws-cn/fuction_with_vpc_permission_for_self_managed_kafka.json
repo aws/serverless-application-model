@@ -45,19 +45,12 @@
           ]
         },
         "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Policies": [
           {
             "PolicyDocument": {
               "Statement": [
-                {
-                  "Action": [
-                    "secretsmanager:GetSecretValue"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
-                },
                 {
                   "Action": [
                     "ec2:CreateNetworkInterface",
@@ -95,10 +88,6 @@
           "Topic1"
         ],
         "SourceAccessConfigurations": [
-          {
-            "Type": "SASL_SCRAM_512_AUTH",
-            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
-          },
           {
             "Type": "VPC_SUBNET",
             "URI": "subnet:subnet-12345"
