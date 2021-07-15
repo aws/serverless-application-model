@@ -6,11 +6,12 @@ from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
 from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion
+from samtranslator.model.cloudwatch import SyntheticsCanary
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.packagetype import IMAGE, ZIP
-from samtranslator.model.sam_resources import SamFunction, SamApi, SamHttpApi
+from samtranslator.model.sam_resources import SamFunction, SamApi, SamHttpApi, SamCanary
 
 
 class TestCodeUriandImageUri(TestCase):
@@ -167,6 +168,109 @@ class TestVersionDescription(TestCase):
         cfnResources = function.to_cloudformation(**self.kwargs)
         generateFunctionVersion = [x for x in cfnResources if isinstance(x, LambdaVersion)]
         self.assertEqual(generateFunctionVersion[0].Description, test_description)
+
+
+class TestCanaryCodeUriandInlineCode(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_code_uri(self):
+        canary = SamCanary("foo")
+        canary.CodeUri = "s3://foobar/foo.zip"
+        canary.Runtime = "foo"
+        canary.Handler = "bar"
+
+        cfnResources = canary.to_cloudformation(**self.kwargs)
+        generatedFunctionList = [x for x in cfnResources if isinstance(x, SyntheticsCanary)]
+        self.assertEqual(generatedFunctionList.__len__(), 1)
+        self.assertEqual(generatedFunctionList[0].Code, {"S3Key": "foo.zip", "S3Bucket": "foobar", "Handler": "bar"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_inline_code(self):
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+        canary.Runtime = "foo"
+        canary.Handler = "bar"
+
+        cfnResources = canary.to_cloudformation(**self.kwargs)
+        generatedFunctionList = [x for x in cfnResources if isinstance(x, SyntheticsCanary)]
+        self.assertEqual(generatedFunctionList.__len__(), 1)
+        self.assertEqual(generatedFunctionList[0].Code, {"Script": "foobar", "Handler": "bar"})
+
+    def test_with_no_code_uri_or_inline_code(self):
+        canary = SamCanary("foo")
+        with pytest.raises(InvalidResourceException):
+            canary.to_cloudformation(**self.kwargs)
+
+
+class TestCanaryRunConfig(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_no_run_config_properties(self):
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+
+        resources = canary.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].RunConfig, None)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_environment_property(self):
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+        canary.Environment = {"Variables": {"Key1": "Key1", "Key2": "Key2"}}
+
+        resources = canary.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].RunConfig.__len__(), 1)
+        self.assertEqual(deployment[0].RunConfig["EnvironmentVariables"], {"Key1": "Key1", "Key2": "Key2"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_all_run_config_properties(self):
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+        canary.Environment = {"Variables": {"Key1": "Key1", "Key2": "Key2"}}
+        canary.MemorySize = 10
+        canary.Timeout = 100
+        canary.Tracing = True
+
+        resources = canary.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].RunConfig.__len__(), 4)
+        self.assertEqual(deployment[0].RunConfig["EnvironmentVariables"], {"Key1": "Key1", "Key2": "Key2"})
+        self.assertEqual(deployment[0].RunConfig["MemoryInMB"], 10)
+        self.assertEqual(deployment[0].RunConfig["TimeoutInSeconds"], 100)
+        self.assertEqual(deployment[0].RunConfig["ActiveTracing"], True)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_some_run_config_properties(self):
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+        canary.Timeout = 90
+        canary.MemorySize = 10
+
+        resources = canary.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].RunConfig.__len__(), 2)
+        self.assertEqual(deployment[0].RunConfig["TimeoutInSeconds"], 90)
+        self.assertEqual(deployment[0].RunConfig["MemoryInMB"], 10)
 
 
 class TestOpenApi(TestCase):

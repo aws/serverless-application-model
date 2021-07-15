@@ -1,6 +1,7 @@
 do_not_verify = {
     # type_after_transform: type_before_transform
     "AWS::Lambda::Function": "AWS::Serverless::Function",
+    "AWS::Synthetics::Canary": "AWS::Serverless::Canary",
     "AWS::Lambda::LayerVersion": "AWS::Serverless::LayerVersion",
     "AWS::ApiGateway::RestApi": "AWS::Serverless::Api",
     "AWS::ApiGatewayV2::Api": "AWS::Serverless::HttpApi",

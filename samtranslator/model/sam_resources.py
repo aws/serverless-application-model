@@ -22,6 +22,7 @@ from samtranslator.model.apigateway import (
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
 from samtranslator.model.cloudformation import NestedStack
+from samtranslator.model.cloudwatch import SyntheticsCanary
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
@@ -800,6 +801,120 @@ class SamFunction(SamResourceMacro):
             lambda_alias.set_resource_attribute(
                 "UpdatePolicy", deployment_preference_collection.update_policy(self.logical_id).to_dict()
             )
+
+
+class SamCanary(SamResourceMacro):
+    """SAM canary macro."""
+
+    resource_type = "AWS::Serverless::Canary"
+    property_types = {
+        "FunctionName": PropertyType(False, is_str()),
+        "Handler": PropertyType(True, is_str()),
+        "Runtime": PropertyType(True, is_str()),
+        "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "MemorySize": PropertyType(False, is_type(int)),
+        "Tags": PropertyType(False, is_type(dict)),
+        "Tracing": PropertyType(False, is_type(bool)),
+        "Timeout": PropertyType(False, is_type(int)),
+        "Role": PropertyType(False, is_str()),
+        "Schedule": PropertyType(True, is_type(dict)),
+        "StartCanaryAfterCreation": PropertyType(True, is_type(bool)),
+        "ArtifactS3Location": PropertyType(False, one_of(is_type(dict), is_str())),
+        "FailureRetentionPeriod": PropertyType(False, is_type(int)),
+        "SuccessRetentionPeriod": PropertyType(False, is_type(int)),
+        "VpcConfig": PropertyType(False, is_type(dict)),
+        "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
+    }
+
+    def to_cloudformation(self, **kwargs):
+        """Returns the Synthetics Canary to which this SAM Canary corresponds.
+
+        :param dict kwargs: already-converted resources that may need to be modified when converting this \
+        macro to pure CloudFormation
+        :returns: a list of vanilla CloudFormation Resources, to which this Serverless Canary expands
+        :rtype: list
+        """
+        resources = []
+        synthetics_canary = self._construct_synthetics_canary()
+        resources.append(synthetics_canary)
+
+        return resources
+
+    def _construct_synthetics_canary(self):
+
+        """Constructs a AWS::Synthetics::Canary resource."""
+        canary = SyntheticsCanary(
+            self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()
+        )
+        canary.ArtifactS3Location = self.ArtifactS3Location
+        canary.Code = self._construct_code_dict
+        canary.ExecutionRoleArn = self.Role
+        canary.FailureRetentionPeriod = self.FailureRetentionPeriod
+        # sets the default name as the logical id because Synthetics Canary resource requires Name property,
+        # also requires it be lower case
+        canary.Name = self.FunctionName if self.FunctionName else self.logical_id.lower()
+        canary.RuntimeVersion = self.Runtime
+        canary.Schedule = self.Schedule
+        canary.StartCanaryAfterCreation = self.StartCanaryAfterCreation
+        canary.SuccessRetentionPeriod = self.SuccessRetentionPeriod
+        canary.Tags = self._construct_tag_list(self.Tags)
+        canary.VPCConfig = self.VpcConfig
+
+        if self.Tracing or self.Environment or self.MemorySize or self.Timeout:
+            canary.RunConfig = self._construct_run_config()
+        return canary
+
+    @staticmethod
+    def _extract_not_none_properties(d):
+        """
+        Filters out not None properties
+        """
+        return {k: v for k, v in d if v is not None}
+
+    def _construct_run_config(self):
+        """
+        If the user specifies any of Tracing, MemorySize, Timeout or Environment then the RunConfig resource in the
+        transformed AWS::Synthetics::Canary needs to be added. Note, for Environment property the syntax in AWS::Serverless::Canary is
+        Environment:
+            Variables:
+                Var1: Var2
+        while in AWS::Synthetics::Canary its
+        EnvironmentVariables:
+            Var1: Var2
+        so it needs to be transformed accordingly
+        """
+        runconfig = {"ActiveTracing": self.Tracing, "MemoryInMB": self.MemorySize, "TimeoutInSeconds": self.Timeout}
+        if self.Environment:
+            runconfig["EnvironmentVariables"] = self.Environment["Variables"]
+
+        return self._extract_not_none_properties(runconfig.items())
+
+    @property
+    def _construct_code_dict(self):
+        """Constructs Synthetics Canary Code Dictionary based on the accepted SAM artifact properties such
+        as `InlineCode` and `CodeUri`
+
+        :raises InvalidResourceException when conditions on the SAM artifact properties are not met.
+        """
+        # accepted artifacts
+        artifacts = {"InlineCode": self.InlineCode, "CodeUri": self.CodeUri}
+
+        filtered_artifacts = self._extract_not_none_properties(artifacts.items())
+        filtered_artifact_keys = list(filtered_artifacts.keys())
+
+        # Note: To emulate the same behavior as SAM Function, if user includes both InlineCode and CodeUri,
+        # InlineCode will take priority
+        if "InlineCode" in filtered_artifact_keys:
+            # Inline function for transformation of inline code.
+            return {"Handler": self.Handler, "Script": self.InlineCode}
+        elif "CodeUri" in filtered_artifact_keys:
+            # extracts Bucket and Key values, adds Handler and extracted values to Code object
+            code = construct_s3_location_object(self.CodeUri, self.logical_id, "CodeUri")
+            code["Handler"] = self.Handler
+            return code
+        else:
+            raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
 
 
 class SamApi(SamResourceMacro):
