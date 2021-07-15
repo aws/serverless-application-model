@@ -866,11 +866,11 @@ class SamCanary(SamResourceMacro):
         return canary
 
     @staticmethod
-    def _extract_not_none_properties(items):
+    def _extract_not_none_properties(d):
         """
         Filters out not None properties
         """
-        return {k: v for k, v in items if v is not None}
+        return {k: v for k, v in d if v is not None}
 
     def _construct_run_config(self):
         """
