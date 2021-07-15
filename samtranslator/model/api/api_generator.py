@@ -609,11 +609,6 @@ class ApiGenerator(object):
                 allow_credentials=properties.AllowCredentials,
             )
 
-        # Set default 4XX and 5XX responses if cors is enabled
-        gateway_responses = {}
-        self._set_default_4xx_5xx_responses(gateway_responses)
-        editor.add_gateway_responses(gateway_responses)
-
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
 

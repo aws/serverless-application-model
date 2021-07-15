@@ -7,19 +7,14 @@ Resources:
   ImplicitApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://sam-demo-bucket/member_portal.zip
-      Handler: index.gethtml
+      InlineCode: |
+        exports.handler = async () => ‘Hello World!'
+      Handler: index.handler
       Runtime: nodejs12.x
       Events:
         OneTrigger:
           Type: Cognito
           Properties:
-            UserPool: 
+            UserPool:
               Ref: UserPool
-            Trigger: PreSignUp
-        TwoTrigger:
-          Type: Cognito
-          Properties:
-            UserPool: 
-              Ref: UserPool
-            Trigger: [KMSKeyID, VerifyAuthChallengeResponse]
+            Trigger: !Join [ "", [ "Pre", "Sign", "Up"] ]

@@ -950,6 +950,20 @@ class Cognito(PushEventSource):
         "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str()))),
     }
 
+    valid_triggers = [
+        "CreateAuthChallenge",
+        "CustomMessage",
+        "DefineAuthChallenge",
+        "KMSKeyID",
+        "PostAuthentication",
+        "PostConfirmation",
+        "PreAuthentication",
+        "PreSignUp",
+        "PreTokenGeneration",
+        "UserMigration",
+        "VerifyAuthChallengeResponse",
+    ]
+
     def resources_to_link(self, resources):
         if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
             userpool_id = self.UserPool["Ref"]
@@ -994,6 +1008,15 @@ class Cognito(PushEventSource):
 
     def _inject_lambda_config(self, function, userpool):
         event_triggers = self.Trigger
+
+        if not isinstance(event_triggers, string_types) and not isinstance(event_triggers, list):
+            raise InvalidEventException(
+                self.relative_id,
+                'Invalid type for trigger "{trigger}". Trigger must be of type list or string.'.format(
+                    trigger=self.Trigger
+                ),
+            )
+
         if isinstance(self.Trigger, string_types):
             event_triggers = [self.Trigger]
 
@@ -1010,6 +1033,11 @@ class Cognito(PushEventSource):
             properties["LambdaConfig"] = lambda_config
 
         for event_trigger in event_triggers:
+            if event_trigger not in self.valid_triggers:
+                raise InvalidEventException(
+                    self.relative_id, 'Unsupported trigger "{trigger}".'.format(trigger=event_trigger)
+                )
+
             if event_trigger not in lambda_config:
                 lambda_config[event_trigger] = function.get_runtime_attr("arn")
             else:
