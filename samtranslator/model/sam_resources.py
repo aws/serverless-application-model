@@ -832,7 +832,7 @@ class SamCanary(SamResourceMacro):
 
         :param dict kwargs: already-converted resources that may need to be modified when converting this \
         macro to pure CloudFormation
-        :returns: a list of vanilla CloudFormation Resources, to which this Function expands
+        :returns: a list of vanilla CloudFormation Resources, to which this Serverless Canary expands
         :rtype: list
         """
         resources = []
@@ -865,16 +865,17 @@ class SamCanary(SamResourceMacro):
             canary.RunConfig = self._construct_run_config()
         return canary
 
-    def _extract_not_none_properties(self, dict):
+    @staticmethod
+    def _extract_not_none_properties(items):
         """
         Filters out not None properties
         """
-        return {k: v for k, v in dict if v is not None}
+        return {k: v for k, v in items if v is not None}
 
     def _construct_run_config(self):
         """
-        If the user specifies any of Tracing, MemorySize, TImeout or Environement then the RunConfig resource in the
-        transformed AWS::Synthetics::Canary needs to be added. Note, for Environment property the syntaxt in AWS::Serverless::Canary is
+        If the user specifies any of Tracing, MemorySize, Timeout or Environment then the RunConfig resource in the
+        transformed AWS::Synthetics::Canary needs to be added. Note, for Environment property the syntax in AWS::Serverless::Canary is
         Environment:
             Variables:
                 Var1: Var2
@@ -902,6 +903,8 @@ class SamCanary(SamResourceMacro):
         filtered_artifacts = self._extract_not_none_properties(artifacts.items())
         filtered_artifact_keys = list(filtered_artifacts.keys())
 
+        # Note: To emulate the same behavior as SAM Function, if user includes both InlineCode and CodeUri,
+        # InlineCode will take priority
         if "InlineCode" in filtered_artifact_keys:
             # Inline function for transformation of inline code.
             return {"Handler": self.Handler, "Script": self.InlineCode}

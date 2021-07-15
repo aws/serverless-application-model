@@ -2,6 +2,7 @@ from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, is_str, list_of, one_of
 
 
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-synthetics-canary.html
 class SyntheticsCanary(Resource):
     resource_type = "AWS::Synthetics::Canary"
 
