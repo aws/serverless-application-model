@@ -267,6 +267,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "application_with_intrinsics",
                 "basic_layer",
                 "cloudwatchevent",
+                "cloudwatchevent_intrinsics",
                 "eventbridgerule",
                 "eventbridgerule_with_dlq",
                 "eventbridgerule_with_retry_policy",
