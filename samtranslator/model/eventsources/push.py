@@ -950,25 +950,6 @@ class Cognito(PushEventSource):
         "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str()))),
     }
 
-    # List of valid triggers from:
-    # https: // docs.aws.amazon.com / AWSCloudFormation / latest / UserGuide / aws - properties - cognito - userpool - lambdaconfig.html
-    # Commented triggers are currently not supported by CloudFormation
-    valid_triggers = [
-        "CreateAuthChallenge",
-        # "CustomEmailSender"
-        "CustomMessage",
-        # "CustomSMSSender",
-        "DefineAuthChallenge",
-        # "KMSKeyID",
-        "PostAuthentication",
-        "PostConfirmation",
-        "PreAuthentication",
-        "PreSignUp",
-        "PreTokenGeneration",
-        "UserMigration",
-        "VerifyAuthChallengeResponse",
-    ]
-
     def resources_to_link(self, resources):
         if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
             userpool_id = self.UserPool["Ref"]
@@ -1038,11 +1019,6 @@ class Cognito(PushEventSource):
             properties["LambdaConfig"] = lambda_config
 
         for event_trigger in event_triggers:
-            if event_trigger not in self.valid_triggers:
-                raise InvalidEventException(
-                    self.relative_id, 'Unsupported trigger "{trigger}".'.format(trigger=event_trigger)
-                )
-
             if event_trigger not in lambda_config:
                 lambda_config[event_trigger] = function.get_runtime_attr("arn")
             else:

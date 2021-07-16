@@ -1,3 +1,0 @@
-{
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ImplicitApiFunction] is invalid. Event with id [OneTrigger] is invalid. Unsupported trigger \"InvalidValue\"."
-}
