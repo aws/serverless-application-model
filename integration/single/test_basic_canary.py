@@ -20,7 +20,6 @@ class TestBasicCanary(BaseTest):
 
         bucket_name = self.get_physical_id_by_type("AWS::S3::Bucket")
         self.client_provider.s3_client.delete_bucket(Bucket=bucket_name)
-
         self.assertEqual(name, canary_name)
 
     def test_canary_with_tags(self):
