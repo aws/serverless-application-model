@@ -82,6 +82,7 @@ class SamResourceType(Enum):
     LambdaLayerVersion = "AWS::Serverless::LayerVersion"
     HttpApi = "AWS::Serverless::HttpApi"
     StateMachine = "AWS::Serverless::StateMachine"
+    Canary = "AWS::Serverless::Canary"
 
     @classmethod
     def has_value(cls, value):

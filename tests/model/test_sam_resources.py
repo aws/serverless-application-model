@@ -273,6 +273,42 @@ class TestCanaryRunConfig(TestCase):
         self.assertEqual(deployment[0].RunConfig["MemoryInMB"], 10)
 
 
+class TestCanaryArtifactS3Location(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    def test_with_artifact_location(self):
+        artifact_s3location = "s3://test"
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+        canary.ArtifactS3Location = artifact_s3location
+
+        resources = canary.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].ArtifactS3Location, artifact_s3location)
+
+    def test_without_artifact_location(self):
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+
+        resources = canary.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].Name, "foo")
+
+        # logical id of s3 resource is the name of the canary plus the string "ArtifactBucket"
+        bucket_name = deployment[0].Name + "ArtifactBucket"
+
+        artifact_s3location = {"Fn::Join": ["", ["s3://", {"Ref": bucket_name}]]}
+        self.assertEqual(deployment[0].ArtifactS3Location, artifact_s3location)
+
+
 class TestOpenApi(TestCase):
     kwargs = {
         "intrinsics_resolver": IntrinsicsResolver({}),
