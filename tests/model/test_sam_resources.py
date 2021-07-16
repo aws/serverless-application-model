@@ -308,6 +308,7 @@ class TestCanaryArtifactS3Location(TestCase):
         artifact_s3location = {"Fn::Join": ["", ["s3://", {"Ref": bucket_name}]]}
         self.assertEqual(deployment[0].ArtifactS3Location, artifact_s3location)
 
+
 class TestOpenApi(TestCase):
     kwargs = {
         "intrinsics_resolver": IntrinsicsResolver({}),
