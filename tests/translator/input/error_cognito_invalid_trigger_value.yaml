@@ -2,8 +2,16 @@ Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      LambdaConfig:
-        PreAuthentication: "Test"
+      UserPoolName: UserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
   ImplicitApiFunction:
     Type: AWS::Serverless::Function
     Properties:

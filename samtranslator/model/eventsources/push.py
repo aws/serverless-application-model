@@ -950,11 +950,16 @@ class Cognito(PushEventSource):
         "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str()))),
     }
 
+    # List of valid triggers from:
+    # https: // docs.aws.amazon.com / AWSCloudFormation / latest / UserGuide / aws - properties - cognito - userpool - lambdaconfig.html
+    # Commented triggers are currently not supported by CloudFormation
     valid_triggers = [
         "CreateAuthChallenge",
+        # "CustomEmailSender"
         "CustomMessage",
+        # "CustomSMSSender",
         "DefineAuthChallenge",
-        "KMSKeyID",
+        # "KMSKeyID",
         "PostAuthentication",
         "PostConfirmation",
         "PreAuthentication",
