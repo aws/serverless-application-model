@@ -1,4 +1,5 @@
 import copy
+import json
 import re
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
@@ -995,11 +996,12 @@ class Cognito(PushEventSource):
     def _inject_lambda_config(self, function, userpool):
         event_triggers = self.Trigger
 
-        if not isinstance(event_triggers, string_types) and not isinstance(event_triggers, list):
+        if isinstance(event_triggers, dict):
+            err_string = json.dumps(event_triggers)
             raise InvalidEventException(
                 self.relative_id,
                 'Invalid type for trigger "{trigger}". Trigger must be of type list or string.'.format(
-                    trigger=self.Trigger
+                    trigger=err_string
                 ),
             )
 
