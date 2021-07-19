@@ -1,0 +1,10 @@
+[
+        {"LogicalResourceId": "MyApi", "ResourceType": "AWS::ApiGateway::RestApi"},
+        {"LogicalResourceId": "MyApiDeploymentada889e3ac", "ResourceType": "AWS::ApiGateway::Deployment"},
+        {"LogicalResourceId": "MyApiMyNewStageNameStage", "ResourceType": "AWS::ApiGateway::Stage"},
+        {"LogicalResourceId": "TestFunction", "ResourceType": "AWS::Lambda::Function"},
+        {"LogicalResourceId": "TestFunctionAliaslive", "ResourceType": "AWS::Lambda::Alias"},
+        {"LogicalResourceId": "TestFunctionPutPermissionMyNewStageName", "ResourceType": "AWS::Lambda::Permission"},
+        {"LogicalResourceId": "TestFunctionRole", "ResourceType": "AWS::IAM::Role"},
+        {"LogicalResourceId": "TestFunctionVersion847aaa5fc1", "ResourceType": "AWS::Lambda::Version"}
+    ]
