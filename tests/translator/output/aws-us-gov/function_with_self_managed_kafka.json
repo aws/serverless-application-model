@@ -87,7 +87,6 @@
     "KafkaFunctionMyKafkaCluster": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
-        "EventSourceArn": "BROKER-ARN",
         "FunctionName": {
           "Ref": "KafkaFunction"
         },

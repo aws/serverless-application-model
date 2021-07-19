@@ -45,7 +45,7 @@
           ]
         },
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Policies": [
           {
@@ -80,7 +80,6 @@
     "KafkaFunctionMyKafkaCluster": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
-        "EventSourceArn": "BROKER-ARN",
         "FunctionName": {
           "Ref": "KafkaFunction"
         },

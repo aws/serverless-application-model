@@ -11,7 +11,7 @@ Resources:
         MyKafkaCluster:
           Type: SelfManagedKafka
           Properties:
-            Broker: "BROKER-ARN"
+            # Broker: "BROKER-ARN"
             KafkaBootstrapServers:
               - "abc.xyz.com:9092"
               - "12.345.67.89:9096"

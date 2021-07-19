@@ -64,7 +64,7 @@ class LambdaEventSourceMapping(Resource):
     property_types = {
         "BatchSize": PropertyType(False, is_type(int)),
         "Enabled": PropertyType(False, is_type(bool)),
-        "EventSourceArn": PropertyType(True, is_str()),
+        "EventSourceArn": PropertyType(False, is_str()),
         "FunctionName": PropertyType(True, is_str()),
         "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
         "MaximumRetryAttempts": PropertyType(False, is_type(int)),

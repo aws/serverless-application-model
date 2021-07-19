@@ -76,7 +76,7 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if not (self.resource_type == "SelfManagedKafka") and not self.Stream and not self.Queue and not self.Broker:
+        if (self.resource_type != "SelfManagedKafka") and not self.Stream and not self.Queue and not self.Broker:
             raise InvalidEventException(
                 self.relative_id,
                 "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
