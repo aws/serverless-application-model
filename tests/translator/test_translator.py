@@ -329,6 +329,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "s3_existing_lambda_notification_configuration",
                 "s3_existing_other_notification_configuration",
                 "s3_filter",
+                "s3_intrinsics",
                 "s3_multiple_events_same_bucket",
                 "s3_multiple_functions",
                 "s3_with_dependsOn",
