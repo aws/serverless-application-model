@@ -1,6 +1,7 @@
 ﻿""" SAM macro definitions """
 from six import string_types
 import copy
+import uuid
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -809,7 +810,7 @@ class SamCanary(SamResourceMacro):
 
     resource_type = "AWS::Serverless::Canary"
     property_types = {
-        "FunctionName": PropertyType(False, is_str()),
+        "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Handler": PropertyType(True, is_str()),
         "Runtime": PropertyType(True, is_str()),
         "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
@@ -895,7 +896,7 @@ class SamCanary(SamResourceMacro):
         canary.FailureRetentionPeriod = self.FailureRetentionPeriod
         # sets the default name as the logical id because Synthetics Canary resource requires Name property,
         # also requires it be lower case
-        canary.Name = self.FunctionName if self.FunctionName else self.logical_id.lower()
+        canary.Name = self.FunctionName if self.FunctionName else self._construct_canary_name()
         canary.RuntimeVersion = self.Runtime
         canary.Schedule = self.Schedule
         canary.StartCanaryAfterCreation = self.StartCanaryAfterCreation
@@ -906,6 +907,15 @@ class SamCanary(SamResourceMacro):
         if self.Tracing or self.Environment or self.MemorySize or self.Timeout:
             canary.RunConfig = self._construct_run_config()
         return canary
+
+    # Need to construct canary name since the Name property is required in AWS::Synthetics::Canary and CloudFormation
+    # doesn't automatically generate one upon deployment
+    def _construct_canary_name(self):
+        # Synthetics Canary name is limited to 21 characters
+        prefix = "sam-"
+        logical_id_lowered = self.logical_id.lower()[:11] + "-"
+        suffix = uuid.uuid4().hex[:5]
+        return prefix + logical_id_lowered + suffix
 
     @staticmethod
     def _extract_not_none_properties(d):

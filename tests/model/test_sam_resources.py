@@ -282,6 +282,7 @@ class TestCanaryArtifactS3Location(TestCase):
 
     def test_with_artifact_location(self):
         artifact_s3location = "s3://test"
+
         canary = SamCanary("foo")
         canary.InlineCode = "foobar"
         canary.ArtifactS3Location = artifact_s3location
@@ -294,16 +295,17 @@ class TestCanaryArtifactS3Location(TestCase):
 
     def test_without_artifact_location(self):
         canary = SamCanary("foo")
+        canary.FunctionName = "bar"
         canary.InlineCode = "foobar"
 
         resources = canary.to_cloudformation(**self.kwargs)
         deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]
 
         self.assertEqual(deployment.__len__(), 1)
-        self.assertEqual(deployment[0].Name, "foo")
+        self.assertEqual(deployment[0].Name, "bar")
 
         # logical id of s3 resource is the name of the canary plus the string "ArtifactBucket"
-        bucket_name = deployment[0].Name + "ArtifactBucket"
+        bucket_name = deployment[0].logical_id + "ArtifactBucket"
 
         artifact_s3location = {"Fn::Join": ["", ["s3://", {"Ref": bucket_name}]]}
         self.assertEqual(deployment[0].ArtifactS3Location, artifact_s3location)
