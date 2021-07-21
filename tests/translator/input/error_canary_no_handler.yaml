@@ -1,0 +1,10 @@
+Resources:
+  Canary:
+    Type: 'AWS::Serverless::Canary'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Runtime: python2.7
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Role: hello

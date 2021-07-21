@@ -1,0 +1,52 @@
+{
+  "Resources": {
+    "CanaryWithNoArtifactLocation": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "CanaryWithNoArtifactLocationArtifactBucket"
+              }
+            ]
+          ]
+        },
+        "Code": {
+          "Handler": "hello.handler",
+          "Script": "hello"
+        },
+        "ExecutionRoleArn": "hello",
+        "Name": "canary1",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithNoArtifactLocationArtifactBucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

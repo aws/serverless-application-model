@@ -1,0 +1,10 @@
+Resources:
+  Canary:
+    Type: 'AWS::Serverless::Canary'
+    Properties:
+      CodeUri: http://dropbox.com/my-object.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true

@@ -847,6 +847,15 @@ class SamCanary(SamResourceMacro):
             s3bucket = self._construct_artifact_bucket()
             resources.append(s3bucket)
             synthetics_canary.ArtifactS3Location = {"Fn::Join": ["", ["s3://", {"Ref": s3bucket.logical_id}]]}
+        else:
+            # Check if ArtifactS3Location includes "s3://" at the beginning. The rest of the string will be used when
+            # creating a role for this canary
+            artifact_prefix = "s3://"
+            s3string = synthetics_canary.ArtifactS3Location[: len(artifact_prefix)]
+            if s3string != artifact_prefix:
+                raise InvalidResourceException(
+                    self.logical_id, "Invalid ArtifactS3Location, must include s3:// at the beginning"
+                )
 
         return resources
 
@@ -911,10 +920,14 @@ class SamCanary(SamResourceMacro):
     # Need to construct canary name since the Name property is required in AWS::Synthetics::Canary and CloudFormation
     # doesn't automatically generate one upon deployment
     def _construct_canary_name(self):
-        # Synthetics Canary name is limited to 21 characters
+        # Synthetics Canary name is limited to 22 characters
+        max_logical_id_length = 11
+        max_unique_id_length = 5
         prefix = "sam-"
-        logical_id_lowered = self.logical_id.lower()[:11] + "-"
-        suffix = uuid.uuid4().hex[:5]
+
+        # max_logical_id_length + max_unique_id_length + len(prefix) must be less than or equal to 22
+        logical_id_lowered = self.logical_id.lower()[:max_logical_id_length] + "-"
+        suffix = uuid.uuid4().hex[:max_unique_id_length]
         return prefix + logical_id_lowered + suffix
 
     @staticmethod

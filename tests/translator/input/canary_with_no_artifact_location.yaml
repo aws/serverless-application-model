@@ -1,0 +1,12 @@
+Resources:
+  CanaryWithNoArtifactLocation:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary1
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Role: hello

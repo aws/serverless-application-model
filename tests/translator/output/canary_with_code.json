@@ -1,0 +1,98 @@
+{
+  "Resources": {
+    "CanaryWithBucketUri": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://hello",
+        "Code": {
+          "S3Bucket": "sam-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": "hello",
+        "Name": "canary1",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithFunctionCodeObject": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://hello",
+        "Code": {
+          "S3Bucket": "sam-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": "hello",
+        "Name": "canary2",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithInlineCode": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://hello",
+        "Code": {
+          "Handler": "hello.handler",
+          "Script": "hello"
+        },
+        "ExecutionRoleArn": "hello",
+        "Name": "canary3",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithBothInlineCodeAndCodeUri": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://hello",
+        "Code": {
+          "Handler": "hello.handler",
+          "Script": "hello"
+        },
+        "ExecutionRoleArn": "hello",
+        "Name": "canary4",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    }
+  }
+}
