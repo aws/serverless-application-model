@@ -852,15 +852,6 @@ class SamCanary(SamResourceMacro):
             s3bucket = self._construct_artifact_bucket()
             resources.append(s3bucket)
             synthetics_canary.ArtifactS3Location = {"Fn::Join": ["", ["s3://", {"Ref": s3bucket.logical_id}]]}
-        else:
-            # Check if ArtifactS3Location includes "s3://" at the beginning. The rest of the string will be used when
-            # creating a role for this canary
-            artifact_prefix = "s3://"
-            s3string = synthetics_canary.ArtifactS3Location[: len(artifact_prefix)]
-            if s3string != artifact_prefix:
-                raise InvalidResourceException(
-                    self.logical_id, "Invalid ArtifactS3Location, must include s3:// at the beginning"
-                )
 
         return resources
 

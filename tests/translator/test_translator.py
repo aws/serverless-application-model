@@ -657,7 +657,6 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_canary_no_code",
         "error_canary_no_schedule",
         "error_canary_no_start_canary",
-        "error_canary_invalid_s3",
         "error_state_machine_definition_string",
         "error_state_machine_invalid_s3_object",
         "error_state_machine_invalid_s3_string",
