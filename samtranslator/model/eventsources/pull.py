@@ -76,7 +76,7 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if (self.resource_type != "SelfManagedKafka") and not self.Stream and not self.Queue and not self.Broker:
+        if self.resource_type != "SelfManagedKafka" and not self.Stream and not self.Queue and not self.Broker:
             raise InvalidEventException(
                 self.relative_id,
                 "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
@@ -344,7 +344,7 @@ class SelfManagedKafka(PullEventSource):
 
         authentication_uri, has_vpc_config = self.get_secret_key()
         if authentication_uri:
-            secret_manager = self.get_secret_manger_secret(authentication_uri)
+            secret_manager = self.get_secret_manager_secret(authentication_uri)
             document["PolicyDocument"]["Statement"].append(secret_manager)
 
         if has_vpc_config:
@@ -363,19 +363,11 @@ class SelfManagedKafka(PullEventSource):
         has_vpc_security_group = False
         for config in self.SourceAccessConfigurations:
             if config["Type"] == "VPC_SUBNET":
-                if not config["URI"]:
-                    raise InvalidEventException(
-                        self.relative_id,
-                        "No VPC_SUBNET URI property specified in SourceAccessConfigurations for self managed kafka event.",
-                    )
+                self.validate_uri(config, "VPC_SUBNET")
                 has_vpc_subnet = True
 
             if config["Type"] == "VPC_SECURITY_GROUP":
-                if not config["URI"]:
-                    raise InvalidEventException(
-                        self.relative_id,
-                        "No VPC_SECURITY_GROUP URI property specified in SourceAccessConfigurations for self managed kafka event.",
-                    )
+                self.validate_uri(config, "VPC_SECURITY_GROUP")
                 has_vpc_security_group = True
 
             if config["Type"] in self.AUTH_MECHANISM:
@@ -384,25 +376,32 @@ class SelfManagedKafka(PullEventSource):
                         self.relative_id,
                         "Multiple auth mechanism properties specified in SourceAccessConfigurations for self managed kafka event.",
                     )
+                self.validate_uri(config, "auth mechanism")
                 authentication_uri = config["URI"]
 
-        if not (has_vpc_subnet == has_vpc_security_group):
+        if (not has_vpc_subnet and has_vpc_security_group) or (has_vpc_subnet and not has_vpc_security_group):
             raise InvalidEventException(
                 self.relative_id,
-                "VPC_SUBNET and VPC_SECURITY_GROUP in SourceAccessConfigurations for SelfManagedKafka not provided.",
+                "VPC_SUBNET and VPC_SECURITY_GROUP in SourceAccessConfigurations for SelfManagedKafka must be both provided.",
             )
         return authentication_uri, (has_vpc_subnet and has_vpc_security_group)
 
-    def get_secret_manger_secret(self, authentication_uri):
-        secret_manager = {
+    def validate_uri(self, config, msg):
+        if not config["URI"]:
+            raise InvalidEventException(
+                self.relative_id,
+                f"No {msg} URI property specified in SourceAccessConfigurations for self managed kafka event.",
+            )
+                
+    def get_secret_manager_secret(self, authentication_uri):
+        return {
             "Action": ["secretsmanager:GetSecretValue"],
             "Effect": "Allow",
             "Resource": authentication_uri,
         }
-        return secret_manager
 
     def get_vpc_permission(self):
-        vpc_permissions = {
+        return {
             "Action": [
                 "ec2:CreateNetworkInterface",
                 "ec2:DescribeNetworkInterfaces",
@@ -414,10 +413,9 @@ class SelfManagedKafka(PullEventSource):
             "Effect": "Allow",
             "Resource": "*",
         }
-        return vpc_permissions
 
     def get_kms_policy(self):
-        kms_policy = {
+        return {
             "Action": ["kms:Decrypt"],
             "Effect": "Allow",
             "Resource": {
@@ -425,3 +423,4 @@ class SelfManagedKafka(PullEventSource):
                 + self.SecretsManagerKmsKeyId
             },
         }
+
