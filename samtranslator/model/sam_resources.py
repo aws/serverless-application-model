@@ -53,6 +53,11 @@ from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
 
+# max_logical_id_length + max_unique_id_length + len(prefix) must be less than or equal to 22
+MAX_CANARY_LOGICAL_ID_LENGTH = 11
+MAX_CANARY_UNIQUE_ID_LENGTH = 5
+CANARY_NAME_PREFIX = "sam-"
+
 
 class SamFunction(SamResourceMacro):
     """SAM function macro."""
@@ -878,15 +883,15 @@ class SamCanary(SamResourceMacro):
         # tries to delete the artifact bucket made by SAM but can't since its not empty. Retaining the bucket will by
         # pass this error
 
-        attributes = self.get_passthrough_resource_attributes()
-        if attributes is None:
-            attributes = {}
-        attributes["DeletionPolicy"] = "Retain"
+        passthrough_attributes = self.get_passthrough_resource_attributes()
+        if passthrough_attributes is None:
+            passthrough_attributes = {}
+        passthrough_attributes["DeletionPolicy"] = "Retain"
 
         s3bucket = S3Bucket(
             logical_id=logical_id,
             depends_on=self.depends_on,
-            attributes=attributes,
+            attributes=passthrough_attributes,
         )
         s3bucket.BucketEncryption = {
             "ServerSideEncryptionConfiguration": [{"ServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]
@@ -903,7 +908,7 @@ class SamCanary(SamResourceMacro):
         canary.Code = self._construct_code_dict
         canary.ExecutionRoleArn = self.Role
         canary.FailureRetentionPeriod = self.FailureRetentionPeriod
-        # sets the default name as the logical id because Synthetics Canary resource requires Name property,
+        # constructs default name if FunctionName isn't provided because Synthetics Canary resource requires a Name,
         # also requires it be lower case
         canary.Name = self.FunctionName if self.FunctionName else self._construct_canary_name()
         canary.RuntimeVersion = self.Runtime
@@ -920,15 +925,13 @@ class SamCanary(SamResourceMacro):
     # Need to construct canary name since the Name property is required in AWS::Synthetics::Canary and CloudFormation
     # doesn't automatically generate one upon deployment
     def _construct_canary_name(self):
-        # Synthetics Canary name is limited to 22 characters
-        max_logical_id_length = 11
-        max_unique_id_length = 5
-        prefix = "sam-"
-
+        # Synthetics Canary name is limited to 22 characters]
         # max_logical_id_length + max_unique_id_length + len(prefix) must be less than or equal to 22
-        logical_id_lowered = self.logical_id.lower()[:max_logical_id_length] + "-"
-        suffix = uuid.uuid4().hex[:max_unique_id_length]
-        return prefix + logical_id_lowered + suffix
+
+        logical_id_lowered = self.logical_id.lower()[:MAX_CANARY_LOGICAL_ID_LENGTH] + "-"
+        suffix = uuid.uuid4().hex[:MAX_CANARY_UNIQUE_ID_LENGTH]
+
+        return CANARY_NAME_PREFIX + logical_id_lowered + suffix
 
     @staticmethod
     def _extract_not_none_properties(d):
