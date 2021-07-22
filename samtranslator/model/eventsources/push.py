@@ -1,5 +1,4 @@
 import copy
-import json
 import re
 from six import string_types
 from samtranslator.model import ResourceMacro, PropertyType
@@ -995,7 +994,6 @@ class Cognito(PushEventSource):
 
     def _inject_lambda_config(self, function, userpool):
         event_triggers = self.Trigger
-
         if isinstance(self.Trigger, string_types):
             event_triggers = [self.Trigger]
 
