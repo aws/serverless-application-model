@@ -319,7 +319,7 @@ class SelfManagedKafka(PullEventSource):
                 "No Topics provided for self managed kafka as an event source",
             )
 
-        if not (len(self.Topics) == 1):
+        if len(self.Topics) != 1:
             raise InvalidEventException(
                 self.relative_id,
                 "Topics for self managed kafka only supports single configuration entry.",
@@ -366,11 +366,11 @@ class SelfManagedKafka(PullEventSource):
                 self.validate_uri(config, "VPC_SUBNET")
                 has_vpc_subnet = True
 
-            if config["Type"] == "VPC_SECURITY_GROUP":
+            elif config["Type"] == "VPC_SECURITY_GROUP":
                 self.validate_uri(config, "VPC_SECURITY_GROUP")
                 has_vpc_security_group = True
 
-            if config["Type"] in self.AUTH_MECHANISM:
+            elif config["Type"] in self.AUTH_MECHANISM:
                 if authentication_uri:
                     raise InvalidEventException(
                         self.relative_id,
@@ -378,6 +378,12 @@ class SelfManagedKafka(PullEventSource):
                     )
                 self.validate_uri(config, "auth mechanism")
                 authentication_uri = config["URI"]
+
+            else:
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Invalid SourceAccessConfigurations Type provided for self managed kafka event.",
+                )
 
         if (not has_vpc_subnet and has_vpc_security_group) or (has_vpc_subnet and not has_vpc_security_group):
             raise InvalidEventException(
@@ -390,7 +396,14 @@ class SelfManagedKafka(PullEventSource):
         if not config["URI"]:
             raise InvalidEventException(
                 self.relative_id,
-                f"No {msg} URI property specified in SourceAccessConfigurations for self managed kafka event.",
+                "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
+            )
+        if not isinstance(config["URI"], str):
+            raise InvalidEventException(
+                self.relative_id,
+                "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(
+                    msg
+                ),
             )
 
     def get_secret_manager_secret(self, authentication_uri):
