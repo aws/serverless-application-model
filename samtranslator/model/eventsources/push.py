@@ -948,7 +948,7 @@ class Cognito(PushEventSource):
 
     property_types = {
         "UserPool": PropertyType(True, is_str()),
-        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str()))),
+        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
     }
 
     def resources_to_link(self, resources):
@@ -995,15 +995,6 @@ class Cognito(PushEventSource):
 
     def _inject_lambda_config(self, function, userpool):
         event_triggers = self.Trigger
-
-        if isinstance(event_triggers, dict):
-            err_string = json.dumps(event_triggers)
-            raise InvalidEventException(
-                self.relative_id,
-                'Invalid type for trigger "{trigger}". Trigger must be of type list or string.'.format(
-                    trigger=err_string
-                ),
-            )
 
         if isinstance(self.Trigger, string_types):
             event_triggers = [self.Trigger]
