@@ -32,6 +32,20 @@ Resources:
             Identity:
               Headers:
                 - Authorization1
+
+  MyApiWithNotCachedLambdaRequestAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuth
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            Identity:
+              ReauthorizeEvery: 0
+
   MyAuthFn:
     Type: AWS::Serverless::Function
     Properties:
@@ -81,6 +95,13 @@ Resources:
             RestApiId: !Ref MyApiWithLambdaRequestAuth
             Method: any
             Path: /any/lambda-request
+        LambdaNotCachedRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithNotCachedLambdaRequestAuth
+            Method: get
+            Path: /not-cached-lambda-request
+
   MyUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
