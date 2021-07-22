@@ -1,0 +1,89 @@
+{  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "isProd": true
+  },
+  "Resources": {
+    "APIGateway": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Body": {
+          "swagger": "2.0",
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {},
+          "securityDefinitions": {
+            "SomeAuthorizer": {
+              "type": "apiKey",
+              "name": "Unused",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "custom",
+              "x-amazon-apigateway-authorizer": {
+                "type": "request",
+                "authorizerUri": {
+                  "Fn::Sub": [
+                    "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    {
+                      "__FunctionArn__": "SomeArn"
+                    }
+                  ]
+                },
+                "authorizerResultTtlInSeconds": {
+                  "Fn::If": [
+                    "isProd",
+                    3600,
+                    0
+                  ]
+                },
+                "identitySource": "method.request.header.Accept"
+              }
+            }
+          }
+        }
+      }
+    },
+    "APIGatewayDeployment09cf6f1593": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "Description": "RestApi deployment id: 09cf6f15938fb43d44759986383f7d1304187288",
+        "RestApiId": {
+          "Ref": "APIGateway"
+        },
+        "StageName": "Stage"
+      }
+    },
+    "APIGatewayProdStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "APIGatewayDeployment09cf6f1593"
+        },
+        "RestApiId": {
+          "Ref": "APIGateway"
+        },
+        "StageName": "Prod"
+      }
+    },
+    "APIGatewaySomeAuthorizerAuthorizerPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": "SomeArn",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
+            {
+              "__ApiId__": {
+                "Ref": "APIGateway"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

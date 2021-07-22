@@ -272,7 +272,20 @@ class ApiGatewayAuthorizer(object):
         context = identity.get("Context")
         ttl = identity.get("ReauthorizeEvery")
 
-        if (ttl is None or int(ttl) > 0) and not headers and not query_strings and not stage_variables and not context:
+        required_properties_missing = not headers and not query_strings and not stage_variables and not context
+
+        try:
+            int(ttl)
+        # this will catch if ttl is None and not convertable to an int
+        except TypeError:
+            # previous behavior before trying to read ttl
+            if required_properties_missing:
+               return True
+
+            return False
+
+        # If we can resolve ttl, attempt to see if things are valid
+        if (ttl is None or int(ttl) > 0) and required_properties_missing:
             return True
 
         return False
