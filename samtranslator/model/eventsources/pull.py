@@ -392,7 +392,7 @@ class SelfManagedKafka(PullEventSource):
                 self.relative_id,
                 f"No {msg} URI property specified in SourceAccessConfigurations for self managed kafka event.",
             )
-                
+
     def get_secret_manager_secret(self, authentication_uri):
         return {
             "Action": ["secretsmanager:GetSecretValue"],
@@ -423,4 +423,3 @@ class SelfManagedKafka(PullEventSource):
                 + self.SecretsManagerKmsKeyId
             },
         }
-
