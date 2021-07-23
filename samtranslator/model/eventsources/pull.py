@@ -1,4 +1,4 @@
-from six import integer_types
+from six import string_types
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX,  PropertyType
@@ -398,7 +398,8 @@ class SelfManagedKafka(PullEventSource):
                 self.relative_id,
                 "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
             )
-        if not isinstance(config["URI"], str):
+
+        if not isinstance(config["URI"], string_types):
             raise InvalidEventException(
                 self.relative_id,
                 "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(
