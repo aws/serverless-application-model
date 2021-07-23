@@ -342,6 +342,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "alexa_skill",
                 "alexa_skill_with_skill_id",
                 "iot_rule",
+                "kinesis_intrinsics",
                 "layers_with_intrinsics",
                 "layers_all_properties",
                 "layer_deletion_policy_precedence",

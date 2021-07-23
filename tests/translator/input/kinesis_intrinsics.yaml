@@ -1,0 +1,82 @@
+Parameters:
+  IntValue:
+    Type: Number
+    Default: 50
+
+  StringValue:
+    Type: String
+    Default: us-east-1
+
+  StartingPositionValue:
+    Type: String
+    Default: LATEST
+
+  FunctionResponseTypesValue:
+    Type: String
+    Default: ReportBatchItemFailures
+
+Conditions:
+  TrueCondition:
+    Fn::Equals:
+      - true
+      - true
+  FalseCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: s3://sam-demo-bucket/stream.zip
+      MemorySize: 128
+
+      Events:
+        KinesisStream:
+          Type: Kinesis
+          Properties:
+            BatchSize:
+              Ref: IntValue
+            BisectBatchOnFunctionError:
+              Fn::If:
+                - FalseCondition
+                - True
+                - False
+            Enabled:
+              Fn::If:
+                - TrueCondition
+                - True
+                - False
+            FunctionResponseTypes:
+              - Ref: FunctionResponseTypesValue
+            MaximumBatchingWindowInSeconds:
+              Ref: IntValue
+            MaximumRecordAgeInSeconds:
+              Ref: IntValue
+            MaximumRetryAttempts:
+              Ref: IntValue
+            ParallelizationFactor:
+              Ref: IntValue
+            StartingPosition:
+              Ref: StartingPositionValue
+            Stream:
+              # Connect with the stream we have created in this template
+              Fn::Join:
+                - ''
+                - - 'arn:'
+                  - Ref: AWS::Partition
+                  - ':kinesis:'
+                  - Ref: AWS::Region
+                  - ':'
+                  - Ref: AWS::AccountId
+                  - ':stream/'
+                  - Ref: MyStream
+            TumblingWindowInSeconds:
+              Ref: IntValue
+  MyStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
