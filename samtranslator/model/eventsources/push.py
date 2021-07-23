@@ -947,7 +947,7 @@ class Cognito(PushEventSource):
 
     property_types = {
         "UserPool": PropertyType(True, is_str()),
-        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str()))),
+        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
     }
 
     def resources_to_link(self, resources):

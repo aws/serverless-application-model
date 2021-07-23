@@ -666,6 +666,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_state_machine_with_cwe_invalid_dlq_type",
         "error_state_machine_with_cwe_both_dlq_property_provided",
         "error_state_machine_with_cwe_missing_dlq_property",
+        "error_cognito_trigger_invalid_type",
         "error_cognito_userpool_duplicate_trigger",
         "error_cognito_userpool_not_string",
         "error_api_duplicate_methods_same_path",
