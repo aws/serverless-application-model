@@ -1,0 +1,41 @@
+Parameters:
+  SnsRegion:
+    Type: String
+    Default: us-east-1
+
+Conditions:
+  MyCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  SaveNotificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/notifications.zip
+      Handler: index.save_notification
+      Runtime: nodejs12.x
+      Events:
+        NotificationTopic:
+          Type: SNS
+          Properties:
+            FilterPolicy:
+              Fn::If:
+                - MyCondition
+                - price_usd:
+                    - numeric:
+                        - ">="
+                        - 100
+                - price_usd:
+                    - numeric:
+                        - "<"
+                        - 100
+            Region:
+              Ref: SnsRegion
+            SqsSubscription: true
+            Topic:
+              Ref: Notifications
+
+  Notifications:
+    Type: AWS::SNS::Topic
