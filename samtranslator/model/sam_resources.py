@@ -920,7 +920,7 @@ class SamCanary(SamResourceMacro):
         Need to construct canary name since the Name property is required in AWS::Synthetics::Canary and CloudFormation
         doesn't automatically generate one upon deployment
 
-        Synthetics Canary name is limited to 22 characters
+        Synthetics Canary name is limited to 21 characters
         https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-synthetics-canary.html#cfn-synthetics-canary-name
 
         len(prefix) + MAX_CANARY_LOGICAL_ID_LENGTH + MAX_CANARY_UNIQUE_ID_LENGTH + 1 (extra '-' char added) must be less
