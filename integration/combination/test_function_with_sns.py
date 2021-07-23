@@ -17,7 +17,7 @@ class TestFunctionWithSns(BaseTest):
         lambda_subscription = next((x for x in subscriptions if x["Protocol"] == "lambda"), None)
 
         self.assertIsNotNone(lambda_subscription)
-        self.assertTrue(lambda_function_endpoint in lambda_subscription["Endpoint"])
+        self.assertIn(lambda_function_endpoint, lambda_subscription["Endpoint"])
         self.assertEqual(lambda_subscription["Protocol"], "lambda")
         self.assertEqual(lambda_subscription["TopicArn"], sns_topic_arn)
 
@@ -26,3 +26,23 @@ class TestFunctionWithSns(BaseTest):
         self.assertIsNotNone(sqs_subscription)
         self.assertEqual(sqs_subscription["Protocol"], "sqs")
         self.assertEqual(sqs_subscription["TopicArn"], sns_topic_arn)
+
+    def test_function_with_sns_intrinsics(self):
+        self.create_and_verify_stack("combination/function_with_sns_intrinsics")
+
+        sns_client = self.client_provider.sns_client
+
+        sns_topic_arn = self.get_physical_id_by_type("AWS::SNS::Topic")
+
+        subscriptions = sns_client.list_subscriptions_by_topic(TopicArn=sns_topic_arn)["Subscriptions"]
+        self.assertEqual(len(subscriptions), 1)
+
+        subscription = subscriptions[0]
+
+        self.assertIsNotNone(subscription)
+        self.assertEqual(subscription["Protocol"], "sqs")
+        self.assertEqual(subscription["TopicArn"], sns_topic_arn)
+
+        subscription_arn = subscription["SubscriptionArn"]
+        subscription_attributes = sns_client.get_subscription_attributes(SubscriptionArn=subscription_arn)
+        self.assertEqual(subscription_attributes["Attributes"]["FilterPolicy"], '{"price_usd":[{"numeric":["<",100]}]}')
