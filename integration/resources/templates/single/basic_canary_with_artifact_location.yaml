@@ -4,6 +4,8 @@ Parameters:
     Default: integration-test
     MaxLength: 21
 Resources:
+  # role and role permission created for now so that canary will develop, won't be needed in the future when feature to
+  # automatically create role from serverless canary is added
   CloudWatchSyntheticsRole:
     Type: AWS::IAM::Role
     Properties:
@@ -57,11 +59,12 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName:
-        Fn::Sub: intg-syn-results-${AWS::AccountId}-${AWS::Region}
+        Fn::Sub: sam-integration-tests-${AWS::AccountId}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+
   SyntheticsCanary:
     Type: AWS::Serverless::Canary
     Properties:
@@ -90,6 +93,3 @@ Resources:
       StartCanaryAfterCreation: False
       Schedule:
         Expression: rate(0 minute)
-      Tags:
-        TagKey1: TagValue1
-        TagKey2: ""

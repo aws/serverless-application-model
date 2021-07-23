@@ -266,6 +266,10 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "application_preparing_state",
                 "application_with_intrinsics",
                 "basic_layer",
+                "canary_with_code",
+                "canary_with_no_artifact_location",
+                "canary_with_defined_artifact_location",
+                "canaries_with_no_artifact_location",
                 "cloudwatchevent",
                 "eventbridgerule",
                 "eventbridgerule_with_dlq",
@@ -648,6 +652,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
 @pytest.mark.parametrize(
     "testcase",
     [
+        "error_canary_no_handler",
+        "error_canary_invalid_codeuri",
+        "error_canary_no_code",
+        "error_canary_no_schedule",
+        "error_canary_no_start_canary",
         "error_state_machine_definition_string",
         "error_state_machine_invalid_s3_object",
         "error_state_machine_invalid_s3_string",

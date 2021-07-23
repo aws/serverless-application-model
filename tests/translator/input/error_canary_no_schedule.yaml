@@ -1,0 +1,10 @@
+Resources:
+  Canary:
+    Type: 'AWS::Serverless::Canary'
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      StartCanaryAfterCreation: true
+      Role: hello
+      ArtifactS3Location: s3://bar

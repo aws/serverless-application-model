@@ -1,0 +1,10 @@
+Resources:
+  Canary:
+    Type: 'AWS::Serverless::Canary'
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      Role: hello

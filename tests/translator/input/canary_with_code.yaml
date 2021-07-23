@@ -1,0 +1,56 @@
+Resources:
+  CanaryWithBucketUri:
+    Type: AWS::Serverless::Canary
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      FunctionName: canary1
+      ArtifactS3Location: s3://hello
+      CodeUri: s3://sam-bucket/hello.zip
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Role: hello
+
+  CanaryWithFunctionCodeObject:
+    Type: AWS::Serverless::Canary
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      FunctionName: canary2
+      ArtifactS3Location: s3://hello
+      CodeUri:
+        Bucket: sam-bucket
+        Key: hello.zip
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Role: hello
+
+  CanaryWithInlineCode:
+    Type: AWS::Serverless::Canary
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      FunctionName: canary3
+      ArtifactS3Location: s3://hello
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Role: hello
+
+  # for better backwards compatibility, if the user fills both CodeUri and InlineCode property then we take InlineCode
+  CanaryWithBothInlineCodeAndCodeUri:
+    Type: AWS::Serverless::Canary
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      FunctionName: canary4
+      ArtifactS3Location: s3://hello
+      CodeUri: s3://sam-bucket/hello.zip
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Role: hello
