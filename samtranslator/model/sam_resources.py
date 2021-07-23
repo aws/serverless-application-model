@@ -53,7 +53,9 @@ from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
 
-# max_logical_id_length + max_unique_id_length + len(prefix) must be less than or equal to 22
+# len(prefix) + MAX_CANARY_LOGICAL_ID_LENGTH + MAX_CANARY_UNIQUE_ID_LENGTH + 1 (extra '-' char added) must be less
+# than or equal to 21
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-synthetics-canary.html#cfn-synthetics-canary-name
 MAX_CANARY_LOGICAL_ID_LENGTH = 11
 MAX_CANARY_UNIQUE_ID_LENGTH = 5
 CANARY_NAME_PREFIX = "sam-"
@@ -913,11 +915,17 @@ class SamCanary(SamResourceMacro):
             canary.RunConfig = self._construct_run_config()
         return canary
 
-    # Need to construct canary name since the Name property is required in AWS::Synthetics::Canary and CloudFormation
-    # doesn't automatically generate one upon deployment
     def _construct_canary_name(self):
-        # Synthetics Canary name is limited to 22 characters]
-        # max_logical_id_length + max_unique_id_length + len(prefix) must be less than or equal to 22
+        """
+        Need to construct canary name since the Name property is required in AWS::Synthetics::Canary and CloudFormation
+        doesn't automatically generate one upon deployment
+
+        Synthetics Canary name is limited to 22 characters
+        https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-synthetics-canary.html#cfn-synthetics-canary-name
+
+        len(prefix) + MAX_CANARY_LOGICAL_ID_LENGTH + MAX_CANARY_UNIQUE_ID_LENGTH + 1 (extra '-' char added) must be less
+        than or equal to 21
+        """
 
         logical_id_lowered = self.logical_id.lower()[:MAX_CANARY_LOGICAL_ID_LENGTH] + "-"
         suffix = uuid.uuid4().hex[:MAX_CANARY_UNIQUE_ID_LENGTH]
