@@ -23,6 +23,7 @@ class TestFunctionWithKinesis(BaseTest):
         self.assertEqual(event_source_mapping_function_arn, lambda_function_arn)
         self.assertEqual(event_source_mapping_kinesis_stream_arn, kinesis_stream["StreamARN"])
 
+
 class TestFunctionWithKinesisIntrinsics(BaseTest):
     def test_function_with_kinesis_trigger(self):
         self.create_and_verify_stack("combination/function_with_kinesis_intrinsics")
@@ -44,4 +45,3 @@ class TestFunctionWithKinesisIntrinsics(BaseTest):
         self.assertEqual(event_source_mapping_batch_size, 100)
         self.assertEqual(event_source_mapping_function_arn, lambda_function_arn)
         self.assertEqual(event_source_mapping_kinesis_stream_arn, kinesis_stream["StreamARN"])
-
