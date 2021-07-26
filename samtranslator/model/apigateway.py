@@ -280,7 +280,7 @@ class ApiGatewayAuthorizer(object):
         except TypeError:
             # previous behavior before trying to read ttl
             if required_properties_missing:
-               return True
+                return True
 
             return False
 
