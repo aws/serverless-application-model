@@ -244,7 +244,7 @@ class S3(PushEventSource):
     principal = "s3.amazonaws.com"
     property_types = {
         "Bucket": PropertyType(True, is_str()),
-        "Events": PropertyType(True, one_of(is_str(), list_of(is_str()))),
+        "Events": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
         "Filter": PropertyType(False, dict_of(is_str(), is_str())),
     }
 
