@@ -1,0 +1,34 @@
+Globals:
+  Api:
+    Auth:
+      ApiKeyRequired: true
+      UsagePlan:
+        CreateUsagePlan: SHARED
+
+Resources:
+  MyApiFour:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  MyFunctionFour:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event) => {
+          return {
+          statusCode: 200,
+          body: JSON.stringify(event),
+          headers: {}
+          }
+        }
+      Events:
+        ApiKey:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiFour
+            Method: get
+            Path: /path/four

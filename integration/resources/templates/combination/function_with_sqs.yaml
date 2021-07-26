@@ -1,0 +1,17 @@
+Resources:
+  MySqsQueueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      Events:
+        MySqsEvent:
+          Type: SQS
+          Properties:
+            Queue:
+              Fn::GetAtt: ["MySqsQueue", "Arn"]
+            BatchSize: 2
+
+  MySqsQueue:
+    Type: AWS::SQS::Queue

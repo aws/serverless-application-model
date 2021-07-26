@@ -1,0 +1,30 @@
+[
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MySnsTopic",
+    "ResourceType": "AWS::SNS::Topic"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionSNSEvent",
+    "ResourceType": "AWS::SNS::Subscription"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionSNSEventQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionSNSEventEventSourceMapping",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionSNSEventQueuePolicy",
+    "ResourceType": "AWS::SQS::QueuePolicy"
+  }
+]

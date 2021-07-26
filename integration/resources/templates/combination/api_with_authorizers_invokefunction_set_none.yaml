@@ -1,0 +1,76 @@
+Resources:
+  MyApiWithAwsIamAuthNoCallerCredentials:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+
+  MyFunctionDefaultInvokeRole:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        print("hello")
+      Handler: index.handler
+      Runtime: python3.6
+      Events:
+        API3:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiWithAwsIamAuthNoCallerCredentials
+            Method: get
+            Path: /MyFunctionDefaultInvokeRole
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: CALLER_CREDENTIALS
+
+  MyFunctionNONEInvokeRole:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        print("hello")
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        API3:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiWithAwsIamAuthNoCallerCredentials
+            Method: get
+            Path: /MyFunctionNONEInvokeRole
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: NONE
+
+  MyFunctionWithAwsIamAuth:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        print("hello")
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        MyApiWithAwsIamAuth:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApiWithAwsIamAuthNoCallerCredentials
+            Path: /api/with-auth
+            Method: get
+        MyApiWithNoAuth:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: MyApiWithAwsIamAuthNoCallerCredentials
+            Path: /api/without-auth
+            Method: get
+            Auth:
+              Authorizer: NONE
+
+Outputs:
+    ApiUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApiWithAwsIamAuthNoCallerCredentials}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'

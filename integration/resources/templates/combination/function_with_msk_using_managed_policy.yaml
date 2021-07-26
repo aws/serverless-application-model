@@ -1,0 +1,72 @@
+Resources:
+  MyVpc:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      
+  MySubnetOne:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: MyVpc
+      CidrBlock: "10.0.0.0/24"
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+    DependsOn:
+      - MyVpc
+  
+  MySubnetTwo:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId:
+        Ref: MyVpc
+      CidrBlock: "10.0.1.0/24"
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+    DependsOn:
+      - MyVpc
+
+  MyMskCluster:
+    Type: 'AWS::MSK::Cluster'
+    Properties:
+      BrokerNodeGroupInfo:
+        ClientSubnets:
+          - Ref: MySubnetOne
+          - Ref: MySubnetTwo
+        InstanceType: kafka.t3.small
+        StorageInfo:
+          EBSStorageInfo:
+            VolumeSize: 1
+      ClusterName: MyMskClusterTestName2
+      KafkaVersion: 2.4.1.1
+      NumberOfBrokerNodes: 2
+    DependsOn: 
+      - MyVpc
+      - MySubnetOne
+      - MySubnetTwo
+
+  MyMskStreamProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs12.x
+      Handler: index.handler
+      CodeUri: ${codeuri}
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: 
+              Ref: MyMskCluster
+            Topics:
+              - "MyDummyTestTopic"
+    DependsOn: 
+      - MyVpc
+      - MySubnetOne
+      - MySubnetTwo
+      - MyMskCluster
+

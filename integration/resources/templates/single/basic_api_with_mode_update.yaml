@@ -1,0 +1,24 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: MyNewStageName
+      Mode: overwrite
+
+  TestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: python3.6
+      AutoPublishAlias: live
+      InlineCode: |
+        def handler(event, context):
+          print("Hello, world!")
+      Events:
+        Put:
+          Type: Api
+          Properties:
+            Path: /put
+            Method: put
+            RestApiId: !Ref MyApi
+
