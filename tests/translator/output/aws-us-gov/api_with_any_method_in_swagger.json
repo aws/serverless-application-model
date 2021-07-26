@@ -1,0 +1,197 @@
+{
+  "Resources": {
+    "MyApiStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeployment0ebc8893a3"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": {
+          "Ref": "Stage"
+        }
+      }
+    },
+    "HttpApiFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.restapi",
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "todo_list.zip"
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "HttpApiFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "HttpApiFunctionSimpleCasePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "HttpApiFunction"
+        },
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*",
+            {
+              "__Stage__": "*",
+              "__ApiId__": {
+                "Ref": "MyApi"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "HttpApiFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    },
+    "MyApiDeployment0ebc8893a3": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "Description": "RestApi deployment id: 0ebc8893a30055fb944d26720dc8ffddacc6d27d",
+        "StageName": "Stage"
+      }
+    },
+    "MyApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Fn::Sub": "${AWS::StackName}-Api"
+            }
+          },
+          "paths": {
+            "$default": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "isDefaultRoute": true,
+                "security": [
+                  {
+                    "LambdaAuthorizer": []
+                  }
+                ],
+                "responses": {}
+              }
+            },
+            "/": {
+              "any": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "ANY",
+                  "type": "http_proxy",
+                  "uri": "https://www.alphavantage.co/",
+                  "payloadFormatVersion": "1.0"
+                },
+                "security": [
+                  {
+                    "LambdaAuthorizer": []
+                  }
+                ]
+              },
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
+                  },
+                  "payloadFormatVersion": "2.0"
+                },
+                "security": [
+                  {
+                    "LambdaAuthorizer": []
+                  }
+                ],
+                "responses": {}
+              }
+            }
+          },
+          "openapi": "3.0",
+          "components": {
+            "securitySchemes": {
+              "LambdaAuthorizer": {
+                "in": "header",
+                "type": "apiKey",
+                "name": "Unused",
+                "x-amazon-apigateway-authorizer": {
+                  "type": "request",
+                  "identitySource": "method.request.header.Authorization",
+                  "authorizerUri": {
+                    "Fn::Sub": [
+                      "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      {
+                        "__FunctionArn__": null
+                      }
+                    ]
+                  }
+                },
+                "x-amazon-apigateway-authtype": "custom"
+              }
+            }
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      }
+    }
+  }
+}
