@@ -8,7 +8,6 @@
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
-          "swagger": "2.0",
           "info": {
             "version": "1.0",
             "title": {
@@ -16,22 +15,14 @@
             }
           },
           "paths": {},
+          "swagger": "2.0",
           "securityDefinitions": {
             "SomeAuthorizer": {
+              "in": "header",
               "type": "apiKey",
               "name": "Unused",
-              "in": "header",
-              "x-amazon-apigateway-authtype": "custom",
               "x-amazon-apigateway-authorizer": {
                 "type": "request",
-                "authorizerUri": {
-                  "Fn::Sub": [
-                    "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
-                    {
-                      "__FunctionArn__": "SomeArn"
-                    }
-                  ]
-                },
                 "authorizerResultTtlInSeconds": {
                   "Fn::If": [
                     "isProd",
@@ -39,49 +30,46 @@
                     0
                   ]
                 },
-                "identitySource": "method.request.header.Accept"
-              }
+                "identitySource": "method.request.header.Accept",
+                "authorizerUri": {
+                  "Fn::Sub": [
+                    "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    {
+                      "__FunctionArn__": "SomeArn"
+                    }
+                  ]
+                }
+              },
+              "x-amazon-apigateway-authtype": "custom"
             }
           }
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
         },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
           ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     },
-    "APIGatewayDeployment6a5b3a7036": {
+    "APIGatewayDeploymentbbcece046c": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 6a5b3a7036e3315b4572de9f418d31c49d52786d",
         "RestApiId": {
           "Ref": "APIGateway"
         },
+        "Description": "RestApi deployment id: bbcece046c6ecd35f10c6ba88cf762d87ef35e8a",
         "StageName": "Stage"
-      }
-    },
-    "APIGatewayProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "APIGatewayDeployment6a5b3a7036"
-        },
-        "RestApiId": {
-          "Ref": "APIGateway"
-        },
-        "StageName": "Prod"
       }
     },
     "APIGatewaySomeAuthorizerAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "FunctionName": "SomeArn",
         "Principal": "apigateway.amazonaws.com",
+        "FunctionName": "SomeArn",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
@@ -92,6 +80,18 @@
             }
           ]
         }
+      }
+    },
+    "APIGatewayProdStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "APIGatewayDeploymentbbcece046c"
+        },
+        "RestApiId": {
+          "Ref": "APIGateway"
+        },
+        "StageName": "Prod"
       }
     }
   }
