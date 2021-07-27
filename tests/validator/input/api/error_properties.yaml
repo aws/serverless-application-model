@@ -1,13 +1,12 @@
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  # Properties missing
   ApiPropertiesMissing:
     Type: AWS::Serverless::Api
-  # Properties empty
+
   ApiPropertiesEmpty:
     Type: AWS::Serverless::Api
     Properties:
-  # Properties not object
+
   ApiPropertiesNotObject:
     Type: AWS::Serverless::Api
     Properties: MyProps

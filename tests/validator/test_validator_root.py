@@ -19,8 +19,7 @@ class TestValidatorRoot(TestValidatorBase):
             "error_resources_empty",
             "error_resources_missing",
             "error_resources_not_object",
-            "error_resources_one_empty",
-            "error_resources_one_missing_properties",
+            "error_resources",
             "error_transform_empty",
         ],
     )

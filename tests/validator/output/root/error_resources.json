@@ -1,0 +1,4 @@
+[
+  "[Resources.EmptyResource] Must not be empty",
+  "[Resources.TypeWrongFormat.Type] 'AWS::Serverless:Api' must use format x::y::z"
+]

@@ -65,6 +65,14 @@
           "allOf": [
             {
               "$ref": "file:definitions/api.json#/definitions/AWS::Serverless::Api"
+            },
+            {
+              "properties": {
+                "Type": {
+                  "pattern": "[a-zA-Z]+::[a-zA-Z]+::[a-zA-Z]+",
+                  "patternError": "must use format x::y::z"
+                }
+              }
             }
           ],
           "type": "object"
