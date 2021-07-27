@@ -2,5 +2,8 @@ Transform: AWS::Serverless-2016-10-31
 Resources:
   EmptyResource:
 
-  TypeWrongFormat:
+  TypeMissingSemiColon:
     Type: AWS::Serverless:Api
+
+  TypeUnknownServerless:
+    Type: AWS::Serverless::UnknownType

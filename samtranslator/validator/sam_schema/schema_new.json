@@ -73,6 +73,30 @@
                   "patternError": "must use format x::y::z"
                 }
               }
+            },
+            {
+              "if": {
+                "properties": {
+                  "Type": {
+                    "pattern": "^AWS::Serverless::"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "Type": {
+                    "enum": [
+                      "AWS::Serverless::Api",
+                      "AWS::Serverless::Application",
+                      "AWS::Serverless::Function",
+                      "AWS::Serverless::HttpApi",
+                      "AWS::Serverless::LayerVersion",
+                      "AWS::Serverless::SimpleTable",
+                      "AWS::Serverless::StateMachine"
+                    ]
+                  }
+                }
+              }
             }
           ],
           "type": "object"
