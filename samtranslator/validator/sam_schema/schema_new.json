@@ -69,7 +69,7 @@
             {
               "properties": {
                 "Type": {
-                  "pattern": "[a-zA-Z]+::[a-zA-Z]+::[a-zA-Z]+",
+                  "pattern": "[a-zA-Z0-9]+::[a-zA-Z0-9]+::[a-zA-Z0-9]+",
                   "patternError": "must use format x::y::z"
                 }
               }
