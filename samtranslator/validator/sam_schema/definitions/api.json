@@ -147,7 +147,7 @@
               },
               "OpenApiVersion": {
                 "type": "string",
-                "pattern": "^[2-3](\\.\\d)(\\.\\d)?$",
+                "pattern": "^(2\\.0|3\\.\\d\\.\\d)?$",
                 "patternError": "must match 2.x or 3.x.x"
               },
               "StageName": {
