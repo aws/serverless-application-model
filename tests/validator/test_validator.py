@@ -1,7 +1,7 @@
 import os.path
+from unittest import TestCase
 import pytest
 from parameterized import parameterized
-from unittest import TestCase
 from samtranslator.yaml_helper import yaml_parse
 from samtranslator.validator.validator import SamTemplateValidator, sam_schema
 
@@ -170,7 +170,7 @@ class TestValidatorTranslatorTemplates(TestValidatorBase):
 
 
 class TestValidatorLegacy(TestValidatorBase):
-    def test_validate_using_old_interface_with_same_result(self):
+    def test_validate_old_interface(self):
         """
         Validates that the old deprecated static method returns the same result as the new one
         """

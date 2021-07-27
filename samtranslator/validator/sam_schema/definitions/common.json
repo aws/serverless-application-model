@@ -15,19 +15,15 @@
       "type": "string"
     },
     "DependsOn": {
-      "anyOf": [
-        {
-          "pattern": "^[a-zA-Z0-9]+$",
-          "type": "string"
-        },
-        {
-          "items": {
-            "pattern": "^[a-zA-Z0-9]+$",
-            "type": "string"
-          },
-          "type": "array"
-        }
-      ]
+      "type": [
+        "string",
+        "array"
+      ],
+      "pattern": "^[a-zA-Z0-9]+$",
+      "items": {
+        "pattern": "^[a-zA-Z0-9]+$",
+        "type": "string"
+      }
     },
     "GatewayResponse": {
       "additionalProperties": false,
@@ -174,6 +170,11 @@
       "type": "string"
     },
     "UpdateReplacePolicy": {
+      "enum": [
+        "Delete",
+        "Retain",
+        "Snapshot"
+      ],
       "type": "string"
     }
   }

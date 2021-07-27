@@ -30,3 +30,26 @@ Resources:
               StageVariables:
                 - Variable1
                 - Variable2
+
+          LambdaRequestCompleteIntrinsics:
+            AuthorizationScopes:
+              - Scope1
+              - Scope2
+            FunctionArn: Function.Arn
+            FunctionInvokeRole: My function invoke role
+            FunctionPayloadType: REQUEST
+            Identity:
+              Context:
+                - Context1
+                - Context2
+              Headers:
+                - Headers1
+                - Headers2
+              QueryStrings:
+                - QueryString1
+                - QueryString2
+              ReauthorizeEvery:
+                Ref: ParamReauthorizeEvery
+              StageVariables:
+                - Variable1
+                - Variable2

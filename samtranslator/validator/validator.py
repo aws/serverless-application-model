@@ -1,4 +1,3 @@
-from collections import OrderedDict
 import json
 import re
 
@@ -8,7 +7,7 @@ from jsonschema.exceptions import ValidationError
 from . import sam_schema
 
 
-class SamTemplateValidator(object):
+class SamTemplateValidator:
     """
     SAM template validator
     """
@@ -38,6 +37,7 @@ class SamTemplateValidator(object):
 
         # Helps resolve the $Ref to external files
         # schema content must be passed to resolve local (#/def...) references
+        # Hardcoded "/" as this is an URI, not a Path
         resolver = jsonschema.RefResolver("file://" + sam_schema.SCHEMA_DIR + "/", schema)
 
         SAMValidator = jsonschema.validators.extend(
@@ -49,7 +49,7 @@ class SamTemplateValidator(object):
         self.validator = SAMValidator(schema, resolver=resolver)
 
     @staticmethod
-    def validate(template_dict, schema=None):
+    def validate(template_dict, schema=None):  # pylint: disable=method-hidden
         """
         Validates a SAM Template
 
@@ -94,7 +94,7 @@ class SamTemplateValidator(object):
         # Each object can have a list of child errors in its Context attribute
         validation_errors = self.validator.iter_errors(template_dict)
 
-        # Set of "[/Path/To/Element] Error message"
+        # Set of "[Path.To.Element] Error message"
         # To track error uniqueness, Dict instead of List, for speed
         errors_set = {}
 
@@ -124,9 +124,9 @@ class SamTemplateValidator(object):
 
         if not error.context:
             # We only display the leaves
-            # Format the message:
-            # [/Path/To/Element] Error message
-            error_path = "/".join([str(p) for p in error.absolute_path]) if error.absolute_path else "/"
+            # Format the message with pseudo JSON Path:
+            # [Path.To.Element] Error message
+            error_path = ".".join([str(p) for p in error.absolute_path]) if error.absolute_path else "."
 
             error_content = "[{}] {}".format(error_path, self._cleanup_error_message(error))
 
@@ -136,7 +136,7 @@ class SamTemplateValidator(object):
             return
 
         for context_error in error.context:
-            # Each context item is also a validation error
+            # Each "context" item is also a validation error
             self._process_error(context_error, errors_set)
 
     def _cleanup_error_message(self, error):
@@ -244,14 +244,14 @@ def is_intrinsic(checker, instance):
     return isinstance(instance, dict) and has_intrinsic_attr(instance)
 
 
-def has_intrinsic_attr(dict):
+def has_intrinsic_attr(instance):
     """
-    Returns a value indicating whether the dict has an intrinsic attribute
+    Returns a value indicating whether the instance has an intrinsic attribute
     Only one attribute which must be one of the intrinsics
 
     Parameters
     ----------
-    dict : dict
+    instance : dict
         Dictionary
 
     Returns
@@ -259,4 +259,4 @@ def has_intrinsic_attr(dict):
     boolean
         True if only has one intrinsic attribute, False otherwise
     """
-    return len(dict) == 1 and next(iter(dict)) in INTRINSIC_ATTR
+    return len(instance) == 1 and next(iter(instance)) in INTRINSIC_ATTR

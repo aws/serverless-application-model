@@ -38,6 +38,7 @@ class TestValidatorApi(TestValidatorBase):
             "error_name",
             "error_openapiversion",
             "error_properties",
+            "error_resource_attributes",
             "error_stagename",
             "error_tags",
             "error_tracingenabled",
@@ -53,6 +54,7 @@ class TestValidatorApi(TestValidatorBase):
             "success_auth_lambdarequest",
             "success_complete_api",
             "success_minimal_api",
+            "success_resource_attributes",
         ],
     )
     def test_success(self, template):

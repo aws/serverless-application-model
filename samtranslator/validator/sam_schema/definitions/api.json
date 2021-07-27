@@ -20,6 +20,9 @@
           "Condition": {
             "$ref": "file:common.json#definitions/Condition"
           },
+          "DeletionPolicy": {
+            "$ref": "file:common.json#definitions/DeletionPolicy"
+          },
           "DependsOn": {
             "$ref": "file:common.json#definitions/DependsOn"
           },
@@ -186,6 +189,12 @@
           },
           "Type": {
             "const": "AWS::Serverless::Api"
+          },
+          "UpdatePolicy": {
+            "$ref": "file:common.json#definitions/UpdatePolicy"
+          },
+          "UpdateReplacePolicy": {
+            "$ref": "file:common.json#definitions/UpdateReplacePolicy"
           }
         },
         "required": [
@@ -343,7 +352,10 @@
           "type": "string"
         },
         "ReauthorizeEvery": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "intrinsic"
+          ],
           "maximum": 3600,
           "minimum": 1
         },

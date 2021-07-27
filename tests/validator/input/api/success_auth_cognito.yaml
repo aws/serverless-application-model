@@ -25,7 +25,8 @@ Resources:
               - Scope2
             Identity:
               Header: Identity header
-              ReauthorizeEvery: 3
+              ReauthorizeEvery:
+                Ref: ParamReauthorizeEvery
               ValidationExpression: "[a-z]+"
             UserPoolArn:
               Fn::GetAtt:
