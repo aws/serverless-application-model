@@ -31,6 +31,16 @@ class TestApiGatewayAuthorizer(TestCase):
                 api_logical_id="logicalId", name="authName", identity={}, function_payload_type="REQUEST"
             )
 
+    def test_create_authorizer_doesnt_fail_with_identity_reauthorization_every_as_zero(self):
+        auth = ApiGatewayAuthorizer(
+            api_logical_id="logicalId",
+            name="authName",
+            identity={"ReauthorizeEvery": 0},
+            function_payload_type="REQUEST",
+        )
+
+        self.assertIsNotNone(auth)
+
     def test_create_authorizer_with_non_integer_identity(self):
         auth = ApiGatewayAuthorizer(
             api_logical_id="logicalId",
