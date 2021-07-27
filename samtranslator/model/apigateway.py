@@ -275,20 +275,14 @@ class ApiGatewayAuthorizer(object):
         required_properties_missing = not headers and not query_strings and not stage_variables and not context
 
         try:
-            int(ttl)
+            ttl_int = int(ttl)
         # this will catch if ttl is None and not convertable to an int
         except TypeError:
             # previous behavior before trying to read ttl
-            if required_properties_missing:
-                return True
-
-            return False
+            return required_properties_missing
 
         # If we can resolve ttl, attempt to see if things are valid
-        if (ttl is None or int(ttl) > 0) and required_properties_missing:
-            return True
-
-        return False
+        return ttl_int > 0 and required_properties_missing
 
     def generate_swagger(self):
         authorizer_type = self._get_type()
