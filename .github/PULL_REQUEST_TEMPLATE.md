@@ -6,7 +6,10 @@
 
 *Checklist:*
 
-- [ ] Write/update tests
+- [ ] Add/update tests using:
+    - [ ] Correct values
+    - [ ] Bad/wrong values (None, empty, wrong type, length, etc.)
+    - [ ] [Intrinsic Functions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html)
 - [ ] `make pr` passes
 - [ ] Update documentation
 - [ ] Verify transformed template deploys and application functions as expected
