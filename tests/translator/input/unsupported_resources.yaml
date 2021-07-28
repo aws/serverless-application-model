@@ -7,8 +7,8 @@ Resources:
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
 
-  InvalidResourceTypeShouldBeAccepted:
-    Type: AWS::Serverless::ABCD
+  UnknownTypeShouldBeAccepted:
+    Type: AWS::Other::ABCD
     Properties:
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
