@@ -21,7 +21,6 @@ Resources:
           Properties:
             KafkaBootstrapServers:
               - Ref: KafkaBootstrapServersValue
-              # - abc.xyz.com:9092
             Topics:
               Ref: TopicsValue
             SourceAccessConfigurations:
