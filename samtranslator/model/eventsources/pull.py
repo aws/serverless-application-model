@@ -3,6 +3,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX,  PropertyType
 from samtranslator.model.types import is_type, is_str, list_of
+from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -40,7 +41,7 @@ class PullEventSource(ResourceMacro):
         "SecretsManagerKmsKeyId": PropertyType(False, is_str()),
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
-        "KafkaBootstrapServers": PropertyType(False, list_of(is_str())),
+        "KafkaBootstrapServers": PropertyType(False, is_type(list)),
     }
 
     def get_policy_arn(self):
@@ -399,7 +400,7 @@ class SelfManagedKafka(PullEventSource):
                 "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
             )
 
-        if not isinstance(config["URI"], string_types):
+        if not isinstance(config["URI"], string_types) and not is_intrinsic(config["URI"]):
             raise InvalidEventException(
                 self.relative_id,
                 "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(

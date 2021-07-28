@@ -123,7 +123,6 @@ class SelfManagedKafkaEventSource(TestCase):
         self.kafka_event_source.SecretsManagerKmsKeyId = "SECRET_KEY"
 
         policy_statements = self.kafka_event_source.get_policy_statements()
-        print(policy_statements)
         expected_policy_document = [
             {
                 "PolicyDocument": {
@@ -225,7 +224,7 @@ class SelfManagedKafkaEventSource(TestCase):
         with self.assertRaises(InvalidEventException):
             self.kafka_event_source.get_policy_statements()
 
-    def test_must_raise_for_missing_vpc_security_group(self):
+    def test_must_raise_for_missing_vpc_subnet(self):
         self.kafka_event_source.SourceAccessConfigurations = [
             {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
             {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
@@ -238,7 +237,7 @@ class SelfManagedKafkaEventSource(TestCase):
         with self.assertRaises(InvalidEventException):
             self.kafka_event_source.get_policy_statements()
 
-    def test_must_raise_for_missing_vpc_subnet(self):
+    def test_must_raise_for_missing_vpc_security_group(self):
         self.kafka_event_source.SourceAccessConfigurations = [
             {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
             {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
