@@ -747,8 +747,9 @@ class Api(PushEventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
+                api_id = self.RestApiId if isinstance(self.RestApiId, string_types) else self.RestApiId.get("Ref")
                 editor.add_resource_policy(
-                    resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
+                    resource_policy=resource_policy, path=self.Path, api_id=api_id, stage=self.Stage
                 )
                 if resource_policy.get("CustomStatements"):
                     editor.add_custom_statements(resource_policy.get("CustomStatements"))
