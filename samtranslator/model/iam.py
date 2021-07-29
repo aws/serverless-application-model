@@ -129,3 +129,45 @@ class IAMRolePolicies:
             },
         }
         return document
+
+    @classmethod
+    def execute_canary_policy(cls, logical_id, result_bucket, canary_name):
+        document = {
+            "PolicyName": logical_id + "CanaryPolicy",
+            "PolicyDocument": {
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": ["s3:PutObject", "s3:GetBucketLocation"],
+                        "Resource": [{"Fn::Join": ["", ["arn:aws:s3:::", result_bucket, "/*"]]}],
+                    },
+                    {
+                        "Effect": "Allow",
+                        "Action": ["logs:CreateLogStream", "logs:PutLogEvents", "logs:CreateLogGroup"],
+                        "Resource": [
+                            {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${"
+                                            "AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-"
+                                        },
+                                        canary_name,
+                                        "-*",
+                                    ],
+                                ]
+                            }
+                        ],
+                    },
+                    {"Effect": "Allow", "Action": ["s3:ListAllMyBuckets"], "Resource": ["*"]},
+                    {
+                        "Effect": "Allow",
+                        "Action": "cloudwatch:PutMetricData",
+                        "Resource": "*",
+                        "Condition": {"StringEquals": {"cloudwatch:namespace": "CloudWatchSynthetics"}},
+                    },
+                ]
+            },
+        }
+        return document

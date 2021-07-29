@@ -14,7 +14,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
     """
 
     _plugin_name = ""
-    SUPPORTED_RESOURCE_TYPE = {"AWS::Serverless::Function", "AWS::Serverless::StateMachine"}
+    SUPPORTED_RESOURCE_TYPE = {"AWS::Serverless::Function", "AWS::Serverless::StateMachine", "AWS::Serverless::Canary"}
 
     def __init__(self, policy_template_processor):
         """

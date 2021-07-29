@@ -834,6 +834,7 @@ class SamCanary(SamResourceMacro):
         "SuccessRetentionPeriod": PropertyType(False, is_type(int)),
         "VpcConfig": PropertyType(False, is_type(dict)),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
+        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -845,17 +846,75 @@ class SamCanary(SamResourceMacro):
         :rtype: list
         """
         resources = []
+        managed_policy_map = kwargs.get("managed_policy_map", {})
         synthetics_canary = self._construct_synthetics_canary()
         resources.append(synthetics_canary)
 
         # A S3 Bucket resource will be added to the transformed template if the user doesn't provide an artifact
         # bucket to store canary results
-        if synthetics_canary.ArtifactS3Location is None:
+        artifact_bucket_name = ""
+        if self.ArtifactS3Location is None:
             s3bucket = self._construct_artifact_bucket()
             resources.append(s3bucket)
             synthetics_canary.ArtifactS3Location = {"Fn::Join": ["", ["s3://", {"Ref": s3bucket.logical_id}]]}
+            artifact_bucket_name = {"Ref": s3bucket.logical_id}
+
+        if self.Role is None:
+            role = self._construct_role(artifact_bucket_name, synthetics_canary.Name, managed_policy_map)
+            resources.append(role)
+            synthetics_canary.ExecutionRoleArn = role.get_runtime_attr("arn")
 
         return resources
+
+    def _construct_role(self, artifact_bucket_name, canary_name, managed_policy_map):
+        """Constructs a Role based on this SAM Canaries's Policies and ArtifactS3Location property.
+
+        :returns: the generated IAM Role
+        :rtype: model.iam.IAMRole
+        """
+
+        assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()
+        role_attributes = self.get_passthrough_resource_attributes()
+
+        # add AWS managed policies if user has enabled VpcConfig or Tracing
+        managed_policy_arns = []
+        if self.VpcConfig:
+            managed_policy_arns.append(
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
+            )
+        if self.Tracing:
+            managed_policy_name = get_xray_managed_policy_name()
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
+
+        # if user has defined Policies property, those policies will be appended to this role
+        function_policies = ResourcePolicies(
+            {"Policies": self.Policies},
+            # No support for policy templates in the "core"
+            policy_template_processor=None,
+        )
+
+        # The policy to execute the canary is only added to the role if the user hasn't defined ArtifactS3Location
+        # this emulates CloudWatch Synthetics Canary dashboard's behavior
+        policy_documents = []
+        if self.ArtifactS3Location is None:
+            policy_documents.append(
+                IAMRolePolicies.execute_canary_policy(
+                    logical_id=self.logical_id, result_bucket=artifact_bucket_name, canary_name=canary_name
+                )
+            )
+
+        execution_role = construct_role_for_resource(
+            resource_logical_id=self.logical_id,
+            attributes=role_attributes,
+            managed_policy_map=managed_policy_map,
+            assume_role_policy_document=assume_role_policy_document,
+            resource_policies=function_policies,
+            managed_policy_arns=managed_policy_arns,
+            policy_documents=policy_documents,
+            permissions_boundary=None,
+            tags=self._construct_tag_list(self.Tags),
+        )
+        return execution_role
 
     def _construct_artifact_bucket(self):
         """Constructs a S3Bucket resource to store canary artifacts.
