@@ -852,6 +852,7 @@ class SamCanary(SamResourceMacro):
 
         # A S3 Bucket resource will be added to the transformed template if the user doesn't provide an artifact
         # bucket to store canary results
+
         artifact_bucket_name = ""
         if self.ArtifactS3Location is None:
             s3bucket = self._construct_artifact_bucket()
