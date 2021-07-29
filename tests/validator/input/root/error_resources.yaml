@@ -7,3 +7,6 @@ Resources:
 
   TypeUnknownServerless:
     Type: AWS::Serverless::UnknownType
+
+  TypeCustomThreePartsInsteadOfTwo:
+    Type: Custom::My::Custom

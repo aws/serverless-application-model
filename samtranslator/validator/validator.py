@@ -57,6 +57,8 @@ class SamTemplateValidator:
             validator = SamTemplateValidator()
             validator.validate(template_dict)
 
+        Kept for backward compatibility
+
         Parameters
         ----------
         template_dict : dict
@@ -66,8 +68,8 @@ class SamTemplateValidator:
 
         Returns
         -------
-        list[str]
-            List of validation errors
+        str
+            Validation errors separated by commas ","
         """
         validator = SamTemplateValidator(schema)
 

@@ -67,10 +67,27 @@
               "$ref": "file:definitions/api.json#/definitions/AWS::Serverless::Api"
             },
             {
-              "properties": {
-                "Type": {
-                  "pattern": "[a-zA-Z0-9]+::[a-zA-Z0-9]+::[a-zA-Z0-9]+",
-                  "patternError": "must use format x::y::z"
+              "if": {
+                "properties": {
+                  "Type": {
+                    "pattern": "^Custom::"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "Type": {
+                    "pattern": "^Custom::[a-zA-Z0-9]+$",
+                    "patternError": "must use format Custom::X"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "Type": {
+                    "pattern": "^[a-zA-Z0-9]+::[a-zA-Z0-9]+::[a-zA-Z0-9]+$",
+                    "patternError": "must use format X::Y::Z"
+                  }
                 }
               }
             },
