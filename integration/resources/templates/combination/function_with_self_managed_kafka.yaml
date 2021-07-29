@@ -12,6 +12,7 @@ Resources:
           Properties:
             KafkaBootstrapServers:
               - abc.xyz.com:9092
+              - 123.45.67.89:9096 
             Topics:
               - Topic1
             SourceAccessConfigurations:
