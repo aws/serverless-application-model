@@ -1,0 +1,22 @@
+Resources:
+  CanaryWithPolicies:
+    Type: AWS::Serverless::Canary
+    Properties:
+      Handler: pageLoadBlueprint.handler
+      InlineCode: |
+        const loadBlueprint = async function () {
+            console.log("hello")
+        };
+        exports.handler = async () => {
+            return await loadBlueprint();
+        };
+      Runtime: syn-nodejs-puppeteer-3.1
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      VpcConfig:
+        SecurityGroupIds: []
+        SubnetIds: []
+      Tracing: true
+      Policies:
+        - CloudWatchPutMetricPolicy: { }

@@ -3,14 +3,20 @@ Parameters:
     Type: String
     Default: integration-test
     MaxLength: 21
+  S3Name:
+    Type: String
+    Default: sam-integration-test-bucket
+  RoleName:
+    Type: String
+    Default: sam-integration-test-role
 Resources:
   # role and role permission created for now so that canary will develop, won't be needed in the future when feature to
   # automatically create role from serverless canary is added
-  CloudWatchSyntheticsRole:
+  SamIntegrationTestRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName:
-        Fn::Sub: CloudWatchSyntheticsRole-${CanaryName}-${AWS::Region}
+        Fn::Sub: ${RoleName}-${CanaryName}-${AWS::Region}
       Description: CloudWatch Synthetics lambda execution role for running canaries
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -24,9 +30,9 @@ Resources:
     Type: AWS::IAM::Policy
     Properties:
       Roles:
-        - Ref: CloudWatchSyntheticsRole
+        - Ref: SamIntegrationTestRole
       PolicyName:
-        Fn::Sub: CloudWatchSyntheticsPolicy-${CanaryName}-${AWS::Region}
+        Fn::Sub: ${RoleName}-policy-${CanaryName}-${AWS::Region}
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -59,7 +65,8 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName:
-        Fn::Sub: sam-integration-tests-${AWS::AccountId}
+        # have to add the account id to make sure the bucket name is unique and the bucket deploys correctly
+        Fn::Sub: ${S3Name}-${CanaryName}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -72,17 +79,11 @@ Resources:
         Fn::Sub: ${CanaryName}
       Handler: pageLoadBlueprint.handler
       InlineCode: |
-        from aws_synthetics.common import synthetics_logger as logger
-
-        def main():
-            logger.info("Canary successfully executed")
-
         def handler(event, context):
-            logger.info("Selenium Python heartbeat canary")
-            return main()
+          print("Hello, world!")
       Role:
         Fn::GetAtt:
-          - CloudWatchSyntheticsRole
+          - SamIntegrationTestRole
           - Arn
       Runtime: syn-python-selenium-1.0
       ArtifactS3Location:
@@ -90,6 +91,6 @@ Resources:
           - ''
           - - s3://
             - Ref: ResultsBucket
-      StartCanaryAfterCreation: False
+      StartCanaryAfterCreation: true
       Schedule:
         Expression: rate(0 minute)

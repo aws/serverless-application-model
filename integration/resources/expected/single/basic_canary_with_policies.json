@@ -1,0 +1,5 @@
+[
+  { "LogicalResourceId":"CanaryWithPolicies", "ResourceType":"AWS::Synthetics::Canary" },
+  { "LogicalResourceId":"CanaryWithPoliciesRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"CanaryWithPoliciesArtifactBucket", "ResourceType":"AWS::S3::Bucket" }
+]
