@@ -1,0 +1,55 @@
+Resources:
+  CanaryWithRoleDefined:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary1
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      ArtifactS3Location: s3://foo
+      Role:
+        Fn::GetAtt: [ "MyCanaryRole", "Arn" ]
+
+  CanaryWithRoleAndPoliciesDefined:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary2
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      ArtifactS3Location: s3://foo
+       # 'Policies' should be ignored
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "Some function"
+      Role:
+        Fn::GetAtt: [ "MyCanaryRole", "Arn" ]
+
+  MyCanaryRole:
+    # This is just some role. Actual role definition might be wrong
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "*"
+                Resource: "*"

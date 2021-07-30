@@ -1,0 +1,24 @@
+Resources:
+  CanaryWithoutRole:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://sam-bucket/hello.zip
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+
+  CanaryWithoutRoleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com

@@ -1,0 +1,101 @@
+Resources:
+  CompleteCanary:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: everything-defined-canary
+      CodeUri: s3://sam-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      ArtifactS3Location: s3://test
+      Role: test
+      Schedule:
+        Expression: rate(0 minutes)
+        DurationInSeconds: 100
+      StartCanaryAfterCreation: true
+      MemorySize: 10
+      Tracing: true
+      Timeout: 200
+      FailureRetentionPeriod: 100
+      SuccessRetentionPeriod: 100
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-085912345678492fb
+        SubnetIds:
+          - subnet-071f712345678e7c8
+      Environment:
+        Variables:
+          test1: value1
+      Policies:
+        - CloudWatchPutMetricPolicy: { }
+
+  CanaryWithTracing:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary-with-tracing
+      CodeUri: s3://sam-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      ArtifactS3Location: s3://test
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Tracing: true
+
+  CanaryWithInlineCode:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary-with-inline-code
+      InlineCode: "hello world"
+      Handler: hello.handler
+      Runtime: python2.7
+      ArtifactS3Location: s3://test
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Role: hello
+
+  CanaryWithCodeUriObject:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary-codeuri
+      CodeUri:
+        Bucket: somebucket
+        Key: somekey
+        Version: "1"
+      Handler: hello.handler
+      Runtime: python2.7
+      ArtifactS3Location: s3://test
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Role: hello
+
+  CanaryWithPolicies:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary-policies
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      ArtifactS3Location: s3://test
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Policies: AmazonDynamoDBFullAccess
+
+  CanaryWithPolicyDocument:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary-policy-doc
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      ArtifactS3Location: s3://test
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Policies:
+        Statement:
+          - Action: [ 'dynamodb:*' ]
+            Effect: Allow
+            Resource: '*'

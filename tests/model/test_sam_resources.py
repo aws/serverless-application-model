@@ -311,6 +311,48 @@ class TestCanaryArtifactS3Location(TestCase):
         self.assertEqual(deployment[0].ArtifactS3Location, artifact_s3location)
 
 
+class TestCanaryRoleCreation(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    def test_with_role(self):
+        role = "foo"
+
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+        canary.Role = role
+
+        resources = canary.to_cloudformation(**self.kwargs)
+        deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]
+
+        self.assertEqual(deployment.__len__(), 1)
+        self.assertEqual(deployment[0].ExecutionRoleArn, role)
+
+    def test_with_no_role(self):
+        artifact_s3location = "s3://test"
+
+        canary = SamCanary("foo")
+        canary.InlineCode = "foobar"
+        canary.ArtifactS3Location = artifact_s3location
+
+        resources = canary.to_cloudformation(**self.kwargs)
+        canary_resource = [x for x in resources if isinstance(x, SyntheticsCanary)]
+        role = {"Fn::GetAtt": ["fooRole", "Arn"]}
+
+        self.assertEqual(canary_resource.__len__(), 1)
+        self.assertEqual(canary_resource[0].ExecutionRoleArn, role)
+
+        role_resource = [x for x in resources if isinstance(x, IAMRole)]
+        self.assertEqual(role_resource.__len__(), 1)
+        self.assertEqual(role_resource[0].logical_id, canary.logical_id + "Role")
+        # since 'ArtifactS3Location' is defined and no policies are added through the 'Policies' property, this role
+        # should have no policies attached to it
+        self.assertIsNone(role_resource[0].Policies)
+
+
 class TestOpenApi(TestCase):
     kwargs = {
         "intrinsics_resolver": IntrinsicsResolver({}),
