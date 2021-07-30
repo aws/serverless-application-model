@@ -1,0 +1,21 @@
+Resources:
+  Canary:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://sam-bucket/hello.zip
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      ArtifactS3Location: s3://test
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"

@@ -270,6 +270,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "canary_with_policies",
                 "canary_with_role",
                 "canary_with_no_role",
+                "canary_with_assume_role_policy",
                 "canary_with_code",
                 "canary_with_no_artifact_location",
                 "canary_with_defined_artifact_location",

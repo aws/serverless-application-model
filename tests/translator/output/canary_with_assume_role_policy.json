@@ -1,0 +1,61 @@
+{
+  "Resources": {
+    "Canary": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://test",
+        "Code": {
+          "S3Bucket": "sam-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "CanaryRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "ManagedPolicyArns": [],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    }
+  }
+}
