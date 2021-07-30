@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from samtranslator.model.eventsources.push import Api
 from samtranslator.model.lambda_ import LambdaFunction, LambdaPermission
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 
 
 class ApiEventSource(TestCase):
@@ -116,6 +117,29 @@ class ApiEventSource(TestCase):
             self.fail("Permission class isn't valid")
 
         self.assertEqual(arn, "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/")
+
+    def test_swagger_integration_with_string_rest_api_id(self):
+        self.api_event_source.Auth = {"Authorizer": "AWS_IAM", "ResourcePolicy": {"AwsAccountWhitelist": ["123456"]}}
+        self.api_event_source.to_cloudformation(
+            function=self.func,
+            explicit_api={
+                "__MANAGE_SWAGGER": True,
+                "DefinitionBody": {"openapi": "3.0.1", "paths": {"/foo": {}, "/bar": {}}},
+            },
+            intrinsics_resolver=IntrinsicsResolver({}),
+        )
+
+    def test_swagger_integration_with_object_rest_api_id(self):
+        self.api_event_source.RestApiId = {"Ref": "ApiId"}
+        self.api_event_source.Auth = {"Authorizer": "AWS_IAM", "ResourcePolicy": {"AwsAccountWhitelist": ["123456"]}}
+        self.api_event_source.to_cloudformation(
+            function=self.func,
+            explicit_api={
+                "__MANAGE_SWAGGER": True,
+                "DefinitionBody": {"openapi": "3.0.1", "paths": {"/foo": {}, "/bar": {}}},
+            },
+            intrinsics_resolver=IntrinsicsResolver({}),
+        )
 
     def _extract_path_from_arn(self, logical_id, perm):
         arn = perm.to_dict().get(logical_id, {}).get("Properties", {}).get("SourceArn", {}).get("Fn::Sub", [])[0]
