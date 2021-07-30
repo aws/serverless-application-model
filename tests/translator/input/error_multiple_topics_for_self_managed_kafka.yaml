@@ -13,7 +13,7 @@ Resources:
           Properties:
             KafkaBootstrapServers:
               - "abc.xyz.com:9092"
-              - "12.345.67.89:9096"
+              - "123.45.67.89:9096"
             Topics:
               - "Topic1"
               - "Topic2"
