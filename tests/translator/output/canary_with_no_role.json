@@ -106,7 +106,13 @@
               }
             }
           ]
-        }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       }
     },
     "CanaryWithNoRoleOrArtifactS3LocationRole": {

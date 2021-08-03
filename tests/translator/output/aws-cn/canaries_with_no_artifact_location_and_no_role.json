@@ -103,7 +103,13 @@
               }
             }
           ]
-        }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       }
     },
     "FirstCanary": {
@@ -156,7 +162,13 @@
               }
             }
           ]
-        }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       }
     },
     "FirstCanaryRole": {
@@ -313,7 +325,13 @@
               }
             }
           ]
-        }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       }
     },
     "SecondCanaryRole": {

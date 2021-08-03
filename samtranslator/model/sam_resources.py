@@ -946,9 +946,9 @@ class SamCanary(SamResourceMacro):
 
         # Set the DeletionPolicy of the S3 resource to Retain to prevent CloudFormation from trying to delete the
         # bucket when its not empty. This is necessary because if a user creates and runs a serverless canary without
-        # an artifact bucket, then tries to delete/replace that resource, CloudFormation will give an error as it
-        # tries to delete the artifact bucket made by SAM but can't since its not empty. Retaining the bucket will by
-        # pass this error
+        # an artifact bucket, then tries to delete/replace that resource, CloudFormation will try to delete the
+        # artifact bucket made by SAM which will throw an error since its not empty. Retaining the bucket will bypass
+        # this error.
 
         passthrough_attributes = self.get_passthrough_resource_attributes()
         if passthrough_attributes is None:
@@ -963,6 +963,8 @@ class SamCanary(SamResourceMacro):
         s3bucket.BucketEncryption = {
             "ServerSideEncryptionConfiguration": [{"ServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]
         }
+        s3bucket.Tags = self._construct_tag_list(self.Tags)
+
         return s3bucket
 
     def _construct_synthetics_canary(self):
