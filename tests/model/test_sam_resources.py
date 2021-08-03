@@ -245,7 +245,7 @@ class TestCanaryRunConfig(TestCase):
         canary.Environment = {"Variables": {"Key1": "Key1", "Key2": "Key2"}}
         canary.MemorySize = 10
         canary.Timeout = 100
-        canary.Tracing = True
+        canary.ActiveTracing = True
 
         resources = canary.to_cloudformation(**self.kwargs)
         deployment = [x for x in resources if isinstance(x, SyntheticsCanary)]

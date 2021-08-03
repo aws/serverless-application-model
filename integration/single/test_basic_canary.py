@@ -96,11 +96,11 @@ class TestBasicCanary(BaseTest):
         role_name = self.get_physical_id_by_type("AWS::IAM::Role")
         attached_policies = self.client_provider.iam_client.list_attached_role_policies(RoleName=role_name)
 
-        # since we activate VPC and Tracing and added no other policies, there should be only 2 service policies
+        # since we activated VPC and Tracing and added no other policies, there should only be 2 service policies
         # attached to this role
         self.assertEqual(len(attached_policies["AttachedPolicies"]), 2)
-        # Service policy for Tracing can be AWSXrayWriteOnlyAccess or AWSXRayDaemonWriteAccess depending on the region
         self.assertTrue(
+            # Service policy for Tracing can be AWSXrayWriteOnlyAccess or AWSXRayDaemonWriteAccess based on the region
             attached_policies["AttachedPolicies"][0]["PolicyName"],
             {"AWSXrayWriteOnlyAccess", "AWSXRayDaemonWriteAccess"},
         )

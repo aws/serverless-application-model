@@ -17,4 +17,4 @@ Resources:
       VpcConfig:
         SecurityGroupIds: []
         SubnetIds: []
-      Tracing: true
+      ActiveTracing: true

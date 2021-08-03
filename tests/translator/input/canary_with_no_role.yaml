@@ -46,7 +46,7 @@ Resources:
       Handler: hello.handler
       Runtime: python2.7
       InlineCode: hello
-      Tracing: true
+      ActiveTracing: true
       ArtifactS3Location: s3://foo
       Schedule:
         Expression: rate(0 minutes)

@@ -824,7 +824,8 @@ class SamCanary(SamResourceMacro):
         "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
         "MemorySize": PropertyType(False, is_type(int)),
         "Tags": PropertyType(False, is_type(dict)),
-        "Tracing": PropertyType(False, is_type(bool)),
+        # Easier to pass through as AWS::Synthetics::Canary only accepts a boolean
+        "ActiveTracing": PropertyType(False, is_type(bool)),
         "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
         "Timeout": PropertyType(False, is_type(int)),
         "Role": PropertyType(False, is_str()),
@@ -892,7 +893,7 @@ class SamCanary(SamResourceMacro):
             managed_policy_arns.append(
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
             )
-        if self.Tracing is True:
+        if self.ActiveTracing is True:
             managed_policy_name = get_xray_managed_policy_name()
             managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
 
@@ -984,7 +985,7 @@ class SamCanary(SamResourceMacro):
         canary.Tags = self._construct_tag_list(self.Tags)
         canary.VPCConfig = self.VpcConfig
 
-        if self.Tracing or self.Environment or self.MemorySize or self.Timeout:
+        if self.ActiveTracing or self.Environment or self.MemorySize or self.Timeout:
             canary.RunConfig = self._construct_run_config()
         return canary
 
@@ -1029,7 +1030,11 @@ class SamCanary(SamResourceMacro):
 
         so it needs to be transformed accordingly
         """
-        runconfig = {"ActiveTracing": self.Tracing, "MemoryInMB": self.MemorySize, "TimeoutInSeconds": self.Timeout}
+        runconfig = {
+            "ActiveTracing": self.ActiveTracing,
+            "MemoryInMB": self.MemorySize,
+            "TimeoutInSeconds": self.Timeout,
+        }
         if self.Environment:
             runconfig["EnvironmentVariables"] = self.Environment["Variables"]
 

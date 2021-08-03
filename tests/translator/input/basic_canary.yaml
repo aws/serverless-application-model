@@ -13,7 +13,7 @@ Resources:
         DurationInSeconds: 100
       StartCanaryAfterCreation: true
       MemorySize: 10
-      Tracing: true
+      ActiveTracing: true
       Timeout: 200
       FailureRetentionPeriod: 100
       SuccessRetentionPeriod: 100
@@ -39,7 +39,7 @@ Resources:
       Schedule:
         Expression: rate(0 minutes)
       StartCanaryAfterCreation: true
-      Tracing: true
+      ActiveTracing: true
 
   CanaryWithInlineCode:
     Type: AWS::Serverless::Canary
