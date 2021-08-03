@@ -882,7 +882,7 @@ class SamCanary(SamResourceMacro):
         :rtype: model.iam.IAMRole
         """
         role_attributes = self.get_passthrough_resource_attributes()
-        if self.AssumeRolePolicyDocument is not None:
+        if self.AssumeRolePolicyDocument:
             assume_role_policy_document = self.AssumeRolePolicyDocument
         else:
             assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()
