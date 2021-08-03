@@ -25,19 +25,14 @@ class TestBasicCanary(BaseTest):
         self.assertEqual(name, canary_name)
 
         role_name = self.get_physical_id_by_type("AWS::IAM::Role")
-        assume_role_policy_expected = {
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Action": "sts:AssumeRole",
-                    "Effect": "Allow",
-                    "Principal": {"Service": "lambda.amazonaws.com"},
-                }
-            ],
-        }
-        get_role_results = self.client_provider.iam_client.get_role(RoleName=role_name)["Role"]
-        assume_role_policy_document = get_role_results["AssumeRolePolicyDocument"]
-        self.assertEqual(assume_role_policy_document, assume_role_policy_expected)
+        get_role_results = self.client_provider.iam_client.list_role_policies(RoleName=role_name)
+
+        # Check that all the required policies to execute the canary are added to the role
+        policy_names = get_role_results["PolicyNames"]
+        canary_logical_id = self.get_logical_id_by_type("AWS::Synthetics::Canary")
+        self.assertIn(canary_logical_id + "CanaryLogsPolicy", policy_names)
+        self.assertIn(canary_logical_id + "CanaryMetricPolicy", policy_names)
+        self.assertIn(canary_logical_id + "CanaryS3Policy", policy_names)
 
     def test_canary_with_tags(self):
         """
@@ -72,7 +67,6 @@ class TestBasicCanary(BaseTest):
 
         # delete bucket after stack is verified
         bucket_name = self.get_physical_id_by_type("AWS::S3::Bucket")
-        print(bucket_name)
         self._clean_bucket(bucket_name)
 
         canary_name = self.get_physical_id_by_type("AWS::Synthetics::Canary")
@@ -87,7 +81,7 @@ class TestBasicCanary(BaseTest):
         """
         Creates a basic synthetics canary with the VPC and Tracing
         """
-        self.create_and_verify_stack("basic_canary_with_policies")
+        self.create_and_verify_stack("basic_canary_with_vpc_and_tracing")
 
         # delete bucket after stack is verified
         bucket_name = self.get_physical_id_by_type("AWS::S3::Bucket")
@@ -113,6 +107,7 @@ class TestBasicCanary(BaseTest):
         self.assertTrue(attached_policies["AttachedPolicies"][1]["PolicyName"], "AWSLambdaVPCAccessExecutionRole")
 
     def test_canary_with_policies(self):
+        policy_expected = {"Statement": [{"Effect": "Allow", "Action": ["cloudwatch:PutMetricData"], "Resource": "*"}]}
         self.create_and_verify_stack("basic_canary_with_policies")
 
         # delete bucket after stack is verified
@@ -122,5 +117,10 @@ class TestBasicCanary(BaseTest):
         role_name = self.get_physical_id_by_type("AWS::IAM::Role")
         role_policies = self.client_provider.iam_client.list_role_policies(RoleName=role_name)
 
-        # Role must have the policy to execute canary and the policy attached in the template
-        self.assertEqual(len(role_policies["PolicyNames"]), 2)
+        # Since ArtifactS3Location is defined Role must only have the policy from Policies property
+        self.assertEqual(len(role_policies["PolicyNames"]), 1)
+
+        policy_found = self.client_provider.iam_client.get_role_policy(
+            RoleName=role_name, PolicyName=role_policies["PolicyNames"][0]
+        )["PolicyDocument"]
+        self.assertEqual(policy_found, policy_expected)

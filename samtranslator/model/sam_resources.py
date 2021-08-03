@@ -862,13 +862,13 @@ class SamCanary(SamResourceMacro):
             artifact_bucket_name = {"Ref": s3bucket.logical_id}
 
         if not self.Role:
-            role = self._construct_role(artifact_bucket_name, synthetics_canary.Name, managed_policy_map)
+            role = self._construct_role(artifact_bucket_name, managed_policy_map)
             resources.append(role)
             synthetics_canary.ExecutionRoleArn = role.get_runtime_attr("arn")
 
         return resources
 
-    def _construct_role(self, artifact_bucket_name, canary_name, managed_policy_map):
+    def _construct_role(self, artifact_bucket_name, managed_policy_map):
         """Constructs an IAM:Role resource only if user doesn't specify Role property in Serverless Canary
 
         -   If the ArtifactS3Location property isn't specified then the the policies to execute the Canary and handle
@@ -892,7 +892,7 @@ class SamCanary(SamResourceMacro):
             managed_policy_arns.append(
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
             )
-        if self.Tracing:
+        if self.Tracing is True:
             managed_policy_name = get_xray_managed_policy_name()
             managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
 
@@ -907,9 +907,13 @@ class SamCanary(SamResourceMacro):
         # this emulates CloudWatch Synthetics Canary dashboard's behavior
         policy_documents = []
         if self.ArtifactS3Location is None:
-            policy_documents.append(
-                IAMRolePolicies.execute_canary_policy(
-                    logical_id=self.logical_id, result_bucket=artifact_bucket_name, canary_name=canary_name
+            policy_documents.extend(
+                (
+                    IAMRolePolicies.canary_put_artifacts_in_s3_policy(
+                        logical_id=self.logical_id, result_bucket=artifact_bucket_name
+                    ),
+                    IAMRolePolicies.canary_put_logs_policy(logical_id=self.logical_id),
+                    IAMRolePolicies.canary_put_metric_data_policy(logical_id=self.logical_id),
                 )
             )
 

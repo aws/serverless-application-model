@@ -131,7 +131,7 @@
         "ManagedPolicyArns": [],
         "Policies": [
           {
-            "PolicyName": "CanaryWithNoRoleOrArtifactS3LocationCanaryPolicy",
+            "PolicyName": "CanaryWithNoRoleOrArtifactS3LocationCanaryS3Policy",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -158,34 +158,39 @@
                 {
                   "Effect": "Allow",
                   "Action": [
+                    "s3:ListAllMyBuckets"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "CanaryWithNoRoleOrArtifactS3LocationCanaryLogsPolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
                     "logs:CreateLogGroup"
                   ],
                   "Resource": [
                     {
-                      "Fn::Join": [
-                        "",
-                        [
-                          {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-"
-                          },
-                          "canary2",
-                          "-*"
-                        ]
-                      ]
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-*"
                     }
                   ]
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "s3:ListAllMyBuckets"
-                  ],
-                  "Resource": [
-                    "*"
-                  ]
-                },
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "CanaryWithNoRoleOrArtifactS3LocationCanaryMetricPolicy",
+            "PolicyDocument": {
+              "Statement": [
                 {
                   "Effect": "Allow",
                   "Action": "cloudwatch:PutMetricData",

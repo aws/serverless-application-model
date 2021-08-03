@@ -181,7 +181,7 @@
         "ManagedPolicyArns": [],
         "Policies": [
           {
-            "PolicyName": "FirstCanaryCanaryPolicy",
+            "PolicyName": "FirstCanaryCanaryS3Policy",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -208,34 +208,39 @@
                 {
                   "Effect": "Allow",
                   "Action": [
+                    "s3:ListAllMyBuckets"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "FirstCanaryCanaryLogsPolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
                     "logs:CreateLogGroup"
                   ],
                   "Resource": [
                     {
-                      "Fn::Join": [
-                        "",
-                        [
-                          {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-"
-                          },
-                          "canary1",
-                          "-*"
-                        ]
-                      ]
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-*"
                     }
                   ]
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "s3:ListAllMyBuckets"
-                  ],
-                  "Resource": [
-                    "*"
-                  ]
-                },
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "FirstCanaryCanaryMetricPolicy",
+            "PolicyDocument": {
+              "Statement": [
                 {
                   "Effect": "Allow",
                   "Action": "cloudwatch:PutMetricData",
@@ -333,7 +338,7 @@
         "ManagedPolicyArns": [],
         "Policies": [
           {
-            "PolicyName": "SecondCanaryCanaryPolicy",
+            "PolicyName": "SecondCanaryCanaryS3Policy",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -360,34 +365,39 @@
                 {
                   "Effect": "Allow",
                   "Action": [
+                    "s3:ListAllMyBuckets"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "SecondCanaryCanaryLogsPolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
                     "logs:CreateLogGroup"
                   ],
                   "Resource": [
                     {
-                      "Fn::Join": [
-                        "",
-                        [
-                          {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-"
-                          },
-                          "canary2",
-                          "-*"
-                        ]
-                      ]
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-*"
                     }
                   ]
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": [
-                    "s3:ListAllMyBuckets"
-                  ],
-                  "Resource": [
-                    "*"
-                  ]
-                },
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "SecondCanaryCanaryMetricPolicy",
+            "PolicyDocument": {
+              "Statement": [
                 {
                   "Effect": "Allow",
                   "Action": "cloudwatch:PutMetricData",

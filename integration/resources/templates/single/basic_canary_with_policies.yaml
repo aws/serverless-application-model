@@ -1,4 +1,12 @@
 Resources:
+  # added the Artifact Bucket inside the template so that only the policies from the Policies property gets added to the default role
+  ResultsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
   CanaryWithPolicies:
     Type: AWS::Serverless::Canary
     Properties:
@@ -11,12 +19,13 @@ Resources:
             return await loadBlueprint();
         };
       Runtime: syn-nodejs-puppeteer-3.1
+      ArtifactS3Location:
+        Fn::Join:
+          - ''
+          - - s3://
+            - Ref: ResultsBucket
       Schedule:
         Expression: rate(0 minutes)
       StartCanaryAfterCreation: true
-      VpcConfig:
-        SecurityGroupIds: []
-        SubnetIds: []
-      Tracing: true
       Policies:
         - CloudWatchPutMetricPolicy: { }

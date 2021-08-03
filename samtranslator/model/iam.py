@@ -131,9 +131,9 @@ class IAMRolePolicies:
         return document
 
     @classmethod
-    def execute_canary_policy(cls, logical_id, result_bucket, canary_name):
+    def canary_put_artifacts_in_s3_policy(cls, logical_id, result_bucket):
         document = {
-            "PolicyName": logical_id + "CanaryPolicy",
+            "PolicyName": logical_id + "CanaryS3Policy",
             "PolicyDocument": {
                 "Statement": [
                     {
@@ -141,32 +141,45 @@ class IAMRolePolicies:
                         "Action": ["s3:PutObject", "s3:GetBucketLocation"],
                         "Resource": [{"Fn::Join": ["", ["arn:aws:s3:::", result_bucket, "/*"]]}],
                     },
+                    {"Effect": "Allow", "Action": ["s3:ListAllMyBuckets"], "Resource": ["*"]},
+                ]
+            },
+        }
+        return document
+
+    @classmethod
+    def canary_put_logs_policy(cls, logical_id):
+        document = {
+            "PolicyName": logical_id + "CanaryLogsPolicy",
+            "PolicyDocument": {
+                "Statement": [
                     {
                         "Effect": "Allow",
                         "Action": ["logs:CreateLogStream", "logs:PutLogEvents", "logs:CreateLogGroup"],
                         "Resource": [
                             {
-                                "Fn::Join": [
-                                    "",
-                                    [
-                                        {
-                                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${"
-                                            "AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-"
-                                        },
-                                        canary_name,
-                                        "-*",
-                                    ],
-                                ]
+                                "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${"
+                                "AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-*"
                             }
                         ],
-                    },
-                    {"Effect": "Allow", "Action": ["s3:ListAllMyBuckets"], "Resource": ["*"]},
+                    }
+                ]
+            },
+        }
+        return document
+
+    @classmethod
+    def canary_put_metric_data_policy(cls, logical_id):
+        document = {
+            "PolicyName": logical_id + "CanaryMetricPolicy",
+            "PolicyDocument": {
+                "Statement": [
                     {
                         "Effect": "Allow",
                         "Action": "cloudwatch:PutMetricData",
                         "Resource": "*",
                         "Condition": {"StringEquals": {"cloudwatch:namespace": "CloudWatchSynthetics"}},
-                    },
+                    }
                 ]
             },
         }
