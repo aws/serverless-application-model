@@ -27,11 +27,6 @@ class SamTemplateValidator:
         schema_path : str, optional
             Path to a schema to use for validation, by default None, the default schema.json will be used
         """
-        # Replaces the static method with the instance method
-        # Otherwise the instance would call the static one
-        # Static one is kept for backward compatibility
-        self.validate = self._validate
-
         if not schema:
             schema = self._read_json(sam_schema.SCHEMA_NEW_FILE)
 
@@ -49,13 +44,13 @@ class SamTemplateValidator:
         self.validator = SAMValidator(schema, resolver=resolver)
 
     @staticmethod
-    def validate(template_dict, schema=None):  # pylint: disable=method-hidden
+    def validate(template_dict, schema=None):
         """
         Validates a SAM Template
 
-        [DEPRECATED]: Instanciate this class and use the instance method instead:
+        [DEPRECATED]: Instanciate this class and use the get_errors instead:
             validator = SamTemplateValidator()
-            validator.validate(template_dict)
+            validator.get_errors(template_dict)
 
         Kept for backward compatibility
 
@@ -64,7 +59,7 @@ class SamTemplateValidator:
         template_dict : dict
             Template
         schema : dict, optional
-            Schema content, by default None
+            Schema content, defaults to the integrated schema
 
         Returns
         -------
@@ -73,9 +68,9 @@ class SamTemplateValidator:
         """
         validator = SamTemplateValidator(schema)
 
-        return ", ".join(validator.validate(template_dict))
+        return ", ".join(validator.get_errors(template_dict))
 
-    def _validate(self, template_dict):
+    def get_errors(self, template_dict):
         """
         Validates a SAM Template
 

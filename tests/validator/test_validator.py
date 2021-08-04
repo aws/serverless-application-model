@@ -33,7 +33,7 @@ class TestValidatorBase(TestCase):
     def _test_validator_error(self, template, output):
         manifest = self._get_template_content(template)
 
-        validation_errors = TestValidatorProvider.get().validate(manifest)
+        validation_errors = TestValidatorProvider.get().get_errors(manifest)
 
         errors = self._get_output_content(output)
 
@@ -50,7 +50,7 @@ class TestValidatorBase(TestCase):
     def _test_validator_success(self, template):
         manifest = self._get_template_content(template)
 
-        validation_errors = TestValidatorProvider.get().validate(manifest)
+        validation_errors = TestValidatorProvider.get().get_errors(manifest)
 
         self.assertFalse(validation_errors)
 
@@ -161,7 +161,7 @@ class TestValidatorTranslatorTemplates(TestValidatorBase):
     )
     def test_success(self, testcase):
         manifest = yaml_parse(open(os.path.join(TRANSLATOR_INPUT_FOLDER, testcase + ".yaml")))
-        validation_errors = TestValidatorProvider.get().validate(manifest)
+        validation_errors = TestValidatorProvider.get().get_errors(manifest)
         has_errors = len(validation_errors)
         if has_errors:
             print("\nFailing template: {0}\n".format(testcase))
@@ -177,6 +177,6 @@ class TestValidatorLegacy(TestValidatorBase):
         manifest = yaml_parse(open(os.path.join(VALIDATOR_INPUT_FOLDER, "api", "success_complete_api.yaml")))
 
         old_validation_errors = SamTemplateValidator.validate(manifest)
-        new_validation_errors = TestValidatorProvider.get().validate(manifest)
+        new_validation_errors = TestValidatorProvider.get().get_errors(manifest)
 
         self.assertEqual(old_validation_errors, ", ".join(new_validation_errors))
