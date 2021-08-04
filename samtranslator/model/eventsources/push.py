@@ -20,6 +20,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.utils.rest_api_id import get_rest_api_id_string
 
 CONDITION = "Condition"
 
@@ -532,10 +533,6 @@ class Api(PushEventSource):
         necessary data from the explicit API
         """
 
-        rest_api_id = self.RestApiId
-        if isinstance(rest_api_id, dict) and "Ref" in rest_api_id:
-            rest_api_id = rest_api_id["Ref"]
-
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the Lambda function. If we are unable to resolve the stage name, we will
@@ -545,7 +542,8 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        if isinstance(rest_api_id, string_types):
+        rest_api_id = get_rest_api_id_string(self.RestApiId)
+        if rest_api_id:
 
             if (
                 rest_api_id in resources
@@ -747,7 +745,7 @@ class Api(PushEventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
-                api_id = self.RestApiId if isinstance(self.RestApiId, string_types) else self.RestApiId.get("Ref")
+                api_id = get_rest_api_id_string(self.RestApiId)
                 editor.add_resource_policy(
                     resource_policy=resource_policy, path=self.Path, api_id=api_id, stage=self.Stage
                 )
