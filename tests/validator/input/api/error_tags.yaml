@@ -19,13 +19,13 @@ Resources:
       StageName: Stage name
       Tags:
         MyTag:
-  # Tags item name not alphanumeric
-  ApiTagsItemNotAlphanumeric:
+  # Tags item name contains an invalid character
+  ApiTagsItemInvalidCharacter:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Stage name
       Tags:
-        My_Tag: MyValue
+        My$Tag: MyValue
   # Tags item name too long
   ApiTagsItemTooLong:
     Type: AWS::Serverless::Api

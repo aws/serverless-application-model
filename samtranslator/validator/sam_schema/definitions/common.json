@@ -143,13 +143,16 @@
     "TagsMap": {
       "additionalProperties": false,
       "patternProperties": {
-        "^[a-zA-Z0-9]{1,127}$": {
-          "maxLength": 255,
+        "^[a-zA-Z0-9 _./=+-:]{1,128}$": {
+          "maxLength": 256,
           "minLength": 1,
-          "type": "string"
+          "type": [
+            "string",
+            "intrinsic"
+          ]
         }
       },
-      "patternError": "can only contain alphanumeric characters (max length 127)",
+      "patternError": "can only contain a-zA-Z0-9 _./=+-: characters (max length 128)",
       "type": "object"
     },
     "TagsList": {

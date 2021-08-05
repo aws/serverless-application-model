@@ -154,7 +154,10 @@ Resources:
       StageName: Stage name
       Tags:
         ApiTag1: ApiTag1Value
-        ApiTag2: ApiTag2Value
+        "A:p-i.T/a=g+with_special_chars": ApiTag2Value
+        VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLong: VeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTagValue
+        ApiTagWithIntrinsicValue:
+          Ref: MyTagValue
       TracingEnabled: true
       Variables:
         MyVariable1: MyVariable1Value
