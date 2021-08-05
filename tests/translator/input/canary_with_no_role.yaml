@@ -1,0 +1,53 @@
+Resources:
+  CanaryWithDefinedArtifactS3LocationAndNoRole:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary1
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      ArtifactS3Location: s3://foo
+
+  CanaryWithNoRoleOrArtifactS3Location:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary2
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+
+  CanaryWithVPC:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary3
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      ArtifactS3Location: s3://foo
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-085912345678492fb
+        SubnetIds:
+          - subnet-071f712345678e7c8
+
+  CanaryWithTracing:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary2
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      ActiveTracing: true
+      ArtifactS3Location: s3://foo
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true

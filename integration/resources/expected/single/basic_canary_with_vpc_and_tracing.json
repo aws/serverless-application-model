@@ -1,0 +1,5 @@
+[
+  { "LogicalResourceId":"CanaryWithVPCAndTracing", "ResourceType":"AWS::Synthetics::Canary" },
+  { "LogicalResourceId":"CanaryWithVPCAndTracingRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"CanaryWithVPCAndTracingArtifactBucket", "ResourceType":"AWS::S3::Bucket" }
+]

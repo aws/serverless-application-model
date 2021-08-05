@@ -52,28 +52,26 @@ class BaseTest(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls._clean_bucket()
+        cls._clean_bucket(cls.s3_bucket_name)
 
     @classmethod
-    def _clean_bucket(cls):
+    def _clean_bucket(cls, s3_bucket_name):
         """
         Empties and deletes the bucket used for the tests
         """
         s3 = boto3.resource("s3")
-        bucket = s3.Bucket(cls.s3_bucket_name)
+        bucket = s3.Bucket(s3_bucket_name)
         object_summary_iterator = bucket.objects.all()
 
         for object_summary in object_summary_iterator:
             try:
-                cls.client_provider.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
+                cls.client_provider.s3_client.delete_object(Key=object_summary.key, Bucket=s3_bucket_name)
             except ClientError as e:
-                LOG.error(
-                    "Unable to delete object %s from bucket %s", object_summary.key, cls.s3_bucket_name, exc_info=e
-                )
+                LOG.error("Unable to delete object %s from bucket %s", object_summary.key, s3_bucket_name, exc_info=e)
         try:
-            cls.client_provider.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
+            cls.client_provider.s3_client.delete_bucket(Bucket=s3_bucket_name)
         except ClientError as e:
-            LOG.error("Unable to delete bucket %s", cls.s3_bucket_name, exc_info=e)
+            LOG.error("Unable to delete bucket %s", s3_bucket_name, exc_info=e)
 
     @classmethod
     def _upload_resources(cls, file_to_s3_uri_map):
@@ -99,7 +97,7 @@ class BaseTest(TestCase):
                 file_info["uri"] = cls._get_s3_uri(file_name, file_info["type"])
         except ClientError as error:
             LOG.error("Upload of file %s to bucket %s failed", current_file_name, cls.s3_bucket_name, exc_info=error)
-            cls._clean_bucket()
+            cls._clean_bucket(cls.s3_bucket_name)
             raise error
 
     @classmethod

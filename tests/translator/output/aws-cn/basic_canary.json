@@ -1,0 +1,289 @@
+{
+  "Resources": {
+    "CompleteCanary": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://test",
+        "Code": {
+          "S3Bucket": "sam-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": "test",
+        "FailureRetentionPeriod": 100,
+        "Name": "everything-defined-canary",
+        "RunConfig": {
+          "ActiveTracing": true,
+          "MemoryInMB": 10,
+          "TimeoutInSeconds": 200,
+          "EnvironmentVariables": {
+            "test1": "value1"
+          }
+        },
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)",
+          "DurationInSeconds": 100
+        },
+        "StartCanaryAfterCreation": true,
+        "SuccessRetentionPeriod": 100,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "VPCConfig": {
+          "SecurityGroupIds": [
+            "sg-085912345678492fb"
+          ],
+          "SubnetIds": [
+            "subnet-071f712345678e7c8"
+          ]
+        }
+      }
+    },
+    "CanaryWithTracing": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://test",
+        "Code": {
+          "S3Bucket": "sam-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "CanaryWithTracingRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary-with-tracing",
+        "RunConfig": {
+          "ActiveTracing": true
+        },
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithTracingRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/AWSXRayDaemonWriteAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithInlineCode": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://test",
+        "Code": {
+          "Handler": "hello.handler",
+          "Script": "hello world"
+        },
+        "ExecutionRoleArn": "hello",
+        "Name": "canary-with-inline-code",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithCodeUriObject": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://test",
+        "Code": {
+          "S3Bucket": "somebucket",
+          "S3Key": "somekey",
+          "S3ObjectVersion": "1",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": "hello",
+        "Name": "canary-codeuri",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithPolicies": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://test",
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "CanaryWithPoliciesRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary-policies",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithPoliciesRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithPolicyDocument": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://test",
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "CanaryWithPolicyDocumentRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary-policy-doc",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithPolicyDocumentRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyName": "CanaryWithPolicyDocumentRolePolicy0",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:*"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    }
+  }
+}

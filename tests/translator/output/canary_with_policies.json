@@ -1,0 +1,491 @@
+{
+  "Parameters": {
+    "FunctionNameParam": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "CanaryWithPoliciesAndNoArtifactS3Location": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "CanaryWithPoliciesAndNoArtifactS3LocationArtifactBucket"
+              }
+            ]
+          ]
+        },
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "CanaryWithPoliciesAndNoArtifactS3LocationRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary1",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithPoliciesAndNoArtifactS3LocationArtifactBucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "CanaryWithPoliciesAndNoArtifactS3LocationRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyName": "CanaryWithPoliciesAndNoArtifactS3LocationCanaryS3Policy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject",
+                    "s3:GetBucketLocation"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:s3:::",
+                          {
+                            "Ref": "CanaryWithPoliciesAndNoArtifactS3LocationArtifactBucket"
+                          },
+                          "/*"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:ListAllMyBuckets"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "CanaryWithPoliciesAndNoArtifactS3LocationCanaryLogsPolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                    "logs:CreateLogGroup"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-*"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "CanaryWithPoliciesAndNoArtifactS3LocationCanaryMetricPolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "cloudwatch:PutMetricData",
+                  "Resource": "*",
+                  "Condition": {
+                    "StringEquals": {
+                      "cloudwatch:namespace": "CloudWatchSynthetics"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "CanaryWithPoliciesAndNoArtifactS3LocationRolePolicy0",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
+                      {
+                        "functionName": "Some function"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "OnePolicyTemplate": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://foo",
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "OnePolicyTemplateRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary2",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "OnePolicyTemplateRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyName": "OnePolicyTemplateRolePolicy0",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:ChangeMessageVisibilityBatch",
+                    "sqs:DeleteMessage",
+                    "sqs:DeleteMessageBatch",
+                    "sqs:GetQueueAttributes",
+                    "sqs:ReceiveMessage"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": {
+                          "Fn::Sub": [
+                            "Some${value}",
+                            {
+                              "value": "KeyId"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "MultiplePolicyTemplates": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://foo",
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "MultiplePolicyTemplatesRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary3",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "MultiplePolicyTemplatesRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyName": "MultiplePolicyTemplatesRolePolicy0",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:ChangeMessageVisibilityBatch",
+                    "sqs:DeleteMessage",
+                    "sqs:DeleteMessageBatch",
+                    "sqs:GetQueueAttributes",
+                    "sqs:ReceiveMessage"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
+                      {
+                        "queueName": "Somekey"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "MultiplePolicyTemplatesRolePolicy1",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
+                      {
+                        "functionName": "Some function"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "AllCombinations": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": "s3://foo",
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip",
+          "Handler": "hello.handler"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "AllCombinationsRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary4",
+        "RuntimeVersion": "python2.7",
+        "Schedule": {
+          "Expression": "rate(0 minutes)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "AllCombinationsRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
+        ],
+        "Policies": [
+          {
+            "PolicyName": "AllCombinationsRolePolicy0",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:*"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "AllCombinationsRolePolicy2",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
+                      {
+                        "functionName": {
+                          "Ref": "FunctionNameParam"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    }
+  }
+}

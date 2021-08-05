@@ -1,6 +1,5 @@
 [
   { "LogicalResourceId":"SyntheticsCanary", "ResourceType":"AWS::Synthetics::Canary" },
-  { "LogicalResourceId":"CloudWatchSyntheticsRole", "ResourceType":"AWS::IAM::Role" },
-  { "LogicalResourceId":"RolePermissions", "ResourceType":"AWS::IAM::Policy" },
+  { "LogicalResourceId":"SyntheticsCanaryRole", "ResourceType":"AWS::IAM::Role" },
   { "LogicalResourceId":"SyntheticsCanaryArtifactBucket", "ResourceType":"AWS::S3::Bucket" }
 ]

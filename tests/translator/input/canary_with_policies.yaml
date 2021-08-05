@@ -1,0 +1,84 @@
+Parameters:
+  FunctionNameParam:
+    Type: String
+
+Resources:
+  # should have both the 'Policies' property and the policies for ArtifactS3Location in the default role
+  CanaryWithPoliciesAndNoArtifactS3Location:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary1
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "Some function"
+
+  OnePolicyTemplate:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary2
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      ArtifactS3Location: s3://foo
+      Policies:
+        SQSPollerPolicy:
+          QueueName:
+            Fn::Sub: ["Some${value}", {"value": "KeyId"}]
+
+          # Extra parameters will be skipped, and not appear in output
+          ExtraParam1: Value1
+          ExtraParam2: Value2
+
+  MultiplePolicyTemplates:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary3
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      ArtifactS3Location: s3://foo
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: "Somekey"
+        - LambdaInvokePolicy:
+            FunctionName: "Some function"
+
+  AllCombinations:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary4
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+      ArtifactS3Location: s3://foo
+      Policies:
+        # Inline statement
+        - Statement:
+          - Action: [ 'dynamodb:*' ]
+            Effect: Allow
+            Resource: '*'
+        # Regular managed policy
+        - AmazonDynamoDBFullAccess
+
+        - LambdaInvokePolicy:
+            FunctionName:
+              # Refer to something
+              Ref: FunctionNameParam
+
+        # Regular managed policy
+        - AWSLambdaRole

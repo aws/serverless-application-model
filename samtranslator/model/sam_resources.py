@@ -824,7 +824,9 @@ class SamCanary(SamResourceMacro):
         "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
         "MemorySize": PropertyType(False, is_type(int)),
         "Tags": PropertyType(False, is_type(dict)),
-        "Tracing": PropertyType(False, is_type(bool)),
+        # Easier to pass through as AWS::Synthetics::Canary only accepts a boolean
+        "ActiveTracing": PropertyType(False, is_type(bool)),
+        "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
         "Timeout": PropertyType(False, is_type(int)),
         "Role": PropertyType(False, is_str()),
         "Schedule": PropertyType(True, is_type(dict)),
@@ -834,6 +836,7 @@ class SamCanary(SamResourceMacro):
         "SuccessRetentionPeriod": PropertyType(False, is_type(int)),
         "VpcConfig": PropertyType(False, is_type(dict)),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
+        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -845,17 +848,88 @@ class SamCanary(SamResourceMacro):
         :rtype: list
         """
         resources = []
+        managed_policy_map = kwargs.get("managed_policy_map", {})
         synthetics_canary = self._construct_synthetics_canary()
         resources.append(synthetics_canary)
 
         # A S3 Bucket resource will be added to the transformed template if the user doesn't provide an artifact
         # bucket to store canary results
-        if synthetics_canary.ArtifactS3Location is None:
+
+        artifact_bucket_name = ""
+        if not self.ArtifactS3Location:
             s3bucket = self._construct_artifact_bucket()
             resources.append(s3bucket)
             synthetics_canary.ArtifactS3Location = {"Fn::Join": ["", ["s3://", {"Ref": s3bucket.logical_id}]]}
+            artifact_bucket_name = {"Ref": s3bucket.logical_id}
+
+        if not self.Role:
+            role = self._construct_role(artifact_bucket_name, managed_policy_map)
+            resources.append(role)
+            synthetics_canary.ExecutionRoleArn = role.get_runtime_attr("arn")
 
         return resources
+
+    def _construct_role(self, artifact_bucket_name, managed_policy_map):
+        """Constructs an IAM:Role resource only if user doesn't specify Role property in Serverless Canary
+
+        -   If the ArtifactS3Location property isn't specified then the the policies to execute the Canary and handle
+            the resulting data will be added
+        -   If the Tracing property is enabled then the XRay policy based on the user's region will be added
+        -   If the VpcConfig property is specified then the policy to execute VPC will be added
+        -   If the Policies property is specified then the that will be appended to the IAM::Role's Policies property
+
+        :returns: the generated IAM Role
+        :rtype: model.iam.IAMRole
+        """
+        role_attributes = self.get_passthrough_resource_attributes()
+        if self.AssumeRolePolicyDocument:
+            assume_role_policy_document = self.AssumeRolePolicyDocument
+        else:
+            assume_role_policy_document = IAMRolePolicies.lambda_assume_role_policy()
+
+        # add AWS managed policies if user has enabled VpcConfig or Tracing
+        managed_policy_arns = []
+        if self.VpcConfig:
+            managed_policy_arns.append(
+                ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
+            )
+        if self.ActiveTracing is True:
+            managed_policy_name = get_xray_managed_policy_name()
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
+
+        # if user has defined Policies property, those policies will be appended to this role
+        function_policies = ResourcePolicies(
+            {"Policies": self.Policies},
+            # No support for policy templates in the "core"
+            policy_template_processor=None,
+        )
+
+        # The policy to execute the canary is only added to the role if the user hasn't defined ArtifactS3Location
+        # this emulates CloudWatch Synthetics Canary dashboard's behavior
+        policy_documents = []
+        if self.ArtifactS3Location is None:
+            policy_documents.extend(
+                (
+                    IAMRolePolicies.canary_put_artifacts_in_s3_policy(
+                        logical_id=self.logical_id, result_bucket=artifact_bucket_name
+                    ),
+                    IAMRolePolicies.canary_put_logs_policy(logical_id=self.logical_id),
+                    IAMRolePolicies.canary_put_metric_data_policy(logical_id=self.logical_id),
+                )
+            )
+
+        execution_role = construct_role_for_resource(
+            resource_logical_id=self.logical_id,
+            attributes=role_attributes,
+            managed_policy_map=managed_policy_map,
+            assume_role_policy_document=assume_role_policy_document,
+            resource_policies=function_policies,
+            managed_policy_arns=managed_policy_arns,
+            policy_documents=policy_documents,
+            permissions_boundary=None,
+            tags=self._construct_tag_list(self.Tags),
+        )
+        return execution_role
 
     def _construct_artifact_bucket(self):
         """Constructs a S3Bucket resource to store canary artifacts.
@@ -872,9 +946,9 @@ class SamCanary(SamResourceMacro):
 
         # Set the DeletionPolicy of the S3 resource to Retain to prevent CloudFormation from trying to delete the
         # bucket when its not empty. This is necessary because if a user creates and runs a serverless canary without
-        # an artifact bucket, then tries to delete/replace that resource, CloudFormation will give an error as it
-        # tries to delete the artifact bucket made by SAM but can't since its not empty. Retaining the bucket will by
-        # pass this error
+        # an artifact bucket, then tries to delete/replace that resource, CloudFormation will try to delete the
+        # artifact bucket made by SAM which will throw an error since its not empty. Retaining the bucket will bypass
+        # this error.
 
         passthrough_attributes = self.get_passthrough_resource_attributes()
         if passthrough_attributes is None:
@@ -889,6 +963,8 @@ class SamCanary(SamResourceMacro):
         s3bucket.BucketEncryption = {
             "ServerSideEncryptionConfiguration": [{"ServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]
         }
+        s3bucket.Tags = self._construct_tag_list(self.Tags)
+
         return s3bucket
 
     def _construct_synthetics_canary(self):
@@ -911,7 +987,7 @@ class SamCanary(SamResourceMacro):
         canary.Tags = self._construct_tag_list(self.Tags)
         canary.VPCConfig = self.VpcConfig
 
-        if self.Tracing or self.Environment or self.MemorySize or self.Timeout:
+        if self.ActiveTracing or self.Environment or self.MemorySize or self.Timeout:
             canary.RunConfig = self._construct_run_config()
         return canary
 
@@ -956,7 +1032,11 @@ class SamCanary(SamResourceMacro):
 
         so it needs to be transformed accordingly
         """
-        runconfig = {"ActiveTracing": self.Tracing, "MemoryInMB": self.MemorySize, "TimeoutInSeconds": self.Timeout}
+        runconfig = {
+            "ActiveTracing": self.ActiveTracing,
+            "MemoryInMB": self.MemorySize,
+            "TimeoutInSeconds": self.Timeout,
+        }
         if self.Environment:
             runconfig["EnvironmentVariables"] = self.Environment["Variables"]
 

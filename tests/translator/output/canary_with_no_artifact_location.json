@@ -45,7 +45,13 @@
               }
             }
           ]
-        }
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       }
     }
   }

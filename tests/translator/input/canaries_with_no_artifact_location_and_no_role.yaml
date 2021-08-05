@@ -2,7 +2,7 @@ Resources:
   CanaryWithDefinedArtifactLocation:
     Type: AWS::Serverless::Canary
     Properties:
-      FunctionName: canary1
+      FunctionName: canary
       Handler: hello.handler
       Runtime: python2.7
       ArtifactS3Location: s3://hello
@@ -10,10 +10,32 @@ Resources:
       Schedule:
         Expression: rate(0 minutes)
       StartCanaryAfterCreation: true
-      Role: hello
 
-  # if two serverless canaries without defined artifact locations are made they should each have an S3 bucket resource
-  FirstCanaryWithNoArtifactLocation:
+  CanaryWithDefinedRole:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary
+      Handler: hello.handler
+      Runtime: python2.7
+      Role: hello
+      CodeUri: s3://sam-bucket/hello.zip
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+
+  # if two serverless canaries without defined artifact locations are made they should each have a S3 bucket resource and an IAM role resource
+  FirstCanary:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary1
+      Handler: hello.handler
+      Runtime: python2.7
+      InlineCode: hello
+      Schedule:
+        Expression: rate(0 minutes)
+      StartCanaryAfterCreation: true
+
+  SecondCanary:
     Type: AWS::Serverless::Canary
     Properties:
       FunctionName: canary2
@@ -23,16 +45,3 @@ Resources:
       Schedule:
         Expression: rate(0 minutes)
       StartCanaryAfterCreation: true
-      Role: hello
-
-  SecondCanaryWithNoArtifactLocation:
-    Type: AWS::Serverless::Canary
-    Properties:
-      FunctionName: canary3
-      Handler: hello.handler
-      Runtime: python2.7
-      InlineCode: hello
-      Schedule:
-        Expression: rate(0 minutes)
-      StartCanaryAfterCreation: true
-      Role: hello
