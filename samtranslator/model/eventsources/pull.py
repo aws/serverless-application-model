@@ -22,6 +22,7 @@ class PullEventSource(ResourceMacro):
     """
 
     resource_type = None
+    requires_stream_queue_broker = True
     property_types = {
         "Stream": PropertyType(False, is_str()),
         "Queue": PropertyType(False, is_str()),
@@ -77,7 +78,7 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if self.resource_type != "SelfManagedKafka" and not self.Stream and not self.Queue and not self.Broker:
+        if self.requires_stream_queue_broker and not self.Stream and not self.Queue and not self.Broker:
             raise InvalidEventException(
                 self.relative_id,
                 "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
@@ -302,6 +303,7 @@ class SelfManagedKafka(PullEventSource):
     """
 
     resource_type = "SelfManagedKafka"
+    requires_stream_queue_broker = False
     AUTH_MECHANISM = ["SASL_SCRAM_256_AUTH", "SASL_SCRAM_512_AUTH", "BASIC_AUTH"]
 
     def get_policy_arn(self):
@@ -363,22 +365,22 @@ class SelfManagedKafka(PullEventSource):
         has_vpc_subnet = False
         has_vpc_security_group = False
         for config in self.SourceAccessConfigurations:
-            if config["Type"] == "VPC_SUBNET":
+            if config.get("Type") == "VPC_SUBNET":
                 self.validate_uri(config, "VPC_SUBNET")
                 has_vpc_subnet = True
 
-            elif config["Type"] == "VPC_SECURITY_GROUP":
+            elif config.get("Type") == "VPC_SECURITY_GROUP":
                 self.validate_uri(config, "VPC_SECURITY_GROUP")
                 has_vpc_security_group = True
 
-            elif config["Type"] in self.AUTH_MECHANISM:
+            elif config.get("Type") in self.AUTH_MECHANISM:
                 if authentication_uri:
                     raise InvalidEventException(
                         self.relative_id,
                         "Multiple auth mechanism properties specified in SourceAccessConfigurations for self managed kafka event.",
                     )
                 self.validate_uri(config, "auth mechanism")
-                authentication_uri = config["URI"]
+                authentication_uri = config.get("URI")
 
             else:
                 raise InvalidEventException(
@@ -394,13 +396,13 @@ class SelfManagedKafka(PullEventSource):
         return authentication_uri, (has_vpc_subnet and has_vpc_security_group)
 
     def validate_uri(self, config, msg):
-        if not config["URI"]:
+        if not config.get("URI"):
             raise InvalidEventException(
                 self.relative_id,
                 "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
             )
 
-        if not isinstance(config["URI"], string_types) and not is_intrinsic(config["URI"]):
+        if not isinstance(config.get("URI"), string_types) and not is_intrinsic(config.get("URI")):
             raise InvalidEventException(
                 self.relative_id,
                 "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(
