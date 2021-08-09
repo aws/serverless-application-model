@@ -119,7 +119,7 @@ class TestBasicCanary(BaseTest):
 
         # Since ArtifactS3Location is defined Role must only have the policy from Policies property
         self.assertEqual(len(role_policies["PolicyNames"]), 1)
-
+        
         policy_found = self.client_provider.iam_client.get_role_policy(
             RoleName=role_name, PolicyName=role_policies["PolicyNames"][0]
         )["PolicyDocument"]
