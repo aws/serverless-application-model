@@ -124,3 +124,10 @@ class TestBasicCanary(BaseTest):
             RoleName=role_name, PolicyName=role_policies["PolicyNames"][0]
         )["PolicyDocument"]
         self.assertEqual(policy_found, policy_expected)
+
+    def test_canary_with_alarms(self):
+        self.create_and_verify_stack("basic_canary_with_alarms")
+
+        # delete bucket after stack is verified
+        bucket_name = self.get_physical_id_by_type("AWS::S3::Bucket")
+        self._clean_bucket(bucket_name)

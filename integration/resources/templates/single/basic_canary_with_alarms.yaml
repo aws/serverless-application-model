@@ -1,0 +1,24 @@
+Resources:
+  SyntheticsCanaryAlarm:
+    Type: AWS::Serverless::Canary
+    Properties:
+      Handler: pageLoadBlueprint.handler
+      InlineCode: |
+        def handler(event, context):
+          print("Hello, world!")
+      Runtime: syn-python-selenium-1.0
+      StartCanaryAfterCreation: true
+      Schedule:
+        Expression: rate(0 minute)
+      CloudWatchAlarms:
+        - AlarmWithEverythingDefined:
+            MetricName: SuccessPercent
+            Threshold: 100
+            ComparisonOperator: GreaterThanThreshold
+            Period: 11160
+        - SuccessPercentAlarm:
+            MetricName: SuccessPercent
+        - DurationAlarm:
+            MetricName: Duration
+        - FailedAlarm:
+            MetricName: Failed

@@ -1,0 +1,9 @@
+[
+  { "LogicalResourceId":"SyntheticsCanaryAlarm", "ResourceType":"AWS::Synthetics::Canary" },
+  { "LogicalResourceId":"SyntheticsCanaryAlarmRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"SyntheticsCanaryAlarmArtifactBucket", "ResourceType":"AWS::S3::Bucket" },
+  { "LogicalResourceId":"AlarmWithEverythingDefined", "ResourceType":"AWS::CloudWatch::Alarm" },
+  { "LogicalResourceId":"SuccessPercentAlarm", "ResourceType":"AWS::CloudWatch::Alarm" },
+  { "LogicalResourceId":"DurationAlarm", "ResourceType":"AWS::CloudWatch::Alarm" },
+  { "LogicalResourceId":"FailedAlarm", "ResourceType":"AWS::CloudWatch::Alarm" }
+]
