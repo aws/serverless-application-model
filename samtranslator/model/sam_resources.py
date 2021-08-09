@@ -24,7 +24,7 @@ from samtranslator.model.apigateway import (
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.s3 import S3Bucket
-from samtranslator.model.cloudwatch import SyntheticsCanary
+from samtranslator.model.cloudwatch import SyntheticsCanary, CloudWatchAlarm
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
@@ -837,6 +837,7 @@ class SamCanary(SamResourceMacro):
         "VpcConfig": PropertyType(False, is_type(dict)),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
+        "CloudWatchAlarms": PropertyType(False, list_of(is_type(dict))),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -867,7 +868,88 @@ class SamCanary(SamResourceMacro):
             resources.append(role)
             synthetics_canary.ExecutionRoleArn = role.get_runtime_attr("arn")
 
+        if self.CloudWatchAlarms:
+            self._validate_cloudwatch_alarms()
+            for dict_item in self.CloudWatchAlarms:
+                resources.append(self._construct_cloudwatch_alarms(dict_item))
+
         return resources
+
+    def _validate_cloudwatch_alarms(self):
+        keys = []
+        for dict_item in self.CloudWatchAlarms:
+
+            # Throw an error if there is more than one alarm defined in the dict
+            if len(dict_item) > 1:
+                raise InvalidResourceException(self.logical_id, "Must only have one alarm per array index")
+
+            key = list(dict_item.keys())[0]
+            alarm_item = dict_item[key]
+
+            # MetricName is required
+            if alarm_item is None or "MetricName" not in alarm_item:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "CloudWatch alarm '{key}' is missing required property 'MetricName'.".format(key=key),
+                )
+
+            metric_name = alarm_item["MetricName"]
+            valid_metrics = ["SuccessPercent", "Failed", "Duration"]
+
+            # MetricName must be one of "SuccessPercent", "Failed" and "Duration"
+            if metric_name not in valid_metrics:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "MetricName needs to be one of {}".format(valid_metrics),
+                )
+
+            # make sure all the alarm names are unique because they are used as logical ids and we don't want them to
+            # override each other
+            if key in keys:
+                raise InvalidResourceException(self.logical_id, "Duplicate CloudWatch alarm names")
+            else:
+                keys.append(key)
+
+    def _construct_cloudwatch_alarms(self, dict_item):
+        passthrough_attributes = self.get_passthrough_resource_attributes()
+
+        default_values = {
+            "SuccessPercent": {"ComparisonOperator": "LessThanThreshold", "Threshold": 90, "Period": 300},
+            "Failed": {"ComparisonOperator": "GreaterThanOrEqualToThreshold", "Threshold": 1, "Period": 300},
+            "Duration": {"ComparisonOperator": "GreaterThanThreshold", "Threshold": 3000, "Period": 900},
+        }
+
+        key = list(dict_item.keys())[0]
+        alarm_item = dict_item[key]
+
+        cloudwatch_alarm = CloudWatchAlarm(
+            logical_id=key,
+            depends_on=self.depends_on,
+            attributes=passthrough_attributes,
+        )
+        cloudwatch_alarm.MetricName = alarm_item["MetricName"]
+        cloudwatch_alarm.Namespace = "CloudWatchSynthetics"
+        cloudwatch_alarm.EvaluationPeriods = 1
+        cloudwatch_alarm.Statistic = "Sum"
+        cloudwatch_alarm.TreatMissingData = "notBreaching"
+        cloudwatch_alarm.Dimensions = [{"Name": "CanaryName", "Value": {"Ref": self.logical_id}}]
+
+        if "ComparisonOperator" in alarm_item:
+            cloudwatch_alarm.ComparisonOperator = alarm_item["ComparisonOperator"]
+        else:
+            cloudwatch_alarm.ComparisonOperator = default_values[alarm_item["MetricName"]]["ComparisonOperator"]
+
+        if "Threshold" in alarm_item:
+            cloudwatch_alarm.Threshold = alarm_item["Threshold"]
+        else:
+            cloudwatch_alarm.Threshold = default_values[alarm_item["MetricName"]]["Threshold"]
+
+        if "Period" in alarm_item:
+            cloudwatch_alarm.Period = alarm_item["Period"]
+        else:
+            cloudwatch_alarm.Period = default_values[alarm_item["MetricName"]]["Period"]
+
+        return cloudwatch_alarm
 
     def _construct_role(self, artifact_bucket_name, managed_policy_map):
         """Constructs an IAM:Role resource only if user doesn't specify Role property in Serverless Canary
