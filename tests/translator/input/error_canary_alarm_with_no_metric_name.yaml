@@ -1,0 +1,17 @@
+Resources:
+  SyntheticsCanary:
+    Type: AWS::Serverless::Canary
+    Properties:
+      FunctionName: canary
+      Handler: pageLoadBlueprint.handler
+      InlineCode: |
+        def handler(event, context):
+          print("Hello, world!")
+      Runtime: syn-python-selenium-1.0
+      StartCanaryAfterCreation: true
+      Schedule:
+        Expression: rate(0 minute)
+      CloudWatchAlarms:
+        - FailedAlarm:
+            MetricName: Failed
+        - SuccessAlarm:

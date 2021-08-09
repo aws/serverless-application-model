@@ -1,0 +1,251 @@
+{
+  "Resources": {
+    "SyntheticsCanary": {
+      "Type": "AWS::Synthetics::Canary",
+      "Properties": {
+        "ArtifactS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "SyntheticsCanaryArtifactBucket"
+              }
+            ]
+          ]
+        },
+        "Code": {
+          "Handler": "pageLoadBlueprint.handler",
+          "Script": "def handler(event, context):\n  print(\"Hello, world!\")\n"
+        },
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "SyntheticsCanaryRole",
+            "Arn"
+          ]
+        },
+        "Name": "canary",
+        "RuntimeVersion": "syn-python-selenium-1.0",
+        "Schedule": {
+          "Expression": "rate(0 minute)"
+        },
+        "StartCanaryAfterCreation": true,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "SyntheticsCanaryArtifactBucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "SyntheticsCanaryRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyName": "SyntheticsCanaryCanaryS3Policy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject",
+                    "s3:GetBucketLocation"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:s3:::",
+                          {
+                            "Ref": "SyntheticsCanaryArtifactBucket"
+                          },
+                          "/*"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:ListAllMyBuckets"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "SyntheticsCanaryCanaryLogsPolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                    "logs:CreateLogGroup"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/${AWS::Partition}/lambda/cwsyn-*"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "SyntheticsCanaryCanaryMetricPolicy",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "cloudwatch:PutMetricData",
+                  "Resource": "*",
+                  "Condition": {
+                    "StringEquals": {
+                      "cloudwatch:namespace": "CloudWatchSynthetics"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "AlarmWithEverythingDefined": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "CanaryName",
+            "Value": {
+              "Ref": "SyntheticsCanary"
+            }
+          }
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "SuccessPercent",
+        "Namespace": "CloudWatchSynthetics",
+        "Period": 11160,
+        "Statistic": "Sum",
+        "Threshold": 100,
+        "TreatMissingData": "notBreaching"
+      }
+    },
+    "SuccessPercentAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ComparisonOperator": "LessThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "CanaryName",
+            "Value": {
+              "Ref": "SyntheticsCanary"
+            }
+          }
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "SuccessPercent",
+        "Namespace": "CloudWatchSynthetics",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 90,
+        "TreatMissingData": "notBreaching"
+      }
+    },
+    "DurationAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": [
+          {
+            "Name": "CanaryName",
+            "Value": {
+              "Ref": "SyntheticsCanary"
+            }
+          }
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "Duration",
+        "Namespace": "CloudWatchSynthetics",
+        "Period": 900,
+        "Statistic": "Sum",
+        "Threshold": 3000,
+        "TreatMissingData": "notBreaching"
+      }
+    },
+    "FailedAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": [
+          {
+            "Name": "CanaryName",
+            "Value": {
+              "Ref": "SyntheticsCanary"
+            }
+          }
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "Failed",
+        "Namespace": "CloudWatchSynthetics",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 1,
+        "TreatMissingData": "notBreaching"
+      }
+    }
+  }
+}

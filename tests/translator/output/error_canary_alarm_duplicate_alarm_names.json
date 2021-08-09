@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [SyntheticsCanary] is invalid. Duplicate CloudWatch alarm names"
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [SyntheticsCanary] is invalid. Duplicate CloudWatch alarm names"
+}

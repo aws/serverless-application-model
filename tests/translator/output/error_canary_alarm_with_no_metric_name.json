@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [SyntheticsCanary] is invalid. CloudWatch alarm 'SuccessAlarm' is missing required property 'MetricName'."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [SyntheticsCanary] is invalid. CloudWatch alarm 'SuccessAlarm' is missing required property 'MetricName'."
+}

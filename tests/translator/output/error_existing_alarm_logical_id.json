@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Transforming resource with id [SyntheticsCanary] attempts to create a new resource with id [FailedAlarm] and type \"AWS::CloudWatch::Alarm\". A resource with that id already exists within this template. Please use a different id for that resource."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Transforming resource with id [SyntheticsCanary] attempts to create a new resource with id [FailedAlarm] and type \"AWS::CloudWatch::Alarm\". A resource with that id already exists within this template. Please use a different id for that resource."
+}
