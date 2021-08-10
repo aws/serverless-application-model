@@ -876,21 +876,47 @@ class SamCanary(SamResourceMacro):
         return resources
 
     def _validate_cloudwatch_alarms(self):
-        keys = []
+        """Validates the CloudWatchAlarms property in Serverless Canary
+
+        The property should follow the following structure
+
+        CloudWatchAlarms:
+            - AlarmName:
+                MetricName (required): one of ["SuccessPercent", "Failed", "Duration"]
+                Threshold (optional): any value of type double
+                ComparisonOperator (optional): any of the valid values (https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html#cfn-cloudwatch-alarms-comparisonoperator)
+                Period (optional): Integer that is 10, 30, 60, or any multiple of 60
+            - AlarmName2:
+                MetricName: Failed
+
+        Note: Alarm names are used as logical ids for their respective CloudWatchAlarm property so there should be no
+        duplicate names as we don't want the alarms to override each other without the user knowing
+
+        :raise: InvalidResourceException
+        """
+        # keeps list of alarm names to make sure there are no duplicates
+        list_of_alarm_names = []
         for dict_item in self.CloudWatchAlarms:
 
-            # Throw an error if there is more than one alarm defined in the dict
+            # Throw an error if there is more than one alarm in the array index, like for example
+            # CloudWatchAlarms:
+            #     - Alarm1:
+            #         MetricName: SuccessPercent
+            #       Alarm2:
+            #         MetricName: SuccessPercent
+            #         Threshold: 90
             if len(dict_item) > 1:
                 raise InvalidResourceException(self.logical_id, "Must only have one alarm per array index")
 
-            key = list(dict_item.keys())[0]
-            alarm_item = dict_item[key]
+            # get the alarm name and the properties the user defined for the alarm
+            alarm_name = list(dict_item.keys())[0]
+            alarm_item = dict_item[alarm_name]
 
-            # MetricName is required
+            # MetricName property is required
             if alarm_item is None or "MetricName" not in alarm_item:
                 raise InvalidResourceException(
                     self.logical_id,
-                    "CloudWatch alarm '{key}' is missing required property 'MetricName'.".format(key=key),
+                    "CloudWatch alarm '{key}' is missing required property 'MetricName'.".format(key=alarm_name),
                 )
 
             metric_name = alarm_item["MetricName"]
@@ -903,30 +929,38 @@ class SamCanary(SamResourceMacro):
                     "MetricName needs to be one of {}".format(valid_metrics),
                 )
 
-            # make sure all the alarm names are unique because they are used as logical ids and we don't want them to
-            # override each other
-            if key in keys:
+            # make sure all the alarm names are unique
+            if alarm_name in list_of_alarm_names:
                 raise InvalidResourceException(self.logical_id, "Duplicate CloudWatch alarm names")
             else:
-                keys.append(key)
+                list_of_alarm_names.append(alarm_name)
 
     def _construct_cloudwatch_alarms(self, dict_item):
-        passthrough_attributes = self.get_passthrough_resource_attributes()
+        """Constructs an CloudWatch::Alarm resource if the user specifies the CloudWatchAlarm property in Serverless Canary
 
+        :returns: the generated CloudWatch Alarm
+        :rtype: model.cloudwatch.CloudWatchAlarm
+        """
+
+        # The default values for ComparisonOperator, Threshold and Period based on the MetricName provided by the user
+        # These default values were acquired from the Create Canary page in the Synthetics Canary dashboard
         default_values = {
             "SuccessPercent": {"ComparisonOperator": "LessThanThreshold", "Threshold": 90, "Period": 300},
             "Failed": {"ComparisonOperator": "GreaterThanOrEqualToThreshold", "Threshold": 1, "Period": 300},
-            "Duration": {"ComparisonOperator": "GreaterThanThreshold", "Threshold": 3000, "Period": 900},
+            "Duration": {"ComparisonOperator": "GreaterThanThreshold", "Threshold": 30000, "Period": 900},
         }
 
-        key = list(dict_item.keys())[0]
-        alarm_item = dict_item[key]
+        alarm_name = list(dict_item.keys())[0]
+        alarm_item = dict_item[alarm_name]
 
         cloudwatch_alarm = CloudWatchAlarm(
-            logical_id=key,
+            logical_id=alarm_name,
             depends_on=self.depends_on,
-            attributes=passthrough_attributes,
+            attributes=self.get_passthrough_resource_attributes(),
         )
+
+        # default settings for the CloudWatch alarms
+        # the settings are identical to the Alarms that are made by Synthetics Canary using their dashboard
         cloudwatch_alarm.MetricName = alarm_item["MetricName"]
         cloudwatch_alarm.Namespace = "CloudWatchSynthetics"
         cloudwatch_alarm.EvaluationPeriods = 1

@@ -222,7 +222,7 @@
         "Namespace": "CloudWatchSynthetics",
         "Period": 900,
         "Statistic": "Sum",
-        "Threshold": 3000,
+        "Threshold": 30000,
         "TreatMissingData": "notBreaching"
       }
     },
