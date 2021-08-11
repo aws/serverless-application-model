@@ -905,7 +905,7 @@ class SamCanary(SamResourceMacro):
             #       Alarm2:
             #         MetricName: SuccessPercent
             #         Threshold: 90
-            if len(dict_item) > 1:
+            if len(dict_item) != 1:
                 raise InvalidResourceException(self.logical_id, "Must only have one alarm per array index")
 
             # get the alarm name and the properties the user defined for the alarm
