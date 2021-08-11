@@ -67,6 +67,7 @@ DEFAULT_METRIC_VALUES = {
     "Failed": {"ComparisonOperator": "GreaterThanOrEqualToThreshold", "Threshold": 1, "Period": 300},
     "Duration": {"ComparisonOperator": "GreaterThanThreshold", "Threshold": 30000, "Period": 900},
 }
+# the main metrics produced by Synthetics Canary
 VALID_CANARY_METRICS = ["SuccessPercent", "Failed", "Duration"]
 
 
@@ -891,15 +892,14 @@ class SamCanary(SamResourceMacro):
 
         CanaryMetricAlarms:
             - AlarmName:
-                MetricName (required): one of ["SuccessPercent", "Failed", "Duration"]
+                MetricName (required): one of the metrics in VALID_CANARY_METRICS
                 Threshold (optional): any value of type double
                 ComparisonOperator (optional): any of the valid values (https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html#cfn-cloudwatch-alarms-comparisonoperator)
                 Period (optional): Integer that is 10, 30, 60, or any multiple of 60
-            - AlarmName2:
-                MetricName: Failed
 
-        Note: Alarm names are used as logical ids for their respective CloudWatchAlarm property so there should be no
-        duplicate names as we don't want the alarms to override each other without the user knowing
+        Note: Alarm names are used as logical ids for their respective CloudWatchAlarm property so if user has multiple
+        alarms there should be no duplicate names as we don't want the alarms to override each other without the user's
+        knowledge
 
         :raise: InvalidResourceException
         """
@@ -916,7 +916,7 @@ class SamCanary(SamResourceMacro):
             #         Threshold: 90
             #     - Alarm3:
             #         MetricName: Failed
-            # throws an error for Alarm2
+            # throws an error for Alarm2 since its Alarm1 is already defined in that dict
             if len(alarm_dict) != 1:
                 raise InvalidResourceException(self.logical_id, "Must only have one alarm per array index")
 
@@ -954,6 +954,7 @@ class SamCanary(SamResourceMacro):
         :rtype: model.cloudwatch.CloudWatchAlarm
         """
 
+        # gets alarm name and the properties defined by user
         alarm_name = list(alarm_dict.keys())[0]
         alarm_item = alarm_dict[alarm_name]
 
@@ -970,9 +971,10 @@ class SamCanary(SamResourceMacro):
         cloudwatch_alarm.EvaluationPeriods = 1
         cloudwatch_alarm.Statistic = "Sum"
         cloudwatch_alarm.TreatMissingData = "notBreaching"
-        # connects the alarm to the metric of the canary made by this Serverless resource
+        # connects the alarm to the metric produced by the Synthetics canary from this Serverless resource
         cloudwatch_alarm.Dimensions = [{"Name": "CanaryName", "Value": {"Ref": self.logical_id}}]
 
+        # set the values if user provides them, if not set them to default value based on the MetricName
         cloudwatch_alarm.ComparisonOperator = alarm_item.get(
             "ComparisonOperator", DEFAULT_METRIC_VALUES[alarm_item["MetricName"]]["ComparisonOperator"]
         )
