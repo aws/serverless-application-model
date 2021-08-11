@@ -879,8 +879,8 @@ class SamCanary(SamResourceMacro):
 
         if self.CanaryMetricAlarms:
             self._validate_cloudwatch_alarms()
-            for alarm in self.CanaryMetricAlarms:
-                resources.append(self._construct_cloudwatch_alarms(alarm))
+            for alarm_dict in self.CanaryMetricAlarms:
+                resources.append(self._construct_cloudwatch_alarms(alarm_dict))
 
         return resources
 
@@ -905,7 +905,7 @@ class SamCanary(SamResourceMacro):
         """
         # keeps list of alarm names to make sure there are no duplicates
         list_of_alarm_names = []
-        for dict_item in self.CanaryMetricAlarms:
+        for alarm_dict in self.CanaryMetricAlarms:
 
             # Throw an error if there is more than one alarm in the array index, like for example
             # CanaryMetricAlarms:
@@ -914,12 +914,15 @@ class SamCanary(SamResourceMacro):
             #       Alarm2:
             #         MetricName: SuccessPercent
             #         Threshold: 90
-            if len(dict_item) != 1:
+            #     - Alarm3:
+            #         MetricName: Failed
+            # throws an error for Alarm2
+            if len(alarm_dict) != 1:
                 raise InvalidResourceException(self.logical_id, "Must only have one alarm per array index")
 
             # get the alarm name and the properties the user defined for the alarm
-            alarm_name = list(dict_item.keys())[0]
-            alarm_item = dict_item[alarm_name]
+            alarm_name = list(alarm_dict.keys())[0]
+            alarm_item = alarm_dict[alarm_name]
 
             # MetricName property is required
             if alarm_item is None or "MetricName" not in alarm_item:
