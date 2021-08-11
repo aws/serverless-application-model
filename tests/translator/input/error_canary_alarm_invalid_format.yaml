@@ -11,7 +11,7 @@ Resources:
       StartCanaryAfterCreation: true
       Schedule:
         Expression: rate(0 minute)
-      CloudWatchAlarms:
+      CanaryMetricAlarms:
         - FailedAlarm:
             MetricName: Failed
           SuccessAlarm:

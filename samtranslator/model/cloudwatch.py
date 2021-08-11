@@ -27,8 +27,8 @@ class CloudWatchAlarm(Resource):
     resource_type = "AWS::CloudWatch::Alarm"
 
     property_types = {
-        "ActionsEnabled": PropertyType(False, is_str()),
-        "AlarmActions": PropertyType(False, is_str()),
+        "ActionsEnabled": PropertyType(False, is_type(bool)),
+        "AlarmActions": PropertyType(False, list_of(is_str())),
         "AlarmDescription": PropertyType(False, is_str()),
         "AlarmName": PropertyType(False, is_str()),
         "ComparisonOperator": PropertyType(True, is_str()),
@@ -37,14 +37,14 @@ class CloudWatchAlarm(Resource):
         "EvaluateLowSampleCountPercentile": PropertyType(False, is_str()),
         "EvaluationPeriods": PropertyType(True, is_type(int)),
         "ExtendedStatistic": PropertyType(False, is_str()),
-        "InsufficientDataActions": PropertyType(False, is_str()),
+        "InsufficientDataActions": PropertyType(False, list_of(is_str())),
         "MetricName": PropertyType(False, is_str()),
         "Metrics": PropertyType(False, is_type(dict)),
         "Namespace": PropertyType(False, is_str()),
-        "OKActions": PropertyType(False, is_str()),
+        "OKActions": PropertyType(False, list_of(is_str())),
         "Period": PropertyType(False, is_type(int)),
         "Statistic": PropertyType(False, is_str()),
-        "Threshold": PropertyType(False, is_type(int)),
+        "Threshold": PropertyType(False, is_type(float)),
         "ThresholdMetricId": PropertyType(False, is_str()),
         "TreatMissingData": PropertyType(False, is_str()),
         "Unit": PropertyType(False, is_str()),

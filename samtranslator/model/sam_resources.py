@@ -60,6 +60,15 @@ MAX_CANARY_LOGICAL_ID_LENGTH = 11
 MAX_CANARY_UNIQUE_ID_LENGTH = 5
 CANARY_NAME_PREFIX = "sam-"
 
+# The default values for ComparisonOperator, Threshold and Period based on the MetricName provided by the user
+# These default values were acquired from the Create Canary page in the Synthetics Canary dashboard
+DEFAULT_METRIC_VALUES = {
+    "SuccessPercent": {"ComparisonOperator": "LessThanThreshold", "Threshold": 90, "Period": 300},
+    "Failed": {"ComparisonOperator": "GreaterThanOrEqualToThreshold", "Threshold": 1, "Period": 300},
+    "Duration": {"ComparisonOperator": "GreaterThanThreshold", "Threshold": 30000, "Period": 900},
+}
+VALID_CANARY_METRICS = ["SuccessPercent", "Failed", "Duration"]
+
 
 class SamFunction(SamResourceMacro):
     """SAM function macro."""
@@ -837,7 +846,7 @@ class SamCanary(SamResourceMacro):
         "VpcConfig": PropertyType(False, is_type(dict)),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
-        "CloudWatchAlarms": PropertyType(False, list_of(is_type(dict))),
+        "CanaryMetricAlarms": PropertyType(False, list_of(is_type(dict))),
     }
 
     def to_cloudformation(self, **kwargs):
@@ -868,19 +877,19 @@ class SamCanary(SamResourceMacro):
             resources.append(role)
             synthetics_canary.ExecutionRoleArn = role.get_runtime_attr("arn")
 
-        if self.CloudWatchAlarms:
+        if self.CanaryMetricAlarms:
             self._validate_cloudwatch_alarms()
-            for dict_item in self.CloudWatchAlarms:
-                resources.append(self._construct_cloudwatch_alarms(dict_item))
+            for alarm in self.CanaryMetricAlarms:
+                resources.append(self._construct_cloudwatch_alarms(alarm))
 
         return resources
 
     def _validate_cloudwatch_alarms(self):
-        """Validates the CloudWatchAlarms property in Serverless Canary
+        """Validates the CanaryMetricAlarms property in Serverless Canary
 
         The property should follow the following structure
 
-        CloudWatchAlarms:
+        CanaryMetricAlarms:
             - AlarmName:
                 MetricName (required): one of ["SuccessPercent", "Failed", "Duration"]
                 Threshold (optional): any value of type double
@@ -896,10 +905,10 @@ class SamCanary(SamResourceMacro):
         """
         # keeps list of alarm names to make sure there are no duplicates
         list_of_alarm_names = []
-        for dict_item in self.CloudWatchAlarms:
+        for dict_item in self.CanaryMetricAlarms:
 
             # Throw an error if there is more than one alarm in the array index, like for example
-            # CloudWatchAlarms:
+            # CanaryMetricAlarms:
             #     - Alarm1:
             #         MetricName: SuccessPercent
             #       Alarm2:
@@ -920,13 +929,12 @@ class SamCanary(SamResourceMacro):
                 )
 
             metric_name = alarm_item["MetricName"]
-            valid_metrics = ["SuccessPercent", "Failed", "Duration"]
 
-            # MetricName must be one of "SuccessPercent", "Failed" and "Duration"
-            if metric_name not in valid_metrics:
+            # MetricName must be one of the values in VALID_CANARY_METRICS
+            if metric_name not in VALID_CANARY_METRICS:
                 raise InvalidResourceException(
                     self.logical_id,
-                    "MetricName needs to be one of {}".format(valid_metrics),
+                    "MetricName needs to be one of {}".format(VALID_CANARY_METRICS),
                 )
 
             # make sure all the alarm names are unique
@@ -935,23 +943,16 @@ class SamCanary(SamResourceMacro):
             else:
                 list_of_alarm_names.append(alarm_name)
 
-    def _construct_cloudwatch_alarms(self, dict_item):
+    def _construct_cloudwatch_alarms(self, alarm_dict):
         """Constructs an CloudWatch::Alarm resource if the user specifies the CloudWatchAlarm property in Serverless Canary
 
+        :param dict alarm_dict: Alarm name and properties as provided by the customer
         :returns: the generated CloudWatch Alarm
         :rtype: model.cloudwatch.CloudWatchAlarm
         """
 
-        # The default values for ComparisonOperator, Threshold and Period based on the MetricName provided by the user
-        # These default values were acquired from the Create Canary page in the Synthetics Canary dashboard
-        default_values = {
-            "SuccessPercent": {"ComparisonOperator": "LessThanThreshold", "Threshold": 90, "Period": 300},
-            "Failed": {"ComparisonOperator": "GreaterThanOrEqualToThreshold", "Threshold": 1, "Period": 300},
-            "Duration": {"ComparisonOperator": "GreaterThanThreshold", "Threshold": 30000, "Period": 900},
-        }
-
-        alarm_name = list(dict_item.keys())[0]
-        alarm_item = dict_item[alarm_name]
+        alarm_name = list(alarm_dict.keys())[0]
+        alarm_item = alarm_dict[alarm_name]
 
         cloudwatch_alarm = CloudWatchAlarm(
             logical_id=alarm_name,
@@ -966,19 +967,18 @@ class SamCanary(SamResourceMacro):
         cloudwatch_alarm.EvaluationPeriods = 1
         cloudwatch_alarm.Statistic = "Sum"
         cloudwatch_alarm.TreatMissingData = "notBreaching"
+        # connects the alarm to the metric of the canary made by this Serverless resource
         cloudwatch_alarm.Dimensions = [{"Name": "CanaryName", "Value": {"Ref": self.logical_id}}]
 
-        cloudwatch_alarm.ComparisonOperator = alarm_item.get("ComparisonOperator", default_values[alarm_item["MetricName"]])
+        cloudwatch_alarm.ComparisonOperator = alarm_item.get(
+            "ComparisonOperator", DEFAULT_METRIC_VALUES[alarm_item["MetricName"]]["ComparisonOperator"]
+        )
 
-        if "Threshold" in alarm_item:
-            cloudwatch_alarm.Threshold = alarm_item["Threshold"]
-        else:
-            cloudwatch_alarm.Threshold = default_values[alarm_item["MetricName"]]["Threshold"]
+        cloudwatch_alarm.Threshold = float(
+            alarm_item.get("Threshold", DEFAULT_METRIC_VALUES[alarm_item["MetricName"]]["Threshold"])
+        )
 
-        if "Period" in alarm_item:
-            cloudwatch_alarm.Period = alarm_item["Period"]
-        else:
-            cloudwatch_alarm.Period = default_values[alarm_item["MetricName"]]["Period"]
+        cloudwatch_alarm.Period = alarm_item.get("Period", DEFAULT_METRIC_VALUES[alarm_item["MetricName"]]["Period"])
 
         return cloudwatch_alarm
 
