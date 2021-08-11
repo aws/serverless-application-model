@@ -968,7 +968,7 @@ class SamCanary(SamResourceMacro):
         cloudwatch_alarm.TreatMissingData = "notBreaching"
         cloudwatch_alarm.Dimensions = [{"Name": "CanaryName", "Value": {"Ref": self.logical_id}}]
 
-        cloudwatch_alarm.ComparisonOperator = alarm_item.get("ComparisonOperator", default_values[alarm_item["MetricName"]])
+        cloudwatch_alarm.ComparisonOperator = alarm_item.get("ComparisonOperator", default_values[alarm_item["MetricName"]]["ComparisonOperator"])
 
         if "Threshold" in alarm_item:
             cloudwatch_alarm.Threshold = alarm_item["Threshold"]
