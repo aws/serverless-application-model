@@ -62,13 +62,14 @@ CANARY_NAME_PREFIX = "sam-"
 
 # The default values for ComparisonOperator, Threshold and Period based on the MetricName provided by the user
 # These default values were acquired from the Create Canary page in the Synthetics Canary dashboard
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Synthetics_Canaries_metrics.html
 DEFAULT_METRIC_VALUES = {
     "SuccessPercent": {"ComparisonOperator": "LessThanThreshold", "Threshold": 90, "Period": 300},
     "Failed": {"ComparisonOperator": "GreaterThanOrEqualToThreshold", "Threshold": 1, "Period": 300},
     "Duration": {"ComparisonOperator": "GreaterThanThreshold", "Threshold": 30000, "Period": 900},
 }
 # the main metrics produced by Synthetics Canary
-VALID_CANARY_METRICS = ["SuccessPercent", "Failed", "Duration"]
+VALID_CANARY_METRICS = list(DEFAULT_METRIC_VALUES.keys())
 
 
 class SamFunction(SamResourceMacro):
@@ -881,7 +882,7 @@ class SamCanary(SamResourceMacro):
         if self.CanaryMetricAlarms:
             self._validate_cloudwatch_alarms()
             for alarm_dict in self.CanaryMetricAlarms:
-                resources.append(self._construct_cloudwatch_alarms(alarm_dict))
+                resources.append(self._construct_cloudwatch_alarm(alarm_dict))
 
         return resources
 
@@ -918,10 +919,10 @@ class SamCanary(SamResourceMacro):
             #         MetricName: Failed
             # throws an error for Alarm2 since its Alarm1 is already defined in that dict
             if len(alarm_dict) != 1:
-                raise InvalidResourceException(self.logical_id, "Must only have one alarm per array index")
+                raise InvalidResourceException(self.logical_id, "Must have one alarm per array index")
 
             # get the alarm name and the properties the user defined for the alarm
-            alarm_name = list(alarm_dict.keys())[0]
+            alarm_name = next(iter(alarm_dict))
             alarm_item = alarm_dict[alarm_name]
 
             # MetricName property is required
@@ -946,7 +947,7 @@ class SamCanary(SamResourceMacro):
             else:
                 list_of_alarm_names.append(alarm_name)
 
-    def _construct_cloudwatch_alarms(self, alarm_dict):
+    def _construct_cloudwatch_alarm(self, alarm_dict):
         """Constructs an CloudWatch::Alarm resource if the user specifies the CloudWatchAlarm property in Serverless Canary
 
         :param dict alarm_dict: Alarm name and properties as provided by the customer
@@ -955,7 +956,7 @@ class SamCanary(SamResourceMacro):
         """
 
         # gets alarm name and the properties defined by user
-        alarm_name = list(alarm_dict.keys())[0]
+        alarm_name = next(iter(alarm_dict))
         alarm_item = alarm_dict[alarm_name]
 
         cloudwatch_alarm = CloudWatchAlarm(
