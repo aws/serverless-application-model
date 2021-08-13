@@ -69,7 +69,8 @@ DEFAULT_METRIC_VALUES = {
     "Duration": {"ComparisonOperator": "GreaterThanThreshold", "Threshold": 30000, "Period": 900},
 }
 # the main metrics produced by Synthetics Canary
-VALID_CANARY_METRICS = list(DEFAULT_METRIC_VALUES.keys())
+# sorted for backwards compatibility (python 2.7 automatically sorts keys)
+VALID_CANARY_METRICS = list(sorted(DEFAULT_METRIC_VALUES))
 
 
 class SamFunction(SamResourceMacro):
