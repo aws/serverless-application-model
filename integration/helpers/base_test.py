@@ -141,9 +141,7 @@ class BaseTest(TestCase):
             List of parameters
         """
         folder, file_name = file_path.split("/")
-        # add a folder name before file name to avoid possible collisions between
-        # files in the single and combination folder
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
+        self.generate_out_put_file_path(folder, file_name)
         self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
         self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
 
@@ -169,9 +167,7 @@ class BaseTest(TestCase):
             os.remove(self.sub_input_file_path)
 
         folder, file_name = file_path.split("/")
-        # add a folder name before file name to avoid possible collisions between
-        # files in the single and combination folder
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
+        self.generate_out_put_file_path(folder, file_name)
 
         self._fill_template(folder, file_name)
         self.transform_template()
@@ -193,15 +189,19 @@ class BaseTest(TestCase):
             raise Exception("Stack not created.")
 
         folder, file_name = file_path.split("/")
-        # add a folder name before file name to avoid possible collisions between
-        # files in the single and combination folder
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder + "_" + file_name + ".yaml"))
+        self.generate_out_put_file_path(folder, file_name)
         self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
 
         self._fill_template(folder, file_name)
         self.transform_template()
         self.deploy_stack(parameters)
         self.verify_stack(end_state="UPDATE_COMPLETE")
+
+    def generate_out_put_file_path(self, folder_name, file_name):
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder_name + "_" + file_name + generate_suffix() + ".yaml"))
+
 
     def transform_template(self):
         transform_template(self.sub_input_file_path, self.output_file_path)
@@ -349,7 +349,7 @@ class BaseTest(TestCase):
         input_file_path = str(Path(self.template_dir, folder, file_name + ".yaml"))
         # add a folder name before file name to avoid possible collisions between
         # files in the single and combination folder
-        updated_template_path = str(Path(self.output_dir, "sub_" + folder + "_" + file_name + ".yaml"))
+        updated_template_path = self.output_file_path.split(".yaml")[0] + "_sub" + ".yaml"
         with open(input_file_path) as f:
             data = f.read()
         for key, _ in self.code_key_to_file.items():

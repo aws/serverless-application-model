@@ -1,6 +1,12 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
 
 
+@skipIf(
+    current_region_does_not_support(["MSK"]), "MSK is not supported in this testing region"
+)
 class TestFunctionWithMsk(BaseTest):
     def test_function_with_msk_trigger(self):
         self._common_validations_for_MSK("combination/function_with_msk")

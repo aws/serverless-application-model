@@ -1,5 +1,9 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
 import requests
+
+from integration.helpers.resource import current_region_does_not_support
 
 
 class TestBasicApi(BaseTest):
@@ -25,6 +29,9 @@ class TestBasicApi(BaseTest):
 
         self.assertEqual(len(set(first_dep_ids).intersection(second_dep_ids)), 0)
 
+    @skipIf(
+        current_region_does_not_support(["Mode"]), "Mode is not supported in this testing region"
+    )
     def test_basic_api_with_mode(self):
         """
         Creates an API and updates its DefinitionUri

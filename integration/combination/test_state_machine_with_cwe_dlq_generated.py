@@ -1,7 +1,13 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
 from integration.helpers.common_api import get_policy_statements, get_queue_policy
+from integration.helpers.resource import current_region_does_not_support
 
 
+@skipIf(
+    current_region_does_not_support(["CweCwsDlq"]), "CweCwsDlq is not supported in this testing region"
+)
 class TestStateMachineWithCweDlqGenerated(BaseTest):
     def test_state_machine_with_cwe(self):
         self.create_and_verify_stack("combination/state_machine_with_cwe_dlq_generated")

@@ -43,7 +43,7 @@ Resources:
                 - TestSchedule${__StackName__}
                 - __StackName__: 
                     Fn::Select:
-                      - 3
+                      - 6
                       - Fn::Split:
                         - "-"
                         - Ref: AWS::StackName
@@ -151,7 +151,7 @@ Outputs:
         - TestSchedule${__StackName__}
         - __StackName__: 
             Fn::Select:
-              - 3
+              - 6
               - Fn::Split:
                 - "-"
                 - Ref: AWS::StackName
