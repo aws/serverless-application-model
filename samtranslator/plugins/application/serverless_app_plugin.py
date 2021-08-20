@@ -360,7 +360,6 @@ class ServerlessAppPlugin(BasePlugin):
         """
         try:
             response = service_call_lambda(*args)
-            LOG.info(response)
             return response
         except ClientError as e:
             error_code = e.response["Error"]["Code"]

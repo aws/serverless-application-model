@@ -352,7 +352,7 @@ class OpenApiEditor(object):
                             )
                         ]
                     )
-                for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+                for method_definition in self.get_method_contents(method):
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                     if not self.method_definition_has_integration(method_definition):
                         continue

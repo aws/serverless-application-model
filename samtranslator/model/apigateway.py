@@ -270,11 +270,19 @@ class ApiGatewayAuthorizer(object):
         query_strings = identity.get("QueryStrings")
         stage_variables = identity.get("StageVariables")
         context = identity.get("Context")
+        ttl = identity.get("ReauthorizeEvery")
 
-        if not headers and not query_strings and not stage_variables and not context:
-            return True
+        required_properties_missing = not headers and not query_strings and not stage_variables and not context
 
-        return False
+        try:
+            ttl_int = int(ttl)
+        # this will catch if ttl is None and not convertable to an int
+        except TypeError:
+            # previous behavior before trying to read ttl
+            return required_properties_missing
+
+        # If we can resolve ttl, attempt to see if things are valid
+        return ttl_int > 0 and required_properties_missing
 
     def generate_swagger(self):
         authorizer_type = self._get_type()
@@ -314,7 +322,9 @@ class ApiGatewayAuthorizer(object):
                 swagger[APIGATEWAY_AUTHORIZER_KEY]["authorizerCredentials"] = function_invoke_role
 
             if self._get_function_payload_type() == "REQUEST":
-                swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
+                identity_source = self._get_identity_source()
+                if identity_source:
+                    swagger[APIGATEWAY_AUTHORIZER_KEY]["identitySource"] = self._get_identity_source()
 
         # Authorizer Validation Expression is only allowed on COGNITO_USER_POOLS and LAMBDA_TOKEN
         is_lambda_token_authorizer = authorizer_type == "LAMBDA" and self._get_function_payload_type() == "TOKEN"

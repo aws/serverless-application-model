@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Conditions:
+  isProd: true
+
+
+Resources:
+  APIGateway:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: SomeAuthorizer
+        Authorizers:
+          SomeAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn: SomeArn
+            Identity:
+              Headers:
+                - Accept
+              ReauthorizeEvery: !If [isProd, 3600, 0]
