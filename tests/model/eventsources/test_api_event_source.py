@@ -131,7 +131,7 @@ class ApiEventSource(TestCase):
         )
 
     @patch("boto3.session.Session.region_name", "eu-west-2")
-    def test_swagger_integration_with_object_rest_api_id(self):
+    def test_swagger_integration_with_ref_intrinsic_rest_api_id(self):
         self.api_event_source.RestApiId = {"Ref": "ApiId"}
         self.api_event_source.Auth = {"Authorizer": "AWS_IAM", "ResourcePolicy": {"AwsAccountWhitelist": ["123456"]}}
         self.api_event_source.to_cloudformation(
