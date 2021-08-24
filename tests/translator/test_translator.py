@@ -786,6 +786,13 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_invalid_method_definition",
         "error_mappings_is_null",
         "error_swagger_security_not_dict",
+        "error_api_swagger_integration_with_condition_intrinsic_api_id",
+        "error_api_swagger_integration_with_find_in_map_intrinsic_api_id",
+        "error_api_swagger_integration_with_join_intrinsic_api_id",
+        "error_api_swagger_integration_with_select_intrinsic_api_id",
+        "error_api_swagger_integration_with_sub_intrinsic_api_id",
+        "error_api_swagger_integration_with_transform_intrinsic_api_id",
+        "error_api_swagger_integration_with_getatt_intrinsic_api_id"
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
