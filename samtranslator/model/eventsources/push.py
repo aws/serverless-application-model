@@ -542,7 +542,7 @@ class Api(PushEventSource):
         stage_suffix = "AllStages"
         explicit_api = None
         rest_api_id = self.get_rest_api_id_string(self.RestApiId)
-        if isinstance(rest_api_id, string_types): 
+        if isinstance(rest_api_id, string_types):
 
             if (
                 rest_api_id in resources
@@ -881,7 +881,7 @@ class Api(PushEventSource):
         rest_api_id can be either a string or a dictionary where the actual api id is the value at key "Ref".
         If rest_api_id is a dictionary with key "Ref", returns value at key "Ref". Otherwise, return rest_api_id.
 
-        :param rest_api_id: a string or dictionary that contains the api id 
+        :param rest_api_id: a string or dictionary that contains the api id
         :return: string value of rest_api_id
         """
         return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id

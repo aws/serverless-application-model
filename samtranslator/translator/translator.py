@@ -67,7 +67,7 @@ class Translator:
                     if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
                         rest_api = item.get("Properties").get("RestApiId")
                         api_name = Api.get_rest_api_id_string(rest_api)
-                        if isinstance(api_name, string_types): 
+                        if isinstance(api_name, string_types):
                             resource_dict_copy = copy.deepcopy(resource_dict)
                             function_name = intrinsics_resolver.resolve_parameter_refs(
                                 resource_dict_copy.get("Properties").get("FunctionName")
