@@ -1,4 +1,5 @@
 import copy
+from six import string_types
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 
 from samtranslator.feature_toggle.feature_toggle import (
@@ -27,7 +28,7 @@ from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplat
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.utils.rest_api_id import get_rest_api_id_string
+from samtranslator.model.eventsources.push import Api
 
 
 class Translator:
@@ -65,8 +66,8 @@ class Translator:
                     # adds to the function_names dict with key as the api_name and value as the function_name
                     if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
                         rest_api = item.get("Properties").get("RestApiId")
-                        api_name = get_rest_api_id_string(rest_api)
-                        if api_name:
+                        api_name = Api.get_rest_api_id_string(rest_api)
+                        if isinstance(api_name, string_types): 
                             resource_dict_copy = copy.deepcopy(resource_dict)
                             function_name = intrinsics_resolver.resolve_parameter_refs(
                                 resource_dict_copy.get("Properties").get("FunctionName")

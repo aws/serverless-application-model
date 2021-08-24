@@ -20,7 +20,6 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.utils.rest_api_id import get_rest_api_id_string
 
 CONDITION = "Condition"
 
@@ -542,8 +541,8 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        rest_api_id = get_rest_api_id_string(self.RestApiId)
-        if rest_api_id:
+        rest_api_id = self.get_rest_api_id_string(self.RestApiId)
+        if isinstance(rest_api_id, string_types): 
 
             if (
                 rest_api_id in resources
@@ -745,7 +744,7 @@ class Api(PushEventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
-                api_id = get_rest_api_id_string(self.RestApiId)
+                api_id = self.get_rest_api_id_string(self.RestApiId)
                 editor.add_resource_policy(
                     resource_policy=resource_policy, path=self.Path, api_id=api_id, stage=self.Stage
                 )
@@ -875,6 +874,17 @@ class Api(PushEventSource):
             )
 
         api["DefinitionBody"] = editor.swagger
+
+    @staticmethod
+    def get_rest_api_id_string(rest_api_id):
+        """
+        rest_api_id can be either a string or a dictionary where the actual api id is the value at key "Ref".
+        If rest_api_id is a dictionary with key "Ref", returns value at key "Ref". Otherwise, return rest_api_id.
+
+        :param rest_api_id: a string or dictionary that contain the rest_api_id
+        :return: string value of rest_api_id
+        """
+        return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id
 
 
 class AlexaSkill(PushEventSource):

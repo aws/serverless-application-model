@@ -1,6 +1,7 @@
 import copy
 
 from samtranslator.model.intrinsics import make_combined_condition
+from samtranslator.model.eventsources.push import Api
 from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException
 from samtranslator.public.sdk.resource import SamResourceType
@@ -218,9 +219,7 @@ class ImplicitApiPlugin(BasePlugin):
         Handles case where API id is not specified or is a reference to a logical id.
         """
         api_id = event_properties.get(self.api_id_property)
-        if isinstance(api_id, dict) and "Ref" in api_id:
-            api_id = api_id["Ref"]
-        return api_id
+        return Api.get_rest_api_id_string(api_id)
 
     def _maybe_add_condition_to_implicit_api(self, template_dict):
         """
