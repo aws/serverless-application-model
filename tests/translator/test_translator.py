@@ -446,7 +446,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "state_machine_with_permissions_boundary",
                 "version_deletion_policy_precedence",
                 "api_swagger_integration_with_string_api_id",
-                "api_swagger_integration_with_object_api_id",
+                "api_swagger_integration_with_ref_api_id",
             ],
             [
                 ("aws", "ap-southeast-1"),
