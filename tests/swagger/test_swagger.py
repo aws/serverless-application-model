@@ -1149,7 +1149,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         ## fails
         resourcePolicy = {"AwsAccountWhitelist": ["123456"]}
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1170,7 +1170,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         resourcePolicy = {"AwsAccountBlacklist": ["123456"]}
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1191,7 +1191,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         resourcePolicy = {"IpRangeWhitelist": ["1.2.3.4"]}
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1224,7 +1224,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         resourcePolicy = {"IpRangeBlacklist": ["1.2.3.4"]}
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1259,7 +1259,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             "SourceVpcWhitelist": ["vpc-123", "vpce-345"],
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1303,7 +1303,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         resource_policy = {resource_policy_key: [{"sub": "somevalue"}]}
 
         with self.assertRaises(InvalidDocumentException):
-            self.editor.add_resource_policy(resource_policy, "/foo", "123", "prod")
+            self.editor.add_resource_policy(resource_policy, "/foo", "prod")
 
     def test_must_add_vpc_deny_string_only(self):
 
@@ -1311,7 +1311,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             "SourceVpcBlacklist": ["vpc-123"],
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1348,7 +1348,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             "IntrinsicVpceWhitelist": ["Mock-Allowlist-C"],
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1388,7 +1388,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             "IntrinsicVpceBlacklist": ["Mock-Denylist-A", "Mock-List-1"],
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1429,7 +1429,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             "SourceVpcWhitelist": ["non-valid-endpoint-name-1", "non-valid-endpoint-name-2"],
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {}
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
@@ -1445,7 +1445,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             "IntrinsicVpceBlacklist": ["Mock-Denylist-A", "Mock-List-1"],
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1502,7 +1502,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ],
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
         self.editor.add_custom_statements(resourcePolicy.get("CustomStatements"))
 
         expected = {

@@ -118,31 +118,6 @@ class ApiEventSource(TestCase):
 
         self.assertEqual(arn, "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/")
 
-    @patch("boto3.session.Session.region_name", "eu-west-2")
-    def test_swagger_integration_with_string_rest_api_id(self):
-        self.api_event_source.Auth = {"Authorizer": "AWS_IAM", "ResourcePolicy": {"AwsAccountWhitelist": ["123456"]}}
-        self.api_event_source.to_cloudformation(
-            function=self.func,
-            explicit_api={
-                "__MANAGE_SWAGGER": True,
-                "DefinitionBody": {"openapi": "3.0.1", "paths": {"/foo": {}, "/bar": {}}},
-            },
-            intrinsics_resolver=IntrinsicsResolver({}),
-        )
-
-    @patch("boto3.session.Session.region_name", "eu-west-2")
-    def test_swagger_integration_with_ref_intrinsic_rest_api_id(self):
-        self.api_event_source.RestApiId = {"Ref": "ApiId"}
-        self.api_event_source.Auth = {"Authorizer": "AWS_IAM", "ResourcePolicy": {"AwsAccountWhitelist": ["123456"]}}
-        self.api_event_source.to_cloudformation(
-            function=self.func,
-            explicit_api={
-                "__MANAGE_SWAGGER": True,
-                "DefinitionBody": {"openapi": "3.0.1", "paths": {"/foo": {}, "/bar": {}}},
-            },
-            intrinsics_resolver=IntrinsicsResolver({}),
-        )
-
     def _extract_path_from_arn(self, logical_id, perm):
         arn = perm.to_dict().get(logical_id, {}).get("Properties", {}).get("SourceArn", {}).get("Fn::Sub", [])[0]
 
