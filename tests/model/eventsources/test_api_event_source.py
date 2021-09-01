@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from samtranslator.model.eventsources.push import Api
 from samtranslator.model.lambda_ import LambdaFunction, LambdaPermission
-from samtranslator.intrinsics.resolver import IntrinsicsResolver
 
 
 class ApiEventSource(TestCase):
