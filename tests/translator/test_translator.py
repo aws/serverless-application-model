@@ -445,6 +445,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
                 "version_deletion_policy_precedence",
+                "api_swagger_integration_with_string_api_id",
+                "api_swagger_integration_with_ref_intrinsic_api_id",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -784,6 +786,13 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_invalid_method_definition",
         "error_mappings_is_null",
         "error_swagger_security_not_dict",
+        "error_api_swagger_integration_with_condition_intrinsic_api_id",
+        "error_api_swagger_integration_with_find_in_map_intrinsic_api_id",
+        "error_api_swagger_integration_with_join_intrinsic_api_id",
+        "error_api_swagger_integration_with_select_intrinsic_api_id",
+        "error_api_swagger_integration_with_sub_intrinsic_api_id",
+        "error_api_swagger_integration_with_transform_intrinsic_api_id",
+        "error_api_swagger_integration_with_getatt_intrinsic_api_id",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

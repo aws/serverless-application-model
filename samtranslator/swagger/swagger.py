@@ -902,7 +902,7 @@ class SwaggerEditor(object):
 
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy, path, api_id, stage):
+    def add_resource_policy(self, resource_policy, path, stage):
         """
         Add resource policy definition to Swagger.
 
@@ -928,19 +928,19 @@ class SwaggerEditor(object):
         source_vpce_intrinsic_blacklist = resource_policy.get("IntrinsicVpceBlacklist")
 
         if aws_account_whitelist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            resource_list = self._get_method_path_uri_list(path, stage)
             self._add_iam_resource_policy_for_method(aws_account_whitelist, "Allow", resource_list)
 
         if aws_account_blacklist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            resource_list = self._get_method_path_uri_list(path, stage)
             self._add_iam_resource_policy_for_method(aws_account_blacklist, "Deny", resource_list)
 
         if ip_range_whitelist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            resource_list = self._get_method_path_uri_list(path, stage)
             self._add_ip_resource_policy_for_method(ip_range_whitelist, "NotIpAddress", resource_list)
 
         if ip_range_blacklist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            resource_list = self._get_method_path_uri_list(path, stage)
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
         if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_blacklist):
@@ -957,7 +957,7 @@ class SwaggerEditor(object):
             "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
             "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
         }
-        resource_list = self._get_method_path_uri_list(path, api_id, stage)
+        resource_list = self._get_method_path_uri_list(path, stage)
         self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
 
         if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):
@@ -1019,7 +1019,7 @@ class SwaggerEditor(object):
             statement.extend([policy_statement])
             self.resource_policy["Statement"] = statement
 
-    def _get_method_path_uri_list(self, path, api_id, stage):
+    def _get_method_path_uri_list(self, path, stage):
         """
         It turns out that APIGW doesn't like trailing slashes in paths (#665)
         and removes as a part of their behavior, but this isn't documented.

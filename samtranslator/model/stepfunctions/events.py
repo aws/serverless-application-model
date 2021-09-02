@@ -9,6 +9,7 @@ from samtranslator.model.intrinsics import fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
+from samtranslator.model.eventsources.push import Api as PushApi
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
@@ -246,10 +247,6 @@ class Api(EventSource):
         necessary data from the explicit API
         """
 
-        rest_api_id = self.RestApiId
-        if isinstance(rest_api_id, dict) and "Ref" in rest_api_id:
-            rest_api_id = rest_api_id["Ref"]
-
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the State Machine. If we are unable to resolve the stage name, we will
@@ -259,6 +256,7 @@ class Api(EventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
+        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, string_types):
 
             if (
@@ -414,9 +412,7 @@ class Api(EventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(
-                    resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
-                )
+                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)
                 if resource_policy.get("CustomStatements"):
                     editor.add_custom_statements(resource_policy.get("CustomStatements"))
 

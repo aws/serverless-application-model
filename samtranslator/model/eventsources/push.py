@@ -532,10 +532,6 @@ class Api(PushEventSource):
         necessary data from the explicit API
         """
 
-        rest_api_id = self.RestApiId
-        if isinstance(rest_api_id, dict) and "Ref" in rest_api_id:
-            rest_api_id = rest_api_id["Ref"]
-
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the Lambda function. If we are unable to resolve the stage name, we will
@@ -545,6 +541,7 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
+        rest_api_id = self.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, string_types):
 
             if (
@@ -747,9 +744,7 @@ class Api(PushEventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(
-                    resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
-                )
+                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)
                 if resource_policy.get("CustomStatements"):
                     editor.add_custom_statements(resource_policy.get("CustomStatements"))
 
@@ -876,6 +871,17 @@ class Api(PushEventSource):
             )
 
         api["DefinitionBody"] = editor.swagger
+
+    @staticmethod
+    def get_rest_api_id_string(rest_api_id):
+        """
+        rest_api_id can be either a string or a dictionary where the actual api id is the value at key "Ref".
+        If rest_api_id is a dictionary with key "Ref", returns value at key "Ref". Otherwise, return rest_api_id.
+
+        :param rest_api_id: a string or dictionary that contains the api id
+        :return: string value of rest_api_id
+        """
+        return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id
 
 
 class AlexaSkill(PushEventSource):
