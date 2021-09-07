@@ -22,6 +22,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
+from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
@@ -91,6 +92,7 @@ class SamFunction(SamResourceMacro):
         "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
         "ImageConfig": PropertyType(False, is_type(dict)),
         "CodeSigningConfigArn": PropertyType(False, is_str()),
+        "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
     }
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -419,6 +421,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.FileSystemConfigs = self.FileSystemConfigs
         lambda_function.ImageConfig = self.ImageConfig
         lambda_function.PackageType = self.PackageType
+        lambda_function.Architectures = self.Architectures
 
         if self.Tracing:
             lambda_function.TracingConfig = {"Mode": self.Tracing}
@@ -429,6 +432,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
 
         self._validate_package_type(lambda_function)
+        self._validate_architectures(lambda_function)
         return lambda_function
 
     def _add_event_invoke_managed_policy(self, dest_config, logical_id, condition, dest_arn):
@@ -542,6 +546,36 @@ class SamFunction(SamResourceMacro):
 
         # Call appropriate validation function based on the package type.
         return _validate_per_package_type[packagetype]()
+
+    def _validate_architectures(self, lambda_function):
+        """
+        Validates Function based on the existence of architecture type
+
+        parameters
+        ----------
+        lambda_function: LambdaFunction
+            Object of function properties supported on AWS Lambda
+
+        Raises
+        ------
+        InvalidResourceException
+            Raised when the Architectures property is invalid
+        """
+
+        architectures = [X86_64] if lambda_function.Architectures is None else lambda_function.Architectures
+
+        if is_intrinsic(architectures):
+            return
+
+        if (
+            not isinstance(architectures, list)
+            or len(architectures) != 1
+            or (not is_intrinsic(architectures[0]) and (architectures[0] not in [X86_64, ARM64]))
+        ):
+            raise InvalidResourceException(
+                lambda_function.logical_id,
+                "Architectures needs to be a list with one string, either `{}` or `{}`.".format(X86_64, ARM64),
+            )
 
     def _validate_dlq(self):
         """Validates whether the DeadLetterQueue LogicalId is validation
@@ -1138,6 +1172,7 @@ class SamLayerVersion(SamResourceMacro):
         "LayerName": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Description": PropertyType(False, is_str()),
         "ContentUri": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "CompatibleArchitectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "LicenseInfo": PropertyType(False, is_str()),
         "RetentionPolicy": PropertyType(False, is_str()),
@@ -1220,6 +1255,9 @@ class SamLayerVersion(SamResourceMacro):
         lambda_layer.LayerName = self.LayerName
         lambda_layer.Description = self.Description
         lambda_layer.Content = construct_s3_location_object(self.ContentUri, self.logical_id, "ContentUri")
+
+        lambda_layer.CompatibleArchitectures = self.CompatibleArchitectures
+        self._validate_architectures(lambda_layer)
         lambda_layer.CompatibleRuntimes = self.CompatibleRuntimes
         lambda_layer.LicenseInfo = self.LicenseInfo
 
@@ -1252,6 +1290,31 @@ class SamLayerVersion(SamResourceMacro):
                 self.logical_id,
                 "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
             )
+
+    def _validate_architectures(self, lambda_layer):
+        """Validate the values inside the CompatibleArchitectures field of a layer
+
+        Parameters
+        ----------
+        lambda_layer: SamLayerVersion
+            The AWS Lambda layer version to validate
+
+        Raises
+        ------
+        InvalidResourceException
+            If any of the architectures is not valid
+        """
+        architectures = lambda_layer.CompatibleArchitectures or [X86_64]
+        # Intrinsics are not validated
+        if is_intrinsic(architectures):
+            return
+        for arq in architectures:
+            # We validate the values only if we they're not intrinsics
+            if not is_intrinsic(arq) and not arq in [ARM64, X86_64]:
+                raise InvalidResourceException(
+                    lambda_layer.logical_id,
+                    "CompatibleArchitectures needs to be a list of '{}' or '{}'".format(X86_64, ARM64),
+                )
 
 
 class SamStateMachine(SamResourceMacro):

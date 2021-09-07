@@ -38,7 +38,7 @@ Resources:
 
   LayerWithCondition:
     Type: 'AWS::Serverless::LayerVersion'
-    Condition: TestCondition    
+    Condition: TestCondition
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
 
@@ -53,3 +53,11 @@ Resources:
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       RetentionPolicy: !Ref DeletePolicy
+
+  LayerWithArchitectures:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      CompatibleArchitectures:
+        - x86_64
+        - arm64

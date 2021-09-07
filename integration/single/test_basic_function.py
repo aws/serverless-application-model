@@ -44,6 +44,28 @@ class TestBasicFunction(BaseTest):
 
         self.assertEqual(requests.get(endpoint).text, self.FUNCTION_OUTPUT)
 
+    @parameterized.expand(
+        [
+            ("single/basic_function", ["x86_64"]),
+            ("single/basic_function_no_envvar", ["x86_64"]),
+            ("single/basic_function_openapi", ["x86_64"]),
+            ("single/basic_function_with_arm_architecture", ["arm64"]),
+            ("single/basic_function_with_x86_architecture", ["x86_64"]),
+        ]
+    )
+    @skipIf(current_region_does_not_support(["ARM"]), "ARM is not supported in this testing region")
+    def test_basic_function_with_architecture(self, file_name, architecture):
+        """
+        Creates a basic lambda function
+        """
+        self.create_and_verify_stack(file_name)
+
+        lambda_client = self.client_provider.lambda_client
+        function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
+        function_architecture = lambda_client.get_function_configuration(FunctionName=function_name)["Architectures"]
+
+        self.assertEqual(function_architecture, architecture)
+
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
         self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")
 

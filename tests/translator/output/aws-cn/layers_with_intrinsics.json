@@ -1,5 +1,13 @@
 {
   "Parameters": {
+    "CompatibleArchitecturesList": {
+      "Type": "CommaDelimitedList",
+      "Default": "arm64,x86_64"
+    },
+    "CompatibleArchitecturesRef": {
+      "Type": "String",
+      "Default": "arm64"
+    },
     "LayerLicenseInfo": {
       "Default": "MIT-0 License",
       "Type": "String"
@@ -123,6 +131,36 @@
           "Fn::Sub": "layer-SomeLayerName"
         }
       }
+    },
+    "LayerWithArchitecturesIntrinsicb79067ee69": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithArchitecturesIntrinsic",
+        "CompatibleArchitectures": {
+          "Ref": "CompatibleArchitecturesList"
+        }
+      }
+    },
+    "LayerWithSingleListRefArchitecturesIntrinsicf8a2807636": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "CompatibleArchitectures": [
+          {
+            "Ref": "CompatibleArchitecturesRef"
+          }
+        ],
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithSingleListRefArchitecturesIntrinsic"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
     }
   }
 }
