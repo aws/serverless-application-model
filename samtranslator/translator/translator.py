@@ -1,8 +1,8 @@
 import copy
+from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
-    FeatureToggleLocalConfigProvider,
     FeatureToggleDefaultConfigProvider,
 )
 from samtranslator.model import ResourceTypeResolver, sam_resources
@@ -32,7 +32,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None):
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -44,8 +44,10 @@ class Translator:
         self.sam_parser = sam_parser
         self.feature_toggle = None
         self.boto_session = boto_session
+        self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
 
-        ArnGenerator.class_boto_session = self.boto_session
+        if self.boto_session:
+            ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
     def _get_function_names(self, resource_dict, intrinsics_resolver):
         """
@@ -230,7 +232,7 @@ class Translator:
         return functions + statemachines + apis + others
 
 
-def prepare_plugins(plugins, parameters={}):
+def prepare_plugins(plugins, parameters=None):
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
@@ -240,6 +242,8 @@ def prepare_plugins(plugins, parameters={}):
     :return samtranslator.plugins.SamPlugins: Instance of `SamPlugins`
     """
 
+    if parameters is None:
+        parameters = {}
     required_plugins = [
         DefaultDefinitionBodyPlugin(),
         make_implicit_rest_api_plugin(),

@@ -14,7 +14,7 @@ class TestBasicLayerVersion(BaseTest):
         """
         Creates a basic lambda layer version
         """
-        self.create_and_verify_stack("basic_layer")
+        self.create_and_verify_stack("single/basic_layer")
 
         layer_logical_id_1 = self.get_logical_id_by_type("AWS::Lambda::LayerVersion")
 
@@ -31,7 +31,7 @@ class TestBasicLayerVersion(BaseTest):
         """
         Creates a basic lambda layer version with parameters
         """
-        self.create_and_verify_stack("basic_layer_with_parameters")
+        self.create_and_verify_stack("single/basic_layer_with_parameters")
 
         outputs = self.get_stack_outputs()
         layer_arn = outputs["MyLayerArn"]

@@ -1,0 +1,46 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        CWEvent:
+          Type: CloudWatchEvent
+          Properties:
+            Pattern:
+              detail:
+                state:
+                - terminated
+            RetryPolicy:
+              MaximumRetryAttempts: 6
+              MaximumEventAgeInSeconds: 900
+            DeadLetterConfig:
+              Type: SQS
+              QueueLogicalId: MyDlq
+
+Outputs:
+  MyLambdaArn:
+    Description: "Arn of the Lambda target"
+    Value:
+      Fn::GetAtt:
+        - "MyLambdaFunction"
+        - "Arn"
+  MyEventName:
+    Description: "Name of the CWE rule created"
+    Value:
+      Ref: MyLambdaFunctionCWEvent
+  MyDLQArn:
+    Description: "Arn of the dead-letter queue provided for the CWE rule target"
+    Value:
+      Fn::GetAtt:
+        - "MyDlq"
+        - "Arn"
+  MyDLQUrl:
+    Description: "Url of the dead-letter queue provided for the CWE rule target"
+    Value:
+      Ref: MyDlq
+

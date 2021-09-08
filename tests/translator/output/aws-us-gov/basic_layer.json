@@ -6,7 +6,13 @@
         "beta"
       ]
     }
-  }, 
+  },
+  "Parameters": {
+    "DeletePolicy": {
+      "Default": "Retain",
+      "Type": "String"
+    }
+  },
   "Resources": {
     "LayerWithCondition7c655e10ea": {
       "DeletionPolicy": "Retain", 
@@ -47,7 +53,7 @@
           "python2.7"
         ]
       }
-    }, 
+    },
     "LayerWithContentUriObjectbdbf1b82ac": {
       "DeletionPolicy": "Delete", 
       "Type": "AWS::Lambda::LayerVersion", 
@@ -58,6 +64,28 @@
           "S3ObjectVersion": "v1"
         }, 
         "LayerName": "LayerWithContentUriObject"
+      }
+    },
+    "LayerWithCaseInsensitiveRetentionPolicyead52a491d": {
+      "DeletionPolicy": "Delete",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithCaseInsensitiveRetentionPolicy"
+      }
+    },
+    "LayerWithRetentionPolicyParamcc64815342": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Lambda::LayerVersion",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "LayerWithRetentionPolicyParam"
       }
     }
   }

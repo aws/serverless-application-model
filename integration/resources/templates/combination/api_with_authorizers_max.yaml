@@ -1,0 +1,196 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyCognitoAuthorizer
+        Authorizers:
+          MyCognitoAuthorizer:
+            UserPoolArn:
+              - Fn::GetAtt: MyCognitoUserPool.Arn
+              - Fn::GetAtt: MyCognitoUserPoolTwo.Arn
+            Identity:
+              Header: MyAuthorizationHeader
+              ValidationExpression: myauthvalidationexpression
+
+          MyLambdaTokenAuth:
+            FunctionPayloadType: TOKEN
+            FunctionArn:
+              Fn::GetAtt: MyLambdaAuthFunction.Arn
+            FunctionInvokeRole:
+              Fn::GetAtt: LambdaAuthInvokeRole.Arn
+            Identity:
+              Header: MyCustomAuthHeader
+              ValidationExpression: allow
+              ReauthorizeEvery: 20
+
+          MyLambdaRequestAuth:
+            FunctionPayloadType: REQUEST
+            FunctionArn:
+              Fn::GetAtt: MyLambdaAuthFunction.Arn
+            FunctionInvokeRole:
+              Fn::GetAtt: LambdaAuthInvokeRole.Arn
+            Identity:
+              Headers:
+                - authorizationHeader
+              QueryStrings:
+                - authorization
+                - authorizationQueryString1
+              ReauthorizeEvery: 0
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Events:
+        None:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /none
+            Auth:
+              Authorizer: NONE
+        Cognito:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /cognito
+        LambdaToken:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /lambda-token
+            Auth:
+              Authorizer: MyLambdaTokenAuth
+        LambdaRequest:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /lambda-request
+            Auth:
+              Authorizer: MyLambdaRequestAuth
+        Iam:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /iam
+            Auth:
+              Authorizer: AWS_IAM
+              InvokeRole: CALLER_CREDENTIALS
+  
+  MyLambdaAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          const token = event.type === 'TOKEN' ? event.authorizationToken : event.queryStringParameters.authorization
+          const policyDocument = {
+            Version: '2012-10-17',
+            Statement: [{
+              Action: 'execute-api:Invoke',
+              Effect: token && token.toLowerCase() === 'allow' ? 'Allow' : 'Deny',
+              Resource: event.methodArn
+            }]
+          }
+          
+          return {
+            principalId: 'user',
+            context: {},
+            policyDocument
+          }
+        }
+
+  LambdaAuthInvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - apigateway.amazonaws.com
+
+  MyLambdaAuthFunctionApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      FunctionName:
+        Fn::GetAtt: MyLambdaAuthFunction.Arn
+      SourceArn:
+        Fn::Sub:
+        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*
+        - __ApiId__:
+            Ref: MyApi
+
+
+  MyCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyCognitoUserPool
+
+  MyCognitoUserPoolTwo:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyCognitoUserPoolTwo
+  
+  MyCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId:
+        Ref: MyCognitoUserPool
+      ClientName: MyCognitoUserPoolClient
+      GenerateSecret: false
+
+Outputs:
+    ApiUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+
+    AuthorizerFunctionArn:
+      Description: "Authorizer Function Arn"
+      Value:
+        Fn::GetAtt: MyLambdaAuthFunction.Arn
+
+    CognitoUserPoolArn:
+      Description: "Cognito User Pool Arn"
+      Value:
+        Fn::GetAtt: MyCognitoUserPool.Arn
+
+    CognitoUserPoolTwoArn:
+      Description: "Cognito User Pool Arn"
+      Value:
+        Fn::GetAtt: MyCognitoUserPoolTwo.Arn
+
+    LambdaAuthInvokeRoleArn:
+      Description: "Authorizer Function Arn"
+      Value:
+        Fn::GetAtt: LambdaAuthInvokeRole.Arn

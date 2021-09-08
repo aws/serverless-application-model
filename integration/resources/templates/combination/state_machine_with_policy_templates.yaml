@@ -1,0 +1,36 @@
+Resources:
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        StartAt: MyTaskState
+        States:
+          MyTaskState:
+            Type: Task
+            Resource:
+              Fn::GetAtt: MyFunction.Arn
+            End: True
+      Policies:
+        - SQSPollerPolicy:
+            QueueName:
+              Fn::GetAtt: ["MyQueue", "QueueName"]
+        - LambdaInvokePolicy:
+            FunctionName:
+              Ref: MyFunction
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: hello.handler
+      Runtime: python2.7
+
+  MyQueue:
+    Type: AWS::SQS::Queue
+
+Outputs:
+  MyStateMachineRole:
+    Description: "ARN of the role created for the State Machine"
+    Value:
+      Ref: MyStateMachineRole

@@ -6,6 +6,9 @@ Parameters:
     Default:
       - Retain
     Type: List
+  DeletePolicyIf:
+    Default: False
+    Type: Boolean
 
 Resources:
   LayerWithRuntimesString:
@@ -44,3 +47,9 @@ Resources:
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       RetentionPolicy: !Ref DeleteList
+
+  LayerWithRetentionPolicyAsIntrinsic:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      RetentionPolicy: !If [DeletePolicyIf, Retain, Delete]

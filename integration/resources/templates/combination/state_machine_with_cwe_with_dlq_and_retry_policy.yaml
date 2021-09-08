@@ -1,0 +1,61 @@
+Resources:
+  MyDeadLetterQueue:
+    Type: AWS::SQS::Queue
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Definition:
+        Comment: A Hello World example of the Amazon States Language using Pass states
+        StartAt: Hello
+        States:
+          Hello:
+            Type: Pass
+            Result: Hello
+            Next: World
+          World:
+            Type: Pass
+            Result: World
+            End: true
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Deny
+              Action: "*"
+              Resource: "*"
+      Events:
+        CWEvent:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              detail:
+                state:
+                  - terminated
+            DeadLetterConfig:
+              Arn:
+                Fn::GetAtt:
+                  - "MyDeadLetterQueue"
+                  - "Arn"
+            RetryPolicy:
+              MaximumEventAgeInSeconds: 400
+              MaximumRetryAttempts: 5
+
+Outputs:
+  MyStateMachineArn:
+    Description: "ARN of the State Machine"
+    Value:
+      Ref: MyStateMachine
+  MyEventName:
+    Description: "Name of the CloudWatchEvent rule created"
+    Value:
+      Ref: MyStateMachineCWEvent
+  MyEventRole:
+    Description: "Name of the role created for the CWE rule"
+    Value:
+      Ref: MyStateMachineCWEventRole
+  MyDLQArn:
+    Description: "Arn of the dead-letter queue provided for the CWE rule target"
+    Value:
+      Fn::GetAtt:
+        - "MyDeadLetterQueue"
+        - "Arn"
