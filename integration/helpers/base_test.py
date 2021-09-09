@@ -2,9 +2,12 @@ import json
 import logging
 import os
 
+import botocore
 import requests
 
 from integration.helpers.client_provider import ClientProvider
+from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
+from integration.helpers.deployer.utils.retry import retry, retry_with_exponential_backoff_and_jitter
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
 from samtranslator.yaml_helper import yaml_parse
@@ -200,8 +203,9 @@ class BaseTest(TestCase):
     def generate_out_put_file_path(self, folder_name, file_name):
         # add a folder name before file name to avoid possible collisions between
         # files in the single and combination folder
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + folder_name + "_" + file_name + generate_suffix() + ".yaml"))
-
+        self.output_file_path = str(
+            Path(self.output_dir, "cfn_" + folder_name + "_" + file_name + generate_suffix() + ".yaml")
+        )
 
     def transform_template(self):
         transform_template(self.sub_input_file_path, self.output_file_path)
@@ -415,8 +419,17 @@ class BaseTest(TestCase):
             self.deployer.execute_changeset(result["Id"], self.stack_name)
             self.deployer.wait_for_execute(self.stack_name, changeset_type)
 
-        self.stack_description = self.client_provider.cfn_client.describe_stacks(StackName=self.stack_name)
+        self._get_stack_description()
         self.stack_resources = self.client_provider.cfn_client.list_stack_resources(StackName=self.stack_name)
+
+    @retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
+    def _get_stack_description(self):
+        try:
+            self.stack_description = self.client_provider.cfn_client.describe_stacks(StackName=self.stack_name)
+        except botocore.exceptions.ClientError as ex:
+            if ex.response["Error"]["Code"] == "ThrottlingException":
+                raise ThrottlingError(stack_name=self.stack_name, msg=str(ex))
+            raise
 
     def verify_stack(self, end_state="CREATE_COMPLETE"):
         """
