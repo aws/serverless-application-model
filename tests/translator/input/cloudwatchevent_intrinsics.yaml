@@ -1,0 +1,31 @@
+Parameters:
+  PathA:
+    Type: String
+    Default: "SomeInputPath"
+  PathB:
+    Type: String
+    Default: "AnotherInputPath"
+
+Conditions:
+  PathCondition:
+    Fn::Equals:
+      - true
+      - true
+
+Resources:
+  LambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        OnTerminate:
+          Type: CloudWatchEvent
+          Properties:
+            EventBusName: !Join [ "", [ "Event", "Bus", "Name" ] ]
+            Input: !Join [ ":", [ "{ Key", "Value }" ] ]
+            InputPath: !If [ PathCondition, !Ref PathA, !Ref PathB ]
+            Pattern:
+              detail:
+                state: !Split [ "," , "terminated,stopped" ]
