@@ -106,7 +106,7 @@ class IAMRolePolicies:
     def sns_publish_role_policy(cls, topic_arn, logical_id):
         document = {
             "PolicyName": logical_id + "SNSPolicy",
-            "PolicyDocument": {"Statement": [{"Action": "sns:publish", "Effect": "Allow", "Resource": topic_arn}]},
+            "PolicyDocument": {"Statement": [{"Action": "sns:Publish", "Effect": "Allow", "Resource": topic_arn}]},
         }
         return document
 
