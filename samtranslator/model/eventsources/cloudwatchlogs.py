@@ -4,6 +4,7 @@ from samtranslator.model.log import SubscriptionFilter
 from samtranslator.model.types import is_str
 from samtranslator.translator.arn_generator import ArnGenerator
 from .push import PushEventSource
+from ...metrics.method_decorator import cw_timer
 
 
 class CloudWatchLogs(PushEventSource):
@@ -13,6 +14,7 @@ class CloudWatchLogs(PushEventSource):
     principal = "logs.amazonaws.com"
     property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}
 
+    @cw_timer(prefix="PushEventSource")
     def to_cloudformation(self, **kwargs):
         """Returns the CloudWatch Logs Subscription Filter and Lambda Permission to which this CloudWatch Logs event source
         corresponds.
