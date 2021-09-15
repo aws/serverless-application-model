@@ -1,3 +1,6 @@
+"""
+Method decorator for execution latency collection
+"""
 import functools
 from datetime import datetime
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
