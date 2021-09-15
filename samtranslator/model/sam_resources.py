@@ -11,6 +11,7 @@ from .api.http_api_generator import HttpApiGenerator
 from .packagetype import ZIP, IMAGE
 from .s3_utils.uri_parser import construct_s3_location_object, construct_image_code_object
 from .tags.resource_tagging import get_tag_list
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, SamResourceMacro, ResourceTypeResolver
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
@@ -50,7 +51,6 @@ from samtranslator.model.sns import SNSTopic
 from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
-from ..metrics.method_decorator import cw_timer
 
 
 class SamFunction(SamResourceMacro):

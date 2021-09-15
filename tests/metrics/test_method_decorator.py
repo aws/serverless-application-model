@@ -1,19 +1,22 @@
 from unittest import TestCase
 from mock import Mock, patch, ANY
 
-from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton, _get_metric_name, _send_cw_metric, \
-    cw_timer
+from samtranslator.metrics.method_decorator import (
+    MetricsMethodWrapperSingleton,
+    _get_metric_name,
+    _send_cw_metric,
+    cw_timer,
+)
 from samtranslator.model import Resource
 
 
 class MyClass:
-
     @cw_timer
     def my_method(self):
         return True
 
-class TestMetricsMethodWrapperSingleton(TestCase):
 
+class TestMetricsMethodWrapperSingleton(TestCase):
     def test_default_instance(self):
         default_instance = MetricsMethodWrapperSingleton.get_instance()
         self.assertEqual(default_instance, MetricsMethodWrapperSingleton._DUMMY_INSTANCE)
@@ -25,7 +28,6 @@ class TestMetricsMethodWrapperSingleton(TestCase):
 
 
 class TestMetricsMethodDecoratorMetricName(TestCase):
-
     def test_get_metric_name_with_name(self):
         given_metric_name = "MetricName"
         metric_name = _get_metric_name(None, given_metric_name, None, [])

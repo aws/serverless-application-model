@@ -1,10 +1,10 @@
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType
 from samtranslator.model.intrinsics import fnSub
 from samtranslator.model.log import SubscriptionFilter
 from samtranslator.model.types import is_str
 from samtranslator.translator.arn_generator import ArnGenerator
 from .push import PushEventSource
-from ...metrics.method_decorator import cw_timer
 
 
 class CloudWatchLogs(PushEventSource):

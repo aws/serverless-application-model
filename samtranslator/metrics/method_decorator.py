@@ -54,7 +54,7 @@ def _get_metric_name(prefix, name, func, args):
     if name:
         metric_name = name
     else:
-        if args > 0 and isinstance(args[0], Resource):
+        if args and isinstance(args[0], Resource):
             metric_name = args[0].resource_type
         else:
             metric_name = func.__name__
@@ -92,7 +92,6 @@ def cw_timer(_func=None, name=None, prefix=None):
     """
 
     def cw_timer_decorator(func):
-
         @functools.wraps(func)
         def wrapper_cw_timer(*args, **kwargs):
             start_time = datetime.now()
