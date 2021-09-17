@@ -1,9 +1,10 @@
 from unittest.case import skipIf
 
+import pytest
 from parameterized import parameterized
 
 from integration.helpers.base_test import BaseTest
-from integration.helpers.resource import current_region_does_not_support
+from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
 
 @skipIf(
@@ -12,12 +13,17 @@ from integration.helpers.resource import current_region_does_not_support
 class TestFunctionWithMq(BaseTest):
     @parameterized.expand(
         [
-            "combination/function_with_mq",
-            "combination/function_with_mq_using_autogen_role",
+            ("combination/function_with_mq", "MQBrokerUserSecretName"),
+            ("combination/function_with_mq_using_autogen_role", "MQBrokerUserSecretName2")
         ]
     )
-    def test_function_with_mq(self, file_name):
-        self.create_and_verify_stack(file_name)
+    def test_function_with_mq(self, file_name, mq_secret):
+        companion_stack_outputs = self.companion_stack.get_stack_outputs()
+        parameters = self.get_parameters(companion_stack_outputs)
+        secret_name = mq_secret + "-" + generate_suffix()
+        parameters.append(self.generate_parameter(mq_secret, secret_name))
+
+        self.create_and_verify_stack(file_name, parameters)
 
         mq_client = self.client_provider.mq_client
         mq_broker_id = self.get_physical_id_by_type("AWS::AmazonMQ::Broker")
@@ -37,6 +43,22 @@ class TestFunctionWithMq(BaseTest):
 
         self.assertEqual(event_source_mapping_function_arn, lambda_function_arn)
         self.assertEqual(event_source_mapping_mq_broker_arn, mq_broker_arn)
+
+    @pytest.fixture(autouse=True)
+    def get_companion_stack(self, setup_companion_stack):
+        self.companion_stack = setup_companion_stack
+
+    def get_parameters(self, dictionary):
+        parameters = []
+        parameters.append(self.generate_parameter("PreCreatedVpc", dictionary["PreCreatedVpc"]))
+        parameters.append(self.generate_parameter("PreCreatedSubnetOne", dictionary["PreCreatedSubnetOne"]))
+        return parameters
+
+    @staticmethod
+    def generate_parameter(key, value, previous_value=False, resolved_value="string"):
+        parameter = {"ParameterKey": key, "ParameterValue": value, "UsePreviousValue": previous_value,
+                     "ResolvedValue": resolved_value}
+        return parameter
 
 
 def get_broker_summary(mq_broker_id, mq_client):
