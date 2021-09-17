@@ -1,2 +1,1 @@
-
 FUNCTION_EVETSOURCE_METRIC_PREFIX = "FunctionEventSource"

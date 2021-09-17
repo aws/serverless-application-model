@@ -19,6 +19,7 @@ LOG = logging.getLogger(__name__)
 
 PLUGIN_METRICS_PREFIX = "Plugin-ServerlessApp"
 
+
 class ServerlessAppPlugin(BasePlugin):
     """
     Resolves all of the ApplicationId and Semantic Version pairs

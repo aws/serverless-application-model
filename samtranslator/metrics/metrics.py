@@ -105,7 +105,7 @@ class MetricDatum:
             "Value": self.value,
             "Unit": self.unit,
             "Dimensions": self.dimensions,
-            "Timestamp": self.timestamp
+            "Timestamp": self.timestamp,
         }
 
 
