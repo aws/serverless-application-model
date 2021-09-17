@@ -498,7 +498,7 @@ class Deployer:
                 return None
 
         except botocore.exceptions.ClientError as ex:
-            if ex.response["Error"]["Code"] == "ThrottlingException":
+            if "Throttling" in str(ex):
                 raise deploy_exceptions.ThrottlingError(stack_name=stack_name, msg=str(ex))
             else:
                 raise deploy_exceptions.DeployStackOutPutFailedError(stack_name=stack_name, msg=str(ex))

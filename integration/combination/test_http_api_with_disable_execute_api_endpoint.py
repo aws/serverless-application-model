@@ -6,9 +6,7 @@ from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
 
 
-@skipIf(
-    current_region_does_not_support(["CustomDomain"]), "CustomDomain is not supported in this testing region"
-)
+@skipIf(current_region_does_not_support(["CustomDomain"]), "CustomDomain is not supported in this testing region")
 class TestHttpApiWithDisableExecuteApiEndpoint(BaseTest):
     @parameterized.expand(
         [

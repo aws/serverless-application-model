@@ -7,9 +7,8 @@ CODEDEPLOY_APPLICATION_LOGICAL_ID = "ServerlessDeploymentApplication"
 LAMBDA_FUNCTION_NAME = "MyLambdaFunction"
 LAMBDA_ALIAS = "Live"
 
-@skipIf(
-    current_region_does_not_support(["CodeDeploy"]), "CodeDeploy is not supported in this testing region"
-)
+
+@skipIf(current_region_does_not_support(["CodeDeploy"]), "CodeDeploy is not supported in this testing region")
 class TestFunctionWithDeploymentPreference(BaseTest):
     def test_lambda_function_with_deployment_preference_uses_code_deploy(self):
         self.create_and_verify_stack("combination/function_with_deployment_basic")

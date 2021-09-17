@@ -71,7 +71,7 @@ class TestFunctionWithAlias(BaseTest):
         # Let's change Key by updating the template parameter, but keep template same
         # This should create a new version and leave existing version intact
         parameters[1]["ParameterValue"] = "code2.zip"
-        #self.deploy_stack(parameters)
+        # self.deploy_stack(parameters)
         self.update_stack("combination/function_with_alias_intrinsics", parameters)
         version_ids = get_function_versions(function_name, self.client_provider.lambda_client)
         # only show 1 version, need to investigate why

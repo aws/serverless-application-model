@@ -4,9 +4,7 @@ from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
 
 
-@skipIf(
-    current_region_does_not_support(["CweCwsDlq"]), "CweCwsDlq is not supported in this testing region"
-)
+@skipIf(current_region_does_not_support(["CweCwsDlq"]), "CweCwsDlq is not supported in this testing region")
 class TestStateMachineWithCweDlqAndRetryPolicy(BaseTest):
     def test_state_machine_with_api(self):
         self.create_and_verify_stack("combination/state_machine_with_cwe_with_dlq_and_retry_policy")

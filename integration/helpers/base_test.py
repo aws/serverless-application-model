@@ -7,7 +7,7 @@ import requests
 
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
-from integration.helpers.deployer.utils.retry import retry, retry_with_exponential_backoff_and_jitter
+from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
 from samtranslator.yaml_helper import yaml_parse
@@ -19,10 +19,7 @@ except ImportError:
 from unittest.case import TestCase
 
 import boto3
-import pytest
-import yaml
 from botocore.exceptions import ClientError
-from botocore.config import Config
 from integration.helpers.deployer.deployer import Deployer
 from integration.helpers.template import transform_template
 
@@ -131,7 +128,7 @@ class BaseTest(TestCase):
         if os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-    def create_and_verify_stack(self, file_path, parameters=None):
+    def create_stack(self, file_path, parameters=None):
         """
         Creates the Cloud Formation stack and verifies it against the expected
         result
@@ -145,12 +142,27 @@ class BaseTest(TestCase):
         """
         folder, file_name = file_path.split("/")
         self.generate_out_put_file_path(folder, file_name)
-        self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
         self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
 
         self._fill_template(folder, file_name)
         self.transform_template()
         self.deploy_stack(parameters)
+
+    def create_and_verify_stack(self, file_path, parameters=None):
+        """
+        Creates the Cloud Formation stack and verifies it against the expected
+        result
+
+        Parameters
+        ----------
+        file_path : string
+            Template file name, format "folder_name/file_name"
+        parameters : list
+            List of parameters
+        """
+        folder, file_name = file_path.split("/")
+        self.create_stack(file_path, parameters)
+        self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
         self.verify_stack()
 
     def update_stack(self, file_path, parameters=None):
@@ -427,7 +439,7 @@ class BaseTest(TestCase):
         try:
             self.stack_description = self.client_provider.cfn_client.describe_stacks(StackName=self.stack_name)
         except botocore.exceptions.ClientError as ex:
-            if ex.response["Error"]["Code"] == "ThrottlingException":
+            if "Throttling" in str(ex):
                 raise ThrottlingError(stack_name=self.stack_name, msg=str(ex))
             raise
 
@@ -437,6 +449,7 @@ class BaseTest(TestCase):
         """
         # verify if the stack was successfully created
         self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], end_state)
+        assert self.stack_description["Stacks"][0]["StackStatus"] == end_state
         # verify if the stack contains the expected resources
         error = verify_stack_resources(self.expected_resource_path, self.stack_resources)
         if error:

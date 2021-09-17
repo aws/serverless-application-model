@@ -1,3 +1,4 @@
+import time
 from unittest.case import skipIf
 
 from integration.helpers.base_test import BaseTest
@@ -29,9 +30,7 @@ class TestBasicApi(BaseTest):
 
         self.assertEqual(len(set(first_dep_ids).intersection(second_dep_ids)), 0)
 
-    @skipIf(
-        current_region_does_not_support(["Mode"]), "Mode is not supported in this testing region"
-    )
+    @skipIf(current_region_does_not_support(["Mode"]), "Mode is not supported in this testing region")
     def test_basic_api_with_mode(self):
         """
         Creates an API and updates its DefinitionUri
@@ -48,6 +47,14 @@ class TestBasicApi(BaseTest):
         self.update_and_verify_stack("single/basic_api_with_mode_update")
         response = requests.get(f"{api_endpoint}/get")
         # API Gateway by default returns 403 if a path do not exist
+        retries = 20
+        while retries > 0:
+            retries -= 1
+            response = requests.get(f"{api_endpoint}/get")
+            if response.status_code != 500:
+                break
+            time.sleep(5)
+
         self.assertEqual(response.status_code, 403)
 
     def test_basic_api_inline_openapi(self):

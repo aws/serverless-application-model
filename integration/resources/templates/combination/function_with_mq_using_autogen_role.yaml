@@ -12,54 +12,40 @@ Parameters:
     MinLength: 12
     ConstraintDescription: The Amazon MQ broker password is required !
     NoEcho: true
+  PreCreatedVpc:
+    Type: String
+  PreCreatedSubnetTwo:
+    Type: String
+  MQBrokerUserSecretName2:
+    Type: String
+  PreCreatedInternetGateway:
+    Type: String
+  MQBrokerName2:
+    Description: The name of MQ Broker
+    Type: String
+    Default: TestMQBroker2
 
 Resources:
-  MyVpc:
-    Type: AWS::EC2::VPC
-    Properties:
-      CidrBlock: "10.42.0.0/16"
-
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-
-  AttachGateway:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId:
-        Ref: MyVpc
-      InternetGatewayId:
-        Ref: InternetGateway
   RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId:
-        Ref: MyVpc
+        Ref: PreCreatedVpc
 
   Route:
     Type: AWS::EC2::Route
-    DependsOn: AttachGateway
     Properties:
       RouteTableId:
         Ref: RouteTable
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId:
-        Ref: InternetGateway
-  PublicSubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Ref: MyVpc
-      CidrBlock: "10.42.0.0/24"
-      AvailabilityZone:
-        Fn::Select:
-          - 0
-          - Fn::GetAZs: ""
+        Ref: PreCreatedInternetGateway
 
   PublicSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId:
-        Ref: PublicSubnet
+        Ref: PreCreatedSubnetTwo
       RouteTableId:
         Ref: RouteTable
 
@@ -69,7 +55,7 @@ Resources:
       GroupDescription: Limits security group ingress and egress traffic for the Amazon
         MQ instance
       VpcId:
-        Ref: MyVpc
+        Ref: PreCreatedVpc
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 8162
@@ -94,7 +80,8 @@ Resources:
 
   MyMqBroker:
     Properties:
-      BrokerName: TestMQBroker2
+      BrokerName:
+        Ref: MQBrokerName2
       DeploymentMode: SINGLE_INSTANCE
       EngineType: ACTIVEMQ
       EngineVersion: 5.15.12
@@ -107,7 +94,7 @@ Resources:
       SecurityGroups:
         - Ref: MQSecurityGroup
       SubnetIds:
-        - Ref: PublicSubnet
+        - Ref: PreCreatedSubnetTwo
       Users:
         - ConsoleAccess: true
           Groups:
@@ -140,7 +127,8 @@ Resources:
   MQBrokerUserSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: MQBrokerUserPassword2
+      Name:
+        Ref: MQBrokerUserSecretName2
       SecretString:
         Fn::Sub: '{"username":"${MQBrokerUser}","password":"${MQBrokerPassword}"}'
       Description: SecretsManager Secret for broker user and password

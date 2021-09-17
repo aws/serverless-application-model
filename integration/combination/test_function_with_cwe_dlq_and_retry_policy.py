@@ -4,9 +4,7 @@ from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
 
 
-@skipIf(
-    current_region_does_not_support(["CweCwsDlq"]), "CweCwsDlq is not supported in this testing region"
-)
+@skipIf(current_region_does_not_support(["CweCwsDlq"]), "CweCwsDlq is not supported in this testing region")
 class TestFunctionWithCweDlqAndRetryPolicy(BaseTest):
     def test_function_with_cwe(self):
         # Verifying that following resources were created is correct

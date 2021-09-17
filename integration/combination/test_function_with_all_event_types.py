@@ -5,7 +5,8 @@ from integration.helpers.resource import current_region_does_not_support
 
 
 @skipIf(
-    current_region_does_not_support(["IoT", "ScheduleEvent"]), "IoT, ScheduleEvent is not supported in this testing region"
+    current_region_does_not_support(["IoT", "ScheduleEvent"]),
+    "IoT, ScheduleEvent is not supported in this testing region",
 )
 class TestFunctionWithAllEventTypes(BaseTest):
     def test_function_with_all_event_types(self):

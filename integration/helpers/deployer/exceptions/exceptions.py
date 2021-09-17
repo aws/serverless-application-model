@@ -66,9 +66,10 @@ class DeployBucketInDifferentRegionError(UserException):
 
 
 class ThrottlingError(UserException):
-    def __init__(self, msg):
+    def __init__(self, stack_name, msg):
+        self.stack_name = stack_name
         self.msg = msg
 
         message_fmt = "Throttling Issue occurred: {stack_name}, {msg}"
 
-        super(ThrottlingError, self).__init__(message=message_fmt.format(msg=self.msg))
+        super(ThrottlingError, self).__init__(message=message_fmt.format(stack_name=self.stack_name, msg=msg))

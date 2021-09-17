@@ -7,21 +7,30 @@ from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
 
 
-@skipIf(
-    current_region_does_not_support(["MQ"]), "MQ is not supported in this testing region"
-)
+@skipIf(current_region_does_not_support(["MQ"]), "MQ is not supported in this testing region")
 class TestFunctionWithMq(BaseTest):
+    @pytest.fixture(autouse=True)
+    def companion_stack_outputs(self, get_companion_stack_outputs):
+        self.companion_stack_outputs = get_companion_stack_outputs
+
     @parameterized.expand(
         [
-            ("combination/function_with_mq", "MQBrokerUserSecretName"),
-            ("combination/function_with_mq_using_autogen_role", "MQBrokerUserSecretName2")
+            ("combination/function_with_mq", "MQBrokerName", "MQBrokerUserSecretName", "PreCreatedSubnetOne"),
+            (
+                "combination/function_with_mq_using_autogen_role",
+                "MQBrokerName2",
+                "MQBrokerUserSecretName2",
+                "PreCreatedSubnetTwo",
+            ),
         ]
     )
-    def test_function_with_mq(self, file_name, mq_secret):
-        companion_stack_outputs = self.companion_stack.get_stack_outputs()
-        parameters = self.get_parameters(companion_stack_outputs)
+    def test_function_with_mq(self, file_name, mq_broker, mq_secret, subnet_key):
+        companion_stack_outputs = self.companion_stack_outputs
+        parameters = self.get_parameters(companion_stack_outputs, subnet_key)
         secret_name = mq_secret + "-" + generate_suffix()
         parameters.append(self.generate_parameter(mq_secret, secret_name))
+        secret_name = mq_broker + "-" + generate_suffix()
+        parameters.append(self.generate_parameter(mq_broker, secret_name))
 
         self.create_and_verify_stack(file_name, parameters)
 
@@ -44,20 +53,21 @@ class TestFunctionWithMq(BaseTest):
         self.assertEqual(event_source_mapping_function_arn, lambda_function_arn)
         self.assertEqual(event_source_mapping_mq_broker_arn, mq_broker_arn)
 
-    @pytest.fixture(autouse=True)
-    def get_companion_stack(self, setup_companion_stack):
-        self.companion_stack = setup_companion_stack
-
-    def get_parameters(self, dictionary):
+    def get_parameters(self, dictionary, subnet_key):
         parameters = []
         parameters.append(self.generate_parameter("PreCreatedVpc", dictionary["PreCreatedVpc"]))
-        parameters.append(self.generate_parameter("PreCreatedSubnetOne", dictionary["PreCreatedSubnetOne"]))
+        parameters.append(self.generate_parameter(subnet_key, dictionary[subnet_key]))
+        parameters.append(self.generate_parameter("PreCreatedInternetGateway", dictionary["PreCreatedInternetGateway"]))
         return parameters
 
     @staticmethod
     def generate_parameter(key, value, previous_value=False, resolved_value="string"):
-        parameter = {"ParameterKey": key, "ParameterValue": value, "UsePreviousValue": previous_value,
-                     "ResolvedValue": resolved_value}
+        parameter = {
+            "ParameterKey": key,
+            "ParameterValue": value,
+            "UsePreviousValue": previous_value,
+            "ResolvedValue": resolved_value,
+        }
         return parameter
 
 

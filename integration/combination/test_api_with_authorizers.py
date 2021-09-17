@@ -8,9 +8,7 @@ from integration.helpers.exception import StatusCodeError
 from integration.helpers.resource import current_region_does_not_support
 
 
-@skipIf(
-    current_region_does_not_support(["Cognito"]), "Cognito is not supported in this testing region"
-)
+@skipIf(current_region_does_not_support(["Cognito"]), "Cognito is not supported in this testing region")
 class TestApiWithAuthorizers(BaseTest):
     def test_authorizers_min(self):
         self.create_and_verify_stack("combination/api_with_authorizers_min")

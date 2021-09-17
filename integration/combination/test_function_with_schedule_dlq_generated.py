@@ -5,9 +5,7 @@ from integration.helpers.common_api import get_queue_policy
 from integration.helpers.resource import current_region_does_not_support
 
 
-@skipIf(
-    current_region_does_not_support(["CweCwsDlq"]), "CweCwsDlq is not supported in this testing region"
-)
+@skipIf(current_region_does_not_support(["CweCwsDlq"]), "CweCwsDlq is not supported in this testing region")
 class TestFunctionWithScheduleDlqGenerated(BaseTest):
     def test_function_with_schedule(self):
         self.create_and_verify_stack("combination/function_with_schedule_dlq_generated")
