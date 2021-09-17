@@ -1,5 +1,6 @@
 import copy
 
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import make_combined_condition
 from samtranslator.model.eventsources.push import Api
 from samtranslator.public.plugins import BasePlugin
@@ -49,6 +50,7 @@ class ImplicitApiPlugin(BasePlugin):
             "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
         )
 
+    @cw_timer(prefix="Plugin-ImplicitApi")
     def on_before_transform_template(self, template_dict):
         """
         Hook method that gets called before the SAM template is processed.

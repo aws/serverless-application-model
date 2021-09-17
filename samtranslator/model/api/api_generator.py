@@ -534,7 +534,7 @@ class ApiGenerator(object):
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
 
-    @cw_timer(name="ApiGenerator")
+    @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(self, redeploy_restapi_parameters):
         """Generates CloudFormation resources from a SAM API resource
 

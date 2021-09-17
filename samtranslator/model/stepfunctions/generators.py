@@ -100,7 +100,7 @@ class StateMachineGenerator(object):
         )
         self.substitution_counter = 1
 
-    @cw_timer(name="StateMachineGenerator")
+    @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):
         """
         Constructs and returns the State Machine resource and any additional resources associated with it.

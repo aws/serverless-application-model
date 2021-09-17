@@ -1,3 +1,4 @@
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.exceptions import InvalidDocumentException
@@ -18,6 +19,7 @@ class GlobalsPlugin(BasePlugin):
         """
         super(GlobalsPlugin, self).__init__(GlobalsPlugin.__name__)
 
+    @cw_timer(prefix="Plugin-Globals")
     def on_before_transform_template(self, template_dict):
         """
         Hook method that runs before a template gets transformed. In this method, we parse and process Globals section

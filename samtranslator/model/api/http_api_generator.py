@@ -617,7 +617,7 @@ class HttpApiGenerator(object):
         open_api_editor.add_description(self.description)
         self.definition_body = open_api_editor.openapi
 
-    @cw_timer(name="HttpApiGenerator")
+    @cw_timer(prefix="Generator", name="HttpApi")
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM HTTP API resource
 
