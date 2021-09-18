@@ -1,6 +1,5 @@
 import copy
 from six import string_types
-
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 
 from samtranslator.feature_toggle.feature_toggle import (
