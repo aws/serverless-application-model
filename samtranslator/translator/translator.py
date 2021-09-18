@@ -49,7 +49,7 @@ class Translator:
         self.feature_toggle = None
         self.boto_session = boto_session
         self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
-        MetricsMethodWrapperSingleton.set_instance(metrics)
+        MetricsMethodWrapperSingleton.set_instance(self.metrics)
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
