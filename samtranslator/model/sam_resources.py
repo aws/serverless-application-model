@@ -11,6 +11,7 @@ from .api.http_api_generator import HttpApiGenerator
 from .packagetype import ZIP, IMAGE
 from .s3_utils.uri_parser import construct_s3_location_object, construct_image_code_object
 from .tags.resource_tagging import get_tag_list
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, SamResourceMacro, ResourceTypeResolver
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
@@ -120,6 +121,7 @@ class SamFunction(SamResourceMacro):
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
@@ -848,6 +850,7 @@ class SamApi(SamResourceMacro):
         "ApiKey": ApiGatewayApiKey.resource_type,
     }
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the API Gateway RestApi, Deployment, and Stage to which this SAM Api corresponds.
 
@@ -955,6 +958,7 @@ class SamHttpApi(SamResourceMacro):
         "DomainName": ApiGatewayV2DomainName.resource_type,
     }
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the API GatewayV2 Api, Deployment, and Stage to which this SAM Api corresponds.
 
@@ -1027,6 +1031,7 @@ class SamSimpleTable(SamResourceMacro):
     }
     attribute_type_conversions = {"String": "S", "Number": "N", "Binary": "B"}
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         dynamodb_resources = self._construct_dynamodb_table()
 
@@ -1091,6 +1096,7 @@ class SamApplication(SamResourceMacro):
         "TimeoutInMinutes": PropertyType(False, is_type(int)),
     }
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the stack with the proper parameters for this application"""
         nested_stack = self._construct_nested_stack()
@@ -1141,6 +1147,7 @@ class SamLayerVersion(SamResourceMacro):
     DELETE = "Delete"
     retention_policy_options = [RETAIN.lower(), DELETE.lower()]
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda layer to which this SAM Layer corresponds.
 
@@ -1269,6 +1276,7 @@ class SamStateMachine(SamResourceMacro):
         samtranslator.model.stepfunctions.events,
     )
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         managed_policy_map = kwargs.get("managed_policy_map", {})
         intrinsics_resolver = kwargs["intrinsics_resolver"]

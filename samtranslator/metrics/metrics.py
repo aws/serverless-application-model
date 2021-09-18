@@ -2,6 +2,7 @@
 Helper classes to publish metrics
 """
 import logging
+from datetime import datetime
 
 LOG = logging.getLogger(__name__)
 
@@ -83,7 +84,7 @@ class MetricDatum:
     Class to hold Metric data.
     """
 
-    def __init__(self, name, value, unit, dimensions=None):
+    def __init__(self, name, value, unit, dimensions=None, timestamp=None):
         """
         Constructor
 
@@ -96,9 +97,16 @@ class MetricDatum:
         self.value = value
         self.unit = unit
         self.dimensions = dimensions if dimensions else []
+        self.timestamp = timestamp if timestamp else datetime.utcnow()
 
     def get_metric_data(self):
-        return {"MetricName": self.name, "Value": self.value, "Unit": self.unit, "Dimensions": self.dimensions}
+        return {
+            "MetricName": self.name,
+            "Value": self.value,
+            "Unit": self.unit,
+            "Dimensions": self.dimensions,
+            "Timestamp": self.timestamp,
+        }
 
 
 class Metrics:
@@ -119,7 +127,7 @@ class Metrics:
             LOG.warn("There are unpublished metrics. Please make sure you call publish after you record all metrics.")
             self.publish()
 
-    def _record_metric(self, name, value, unit, dimensions=[]):
+    def _record_metric(self, name, value, unit, dimensions=None):
         """
         Create and save metric objects to an array.
 
@@ -130,7 +138,7 @@ class Metrics:
         """
         self.metrics_cache.append(MetricDatum(name, value, unit, dimensions))
 
-    def record_count(self, name, value, dimensions=[]):
+    def record_count(self, name, value, dimensions=None):
         """
         Create metric with unit Count.
 
@@ -141,7 +149,7 @@ class Metrics:
         """
         self._record_metric(name, value, Unit.Count, dimensions)
 
-    def record_latency(self, name, value, dimensions=[]):
+    def record_latency(self, name, value, dimensions=None):
         """
         Create metric with unit Milliseconds.
 

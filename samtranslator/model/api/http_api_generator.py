@@ -1,6 +1,8 @@
 import re
 from collections import namedtuple
 from six import string_types
+
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt
 from samtranslator.model.apigatewayv2 import (
     ApiGatewayV2HttpApi,
@@ -609,6 +611,7 @@ class HttpApiGenerator(object):
         open_api_editor.add_description(self.description)
         self.definition_body = open_api_editor.openapi
 
+    @cw_timer(prefix="Generator", name="HttpApi")
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM HTTP API resource
 

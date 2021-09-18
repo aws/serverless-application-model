@@ -1,4 +1,6 @@
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.types import is_type, is_str
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
@@ -45,6 +47,7 @@ class PullEventSource(ResourceMacro):
     def get_policy_statements(self):
         raise NotImplementedError("Subclass must implement this method")
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda EventSourceMapping to which this pull event corresponds. Adds the appropriate managed
         policy to the function's execution role, if such a role is provided.

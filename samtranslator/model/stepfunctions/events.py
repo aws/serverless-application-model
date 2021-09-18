@@ -1,6 +1,7 @@
 from six import string_types
 import json
 
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, ResourceMacro
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
@@ -15,6 +16,7 @@ from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
 
 CONDITION = "Condition"
+SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
 
 
 class EventSource(ResourceMacro):
@@ -87,6 +89,7 @@ class Schedule(EventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
         """Returns the EventBridge Rule and IAM Role to which this Schedule event source corresponds.
 
@@ -160,6 +163,7 @@ class CloudWatchEvent(EventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
         """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
@@ -283,6 +287,7 @@ class Api(EventSource):
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
         """If the Api event source has a RestApi property, then simply return the IAM role resource
         allowing API Gateway to start the state machine execution. If no RestApi is provided, then
