@@ -16,8 +16,8 @@ class MetricsMethodWrapperSingleton:
     This singleton will be alive until lambda receives shutdown event
     """
 
-    _METRICS_INSTANCE = None
     _DUMMY_INSTANCE = Metrics("ServerlessTransform", DummyMetricsPublisher())
+    _METRICS_INSTANCE = _DUMMY_INSTANCE
 
     @staticmethod
     def set_instance(metrics):
@@ -28,10 +28,7 @@ class MetricsMethodWrapperSingleton:
         """
         Return the instance, if nothing is set return a dummy one
         """
-        if MetricsMethodWrapperSingleton._METRICS_INSTANCE:
-            return MetricsMethodWrapperSingleton._METRICS_INSTANCE
-
-        return MetricsMethodWrapperSingleton._DUMMY_INSTANCE
+        return MetricsMethodWrapperSingleton._METRICS_INSTANCE
 
 
 def _get_metric_name(prefix, name, func, args):
