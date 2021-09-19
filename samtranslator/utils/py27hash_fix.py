@@ -8,7 +8,6 @@ import sys
 import logging
 
 from samtranslator.third_party.py27hash.hash import Hash
-from six import string_types
 
 
 LOG = logging.getLogger(__name__)
@@ -46,3 +45,404 @@ class Py27UniStr(unicode_string_type):
 
     def split(self, sep=None, maxsplit=-1):
         return [Py27UniStr(s) for s in super(Py27UniStr, self).split(sep, maxsplit)]
+
+
+class Py27Keys(object):
+    """
+    A class for tracking keys based on based on Python 2.7 order.
+    Based on https://github.com/python/cpython/blob/v2.7.18/Objects/dictobject.c.
+
+    The order of keys in Python 2.7 is path dependent -- the order of inserts and deletes matters
+    in determining the iteration order.
+    """
+    DUMMY = ["dummy"] # marker for deleted keys
+
+    def __init__(self):
+        super(Py27Keys, self).__init__()
+        self.debug = False
+        self.keyorder = dict()
+        self.size = 0 # current size of the keys, equivalent to ma_used in dictobject.c
+        self.fill = 0 # increment count when a key is added, equivalent to ma_fill in dictobject.c
+        self.mask = MINSIZE - 1 # Python2 default dict size
+
+    def _get_key_idx(self, k):
+        """Gets insert location for k"""
+        freeslot = None
+        # C API uses unsigned values
+        h = ctypes.c_size_t(Hash.hash(k)).value
+        i = h & self.mask
+
+        if i not in self.keyorder or self.keyorder[i] == k: 
+            # empty slot or keys match
+            return i
+
+        if i in self.keyorder and self.keyorder[i] is self.DUMMY:
+            # dummy slot
+            freeslot = i
+
+        walker = i
+        perturb = h
+        while i in self.keyorder and self.keyorder[i] != k:
+            walker = (walker << 2) + walker + perturb + 1
+            i = walker & self.mask
+
+            if i not in self.keyorder:
+                return i if freeslot is None else freeslot
+            if self.keyorder[i] == k:
+                return i
+            if freeslot is None and self.keyorder[i] is self.DUMMY:
+                freeslot = i
+            perturb >>= PERTURB_SHIFT
+        return i
+
+    def _resize(self, request):
+        """
+        Resizes allocated size based
+        """
+        newsize = MINSIZE
+        while newsize <= request:
+            newsize <<= 1
+
+        self.mask = newsize - 1
+
+        # Reset key list to simulate the dict resize and copy operation
+        oldkeyorder = copy.copy(self.keyorder)
+        self.keyorder = dict()
+        self.fill = self.size = 0
+        # reinsert all the keys using original order
+        for idx in sorted(oldkeyorder.keys()):
+            if oldkeyorder[idx] is not self.DUMMY:
+                self.add(oldkeyorder[idx])
+
+    def remove(self, key):
+        """Removes key"""
+        i = self._get_key_idx(key)
+        if i in self.keyorder:
+            if self.keyorder[i] is not self.DUMMY:
+                self.keyorder[i] = self.DUMMY
+                self.size -= 1
+
+    def add(self, key):
+        """Adds key"""
+        start_size = self.size
+        i = self._get_key_idx(key)
+        if i not in self.keyorder:
+            # We are not replacing an existing key or a DUMMY key, increment fill
+            self.size += 1
+            self.fill += 1
+            self.keyorder[i] = key
+        else:
+            if self.keyorder[i] is self.DUMMY:
+                self.size += 1
+            if self.keyorder[i] != key:
+                self.keyorder[i] = key
+
+        # Resize if 2/3 capacity
+        if self.size > start_size and self.fill * 3 >= ((self.mask + 1) * 2):
+            # Python2 dict increases size by a factor of 4 for small dict, and 2 for large dict
+            self._resize(self.size * (2 if self.size > 50000 else 4))
+
+    def keys(self):
+        """Return keys in Python2 order"""
+        return [self.keyorder[key] for key in sorted(self.keyorder.keys()) if self.keyorder[key] is not self.DUMMY]
+
+    def __setstate__(self, state):
+        """
+        Overrides default pickling object to force re-adding all keys and match Python 2.7 deserialization logic.
+
+        :param state: input state
+        """
+        self.__dict__ = state
+        keys = self.keys()
+
+        # Clear keys and re-add to match deserialization logic
+        self.__init__()
+
+        for k in keys:
+            if k == self.DUMMY:
+                continue
+            self.add(k)
+
+    def __iter__(self):
+        """
+        Default iterator
+        """
+        return iter(self.keys())
+
+    def __eq__(self, other):
+        if isinstance(other, Py27Keys):
+            return self.keys() == other.keys()
+        if isinstance(other, list):
+            return self.keys() == other
+        return False
+
+    def __len__(self):
+        return len(self.keys())
+
+    def merge(self, other):
+        """
+        Merge keys from an exisitng iterable into this key list.
+        Equivalent to PyDict_Merge
+
+        :param other: iterable
+        """
+        if len(other) == 0 or self is other:
+            # nothing to do
+            return 
+
+        # PyDict_Merge initial merge size is double the size of current + incoming dict
+        if ((self.fill + len(other)) * 3) >= ((self.mask + 1) * 2):
+            self._resize((self.size + len(other)) * 2)
+
+        # Copy actual keys
+        for k in other:
+            self.add(k)
+
+    def copy(self):
+        """
+        Makes a copy of self
+        """
+        # Copy creates a new object and merges keys in
+        new = Py27Keys()
+        new.merge(self.keys())
+        return new
+
+    def pop(self):
+        """
+        Pops the top element from the sorted keys if it exists. Returns None otherwise.
+        """
+        if self.keyorder:
+            value = self.keys()[0]
+            self.remove(value)
+            return value
+        return None
+
+
+class Py27Dict(dict):
+    """
+    Compatibility class to support Python2.7 style iteration in Python3.x
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        Overrides dict logic to always call set item. This allows Python2.7 style iteration
+        """
+        super(Py27Dict, self).__init__()
+
+        # Initialize iteration key list
+        self.keylist = Py27Keys()
+
+        # Initialize base arguments
+        self.update(*args, **kwargs)
+
+    def __reduce__(self):
+        """
+        Method necessary to fully pickle Python 3 subclassed dict objects with attribute fields.
+        """
+        # pylint: disable = W0235
+        return super(Py27Dict, self).__reduce__()
+
+    def __setitem__(self, key, value):
+        """
+        Override of __setitem__ to track keys and simulate Python2.7 dict
+
+        Parameters
+        ----------
+        key: hashable
+        value: Any
+        """
+        super(Py27Dict, self).__setitem__(key, value)
+        self.keylist.add(key)
+
+    def __delitem__(self, key):
+        """
+        Override of __delitem__ to track kyes and simulate Python2.7 dict.
+        
+        Parameters
+        ----------
+        key: hashable
+        """
+        super(Py27Dict, self).__delitem__(key)
+        self.keylist.remove(key)
+
+    def update(self, *args, **kwargs):
+        """
+        Overrides dict logic to always call set item. This allows Python2.7 style iteration.
+        
+        Parameters
+        ----------
+        args: args
+        kwargs: keyword args
+        """
+        for arg in args:
+            # Cast to dict if applicable. Otherwise, assume it's an iterable of (key, value) pairs
+            if isinstance(arg, dict):
+                # Merge incoming keys into keylist
+                self.keylist.merge(arg.keys())
+                arg = arg.items()
+            
+            for k, v in arg:
+                self[k] = v
+
+        for k, v in dict(**kwargs).items():
+            self[k] = v
+
+    def clear(self):
+        """
+        Clears the dict along with its backing Python2.7 keylist.
+        """
+        super(Py27Dict, self).clear()
+        self.keylist = Py27Keys()
+
+    def copy(self):
+        """
+        Copies the dict along with its backing Python2.7 keylist.
+        
+        Returns
+        -------
+        Py27Dict
+            copy of self
+        """
+        new = Py27Dict()
+
+        # First copy the keylist to the new object
+        new.keylist = self.keylist.copy()
+
+        # Copy keys into backing dict
+        for k, v in self.items():
+            new[k] = v
+
+        return new
+
+    def pop(self, key, default=None):
+        """
+        Pops the value at key from the dict if it exists, return default otherwise
+        
+        Parameters
+        ----------
+        key: hashable
+            key to remove
+        default: Any
+            value to return if key is not found
+        
+        Returns
+        -------
+        Any
+            value of key if found or default    
+        """
+        value = super(Py27Dict, self).pop(key, default)
+        self.keylist.remove(key)
+        return value
+
+    def popitem(self):
+        """
+        Pops an element from the dict and returns the item.
+        
+        Returns
+        -------
+        tuple
+            (key, value) pair of an element if found or None if dict is empty
+        """
+        if self:
+            key = self.keylist.pop()
+            value = self[key] if key else None
+
+            del self[key]
+            return key, value
+
+        return None
+
+    def __iter__(self):
+        """
+        Default iterator
+        
+        Returns
+        -------
+        iterator
+        """
+        return self.keylist.__iter__()
+
+    def __str__(self):
+        """
+        Override to minic exact Python2.7 str(dict_obj)
+
+        Returns
+        -------
+        str
+        """
+        string = "{"
+
+        for i, key in enumerate(self):
+            string += ", " if i > 0 else ""
+            if isinstance(key, ("".__class__, u"".__class__, bytes)):
+                string += "%s: " % key.__repr__()
+            else:
+                string += "%s: " % key
+
+            if isinstance(self[key], ("".__class__, u"".__class__, bytes)):
+                string += "%s" % self[key].__repr__()
+            else:
+                string += "%s" % self[key]
+
+        string += "}"
+        return string
+
+    def __repr__(self):
+        """
+        Create a string version of this Dict
+        
+        Returns
+        -------
+        str
+        """
+        return self.__str__()
+
+    def keys(self):
+        """
+        Returns keys ordered using Python2.7 iteration alogrithm
+        
+        Returns
+        -------
+        list
+            list of keys
+        """
+        return self.keylist.keys()
+
+    def values(self):
+        """
+        Returns values ordered using Python2.7 iteration algorithm
+        
+        Returns
+        -------
+        list
+            list of values
+        """
+        return [self[k] for k in self.keys()]
+
+    def items(self):
+        """
+        Returns items ordered using Python2.7 iteration algorithm
+        
+        Returns
+        -------
+        list
+            list of items
+        """
+        return [(k, self[k]) for k in self.keys()]
+
+    def setdefault(self, key, default):
+        """
+        Retruns the value of a key if the key exists. Otherwise inserts key with the default value
+
+        Parameters
+        ----------
+        key: hashable
+        default: Any
+
+        Returns
+        -------
+        Any
+        """
+        if key not in self:
+            self[key] = default
+        return self[key]
+
