@@ -7,8 +7,7 @@ Resources:
         DEFAULT_4XX:
           Fn::Select:
           - 0
-          - - DEFAULT_5XX:
-                ResponseParameters:
+          - - ResponseParameters:
                   Headers:
                     Access-Control-Allow-Origin: '''*'''
                     Access-Control-Allow-Methods: '''GET,OPTIONS'''
