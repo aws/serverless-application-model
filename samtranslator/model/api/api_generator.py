@@ -858,6 +858,19 @@ class ApiGenerator(object):
 
         # Make sure keys in the dict are recognized
         for responses_key, responses_value in self.gateway_responses.items():
+            if is_intrinsic(responses_value):
+                # TODO: Add intrinsic support for this field.
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Unable to set GatewayResponses attribute because "
+                    "intrinsic functions are not supported for this field.",
+                )
+            elif not isinstance(responses_value, dict):
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Invalid property type '{}' for GatewayResponses. "
+                    "Expected an object of type 'GatewayResponse'.".format(type(responses_value).__name__),
+                )
             for response_key in responses_value.keys():
                 if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(
