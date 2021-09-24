@@ -173,8 +173,19 @@ class ImplicitApiPlugin(BasePlugin):
         # Need to grab the AWS::Serverless::Api resource for this API event and update its Swagger definition
         api_id = self._get_api_id(event_properties)
 
+        # As of right now, this is for backwards compatability. SAM fails if you have an event type "Api" but that
+        # references "AWS::Serverless::HttpApi". If you do the opposite, SAM still outputs a valid template. Example of that
+        # can be found https://github.com/aws/serverless-application-model/blob/develop/tests/translator/output/api_with_any_method_in_swagger.json.
+        # One would argue that, this is unexpected and should actually fail. Instead of suddenly breaking customers in this
+        # position, we added a check to make sure the Plugin run (Http or Rest) is referencing an api of the same type.
+        is_referencing_http_from_api_event = (
+            not template.get(api_id)
+            or template.get(api_id).type == "AWS::Serverless::HttpApi"
+            and not template.get(api_id).type == self.api_type
+        )
+
         # RestApiId is not pointing to a valid  API resource
-        if isinstance(api_id, dict) or not template.get(api_id):
+        if isinstance(api_id, dict) or is_referencing_http_from_api_event:
             raise InvalidEventException(
                 event_id,
                 self.api_id_property
