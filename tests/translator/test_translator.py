@@ -793,6 +793,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_api_swagger_integration_with_sub_intrinsic_api_id",
         "error_api_swagger_integration_with_transform_intrinsic_api_id",
         "error_api_swagger_integration_with_getatt_intrinsic_api_id",
+        "error_gateway_response_invalid_type_int",
+        "error_gateway_response_invalid_type_intrinsic",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
