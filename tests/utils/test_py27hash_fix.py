@@ -1,8 +1,14 @@
 import copy
 
 from unittest import TestCase
-from samtranslator.utils.py27hash_fix import Py27Dict, Py27Keys, Py27UniStr
-from six import python_2_unicode_compatible, string_types
+from mock import patch
+from samtranslator.utils.py27hash_fix import (
+    Py27Dict,
+    Py27Keys,
+    Py27UniStr,
+    _convert_to_py27_dict,
+    to_py27_compatible_template,
+)
 
 
 class TestPy27UniStr(TestCase):
@@ -26,7 +32,7 @@ class TestPy27UniStr(TestCase):
         self.assertEqual(added1, "foobar")
 
         added2 = part2 + part1
-        self.assertIsInstance(added2, string_types)
+        self.assertIsInstance(added2, ("".__class__, u"".__class__, bytes))
         self.assertNotIsInstance(added2, Py27UniStr)
         self.assertEqual(added2, "barfoo")
 
@@ -410,3 +416,276 @@ class TestPy27Dict(TestCase):
         # Non-existent key
         self.assertEqual(py27_dict.setdefault("d", "c"), "c")
         self.assertEqual(py27_dict, {"a": "b", "d": "c"})
+
+
+class TestConvertToPy27Dict(TestCase):
+    def test_with_string_input(self):
+        original = "aaa"
+        converted = _convert_to_py27_dict(original)
+        self.assertIsInstance(converted, Py27UniStr)
+        self.assertEqual(converted, "aaa")
+
+    def test_with_simple_dict(self):
+        original = {"a": "b"}
+        converted = _convert_to_py27_dict(original)
+        self.assertIsInstance(converted, Py27Dict)
+        self.assertEqual(converted, {"a": "b"})
+        self.assertEqual(str(converted), "{u'a': u'b'}")
+
+        for key, val in converted.items():
+            if isinstance(key, str):
+                self.assertIsInstance(key, Py27UniStr)
+            if isinstance(val, str):
+                self.assertIsInstance(val, Py27UniStr)
+
+    def test_with_nested_dict(self):
+        original = {"a": {"b": "c"}}
+        converted = _convert_to_py27_dict(original)
+        self.assertIsInstance(converted, Py27Dict)
+        self.assertIsInstance(converted["a"], Py27Dict)
+
+    def test_with_list(self):
+        original = [{"a": "b"}, {"c": "d"}]
+        converted = _convert_to_py27_dict(original)
+        self.assertIsInstance(converted, list)
+        for item in converted:
+            self.assertIsInstance(item, Py27Dict)
+
+    def test_with_other_type(self):
+        original = [
+            ("a", "b"),
+            set(["a", "b"]),
+            123,
+            123.123
+        ]
+        converted = _convert_to_py27_dict(original)
+        self.assertIsInstance(converted[0], tuple)
+        self.assertIsInstance(converted[1], set)
+        self.assertIsInstance(converted[2], int)
+        self.assertIsInstance(converted[3], float)
+        self.assertEqual(original, converted)
+
+
+class TestToPy27CompatibleTemplate(TestCase):
+    def test_all(self):
+        input_template = {
+            "Globals": {
+                "Api": {}
+            },
+            "Parameters": {
+                "Param1": {
+                    "Default": "Value"
+                },
+                "Param2": {
+                    "Default": {}
+                }
+            },
+            "Resources": {
+                "Api": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+
+                    }
+                },
+                "Function": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {}
+                },
+                "StateMachine": {
+                    "Type": "AWS::Serverless::StateMachine",
+                    "Properties": {}
+                },
+                "Other": {
+                    "Type": "AWS::S3::Bucket",
+                    "Properties": {}
+                }
+            }
+        }
+        to_py27_compatible_template(input_template)
+        self.assertEqual(
+            str(input_template["Globals"]),
+            "{'Api': {}}"
+        )
+        self.assertEqual(
+            str(input_template["Parameters"]),
+            "{u'Param2': {'Default': {}}, u'Param1': {'Default': u'Value'}}"
+        )
+        self.assertEqual(
+            str(input_template["Resources"]),
+            "{u'Function': {'Type': 'AWS::Serverless::Function', 'Properties': {}}, u'Api': {'Type': '"
+            "AWS::Serverless::Api', 'Properties': {}}, u'Other': {'Type': 'AWS::S3::Bucket', 'Properti"
+            "es': {}}, u'StateMachine': {'Type': 'AWS::Serverless::StateMachine', 'Properties': {}}}"
+        )
+
+    def test_empty_dict(self):
+        input_template = {}
+        to_py27_compatible_template(input_template)
+        self.assertEqual(str(input_template), "{}")
+
+    def test_only_globals(self):
+        input_template = {
+            "Globals": {
+                "Api": {"Name": "123"},
+                "Function": {"Handler": "handler.handler"},
+            }
+        }
+        to_py27_compatible_template(input_template)
+        self.assertIsInstance(input_template["Globals"]["Api"], Py27Dict)
+        self.assertIsInstance(input_template["Globals"]["Api"]["Name"], Py27UniStr)
+        self.assertNotIsInstance(input_template["Globals"]["Function"], Py27Dict)
+        self.assertNotIsInstance(input_template["Globals"]["Function"]["Handler"], Py27UniStr)
+
+    def test_only_parameters(self):
+        template = {
+            "Parameters": {
+                "Param1": {
+                    "Description": "description",
+                    "Default": "default value" 
+                },
+                "Param2": {
+                    "Description": "description"
+                }
+            }
+        }
+        to_py27_compatible_template(template)
+        self.assertIsInstance(template["Parameters"], Py27Dict)
+        self.assertNotIsInstance(template["Parameters"]["Param1"], Py27Dict)
+        self.assertIsInstance(template["Parameters"]["Param1"]["Default"], Py27UniStr)
+        self.assertNotIsInstance(template["Parameters"]["Param1"]["Description"], Py27UniStr)
+        self.assertNotIsInstance(template["Parameters"]["Param2"]["Description"], Py27UniStr)
+
+    def test_resources_api(self):
+        template = {
+            "Resources": {
+                "Api": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "Name": "MyApi"
+                    }
+                },
+                "HttpApi": {
+                    "Type": "AWS::Serverless::HttpApi"
+                },
+                "Function": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "FunctionName": {
+                            "Ref": "MyFunctionName"
+                        },
+                        "Events": {
+                            "ApiEvent": {
+                                "Type": "Api",
+                                "Properties": {
+                                    "Path": "/user",
+                                    "Method": "GET"
+                                }
+                            },
+                            "SecondApiEvent": {
+                                "Type": "Api",
+                                "Properties": {
+                                    "Path": "/admin",
+                                    "Method": "GET"
+                                }
+                            }
+                        }
+                    }
+                },
+                "StateMachine": {
+                    "Type": "AWS::Serverless::StateMachine",
+                    "Condition": "ShouldAddStateMachine",
+                    "Properties": {
+                        "Event": {
+                            "ApiEvent": {
+                                "Type": "Api",
+                                "Properties": {
+                                    "Path": "/state-machine",
+                                    "Method": "GET"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        to_py27_compatible_template(template)
+        self.assertIsInstance(template["Resources"], Py27Dict)
+        self.assertNotIsInstance(template["Resources"]["Api"], Py27Dict)
+        self.assertIsInstance(template["Resources"]["Api"]["Properties"], Py27Dict)
+        self.assertIsInstance(template["Resources"]["Api"]["Properties"]["Name"], Py27UniStr)
+
+
+    def test_resources(self):
+        template = {
+            "Resources": {
+                "Api": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "Name": "MyApi"
+                    }
+                },
+                "HttpApi": {
+                    "Type": "AWS::Serverless::HttpApi"
+                },
+                "Function": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "FunctionName": {
+                            "Ref": "MyFunctionName"
+                        },
+                        "Events": {
+                            "ApiEvent": {
+                                "Type": "Api",
+                                "Properties": {
+                                    "Path": "/user",
+                                    "Method": "GET"
+                                }
+                            },
+                            "SecondApiEvent": {
+                                "Type": "Api",
+                                "Properties": {
+                                    "Path": "/admin",
+                                    "Method": "GET"
+                                }
+                            }
+                        }
+                    }
+                },
+                "StateMachine": {
+                    "Type": "AWS::Serverless::StateMachine",
+                    "Condition": "ShouldAddStateMachine",
+                    "Properties": {
+                        "Name": "statemachine",
+                        "Events": {
+                            "ApiEvent": {
+                                "Type": "Api",
+                                "Properties": {
+                                    "Path": "/state-machine",
+                                    "Method": "GET"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        to_py27_compatible_template(template)
+
+        self.assertNotIsInstance(template, Py27Dict)
+        self.assertIsInstance(template["Resources"], Py27Dict)
+
+        self.assertNotIsInstance(template["Resources"]["Api"], Py27Dict)
+        self.assertIsInstance(template["Resources"]["Api"]["Properties"], Py27Dict)
+        self.assertIsInstance(template["Resources"]["Api"]["Properties"]["Name"], Py27UniStr)
+
+        self.assertNotIsInstance(template["Resources"]["HttpApi"], Py27Dict)
+        
+        self.assertNotIsInstance(template["Resources"]["Function"], Py27Dict)
+        self.assertNotIsInstance(template["Resources"]["Function"]["Properties"], Py27Dict)
+        self.assertIsInstance(template["Resources"]["Function"]["Properties"]["FunctionName"], Py27Dict)
+        self.assertIsInstance(template["Resources"]["Function"]["Properties"]["Events"], Py27Dict)
+
+        self.assertNotIsInstance(template["Resources"]["StateMachine"], Py27Dict)
+        self.assertNotIsInstance(template["Resources"]["StateMachine"]["Properties"], Py27Dict)
+        self.assertIsInstance(template["Resources"]["StateMachine"]["Condition"], Py27UniStr)
+        self.assertNotIsInstance(template["Resources"]["StateMachine"]["Properties"]["Name"], Py27UniStr)
+        self.assertIsInstance(template["Resources"]["StateMachine"]["Properties"]["Events"], Py27Dict)
