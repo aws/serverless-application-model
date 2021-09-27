@@ -30,12 +30,18 @@ class RegionConfiguration(object):
         """
         SAR is not supported in some regions.
         https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
+        https://docs.aws.amazon.com/general/latest/gr/serverlessrepo.html
 
         :return: True, if SAR is supported in current region.
         """
 
         # get the current region
         region = boto3.Session().region_name
+
+        # boto3 get_available_regions call won't return us-gov and cn regions even if SAR is available
+        if region.startswith("cn") or region.startswith("us-gov"):
+            return True
+
         # get all regions where SAR are available
         available_regions = boto3.Session().get_available_regions("serverlessrepo")
         return region in available_regions
