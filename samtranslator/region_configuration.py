@@ -1,6 +1,6 @@
 import boto3
 
-from .translator.arn_generator import ArnGenerator
+from .translator.arn_generator import ArnGenerator, NoRegionFound
 
 
 class RegionConfiguration(object):
@@ -36,8 +36,16 @@ class RegionConfiguration(object):
         """
 
         session = boto3.Session()
+
         # get the current region
         region = session.region_name
+
+        # need to handle when region is None so that it won't break
+        if region is None:
+            if ArnGenerator.BOTO_SESSION_REGION_NAME is not None:
+                region = ArnGenerator.BOTO_SESSION_REGION_NAME
+            else:
+                raise NoRegionFound("AWS Region cannot be found")
 
         # boto3 get_available_regions call won't return us-gov and cn regions even if SAR is available
         if region.startswith("cn") or region.startswith("us-gov"):
