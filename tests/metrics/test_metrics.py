@@ -104,6 +104,45 @@ class TestMetrics(TestCase):
         self.assertEqual(published_metric["Dimensions"], dimensions)
         self.assertEqual(published_metric["Value"], value)
 
+    @parameterized.expand(
+        [
+            param(
+                "DummyNamespace",
+                "SARLatency",
+                1200,
+                "IAMLatency",
+                400,
+                [{"Name": "SAM", "Value": "Dim1"}, {"Name": "SAM", "Value": "Dim2"}],
+            ),
+        ]
+    )
+    def test_get_metrics(self, namespace, name1, value1, name2, value2, dimensions):
+        mock_metrics_publisher = MetricPublisherTestHelper()
+        metrics = Metrics(namespace, mock_metrics_publisher)
+        metrics.record_count(name1, value1, dimensions)
+        metrics.record_latency(name2, value2, dimensions)
+        # record the first metric twice
+        metrics.record_count(name1, value1 * 2, dimensions)
+
+        m1 = metrics.get_metric(name1)
+        self.assertEqual(len(m1), 2)
+        for i in range(1, 3):  # first value is 1*value1, 2nd is 2*value1
+            metric_data = m1[i - 1].get_metric_data()
+            self.assertEqual(metric_data["MetricName"], name1)
+            self.assertEqual(metric_data["Value"], i * value1)
+            self.assertEqual(metric_data["Dimensions"], dimensions)
+
+        m2 = metrics.get_metric(name2)
+        self.assertEqual(len(m2), 1)
+        metric_data = m2[0].get_metric_data()
+        self.assertEqual(metric_data["MetricName"], name2)
+        self.assertEqual(metric_data["Value"], value2)
+        self.assertEqual(metric_data["Dimensions"], dimensions)
+
+        # non-existent metric should return an empty list
+        m3 = metrics.get_metric(name1 + name2)
+        self.assertListEqual(m3, [])
+
 
 class TestCWMetricPublisher(TestCase):
     @parameterized.expand(
