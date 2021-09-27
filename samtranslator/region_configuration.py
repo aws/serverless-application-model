@@ -33,4 +33,9 @@ class RegionConfiguration(object):
 
         :return: True, if SAR is supported in current region.
         """
-        return "serverlessrepo" in boto3.Session().get_available_services()
+
+        # get the current region
+        region = boto3.Session().region_name
+        # get all regions where SAR are available
+        available_regions = boto3.Session().get_available_regions("serverlessrepo")
+        return region in available_regions
