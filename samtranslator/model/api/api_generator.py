@@ -27,6 +27,7 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 LOG = logging.getLogger(__name__)
 
@@ -317,7 +318,18 @@ class ApiGenerator(object):
                     "'s3://bucket/key' with optional versionId query parameter.",
                 )
 
-        body_s3 = {"Bucket": s3_pointer["Bucket"], "Key": s3_pointer["Key"]}
+            if isinstance(self.definition_uri, Py27UniStr):
+                # self.defintion_uri is a Py27UniStr instance if it is defined in the template
+                # we need to preserve the Py27UniStr type
+                s3_pointer["Bucket"] = Py27UniStr(s3_pointer["Bucket"])
+                s3_pointer["Key"] = Py27UniStr(s3_pointer["Key"])
+                if "Version" in s3_pointer:
+                    s3_pointer["Version"] = Py27UniStr(s3_pointer["Version"])
+
+        # Construct body_s3 as py27 dict
+        body_s3 = Py27Dict()
+        body_s3["Bucket"] = s3_pointer["Bucket"]
+        body_s3["Key"] = s3_pointer["Key"]
         if "Version" in s3_pointer:
             body_s3["Version"] = s3_pointer["Version"]
         return body_s3
@@ -952,12 +964,12 @@ class ApiGenerator(object):
             SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version
         ):
             if definition_body.get("securityDefinitions"):
-                components = definition_body.get("components", {})
+                components = definition_body.get("components", Py27Dict())
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
                 del definition_body["securityDefinitions"]
             if definition_body.get("definitions"):
-                components = definition_body.get("components", {})
+                components = definition_body.get("components", Py27Dict())
                 components["schemas"] = definition_body["definitions"]
                 definition_body["components"] = components
                 del definition_body["definitions"]
@@ -981,11 +993,10 @@ class ApiGenerator(object):
                                 ):
                                     headers = definition_body["paths"][path]["options"][field]["200"]["headers"]
                                     for header in headers.keys():
-                                        header_value = {
-                                            "schema": definition_body["paths"][path]["options"][field]["200"][
-                                                "headers"
-                                            ][header]
-                                        }
+                                        header_value = Py27Dict()
+                                        header_value["schema"] = definition_body["paths"][path]["options"][field]["200"][
+                                            "headers"
+                                        ][header]
                                         definition_body["paths"][path]["options"][field]["200"]["headers"][
                                             header
                                         ] = header_value

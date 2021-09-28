@@ -6,6 +6,7 @@ from samtranslator.model.types import is_type, one_of, is_str, list_of
 from samtranslator.model.intrinsics import ref, fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 
 class ApiGatewayRestApi(Resource):
@@ -133,10 +134,10 @@ class ApiGatewayResponse(object):
         self.status_code = status_code_str
 
     def generate_swagger(self):
-        swagger = {
-            "responseParameters": self._add_prefixes(self.response_parameters),
-            "responseTemplates": self.response_templates,
-        }
+        # Applying Py27Dict here as this goes into swagger
+        swagger = Py27Dict()
+        swagger["responseParameters"] = self._add_prefixes(self.response_parameters)
+        swagger["responseTemplates"] = self.response_templates
 
         # Prevent "null" being written.
         if self.status_code:
@@ -146,13 +147,26 @@ class ApiGatewayResponse(object):
 
     def _add_prefixes(self, response_parameters):
         GATEWAY_RESPONSE_PREFIX = "gatewayresponse."
-        prefixed_parameters = {}
+        # applying Py27Dict as this is part of swagger
+        prefixed_parameters = Py27Dict()
         for key, value in response_parameters.get("Headers", {}).items():
-            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + "header." + key] = value
+            param_key = GATEWAY_RESPONSE_PREFIX + "header." + key
+            if isinstance(key, Py27UniStr):
+                # if key is from template, we need to convert param_key to Py27UniStr
+                param_key = Py27UniStr(param_key)
+            prefixed_parameters[param_key] = value
+
         for key, value in response_parameters.get("Paths", {}).items():
-            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + "path." + key] = value
+            param_key = GATEWAY_RESPONSE_PREFIX + "path." + key
+            if isinstance(key, Py27UniStr):
+                param_key = Py27UniStr(param_key)
+            prefixed_parameters[param_key] = value
+
         for key, value in response_parameters.get("QueryStrings", {}).items():
-            prefixed_parameters[GATEWAY_RESPONSE_PREFIX + "querystring." + key] = value
+            param_key = GATEWAY_RESPONSE_PREFIX + "querystring." + key
+            if isinstance(key, Py27UniStr):
+                param_key = Py27UniStr(param_key)
+            prefixed_parameters[param_key] = value
 
         return prefixed_parameters
 
@@ -287,21 +301,20 @@ class ApiGatewayAuthorizer(object):
     def generate_swagger(self):
         authorizer_type = self._get_type()
         APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
-        swagger = {
-            "type": "apiKey",
-            "name": self._get_swagger_header_name(),
-            "in": "header",
-            "x-amazon-apigateway-authtype": self._get_swagger_authtype(),
-        }
+        swagger = Py27Dict()
+        swagger["type"] = "apiKey"
+        swagger["name"] = self._get_swagger_header_name()
+        swagger["in"] = "header"
+        swagger["x-amazon-apigateway-authtype"] = self._get_swagger_authtype()
 
         if authorizer_type == "COGNITO_USER_POOLS":
-            swagger[APIGATEWAY_AUTHORIZER_KEY] = {
-                "type": self._get_swagger_authorizer_type(),
-                "providerARNs": self._get_user_pool_arn_array(),
-            }
+            authorizer_dict = Py27Dict()
+            authorizer_dict["type"] = self._get_swagger_authorizer_type()
+            authorizer_dict["providerARNs"] = self._get_user_pool_arn_array()
+            swagger[APIGATEWAY_AUTHORIZER_KEY] = authorizer_dict
 
         elif authorizer_type == "LAMBDA":
-            swagger[APIGATEWAY_AUTHORIZER_KEY] = {"type": self._get_swagger_authorizer_type()}
+            swagger[APIGATEWAY_AUTHORIZER_KEY] = Py27Dict({"type": self._get_swagger_authorizer_type()})
             partition = ArnGenerator.get_partition_name()
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
             authorizer_uri = fnSub(
@@ -347,20 +360,36 @@ class ApiGatewayAuthorizer(object):
         identity_source_context = []
 
         if self.identity.get("Headers"):
-            identity_source_headers = list(map(lambda h: "method.request.header." + h, self.identity.get("Headers")))
+            identity_source_headers = []
+            for header in self.identity.get("Headers"):
+                item = "method.request.header." + header
+                if isinstance(header, Py27UniStr):
+                    item = Py27UniStr(item)
+                identity_source_headers.append(item)
 
         if self.identity.get("QueryStrings"):
-            identity_source_query_strings = list(
-                map(lambda qs: "method.request.querystring." + qs, self.identity.get("QueryStrings"))
-            )
+            identity_source_query_strings = []
+            for qs in self.identity.get("QueryStrings"):
+                item = "method.request.querystring." + qs
+                if isinstance(qs, Py27UniStr):
+                    item = Py27UniStr(item)
+                identity_source_query_strings.append(item)
 
         if self.identity.get("StageVariables"):
-            identity_source_stage_variables = list(
-                map(lambda sv: "stageVariables." + sv, self.identity.get("StageVariables"))
-            )
+            identity_source_stage_variables = []
+            for sv in self.identity.get("StageVariables"):
+                item = "stageVariables." + sv
+                if isinstance(sv, Py27UniStr):
+                    item = Py27UniStr(item)
+                identity_source_stage_variables.append(item)
 
         if self.identity.get("Context"):
-            identity_source_context = list(map(lambda c: "context." + c, self.identity.get("Context")))
+            identity_source_context = []
+            for c in self.identity.get("Context"):
+                item = "context." + c
+                if isinstance(c, Py27UniStr):
+                    item = Py27UniStr(item)
+                identity_source_context.append(item)
 
         identity_source_array = (
             identity_source_headers
@@ -369,6 +398,9 @@ class ApiGatewayAuthorizer(object):
             + identity_source_context
         )
         identity_source = ", ".join(identity_source_array)
+        if any(isinstance(i, Py27UniStr) for i in identity_source_array):
+            # Convert identity_source to Py27UniStr if any part of it is Py27UniStr
+            identity_source = Py27UniStr(identity_source)
 
         return identity_source
 

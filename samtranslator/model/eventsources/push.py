@@ -23,6 +23,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 CONDITION = "Condition"
 
@@ -665,13 +666,16 @@ class Api(PushEventSource):
 
         function_arn = function.get_runtime_attr("arn")
         partition = ArnGenerator.get_partition_name()
-        uri = fnSub(
+        arn = (
             "arn:"
             + partition
             + ":apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
             + make_shorthand(function_arn)
             + "/invocations"
         )
+        if function_arn.get("Fn::GetAtt") and isinstance(function_arn["Fn::GetAtt"][0], Py27UniStr):
+            arn = Py27UniStr(arn)
+        uri = Py27Dict(fnSub(arn))
 
         editor = SwaggerEditor(swagger_body)
 
