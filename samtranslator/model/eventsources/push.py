@@ -324,22 +324,18 @@ class S3(PushEventSource):
 
         depends_on = bucket.get("DependsOn", [])
 
-        # Validate that DependsOn is either a list or a string.
-        # If DependsOn is a list, also validate that all elements are also strings
-        check_invalid_type = not (isinstance(depends_on, string_types) or isinstance(depends_on, list)) or (
-            isinstance(depends_on, list) and not all(isinstance(el, str) for el in depends_on)
-        )
-        if check_invalid_type:
+        # DependsOn can be either a list of strings or a scalar string
+        if isinstance(depends_on, string_types):
+            depends_on = [depends_on]
+
+        try:
+            depends_on_set = set(depends_on)
+        except TypeError:
             raise InvalidResourceException(
                 self.logical_id,
                 "Invalid type for field 'DependsOn'. Expected a string or list of strings.",
             )
 
-        # DependsOn can be either a list of strings or a scalar string
-        if isinstance(depends_on, string_types):
-            depends_on = [depends_on]
-
-        depends_on_set = set(depends_on)
         depends_on_set.add(permission.logical_id)
         bucket["DependsOn"] = list(depends_on_set)
 

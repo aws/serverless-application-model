@@ -7,18 +7,13 @@ Resources:
 
   Bucket2:
     Type: AWS::S3::Bucket
-    DependsOn:
-      Ref: BucketRef
+    DependsOn: null
 
   Bucket3:
     Type: AWS::S3::Bucket
-    DependsOn: null
-
-  Bucket4:
-    Type: AWS::S3::Bucket
     DependsOn: 12345
 
-  Function:
+  Function1:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: s3://sam-demo-bucket/member_portal.zip
@@ -60,20 +55,5 @@ Resources:
           Properties:
             Bucket:
               Ref: Bucket3
-            Events:
-              - s3:ObjectCreated:*
-
-  Function4:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: s3://sam-demo-bucket/member_portal.zip
-      Handler: index.gethtml
-      Runtime: nodejs12.x
-      Events:
-        BucketEvent:
-          Type: S3
-          Properties:
-            Bucket:
-              Ref: Bucket4
             Events:
               - s3:ObjectCreated:*
