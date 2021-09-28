@@ -328,7 +328,14 @@ class S3(PushEventSource):
         if isinstance(depends_on, string_types):
             depends_on = [depends_on]
 
-        depends_on_set = set(depends_on)
+        try:
+            depends_on_set = set(depends_on)
+        except TypeError:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Invalid type for field 'DependsOn'. Expected a string or list of strings.",
+            )
+
         depends_on_set.add(permission.logical_id)
         bucket["DependsOn"] = list(depends_on_set)
 

@@ -1,0 +1,59 @@
+Resources:
+  Bucket1:
+    Type: AWS::S3::Bucket
+    DependsOn:
+    - Dict: SomeListOfDicts
+    - Obj: Obj
+
+  Bucket2:
+    Type: AWS::S3::Bucket
+    DependsOn: null
+
+  Bucket3:
+    Type: AWS::S3::Bucket
+    DependsOn: 12345
+
+  Function1:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        BucketEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket1
+            Events:
+            - s3:ObjectCreated:*
+
+  Function2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        BucketEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket2
+            Events:
+              - s3:ObjectCreated:*
+
+  Function3:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        BucketEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket3
+            Events:
+              - s3:ObjectCreated:*
