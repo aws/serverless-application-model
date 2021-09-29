@@ -445,6 +445,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
                 "version_deletion_policy_precedence",
+                "function_with_architectures",
+                "function_with_intrinsic_architecture",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -784,6 +786,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_invalid_method_definition",
         "error_mappings_is_null",
         "error_swagger_security_not_dict",
+        "error_function_with_unknown_architectures",
+        "error_function_with_multiple_architectures",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

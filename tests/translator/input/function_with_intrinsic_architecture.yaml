@@ -1,0 +1,16 @@
+Parameters:
+  ArchitectureRef:
+    Type: String
+    Default: 'arm64'
+Resources: 
+  FunctionWithArchitecturesIntrinsic:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: Created by SAM
+      Handler: index.handler
+      Architectures: 
+        Ref: ArchitectureRef
+      MemorySize: 1024
+      Runtime: nodejs12.x
+      Timeout: 3
