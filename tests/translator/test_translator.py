@@ -448,6 +448,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "version_deletion_policy_precedence",
                 "api_swagger_integration_with_string_api_id",
                 "api_swagger_integration_with_ref_intrinsic_api_id",
+                "function_with_architectures",
+                "function_with_intrinsic_architecture",
             ],
             [
                 ("aws", "ap-southeast-1"),

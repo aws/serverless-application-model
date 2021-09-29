@@ -5,12 +5,79 @@ import pytest
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
-from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion
+from samtranslator.model.lambda_ import LambdaFunction, LambdaLayerVersion, LambdaVersion
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.packagetype import IMAGE, ZIP
-from samtranslator.model.sam_resources import SamFunction, SamApi, SamHttpApi
+from samtranslator.model.sam_resources import SamFunction, SamLayerVersion, SamApi, SamHttpApi
+
+
+class TestArchitecture(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_unknown_architectures(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        invalid_architectures = [["arm"], [1], "arm", 1, {"my": "value"}, True, [], {}]
+        for architecture in invalid_architectures:
+            function.Architectures = architecture
+            with pytest.raises(InvalidResourceException) as e:
+                function.to_cloudformation(**self.kwargs)
+            self.assertEqual(
+                str(e.value.message),
+                "Resource with id [foo] is invalid. Architectures needs to be a list with one string, either `x86_64` or `arm64`.",
+            )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_multiple_architectures(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.Architectures = ["arm64", "x86_64"]
+
+        with pytest.raises(InvalidResourceException) as e:
+            function.to_cloudformation(**self.kwargs)
+        self.assertEqual(
+            str(e.value.message),
+            "Resource with id [foo] is invalid. Architectures needs to be a list with one string, either `x86_64` or `arm64`.",
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_validate_architecture_with_intrinsic(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.Architectures = {"Ref": "MyRef"}
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedFunctionList = [x for x in cfnResources if isinstance(x, LambdaFunction)]
+        self.assertEqual(generatedFunctionList.__len__(), 1)
+        self.assertEqual(generatedFunctionList[0].Architectures, {"Ref": "MyRef"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_valid_architectures(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        valid_architectures = (["arm64"], ["x86_64"])
+
+        for architecture in valid_architectures:
+            function.Architectures = architecture
+            cfnResources = function.to_cloudformation(**self.kwargs)
+            generatedFunctionList = [x for x in cfnResources if isinstance(x, LambdaFunction)]
+            self.assertEqual(generatedFunctionList.__len__(), 1)
+            self.assertEqual(generatedFunctionList[0].Architectures, architecture)
 
 
 class TestCodeUriandImageUri(TestCase):
@@ -340,3 +407,29 @@ class TestPassthroughResourceAttributes(TestCase):
         function = SamFunction("foo", attributes=expected)
         attributes = function.get_passthrough_resource_attributes()
         self.assertEqual(attributes, expected)
+
+
+class TestLayers(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    def test_basic_layer(self):
+        layer = SamLayerVersion("foo")
+        layer.ContentUri = "s3://foobar/foo.zip"
+        cfnResources = layer.to_cloudformation(**self.kwargs)
+        generatedLayerList = [x for x in cfnResources if isinstance(x, LambdaLayerVersion)]
+        self.assertEqual(cfnResources.__len__(), 1)
+        self.assertTrue(isinstance(cfnResources[0], LambdaLayerVersion))
+        self.assertEqual(cfnResources[0].Content, {"S3Key": "foo.zip", "S3Bucket": "foobar"})
+
+    def test_invalid_compatible_architectures(self):
+        layer = SamLayerVersion("foo")
+        layer.ContentUri = "s3://foobar/foo.zip"
+        invalid_architectures = [["arm"], [1], "arm", 1, True]
+        for architecturea in invalid_architectures:
+            layer.CompatibleArchitectures = architecturea
+            with pytest.raises(InvalidResourceException):
+                layer.to_cloudformation(**self.kwargs)
