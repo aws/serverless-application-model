@@ -1,0 +1,23 @@
+Parameters:
+  EventsParam:
+    Type: String
+    Default: s3:ObjectCreated:*
+
+Resources:
+  FunctionInvalidS3Event:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: MyBucket
+            Events:
+              Ref: EventsParam
+
+  MyBucket:
+    Type: AWS::S3::Bucket

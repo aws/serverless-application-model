@@ -43,7 +43,7 @@ from integration.helpers.deployer.utils.table_print import (
     MIN_OFFSET,
 )
 from integration.helpers.deployer.utils.artifact_exporter import mktempfile, parse_s3_url
-from integration.helpers.deployer.utils.time import utc_to_timestamp
+from integration.helpers.deployer.utils.time_util import utc_to_timestamp
 
 LOG = logging.getLogger(__name__)
 
@@ -284,7 +284,7 @@ class Deployer:
         :param stack_name:   Stack name
         :return: Latest status of the create-change-set operation
         """
-        sys.stdout.write("\nWaiting for changeset to be created..\n")
+        sys.stdout.write("\nWaiting for changeset to be created...\n")
         sys.stdout.flush()
 
         # Wait for changeset to be created

@@ -1,0 +1,16 @@
+# File: sam.yml
+# Version: 0.9
+
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: {}
+Resources:
+  TestFunc:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: Created by SAM
+      Handler: index.handler
+      Architectures: ["arm64"]
+      MemorySize: 1024
+      Runtime: nodejs12.x
+      Timeout: 3

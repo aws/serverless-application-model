@@ -1,0 +1,31 @@
+Globals:
+  Api:
+    Auth:
+      ResourcePolicy:
+        SourceVpcWhitelist: [{"Ref":"SomeParameter"}]
+
+Parameters:
+  SomeParameter:
+    Type: String
+    Default: param
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Method: Put
+            Path: /get

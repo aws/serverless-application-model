@@ -42,6 +42,7 @@ class Globals(object):
             "EventInvokeConfig",
             "FileSystemConfigs",
             "CodeSigningConfigArn",
+            "Architectures",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries

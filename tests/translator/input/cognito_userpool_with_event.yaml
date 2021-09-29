@@ -2,8 +2,16 @@ Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      LambdaConfig:
-        PreAuthentication: "Test"
+      UserPoolName: UserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
   ImplicitApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -14,12 +22,12 @@ Resources:
         OneTrigger:
           Type: Cognito
           Properties:
-            UserPool: 
+            UserPool:
               Ref: UserPool
             Trigger: PreSignUp
         TwoTrigger:
           Type: Cognito
           Properties:
-            UserPool: 
+            UserPool:
               Ref: UserPool
-            Trigger: [Test1, Test2]        
+            Trigger: [PostConfirmation, VerifyAuthChallengeResponse]
