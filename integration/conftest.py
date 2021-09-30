@@ -64,7 +64,10 @@ def setup_companion_stack_once(tmpdir_factory, request):
     suffix = ""
     if request.config.getoption("--pipeline"):
         suffix = "-" + request.config.getoption("--pipeline")
-    companion_stack = Stack(COMPANION_STACK_NAME_ONCE + suffix, companion_stack_tempalte_path, cfn_client, output_dir)
+    stack_name = COMPANION_STACK_NAME_ONCE + suffix
+    if _stack_exists(stack_name):
+        return
+    companion_stack = Stack(stack_name, companion_stack_tempalte_path, cfn_client, output_dir)
     companion_stack.create()
 
 
@@ -108,3 +111,16 @@ def pytest_addoption(parser):
         default=None,
         help="the name of the testing pipeline",
     )
+
+
+def _stack_exists(stack_name):
+    cloudformation = boto3.resource('cloudformation')
+    stack = cloudformation.Stack(stack_name)
+    try:
+        stack.stack_status
+    except ClientError as ex:
+        if "does not exist" in str(ex):
+            return False
+        raise ex
+
+    return True
