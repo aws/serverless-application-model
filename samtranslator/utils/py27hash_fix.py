@@ -7,6 +7,7 @@ import json
 import sys
 import logging
 
+from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
 
 
@@ -21,9 +22,10 @@ unicode_string_type = str if sys.version_info.major >= 3 else unicode
 
 def to_py27_compatible_template(template):
     """
-    Convert an input template to a py27hash-compatible template. NOTE: this modified the input template, rather
-    than return a copied template. We choose not to return a copy because copying the template might change its
-    internal state in Py2.7.
+    Convert an input template to a py27hash-compatible template. This function has to be run before any 
+    manipulation occurs for sake of keeping the same initial state. This function modifies the input template,
+    rather than return a copied template. We choose not to return a copy because copying the template might
+    change its internal state in Py2.7.
     We only convert necessary parts in the template which could affect the hash generation for Serverless Api
     template is modified 
 
@@ -36,7 +38,16 @@ def to_py27_compatible_template(template):
     -------
     None
     """
-    if "Globals" in template and "Api" in template["Globals"]:
+    # Passing to parser for a simple validation. Validation is normally done within translator.translate(...). 
+    # However, becuase this conversion is done before translate and also requires the template to be valid, we
+    # perform a simple validation here to just make sure the template is minimally safe for conversion.
+    Parser.validate_datetypes(template)
+
+    if not _template_has_api_resource(template):
+        # template does not contain any API resource, no need to convert
+        return
+
+    if "Globals" in template and isinstance(template["Globals"], dict) and "Api" in template["Globals"]:
         # "Api" section under "Globals" could affect swagger generation for AWS::Serverless::Api resources
         template["Globals"]["Api"] = _convert_to_py27_dict(template["Globals"]["Api"])
 
@@ -523,3 +534,22 @@ def _convert_to_py27_dict(original):
     
     # Anything else does not require conversion
     return original
+
+
+def _template_has_api_resource(template):
+    """
+    Returns true if the template contains at lease one explicit or implicit AWS::Serverless::Api resource
+    """
+    for resource_dict in template.get("Resources", {}).values():
+        if isinstance(resource_dict, dict) and resource_dict.get("Type") == "AWS::Serverless::Api":
+            # i.e. an excplicit API is defined in the template
+            return True
+
+        if resource_dict.get("Type") in ["AWS::Serverless::Function", "AWS::Serverless::StateMachine"]:
+            events = resource_dict.get("Properties", {}).get("Events", {})
+            for event_dict in events.values():
+                # An explicit or implicit API is referenced
+                if event_dict and event_dict.get("Type") == "Api":
+                    return True
+
+    return False

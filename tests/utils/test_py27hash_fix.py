@@ -9,6 +9,7 @@ from samtranslator.utils.py27hash_fix import (
     _convert_to_py27_dict,
     to_py27_compatible_template,
 )
+from samtranslator.model.exceptions import InvalidDocumentException
 
 
 class TestPy27UniStr(TestCase):
@@ -517,25 +518,22 @@ class TestToPy27CompatibleTemplate(TestCase):
             "es': {}}, u'StateMachine': {'Type': 'AWS::Serverless::StateMachine', 'Properties': {}}}"
         )
 
-    def test_empty_dict(self):
+    def test_empty_dict_fails_validation(self):
         input_template = {}
-        to_py27_compatible_template(input_template)
-        self.assertEqual(str(input_template), "{}")
+        with self.assertRaises(InvalidDocumentException):
+            to_py27_compatible_template(input_template)
 
-    def test_only_globals(self):
+    def test_only_globals_fails_validation(self):
         input_template = {
             "Globals": {
                 "Api": {"Name": "123"},
                 "Function": {"Handler": "handler.handler"},
             }
         }
-        to_py27_compatible_template(input_template)
-        self.assertIsInstance(input_template["Globals"]["Api"], Py27Dict)
-        self.assertIsInstance(input_template["Globals"]["Api"]["Name"], Py27UniStr)
-        self.assertNotIsInstance(input_template["Globals"]["Function"], Py27Dict)
-        self.assertNotIsInstance(input_template["Globals"]["Function"]["Handler"], Py27UniStr)
+        with self.assertRaises(InvalidDocumentException):
+            to_py27_compatible_template(input_template)
 
-    def test_only_parameters(self):
+    def test_only_parameters_fails_validation(self):
         template = {
             "Parameters": {
                 "Param1": {
@@ -547,12 +545,8 @@ class TestToPy27CompatibleTemplate(TestCase):
                 }
             }
         }
-        to_py27_compatible_template(template)
-        self.assertIsInstance(template["Parameters"], Py27Dict)
-        self.assertNotIsInstance(template["Parameters"]["Param1"], Py27Dict)
-        self.assertIsInstance(template["Parameters"]["Param1"]["Default"], Py27UniStr)
-        self.assertNotIsInstance(template["Parameters"]["Param1"]["Description"], Py27UniStr)
-        self.assertNotIsInstance(template["Parameters"]["Param2"]["Description"], Py27UniStr)
+        with self.assertRaises(InvalidDocumentException):
+            to_py27_compatible_template(template)
 
     def test_resources_api(self):
         template = {
@@ -614,7 +608,7 @@ class TestToPy27CompatibleTemplate(TestCase):
         self.assertIsInstance(template["Resources"]["Api"]["Properties"]["Name"], Py27UniStr)
 
 
-    def test_resources(self):
+    def test_comprehensive_resources(self):
         template = {
             "Resources": {
                 "Api": {
@@ -689,3 +683,66 @@ class TestToPy27CompatibleTemplate(TestCase):
         self.assertIsInstance(template["Resources"]["StateMachine"]["Condition"], Py27UniStr)
         self.assertNotIsInstance(template["Resources"]["StateMachine"]["Properties"]["Name"], Py27UniStr)
         self.assertIsInstance(template["Resources"]["StateMachine"]["Properties"]["Events"], Py27Dict)
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
+    def test_no_conversion_happens(self, _convert_to_py27_dict_mock):
+        template = {
+            "Resources": {
+                "S3Bucket": {
+                    "Type": "AWS::S3::Bucket",
+                    "Properties": {}
+                }
+            }
+        }
+        to_py27_compatible_template(template)
+
+        _convert_to_py27_dict_mock.assert_not_called()
+    
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
+    def test_explicit_api(self, _convert_to_py27_dict_mock):
+        template = {
+            "Resources": {
+                "Api": {
+                    "Type": "AWS::Serverless::Api",
+                    "Properties": {
+                        "Name": "MyApi"
+                    }
+                },
+            }
+        }
+        to_py27_compatible_template(template)
+
+        _convert_to_py27_dict_mock.assert_called_once_with({"Name": "MyApi"})
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
+    def test_implicit_api(self, _convert_to_py27_dict_mock):
+        template = {
+            "Resources": {
+                "Function": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "FunctionName": {
+                            "Ref": "MyFunctionName"
+                        },
+                        "Events": {
+                            "ApiEvent": {
+                                "Type": "Api",
+                                "Properties": {
+                                    "Path": "/user",
+                                    "Method": "GET"
+                                }
+                            },
+                            "SecondApiEvent": {
+                                "Type": "Api",
+                                "Properties": {
+                                    "Path": "/admin",
+                                    "Method": "GET"
+                                }
+                            }
+                        }
+                    }
+                },
+            }
+        }
+        to_py27_compatible_template(template)
+        self.assertEqual(_convert_to_py27_dict_mock.call_count, 2)

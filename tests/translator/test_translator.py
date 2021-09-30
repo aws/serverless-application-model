@@ -1,8 +1,10 @@
 import json
+import copy
 import itertools
 import os.path
 import hashlib
 import sys
+import re
 from functools import reduce, cmp_to_key
 
 from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
@@ -11,6 +13,7 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidReso
 from samtranslator.model import Resource
 from samtranslator.model.sam_resources import SamSimpleTable
 from samtranslator.public.plugins import BasePlugin
+from samtranslator.utils.py27hash_fix import to_py27_compatible_template, undo_mark_unicode_str_in_template
 
 from tests.translator.helpers import get_template_parameter_values
 from tests.plugins.application.test_serverless_app_plugin import mock_get_region
@@ -176,9 +179,9 @@ class AbstractTestTranslator(TestCase):
         print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
+        # if sys.version_info.major >= 3:
+        #     self._update_logical_id_hash(expected)
+        #     self._update_logical_id_hash(output_fragment)
 
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
@@ -550,9 +553,9 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
+        # if sys.version_info.major >= 3:
+        #     self._update_logical_id_hash(expected)
+        #     self._update_logical_id_hash(output_fragment)
 
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
@@ -609,9 +612,9 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         print(json.dumps(output_fragment, indent=2))
 
         # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
+        # if sys.version_info.major >= 3:
+        #     self._update_logical_id_hash(expected)
+        #     self._update_logical_id_hash(output_fragment)
 
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
@@ -680,6 +683,7 @@ def test_transform_invalid_document(testcase):
         transform(manifest, parameter_values, mock_policy_loader)
 
     error_message = get_exception_error_message(e)
+    error_message = re.sub(r"u'([A-Za-z0-9]*)'", r"'\1'", error_message)
 
     assert error_message == expected.get("errorMessage")
 
