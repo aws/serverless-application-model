@@ -490,6 +490,12 @@ class GetAttAction(Action):
         if not isinstance(value, list) or len(value) < 2:
             return input_dict
 
+        # If items in value array is not a string, then following join line will fail. So if any element is not a string
+        # we just pass along the input to CFN for doing the validation
+        for item in value:
+            if not isinstance(item, string_types):
+                return input_dict
+
         value_str = self._resource_ref_separator.join(value)
         splits = value_str.split(self._resource_ref_separator)
         logical_id = splits[0]
