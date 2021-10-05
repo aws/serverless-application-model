@@ -337,26 +337,27 @@ class SelfManagedKafka(PullEventSource):
         return [document]
 
     def generate_policy_document(self):
+        statements = []
+        authentication_uri, has_vpc_config = self.get_secret_key()
+        if authentication_uri:
+            secret_manager = self.get_secret_manager_secret(authentication_uri)
+            statements.append(secret_manager)
+
+        if has_vpc_config:
+            vpc_permissions = self.get_vpc_permission()
+            statements.append(vpc_permissions)
+
+        if self.SecretsManagerKmsKeyId:
+            kms_policy = self.get_kms_policy()
+            statements.append(kms_policy)
+
         document = {
             "PolicyDocument": {
-                "Statement": [],
+                "Statement": statements,
                 "Version": "2012-10-17",
             },
             "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
         }
-
-        authentication_uri, has_vpc_config = self.get_secret_key()
-        if authentication_uri:
-            secret_manager = self.get_secret_manager_secret(authentication_uri)
-            document["PolicyDocument"]["Statement"].append(secret_manager)
-
-        if has_vpc_config:
-            vpc_permissions = self.get_vpc_permission()
-            document["PolicyDocument"]["Statement"].append(vpc_permissions)
-
-        if self.SecretsManagerKmsKeyId:
-            kms_policy = self.get_kms_policy()
-            document["PolicyDocument"]["Statement"].append(kms_policy)
 
         return document
 
