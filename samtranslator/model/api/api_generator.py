@@ -603,14 +603,17 @@ class ApiGenerator(object):
 
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
-            editor.add_cors(
-                path,
-                properties.AllowOrigin,
-                properties.AllowHeaders,
-                properties.AllowMethods,
-                max_age=properties.MaxAge,
-                allow_credentials=properties.AllowCredentials,
-            )
+            try:
+                editor.add_cors(
+                    path,
+                    properties.AllowOrigin,
+                    properties.AllowHeaders,
+                    properties.AllowMethods,
+                    max_age=properties.MaxAge,
+                    allow_credentials=properties.AllowCredentials,
+                )
+            except InvalidTemplateException as ex:
+                raise InvalidResourceException(self.logical_id, ex.message)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger

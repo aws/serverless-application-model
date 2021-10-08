@@ -321,7 +321,7 @@ class SwaggerEditor(object):
             return
 
         if not allowed_origins:
-            raise ValueError("Invalid input. Value for AllowedOrigins is required")
+            raise InvalidTemplateException("Invalid input. Value for AllowedOrigins is required")
 
         if not allowed_methods:
             # AllowMethods is not given. Let's try to generate the list from the given Swagger.
