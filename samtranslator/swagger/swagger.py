@@ -28,6 +28,7 @@ class SwaggerEditor(object):
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
+    _EXCLUDED_PATHS_FIELDS = ["summary", "description", "parameters"]
     _POLICY_TYPE_IAM = "Iam"
     _POLICY_TYPE_IP = "Ip"
     _POLICY_TYPE_VPC = "Vpc"
@@ -527,8 +528,8 @@ class SwaggerEditor(object):
         for method_name, method in self.get_path(path).items():
             normalized_method_name = self._normalize_method_name(method_name)
 
-            # Excluding parameters section
-            if normalized_method_name == "parameters":
+            # Excluding non-method sections
+            if normalized_method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                 continue
             if add_default_auth_to_preflight or normalized_method_name != "options":
                 normalized_method_name = self._normalize_method_name(method_name)
@@ -623,8 +624,8 @@ class SwaggerEditor(object):
         """
 
         for method_name, method in self.get_path(path).items():
-            # Excluding parameters section
-            if method_name == "parameters":
+            # Excluding non-method sections
+            if method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                 continue
 
             # It is possible that the method could have two definitions in a Fn::If block.

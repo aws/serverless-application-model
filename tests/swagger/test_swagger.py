@@ -949,8 +949,14 @@ class TestSwaggerEditor_add_auth(TestCase):
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
-                "/foo": {"get": {_X_INTEGRATION: {"a": "b"}}, "post": {_X_INTEGRATION: {"a": "b"}}},
-                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
+                "/foo": {
+                    "summary": "a",
+                    "description": "b",
+                    "parameters": {"a": "b"},
+                    "get": {_X_INTEGRATION: {"a": "b"}},
+                    "post": {_X_INTEGRATION: {"a": "b"}},
+                },
+                "/bar": {"summary": "a", "description": "b", "get": {_X_INTEGRATION: {"a": "b"}}},
             },
         }
 
@@ -971,6 +977,8 @@ class TestSwaggerEditor_add_auth(TestCase):
         self.editor.set_path_default_apikey_required(path)
         methods = self.editor.swagger["paths"][path]
         for method in methods:
+            if method in ["summary", "parameters", "description"]:
+                continue
             self.assertEqual(expected, methods[method]["security"])
 
     def test_add_default_apikey_to_all_paths_correctly_handles_method_level_settings(self):
