@@ -45,7 +45,7 @@ class Hash(object):
             return Hash.fhash(value)
         if isinstance(value, int):
             return hash(value)
-        if isinstance(value, ("".__class__, u"".__class__, bytes)) or type(value).__name__ == "buffer":
+        if isinstance(value, ("".__class__, bytes)) or type(value).__name__ == "buffer":
             return Hash.shash(value)
 
         raise TypeError("unhashable type: '%s'" % (type(value).__name__))

@@ -447,12 +447,12 @@ class Py27Dict(dict):
 
         for i, key in enumerate(self):
             string += ", " if i > 0 else ""
-            if isinstance(key, ("".__class__, u"".__class__, bytes)):
+            if isinstance(key, ("".__class__, bytes)):
                 string += "%s: " % key.__repr__()
             else:
                 string += "%s: " % key
 
-            if isinstance(self[key], ("".__class__, u"".__class__, bytes)):
+            if isinstance(self[key], ("".__class__, bytes)):
                 string += "%s" % self[key].__repr__()
             else:
                 string += "%s" % self[key]
@@ -522,7 +522,7 @@ class Py27Dict(dict):
 
 
 def _convert_to_py27_dict(original):
-    if isinstance(original, ("".__class__, u"".__class__, bytes)):
+    if isinstance(original, ("".__class__, bytes)):
         # these are strings, return the Py27UniStr instance of the string
         return Py27UniStr(original)
 

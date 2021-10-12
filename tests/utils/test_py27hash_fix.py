@@ -33,7 +33,7 @@ class TestPy27UniStr(TestCase):
         self.assertEqual(added1, "foobar")
 
         added2 = part2 + part1
-        self.assertIsInstance(added2, ("".__class__, u"".__class__, bytes))
+        self.assertIsInstance(added2, ("".__class__, bytes))
         self.assertNotIsInstance(added2, Py27UniStr)
         self.assertEqual(added2, "barfoo")
 
