@@ -1167,11 +1167,14 @@ class HttpApi(PushEventSource):
             return
 
         function_arn = function.get_runtime_attr("arn")
-        uri = fnSub(
+        arn = (
             "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
             + make_shorthand(function_arn)
             + "/invocations"
         )
+        if function_arn.get("Fn::GetAtt") and isinstance(function_arn["Fn::GetAtt"][0], Py27UniStr):
+            arn = Py27UniStr(arn)
+        uri = Py27Dict(fnSub(arn))
 
         editor = OpenApiEditor(open_api_body)
 

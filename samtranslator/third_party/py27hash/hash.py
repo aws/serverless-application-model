@@ -7,6 +7,7 @@ This is designed for compatibility not performance.
 import ctypes
 import math
 
+
 def hash27(value):
     """
     Wrapper call to Hash.hash()
@@ -19,6 +20,7 @@ def hash27(value):
     """
 
     return Hash.hash(value)
+
 
 class Hash(object):
     """
@@ -145,7 +147,7 @@ class Hash(object):
             x = (1000003 * x) ^ Hash.ordinal(c)
 
         x ^= length
-        x &= 0xffffffffffffffff
+        x &= 0xFFFFFFFFFFFFFFFF
         if x == -1:
             x = -2
 
@@ -165,4 +167,3 @@ class Hash(object):
         """
 
         return value if isinstance(value, int) else ord(value)
- 

@@ -22,23 +22,23 @@ unicode_string_type = str if sys.version_info.major >= 3 else unicode
 
 def to_py27_compatible_template(template):
     """
-    Convert an input template to a py27hash-compatible template. This function has to be run before any 
+    Convert an input template to a py27hash-compatible template. This function has to be run before any
     manipulation occurs for sake of keeping the same initial state. This function modifies the input template,
     rather than return a copied template. We choose not to return a copy because copying the template might
     change its internal state in Py2.7.
     We only convert necessary parts in the template which could affect the hash generation for Serverless Api
-    template is modified 
+    template is modified
 
     Parameters
     ----------
     template: dict
         input template
-    
+
     Returns
     -------
     None
     """
-    # Passing to parser for a simple validation. Validation is normally done within translator.translate(...). 
+    # Passing to parser for a simple validation. Validation is normally done within translator.translate(...).
     # However, becuase this conversion is done before translate and also requires the template to be valid, we
     # perform a simple validation here to just make sure the template is minimally safe for conversion.
     Parser.validate_datetypes(template)
@@ -76,14 +76,16 @@ def to_py27_compatible_template(template):
                         if "Condition" in resource_dict:
                             resource_dict["Condition"] = _convert_to_py27_dict(resource_dict["Condition"])
                         if "FunctionName" in resource_properties:
-                            resource_properties["FunctionName"] = _convert_to_py27_dict(resource_properties["FunctionName"])
+                            resource_properties["FunctionName"] = _convert_to_py27_dict(
+                                resource_properties["FunctionName"]
+                            )
                         if "Events" in resource_properties:
                             resource_properties["Events"] = _convert_to_py27_dict(resource_properties["Events"])
 
             new_resources_dict[Py27UniStr(logical_id)] = resource_dict
         template["Resources"] = new_resources_dict
 
-    
+
 def undo_mark_unicode_str_in_template(template_dict):
     return json.loads(json.dumps(template_dict))
 
@@ -93,6 +95,7 @@ class Py27UniStr(unicode_string_type):
     A string subclass to allow string be recognized as Python2 unicode string
     To preserve the instance type in string operations, we need to override certain methods
     """
+
     def __add__(self, other):
         return Py27UniStr(super(Py27UniStr, self).__add__(other))
 
@@ -124,15 +127,16 @@ class Py27Keys(object):
     The order of keys in Python 2.7 is path dependent -- the order of inserts and deletes matters
     in determining the iteration order.
     """
-    DUMMY = ["dummy"] # marker for deleted keys
+
+    DUMMY = ["dummy"]  # marker for deleted keys
 
     def __init__(self):
         super(Py27Keys, self).__init__()
         self.debug = False
         self.keyorder = dict()
-        self.size = 0 # current size of the keys, equivalent to ma_used in dictobject.c
-        self.fill = 0 # increment count when a key is added, equivalent to ma_fill in dictobject.c
-        self.mask = MINSIZE - 1 # Python2 default dict size
+        self.size = 0  # current size of the keys, equivalent to ma_used in dictobject.c
+        self.fill = 0  # increment count when a key is added, equivalent to ma_fill in dictobject.c
+        self.mask = MINSIZE - 1  # Python2 default dict size
 
     def _get_key_idx(self, k):
         """Gets insert location for k"""
@@ -141,7 +145,7 @@ class Py27Keys(object):
         h = ctypes.c_size_t(Hash.hash(k)).value
         i = h & self.mask
 
-        if i not in self.keyorder or self.keyorder[i] == k: 
+        if i not in self.keyorder or self.keyorder[i] == k:
             # empty slot or keys match
             return i
 
@@ -257,7 +261,7 @@ class Py27Keys(object):
         """
         if len(other) == 0 or self is other:
             # nothing to do
-            return 
+            return
 
         # PyDict_Merge initial merge size is double the size of current + incoming dict
         if ((self.fill + len(other)) * 3) >= ((self.mask + 1) * 2):
@@ -291,6 +295,7 @@ class Py27Dict(dict):
     """
     Compatibility class to support Python2.7 style iteration in Python3.x
     """
+
     def __init__(self, *args, **kwargs):
         """
         Overrides dict logic to always call set item. This allows Python2.7 style iteration
@@ -325,7 +330,7 @@ class Py27Dict(dict):
     def __delitem__(self, key):
         """
         Override of __delitem__ to track kyes and simulate Python2.7 dict.
-        
+
         Parameters
         ----------
         key: hashable
@@ -336,7 +341,7 @@ class Py27Dict(dict):
     def update(self, *args, **kwargs):
         """
         Overrides dict logic to always call set item. This allows Python2.7 style iteration.
-        
+
         Parameters
         ----------
         args: args
@@ -348,7 +353,7 @@ class Py27Dict(dict):
                 # Merge incoming keys into keylist
                 self.keylist.merge(arg.keys())
                 arg = arg.items()
-            
+
             for k, v in arg:
                 self[k] = v
 
@@ -365,7 +370,7 @@ class Py27Dict(dict):
     def copy(self):
         """
         Copies the dict along with its backing Python2.7 keylist.
-        
+
         Returns
         -------
         Py27Dict
@@ -385,18 +390,18 @@ class Py27Dict(dict):
     def pop(self, key, default=None):
         """
         Pops the value at key from the dict if it exists, return default otherwise
-        
+
         Parameters
         ----------
         key: hashable
             key to remove
         default: Any
             value to return if key is not found
-        
+
         Returns
         -------
         Any
-            value of key if found or default    
+            value of key if found or default
         """
         value = super(Py27Dict, self).pop(key, default)
         self.keylist.remove(key)
@@ -405,7 +410,7 @@ class Py27Dict(dict):
     def popitem(self):
         """
         Pops an element from the dict and returns the item.
-        
+
         Returns
         -------
         tuple
@@ -423,7 +428,7 @@ class Py27Dict(dict):
     def __iter__(self):
         """
         Default iterator
-        
+
         Returns
         -------
         iterator
@@ -458,7 +463,7 @@ class Py27Dict(dict):
     def __repr__(self):
         """
         Create a string version of this Dict
-        
+
         Returns
         -------
         str
@@ -468,7 +473,7 @@ class Py27Dict(dict):
     def keys(self):
         """
         Returns keys ordered using Python2.7 iteration alogrithm
-        
+
         Returns
         -------
         list
@@ -479,7 +484,7 @@ class Py27Dict(dict):
     def values(self):
         """
         Returns values ordered using Python2.7 iteration algorithm
-        
+
         Returns
         -------
         list
@@ -490,7 +495,7 @@ class Py27Dict(dict):
     def items(self):
         """
         Returns items ordered using Python2.7 iteration algorithm
-        
+
         Returns
         -------
         list
@@ -531,7 +536,7 @@ def _convert_to_py27_dict(original):
         for key in key_list:
             new_dict[Py27UniStr(key)] = _convert_to_py27_dict(original[key])
         return new_dict
-    
+
     # Anything else does not require conversion
     return original
 

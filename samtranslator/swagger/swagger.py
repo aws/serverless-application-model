@@ -20,7 +20,7 @@ class SwaggerEditor(object):
     we have to apply py27hash_fix. For any dictionary that is created within the swagger body, we need to initiate it
     with Py27Dict() instead of {}. We also need to add keys into the Py27Dict instance one by one, so that the input
     order could be preserved. This is a must for the purpose of preserving the dict key iteration order, which is
-    essential for generating the same logical ID. 
+    essential for generating the same logical ID.
     """
 
     _OPTIONS_METHOD = "options"
@@ -357,9 +357,9 @@ class SwaggerEditor(object):
         Args:
             binary_media_types: list
         """
+
         def replace_recursively(bmt):
-            """replaces "~1" with "/" for the input binary_media_types recursively
-            """
+            """replaces "~1" with "/" for the input binary_media_types recursively"""
             if isinstance(bmt, dict):
                 to_return = Py27Dict()
                 for k, v in bmt.items():
@@ -403,15 +403,19 @@ class SwaggerEditor(object):
         ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
         HEADER_RESPONSE = lambda x: "method.response.header." + x
 
-        response_parameters = Py27Dict({
-            # AllowedOrigin is always required
-            HEADER_RESPONSE(ALLOW_ORIGIN): allowed_origins
-        })
+        response_parameters = Py27Dict(
+            {
+                # AllowedOrigin is always required
+                HEADER_RESPONSE(ALLOW_ORIGIN): allowed_origins
+            }
+        )
 
-        response_headers = Py27Dict({
-            # Allow Origin is always required
-            ALLOW_ORIGIN: {"type": "string"}
-        })
+        response_headers = Py27Dict(
+            {
+                # Allow Origin is always required
+                ALLOW_ORIGIN: {"type": "string"}
+            }
+        )
 
         # Optional values. Skip the header if value is empty
         #
@@ -1076,7 +1080,9 @@ class SwaggerEditor(object):
         for m in methods:
             method = "*" if (m.lower() == self._X_ANY_METHOD or m.lower() == "any") else m.upper()
             resource = "execute-api:/${__Stage__}/" + method + path
-            resource = Py27UniStr(resource) if isinstance(method, Py27UniStr) or isinstance(path, Py27UniStr) else resource
+            resource = (
+                Py27UniStr(resource) if isinstance(method, Py27UniStr) or isinstance(path, Py27UniStr) else resource
+            )
             resource = fnSub(resource, {"__Stage__": stage})
             uri_list.extend([resource])
         return uri_list

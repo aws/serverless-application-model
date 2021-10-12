@@ -994,9 +994,9 @@ class ApiGenerator(object):
                                     headers = definition_body["paths"][path]["options"][field]["200"]["headers"]
                                     for header in headers.keys():
                                         header_value = Py27Dict()
-                                        header_value["schema"] = definition_body["paths"][path]["options"][field]["200"][
-                                            "headers"
-                                        ][header]
+                                        header_value["schema"] = definition_body["paths"][path]["options"][field][
+                                            "200"
+                                        ]["headers"][header]
                                         definition_body["paths"][path]["options"][field]["200"]["headers"][
                                             header
                                         ] = header_value

@@ -114,18 +114,18 @@ class TestPy27Keys(TestCase):
 class TestPy27Dict(TestCase):
     def test_py27_iteration_order_01(self):
         input_order = [
-            ('/users', 'get'),
-            ('/users', 'post'),
-            ('/any/lambdatokennone', 'any'),
-            ('/any/cognitomultiple', 'any'),
-            ('/any/lambdatoken', 'any'),
-            ('/any/default', 'any'),
-            ('/any/lambdarequest', 'any'),
-            ('/users', 'patch'),
-            ('/users', 'delete'),
-            ('/users', 'put'),
-            ('/', 'get'),
-            ('/any/noauth', 'any'),
+            ("/users", "get"),
+            ("/users", "post"),
+            ("/any/lambdatokennone", "any"),
+            ("/any/cognitomultiple", "any"),
+            ("/any/lambdatoken", "any"),
+            ("/any/default", "any"),
+            ("/any/lambdarequest", "any"),
+            ("/users", "patch"),
+            ("/users", "delete"),
+            ("/users", "put"),
+            ("/", "get"),
+            ("/any/noauth", "any"),
         ]
         expected_orders = [
             "/any/cognitomultiple",
@@ -137,13 +137,11 @@ class TestPy27Dict(TestCase):
             "/any/noauth",
             "/users",
         ]
-        expected_copied_orders = [
-            [0, 1, 2, 3, 4, 5, 6, 7]
-        ]
+        expected_copied_orders = [[0, 1, 2, 3, 4, 5, 6, 7]]
 
         py27_dict = Py27Dict()
         for path, _ in input_order:
-            py27_dict[path] = "" 
+            py27_dict[path] = ""
 
         self._validate_iteration_order(py27_dict, expected_orders, expected_copied_orders)
 
@@ -155,7 +153,13 @@ class TestPy27Dict(TestCase):
             "MyLambdaTokenAuth",
             "MyLambdaRequestAuth",
         ]
-        expected_order = ["MyCognitoAuth", "MyLambdaTokenAuthNoneFunctionInvokeRole", "MyCognitoAuthMultipleUserPools", "MyLambdaTokenAuth", "MyLambdaRequestAuth"]
+        expected_order = [
+            "MyCognitoAuth",
+            "MyLambdaTokenAuthNoneFunctionInvokeRole",
+            "MyCognitoAuthMultipleUserPools",
+            "MyLambdaTokenAuth",
+            "MyLambdaRequestAuth",
+        ]
         expected_copied_orders = [
             [0, 1, 2, 3, 4],
         ]
@@ -173,7 +177,7 @@ class TestPy27Dict(TestCase):
             "MyCognitoAuthMultipleUserPools",
             "MyLambdaTokenAuth",
             "MyLambdaRequestAuth",
-            "api_key"
+            "api_key",
         ]
         expected_order = [
             "MyLambdaTokenAuthNoneFunctionInvokeRole",
@@ -181,7 +185,7 @@ class TestPy27Dict(TestCase):
             "MyLambdaRequestAuth",
             "MyCognitoAuth",
             "MyLambdaTokenAuth",
-            "MyCognitoAuthMultipleUserPools"
+            "MyCognitoAuthMultipleUserPools",
         ]
         expected_copied_orders = [
             [0, 5, 2, 3, 4, 1],
@@ -205,7 +209,7 @@ class TestPy27Dict(TestCase):
             "MyCognitoAuthMultipleUserPools",
             "MyLambdaTokenAuth",
             "MyLambdaRequestAuth",
-            "api_key"
+            "api_key",
         ]
         expected_order = [
             "MyLambdaTokenAuthNoneFunctionInvokeRole",
@@ -213,14 +217,14 @@ class TestPy27Dict(TestCase):
             "MyLambdaRequestAuth",
             "MyCognitoAuth",
             "MyLambdaTokenAuth",
-            "MyCognitoAuthMultipleUserPools"
+            "MyCognitoAuthMultipleUserPools",
         ]
         expected_copied_orders = [
             [0, 5, 2, 3, 4, 1],
             [0, 1, 2, 3, 4, 5],
             [0, 5, 2, 3, 4, 1],
         ]
-        
+
         py27_dict = Py27Dict()
         for key in input_order[:-1]:
             py27_dict[key] = ""
@@ -241,7 +245,7 @@ class TestPy27Dict(TestCase):
             "MyCognitoAuthMultipleUserPools",
             "MyLambdaTokenAuth",
             "MyLambdaRequestAuth",
-            "api_key"
+            "api_key",
         ]
         expected_order = [
             "MyLambdaTokenAuthNoneFunctionInvokeRole",
@@ -249,14 +253,14 @@ class TestPy27Dict(TestCase):
             "MyLambdaTokenAuth",
             "MyLambdaRequestAuth",
             "MyCognitoAuth",
-            "MyCognitoAuthMultipleUserPools"
+            "MyCognitoAuthMultipleUserPools",
         ]
         expected_copied_orders = [
             [0, 5, 3, 4, 2, 1],
             [0, 1, 3, 4, 2, 5],
             [0, 5, 3, 4, 2, 1],
         ]
-        
+
         py27_dict = Py27Dict()
         for key in input_order[:-1]:
             py27_dict[key] = ""
@@ -299,9 +303,7 @@ class TestPy27Dict(TestCase):
         self.assertEqual(py27_dict.keys(), ["info", "paths", "components", "openapi"])
 
     def test_py27_iteration_order_07(self):
-        """
-
-        """
+        """"""
         input_order = ["get", "post", "patch", "delete", "put"]
         expected_order = ["put", "delete", "post", "patch", "get"]
         expected_copied_orders = [
@@ -315,13 +317,12 @@ class TestPy27Dict(TestCase):
         for key in input_order:
             py27_dict[key] = {}
             py27_dict_setdefault.setdefault(key, {})
-        
+
         self.assertEqual(py27_dict, py27_dict_setdefault)
         self.assertEqual(py27_dict.keys(), py27_dict_setdefault.keys())
 
         self._validate_iteration_order(py27_dict, expected_order, expected_copied_orders)
         self._validate_iteration_order(py27_dict_setdefault, expected_order, expected_copied_orders)
-        
 
     def _validate_iteration_order(self, py27_dict, expected_order, expected_copied_orders=[]):
         """
@@ -453,12 +454,7 @@ class TestConvertToPy27Dict(TestCase):
             self.assertIsInstance(item, Py27Dict)
 
     def test_with_other_type(self):
-        original = [
-            ("a", "b"),
-            set(["a", "b"]),
-            123,
-            123.123
-        ]
+        original = [("a", "b"), set(["a", "b"]), 123, 123.123]
         converted = _convert_to_py27_dict(original)
         self.assertIsInstance(converted[0], tuple)
         self.assertIsInstance(converted[1], set)
@@ -470,52 +466,25 @@ class TestConvertToPy27Dict(TestCase):
 class TestToPy27CompatibleTemplate(TestCase):
     def test_all(self):
         input_template = {
-            "Globals": {
-                "Api": {}
-            },
-            "Parameters": {
-                "Param1": {
-                    "Default": "Value"
-                },
-                "Param2": {
-                    "Default": {}
-                }
-            },
+            "Globals": {"Api": {}},
+            "Parameters": {"Param1": {"Default": "Value"}, "Param2": {"Default": {}}},
             "Resources": {
-                "Api": {
-                    "Type": "AWS::Serverless::Api",
-                    "Properties": {
-
-                    }
-                },
-                "Function": {
-                    "Type": "AWS::Serverless::Function",
-                    "Properties": {}
-                },
-                "StateMachine": {
-                    "Type": "AWS::Serverless::StateMachine",
-                    "Properties": {}
-                },
-                "Other": {
-                    "Type": "AWS::S3::Bucket",
-                    "Properties": {}
-                }
-            }
+                "Api": {"Type": "AWS::Serverless::Api", "Properties": {}},
+                "Function": {"Type": "AWS::Serverless::Function", "Properties": {}},
+                "StateMachine": {"Type": "AWS::Serverless::StateMachine", "Properties": {}},
+                "Other": {"Type": "AWS::S3::Bucket", "Properties": {}},
+            },
         }
         to_py27_compatible_template(input_template)
+        self.assertEqual(str(input_template["Globals"]), "{'Api': {}}")
         self.assertEqual(
-            str(input_template["Globals"]),
-            "{'Api': {}}"
-        )
-        self.assertEqual(
-            str(input_template["Parameters"]),
-            "{u'Param2': {'Default': {}}, u'Param1': {'Default': u'Value'}}"
+            str(input_template["Parameters"]), "{u'Param2': {'Default': {}}, u'Param1': {'Default': u'Value'}}"
         )
         self.assertEqual(
             str(input_template["Resources"]),
             "{u'Function': {'Type': 'AWS::Serverless::Function', 'Properties': {}}, u'Api': {'Type': '"
             "AWS::Serverless::Api', 'Properties': {}}, u'Other': {'Type': 'AWS::S3::Bucket', 'Properti"
-            "es': {}}, u'StateMachine': {'Type': 'AWS::Serverless::StateMachine', 'Properties': {}}}"
+            "es': {}}, u'StateMachine': {'Type': 'AWS::Serverless::StateMachine', 'Properties': {}}}",
         )
 
     def test_empty_dict_fails_validation(self):
@@ -536,13 +505,8 @@ class TestToPy27CompatibleTemplate(TestCase):
     def test_only_parameters_fails_validation(self):
         template = {
             "Parameters": {
-                "Param1": {
-                    "Description": "description",
-                    "Default": "default value" 
-                },
-                "Param2": {
-                    "Description": "description"
-                }
+                "Param1": {"Description": "description", "Default": "default value"},
+                "Param2": {"Description": "description"},
             }
         }
         with self.assertRaises(InvalidDocumentException):
@@ -551,54 +515,27 @@ class TestToPy27CompatibleTemplate(TestCase):
     def test_resources_api(self):
         template = {
             "Resources": {
-                "Api": {
-                    "Type": "AWS::Serverless::Api",
-                    "Properties": {
-                        "Name": "MyApi"
-                    }
-                },
-                "HttpApi": {
-                    "Type": "AWS::Serverless::HttpApi"
-                },
+                "Api": {"Type": "AWS::Serverless::Api", "Properties": {"Name": "MyApi"}},
+                "HttpApi": {"Type": "AWS::Serverless::HttpApi"},
                 "Function": {
                     "Type": "AWS::Serverless::Function",
                     "Properties": {
-                        "FunctionName": {
-                            "Ref": "MyFunctionName"
-                        },
+                        "FunctionName": {"Ref": "MyFunctionName"},
                         "Events": {
-                            "ApiEvent": {
-                                "Type": "Api",
-                                "Properties": {
-                                    "Path": "/user",
-                                    "Method": "GET"
-                                }
-                            },
-                            "SecondApiEvent": {
-                                "Type": "Api",
-                                "Properties": {
-                                    "Path": "/admin",
-                                    "Method": "GET"
-                                }
-                            }
-                        }
-                    }
+                            "ApiEvent": {"Type": "Api", "Properties": {"Path": "/user", "Method": "GET"}},
+                            "SecondApiEvent": {"Type": "Api", "Properties": {"Path": "/admin", "Method": "GET"}},
+                        },
+                    },
                 },
                 "StateMachine": {
                     "Type": "AWS::Serverless::StateMachine",
                     "Condition": "ShouldAddStateMachine",
                     "Properties": {
                         "Event": {
-                            "ApiEvent": {
-                                "Type": "Api",
-                                "Properties": {
-                                    "Path": "/state-machine",
-                                    "Method": "GET"
-                                }
-                            }
+                            "ApiEvent": {"Type": "Api", "Properties": {"Path": "/state-machine", "Method": "GET"}}
                         }
-                    }
-                }
+                    },
+                },
             }
         }
         to_py27_compatible_template(template)
@@ -607,42 +544,20 @@ class TestToPy27CompatibleTemplate(TestCase):
         self.assertIsInstance(template["Resources"]["Api"]["Properties"], Py27Dict)
         self.assertIsInstance(template["Resources"]["Api"]["Properties"]["Name"], Py27UniStr)
 
-
     def test_comprehensive_resources(self):
         template = {
             "Resources": {
-                "Api": {
-                    "Type": "AWS::Serverless::Api",
-                    "Properties": {
-                        "Name": "MyApi"
-                    }
-                },
-                "HttpApi": {
-                    "Type": "AWS::Serverless::HttpApi"
-                },
+                "Api": {"Type": "AWS::Serverless::Api", "Properties": {"Name": "MyApi"}},
+                "HttpApi": {"Type": "AWS::Serverless::HttpApi"},
                 "Function": {
                     "Type": "AWS::Serverless::Function",
                     "Properties": {
-                        "FunctionName": {
-                            "Ref": "MyFunctionName"
-                        },
+                        "FunctionName": {"Ref": "MyFunctionName"},
                         "Events": {
-                            "ApiEvent": {
-                                "Type": "Api",
-                                "Properties": {
-                                    "Path": "/user",
-                                    "Method": "GET"
-                                }
-                            },
-                            "SecondApiEvent": {
-                                "Type": "Api",
-                                "Properties": {
-                                    "Path": "/admin",
-                                    "Method": "GET"
-                                }
-                            }
-                        }
-                    }
+                            "ApiEvent": {"Type": "Api", "Properties": {"Path": "/user", "Method": "GET"}},
+                            "SecondApiEvent": {"Type": "Api", "Properties": {"Path": "/admin", "Method": "GET"}},
+                        },
+                    },
                 },
                 "StateMachine": {
                     "Type": "AWS::Serverless::StateMachine",
@@ -650,16 +565,10 @@ class TestToPy27CompatibleTemplate(TestCase):
                     "Properties": {
                         "Name": "statemachine",
                         "Events": {
-                            "ApiEvent": {
-                                "Type": "Api",
-                                "Properties": {
-                                    "Path": "/state-machine",
-                                    "Method": "GET"
-                                }
-                            }
-                        }
-                    }
-                }
+                            "ApiEvent": {"Type": "Api", "Properties": {"Path": "/state-machine", "Method": "GET"}}
+                        },
+                    },
+                },
             }
         }
         to_py27_compatible_template(template)
@@ -672,7 +581,7 @@ class TestToPy27CompatibleTemplate(TestCase):
         self.assertIsInstance(template["Resources"]["Api"]["Properties"]["Name"], Py27UniStr)
 
         self.assertNotIsInstance(template["Resources"]["HttpApi"], Py27Dict)
-        
+
         self.assertNotIsInstance(template["Resources"]["Function"], Py27Dict)
         self.assertNotIsInstance(template["Resources"]["Function"]["Properties"], Py27Dict)
         self.assertIsInstance(template["Resources"]["Function"]["Properties"]["FunctionName"], Py27Dict)
@@ -686,28 +595,16 @@ class TestToPy27CompatibleTemplate(TestCase):
 
     @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
     def test_no_conversion_happens(self, _convert_to_py27_dict_mock):
-        template = {
-            "Resources": {
-                "S3Bucket": {
-                    "Type": "AWS::S3::Bucket",
-                    "Properties": {}
-                }
-            }
-        }
+        template = {"Resources": {"S3Bucket": {"Type": "AWS::S3::Bucket", "Properties": {}}}}
         to_py27_compatible_template(template)
 
         _convert_to_py27_dict_mock.assert_not_called()
-    
+
     @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
     def test_explicit_api(self, _convert_to_py27_dict_mock):
         template = {
             "Resources": {
-                "Api": {
-                    "Type": "AWS::Serverless::Api",
-                    "Properties": {
-                        "Name": "MyApi"
-                    }
-                },
+                "Api": {"Type": "AWS::Serverless::Api", "Properties": {"Name": "MyApi"}},
             }
         }
         to_py27_compatible_template(template)
@@ -721,26 +618,12 @@ class TestToPy27CompatibleTemplate(TestCase):
                 "Function": {
                     "Type": "AWS::Serverless::Function",
                     "Properties": {
-                        "FunctionName": {
-                            "Ref": "MyFunctionName"
-                        },
+                        "FunctionName": {"Ref": "MyFunctionName"},
                         "Events": {
-                            "ApiEvent": {
-                                "Type": "Api",
-                                "Properties": {
-                                    "Path": "/user",
-                                    "Method": "GET"
-                                }
-                            },
-                            "SecondApiEvent": {
-                                "Type": "Api",
-                                "Properties": {
-                                    "Path": "/admin",
-                                    "Method": "GET"
-                                }
-                            }
-                        }
-                    }
+                            "ApiEvent": {"Type": "Api", "Properties": {"Path": "/user", "Method": "GET"}},
+                            "SecondApiEvent": {"Type": "Api", "Properties": {"Path": "/admin", "Method": "GET"}},
+                        },
+                    },
                 },
             }
         }
