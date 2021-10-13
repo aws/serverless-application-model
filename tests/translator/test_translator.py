@@ -1,5 +1,4 @@
 import json
-import copy
 import itertools
 import os.path
 import hashlib
@@ -13,7 +12,6 @@ from samtranslator.model.exceptions import InvalidDocumentException, InvalidReso
 from samtranslator.model import Resource
 from samtranslator.model.sam_resources import SamSimpleTable
 from samtranslator.public.plugins import BasePlugin
-from samtranslator.utils.py27hash_fix import to_py27_compatible_template, undo_mark_unicode_str_in_template
 
 from tests.translator.helpers import get_template_parameter_values
 from tests.plugins.application.test_serverless_app_plugin import mock_get_region
@@ -177,11 +175,6 @@ class AbstractTestTranslator(TestCase):
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
         print(json.dumps(output_fragment, indent=2))
-
-        # Only update the deployment Logical Id hash in Py3.
-        # if sys.version_info.major >= 3:
-        #     self._update_logical_id_hash(expected)
-        #     self._update_logical_id_hash(output_fragment)
 
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
@@ -552,11 +545,6 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
 
         print(json.dumps(output_fragment, indent=2))
 
-        # Only update the deployment Logical Id hash in Py3.
-        # if sys.version_info.major >= 3:
-        #     self._update_logical_id_hash(expected)
-        #     self._update_logical_id_hash(output_fragment)
-
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
     @parameterized.expand(
@@ -610,11 +598,6 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
 
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
         print(json.dumps(output_fragment, indent=2))
-
-        # Only update the deployment Logical Id hash in Py3.
-        # if sys.version_info.major >= 3:
-        #     self._update_logical_id_hash(expected)
-        #     self._update_logical_id_hash(output_fragment)
 
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 

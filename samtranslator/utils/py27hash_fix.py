@@ -41,7 +41,7 @@ def to_py27_compatible_template(template):
     # Passing to parser for a simple validation. Validation is normally done within translator.translate(...).
     # However, becuase this conversion is done before translate and also requires the template to be valid, we
     # perform a simple validation here to just make sure the template is minimally safe for conversion.
-    Parser.validate_datetypes(template)
+    Parser.validate_datatypes(template)
 
     if not _template_has_api_resource(template):
         # template does not contain any API resource, no need to convert

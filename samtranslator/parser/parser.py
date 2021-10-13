@@ -13,7 +13,7 @@ class Parser:
         sam_plugins.act(LifeCycleEvents.before_transform_template, sam_template)
 
     @staticmethod
-    def validate_datetypes(sam_template):
+    def validate_datatypes(sam_template):
         """Validates the datatype within the template """
         if (
             "Resources" not in sam_template
@@ -58,6 +58,6 @@ class Parser:
         if parameter_values is None:
             raise ValueError("`parameter_values` argument is required")
 
-        self.validate_datetypes(sam_template)
+        self.validate_datatypes(sam_template)
 
         SamTemplateValidator.validate(sam_template)
