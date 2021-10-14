@@ -8,7 +8,6 @@ pyyaml~=5.4
 # Test requirements
 pytest~=6.1.1; python_version >= '3.6'
 pytest~=4.6.11; python_version < '3.6' # pytest dropped python 2 support after 4.6.x
-mock>=3.0.5,<4.0.0  # 4.0.0 drops Python 2 support
 parameterized~=0.7.4
 
 # Integration tests

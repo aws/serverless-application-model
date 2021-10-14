@@ -1,7 +1,7 @@
 import boto3
 import itertools
 
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 from unittest import TestCase
 from parameterized import parameterized, param
 

@@ -1,6 +1,6 @@
 from unittest import TestCase
 import pytest
-import mock
+from unittest.mock import patch, MagicMock
 
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
@@ -64,9 +64,7 @@ class TestApiGatewayV2Authorizer(TestCase):
             + "AuthorizationScopes must be defined only for OAuth2 Authorizer.",
         )
 
-    @mock.patch(
-        "samtranslator.model.apigatewayv2.ApiGatewayV2Authorizer._get_auth_type", mock.MagicMock(return_value="INVALID")
-    )
+    @patch("samtranslator.model.apigatewayv2.ApiGatewayV2Authorizer._get_auth_type", MagicMock(return_value="INVALID"))
     def test_create_authorizer_fails_with_jtw_configuration_non_oauth2(self):
         with pytest.raises(InvalidResourceException) as e:
             ApiGatewayV2Authorizer(
@@ -165,9 +163,7 @@ class TestApiGatewayV2Authorizer(TestCase):
             + "EnableSimpleResponses must be defined only for Lambda Authorizer.",
         )
 
-    @mock.patch(
-        "samtranslator.model.apigatewayv2.ApiGatewayV2Authorizer._get_auth_type", mock.MagicMock(return_value="JWT")
-    )
+    @patch("samtranslator.model.apigatewayv2.ApiGatewayV2Authorizer._get_auth_type", MagicMock(return_value="JWT"))
     def test_create_jwt_authorizer_no_jwt_configuration(self):
         with pytest.raises(InvalidResourceException) as e:
             ApiGatewayV2Authorizer(api_logical_id="logicalId", name="authName")

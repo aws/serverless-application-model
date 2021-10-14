@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction, FindInMapAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException

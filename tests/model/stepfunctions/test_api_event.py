@@ -1,4 +1,4 @@
-from mock import Mock
+from unittest.mock import Mock
 from unittest import TestCase
 
 from samtranslator.model.stepfunctions.events import Api
