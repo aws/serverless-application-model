@@ -1,0 +1,46 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        Authorizers:
+          LambdaTokenIdentityEmpty:
+            FunctionArn: Function.Arn
+            Identity:
+          LambdaTokenIdentityNotObject:
+            FunctionArn: Function.Arn
+            Identity: 3
+          LambdaTokenIdentityUnknown:
+            FunctionArn: Function.Arn
+            Identity:
+              Unknown: Property
+
+          # ReauthorizeEvery
+          LambdaTokenIdentityReauthorizeEveryEmpty:
+            FunctionArn: Function.Arn
+            Identity:
+              ReauthorizeEvery:
+          LambdaTokenIdentityReauthorizeEveryNotInt:
+            FunctionArn: Function.Arn
+            Identity:
+              ReauthorizeEvery: "3"
+          LambdaTokenIdentityReauthorizeEveryTooLow:
+            FunctionArn: Function.Arn
+            Identity:
+              ReauthorizeEvery: 0
+          LambdaTokenIdentityReauthorizeEveryTooHigh:
+            FunctionArn: Function.Arn
+            Identity:
+              ReauthorizeEvery: 0
+
+          # ValidationExpression
+          LambdaTokenIdentityValidationExpressionEmpty:
+            FunctionArn: Function.Arn
+            Identity:
+              ValidationExpression:
+          LambdaTokenIdentityValidationExpressionNotString:
+            FunctionArn: Function.Arn
+            Identity:
+              ValidationExpression: 3

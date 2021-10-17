@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "type": "object",
+  "definitions": {
+    "Condition": {
+      "type": "string"
+    },
+    "DeletionPolicy": {
+      "enum": [
+        "Delete",
+        "Retain",
+        "Snapshot"
+      ],
+      "type": "string"
+    },
+    "DependsOn": {
+      "type": [
+        "string",
+        "array"
+      ],
+      "pattern": "^[a-zA-Z0-9]+$",
+      "items": {
+        "pattern": "^[a-zA-Z0-9]+$",
+        "type": "string"
+      }
+    },
+    "GatewayResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "ResponseParameters": {
+          "type": [
+            "object",
+            "intrinsic"
+          ]
+        },
+        "ResponseTemplates": {
+          "type": [
+            "object",
+            "intrinsic"
+          ]
+        },
+        "StatusCode": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        }
+      },
+      "references": [
+        "https://docs.aws.amazon.com/apigateway/api-reference/resource/gateway-response/"
+      ],
+      "type": "object"
+    },
+    "GatewayResponses": {
+      "additionalProperties": false,
+      "properties": {
+        "ACCESS_DENIED": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "API_CONFIGURATION_ERROR": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "AUTHORIZER_FAILURE": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "AUTHORIZER_CONFIGURATION_ERROR": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "BAD_REQUEST_PARAMETERS": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "BAD_REQUEST_BODY": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "DEFAULT_4XX": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "DEFAULT_5XX": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "EXPIRED_TOKEN": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "INVALID_SIGNATURE": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "INTEGRATION_FAILURE": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "INTEGRATION_TIMEOUT": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "INVALID_API_KEY": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "MISSING_AUTHENTICATION_TOKEN": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "QUOTA_EXCEEDED": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "REQUEST_TOO_LARGE": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "RESOURCE_NOT_FOUND": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "THROTTLED": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "UNAUTHORIZED": {
+          "$ref": "#definitions/GatewayResponse"
+        },
+        "UNSUPPORTED_MEDIA_TYPE": {
+          "$ref": "#definitions/GatewayResponse"
+        }
+      },
+      "references": [
+        "https://docs.aws.amazon.com/apigateway/api-reference/resource/gateway-response/"
+      ],
+      "type": "object"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Value": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "type": "object"
+    },
+    "TagsMap": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9 _./=+-:]{1,128}$": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        }
+      },
+      "patternError": "can only contain a-zA-Z0-9 _./=+-: characters (max length 128)",
+      "type": "object"
+    },
+    "TagsList": {
+      "items": {
+        "$ref": "#definitions/Tag"
+      },
+      "type": [
+        "array",
+        "intrinsic"
+      ]
+    },
+    "UpdatePolicy": {
+      "enum": [
+        "Delete",
+        "Retain",
+        "Snapshot"
+      ],
+      "type": "string"
+    },
+    "UpdateReplacePolicy": {
+      "enum": [
+        "Delete",
+        "Retain",
+        "Snapshot"
+      ],
+      "type": "string"
+    }
+  }
+}

@@ -8,7 +8,7 @@ Globals:
   Api:
     # Overriding this property for Implicit API
     EndpointConfiguration:
-      Type: { "Ref" : "EndpointConfigType" }
+      Type: { "Ref": "EndpointConfigType" }
       VPCEndpointIds:
         - { "Ref": "VpcEndpointId" }
 Resources:
@@ -30,4 +30,5 @@ Resources:
     Properties:
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
-      EndpointConfiguration: SomeValue
+      EndpointConfiguration:
+        Type: REGIONAL
