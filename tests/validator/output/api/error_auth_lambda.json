@@ -1,0 +1,17 @@
+[
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaAuthorizationScopesEmpty.AuthorizationScopes] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaAuthorizationScopesItemNotString.AuthorizationScopes.0] 3 is not of type 'string'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaAuthorizationScopesNotList.AuthorizationScopes] 'scopes1' is not of type 'array'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionArnEmpty.FunctionArn] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionArnMissing] 'FunctionArn' is a required property",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionArnMissing] 'UserPoolArn' is a required property",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionArnNotIntrinsic.FunctionArn] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionArnNotString.FunctionArn] 3 is not of type 'string', 'intrinsic'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionInvokeRoleEmpty.FunctionInvokeRole] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionInvokeRoleNotIntrinsic.FunctionInvokeRole] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionInvokeRoleNotString.FunctionInvokeRole] 3 is not of type 'string', 'intrinsic'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionPayloadTypeEmpty.FunctionPayloadType] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionPayloadTypeNotString.FunctionPayloadType] 3 is not of type 'string'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionPayloadTypeNotString.FunctionPayloadType] 3 is not one of ['TOKEN', 'REQUEST']",
+  "[Resources.MyApi.Properties.Auth.Authorizers.LambdaFunctionPayloadTypeUnknown.FunctionPayloadType] 'MyPayloadType' is not one of ['TOKEN', 'REQUEST']"
+]

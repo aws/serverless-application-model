@@ -1,0 +1,6 @@
+[
+  "[Resources.ApiOpenApiVersion2Unknown.Properties.OpenApiVersion] '2.0.1' must match 2.x or 3.x.x",
+  "[Resources.ApiOpenApiVersion3Unknown.Properties.OpenApiVersion] '3.1' must match 2.x or 3.x.x",
+  "[Resources.ApiOpenApiVersionEmpty.Properties.OpenApiVersion] Must not be empty",
+  "[Resources.ApiOpenApiVersionNotString.Properties.OpenApiVersion] 3 is not of type 'string'"
+]

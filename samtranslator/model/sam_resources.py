@@ -157,6 +157,11 @@ class SamFunction(SamResourceMacro):
             code_sha256 = None
             if self.AutoPublishCodeSha256:
                 code_sha256 = intrinsics_resolver.resolve_parameter_refs(self.AutoPublishCodeSha256)
+                if not isinstance(code_sha256, string_types):
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        "AutoPublishCodeSha256 must be a string",
+                    )
             lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )

@@ -1,0 +1,371 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Domain
+  ApiDomainEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+      StageName: Stage name
+  ApiDomainNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain: 3
+      StageName: Stage name
+
+  # BasePath
+  ApiBasePathEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        BasePath:
+      StageName: Stage name
+  ApiBasePathNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        BasePath: 3
+      StageName: Stage name
+  ApiBasePathItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        BasePath:
+          - 3
+      StageName: Stage name
+
+  # CertificateArn
+  ApiCertificateArnEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn:
+        DomainName: MyDomainName
+      StageName: Stage name
+  ApiCertificateArnNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: 3
+        DomainName: MyDomainName
+      StageName: Stage name
+  ApiCertificateArnNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn:
+          Not: Intrinsic
+        DomainName: MyDomainName
+      StageName: Stage name
+
+  # DomainName
+  ApiDomainNameEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName:
+      StageName: Stage name
+  ApiDomainNameNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: 3
+      StageName: Stage name
+  ApiDomainNameNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName:
+          Not: Intrinsic
+      StageName: Stage name
+
+  # EndpointConfiguration
+  ApiEndpointConfigurationEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        EndpointConfiguration:
+      StageName: Stage name
+  ApiEndpointConfigurationNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        EndpointConfiguration: 3
+      StageName: Stage name
+  ApiEndpointConfigurationNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        EndpointConfiguration: Unknown
+      StageName: Stage name
+
+  # MutualTlsAuthentication
+  ApiMutualTlsAuthenticationEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication:
+      StageName: Stage name
+  ApiMutualTlsAuthenticationNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication: 3
+      StageName: Stage name
+  ApiMutualTlsAuthenticationUnknownProperty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication:
+          Unknown: Property
+      StageName: Stage name
+
+  # MutualTlsAuthentication TruststoreUri
+  ApiMutualTlsAuthenticationTruststoreUriEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication:
+          TruststoreUri:
+      StageName: Stage name
+  ApiMutualTlsAuthenticationTruststoreUriNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication:
+          TruststoreUri: 3
+      StageName: Stage name
+  ApiMutualTlsAuthenticationTruststoreUriNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication:
+          TruststoreUri:
+            Not: Intrinsic
+      StageName: Stage name
+
+  # MutualTlsAuthentication TruststoreVersion
+  ApiMutualTlsAuthenticationTruststoreVersionEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication:
+          TruststoreVersion:
+      StageName: Stage name
+  ApiMutualTlsAuthenticationTruststoreVersionNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication:
+          TruststoreVersion: 3
+      StageName: Stage name
+  ApiMutualTlsAuthenticationTruststoreVersionNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        MutualTlsAuthentication:
+          TruststoreVersion:
+            Not: Intrinsic
+      StageName: Stage name
+
+  # Route53
+  ApiRoute53Empty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+      StageName: Stage name
+  ApiRoute53NotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53: 3
+      StageName: Stage name
+
+  # Route53 DistributionDomainName
+  ApiRoute53DistributionDomainNameEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          DistributionDomainName:
+      StageName: Stage name
+  ApiRoute53DistributionDomainNameNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          DistributionDomainName: 3
+      StageName: Stage name
+  ApiRoute53DistributionDomainNameNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          DistributionDomainName:
+            Not: Intrinsic
+      StageName: Stage name
+
+  # Route53 EvaluateTargetHealth
+  ApiRoute53EvaluateTargetHealthEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          EvaluateTargetHealth:
+      StageName: Stage name
+  ApiRoute53EvaluateTargetHealthNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          EvaluateTargetHealth: "true"
+      StageName: Stage name
+  ApiRoute53EvaluateTargetHealthNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          EvaluateTargetHealth:
+            Not: Intrinsic
+      StageName: Stage name
+
+  # Route53 HostedZoneId
+  ApiRoute53HostedZoneIdEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          HostedZoneId:
+      StageName: Stage name
+  ApiRoute53HostedZoneIdNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          HostedZoneId: 3
+      StageName: Stage name
+  ApiRoute53HostedZoneIdNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          HostedZoneId:
+            Not: Intrinsic
+      StageName: Stage name
+
+  # Route53 HostedZoneName
+  ApiRoute53HostedZoneNameEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          HostedZoneName:
+      StageName: Stage name
+  ApiRoute53HostedZoneNameNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          HostedZoneName: 3
+      StageName: Stage name
+  ApiRoute53HostedZoneNameNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          HostedZoneName:
+            Not: Intrinsic
+      StageName: Stage name
+
+  # Route53 HostedZoneId and HostedZoneName are both present
+  ApiRoute53HostedZoneIdAndNameBothPresent:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          HostedZoneId: MyHostedZoneId
+          HostedZoneName: MyHostedZoneName
+      StageName: Stage name
+
+  # Route53 IpV6
+  ApiRoute53IpV6Empty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          IpV6:
+      StageName: Stage name
+  ApiRoute53IpV6NotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      Domain:
+        CertificateArn: MyCertificateArn
+        DomainName: MyDomainName
+        Route53:
+          IpV6: "true"
+      StageName: Stage name

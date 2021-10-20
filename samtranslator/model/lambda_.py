@@ -64,7 +64,7 @@ class LambdaEventSourceMapping(Resource):
     property_types = {
         "BatchSize": PropertyType(False, is_type(int)),
         "Enabled": PropertyType(False, is_type(bool)),
-        "EventSourceArn": PropertyType(True, is_str()),
+        "EventSourceArn": PropertyType(False, is_str()),
         "FunctionName": PropertyType(True, is_str()),
         "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
         "MaximumRetryAttempts": PropertyType(False, is_type(int)),
@@ -78,6 +78,7 @@ class LambdaEventSourceMapping(Resource):
         "SourceAccessConfigurations": PropertyType(False, is_type(list)),
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
+        "SelfManagedEventSource": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}

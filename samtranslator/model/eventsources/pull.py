@@ -1,7 +1,9 @@
+from six import string_types
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import is_type, is_str
+from samtranslator.model.types import is_type, is_str, list_of
+from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -20,6 +22,7 @@ class PullEventSource(ResourceMacro):
     """
 
     resource_type = None
+    requires_stream_queue_broker = True
     property_types = {
         "Stream": PropertyType(False, is_str()),
         "Queue": PropertyType(False, is_str()),
@@ -39,6 +42,7 @@ class PullEventSource(ResourceMacro):
         "SecretsManagerKmsKeyId": PropertyType(False, is_str()),
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
+        "KafkaBootstrapServers": PropertyType(False, is_type(list)),
     }
 
     def get_policy_arn(self):
@@ -74,7 +78,7 @@ class PullEventSource(ResourceMacro):
         except NotImplementedError:
             function_name_or_arn = function.get_runtime_attr("arn")
 
-        if not self.Stream and not self.Queue and not self.Broker:
+        if self.requires_stream_queue_broker and not self.Stream and not self.Queue and not self.Broker:
             raise InvalidEventException(
                 self.relative_id,
                 "No Queue (for SQS) or Stream (for Kinesis, DynamoDB or MSK) or Broker (for Amazon MQ) provided.",
@@ -98,6 +102,11 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.SourceAccessConfigurations = self.SourceAccessConfigurations
         lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
         lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
+
+        if self.KafkaBootstrapServers:
+            lambda_eventsourcemapping.SelfManagedEventSource = {
+                "Endpoints": {"KafkaBootstrapServers": self.KafkaBootstrapServers}
+            }
 
         destination_config_policy = None
         if self.DestinationConfig:
@@ -286,3 +295,149 @@ class MQ(PullEventSource):
             }
             document["PolicyDocument"]["Statement"].append(kms_policy)
         return [document]
+
+
+class SelfManagedKafka(PullEventSource):
+    """
+    SelfManagedKafka event source
+    """
+
+    resource_type = "SelfManagedKafka"
+    requires_stream_queue_broker = False
+    AUTH_MECHANISM = ["SASL_SCRAM_256_AUTH", "SASL_SCRAM_512_AUTH", "BASIC_AUTH"]
+
+    def get_policy_arn(self):
+        return None
+
+    def get_policy_statements(self):
+        if not self.KafkaBootstrapServers:
+            raise InvalidEventException(
+                self.relative_id,
+                "No KafkaBootstrapServers provided for self managed kafka as an event source",
+            )
+
+        if not self.Topics:
+            raise InvalidEventException(
+                self.relative_id,
+                "No Topics provided for self managed kafka as an event source",
+            )
+
+        if len(self.Topics) != 1:
+            raise InvalidEventException(
+                self.relative_id,
+                "Topics for self managed kafka only supports single configuration entry.",
+            )
+
+        if not self.SourceAccessConfigurations:
+            raise InvalidEventException(
+                self.relative_id,
+                "No SourceAccessConfigurations for self managed kafka event provided.",
+            )
+        document = self.generate_policy_document()
+        return [document]
+
+    def generate_policy_document(self):
+        statements = []
+        authentication_uri, has_vpc_config = self.get_secret_key()
+        if authentication_uri:
+            secret_manager = self.get_secret_manager_secret(authentication_uri)
+            statements.append(secret_manager)
+
+        if has_vpc_config:
+            vpc_permissions = self.get_vpc_permission()
+            statements.append(vpc_permissions)
+
+        if self.SecretsManagerKmsKeyId:
+            kms_policy = self.get_kms_policy()
+            statements.append(kms_policy)
+
+        document = {
+            "PolicyDocument": {
+                "Statement": statements,
+                "Version": "2012-10-17",
+            },
+            "PolicyName": "SelfManagedKafkaExecutionRolePolicy",
+        }
+
+        return document
+
+    def get_secret_key(self):
+        authentication_uri = None
+        has_vpc_subnet = False
+        has_vpc_security_group = False
+        for config in self.SourceAccessConfigurations:
+            if config.get("Type") == "VPC_SUBNET":
+                self.validate_uri(config, "VPC_SUBNET")
+                has_vpc_subnet = True
+
+            elif config.get("Type") == "VPC_SECURITY_GROUP":
+                self.validate_uri(config, "VPC_SECURITY_GROUP")
+                has_vpc_security_group = True
+
+            elif config.get("Type") in self.AUTH_MECHANISM:
+                if authentication_uri:
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Multiple auth mechanism properties specified in SourceAccessConfigurations for self managed kafka event.",
+                    )
+                self.validate_uri(config, "auth mechanism")
+                authentication_uri = config.get("URI")
+
+            else:
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Invalid SourceAccessConfigurations Type provided for self managed kafka event.",
+                )
+
+        if (not has_vpc_subnet and has_vpc_security_group) or (has_vpc_subnet and not has_vpc_security_group):
+            raise InvalidEventException(
+                self.relative_id,
+                "VPC_SUBNET and VPC_SECURITY_GROUP in SourceAccessConfigurations for SelfManagedKafka must be both provided.",
+            )
+        return authentication_uri, (has_vpc_subnet and has_vpc_security_group)
+
+    def validate_uri(self, config, msg):
+        if not config.get("URI"):
+            raise InvalidEventException(
+                self.relative_id,
+                "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
+            )
+
+        if not isinstance(config.get("URI"), string_types) and not is_intrinsic(config.get("URI")):
+            raise InvalidEventException(
+                self.relative_id,
+                "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(
+                    msg
+                ),
+            )
+
+    def get_secret_manager_secret(self, authentication_uri):
+        return {
+            "Action": ["secretsmanager:GetSecretValue"],
+            "Effect": "Allow",
+            "Resource": authentication_uri,
+        }
+
+    def get_vpc_permission(self):
+        return {
+            "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+        }
+
+    def get_kms_policy(self):
+        return {
+            "Action": ["kms:Decrypt"],
+            "Effect": "Allow",
+            "Resource": {
+                "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/"
+                + self.SecretsManagerKmsKeyId
+            },
+        }
