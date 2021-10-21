@@ -39,8 +39,6 @@ Resources:
       AutoPublishAlias: live
       DeploymentPreference:
         Enabled: false
-        Role:
-          Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/custom-codedeploy-servicerole
         Type: Linear10PercentEvery1Minute
       Timeout: 5
       Environment:
