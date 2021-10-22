@@ -53,7 +53,7 @@
       "maxProperties": 50,
       "patternProperties": {
         "^[a-zA-Z0-9]+$": {
-          "$ref": "file:definitions/parameter.json#/definitions/Parameter"
+          "$ref": "parameter.json#/definitions/Parameter"
         }
       },
       "type": "object"
@@ -64,7 +64,7 @@
         "^[a-zA-Z0-9]+$": {
           "allOf": [
             {
-              "$ref": "file:definitions/api.json#/definitions/AWS::Serverless::Api"
+              "$ref": "api.json#/definitions/AWS::Serverless::Api"
             },
             {
               "if": {

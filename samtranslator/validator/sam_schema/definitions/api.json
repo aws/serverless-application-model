@@ -18,13 +18,13 @@
         "additionalProperties": false,
         "properties": {
           "Condition": {
-            "$ref": "file:common.json#definitions/Condition"
+            "$ref": "common.json#definitions/Condition"
           },
           "DeletionPolicy": {
-            "$ref": "file:common.json#definitions/DeletionPolicy"
+            "$ref": "common.json#definitions/DeletionPolicy"
           },
           "DependsOn": {
-            "$ref": "file:common.json#definitions/DependsOn"
+            "$ref": "common.json#definitions/DependsOn"
           },
           "Metadata": {
             "type": "object"
@@ -33,7 +33,7 @@
             "additionalProperties": false,
             "properties": {
               "AccessLogSetting": {
-                "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.AccessLogSetting"
+                "$ref": "cfn.json#definitions/AWS::ApiGateway::Stage.AccessLogSetting"
               },
               "Auth": {
                 "$ref": "#definitions/AWS::Serverless::Api.Auth"
@@ -63,7 +63,7 @@
                 ]
               },
               "CanarySetting": {
-                "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.CanarySetting"
+                "$ref": "cfn.json#definitions/AWS::ApiGateway::Stage.CanarySetting"
               },
               "Cors": {
                 "if": {
@@ -105,7 +105,7 @@
                 "$ref": "#definitions/AWS::Serverless::Api.EndpointConfiguration"
               },
               "GatewayResponses": {
-                "$ref": "file:common.json#definitions/GatewayResponses",
+                "$ref": "common.json#definitions/GatewayResponses",
                 "references": [
                   "https://docs.aws.amazon.com/apigateway/api-reference/resource/gateway-response/"
                 ]
@@ -116,7 +116,7 @@
                 },
                 "then": {
                   "items": {
-                    "$ref": "file:cfn.json#definitions/AWS::ApiGateway::Stage.MethodSetting"
+                    "$ref": "cfn.json#definitions/AWS::ApiGateway::Stage.MethodSetting"
                   }
                 },
                 "type": [
@@ -157,7 +157,7 @@
                 ]
               },
               "Tags": {
-                "$ref": "file:common.json#definitions/TagsMap"
+                "$ref": "common.json#definitions/TagsMap"
               },
               "TracingEnabled": {
                 "type": [
@@ -191,10 +191,10 @@
             "const": "AWS::Serverless::Api"
           },
           "UpdatePolicy": {
-            "$ref": "file:common.json#definitions/UpdatePolicy"
+            "$ref": "common.json#definitions/UpdatePolicy"
           },
           "UpdateReplacePolicy": {
-            "$ref": "file:common.json#definitions/UpdateReplacePolicy"
+            "$ref": "common.json#definitions/UpdateReplacePolicy"
           }
         },
         "required": [
@@ -222,13 +222,13 @@
           ]
         },
         "Quota": {
-          "$ref": "file:cfn.json#definitions/AWS::ApiGateway::UsagePlan.QuotaSettings"
+          "$ref": "cfn.json#definitions/AWS::ApiGateway::UsagePlan.QuotaSettings"
         },
         "Tags": {
-          "$ref": "file:common.json#definitions/TagsList"
+          "$ref": "common.json#definitions/TagsList"
         },
         "Throttle": {
-          "$ref": "file:cfn.json#definitions/AWS::ApiGateway::UsagePlan.ThrottleSettings"
+          "$ref": "cfn.json#definitions/AWS::ApiGateway::UsagePlan.ThrottleSettings"
         },
         "UsagePlanName": {
           "type": [
@@ -433,7 +433,7 @@
           "type": "string"
         },
         "MutualTlsAuthentication": {
-          "$ref": "file:cfn.json#definitions/AWS::ApiGatewayV2::DomainName.MutualTlsAuthentication"
+          "$ref": "cfn.json#definitions/AWS::ApiGatewayV2::DomainName.MutualTlsAuthentication"
         },
         "Route53": {
           "$ref": "#definitions/AWS::Serverless::Api.Route53Configuration"
