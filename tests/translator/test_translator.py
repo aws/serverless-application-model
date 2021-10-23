@@ -696,7 +696,6 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_cors_on_external_swagger",
         "error_invalid_cors_dict",
         "error_invalid_findinmap",
-        "error_invalid_getatt",
         "error_cors_credentials_true_with_wildcard_origin",
         "error_cors_credentials_true_without_explicit_origin",
         "error_function_invalid_codeuri",
