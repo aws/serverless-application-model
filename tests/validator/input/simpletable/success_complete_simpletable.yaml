@@ -1,6 +1,30 @@
 Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  PrimaryKeyNameParam:
+    Default: MyKeyName
+    Type: String
+  ReadCapacityUnitsParam:
+    Default: 1
+    Type: Number
+  WriteCapacityUnitsParam:
+    Default: 2
+    Type: Number
+  KMSMasterKeyIdParam:
+    Default: MyKMSMasterKeyId
+    Type: String
+  SSEEnabledParam:
+    Default: True
+    Type: String
+  TableNameParam:
+    Default: MyTableName
+    Type: String
+  TagValueParam:
+    Default: MyTagValue
+    Type: String
+
 Resources:
-  PrimaryKeyEmpty:
+  CompleteTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
       PrimaryKey:
@@ -16,3 +40,20 @@ Resources:
       TableName: MyTable
       Tags:
         MyTagName: MyTagValue
+
+  CompleteTableIntrinsics:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: !Ref PrimaryKeyNameParam
+        Type: Number
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnitsParam
+        WriteCapacityUnits: !Ref WriteCapacityUnitsParam
+      SSESpecification:
+        KMSMasterKeyId: !Ref KMSMasterKeyIdParam
+        SSEEnabled: !Ref WriteCapacityUnitsParam
+        SSEType: KMS
+      TableName: !Ref TableNameParam
+      Tags:
+        MyTagName: !Ref TagValueParam
