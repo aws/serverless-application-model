@@ -2360,6 +2360,23 @@
           }
         ]
       }
+    },
+    "StepFunctionsSendTaskStatusPolicy": {
+      "Description": "Gives permission to send task status to a Step Function activity",
+      "Parameters": {},
+      "Definition": {
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "states:SendTaskFailure",
+              "states:SendTaskHeartbeat",
+              "states:SendTaskSuccess"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
     }
   }
 }

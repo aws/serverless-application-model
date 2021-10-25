@@ -174,3 +174,5 @@ Resources:
 
         - Route53ChangeResourceRecordSetsPolicy:
             HostedZoneId: test
+        
+        - StepFunctionsSendTaskStatusPolicy: {}
