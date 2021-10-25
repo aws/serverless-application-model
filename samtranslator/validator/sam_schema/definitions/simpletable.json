@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "type": "object",
+  "definitions": {
+    "AWS::Serverless::SimpleTable": {
+      "if": {
+        "properties": {
+          "Type": {
+            "const": "AWS::Serverless::SimpleTable"
+          }
+        },
+        "required": [
+          "Type"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "properties": {
+          "Condition": {
+            "$ref": "common.json#definitions/Condition"
+          },
+          "DeletionPolicy": {
+            "$ref": "common.json#definitions/DeletionPolicy"
+          },
+          "DependsOn": {
+            "$ref": "common.json#definitions/DependsOn"
+          },
+          "Metadata": {
+            "type": "object"
+          },
+          "Properties": {
+            "additionalProperties": false,
+            "properties": {
+              "PrimaryKey": {
+                "$ref": "#definitions/AWS::Serverless::SimpleTable.PrimaryKey"
+              },
+              "ProvisionedThroughput": {
+                "$ref": "#definitions/AWS::Serverless::SimpleTable.ProvisionedThroughput"
+              },
+              "SSESpecification": {
+                "$ref": "#definitions/AWS::Serverless::SimpleTable.SSESpecification"
+              },
+              "TableName": {
+                "type": [
+                  "string",
+                  "intrinsic"
+                ],
+                "minLength": 3,
+                "maxLength": 255,
+                "pattern": "^[a-zA-Z0-9_.-]+$"
+              },
+              "Tags": {
+                "$ref": "common.json#definitions/TagsMap"
+              }
+            },
+            "type": "object"
+          },
+          "Type": {
+            "const": "AWS::Serverless::SimpleTable"
+          },
+          "UpdatePolicy": {
+            "$ref": "common.json#definitions/UpdatePolicy"
+          },
+          "UpdateReplacePolicy": {
+            "$ref": "common.json#definitions/UpdateReplacePolicy"
+          }
+        },
+        "required": [
+          "Type"
+        ],
+        "type": "object"
+      }
+    },
+    "AWS::Serverless::SimpleTable.PrimaryKey": {
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "Type": {
+          "enum": [
+            "String",
+            "Number",
+            "Binary"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Name",
+        "Type"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::SimpleTable.ProvisionedThroughput": {
+      "additionalProperties": false,
+      "properties": {
+        "ReadCapacityUnits": {
+          "type": [
+            "number",
+            "intrinsic"
+          ]
+        },
+        "WriteCapacityUnits": {
+          "type": [
+            "number",
+            "intrinsic"
+          ]
+        }
+      },
+      "required": [
+        "ReadCapacityUnits",
+        "WriteCapacityUnits"
+      ],
+      "type": [
+        "object",
+        "intrinsic"
+      ]
+    },
+    "AWS::Serverless::SimpleTable.SSESpecification": {
+      "additionalProperties": false,
+      "properties": {
+        "KMSMasterKeyId": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "SSEEnabled": {
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
+        },
+        "SSEType": {
+          "enum": [
+            "KMS"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "SSEEnabled"
+      ],
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ProvisionedThroughputEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+
+  ProvisionedThroughputReadCapacityUnitsMissing:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+        WriteCapacityUnits: 2
+
+  ProvisionedThroughputWriteCapacityUnitsMissing:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+
+  ProvisionedThroughputReadCapacityUnitsNotNumber:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+        ReadCapacityUnits: "1"
+        WriteCapacityUnits: 2
+
+  ProvisionedThroughputWriteCapacityUnitsNotNumber:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: "2"

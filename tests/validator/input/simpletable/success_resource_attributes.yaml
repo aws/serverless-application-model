@@ -1,0 +1,45 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  TableCondition:
+    Condition: MyCondition
+    Type: AWS::Serverless::SimpleTable
+
+  TableDeletionPolicyDelete:
+    DeletionPolicy: Delete
+    Type: AWS::Serverless::SimpleTable
+
+  TableDeletionPolicyRetain:
+    DeletionPolicy: Retain
+    Type: AWS::Serverless::SimpleTable
+
+  TableDeletionPolicySnapshot:
+    DeletionPolicy: Snapshot
+    Type: AWS::Serverless::SimpleTable
+
+  TableDependsOn:
+    DependsOn: MyOtherResource
+    Type: AWS::Serverless::SimpleTable
+
+  TableUpdatePolicyDelete:
+    UpdatePolicy: Delete
+    Type: AWS::Serverless::SimpleTable
+
+  TableUpdatePolicyRetain:
+    UpdatePolicy: Retain
+    Type: AWS::Serverless::SimpleTable
+
+  TableUpdatePolicySnapshot:
+    UpdatePolicy: Snapshot
+    Type: AWS::Serverless::SimpleTable
+
+  TableUpdateReplacePolicyDelete:
+    UpdateReplacePolicy: Delete
+    Type: AWS::Serverless::SimpleTable
+
+  TableUpdateReplacePolicyRetain:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Serverless::SimpleTable
+
+  TableUpdateReplacePolicySnapshot:
+    UpdateReplacePolicy: Snapshot
+    Type: AWS::Serverless::SimpleTable

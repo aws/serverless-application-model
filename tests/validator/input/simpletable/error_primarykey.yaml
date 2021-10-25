@@ -1,0 +1,61 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  PrimaryKeyEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+
+  PrimaryKeyTypeMissing:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: MyKey
+
+  PrimaryKeyNameMissing:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Type: String
+
+  PrimaryKeyNameEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name:
+        Type: String
+
+  PrimaryKeyNameNotString:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: 3
+        Type: String
+
+  PrimaryKeyTypeEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: MyKey
+        Type:
+
+  PrimaryKeyTypeNotString:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: MyKey
+        Type: 3
+
+  PrimaryKeyTypeUnknown:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: MyKey
+        Type: Float
+
+  PrimaryKeyTypeIntrinsic:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: MyKey
+        Type:
+          Ref: MyKeyType

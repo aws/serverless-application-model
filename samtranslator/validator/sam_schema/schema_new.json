@@ -67,6 +67,9 @@
               "$ref": "api.json#/definitions/AWS::Serverless::Api"
             },
             {
+              "$ref": "simpletable.json#/definitions/AWS::Serverless::SimpleTable"
+            },
+            {
               "if": {
                 "properties": {
                   "Type": {

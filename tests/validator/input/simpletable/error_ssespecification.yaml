@@ -1,0 +1,54 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SSESpecificationEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      SSESpecification:
+
+  SSESpecificationSSEEnabledMissing:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      SSESpecification:
+        KMSMasterKeyId: MyKMSMasterKeyId
+
+  SSESpecificationSSEEnabledEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      SSESpecification:
+        KMSMasterKeyId: MyKMSMasterKeyId
+        SSEEnabled:
+
+  SSESpecificationSSEEnabledNotBoolean:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      SSESpecification:
+        KMSMasterKeyId: MyKMSMasterKeyId
+        SSEEnabled: 3
+
+  SSESpecificationKMSMasterKeyIdEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      SSESpecification:
+        KMSMasterKeyId:
+        SSEEnabled: False
+
+  SSESpecificationKMSMasterKeyIdNotString:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      SSESpecification:
+        KMSMasterKeyId: 3
+        SSEEnabled: False
+
+  SSESpecificationSSETypeEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      SSESpecification:
+        SSEEnabled: False
+        SSEType:
+
+  SSESpecificationSSETypeUnknown:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      SSESpecification:
+        SSEEnabled: False
+        SSEType: MySSEType

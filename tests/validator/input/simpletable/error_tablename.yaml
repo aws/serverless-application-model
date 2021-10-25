@@ -1,0 +1,26 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  TableNameEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName:
+
+  TableNameNotString:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: 3
+
+  TableNameTooShort:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: My
+
+  TableNameTooLong:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: MyVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongTableName
+
+  TableNameInvalidChar:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: My&TableName

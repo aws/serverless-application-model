@@ -1,0 +1,10 @@
+[
+  "[Resources.SSESpecificationEmpty.Properties.SSESpecification] Must not be empty",
+  "[Resources.SSESpecificationKMSMasterKeyIdEmpty.Properties.SSESpecification.KMSMasterKeyId] Must not be empty",
+  "[Resources.SSESpecificationKMSMasterKeyIdNotString.Properties.SSESpecification.KMSMasterKeyId] 3 is not of type 'string', 'intrinsic'",
+  "[Resources.SSESpecificationSSEEnabledEmpty.Properties.SSESpecification.SSEEnabled] Must not be empty",
+  "[Resources.SSESpecificationSSEEnabledMissing.Properties.SSESpecification] 'SSEEnabled' is a required property",
+  "[Resources.SSESpecificationSSEEnabledNotBoolean.Properties.SSESpecification.SSEEnabled] 3 is not of type 'boolean', 'intrinsic'",
+  "[Resources.SSESpecificationSSETypeEmpty.Properties.SSESpecification.SSEType] Must not be empty",
+  "[Resources.SSESpecificationSSETypeUnknown.Properties.SSESpecification.SSEType] 'MySSEType' is not one of ['KMS']"
+]

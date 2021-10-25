@@ -1,0 +1,7 @@
+[
+  "[Resources.ProvisionedThroughputEmpty.Properties.ProvisionedThroughput] Must not be empty",
+  "[Resources.ProvisionedThroughputReadCapacityUnitsMissing.Properties.ProvisionedThroughput] 'ReadCapacityUnits' is a required property",
+  "[Resources.ProvisionedThroughputReadCapacityUnitsNotNumber.Properties.ProvisionedThroughput.ReadCapacityUnits] '1' is not of type 'number', 'intrinsic'",
+  "[Resources.ProvisionedThroughputWriteCapacityUnitsMissing.Properties.ProvisionedThroughput] 'WriteCapacityUnits' is a required property",
+  "[Resources.ProvisionedThroughputWriteCapacityUnitsNotNumber.Properties.ProvisionedThroughput.WriteCapacityUnits] '2' is not of type 'number', 'intrinsic'"
+]

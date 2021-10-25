@@ -1,0 +1,18 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  PrimaryKeyEmpty:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: MyKey
+        Type: Number
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 2
+      SSESpecification:
+        KMSMasterKeyId: MyKMSMasterKeyId
+        SSEEnabled: True
+        SSEType: KMS
+      TableName: MyTable
+      Tags:
+        MyTagName: MyTagValue
