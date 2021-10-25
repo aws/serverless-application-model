@@ -5,6 +5,7 @@ from copy import deepcopy
 from six import string_types
 
 import samtranslator.model.eventsources.push
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceTypeResolver
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMRolePolicies
@@ -99,6 +100,7 @@ class StateMachineGenerator(object):
         )
         self.substitution_counter = 1
 
+    @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):
         """
         Constructs and returns the State Machine resource and any additional resources associated with it.

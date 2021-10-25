@@ -11,6 +11,7 @@ from samtranslator.feature_toggle.dialup import (
     ToggleDialup,
     SimpleAccountPercentileDialup,
 )
+from samtranslator.metrics.method_decorator import cw_timer
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
@@ -130,6 +131,7 @@ class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
 class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which loads config from AppConfig."""
 
+    @cw_timer(prefix="External", name="AppConfig")
     def __init__(self, application_id, environment_id, configuration_profile_id):
         FeatureToggleConfigProvider.__init__(self)
         try:

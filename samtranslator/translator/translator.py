@@ -1,5 +1,7 @@
 import copy
 from six import string_types
+
+from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
 
 from samtranslator.feature_toggle.feature_toggle import (
@@ -47,6 +49,7 @@ class Translator:
         self.feature_toggle = None
         self.boto_session = boto_session
         self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
+        MetricsMethodWrapperSingleton.set_instance(self.metrics)
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name

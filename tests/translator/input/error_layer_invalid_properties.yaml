@@ -53,3 +53,15 @@ Resources:
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       RetentionPolicy: !If [DeletePolicyIf, Retain, Delete]
+
+  LayerWithStringArchitecture:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      CompatibleArchitectures: "it must be a list"
+
+  LayerWithWrongArchitecture:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      CompatibleArchitectures: ['wrong']

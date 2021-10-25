@@ -1,0 +1,214 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "AWS::ApiGateway::Stage.AccessLogSetting": {
+      "additionalProperties": false,
+      "properties": {
+        "DestinationArn": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "Format": {
+          "type": "string"
+        }
+      },
+      "type": [
+        "object"
+      ]
+    },
+    "AWS::ApiGateway::Stage.CanarySetting": {
+      "additionalProperties": false,
+      "properties": {
+        "DeploymentId": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "PercentTraffic": {
+          "type": [
+            "number",
+            "intrinsic"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "StageVariableOverrides": {
+          "additionalProperties": true,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "type": [
+                "string",
+                "intrinsic"
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "intrinsic"
+          ]
+        },
+        "UseStageCache": {
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ApiGateway::Stage.MethodSetting": {
+      "additionalProperties": false,
+      "properties": {
+        "CacheDataEncrypted": {
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
+        },
+        "CacheTtlInSeconds": {
+          "type": [
+            "integer",
+            "intrinsic"
+          ]
+        },
+        "CachingEnabled": {
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
+        },
+        "DataTraceEnabled": {
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
+        },
+        "HttpMethod": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "LoggingLevel": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "MetricsEnabled": {
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
+        },
+        "ResourcePath": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "ThrottlingBurstLimit": {
+          "type": [
+            "integer",
+            "intrinsic"
+          ]
+        },
+        "ThrottlingRateLimit": {
+          "type": [
+            "number",
+            "intrinsic"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "AWS::ApiGateway::UsagePlan.QuotaSettings": {
+      "if": {
+        "type": "object"
+      },
+      "then": {
+        "additionalProperties": false,
+        "properties": {
+          "Limit": {
+            "type": [
+              "integer",
+              "intrinsic"
+            ]
+          },
+          "Offset": {
+            "type": [
+              "integer",
+              "intrinsic"
+            ],
+            "minimum": 0
+          },
+          "Period": {
+            "$ref": "#definitions/Period"
+          }
+        }
+      },
+      "type": [
+        "object",
+        "intrinsic"
+      ]
+    },
+    "AWS::ApiGateway::UsagePlan.ThrottleSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "BurstLimit": {
+          "type": [
+            "integer",
+            "intrinsic"
+          ]
+        },
+        "RateLimit": {
+          "type": [
+            "number",
+            "intrinsic"
+          ]
+        }
+      },
+      "type": [
+        "object",
+        "intrinsic"
+      ]
+    },
+    "AWS::ApiGatewayV2::DomainName.MutualTlsAuthentication": {
+      "additionalProperties": false,
+      "properties": {
+        "TruststoreUri": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "TruststoreVersion": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "Period": {
+      "enum": [
+        "DAY",
+        "WEEK",
+        "MONTH"
+      ],
+      "references": [
+        "https://docs.aws.amazon.com/apigateway/api-reference/resource/usage-plan/"
+      ],
+      "type": [
+        "string",
+        "intrinsic"
+      ]
+    }
+  },
+  "type": "object"
+}

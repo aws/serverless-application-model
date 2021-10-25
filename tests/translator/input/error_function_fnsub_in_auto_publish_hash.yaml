@@ -1,0 +1,24 @@
+Description: Dip Investigation
+Parameters:
+  GitCommitInfo: 
+    Type: String
+    Default: hashhash
+  GitDirtInfo: 
+    Type: String
+    Default: dirtyyy
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      VersionDescription:
+        Fn::Sub: ${GitCommitInfo}-${GitDirtyInfo}
+      MemorySize: 128
+      Handler: loader
+      Role:
+        Ref: IamRole
+      CodeUri: s3://some-bucket/somekey
+      AutoPublishCodeSha256:
+        Fn::Sub: ${GitCommitInfo}-${GitDirtInfo}-1
+      Runtime: go1.x
+      AutoPublishAlias: Alias1

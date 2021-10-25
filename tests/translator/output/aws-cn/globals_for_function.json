@@ -83,6 +83,7 @@
           }
         ], 
         "ReservedConcurrentExecutions": 100, 
+        "Architectures": ["x86_64"],
         "MemorySize": 512, 
         "Environment": {
           "Variables": {
@@ -188,6 +189,7 @@
           }
         ], 
         "ReservedConcurrentExecutions": 50, 
+        "Architectures": ["x86_64"],
         "MemorySize": 1024, 
         "Environment": {
           "Variables": {

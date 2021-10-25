@@ -2,6 +2,7 @@
 Helper classes to publish metrics
 """
 import logging
+from datetime import datetime
 
 LOG = logging.getLogger(__name__)
 
@@ -83,7 +84,7 @@ class MetricDatum:
     Class to hold Metric data.
     """
 
-    def __init__(self, name, value, unit, dimensions=None):
+    def __init__(self, name, value, unit, dimensions=None, timestamp=None):
         """
         Constructor
 
@@ -96,9 +97,16 @@ class MetricDatum:
         self.value = value
         self.unit = unit
         self.dimensions = dimensions if dimensions else []
+        self.timestamp = timestamp if timestamp else datetime.utcnow()
 
     def get_metric_data(self):
-        return {"MetricName": self.name, "Value": self.value, "Unit": self.unit, "Dimensions": self.dimensions}
+        return {
+            "MetricName": self.name,
+            "Value": self.value,
+            "Unit": self.unit,
+            "Dimensions": self.dimensions,
+            "Timestamp": self.timestamp,
+        }
 
 
 class Metrics:
@@ -110,7 +118,7 @@ class Metrics:
         :param metrics_publisher: publisher to publish all metrics
         """
         self.metrics_publisher = metrics_publisher if metrics_publisher else DummyMetricsPublisher()
-        self.metrics_cache = []
+        self.metrics_cache = dict()
         self.namespace = namespace
 
     def __del__(self):
@@ -119,18 +127,18 @@ class Metrics:
             LOG.warn("There are unpublished metrics. Please make sure you call publish after you record all metrics.")
             self.publish()
 
-    def _record_metric(self, name, value, unit, dimensions=[]):
+    def _record_metric(self, name, value, unit, dimensions=None):
         """
-        Create and save metric objects to an array.
+        Create and save metric object in internal cache.
 
         :param name: metric name
         :param value: value of metric
         :param unit: unit of metric (try using values from Unit class)
         :param dimensions: array of dimensions applied to the metric
         """
-        self.metrics_cache.append(MetricDatum(name, value, unit, dimensions))
+        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions))
 
-    def record_count(self, name, value, dimensions=[]):
+    def record_count(self, name, value, dimensions=None):
         """
         Create metric with unit Count.
 
@@ -141,7 +149,7 @@ class Metrics:
         """
         self._record_metric(name, value, Unit.Count, dimensions)
 
-    def record_latency(self, name, value, dimensions=[]):
+    def record_latency(self, name, value, dimensions=None):
         """
         Create metric with unit Milliseconds.
 
@@ -154,5 +162,19 @@ class Metrics:
 
     def publish(self):
         """Calls publish method from the configured metrics publisher to publish metrics"""
-        self.metrics_publisher.publish(self.namespace, self.metrics_cache)
-        self.metrics_cache = []
+        # flatten the key->list dict into a flat list; we don't care about the key as it's
+        # the metric name which is also in the MetricDatum object
+        all_metrics = []
+        for m in self.metrics_cache.values():
+            all_metrics.extend(m)
+        self.metrics_publisher.publish(self.namespace, all_metrics)
+        self.metrics_cache = dict()
+
+    def get_metric(self, name):
+        """
+        Returns a list of metrics from the internal cache for a metric name
+
+        :param name: metric name
+        :returns: List (possibly empty) of MetricDatum objects
+        """
+        return self.metrics_cache.get(name, [])

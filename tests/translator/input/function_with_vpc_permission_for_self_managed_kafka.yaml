@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: {}
+Resources:
+  KafkaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Handler: index.kafka_handler
+      Runtime: python3.9
+      Events:
+        MyKafkaCluster:
+          Type: SelfManagedKafka
+          Properties:
+            KafkaBootstrapServers:
+              - "abc.xyz.com:9092"
+              - "123.45.67.89:9096"
+            Topics:
+              - "Topic1"
+            SourceAccessConfigurations:
+              - Type: VPC_SUBNET
+                URI: subnet:subnet-12345
+              - Type: VPC_SECURITY_GROUP
+                URI: security_group:sg-67890 
+

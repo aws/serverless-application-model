@@ -2,6 +2,8 @@ import logging
 from collections import namedtuple
 
 from six import string_types
+
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
@@ -532,6 +534,7 @@ class ApiGenerator(object):
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
 
+    @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(self, redeploy_restapi_parameters):
         """Generates CloudFormation resources from a SAM API resource
 
@@ -855,6 +858,19 @@ class ApiGenerator(object):
 
         # Make sure keys in the dict are recognized
         for responses_key, responses_value in self.gateway_responses.items():
+            if is_intrinsic(responses_value):
+                # TODO: Add intrinsic support for this field.
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Unable to set GatewayResponses attribute because "
+                    "intrinsic functions are not supported for this field.",
+                )
+            elif not isinstance(responses_value, dict):
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Invalid property type '{}' for GatewayResponses. "
+                    "Expected an object of type 'GatewayResponse'.".format(type(responses_value).__name__),
+                )
             for response_key in responses_value.keys():
                 if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(

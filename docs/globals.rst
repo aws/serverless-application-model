@@ -70,6 +70,7 @@ Currently, the following resources and properties are being supported:
       PermissionsBoundary:
       ReservedConcurrentExecutions:
       EventInvokeConfig:
+      Architectures:
 
     Api:
       # Properties of AWS::Serverless::Api
