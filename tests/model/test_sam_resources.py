@@ -235,6 +235,34 @@ class TestVersionDescription(TestCase):
         generateFunctionVersion = [x for x in cfnResources if isinstance(x, LambdaVersion)]
         self.assertEqual(generateFunctionVersion[0].Description, test_description)
 
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_autopublish_bad_hash(self):
+        function = SamFunction("foo")
+        test_description = "foobar"
+
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.AutoPublishAlias = "live"
+        function.AutoPublishCodeSha256 = {"Fn::Sub": "${parameter1}"}
+
+        with pytest.raises(InvalidResourceException):
+            function.to_cloudformation(**self.kwargs)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_autopublish_good_hash(self):
+        function = SamFunction("foo")
+        test_description = "foobar"
+
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.AutoPublishAlias = "live"
+        function.AutoPublishCodeSha256 = "08240bdc52933ca4f88d5f75fc88cd3228a48feffa9920c735602433b94767ad"
+
+        # confirm no exception thrown
+        function.to_cloudformation(**self.kwargs)
+
 
 class TestOpenApi(TestCase):
     kwargs = {

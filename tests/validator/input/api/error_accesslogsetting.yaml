@@ -1,0 +1,38 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ApiAccessLogSettingEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      AccessLogSetting:
+
+  ApiAccessLogSettingNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      AccessLogSetting: 3
+
+  ApiAccessLogSettingDestinationArnNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      AccessLogSetting:
+        DestinationArn: 3
+        Format: format
+      StageName: Stage name
+
+  ApiAccessLogSettingFormatNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      AccessLogSetting:
+        DestinationArn: destination arn
+        Format: 3
+      StageName: Stage name
+
+  ApiAccessLogSettingUnknownProperty:
+    Type: AWS::Serverless::Api
+    Properties:
+      AccessLogSetting:
+        DestinationArn: destination arn
+        Format: format
+        Unknown: Value
+      StageName: Stage name

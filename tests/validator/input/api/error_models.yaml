@@ -1,0 +1,21 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Models is empty
+  ApiModelsEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      Models:
+      StageName: Stage name
+  # Models not an object
+  ApiModelsNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      Models: 3
+      StageName: Stage name
+  # Models not an object
+  ApiModelsPropertyNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      Models:
+        Test: 3
+      StageName: Stage name

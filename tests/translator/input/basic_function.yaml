@@ -7,14 +7,14 @@ Parameters:
     Default: otherparam
 Resources:
   MinimalFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
 
   FunctionWithTracing:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -22,7 +22,7 @@ Resources:
       Tracing: Active
 
   FunctionWithInlineCode:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       InlineCode: "hello world"
       Handler: hello.handler
@@ -30,7 +30,7 @@ Resources:
       Tracing: Active
 
   FunctionWithCodeUriObject:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       CodeUri:
         Bucket: somebucket
@@ -40,7 +40,7 @@ Resources:
       Runtime: python2.7
 
   CompleteFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       FunctionName: MyAwesomeFunction
       CodeUri: s3://sam-demo-bucket/hello.zip
@@ -50,37 +50,37 @@ Resources:
       Timeout: 60
       VpcConfig:
         SecurityGroupIds:
-        - sg-edcd9784
+          - sg-edcd9784
         SubnetIds:
-        - subnet-9d4a7b6c
-        - subnet-65ea5f08
-        - {Ref: SomeParameter}
-        - {Ref: SomeOtherParameter}
+          - subnet-9d4a7b6c
+          - subnet-65ea5f08
+          - { Ref: SomeParameter }
+          - { Ref: SomeOtherParameter }
       Role: arn:aws:iam::012345678901:role/lambda_basic_execution
       Environment:
         Variables:
           Name: Value
           Name2: Value2
   FunctionWithPolicies:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
       Policies: AmazonDynamoDBFullAccess
   FunctionWithPolicyDocument:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
       Runtime: python2.7
       Policies:
         Statement:
-        - Action: [ 'dynamodb:*' ]
-          Effect: Allow
-          Resource: '*'
+          - Action: ["dynamodb:*"]
+            Effect: Allow
+            Resource: "*"
   FunctionWithRoleRef:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip
       Handler: hello.handler
@@ -95,8 +95,7 @@ Resources:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          -
-            Effect: "Allow"
+          - Effect: "Allow"
             Principal:
               Service:
                 - "ec2.amazonaws.com"
@@ -104,12 +103,10 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       Policies:
-        -
-          PolicyName: "root"
+        - PolicyName: "root"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              -
-                Effect: "Allow"
+              - Effect: "Allow"
                 Action: "*"
                 Resource: "*"

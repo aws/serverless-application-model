@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "KafkaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "KafkaFunctionMyKafkaCluster",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  },
+  {
+    "LogicalResourceId": "KafkaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "KafkaUserSecret",
+    "ResourceType": "AWS::SecretsManager::Secret"
+  }
+]

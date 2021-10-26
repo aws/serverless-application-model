@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [KafkaFunction] is invalid. Event with id [MyKafkaCluster] is invalid. No SourceAccessConfigurations for self managed kafka event provided."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [KafkaFunction] is invalid. Event with id [MyKafkaCluster] is invalid. No SourceAccessConfigurations for self managed kafka event provided."
+}
