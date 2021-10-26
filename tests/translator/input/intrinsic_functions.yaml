@@ -16,6 +16,9 @@ Parameters:
   CodeKey:
     Type: String
     Default: "key"
+  RoleFieldName:
+    Type: String
+    Default: Role
 
 Conditions:
   TrueCondition:
@@ -170,3 +173,22 @@ Resources:
                 Resource: "*"
             Version: "2012-10-17"
           PolicyName: lambdaRole
+
+  MyOtherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+
+  FunctionWithValidGetAttAndRef:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      Role:
+        Fn::GetAtt:
+          - MyOtherFunction
+          - Fn::Ref:
+              RoleFieldName
