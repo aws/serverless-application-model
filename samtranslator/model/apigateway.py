@@ -1,5 +1,6 @@
 import json
 from re import match
+from functools import reduce
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.types import is_type, one_of, is_str, list_of
@@ -149,24 +150,15 @@ class ApiGatewayResponse(object):
         GATEWAY_RESPONSE_PREFIX = "gatewayresponse."
         # applying Py27Dict as this is part of swagger
         prefixed_parameters = Py27Dict()
-        for key, value in response_parameters.get("Headers", {}).items():
-            param_key = GATEWAY_RESPONSE_PREFIX + "header." + key
-            if isinstance(key, Py27UniStr):
-                # if key is from template, we need to convert param_key to Py27UniStr
-                param_key = Py27UniStr(param_key)
-            prefixed_parameters[param_key] = value
 
-        for key, value in response_parameters.get("Paths", {}).items():
-            param_key = GATEWAY_RESPONSE_PREFIX + "path." + key
-            if isinstance(key, Py27UniStr):
-                param_key = Py27UniStr(param_key)
-            prefixed_parameters[param_key] = value
-
-        for key, value in response_parameters.get("QueryStrings", {}).items():
-            param_key = GATEWAY_RESPONSE_PREFIX + "querystring." + key
-            if isinstance(key, Py27UniStr):
-                param_key = Py27UniStr(param_key)
-            prefixed_parameters[param_key] = value
+        parameter_prefix_pairs = [("Headers", "header."), ("Paths", "path."), ("QueryStrings", "querystring.")]
+        for parameter, prefix in parameter_prefix_pairs:
+            for key, value in response_parameters.get(parameter, {}).items():
+                param_key = GATEWAY_RESPONSE_PREFIX + prefix + key
+                if isinstance(key, Py27UniStr):
+                    # if key is from template, we need to convert param_key to Py27UniStr
+                    param_key = Py27UniStr(param_key)
+                prefixed_parameters[param_key] = value
 
         return prefixed_parameters
 
@@ -353,50 +345,35 @@ class ApiGatewayAuthorizer(object):
     def _get_identity_validation_expression(self):
         return self.identity and self.identity.get("ValidationExpression")
 
+    def _build_identity_source_item(self, item_prefix, prop_value):
+        item = item_prefix + prop_value
+        if isinstance(prop_value, Py27UniStr):
+            item = Py27UniStr(item)
+        return item
+
+    def _build_identity_source_item_array(self, prop_key, item_prefix):
+        arr = []
+        if self.identity.get(prop_key):
+            arr = [
+                self._build_identity_source_item(item_prefix, prop_value) for prop_value in self.identity.get(prop_key)
+            ]
+        return arr
+
     def _get_identity_source(self):
-        identity_source_headers = []
-        identity_source_query_strings = []
-        identity_source_stage_variables = []
-        identity_source_context = []
+        key_prefix_pairs = [
+            ("Headers", "method.request.header."),
+            ("QueryStrings", "method.request.querystring."),
+            ("StageVariables", "stageVariables."),
+            ("Context", "context."),
+        ]
 
-        if self.identity.get("Headers"):
-            identity_source_headers = []
-            for header in self.identity.get("Headers"):
-                item = "method.request.header." + header
-                if isinstance(header, Py27UniStr):
-                    item = Py27UniStr(item)
-                identity_source_headers.append(item)
-
-        if self.identity.get("QueryStrings"):
-            identity_source_query_strings = []
-            for qs in self.identity.get("QueryStrings"):
-                item = "method.request.querystring." + qs
-                if isinstance(qs, Py27UniStr):
-                    item = Py27UniStr(item)
-                identity_source_query_strings.append(item)
-
-        if self.identity.get("StageVariables"):
-            identity_source_stage_variables = []
-            for sv in self.identity.get("StageVariables"):
-                item = "stageVariables." + sv
-                if isinstance(sv, Py27UniStr):
-                    item = Py27UniStr(item)
-                identity_source_stage_variables.append(item)
-
-        if self.identity.get("Context"):
-            identity_source_context = []
-            for c in self.identity.get("Context"):
-                item = "context." + c
-                if isinstance(c, Py27UniStr):
-                    item = Py27UniStr(item)
-                identity_source_context.append(item)
-
-        identity_source_array = (
-            identity_source_headers
-            + identity_source_query_strings
-            + identity_source_stage_variables
-            + identity_source_context
+        identity_source_array = reduce(
+            lambda accumulator, key_prefix_pair: accumulator
+            + self._build_identity_source_item_array(key_prefix_pair[0], key_prefix_pair[1]),
+            key_prefix_pairs,
+            [],
         )
+
         identity_source = ", ".join(identity_source_array)
         if any(isinstance(i, Py27UniStr) for i in identity_source_array):
             # Convert identity_source to Py27UniStr if any part of it is Py27UniStr

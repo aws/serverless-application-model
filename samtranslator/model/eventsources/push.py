@@ -664,18 +664,8 @@ class Api(PushEventSource):
         if swagger_body is None:
             return
 
-        function_arn = function.get_runtime_attr("arn")
         partition = ArnGenerator.get_partition_name()
-        arn = (
-            "arn:"
-            + partition
-            + ":apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
-            + make_shorthand(function_arn)
-            + "/invocations"
-        )
-        if function_arn.get("Fn::GetAtt") and isinstance(function_arn["Fn::GetAtt"][0], Py27UniStr):
-            arn = Py27UniStr(arn)
-        uri = Py27Dict(fnSub(arn))
+        uri = _build_apigw_integration_uri(function, partition)
 
         editor = SwaggerEditor(swagger_body)
 
@@ -1166,15 +1156,7 @@ class HttpApi(PushEventSource):
         if open_api_body is None:
             return
 
-        function_arn = function.get_runtime_attr("arn")
-        arn = (
-            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
-            + make_shorthand(function_arn)
-            + "/invocations"
-        )
-        if function_arn.get("Fn::GetAtt") and isinstance(function_arn["Fn::GetAtt"][0], Py27UniStr):
-            arn = Py27UniStr(arn)
-        uri = Py27Dict(fnSub(arn))
+        uri = _build_apigw_integration_uri(function, "${AWS::Partition}")
 
         editor = OpenApiEditor(open_api_body)
 
@@ -1263,3 +1245,19 @@ class HttpApi(PushEventSource):
                 "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
             )
         editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+
+
+def _build_apigw_integration_uri(function, partition):
+    function_arn = function.get_runtime_attr("arn")
+    arn = (
+        "arn:"
+        + partition
+        + ":apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
+        + make_shorthand(function_arn)
+        + "/invocations"
+    )
+    # function_arn is always of the form {"Fn::GetAtt": ["<function_logical_id>", "Arn"]}.
+    # We only want to check if the function logical id is a Py27UniStr instance.
+    if function_arn.get("Fn::GetAtt") and isinstance(function_arn["Fn::GetAtt"][0], Py27UniStr):
+        arn = Py27UniStr(arn)
+    return Py27Dict(fnSub(arn))

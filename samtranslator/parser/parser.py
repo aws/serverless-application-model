@@ -58,6 +58,6 @@ class Parser:
         if parameter_values is None:
             raise ValueError("`parameter_values` argument is required")
 
-        self.validate_datatypes(sam_template)
+        Parser.validate_datatypes(sam_template)
 
         SamTemplateValidator.validate(sam_template)
