@@ -55,16 +55,13 @@ def clean_all_integ_buckets():
 
 
 @pytest.fixture()
-def setup_companion_stack_once(tmpdir_factory, request):
+def setup_companion_stack_once(tmpdir_factory, get_prefix):
     tests_integ_dir = Path(__file__).resolve().parents[1]
     template_foler = Path(tests_integ_dir, "integration", "setup")
     companion_stack_tempalte_path = Path(template_foler, COMPANION_STACK_Template)
     cfn_client = ClientProvider().cfn_client
     output_dir = tmpdir_factory.mktemp("data")
-    suffix = ""
-    if request.config.getoption("--pipeline"):
-        suffix = "-" + request.config.getoption("--pipeline")
-    stack_name = COMPANION_STACK_NAME_ONCE + suffix
+    stack_name = get_prefix + COMPANION_STACK_NAME_ONCE
     if _stack_exists(stack_name):
         return
     companion_stack = Stack(stack_name, companion_stack_tempalte_path, cfn_client, output_dir)
@@ -72,10 +69,10 @@ def setup_companion_stack_once(tmpdir_factory, request):
 
 
 @pytest.fixture()
-def delete_companion_stack_once(request):
+def delete_companion_stack_once(request, get_prefix):
     if request.config.getoption("--pipeline"):
         return
-    ClientProvider().cfn_client.delete_stack(StackName=COMPANION_STACK_NAME_ONCE)
+    ClientProvider().cfn_client.delete_stack(StackName=(get_prefix + COMPANION_STACK_NAME_ONCE))
 
 
 @retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
@@ -97,12 +94,17 @@ def get_stack_outputs(stack_description):
 
 
 @pytest.fixture()
-def get_companion_stack_outputs(request):
-    suffix = ""
-    if request.config.getoption("--pipeline"):
-        suffix = "-" + request.config.getoption("--pipeline")
-    companion_stack_description = get_stack_description(COMPANION_STACK_NAME_ONCE + suffix)
+def get_companion_stack_outputs(get_prefix):
+    companion_stack_description = get_stack_description(get_prefix + COMPANION_STACK_NAME_ONCE)
     return get_stack_outputs(companion_stack_description)
+
+
+@pytest.fixture()
+def get_prefix(request):
+    prefix = ""
+    if request.config.getoption("--pipeline"):
+        prefix = request.config.getoption("--pipeline") + "-"
+    return prefix
 
 
 def pytest_addoption(parser):

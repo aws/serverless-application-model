@@ -3,6 +3,7 @@ import logging
 import os
 
 import botocore
+import pytest
 import requests
 
 from integration.helpers.client_provider import ClientProvider
@@ -31,7 +32,13 @@ S3_BUCKET_PREFIX = "sam-integ-bucket-"
 
 
 class BaseTest(TestCase):
+
+    @pytest.fixture(autouse=True)
+    def prefix(self, get_prefix):
+        self.pipeline_prefix = get_prefix
+
     @classmethod
+    @pytest.mark.usefixtures("get_prefix")
     def setUpClass(cls):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
@@ -142,7 +149,7 @@ class BaseTest(TestCase):
         """
         folder, file_name = file_path.split("/")
         self.generate_out_put_file_path(folder, file_name)
-        self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
+        self.stack_name = self.pipeline_prefix + STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
 
         self._fill_template(folder, file_name)
         self.transform_template()
