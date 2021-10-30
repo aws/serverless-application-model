@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template with preference that does not require a new CodeDeploy Service Role
+
+Resources:
+
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda.lambda_handler
+      Role:
+        Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/lambda-role
+      Runtime: python3.7
+      CodeUri: s3://bucket/key
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: Linear10PercentEvery1Minute
+        Role:
+          Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/custom-codedeploy-servicerole
+        Hooks:
+          PreTraffic:
+            Ref: preTrafficHook
+        Events:
+          Api:
+            Type: Api
+            Properties:
+              Path: /test
+              Method: get
+
+  preTrafficHook:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: hook.lambda_handler
+      Role:
+        Fn::Sub: arn:${AWS::Partition}:iam::${AWS::AccountId}:role/lambda-role
+      Runtime: python3.7
+      CodeUri: s3://bucket/key
+      FunctionName: 'CodeDeployHook_preTrafficHook'
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Enabled: false
+        Type: Linear10PercentEvery1Minute
+      Timeout: 5
+      Environment:
+        Variables:
+          NewVersion:
+            Ref: Function.Version
