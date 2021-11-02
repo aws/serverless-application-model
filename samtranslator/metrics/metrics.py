@@ -51,7 +51,8 @@ class CWMetricsPublisher(MetricsPublisher):
         """
         metric_data = list(map(lambda m: m.get_metric_data(), metrics))
         try:
-            self.cloudwatch_client.put_metric_data(Namespace=namespace, MetricData=metric_data)
+            if metric_data:
+                self.cloudwatch_client.put_metric_data(Namespace=namespace, MetricData=metric_data)
         except Exception as e:
             LOG.exception("Failed to report {} metrics".format(len(metric_data)), exc_info=e)
 
