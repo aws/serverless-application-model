@@ -5,7 +5,9 @@ Parameters:
 Globals:
   Api:
     # Overriding this property for Implicit API
-    EndpointConfiguration: { "Ref": "EndpointConfig" }
+    EndpointConfiguration: {
+      "Ref": "EndpointConfig"
+    }
 
 Resources:
   ImplicitApiFunction:
@@ -26,5 +28,4 @@ Resources:
     Properties:
       StageName: Prod
       DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json
-      EndpointConfiguration:
-        Type: REGIONAL
+      EndpointConfiguration: SomeValue
