@@ -7,4 +7,4 @@ Resources:
         CertificateArn:
           "Ref": "CertificateArn"
         BasePath:
-          - "Fn::Sub": "/${SystemID}"
+          - "Fn::Sub": "/${BasePathId}"
