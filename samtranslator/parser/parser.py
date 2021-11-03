@@ -64,6 +64,11 @@ class Parser:
 
         Parser.validate_datatypes(sam_template)
 
-        validation_errors = SamTemplateValidator.validate(sam_template)
-        if validation_errors:
-            LOG.warn("Template schema validation reported the following errors: " + ", ".join(validation_errors))
+        try:
+            validator = SamTemplateValidator()
+            validation_errors = validator.validate(sam_template)
+            if validation_errors:
+                LOG.warn("Template schema validation reported the following errors: " + ", ".join(validation_errors))
+        except Exception as e:
+            # Catching any exception and not re-raising to make sure any validation process won't break transform
+            LOG.exception("Exception from SamTemplateValidator: %s", e)

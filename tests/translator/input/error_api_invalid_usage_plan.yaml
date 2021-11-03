@@ -1,0 +1,24 @@
+Resources:
+  MyApiWithCognitoAuth:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: !GetAtt MyUserPool.Arn
+        UsagePlan: "Should not be a string"
+
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: UserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
