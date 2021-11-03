@@ -697,6 +697,9 @@ class ApiGenerator(object):
         if auth_properties.UsagePlan is None:
             return []
         usage_plan_properties = auth_properties.UsagePlan
+        # throws error if UsagePlan is not a dict
+        if not isinstance(usage_plan_properties, dict):
+            raise InvalidResourceException(self.logical_id, "'UsagePlan' must be a dictionary")
         # throws error if the property invalid/ unsupported for UsagePlan
         if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
             raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
