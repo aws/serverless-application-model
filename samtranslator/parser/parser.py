@@ -1,7 +1,11 @@
+import logging
+
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException
 from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.public.sdk.template import SamTemplate
+
+LOG = logging.getLogger(__name__)
 
 
 class Parser:
@@ -54,5 +58,12 @@ class Parser:
                         )
                     ]
                 )
+        try:
+            validator = SamTemplateValidator()
+            validation_errors = validator.validate(sam_template)
 
-        SamTemplateValidator.validate(sam_template)
+            if validation_errors:
+                LOG.warn("Template schema validation reported the following errors: " + ", ".join(validation_errors))
+        except Exception as e:
+            # Catching any exception and not re-raising to make sure any validation process won't break transform
+            LOG.exception("Exception from SamTemplateValidator: %s", e)

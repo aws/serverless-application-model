@@ -2,6 +2,8 @@ import logging
 from collections import namedtuple
 
 from six import string_types
+
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
@@ -532,6 +534,7 @@ class ApiGenerator(object):
             alias_target["DNSName"] = route53.get("DistributionDomainName")
         return alias_target
 
+    @cw_timer(prefix="Generator", name="Api")
     def to_cloudformation(self, redeploy_restapi_parameters):
         """Generates CloudFormation resources from a SAM API resource
 
@@ -673,9 +676,7 @@ class ApiGenerator(object):
 
         if auth_properties.ResourcePolicy:
             for path in swagger_editor.iter_on_path():
-                swagger_editor.add_resource_policy(
-                    auth_properties.ResourcePolicy, path, self.logical_id, self.stage_name
-                )
+                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
             if auth_properties.ResourcePolicy.get("CustomStatements"):
                 swagger_editor.add_custom_statements(auth_properties.ResourcePolicy.get("CustomStatements"))
 
@@ -696,6 +697,9 @@ class ApiGenerator(object):
         if auth_properties.UsagePlan is None:
             return []
         usage_plan_properties = auth_properties.UsagePlan
+        # throws error if UsagePlan is not a dict
+        if not isinstance(usage_plan_properties, dict):
+            raise InvalidResourceException(self.logical_id, "'UsagePlan' must be a dictionary")
         # throws error if the property invalid/ unsupported for UsagePlan
         if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
             raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
@@ -857,6 +861,19 @@ class ApiGenerator(object):
 
         # Make sure keys in the dict are recognized
         for responses_key, responses_value in self.gateway_responses.items():
+            if is_intrinsic(responses_value):
+                # TODO: Add intrinsic support for this field.
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Unable to set GatewayResponses attribute because "
+                    "intrinsic functions are not supported for this field.",
+                )
+            elif not isinstance(responses_value, dict):
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Invalid property type '{}' for GatewayResponses. "
+                    "Expected an object of type 'GatewayResponse'.".format(type(responses_value).__name__),
+                )
             for response_key in responses_value.keys():
                 if response_key not in GatewayResponseProperties:
                     raise InvalidResourceException(

@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "type": "object",
+  "definitions": {
+    "Parameter": {
+      "additionalProperties": false,
+      "properties": {
+        "AllowedPattern": {
+          "type": "string"
+        },
+        "AllowedValues": {
+          "type": "array"
+        },
+        "ConstraintDescription": {
+          "type": "string"
+        },
+        "Default": {},
+        "Description": {
+          "type": "string"
+        },
+        "MaxLength": {
+          "type": "integer"
+        },
+        "MaxValue": {
+          "type": "number"
+        },
+        "MinLength": {
+          "type": "integer"
+        },
+        "MinValue": {
+          "type": "number"
+        },
+        "NoEcho": {
+          "type": "boolean"
+        },
+        "Type": {
+          "enum": [
+            "String",
+            "Number",
+            "List<Number>",
+            "CommaDelimitedList",
+            "AWS::EC2::AvailabilityZone::Name",
+            "AWS::EC2::Image::Id",
+            "AWS::EC2::Instance::Id",
+            "AWS::EC2::KeyPair::KeyName",
+            "AWS::EC2::SecurityGroup::GroupName",
+            "AWS::EC2::SecurityGroup::Id",
+            "AWS::EC2::Subnet::Id",
+            "AWS::EC2::Volume::Id",
+            "AWS::EC2::VPC::Id",
+            "AWS::Route53::HostedZone::Id",
+            "List<AWS::EC2::AvailabilityZone::Name>",
+            "List<AWS::EC2::Image::Id>",
+            "List<AWS::EC2::Instance::Id>",
+            "List<AWS::EC2::SecurityGroup::GroupName>",
+            "List<AWS::EC2::SecurityGroup::Id>",
+            "List<AWS::EC2::Subnet::Id>",
+            "List<AWS::EC2::Volume::Id>",
+            "List<AWS::EC2::VPC::Id>",
+            "List<AWS::Route53::HostedZone::Id>",
+            "List<String>"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "type": "object"
+    }
+  }
+}

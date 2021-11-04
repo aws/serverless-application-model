@@ -50,7 +50,7 @@ environment that lets you locally build, test, debug, and deploy applications de
 
 + **Extension of AWS CloudFormation**\. Because SAM is an extension of AWS CloudFormation, you get the reliable deployment capabilities of AWS CloudFormation\. You can define resources by using CloudFormation in your SAM template\. Also, you can use the full suite of resources, intrinsic functions, and other template features that are available in CloudFormation\.
 
-## What is this Github repository? 💻
+## What is this GitHub repository? 💻
 
 This GitHub repository contains the SAM Specification, the Python code that translates SAM templates into AWS CloudFormation stacks and lots of example applications.
 In the words of SAM developers:
@@ -70,25 +70,22 @@ Depending on your interest and skill, you can help build the different parts of 
 **Enhance the SAM Specification**
 
 Make pull requests, report bugs, and share ideas to improve the full SAM template specification.
-Source code is located on Github at [awslabs/serverless-application-model](https://github.com/awslabs/serverless-application-model).
+Source code is located on GitHub at [awslabs/serverless-application-model](https://github.com/awslabs/serverless-application-model).
 Read the [SAM Specification Contributing Guide](https://github.com/awslabs/serverless-application-model/blob/master/CONTRIBUTING.md)
 to get started.
 
 **Strengthen SAM CLI**
 
 Add new commands or enhance existing ones, report bugs, or request new features for the SAM CLI.
-Source code is located on Github at [awslabs/aws-sam-cli](https://github.com/awslabs/aws-sam-cli). Read the [SAM CLI Contributing Guide](https://github.com/awslabs/aws-sam-cli/blob/develop/CONTRIBUTING.md) to
+Source code is located on GitHub at [awslabs/aws-sam-cli](https://github.com/awslabs/aws-sam-cli). Read the [SAM CLI Contributing Guide](https://github.com/awslabs/aws-sam-cli/blob/develop/CONTRIBUTING.md) to 
 get started.
 
 **Update SAM Developer Guide**
 
 [SAM Developer Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/index.html) provides comprehensive getting started guide and reference documentation.
-Source code is located on Github at [awsdocs/aws-sam-developer-guide](https://github.com/awsdocs/aws-sam-developer-guide).
+Source code is located on GitHub at [awsdocs/aws-sam-developer-guide](https://github.com/awsdocs/aws-sam-developer-guide).
 Read the [SAM Documentation Contribution Guide](https://github.com/awsdocs/aws-sam-developer-guide/blob/master/CONTRIBUTING.md) to get
 started.
 
 ### Join the SAM Community on Slack
 [Join the SAM developers channel (#samdev)](https://join.slack.com/t/awsdevelopers/shared_invite/zt-idww18e8-Z1kXhI7GNuDewkweCF3YjA) on Slack to collaborate with fellow community members and the AWS SAM team.
-
-
-

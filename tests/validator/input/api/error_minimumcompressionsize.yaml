@@ -1,0 +1,30 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # MinimumCompressionSize not integer
+  ApiMinimumCompressionSizeNotInt:
+    Type: AWS::Serverless::Api
+    Properties:
+      MinimumCompressionSize: "3"
+      StageName: Stage name
+
+  # MinimumCompressionSize not string
+  ApiMinimumCompressionSizeNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      MinimumCompressionSize:
+        Not: Intrinsic
+      StageName: Stage name
+
+  # MinimumCompressionSize too low
+  ApiMinimumCompressionSizeTooLow:
+    Type: AWS::Serverless::Api
+    Properties:
+      MinimumCompressionSize: -1
+      StageName: Stage name
+
+  # MinimumCompressionSize too high
+  ApiMinimumCompressionSizeTooHigh:
+    Type: AWS::Serverless::Api
+    Properties:
+      MinimumCompressionSize: 10485761
+      StageName: Stage name

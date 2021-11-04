@@ -1,7 +1,10 @@
 import copy
 import re
 from six import string_types
+
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
 from samtranslator.model.intrinsics import ref, fnGetAtt, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
@@ -99,6 +102,7 @@ class Schedule(PushEventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the EventBridge Rule and Lambda Permission to which this Schedule event source corresponds.
 
@@ -172,6 +176,7 @@ class CloudWatchEvent(PushEventSource):
         "Target": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the CloudWatch Events/EventBridge Rule and Lambda Permission to which
         this CloudWatch Events/EventBridge event source corresponds.
@@ -257,6 +262,7 @@ class S3(PushEventSource):
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
         raise InvalidEventException(self.relative_id, "S3 events must reference an S3 bucket in the same template.")
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda Permission resource allowing S3 to invoke the function this event source triggers.
 
@@ -322,7 +328,14 @@ class S3(PushEventSource):
         if isinstance(depends_on, string_types):
             depends_on = [depends_on]
 
-        depends_on_set = set(depends_on)
+        try:
+            depends_on_set = set(depends_on)
+        except TypeError:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Invalid type for field 'DependsOn'. Expected a string or list of strings.",
+            )
+
         depends_on_set.add(permission.logical_id)
         bucket["DependsOn"] = list(depends_on_set)
 
@@ -408,6 +421,7 @@ class SNS(PushEventSource):
         "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),
     }
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda Permission resource allowing SNS to invoke the function this event source triggers.
 
@@ -532,10 +546,6 @@ class Api(PushEventSource):
         necessary data from the explicit API
         """
 
-        rest_api_id = self.RestApiId
-        if isinstance(rest_api_id, dict) and "Ref" in rest_api_id:
-            rest_api_id = rest_api_id["Ref"]
-
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the Lambda function. If we are unable to resolve the stage name, we will
@@ -545,6 +555,7 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
+        rest_api_id = self.get_rest_api_id_string(self.RestApiId)
         if isinstance(rest_api_id, string_types):
 
             if (
@@ -573,6 +584,7 @@ class Api(PushEventSource):
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
         API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the
@@ -747,9 +759,7 @@ class Api(PushEventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(
-                    resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
-                )
+                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)
                 if resource_policy.get("CustomStatements"):
                     editor.add_custom_statements(resource_policy.get("CustomStatements"))
 
@@ -877,6 +887,17 @@ class Api(PushEventSource):
 
         api["DefinitionBody"] = editor.swagger
 
+    @staticmethod
+    def get_rest_api_id_string(rest_api_id):
+        """
+        rest_api_id can be either a string or a dictionary where the actual api id is the value at key "Ref".
+        If rest_api_id is a dictionary with key "Ref", returns value at key "Ref". Otherwise, return rest_api_id.
+
+        :param rest_api_id: a string or dictionary that contains the api id
+        :return: string value of rest_api_id
+        """
+        return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id
+
 
 class AlexaSkill(PushEventSource):
     resource_type = "AlexaSkill"
@@ -884,6 +905,7 @@ class AlexaSkill(PushEventSource):
 
     property_types = {"SkillId": PropertyType(False, is_str())}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         function = kwargs.get("function")
 
@@ -902,6 +924,7 @@ class IoTRule(PushEventSource):
 
     property_types = {"Sql": PropertyType(True, is_str()), "AwsIotSqlVersion": PropertyType(False, is_str())}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         function = kwargs.get("function")
 
@@ -964,6 +987,7 @@ class Cognito(PushEventSource):
             self.relative_id, "Cognito events must reference a Cognito UserPool in the same template."
         )
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         function = kwargs.get("function")
 
@@ -1049,6 +1073,7 @@ class HttpApi(PushEventSource):
 
         return {"explicit_api": explicit_api}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
         API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the

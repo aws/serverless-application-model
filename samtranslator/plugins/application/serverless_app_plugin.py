@@ -5,6 +5,7 @@ import logging
 from time import sleep, time
 import copy
 
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import BasePlugin
 from samtranslator.plugins.exceptions import InvalidPluginException
@@ -15,6 +16,8 @@ from samtranslator.intrinsics.actions import FindInMapAction
 from samtranslator.region_configuration import RegionConfiguration
 
 LOG = logging.getLogger(__name__)
+
+PLUGIN_METRICS_PREFIX = "Plugin-ServerlessApp"
 
 
 class ServerlessAppPlugin(BasePlugin):
@@ -66,6 +69,7 @@ class ServerlessAppPlugin(BasePlugin):
             message = "Cannot set both validate_only and wait_for_template_active_status flags to True."
             raise InvalidPluginException(ServerlessAppPlugin.__name__, message)
 
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_before_transform_template(self, template_dict):
         """
         Hook method that gets called before the SAM template is processed.
@@ -211,6 +215,7 @@ class ServerlessAppPlugin(BasePlugin):
             return None
         return str(param)
 
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_before_transform_resource(self, logical_id, resource_type, resource_properties):
         """
         Hook method that gets called before "each" SAM resource gets processed
@@ -288,6 +293,7 @@ class ServerlessAppPlugin(BasePlugin):
                     logical_id, "Resource is missing the required [{}] " "property.".format(key)
                 )
 
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_after_transform_template(self, template):
         """
         Hook method that gets called after the template is processed
@@ -349,6 +355,7 @@ class ServerlessAppPlugin(BasePlugin):
                 raise InvalidResourceException(application_id, message)
             self._in_progress_templates.append((application_id, template_id))
 
+    @cw_timer(prefix="External", name="SAR")
     def _sar_service_call(self, service_call_lambda, logical_id, *args):
         """
         Handles service calls and exception management for service calls

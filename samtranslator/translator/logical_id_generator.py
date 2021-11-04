@@ -16,6 +16,7 @@ class LogicalIdGenerator(object):
 
         :param prefix: Prefix for the logicalId
         :param data_obj: Data object to trigger new changes on. If set to None, this is ignored
+        :param data_hash: Pre-computed hash, must be a string
         """
 
         data_str = ""

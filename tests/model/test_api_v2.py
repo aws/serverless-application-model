@@ -15,11 +15,11 @@ class TestApiGatewayV2Authorizer(TestCase):
             id_source="https://example.com",
             authorization_scopes=["scope1", "scope2"],
         )
-        self.assertEquals(auth.api_logical_id, "logicalId")
-        self.assertEquals(auth.name, "authName")
-        self.assertEquals(auth.jwt_configuration, {"config": "value"})
-        self.assertEquals(auth.id_source, "https://example.com")
-        self.assertEquals(auth.authorization_scopes, ["scope1", "scope2"])
+        self.assertEqual(auth.api_logical_id, "logicalId")
+        self.assertEqual(auth.name, "authName")
+        self.assertEqual(auth.jwt_configuration, {"config": "value"})
+        self.assertEqual(auth.id_source, "https://example.com")
+        self.assertEqual(auth.authorization_scopes, ["scope1", "scope2"])
 
     def test_create_lambda_auth(self):
         auth = ApiGatewayV2Authorizer(
@@ -31,12 +31,12 @@ class TestApiGatewayV2Authorizer(TestCase):
             authorizer_payload_format_version="2.0",
             enable_simple_responses=True,
         )
-        self.assertEquals(auth.api_logical_id, "logicalId")
-        self.assertEquals(auth.name, "lambdaAuth")
-        self.assertEquals(auth.function_arn, "lambdaArn")
-        self.assertEquals(auth.identity, {"Headers": ["Authorization"], "ReauthorizeEvery": 42})
-        self.assertEquals(auth.authorizer_payload_format_version, "2.0")
-        self.assertEquals(auth.enable_simple_responses, True)
+        self.assertEqual(auth.api_logical_id, "logicalId")
+        self.assertEqual(auth.name, "lambdaAuth")
+        self.assertEqual(auth.function_arn, "lambdaArn")
+        self.assertEqual(auth.identity, {"Headers": ["Authorization"], "ReauthorizeEvery": 42})
+        self.assertEqual(auth.authorizer_payload_format_version, "2.0")
+        self.assertEqual(auth.enable_simple_responses, True)
 
     def test_create_authorizer_fails_with_string_authorization_scopes(self):
         with pytest.raises(InvalidResourceException) as e:

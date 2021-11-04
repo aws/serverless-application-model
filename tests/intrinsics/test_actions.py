@@ -699,6 +699,15 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
 
         self.assertEqual(expected, output)
 
+    def test_must_ignore_non_string_types(self):
+        input = {"Fn::GetAtt": ["a", {"c": "d"}]}
+        expected = {"Fn::GetAtt": ["a", {"c": "d"}]}
+
+        getatt = GetAttAction()
+        output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEqual(expected, output)
+
     def test_must_ignore_missing_properties_with_dot_before(self):
         input = {"Fn::GetAtt": [".id1", "foo"]}
         expected = {"Fn::GetAtt": [".id1", "foo"]}

@@ -1,6 +1,8 @@
 import re
 from collections import namedtuple
 from six import string_types
+
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt
 from samtranslator.model.apigatewayv2 import (
     ApiGatewayV2HttpApi,
@@ -337,19 +339,17 @@ class HttpApiGenerator(object):
             for path in basepaths:
                 # search for invalid characters in the path and raise error if there are
                 invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
+
+                if not isinstance(path, string_types):
+                    raise InvalidResourceException(self.logical_id, "Basepath must be a string.")
+
                 if re.search(invalid_regex, path) is not None:
                     raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
 
-                if path == "/":
-                    path = ""
-                else:
-                    # ignore leading and trailing `/` in the path name
-                    m = re.search(r"[a-zA-Z0-9]+[\-\_]?[a-zA-Z0-9]+", path)
-                    path = m.string[m.start(0) : m.end(0)]
-                    if path is None:
-                        raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
+                # ignore leading and trailing `/` in the path name
+                path = path.strip("/")
 
-                logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-\_]+", "", path), "ApiMapping")
+                logical_id = "{}{}{}".format(self.logical_id, re.sub(r"[\-_/]+", "", path), "ApiMapping")
                 basepath_mapping = ApiGatewayV2ApiMapping(logical_id, attributes=self.passthrough_resource_attributes)
                 basepath_mapping.DomainName = ref(self.domain.get("ApiDomainName"))
                 basepath_mapping.ApiId = ref(http_api.logical_id)
@@ -615,6 +615,7 @@ class HttpApiGenerator(object):
         open_api_editor.add_description(self.description)
         self.definition_body = open_api_editor.openapi
 
+    @cw_timer(prefix="Generator", name="HttpApi")
     def to_cloudformation(self):
         """Generates CloudFormation resources from a SAM HTTP API resource
 

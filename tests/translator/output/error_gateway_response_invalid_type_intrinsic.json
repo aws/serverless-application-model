@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [ApiResource] is invalid. Unable to set GatewayResponses attribute because intrinsic functions are not supported for this field."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ApiResource] is invalid. Unable to set GatewayResponses attribute because intrinsic functions are not supported for this field."
+}
