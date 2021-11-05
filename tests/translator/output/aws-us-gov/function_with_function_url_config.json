@@ -35,7 +35,7 @@
           "Ref": "MyFunction"
         },
         "AuthorizationType": "NONE",
-        "CorsConfig": {
+        "Cors": {
           "AllowOrigins": [
             "https://example.com",
             "example1.com",

@@ -12,5 +12,5 @@ Resources:
       Timeout: 3
       FunctionUrlConfig:
         AuthorizationType: NONE
-        CorsConfig:
+        Cors:
           MaxAge: "10"

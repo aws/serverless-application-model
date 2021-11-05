@@ -476,7 +476,7 @@ class TestFunctionUrlConfig(TestCase):
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "foo"
         function.Handler = "bar"
-        function.FunctionUrlConfig = {"CorsConfig": {"AllowOrigins": ["example1.com"]}}
+        function.FunctionUrlConfig = {"Cors": {"AllowOrigins": ["example1.com"]}}
         with pytest.raises(InvalidResourceException) as e:
             function.to_cloudformation(**self.kwargs)
         self.assertEqual(
@@ -503,7 +503,7 @@ class TestFunctionUrlConfig(TestCase):
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "foo"
         function.Handler = "bar"
-        function.FunctionUrlConfig = {"AuthorizationType": {"Ref": "MyIAMRef"}, "CorsConfig": {"Ref": "MyCorConfigRef"}}
+        function.FunctionUrlConfig = {"AuthorizationType": {"Ref": "MyIAMRef"}, "Cors": {"Ref": "MyCorConfigRef"}}
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
@@ -511,11 +511,11 @@ class TestFunctionUrlConfig(TestCase):
         generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
         self.assertEqual(generatedUrlList.__len__(), 1)
         self.assertEqual(generatedUrlList[0].AuthorizationType, {"Ref": "MyIAMRef"})
-        self.assertEqual(generatedUrlList[0].CorsConfig, {"Ref": "MyCorConfigRef"})
+        self.assertEqual(generatedUrlList[0].Cors, {"Ref": "MyCorConfigRef"})
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_with_valid_function_url_config(self):
-        corsConfig = {
+        cors = {
             "AllowOrigins": ["example1.com", "example2.com", "example2.com"],
             "AllowMethods": ["GET"],
             "AllowCredentials": True,
@@ -527,13 +527,13 @@ class TestFunctionUrlConfig(TestCase):
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "foo"
         function.Handler = "bar"
-        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "CorsConfig": corsConfig}
+        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "Cors": cors}
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
         self.assertEqual(generatedUrlList.__len__(), 1)
         self.assertEqual(generatedUrlList[0].AuthorizationType, "NONE")
-        self.assertEqual(generatedUrlList[0].CorsConfig, corsConfig)
+        self.assertEqual(generatedUrlList[0].Cors, cors)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_with_valid_function_url_config_with_Intrinsics(self):
@@ -553,12 +553,12 @@ class TestFunctionUrlConfig(TestCase):
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "foo"
         function.Handler = "bar"
-        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "CorsConfig": {"AllowOrigin": ["example1.com"]}}
+        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "Cors": {"AllowOrigin": ["example1.com"]}}
         with pytest.raises(InvalidResourceException) as e:
             function.to_cloudformation(**self.kwargs)
         self.assertEqual(
             str(e.value.message),
-            "Resource with id [foo] is invalid. AllowOrigin is not a valid property for configuring CorsConfig.",
+            "Resource with id [foo] is invalid. AllowOrigin is not a valid property for configuring Cors.",
         )
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
@@ -567,7 +567,7 @@ class TestFunctionUrlConfig(TestCase):
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "foo"
         function.Handler = "bar"
-        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "CorsConfig": {"AllowOrigins": "example1.com"}}
+        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "Cors": {"AllowOrigins": "example1.com"}}
         with pytest.raises(InvalidResourceException) as e:
             function.to_cloudformation(**self.kwargs)
         self.assertEqual(
@@ -581,7 +581,7 @@ class TestFunctionUrlConfig(TestCase):
         function.CodeUri = "s3://foobar/foo.zip"
         function.Runtime = "foo"
         function.Handler = "bar"
-        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "CorsConfig": {"AllowOrigins": ["example1.com"]}}
+        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "Cors": {"AllowOrigins": ["example1.com"]}}
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
@@ -596,7 +596,7 @@ class TestFunctionUrlConfig(TestCase):
         function.Runtime = "foo"
         function.Handler = "bar"
         function.AutoPublishAlias = "live"
-        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "CorsConfig": {"AllowOrigins": ["example1.com"]}}
+        function.FunctionUrlConfig = {"AuthorizationType": "NONE", "Cors": {"AllowOrigins": ["example1.com"]}}
 
         cfnResources = function.to_cloudformation(**self.kwargs)
         generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]

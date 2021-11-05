@@ -128,5 +128,5 @@ class LambdaUrl(Resource):
     property_types = {
         "TargetFunctionArn": PropertyType(True, one_of(is_str(), is_type(dict))),
         "AuthorizationType": PropertyType(True, is_str()),
-        "CorsConfig": PropertyType(False, is_type(dict)),
+        "Cors": PropertyType(False, is_type(dict)),
     }

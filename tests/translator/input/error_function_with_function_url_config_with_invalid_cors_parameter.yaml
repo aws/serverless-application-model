@@ -12,6 +12,6 @@ Resources:
       Timeout: 3
       FunctionUrlConfig:
         AuthorizationType: NONE
-        CorsConfig:
+        Cors:
           AllowOrigin: 
             - "https://example.com"

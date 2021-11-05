@@ -870,9 +870,9 @@ class SamFunction(SamResourceMacro):
         logical_id = "{id}Url".format(id=lambda_function.logical_id)
         lambda_url = LambdaUrl(logical_id=logical_id)
 
-        cors = self.FunctionUrlConfig.get("CorsConfig")
+        cors = self.FunctionUrlConfig.get("Cors")
         if cors:
-            lambda_url.CorsConfig = cors
+            lambda_url.Cors = cors
         lambda_url.AuthorizationType = self.FunctionUrlConfig.get("AuthorizationType")
         lambda_url.TargetFunctionArn = (
             lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
@@ -909,7 +909,7 @@ class SamFunction(SamResourceMacro):
             "MaxAge": int,
         }
 
-        cors = self.FunctionUrlConfig.get("CorsConfig")
+        cors = self.FunctionUrlConfig.get("Cors")
 
         if not cors or is_intrinsic(cors):
             return
@@ -918,7 +918,7 @@ class SamFunction(SamResourceMacro):
             if prop_name not in cors_property_data_type:
                 raise InvalidResourceException(
                     lambda_function.logical_id,
-                    "{} is not a valid property for configuring CorsConfig.".format(prop_name),
+                    "{} is not a valid property for configuring Cors.".format(prop_name),
                 )
             prop_type = cors_property_data_type.get(prop_name)
             if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):

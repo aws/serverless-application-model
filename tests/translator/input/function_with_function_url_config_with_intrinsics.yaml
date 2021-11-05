@@ -24,7 +24,7 @@ Resources:
       Timeout: 3
       FunctionUrlConfig:
         AuthorizationType: !Ref AuthorizationTypeRef
-        CorsConfig:
+        Cors:
             AllowOrigins: !Ref AllowOriginsRef
             AllowMethods: !Ref AllowMethodsRef
             

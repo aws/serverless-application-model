@@ -11,7 +11,7 @@ Resources:
       Runtime: nodejs12.x
       Timeout: 3
       FunctionUrlConfig:
-        CorsConfig:
+        Cors:
             AllowOrigins: 
               - "https://example.com"
               - "example1.com"
