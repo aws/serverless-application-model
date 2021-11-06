@@ -552,9 +552,10 @@ def _template_has_api_resource(template):
 
         if resource_dict.get("Type") in ["AWS::Serverless::Function", "AWS::Serverless::StateMachine"]:
             events = resource_dict.get("Properties", {}).get("Events", {})
-            for event_dict in events.values():
-                # An explicit or implicit API is referenced
-                if event_dict and event_dict.get("Type") == "Api":
-                    return True
+            if isinstance(events, dict):
+                for event_dict in events.values():
+                    # An explicit or implicit API is referenced
+                    if event_dict and event_dict.get("Type") == "Api":
+                        return True
 
     return False
