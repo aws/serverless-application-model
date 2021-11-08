@@ -980,13 +980,12 @@ class ApiGenerator(object):
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
                                 options_path = definition_body["paths"][path]["options"]
-                                if options_path and options_path.get(field) is None:
+                                if options_path and not isinstance(options_path.get(field), dict):
                                     raise InvalidDocumentException(
                                         [
                                             InvalidTemplateException(
-                                                "Value of responses in options method for path {} must be a dictionary.".format(
-                                                    path
-                                                )
+                                                f"Value of responses in options method for path {path} must be a "
+                                                f"dictionary according to Swagger spec."
                                             )
                                         ]
                                     )
