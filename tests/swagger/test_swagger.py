@@ -5,7 +5,7 @@ from mock import Mock
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from tests.translator.test_translator import deep_sort_lists
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
@@ -352,7 +352,7 @@ class TestSwaggerEditor_add_cors(TestCase):
     def test_must_fail_for_invalid_allowed_origin(self):
 
         path = "/foo"
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidTemplateException):
             self.editor.add_cors(path, None, "headers", "methods")
 
     def test_must_work_for_optional_allowed_headers(self):
