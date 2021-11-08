@@ -984,8 +984,9 @@ class ApiGenerator(object):
                                     raise InvalidDocumentException(
                                         [
                                             InvalidTemplateException(
-                                                "Value of responses in options method for path {} must be a dictionary."
-                                                    .format(path)
+                                                "Value of responses in options method for path {} must be a dictionary.".format(
+                                                    path
+                                                )
                                             )
                                         ]
                                     )
