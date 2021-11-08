@@ -59,6 +59,22 @@ Resources:
               OnFailure:
                 Type: SQS
                 Destination: !GetAtt MySqsQueue.Arn
+        StreamEventWithoutDestinationConfigType:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream1.Arn
+            MaximumBatchingWindowInSeconds: !Ref MyBatchingWindowParam
+            StartingPosition: LATEST
+            DestinationConfig:
+              OnFailure:
+                Destination: !Ref MySnsTopic
+        StreamEventWithEmptyDestinationConfig:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream1.Arn
+            MaximumBatchingWindowInSeconds: !Ref MyBatchingWindowParam
+            StartingPosition: LATEST
+            DestinationConfig:
 
   KinesisStream:
     Type: AWS::Kinesis::Stream
