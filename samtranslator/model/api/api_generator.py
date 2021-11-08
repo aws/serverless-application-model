@@ -984,8 +984,8 @@ class ApiGenerator(object):
                                     raise InvalidDocumentException(
                                         [
                                             InvalidTemplateException(
-                                                f"Value of responses in options method for path {path} must be a "
-                                                f"dictionary according to Swagger spec."
+                                                "Value of responses in options method for path {} must be a "
+                                                "dictionary according to Swagger spec.".format(path)
                                             )
                                         ]
                                     )
