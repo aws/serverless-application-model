@@ -972,7 +972,8 @@ class ApiGenerator(object):
             paths = definition_body.get("paths")
             if paths:
                 for path, path_item in paths.items():
-                    if isinstance(path_item, dict) and path_item.get("options"):
+                    SwaggerEditor.validate_path_item_is_dict(path_item, path)
+                    if path_item.get("options"):
                         options = path_item.get("options").copy()
                         for field, field_val in options.items():
                             # remove unsupported produces and consumes in options for openapi3
@@ -980,15 +981,11 @@ class ApiGenerator(object):
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                if not isinstance(field_val, dict):
-                                    raise InvalidDocumentException(
-                                        [
-                                            InvalidTemplateException(
-                                                "Value of responses in options method for path {} must be a "
-                                                "dictionary according to Swagger spec.".format(path)
-                                            )
-                                        ]
-                                    )
+                                SwaggerEditor.validate_is_dict(
+                                    field_val,
+                                    "Value of responses in options method for path {} must be a "
+                                    "dictionary according to Swagger spec.".format(path),
+                                )
                                 if field_val.get("200") and field_val.get("200").get("headers"):
                                     headers = field_val["200"]["headers"]
                                     for header, header_val in headers.items():
