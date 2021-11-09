@@ -18,7 +18,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException, InvalidDocumentException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -979,18 +979,23 @@ class ApiGenerator(object):
                             if field in ["produces", "consumes"]:
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
-                            if (
-                                field in ["responses"]
-                                and isinstance(field_val, dict)
-                                and field_val.get("200")
-                                and field_val.get("200").get("headers")
-                            ):
-                                headers = field_val["200"]["headers"]
-                                for header, header_val in headers.items():
-                                    new_header_val_with_schema = {"schema": header_val}
-                                    definition_body["paths"][path]["options"][field]["200"]["headers"][
-                                        header
-                                    ] = new_header_val_with_schema
+                            if field in ["responses"]:
+                                if not isinstance(field_val, dict):
+                                    raise InvalidDocumentException(
+                                        [
+                                            InvalidTemplateException(
+                                                "Value of responses in options method for path {} must be a "
+                                                "dictionary according to Swagger spec.".format(path)
+                                            )
+                                        ]
+                                    )
+                                if field_val.get("200") and field_val.get("200").get("headers"):
+                                    headers = field_val["200"]["headers"]
+                                    for header, header_val in headers.items():
+                                        new_header_val_with_schema = {"schema": header_val}
+                                        definition_body["paths"][path]["options"][field]["200"]["headers"][
+                                            header
+                                        ] = new_header_val_with_schema
 
         return definition_body
 
