@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ExplicitApi] is invalid. Structure of the SAM template is invalid. Invalid input. Value for AllowedOrigins is required"
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ExplicitApi] is invalid. Structure of the SAM template is invalid. Invalid input. Value for AllowedOrigins is required"
+}

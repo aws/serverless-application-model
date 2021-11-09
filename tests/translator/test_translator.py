@@ -363,6 +363,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_custom_codedeploy_deployment_preference",
                 "function_with_custom_conditional_codedeploy_deployment_preference",
                 "function_with_disabled_deployment_preference",
+                "function_with_disabled_traffic_hook",
                 "function_with_deployment_preference",
                 "function_with_deployment_preference_all_parameters",
                 "function_with_deployment_preference_from_parameters",
