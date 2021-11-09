@@ -18,7 +18,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException, InvalidDocumentException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -980,6 +980,15 @@ class ApiGenerator(object):
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
                                 options_path = definition_body["paths"][path]["options"]
+                                if options_path and not isinstance(options_path.get(field), dict):
+                                    raise InvalidDocumentException(
+                                        [
+                                            InvalidTemplateException(
+                                                "Value of responses in options method for path {} must be a "
+                                                "dictionary according to Swagger spec.".format(path)
+                                            )
+                                        ]
+                                    )
                                 if (
                                     options_path
                                     and options_path.get(field).get("200")
