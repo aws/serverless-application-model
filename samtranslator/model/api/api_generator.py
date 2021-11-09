@@ -972,7 +972,7 @@ class ApiGenerator(object):
             paths = definition_body.get("paths")
             if paths:
                 for path, path_item in paths.items():
-                    if path_item and path_item.get("options"):
+                    if isinstance(path_item, dict) and path_item.get("options"):
                         options = path_item.get("options").copy()
                         for field, field_val in options.items():
                             # remove unsupported produces and consumes in options for openapi3
@@ -981,7 +981,7 @@ class ApiGenerator(object):
                             # add schema for the headers in options section for openapi3
                             if (
                                 field in ["responses"]
-                                and field_val
+                                and isinstance(field_val, dict)
                                 and field_val.get("200")
                                 and field_val.get("200").get("headers")
                             ):
