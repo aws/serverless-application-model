@@ -8,6 +8,7 @@ from samtranslator.utils.py27hash_fix import (
     Py27UniStr,
     _convert_to_py27_dict,
     to_py27_compatible_template,
+    _template_has_api_resource,
 )
 from samtranslator.model.exceptions import InvalidDocumentException
 
@@ -637,3 +638,19 @@ class TestToPy27CompatibleTemplate(TestCase):
         }
         to_py27_compatible_template(template)
         self.assertEqual(_convert_to_py27_dict_mock.call_count, 2)
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
+    def test_invalid_function_events(self, _convert_to_py27_dict_mock):
+        template = {
+            "Resources": {
+                "Function": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "FunctionName": {"Ref": "MyFunctionName"},
+                        "Events": {"Fn::If": ["Condition", {}, {}]},
+                    },
+                },
+            }
+        }
+        to_py27_compatible_template(template)
+        _convert_to_py27_dict_mock.assert_not_called()
