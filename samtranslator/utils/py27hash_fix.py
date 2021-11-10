@@ -101,7 +101,9 @@ class Py27UniStr(unicode_string_type):
 
     def __repr__(self):
         if sys.version_info.major >= 3:
-            return "u" + super(Py27UniStr, self).encode("unicode_escape").decode("ascii").__repr__().replace("\\\\", "\\")
+            return "u" + super(Py27UniStr, self).encode("unicode_escape").decode("ascii").__repr__().replace(
+                "\\\\", "\\"
+            )
         return super(Py27UniStr, self).__repr__()
 
     def upper(self):
