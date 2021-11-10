@@ -41,6 +41,14 @@ class TestPy27UniStr(TestCase):
         py27str = Py27UniStr("some string")
         self.assertEqual(repr(py27str), "u'some string'")
 
+    def test_repr_with_unicode_literals(self):
+        py27str = Py27UniStr("\xdf\u9054")
+        self.assertEqual(repr(py27str), "u'\\xdf\\u9054'")
+
+    def test_serialized_dict_with_unicode_literal_values(self):
+        d = {"key": Py27UniStr("\xdf")}
+        self.assertEqual(str(d), "{'key': u'\\xdf'}")
+
     def test_upper(self):
         py27str = Py27UniStr("upper")
         upper = py27str.upper()
