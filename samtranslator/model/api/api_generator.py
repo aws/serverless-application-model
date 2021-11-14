@@ -1007,7 +1007,8 @@ class ApiGenerator(object):
         return definition_body
 
     def _get_authorizers(self, authorizers_config, default_authorizer=None):
-        authorizers = {}
+        # The dict below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
+        authorizers = Py27Dict()
         if default_authorizer == "AWS_IAM":
             authorizers[default_authorizer] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id, name=default_authorizer, is_aws_iam_authorizer=True
