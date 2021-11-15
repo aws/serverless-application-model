@@ -25,6 +25,7 @@ class SwaggerEditor(object):
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _X_APIGW_REQUEST_VALIDATORS = "x-amazon-apigateway-request-validators"
     _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validator"
+    _X_ENDPOINT_CONFIG = "x-amazon-apigateway-endpoint-configuration"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -110,6 +111,19 @@ class SwaggerEditor(object):
         if self._CONDITIONAL_IF in method:
             return method[self._CONDITIONAL_IF][1:]
         return [method]
+
+    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):
+        """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG in open api definition as extension
+        Following this guide:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
+        :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
+        """
+        if not self._doc.get(self._X_ENDPOINT_CONFIG):
+            self._doc[self._X_ENDPOINT_CONFIG] = {}
+
+        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
+        set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
+        self._doc[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
 
     def has_integration(self, path, method):
         """

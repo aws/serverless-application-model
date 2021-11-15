@@ -253,6 +253,12 @@ class HttpApiGenerator(object):
                 "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
             )
         domain_config["EndpointType"] = endpoint
+
+        if self.domain.get("OwnershipVerificationCertificateArn", None):
+            domain_config["OwnershipVerificationCertificateArn"] = self.domain.get(
+                "OwnershipVerificationCertificateArn"
+            )
+
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
         if self.domain.get("SecurityPolicy", None):
             domain_config["SecurityPolicy"] = self.domain.get("SecurityPolicy")
