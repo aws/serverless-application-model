@@ -139,16 +139,7 @@ class SwaggerEditor(object):
         method = self._normalize_method_name(method)
 
         path_dict = self.paths.setdefault(path, {})
-
-        if not isinstance(path_dict, dict):
-            # Either customers has provided us an invalid Swagger, or this class has messed it somehow
-            raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
-                    )
-                ]
-            )
+        SwaggerEditor.validate_path_item_is_dict(path_dict, path)
 
         if self._CONDITIONAL_IF in path_dict:
             path_dict = path_dict[self._CONDITIONAL_IF][1]
@@ -536,15 +527,10 @@ class SwaggerEditor(object):
                 # It is possible that the method could have two definitions in a Fn::If block.
                 for method_definition in self.get_method_contents(method):
 
+                    SwaggerEditor.validate_is_dict(
+                        method_definition, "{} for path {} is not a valid dictionary.".format(method_definition, path)
+                    )
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
-                    if not isinstance(method_definition, dict):
-                        raise InvalidDocumentException(
-                            [
-                                InvalidTemplateException(
-                                    "{} for path {} is not a valid dictionary.".format(method_definition, path)
-                                )
-                            ]
-                        )
                     if not self.method_definition_has_integration(method_definition):
                         continue
                     existing_security = method_definition.get("security", [])
@@ -559,14 +545,9 @@ class SwaggerEditor(object):
                     # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
                     # We want to ensure only a single Authorizer security entry exists while keeping everything else
                     for security in existing_security:
-                        if not isinstance(security, dict):
-                            raise InvalidDocumentException(
-                                [
-                                    InvalidTemplateException(
-                                        "{} in Security for path {} is not a valid dictionary.".format(security, path)
-                                    )
-                                ]
-                            )
+                        SwaggerEditor.validate_is_dict(
+                            security, "{} in Security for path {} is not a valid dictionary.".format(security, path)
+                        )
                         if authorizer_names.isdisjoint(security.keys()):
                             existing_non_authorizer_security.append(security)
                         else:
@@ -912,8 +893,7 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
-        if not isinstance(resource_policy, dict):
-            raise InvalidDocumentException([InvalidTemplateException("Resource Policy is not a valid dictionary.")])
+        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
@@ -1243,6 +1223,31 @@ class SwaggerEditor(object):
                     SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
         return False
+
+    @staticmethod
+    def validate_is_dict(obj, exception_message):
+        """
+        Throws exception if obj is not a dict
+
+        :param obj: object being validated
+        :param exception_message: message to include in exception if obj is not a dict
+        """
+
+        if not isinstance(obj, dict):
+            raise InvalidDocumentException([InvalidTemplateException(exception_message)])
+
+    @staticmethod
+    def validate_path_item_is_dict(path_item, path):
+        """
+        Throws exception if path_item is not a dict
+
+        :param path_item: path_item (value at the path) being validated
+        :param path: path name
+        """
+
+        SwaggerEditor.validate_is_dict(
+            path_item, "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
+        )
 
     @staticmethod
     def gen_skeleton():
