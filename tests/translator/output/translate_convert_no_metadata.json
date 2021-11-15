@@ -64,6 +64,7 @@
     }, 
     "ThumbnailFunction": {
       "Type": "AWS::Lambda::Function", 
+      "Metadata":{"Foo": "Bar"},
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",

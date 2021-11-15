@@ -1,0 +1,19 @@
+Resources:
+  ThumbnailFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      Foo: Bar
+    Properties:
+      CodeUri: s3://sam-demo-bucket/thumbnails.zip
+      Handler: index.generate_thumbails
+      Runtime: nodejs12.x
+      Events:
+        ImageBucket:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Images
+            Events: s3:ObjectCreated:*
+
+  Images:
+    Type: AWS::S3::Bucket

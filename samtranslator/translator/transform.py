@@ -2,7 +2,7 @@ from samtranslator.translator.translator import Translator
 from samtranslator.parser.parser import Parser
 
 
-def transform(input_fragment, parameter_values, managed_policy_loader, feature_toggle=None):
+def transform(input_fragment, parameter_values, managed_policy_loader, feature_toggle=None, passthrough_metadata=False):
     """Translates the SAM manifest provided in the and returns the translation to CloudFormation.
 
     :param dict input_fragment: the SAM template to transform
@@ -13,4 +13,9 @@ def transform(input_fragment, parameter_values, managed_policy_loader, feature_t
 
     sam_parser = Parser()
     translator = Translator(managed_policy_loader.load(), sam_parser)
-    return translator.translate(input_fragment, parameter_values=parameter_values, feature_toggle=feature_toggle)
+    return translator.translate(
+        input_fragment,
+        parameter_values=parameter_values,
+        feature_toggle=feature_toggle,
+        passthrough_metadata=passthrough_metadata,
+    )
