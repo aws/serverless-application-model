@@ -327,6 +327,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_request_model_with_validator",
                 "api_with_stage_tags",
                 "api_with_mode",
+                "api_with_no_properties",
                 "s3",
                 "s3_create_remove",
                 "s3_existing_lambda_notification_configuration",
