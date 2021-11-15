@@ -904,12 +904,13 @@ class ApiGenerator(object):
 
         swagger_editor = SwaggerEditor(self.definition_body)
 
-        gateway_responses = {}
+        # The dicts below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
+        gateway_responses = Py27Dict()
         for response_type, response in self.gateway_responses.items():
             gateway_responses[response_type] = ApiGatewayResponse(
                 api_logical_id=self.logical_id,
-                response_parameters=response.get("ResponseParameters", {}),
-                response_templates=response.get("ResponseTemplates", {}),
+                response_parameters=response.get("ResponseParameters", Py27Dict()),
+                response_templates=response.get("ResponseTemplates", Py27Dict()),
                 status_code=response.get("StatusCode", None),
             )
 

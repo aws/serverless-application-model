@@ -130,8 +130,9 @@ class ApiGatewayResponse(object):
             raise InvalidResourceException(api_logical_id, "Property 'StatusCode' must be numeric")
 
         self.api_logical_id = api_logical_id
-        self.response_parameters = response_parameters or {}
-        self.response_templates = response_templates or {}
+        # Defaults to Py27Dict() as these will go into swagger
+        self.response_parameters = response_parameters or Py27Dict()
+        self.response_templates = response_templates or Py27Dict()
         self.status_code = status_code_str
 
     def generate_swagger(self):
