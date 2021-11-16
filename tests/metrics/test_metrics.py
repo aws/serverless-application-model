@@ -237,3 +237,11 @@ class TestCWMetricPublisher(TestCase):
         dummy_publisher = DummyMetricsPublisher()
         dummy_publisher.publish("NS", [None])
         self.assertTrue(True)
+
+    def test_publish_empty_metric(self):
+        mock_cw_client = MagicMock()
+        metric_publisher = CWMetricsPublisher(mock_cw_client)
+        metrics = []
+        namespace = "DummyNamespace"
+        metric_publisher.publish(namespace, metrics)
+        mock_cw_client.put_metric_data.assert_not_called()

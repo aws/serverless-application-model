@@ -363,6 +363,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_custom_codedeploy_deployment_preference",
                 "function_with_custom_conditional_codedeploy_deployment_preference",
                 "function_with_disabled_deployment_preference",
+                "function_with_disabled_traffic_hook",
                 "function_with_deployment_preference",
                 "function_with_deployment_preference_all_parameters",
                 "function_with_deployment_preference_from_parameters",
@@ -454,6 +455,10 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_self_managed_kafka",
                 "function_with_auth_mechanism_for_self_managed_kafka",
                 "function_with_vpc_permission_for_self_managed_kafka",
+                "function_with_function_url_config",
+                "function_with_function_url_config_with_intrinsics",
+                "function_with_function_url_config_and_autopublishalias",
+                "function_with_function_url_config_without_cors_config",
                 "function_with_event_filtering",
             ],
             [
