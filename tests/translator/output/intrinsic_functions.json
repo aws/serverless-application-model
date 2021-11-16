@@ -334,6 +334,19 @@
             "MyTable",
             "StreamArn"
           ]
+        },
+        "FilterCriteria": {
+          "Fn::Select": [
+            "1",
+            [
+              {},
+              {
+                "Filters": {
+                  "Pattern": "{\"value\": \"b\"}"
+                }
+              }
+            ]
+          ]
         }
       }
     },
