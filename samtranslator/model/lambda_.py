@@ -79,6 +79,7 @@ class LambdaEventSourceMapping(Resource):
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
         "SelfManagedEventSource": PropertyType(False, is_type(dict)),
+        "FilterCriteria": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
