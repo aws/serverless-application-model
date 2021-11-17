@@ -233,6 +233,49 @@
         }
       }
     },
+    "MyFunctionForBatchingExampleStreamEventWithoutDestinationConfigType": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "MaximumBatchingWindowInSeconds": {
+          "Ref": "MyBatchingWindowParam"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "KinesisStream1",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunctionForBatchingExample"
+        },
+        "StartingPosition": "LATEST",
+        "DestinationConfig": {
+            "OnFailure": {
+                "Destination": {
+                    "Ref": "MySnsTopic"
+                }
+            }
+        }
+      }
+    },
+    "MyFunctionForBatchingExampleStreamEventWithEmptyDestinationConfig": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "MaximumBatchingWindowInSeconds": {
+          "Ref": "MyBatchingWindowParam"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "KinesisStream1",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunctionForBatchingExample"
+        },
+        "StartingPosition": "LATEST"
+      }
+    },
     "KinesisStream": {
       "Type": "AWS::Kinesis::Stream",
       "Properties": {

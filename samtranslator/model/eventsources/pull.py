@@ -110,6 +110,9 @@ class PullEventSource(ResourceMacro):
 
         destination_config_policy = None
         if self.DestinationConfig:
+            if self.DestinationConfig.get("OnFailure") is None:
+                raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for 'DestinationConfig'")
+
             # `Type` property is for sam to attach the right policies
             destination_type = self.DestinationConfig.get("OnFailure").get("Type")
 
@@ -120,10 +123,6 @@ class PullEventSource(ResourceMacro):
                 # the values 'SQS' and 'SNS' are allowed. No intrinsics are allowed
                 if destination_type not in ["SQS", "SNS"]:
                     raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")
-                if self.DestinationConfig.get("OnFailure") is None:
-                    raise InvalidEventException(
-                        self.logical_id, "'OnFailure' is a required field for " "'DestinationConfig'"
-                    )
                 if destination_type == "SQS":
                     queue_arn = self.DestinationConfig.get("OnFailure").get("Destination")
                     destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(
@@ -134,6 +133,7 @@ class PullEventSource(ResourceMacro):
                     destination_config_policy = IAMRolePolicies().sns_publish_role_policy(
                         sns_topic_arn, self.logical_id
                     )
+
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
 
         if "role" in kwargs:

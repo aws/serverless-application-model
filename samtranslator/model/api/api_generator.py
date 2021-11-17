@@ -18,7 +18,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException, InvalidDocumentException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -615,14 +615,17 @@ class ApiGenerator(object):
 
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
-            editor.add_cors(
-                path,
-                properties.AllowOrigin,
-                properties.AllowHeaders,
-                properties.AllowMethods,
-                max_age=properties.MaxAge,
-                allow_credentials=properties.AllowCredentials,
-            )
+            try:
+                editor.add_cors(
+                    path,
+                    properties.AllowOrigin,
+                    properties.AllowHeaders,
+                    properties.AllowMethods,
+                    max_age=properties.MaxAge,
+                    allow_credentials=properties.AllowCredentials,
+                )
+            except InvalidTemplateException as ex:
+                raise InvalidResourceException(self.logical_id, ex.message)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
@@ -979,31 +982,31 @@ class ApiGenerator(object):
                 del definition_body["definitions"]
             # removes `consumes` and `produces` options for CORS in openapi3 and
             # adds `schema` for the headers in responses for openapi3
-            if definition_body.get("paths"):
-                for path in definition_body.get("paths"):
-                    if definition_body.get("paths").get(path).get("options"):
-                        definition_body_options = definition_body.get("paths").get(path).get("options").copy()
-                        for field in definition_body_options.keys():
+            paths = definition_body.get("paths")
+            if paths:
+                for path, path_item in paths.items():
+                    SwaggerEditor.validate_path_item_is_dict(path_item, path)
+                    if path_item.get("options"):
+                        options = path_item.get("options").copy()
+                        for field, field_val in options.items():
                             # remove unsupported produces and consumes in options for openapi3
                             if field in ["produces", "consumes"]:
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                options_path = definition_body["paths"][path]["options"]
-                                if (
-                                    options_path
-                                    and options_path.get(field).get("200")
-                                    and options_path.get(field).get("200").get("headers")
-                                ):
-                                    headers = definition_body["paths"][path]["options"][field]["200"]["headers"]
-                                    for header in headers.keys():
-                                        header_value = Py27Dict()
-                                        header_value["schema"] = definition_body["paths"][path]["options"][field][
-                                            "200"
-                                        ]["headers"][header]
+                                SwaggerEditor.validate_is_dict(
+                                    field_val,
+                                    "Value of responses in options method for path {} must be a "
+                                    "dictionary according to Swagger spec.".format(path),
+                                )
+                                if field_val.get("200") and field_val.get("200").get("headers"):
+                                    headers = field_val["200"]["headers"]
+                                    for header, header_val in headers.items():
+                                        new_header_val_with_schema = Py27Dict()
+                                        new_header_val_with_schema["schema"] = header_val
                                         definition_body["paths"][path]["options"][field]["200"]["headers"][
                                             header
-                                        ] = header_value
+                                        ] = new_header_val_with_schema
 
         return definition_body
 

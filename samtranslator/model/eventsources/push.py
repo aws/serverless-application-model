@@ -1063,7 +1063,7 @@ class HttpApi(PushEventSource):
         if isinstance(api_id, dict) and "Ref" in api_id:
             api_id = api_id["Ref"]
 
-        explicit_api = resources[api_id].get("Properties")
+        explicit_api = resources[api_id].get("Properties", {})
 
         return {"explicit_api": explicit_api}
 

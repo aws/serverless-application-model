@@ -6,7 +6,7 @@ init:
 	pip install -e '.[dev]'
 
 test:
-	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 tests/*
+	pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
 
 test-cov-report:
 	pytest --cov samtranslator --cov-report term-missing --cov-report html --cov-fail-under 95 tests/*
