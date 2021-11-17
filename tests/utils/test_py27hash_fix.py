@@ -6,6 +6,7 @@ from samtranslator.utils.py27hash_fix import (
     Py27Dict,
     Py27Keys,
     Py27UniStr,
+    Py27LongInt,
     _convert_to_py27_dict,
     to_py27_compatible_template,
     _template_has_api_resource,
@@ -89,6 +90,26 @@ class TestPy27UniStr(TestCase):
         self.assertEqual(after, ["a", "b,c"])
         for c in after:
             self.assertIsInstance(c, Py27UniStr)
+
+
+class TestPy27LongInt(TestCase):
+    def test_long_int(self):
+        i = Py27LongInt(9223372036854775810)
+        self.assertEqual(repr(i), "9223372036854775810L")
+
+    def test_normal_int(self):
+        i = Py27LongInt(100)
+        self.assertEqual(repr(i), "100")
+
+    def test_serialized_dict_with_long_int(self):
+        i = Py27LongInt(9223372036854775810)
+        d = {"num": i}
+        self.assertEqual(str(d), "{'num': 9223372036854775810L}")
+
+    def test_serialized_dict_with_normal_int(self):
+        i = Py27LongInt(100)
+        d = {"num": i}
+        self.assertEqual(str(d), "{'num': 100}")
 
 
 class TestPy27Keys(TestCase):
@@ -471,6 +492,19 @@ class TestConvertToPy27Dict(TestCase):
         self.assertIsInstance(converted[3], float)
         self.assertEqual(original, converted)
 
+    def test_with_long_int_input(self):
+        original = 9223372036854775810
+        converted = _convert_to_py27_dict(original)
+        self.assertIsInstance(converted, Py27LongInt)
+        self.assertEqual(converted, original)
+
+    def test_with_normal_int_input(self):
+        original = 99
+        converted = _convert_to_py27_dict(original)
+        self.assertNotIsInstance(converted, Py27LongInt)
+        self.assertIsInstance(converted, int)
+        self.assertEqual(converted, original)
+
 
 class TestToPy27CompatibleTemplate(TestCase):
     def test_all(self):
@@ -484,7 +518,8 @@ class TestToPy27CompatibleTemplate(TestCase):
                 "Other": {"Type": "AWS::S3::Bucket", "Properties": {}},
             },
         }
-        to_py27_compatible_template(input_template)
+        param_values = {"paramA": "valueA", "paramB": ["valueB1", "valueB2", "valueB3"]}
+        to_py27_compatible_template(input_template, param_values)
         self.assertEqual(str(input_template["Globals"]), "{'Api': {}}")
         self.assertEqual(
             str(input_template["Parameters"]), "{u'Param2': {'Default': {}}, u'Param1': {'Default': u'Value'}}"
@@ -495,6 +530,7 @@ class TestToPy27CompatibleTemplate(TestCase):
             "AWS::Serverless::Api', 'Properties': {}}, u'Other': {'Type': 'AWS::S3::Bucket', 'Properti"
             "es': {}}, u'StateMachine': {'Type': 'AWS::Serverless::StateMachine', 'Properties': {}}}",
         )
+        self.assertEqual(str(param_values), "{'paramA': u'valueA', 'paramB': [u'valueB1', u'valueB2', u'valueB3']}")
 
     def test_empty_dict_fails_validation(self):
         input_template = {}

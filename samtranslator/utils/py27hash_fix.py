@@ -18,9 +18,10 @@ MINSIZE = 8
 PERTURB_SHIFT = 5
 
 unicode_string_type = str if sys.version_info.major >= 3 else unicode
+long_int_type = int if sys.version_info.major >= 3 else long
 
 
-def to_py27_compatible_template(template):
+def to_py27_compatible_template(template, parameter_values=None):
     """
     Convert an input template to a py27hash-compatible template. This function has to be run before any
     manipulation occurs for sake of keeping the same initial state. This function modifies the input template,
@@ -28,6 +29,7 @@ def to_py27_compatible_template(template):
     change its internal state in Py2.7.
     We only convert necessary parts in the template which could affect the hash generation for Serverless Api
     template is modified
+    Also update parameter_values to py27hash-compatible if it is provided.
 
     Parameters
     ----------
@@ -85,6 +87,10 @@ def to_py27_compatible_template(template):
             new_resources_dict[Py27UniStr(logical_id)] = resource_dict
         template["Resources"] = new_resources_dict
 
+    if parameter_values:
+        for key, val in parameter_values.items():
+            parameter_values[key] = _convert_to_py27_dict(val)
+
 
 def undo_mark_unicode_str_in_template(template_dict):
     return json.loads(json.dumps(template_dict))
@@ -119,6 +125,20 @@ class Py27UniStr(unicode_string_type):
 
     def split(self, sep=None, maxsplit=-1):
         return [Py27UniStr(s) for s in super(Py27UniStr, self).split(sep, maxsplit)]
+
+
+class Py27LongInt(long_int_type):
+    """
+    An int subclass to allow int be recognized as Python2 long int
+    Overriding __repr__ only
+    """
+
+    PY2_MAX_INT = 9223372036854775807  # sys.maxint from Python2.7 Lambda runtime
+
+    def __repr__(self):
+        if sys.version_info.major >= 3 and self > Py27LongInt.PY2_MAX_INT:
+            return super(Py27LongInt, self).__repr__() + "L"
+        return super(Py27LongInt, self).__repr__()
 
 
 class Py27Keys(object):
@@ -527,6 +547,10 @@ def _convert_to_py27_dict(original):
     if isinstance(original, ("".__class__, bytes)):
         # these are strings, return the Py27UniStr instance of the string
         return Py27UniStr(original)
+
+    if isinstance(original, int) and original > Py27LongInt.PY2_MAX_INT:
+        # only convert long int to Py27LongInt
+        return Py27LongInt(original)
 
     if isinstance(original, list):
         return [_convert_to_py27_dict(item) for item in original]
