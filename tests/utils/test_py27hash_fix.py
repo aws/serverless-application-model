@@ -7,7 +7,7 @@ from samtranslator.utils.py27hash_fix import (
     Py27Keys,
     Py27UniStr,
     Py27LongInt,
-    _convert_to_py27_dict,
+    _convert_to_py27_type,
     to_py27_compatible_template,
     _template_has_api_resource,
 )
@@ -453,13 +453,13 @@ class TestPy27Dict(TestCase):
 class TestConvertToPy27Dict(TestCase):
     def test_with_string_input(self):
         original = "aaa"
-        converted = _convert_to_py27_dict(original)
+        converted = _convert_to_py27_type(original)
         self.assertIsInstance(converted, Py27UniStr)
         self.assertEqual(converted, "aaa")
 
     def test_with_simple_dict(self):
         original = {"a": "b"}
-        converted = _convert_to_py27_dict(original)
+        converted = _convert_to_py27_type(original)
         self.assertIsInstance(converted, Py27Dict)
         self.assertEqual(converted, {"a": "b"})
         self.assertEqual(str(converted), "{u'a': u'b'}")
@@ -472,20 +472,20 @@ class TestConvertToPy27Dict(TestCase):
 
     def test_with_nested_dict(self):
         original = {"a": {"b": "c"}}
-        converted = _convert_to_py27_dict(original)
+        converted = _convert_to_py27_type(original)
         self.assertIsInstance(converted, Py27Dict)
         self.assertIsInstance(converted["a"], Py27Dict)
 
     def test_with_list(self):
         original = [{"a": "b"}, {"c": "d"}]
-        converted = _convert_to_py27_dict(original)
+        converted = _convert_to_py27_type(original)
         self.assertIsInstance(converted, list)
         for item in converted:
             self.assertIsInstance(item, Py27Dict)
 
     def test_with_other_type(self):
         original = [("a", "b"), set(["a", "b"]), 123, 123.123]
-        converted = _convert_to_py27_dict(original)
+        converted = _convert_to_py27_type(original)
         self.assertIsInstance(converted[0], tuple)
         self.assertIsInstance(converted[1], set)
         self.assertIsInstance(converted[2], int)
@@ -494,13 +494,13 @@ class TestConvertToPy27Dict(TestCase):
 
     def test_with_long_int_input(self):
         original = 9223372036854775810
-        converted = _convert_to_py27_dict(original)
+        converted = _convert_to_py27_type(original)
         self.assertIsInstance(converted, Py27LongInt)
         self.assertEqual(converted, original)
 
     def test_with_normal_int_input(self):
         original = 99
-        converted = _convert_to_py27_dict(original)
+        converted = _convert_to_py27_type(original)
         self.assertNotIsInstance(converted, Py27LongInt)
         self.assertIsInstance(converted, int)
         self.assertEqual(converted, original)
@@ -638,15 +638,15 @@ class TestToPy27CompatibleTemplate(TestCase):
         self.assertNotIsInstance(template["Resources"]["StateMachine"]["Properties"]["Name"], Py27UniStr)
         self.assertIsInstance(template["Resources"]["StateMachine"]["Properties"]["Events"], Py27Dict)
 
-    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
-    def test_no_conversion_happens(self, _convert_to_py27_dict_mock):
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_no_conversion_happens(self, _convert_to_py27_type_mock):
         template = {"Resources": {"S3Bucket": {"Type": "AWS::S3::Bucket", "Properties": {}}}}
         to_py27_compatible_template(template)
 
-        _convert_to_py27_dict_mock.assert_not_called()
+        _convert_to_py27_type_mock.assert_not_called()
 
-    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
-    def test_explicit_api(self, _convert_to_py27_dict_mock):
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_explicit_api(self, _convert_to_py27_type_mock):
         template = {
             "Resources": {
                 "Api": {"Type": "AWS::Serverless::Api", "Properties": {"Name": "MyApi"}},
@@ -654,10 +654,10 @@ class TestToPy27CompatibleTemplate(TestCase):
         }
         to_py27_compatible_template(template)
 
-        _convert_to_py27_dict_mock.assert_called_once_with({"Name": "MyApi"})
+        _convert_to_py27_type_mock.assert_called_once_with({"Name": "MyApi"})
 
-    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
-    def test_implicit_api(self, _convert_to_py27_dict_mock):
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_implicit_api(self, _convert_to_py27_type_mock):
         template = {
             "Resources": {
                 "Function": {
@@ -673,10 +673,10 @@ class TestToPy27CompatibleTemplate(TestCase):
             }
         }
         to_py27_compatible_template(template)
-        self.assertEqual(_convert_to_py27_dict_mock.call_count, 2)
+        self.assertEqual(_convert_to_py27_type_mock.call_count, 2)
 
-    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_dict")
-    def test_invalid_function_events(self, _convert_to_py27_dict_mock):
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_invalid_function_events(self, _convert_to_py27_type_mock):
         template = {
             "Resources": {
                 "Function": {
@@ -689,4 +689,4 @@ class TestToPy27CompatibleTemplate(TestCase):
             }
         }
         to_py27_compatible_template(template)
-        _convert_to_py27_dict_mock.assert_not_called()
+        _convert_to_py27_type_mock.assert_not_called()

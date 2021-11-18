@@ -51,13 +51,13 @@ def to_py27_compatible_template(template, parameter_values=None):
 
     if "Globals" in template and isinstance(template["Globals"], dict) and "Api" in template["Globals"]:
         # "Api" section under "Globals" could affect swagger generation for AWS::Serverless::Api resources
-        template["Globals"]["Api"] = _convert_to_py27_dict(template["Globals"]["Api"])
+        template["Globals"]["Api"] = _convert_to_py27_type(template["Globals"]["Api"])
 
     if "Parameters" in template and isinstance(template["Parameters"], dict):
         new_parameters_dict = Py27Dict()
         for logical_id, param_dict in template["Parameters"].items():
             if isinstance(param_dict, dict) and "Default" in param_dict:
-                param_dict["Default"] = _convert_to_py27_dict(param_dict["Default"])
+                param_dict["Default"] = _convert_to_py27_type(param_dict["Default"])
 
             # dict keys have to be Py27UniStr for correct serialization
             new_parameters_dict[Py27UniStr(logical_id)] = param_dict
@@ -72,24 +72,24 @@ def to_py27_compatible_template(template, parameter_values=None):
                 if resource_properties is not None:
                     # We only convert for AWS::Serverless::Api resource
                     if resource_type == "AWS::Serverless::Api":
-                        resource_dict["Properties"] = _convert_to_py27_dict(resource_properties)
+                        resource_dict["Properties"] = _convert_to_py27_type(resource_properties)
                     elif resource_type in ["AWS::Serverless::Function", "AWS::Serverless::StateMachine"]:
                         # properties below could affect swagger generation
                         if "Condition" in resource_dict:
-                            resource_dict["Condition"] = _convert_to_py27_dict(resource_dict["Condition"])
+                            resource_dict["Condition"] = _convert_to_py27_type(resource_dict["Condition"])
                         if "FunctionName" in resource_properties:
-                            resource_properties["FunctionName"] = _convert_to_py27_dict(
+                            resource_properties["FunctionName"] = _convert_to_py27_type(
                                 resource_properties["FunctionName"]
                             )
                         if "Events" in resource_properties:
-                            resource_properties["Events"] = _convert_to_py27_dict(resource_properties["Events"])
+                            resource_properties["Events"] = _convert_to_py27_type(resource_properties["Events"])
 
             new_resources_dict[Py27UniStr(logical_id)] = resource_dict
         template["Resources"] = new_resources_dict
 
     if parameter_values:
         for key, val in parameter_values.items():
-            parameter_values[key] = _convert_to_py27_dict(val)
+            parameter_values[key] = _convert_to_py27_type(val)
 
 
 def undo_mark_unicode_str_in_template(template_dict):
@@ -543,7 +543,7 @@ class Py27Dict(dict):
         return self[key]
 
 
-def _convert_to_py27_dict(original):
+def _convert_to_py27_type(original):
     if isinstance(original, ("".__class__, bytes)):
         # these are strings, return the Py27UniStr instance of the string
         return Py27UniStr(original)
@@ -553,14 +553,14 @@ def _convert_to_py27_dict(original):
         return Py27LongInt(original)
 
     if isinstance(original, list):
-        return [_convert_to_py27_dict(item) for item in original]
+        return [_convert_to_py27_type(item) for item in original]
 
     if isinstance(original, dict):
         # Recursively convert dict items
         key_list = original.keys()
         new_dict = Py27Dict()
         for key in key_list:
-            new_dict[Py27UniStr(key)] = _convert_to_py27_dict(original[key])
+            new_dict[Py27UniStr(key)] = _convert_to_py27_type(original[key])
         return new_dict
 
     # Anything else does not require conversion
