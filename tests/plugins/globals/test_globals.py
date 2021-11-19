@@ -206,11 +206,15 @@ class TestGlobalsObject(TestCase):
         self._originals = {
             "resource_prefix": Globals._RESOURCE_PREFIX,
             "supported_properties": Globals.supported_properties,
+            "unreleased_properties": Globals.unreleased_properties,
         }
         Globals._RESOURCE_PREFIX = "prefix_"
         Globals.supported_properties = {
             "prefix_type1": ["prop1", "prop2"],
             "prefix_type2": ["otherprop1", "otherprop2"],
+        }
+        Globals.unreleased_properties = {
+            "prefix_type1": ["prop2"],
         }
 
         self.template = {
@@ -223,6 +227,7 @@ class TestGlobalsObject(TestCase):
     def tearDown(self):
         Globals._RESOURCE_PREFIX = self._originals["resource_prefix"]
         Globals.supported_properties = self._originals["supported_properties"]
+        Globals.unreleased_properties = self._originals["unreleased_properties"]
 
     def test_parse_should_parse_all_known_resource_types(self):
         globals = Globals(self.template)
@@ -386,6 +391,17 @@ class TestGlobalsObject(TestCase):
         result = globals.merge(type, properties)
 
         self.assertEqual(expected, result)
+
+    def test_should_not_include_unreleased_properties_in_error_message(self):
+        template = {"Globals": {"type1": {"unsupported_property": "value"}}}
+
+        with self.assertRaises(InvalidGlobalsSectionException) as exc:
+            Globals(template)
+        expected_message = (
+            "'Globals' section is invalid. 'unsupported_property' is not a supported property of 'type1'. "
+            + "Must be one of the following values - ['prop1']"
+        )
+        self.assertEqual(exc.exception.message, expected_message)
 
 
 class TestGlobalsOpenApi(TestCase):

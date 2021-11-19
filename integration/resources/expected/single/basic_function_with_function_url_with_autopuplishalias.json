@@ -1,0 +1,22 @@
+[
+  {
+    "LogicalResourceId": "MyLambdaFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionUrl",
+    "ResourceType": "AWS::Lambda::Url"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionAliaslive",
+    "ResourceType": "AWS::Lambda::Alias"
+  },
+  {
+    "LogicalResourceId": "MyLambdaFunctionVersion",
+    "ResourceType": "AWS::Lambda::Version"
+  }
+]
