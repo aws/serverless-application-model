@@ -82,11 +82,7 @@ class Globals(object):
         SamResourceType.SimpleTable.value: ["SSESpecification"],
     }
     # unreleased_properties *must be* part of supported_properties too
-    unreleased_properties = {
-        SamResourceType.Function.value: [
-            "FunctionUrlConfig",
-        ]
-    }
+    unreleased_properties = {}
 
     def __init__(self, template):
         """
