@@ -1,0 +1,266 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # UsagePlan
+  ApiUsagePlanEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+  ApiUsagePlanNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan: 3
+
+  # CreateUsagePlan
+  ApiCreateUsagePlanEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan:
+  ApiCreateUsagePlanNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: 3
+  ApiCreateUsagePlanUnknown:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: UNKNOWN
+
+  # Description
+  ApiDescriptionEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Description:
+  ApiDescriptionNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Description: 3
+
+  # Quota
+  ApiQuotaEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+  ApiQuotaNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota: 3
+  ApiQuotaUnknownProperty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+            Unknown: Property
+  ApiQuotaLimitNotInteger:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+            Limit: "3"
+  ApiQuotaLimitNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+            Limit:
+              Not: Intrinsic
+  ApiQuotaOffsetNotInteger:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+            Offset: "3"
+  ApiQuotaOffsetNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+            Offset:
+              Not: Intrinsic
+  ApiQuotaPeriodNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+            Period: 3
+  ApiQuotaPeriodUnknown:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+            Period: CENTURY
+  ApiQuotaPeriodNotIntrinsic:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Quota:
+            Period:
+              Not: Intrinsic
+
+  # Tags
+  ApiTagsEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Tags:
+  ApiTagsNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Tags: 3
+  ApiTagsItemNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Tags:
+            - 3
+  ApiTagsItemMissingKey:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Tags:
+            - Value: MyValue
+  ApiTagsItemMissingValue:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Tags:
+            - Key: MyKey
+
+  # Throttle
+  ApiThrottleEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Throttle:
+  ApiThrottleNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Throttle: 3
+  ApiThrottleBurstLimitEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Throttle:
+            BurstLimit:
+  ApiThrottleBurstLimitNotInteger:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Throttle:
+            BurstLimit: "3"
+  ApiThrottleRateLimitEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Throttle:
+            RateLimit:
+  ApiThrottleRateLimitNotDouble:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          Throttle:
+            RateLimit: "3"
+
+  # UsagePlanName
+  ApiUsagePlanNameEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          UsagePlanName:
+  ApiUsagePlanNameNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      Auth:
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          UsagePlanName: 3
