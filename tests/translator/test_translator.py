@@ -456,6 +456,10 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_self_managed_kafka",
                 "function_with_auth_mechanism_for_self_managed_kafka",
                 "function_with_vpc_permission_for_self_managed_kafka",
+                "function_with_function_url_config",
+                "function_with_function_url_config_with_intrinsics",
+                "function_with_function_url_config_and_autopublishalias",
+                "function_with_function_url_config_without_cors_config",
             ],
             [
                 ("aws", "ap-southeast-1"),
