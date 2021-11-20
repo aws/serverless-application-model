@@ -66,39 +66,6 @@ class TestBasicFunction(BaseTest):
 
         self.assertEqual(function_architecture, architecture)
 
-    @parameterized.expand(
-        [
-            ("single/basic_function_with_function_url_config", None),
-            ("single/basic_function_with_function_url_with_autopuplishalias", "live"),
-        ]
-    )
-    @skipIf(current_region_does_not_support(["Url"]), "Url is not supported in this testing region")
-    def test_basic_function_with_url_config(self, file_name, qualifier):
-        """
-        Creates a basic lambda function with Function Url enabled
-        """
-        self.create_and_verify_stack(file_name)
-
-        lambda_client = self.client_provider.lambda_client
-
-        function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
-        function_url_config = (
-            lambda_client.get_function_url_config(FunctionName=function_name, Qualifier=qualifier)
-            if qualifier
-            else lambda_client.get_function_url_config(FunctionName=function_name)
-        )
-        cors_config = {
-            "AllowOrigins": ["https://foo.com"],
-            "AllowMethods": ["POST"],
-            "AllowCredentials": True,
-            "AllowHeaders": ["x-Custom-Header"],
-            "ExposeHeaders": ["x-amzn-header"],
-            "MaxAge": 10,
-        }
-
-        self.assertEqual(function_url_config["AuthorizationType"], "NONE")
-        self.assertEqual(function_url_config["Cors"], cors_config)
-
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
         self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")
 

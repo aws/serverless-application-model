@@ -43,7 +43,6 @@ class Globals(object):
             "FileSystemConfigs",
             "CodeSigningConfigArn",
             "Architectures",
-            "FunctionUrlConfig",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
@@ -81,8 +80,6 @@ class Globals(object):
         ],
         SamResourceType.SimpleTable.value: ["SSESpecification"],
     }
-    # unreleased_properties *must be* part of supported_properties too
-    unreleased_properties = {}
 
     def __init__(self, template):
         """
@@ -198,17 +195,14 @@ class Globals(object):
             if not isinstance(properties, dict):
                 raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")
 
-            supported = self.supported_properties[resource_type]
-            supported_displayed = [
-                prop for prop in supported if prop not in self.unreleased_properties.get(resource_type, [])
-            ]
             for key, value in properties.items():
+                supported = self.supported_properties[resource_type]
                 if key not in supported:
                     raise InvalidGlobalsSectionException(
                         self._KEYWORD,
                         "'{key}' is not a supported property of '{section}'. "
                         "Must be one of the following values - {supported}".format(
-                            key=key, section=section_name, supported=supported_displayed
+                            key=key, section=section_name, supported=supported
                         ),
                     )
 
