@@ -194,3 +194,30 @@ Resources:
       Auth:
         Authorizers:
           MyCognitoAuthorizer:
+
+  NonStringDefaultAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        GetRoot:
+          Type: HttpApi
+          Properties:
+            ApiId: NonStringDefaultAuthorizerApi
+            Path: /
+            Method: get
+
+  NonStringDefaultAuthorizerApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          MyAuth:
+            JwtConfiguration:
+              audience: https://test-sam.com
+              issuer: https://test-sam.com
+            IdentitySource: "$request.header.Authorization"
+        # Correct usage: DefaultAuthorizer: MyAuth
+        DefaultAuthorizer: !Ref MyAuth
