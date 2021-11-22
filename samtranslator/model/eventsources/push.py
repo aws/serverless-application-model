@@ -1207,6 +1207,13 @@ class HttpApi(PushEventSource):
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
         method_authorizer = self.Auth.get("Authorizer")
+
+        if method_authorizer is not None and not isinstance(method_authorizer, string_types):
+            raise InvalidEventException(
+                self.relative_id,
+                "'Authorizer' in the 'Auth' section must be a string.",
+            )
+
         api_auth = api.get("Auth", {})
         if not method_authorizer:
             if api_auth.get("DefaultAuthorizer"):
