@@ -305,6 +305,7 @@ class OpenApiEditor(object):
                 else:
                     # create as Py27Dict and insert keys one by one to preserve input order
                     parameter = Py27Dict()
+                    param = Py27UniStr(param) if isinstance(param, str) else param
                     parameter["name"] = param
                     parameter["in"] = "path"
                     parameter["required"] = True
