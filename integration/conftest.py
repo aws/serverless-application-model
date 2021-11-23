@@ -82,7 +82,7 @@ def get_stack_description(stack_name):
     except botocore.exceptions.ClientError as ex:
         if "Throttling" in str(ex):
             raise ThrottlingError(stack_name=stack_name, msg=str(ex))
-        raise
+        raise ex
 
 
 def get_stack_outputs(stack_description):
@@ -114,6 +114,7 @@ def pytest_addoption(parser):
     )
 
 
+@retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
 def _stack_exists(stack_name):
     cloudformation = boto3.resource('cloudformation')
     stack = cloudformation.Stack(stack_name)
@@ -122,6 +123,8 @@ def _stack_exists(stack_name):
     except ClientError as ex:
         if "does not exist" in str(ex):
             return False
+        if "Throttling" in str(ex):
+            raise ThrottlingError(stack_name=stack_name, msg=str(ex))
         raise ex
 
     return True
