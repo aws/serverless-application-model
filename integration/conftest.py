@@ -70,7 +70,8 @@ def setup_companion_stack_once(tmpdir_factory, get_prefix):
 
 @pytest.fixture()
 def delete_companion_stack_once(get_prefix):
-    ClientProvider().cfn_client.delete_stack(StackName=(get_prefix + COMPANION_STACK_NAME))
+    if not get_prefix:
+        ClientProvider().cfn_client.delete_stack(StackName=COMPANION_STACK_NAME)
 
 
 @retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
