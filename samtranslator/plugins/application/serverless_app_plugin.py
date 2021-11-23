@@ -180,6 +180,9 @@ class ServerlessAppPlugin(BasePlugin):
             warning_message = "{}. Unable to verify access to {}/{}.".format(e, app_id, semver)
             LOG.warning(warning_message)
             self._applications[key] = {"Unable to verify"}
+        except ClientError as e:
+            LOG.exception(e)
+            raise e
 
     def _handle_create_cfn_template_request(self, app_id, semver, key, logical_id):
         """
@@ -194,7 +197,12 @@ class ServerlessAppPlugin(BasePlugin):
         create_cfn_template = lambda app_id, semver: self._sar_client.create_cloud_formation_template(
             ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
         )
-        response = self._sar_service_call(create_cfn_template, logical_id, app_id, semver)
+        try:
+            response = self._sar_service_call(create_cfn_template, logical_id, app_id, semver)
+        except ClientError as e:
+            LOG.exception(e)
+            raise e
+
         LOG.info("Requested to create CFN template {}/{} in serverless application repo.".format(app_id, semver))
         self._applications[key] = response[self.TEMPLATE_URL_KEY]
         if response["Status"] != "ACTIVE":
@@ -308,6 +316,7 @@ class ServerlessAppPlugin(BasePlugin):
             while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
                 temp = self._in_progress_templates
                 self._in_progress_templates = []
+                throttled = False
 
                 # Check each resource to make sure it's active
                 LOG.info("Checking resources in serverless application repo...")
@@ -318,8 +327,26 @@ class ServerlessAppPlugin(BasePlugin):
                             TemplateId=self._sanitize_sar_str_param(template_id),
                         )
                     )
-                    response = self._sar_service_call(get_cfn_template, application_id, application_id, template_id)
+                    response = {"Status": "PREPARING"}  # default response if we can't reach SAR
+
+                    try:
+                        if not throttled:
+                            response = self._sar_service_call(
+                                get_cfn_template, application_id, application_id, template_id
+                            )
+                    except ClientError as e:
+                        error_code = e.response["Error"]["Code"]
+                        if error_code == "TooManyRequestsException":
+                            # We were throttled by SAR, don't hammer SAR with more calls in this for loop
+                            throttled = True
+                            LOG.debug("SAR call timed out for application id {}".format(application_id))
+                            # don't re-raise, fall through to regular processing as if the template wasn't ready yet
+                        else:
+                            LOG.exception(e)
+                            raise e
+
                     self._handle_get_cfn_template_response(response, application_id, template_id)
+
                 LOG.info("Finished checking resources in serverless application repo.")
 
                 # Don't sleep if there are no more templates with PREPARING status
@@ -372,9 +399,6 @@ class ServerlessAppPlugin(BasePlugin):
             error_code = e.response["Error"]["Code"]
             if error_code in ("AccessDeniedException", "NotFoundException"):
                 raise InvalidResourceException(logical_id, e.response["Error"]["Message"])
-
-            # 'ForbiddenException'- SAR rejects connection
-            LOG.exception(e)
             raise e
 
     def _resource_is_supported(self, resource_type):
