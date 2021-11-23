@@ -82,7 +82,11 @@
         },
         "StartingPosition": "TRIM_HORIZON",
         "FilterCriteria": {
-          "Filters": []
+          "Filters": [
+            {
+              "Pattern": "{ \"dynamodb\": { \"NewImage\": { \"value\": { \"S\": [\"test\"] } } } }"
+            }
+          ]
         }
       }
     },

@@ -21,7 +21,14 @@ Resources:
             Stream: !GetAtt DynamoDBTable.StreamArn
             StartingPosition: TRIM_HORIZON
             FilterCriteria:
-              Filters: []
+              Filters:
+                - Pattern: '{
+                      "dynamodb": {
+                        "NewImage": {
+                          "value": { "S": ["test"] }
+                        }
+                      }
+                    }'
         MySqsQueue:
           Type: SQS
           Properties:
