@@ -878,6 +878,7 @@ class SamApi(SamResourceMacro):
         "Domain": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "Mode": PropertyType(False, is_str()),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
     referable_properties = {
@@ -925,6 +926,7 @@ class SamApi(SamResourceMacro):
             method_settings=self.MethodSettings,
             binary_media=self.BinaryMediaTypes,
             minimum_compression_size=self.MinimumCompressionSize,
+            disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
             cors=self.Cors,
             auth=self.Auth,
             gateway_responses=self.GatewayResponses,
