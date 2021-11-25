@@ -20,5 +20,3 @@ KINESIS = "Kinesis"
 SNS = "SNS"
 SQS = "SQS"
 CUSTOM_DOMAIN = "CustomDomain"
-
-

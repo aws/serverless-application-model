@@ -116,7 +116,7 @@ def pytest_addoption(parser):
 
 @retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
 def _stack_exists(stack_name):
-    cloudformation = boto3.resource('cloudformation')
+    cloudformation = boto3.resource("cloudformation")
     stack = cloudformation.Stack(stack_name)
     try:
         stack.stack_status

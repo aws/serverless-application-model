@@ -57,4 +57,3 @@ class TestFunctionWithMsk(BaseTest):
         parameters.append(self.generate_parameter("PreCreatedSubnetOne", dictionary["PreCreatedSubnetOne"]))
         parameters.append(self.generate_parameter("PreCreatedSubnetTwo", dictionary["PreCreatedSubnetTwo"]))
         return parameters
-

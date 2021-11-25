@@ -4,6 +4,7 @@ from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import DYNAMO_DB
 
+
 @skipIf(current_region_does_not_support([DYNAMO_DB]), "DynamoDB is not supported in this testing region")
 class TestFunctionWithDynamoDB(BaseTest):
     def test_function_with_dynamoDB_trigger(self):

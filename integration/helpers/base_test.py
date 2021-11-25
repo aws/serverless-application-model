@@ -32,7 +32,6 @@ S3_BUCKET_PREFIX = "sam-integ-bucket-"
 
 
 class BaseTest(TestCase):
-
     @pytest.fixture(autouse=True)
     def prefix(self, get_prefix):
         self.pipeline_prefix = get_prefix
@@ -149,7 +148,9 @@ class BaseTest(TestCase):
         """
         folder, file_name = file_path.split("/")
         self.generate_out_put_file_path(folder, file_name)
-        self.stack_name = self.pipeline_prefix + STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
+        self.stack_name = (
+            self.pipeline_prefix + STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
+        )
 
         self._fill_template(folder, file_name)
         self.transform_template()
