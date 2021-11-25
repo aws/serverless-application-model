@@ -6,11 +6,11 @@ from integration.helpers.base_test import BaseTest
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.resource import current_region_does_not_support
-
+from integration.config.service_names import SERVERLESS_REPO
 
 class TestFunctionWithApplication(BaseTest):
     @skipIf(
-        current_region_does_not_support(["ServerlessRepo"]), "ServerlessRepo is not supported in this testing region"
+        current_region_does_not_support([SERVERLESS_REPO]), "ServerlessRepo is not supported in this testing region"
     )
     def test_function_referencing_outputs_from_application(self):
         self.create_and_verify_stack("combination/function_with_application")

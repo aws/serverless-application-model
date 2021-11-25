@@ -45,7 +45,7 @@ class TestBasicApi(BaseTest):
 
         # Removes get from the API
         self.update_and_verify_stack("single/basic_api_with_mode_update")
-        response = requests.get(f"{api_endpoint}/get")
+
         # API Gateway by default returns 403 if a path do not exist
         retries = 20
         while retries > 0:

@@ -23,7 +23,7 @@ class Stack:
         self.stack_resources = None
 
     def create(self):
-        output_template_path = self._generate_out_put_file_path(self.template_path, self.output_dir)
+        output_template_path = self._generate_output_file_path(self.template_path, self.output_dir)
         transform_template(self.template_path, output_template_path)
         self._deploy_stack(output_template_path)
 
@@ -67,7 +67,7 @@ class Stack:
             raise
 
     @staticmethod
-    def _generate_out_put_file_path(file_path, output_dir):
+    def _generate_output_file_path(file_path, output_dir):
         # add a folder name before file name to avoid possible collisions between
         # files in the single and combination folder
         folder_name = file_path.split("/")[-2]

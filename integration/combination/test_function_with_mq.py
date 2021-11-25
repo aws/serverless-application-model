@@ -5,9 +5,10 @@ from parameterized import parameterized
 
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support, generate_suffix
+from integration.config.service_names import MQ
 
 
-@skipIf(current_region_does_not_support(["MQ"]), "MQ is not supported in this testing region")
+@skipIf(current_region_does_not_support([MQ]), "MQ is not supported in this testing region")
 class TestFunctionWithMq(BaseTest):
     @pytest.fixture(autouse=True)
     def companion_stack_outputs(self, get_companion_stack_outputs):
