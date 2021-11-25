@@ -74,10 +74,7 @@ class TestFunctionWithAlias(BaseTest):
         # self.deploy_stack(parameters)
         self.update_stack("combination/function_with_alias_intrinsics", parameters)
         version_ids = get_function_versions(function_name, self.client_provider.lambda_client)
-        # only show 1 version, need to investigate why
-        # self.assertEqual(["1", "2"], version_ids)
-        # alias = self.get_alias(function_name, alias_name)
-        # self.assertEqual("2", alias["FunctionVersion"])
+
         self.assertEqual(["1"], version_ids)
         alias = self.get_alias(function_name, alias_name)
         self.assertEqual("1", alias["FunctionVersion"])
