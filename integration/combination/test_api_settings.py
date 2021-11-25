@@ -1,7 +1,5 @@
 import hashlib
 
-import pytest
-
 try:
     from pathlib import Path
 except ImportError:
