@@ -1,0 +1,61 @@
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        HelloGet:
+          Type: HttpApi
+          Properties:
+            Path: /hello
+            Method: get
+            ApiId: !Ref MyApi
+        HelloPut:
+          Type: HttpApi
+          Properties:
+            Path: /hello
+            Method: put
+            ApiId: !Ref MyApi
+            Auth:
+              Authorizer: MyOauth2Authorizer
+        HelloPost:
+          Type: HttpApi
+          Properties:
+            Path: /hello
+            Method: post
+            ApiId: !Ref MyApi
+        SimpleCase: # path exists, integration doesn't
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
+      Auth:
+        Authorizers:
+          LambdaAuth:
+            FunctionArn: !GetAtt MyAuthFn.Arn
+            AuthorizerPayloadFormatVersion: 1.0
+          MyOauth2Authorizer:
+            AuthorizationScopes:
+              - scope
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              audience:
+                - audience1
+                - audience2
+              issuer: "https://www.example.com/v1/connect/oidc"
+        DefaultAuthorizer: LambdaAuth
