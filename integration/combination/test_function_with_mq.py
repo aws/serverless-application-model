@@ -61,16 +61,6 @@ class TestFunctionWithMq(BaseTest):
         parameters.append(self.generate_parameter("PreCreatedInternetGateway", dictionary["PreCreatedInternetGateway"]))
         return parameters
 
-    @staticmethod
-    def generate_parameter(key, value, previous_value=False, resolved_value="string"):
-        parameter = {
-            "ParameterKey": key,
-            "ParameterValue": value,
-            "UsePreviousValue": previous_value,
-            "ResolvedValue": resolved_value,
-        }
-        return parameter
-
 
 def get_broker_summary(mq_broker_id, mq_client):
     broker_summaries = mq_client.list_brokers()["BrokerSummaries"]

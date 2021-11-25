@@ -58,12 +58,3 @@ class TestFunctionWithMsk(BaseTest):
         parameters.append(self.generate_parameter("PreCreatedSubnetTwo", dictionary["PreCreatedSubnetTwo"]))
         return parameters
 
-    @staticmethod
-    def generate_parameter(key, value, previous_value=False, resolved_value="string"):
-        parameter = {
-            "ParameterKey": key,
-            "ParameterValue": value,
-            "UsePreviousValue": previous_value,
-            "ResolvedValue": resolved_value,
-        }
-        return parameter
