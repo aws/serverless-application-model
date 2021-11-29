@@ -53,6 +53,14 @@ class SwaggerEditor(object):
         self.resource_policy = self._doc.get(self._X_APIGW_POLICY, {})
         self.definitions = self._doc.get("definitions", {})
 
+        # https://swagger.io/specification/#path-item-object
+        # According to swagger spec,
+        # each path item object must be a dict (even it is empty).
+        # We can do an early path validation on path item objects,
+        # so we don't need to validate wherever we use them.
+        for path in self.iter_on_path():
+            SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
+
     def get_path(self, path):
         path_dict = self.paths.get(path)
         if isinstance(path_dict, dict) and self._CONDITIONAL_IF in path_dict:
