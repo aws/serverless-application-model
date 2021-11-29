@@ -316,6 +316,8 @@ class ServerlessAppPlugin(BasePlugin):
             while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
                 temp = self._in_progress_templates
                 self._in_progress_templates = []
+                # it's either our first time in this loop or we just slept SLEEP_TIME_SECONDS so we can
+                # try calling SAR
                 throttled = False
 
                 # Check each resource to make sure it's active

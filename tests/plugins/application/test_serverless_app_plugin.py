@@ -257,9 +257,6 @@ class ApplicationResource(object):
 
 
 class TestServerlessAppPlugin_on_after_transform_template(TestCase):
-    def setUp(self):
-        pass
-
     def test_sar_throttling_doesnt_stop_processing(self):
         client = Mock()
         client.get_cloud_formation_template = Mock()
