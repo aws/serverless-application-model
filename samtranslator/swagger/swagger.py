@@ -545,12 +545,18 @@ class SwaggerEditor(object):
             if normalized_method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                 continue
             if add_default_auth_to_preflight or normalized_method_name != "options":
-                normalized_method_name = self._normalize_method_name(method_name)
+                SwaggerEditor.validate_is_dict(
+                    method,
+                    'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(method_name, method, path),
+                )
                 # It is possible that the method could have two definitions in a Fn::If block.
                 for method_definition in self.get_method_contents(method):
 
                     SwaggerEditor.validate_is_dict(
-                        method_definition, "{} for path {} is not a valid dictionary.".format(method_definition, path)
+                        method_definition,
+                        'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
+                            method_name, method_definition, path
+                        ),
                     )
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                     if not self.method_definition_has_integration(method_definition):
