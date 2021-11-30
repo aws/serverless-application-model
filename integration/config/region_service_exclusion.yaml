@@ -8,13 +8,16 @@ regions:
     - IoT
     - GatewayResponses
     - HttpApi
+    - ARM
   ap-east-1:
     - Cognito
     - IoT
     - ServerlessRepo
     - HttpApi
+    - ARM
   ap-northeast-2:
     - HttpApi
+    - ARM
   ap-northeast-3:
     - Cognito
     - IoT
@@ -22,6 +25,7 @@ regions:
     - XRay
     - CodeDeploy
     - HttpApi
+    - ARM
   ap-south-1:
     - HttpApi
   ap-southeast-1:
@@ -30,6 +34,7 @@ regions:
     - Cognito
     - IoT
     - HttpApi
+    - ARM
   cn-north-1:
     - ServerlessRepo
     - Cognito
@@ -39,6 +44,7 @@ regions:
     - IoT
     - GatewayResponses
     - HttpApi
+    - ARM
   cn-northwest-1:
     - ServerlessRepo
     - Cognito
@@ -48,12 +54,14 @@ regions:
     - IoT
     - GatewayResponses
     - HttpApi
+    - ARM
   eu-north-1:
     - ServerlessRepo
     - Cognito
     - IoT
     - HttpApi
     - Layers
+    - ARM
   eu-south-1:
     - ServerlessRepo
     - Cognito
@@ -63,6 +71,7 @@ regions:
     - IoT
     - GatewayResponses
     - HttpApi
+    - ARM
   eu-west-2:
     - HttpApi
   eu-west-3:
@@ -70,17 +79,21 @@ regions:
     - IoT
     - XRay
     - HttpApi
+    - ARM
   me-south-1:
     - ServerlessRepo
     - Cognito
     - IoT
     - HttpApi
+    - ARM
   sa-east-1:
     - IoT
     - Cognito
     - HttpApi
+    - ARM
   us-east-2:
     - HttpApi
   us-west-1:
     - Cognito
     - IoT
+    - ARM

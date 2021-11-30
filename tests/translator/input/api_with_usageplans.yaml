@@ -63,6 +63,13 @@ Resources:
                Ref: MyApiOne
              Method: get
              Path: /path/one
+         ApiKeyAnyMethod:
+           Type: Api
+           Properties:
+             RestApiId:
+               Ref: MyApiOne
+             Method: any
+             Path: /any/path/one
 
    MyFunctionTwo:
      Type: AWS::Serverless::Function

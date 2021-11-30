@@ -1,0 +1,22 @@
+Parameters:
+  Bucket:
+    Type: String
+  CodeKey:
+    Type: String
+  SwaggerKey:
+    Type: String
+  ImageType:
+    Type: String
+    Default: image~1gif
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: ${definitionuri}
+      BinaryMediaTypes:
+        - image~1jpg
+        - {"Fn::Join": ["~1", ["image", "png"]]}
+        - {"Ref": "ImageType"}
+

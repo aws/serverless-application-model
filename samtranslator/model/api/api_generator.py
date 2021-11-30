@@ -27,7 +27,6 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple(
@@ -181,6 +180,7 @@ class ApiGenerator(object):
         models=None,
         domain=None,
         description=None,
+        mode=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -231,6 +231,7 @@ class ApiGenerator(object):
         self.description = description
         self.shared_api_usage_plan = shared_api_usage_plan
         self.template_conditions = template_conditions
+        self.mode = mode
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -283,6 +284,9 @@ class ApiGenerator(object):
 
         if self.description:
             rest_api.Description = self.description
+
+        if self.mode:
+            rest_api.Mode = self.mode
 
         return rest_api
 

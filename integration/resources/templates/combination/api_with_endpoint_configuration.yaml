@@ -1,0 +1,21 @@
+Parameters:
+  Bucket:
+    Type: String
+  CodeKey:
+    Type: String
+  SwaggerKey:
+    Type: String
+  Config:
+    Type: String
+    Default: REGIONAL
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration: {
+        "Ref": "Config"
+      }
+      DefinitionUri: ${definitionuri}
+

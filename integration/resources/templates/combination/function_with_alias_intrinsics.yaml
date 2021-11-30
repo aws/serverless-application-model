@@ -1,0 +1,29 @@
+Parameters:
+ Bucket:
+  Type: String
+ CodeKey:
+  Type: String
+ SwaggerKey:
+  Type: String
+ AliasName:
+  Type: String
+  Default: Live
+
+Globals:
+  Function:
+    AutoPublishAlias:
+        Ref: AliasName
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri:
+        # Just trying to create a complex intrinsic function where only a part of it can be resolved
+        Bucket:
+          Fn::Join: ["", [{Ref: Bucket}]]
+        Key:
+          # Even though the entire Sub won't be resolved, translator will substitute ${Key} with value passed at runtime
+          Fn::Sub: "${CodeKey}"

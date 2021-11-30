@@ -267,6 +267,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "application_with_intrinsics",
                 "basic_layer",
                 "cloudwatchevent",
+                "cloudwatchevent_intrinsics",
                 "eventbridgerule",
                 "eventbridgerule_with_dlq",
                 "eventbridgerule_with_retry_policy",
@@ -277,6 +278,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "sqs",
                 "function_with_amq",
                 "function_with_amq_kms",
+                "function_with_mq_virtual_host",
                 "simpletable",
                 "simpletable_with_sse",
                 "implicit_api",
@@ -293,6 +295,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_default_aws_iam_auth_and_no_auth_route",
                 "api_with_method_aws_iam_auth",
                 "api_with_aws_iam_auth_overrides",
+                "api_with_swagger_authorizer_none",
                 "api_with_method_settings",
                 "api_with_binary_media_types",
                 "api_with_binary_media_types_definition_body",
@@ -313,29 +316,36 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_gateway_responses_minimal",
                 "api_with_gateway_responses_implicit",
                 "api_with_gateway_responses_string_status_code",
+                "api_with_identity_intrinsic",
                 "api_cache",
                 "api_with_access_log_setting",
+                "api_with_any_method_in_swagger",
                 "api_with_canary_setting",
                 "api_with_xray_tracing",
                 "api_request_model",
+                "api_request_model_with_validator",
                 "api_with_stage_tags",
+                "api_with_mode",
                 "s3",
                 "s3_create_remove",
                 "s3_existing_lambda_notification_configuration",
                 "s3_existing_other_notification_configuration",
                 "s3_filter",
+                "s3_intrinsics",
                 "s3_multiple_events_same_bucket",
                 "s3_multiple_functions",
                 "s3_with_dependsOn",
                 "sns",
                 "sns_sqs",
                 "sns_existing_sqs",
+                "sns_intrinsics",
                 "sns_outside_sqs",
                 "sns_existing_other_subscription",
                 "sns_topic_outside_template",
                 "alexa_skill",
                 "alexa_skill_with_skill_id",
                 "iot_rule",
+                "kinesis_intrinsics",
                 "layers_with_intrinsics",
                 "layers_all_properties",
                 "layer_deletion_policy_precedence",
@@ -435,6 +445,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
                 "version_deletion_policy_precedence",
+                "function_with_architectures",
+                "function_with_intrinsic_architecture",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -469,6 +481,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_auth_all_minimum_openapi",
                 "api_with_swagger_and_openapi_with_auth",
                 "api_with_openapi_definition_body_no_flag",
+                "api_request_model_with_validator_openapi_3",
                 "api_request_model_openapi_3",
                 "api_with_apikey_required_openapi_3",
                 "api_with_basic_custom_domain",
@@ -599,6 +612,49 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
 
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
+    @parameterized.expand(
+        itertools.product(
+            [
+                (
+                    "usage_plans",
+                    ("api_with_usageplans_shared_no_side_effect_1", "api_with_usageplans_shared_no_side_effect_2"),
+                ),
+            ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],
+        )
+    )
+    @patch(
+        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
+        mock_sar_service_call,
+    )
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_transform_success_no_side_effect(self, testcase, partition_with_region):
+        """
+        Tests that the transform does not leak/leave data in shared caches/lists between executions
+        Performs the transform of the templates in a row without reinitialization
+        Data from template X should not leak in template X+1
+
+        Parameters
+        ----------
+        testcase : Tuple
+            Test name (unused) and Templates
+        templates : List
+            List of templates to transform
+        """
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        for template in testcase[1]:
+            print(template, partition, region)
+            manifest = self._read_input(template)
+            expected = self._read_expected_output(template, partition)
+
+            self._compare_transform(manifest, expected, partition, region)
+
 
 @pytest.mark.parametrize(
     "testcase",
@@ -616,12 +672,15 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_state_machine_with_cwe_invalid_dlq_type",
         "error_state_machine_with_cwe_both_dlq_property_provided",
         "error_state_machine_with_cwe_missing_dlq_property",
+        "error_cognito_trigger_invalid_type",
         "error_cognito_userpool_duplicate_trigger",
         "error_cognito_userpool_not_string",
         "error_api_duplicate_methods_same_path",
         "error_api_gateway_responses_nonnumeric_status_code",
         "error_api_gateway_responses_unknown_responseparameter",
         "error_api_gateway_responses_unknown_responseparameter_property",
+        "error_api_request_model_with_intrinsics_validator",
+        "error_api_request_model_with_strings_validator",
         "error_api_invalid_auth",
         "error_api_invalid_path",
         "error_api_invalid_definitionuri",
@@ -642,6 +701,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_cors_credentials_true_without_explicit_origin",
         "error_function_invalid_codeuri",
         "error_function_invalid_api_event",
+        "error_function_invalid_s3_event",
         "error_function_invalid_autopublishalias",
         "error_function_invalid_event_type",
         "error_function_invalid_layer",
@@ -660,6 +720,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_function_with_cwe_missing_dlq_property",
         "error_invalid_logical_id",
         "error_layer_invalid_properties",
+        "error_missing_basic_auth_in_mq",
+        "error_missing_basic_auth_uri_in_mq",
+        "error_multiple_basic_auth_in_mq",
+        "error_missing_sac_in_mq",
+        "error_invalid_config_mq",
         "error_missing_broker",
         "error_missing_queue",
         "error_missing_startingposition",
@@ -667,6 +732,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_multiple_resource_errors",
         "error_null_application_id",
         "error_s3_not_in_template",
+        "error_sns_intrinsics",
         "error_table_invalid_attributetype",
         "error_table_primary_key_missing_name",
         "error_table_primary_key_missing_type",
@@ -720,6 +786,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         "error_invalid_method_definition",
         "error_mappings_is_null",
         "error_swagger_security_not_dict",
+        "error_function_with_unknown_architectures",
+        "error_function_with_multiple_architectures",
     ],
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")

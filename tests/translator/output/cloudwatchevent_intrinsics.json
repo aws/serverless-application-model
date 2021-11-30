@@ -1,0 +1,147 @@
+{
+  "Parameters": {
+    "PathA": {
+      "Type": "String",
+      "Default": "SomeInputPath"
+    },
+    "PathB": {
+      "Type": "String",
+      "Default": "AnotherInputPath"
+    }
+  },
+  "Conditions": {
+    "PathCondition": {
+      "Fn::Equals": [
+        true,
+        true
+      ]
+    }
+  },
+  "Resources": {
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "LambdaFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "LambdaFunctionOnTerminate": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "EventBusName": {
+          "Fn::Join": [
+            "",
+            [
+              "Event",
+              "Bus",
+              "Name"
+            ]
+          ]
+        },
+        "EventPattern": {
+          "detail": {
+            "state": {
+              "Fn::Split": [
+                ",",
+                "terminated,stopped"
+              ]
+            }
+          }
+        },
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "LambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "LambdaFunctionOnTerminateLambdaTarget",
+            "Input": {
+              "Fn::Join": [
+                ":",
+                [
+                  "{ Key",
+                  "Value }"
+                ]
+              ]
+            },
+            "InputPath": {
+              "Fn::If": [
+                "PathCondition",
+                {
+                  "Ref": "PathA"
+                },
+                {
+                  "Ref": "PathB"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "LambdaFunctionOnTerminatePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "LambdaFunction"
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "LambdaFunctionOnTerminate",
+            "Arn"
+          ]
+        }
+      }
+    }
+  }
+}

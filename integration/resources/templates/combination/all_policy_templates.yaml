@@ -1,0 +1,209 @@
+# When you add/remove a policy template, you must add it here to make sure it works.
+# If you run into IAM limitations on the size inline policies inside one IAM Role, create a new function and attach
+# the remaining there.
+
+Resources:
+  MyFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+
+        - SQSPollerPolicy:
+            QueueName: name
+
+        - LambdaInvokePolicy:
+            FunctionName: name
+
+        - CloudWatchPutMetricPolicy: {}
+
+        - EC2DescribePolicy: {}
+
+        - DynamoDBCrudPolicy:
+            TableName: name
+
+        - DynamoDBReadPolicy:
+            TableName: name
+
+        - SESSendBouncePolicy:
+            IdentityName: name
+
+        - ElasticsearchHttpPostPolicy:
+            DomainName: name
+
+        - S3ReadPolicy:
+            BucketName: name
+
+        - S3CrudPolicy:
+            BucketName: name
+
+        - AMIDescribePolicy: {}
+
+        - CloudFormationDescribeStacksPolicy: {}
+
+        - RekognitionDetectOnlyPolicy: {}
+
+        - RekognitionNoDataAccessPolicy:
+            CollectionId: id
+
+        - RekognitionReadPolicy:
+            CollectionId: id
+
+        - RekognitionWriteOnlyAccessPolicy:
+            CollectionId: id
+
+        - SQSSendMessagePolicy:
+            QueueName: name
+
+        - SNSPublishMessagePolicy:
+            TopicName: name
+
+        - VPCAccessPolicy: {}
+
+        - DynamoDBStreamReadPolicy:
+            TableName: name
+            StreamName: name
+
+        - KinesisStreamReadPolicy:
+            StreamName: name
+
+        - SESCrudPolicy:
+            IdentityName: name
+
+        - SNSCrudPolicy:
+            TopicName: name
+
+        - KinesisCrudPolicy:
+            StreamName: name
+
+        - KMSDecryptPolicy:
+            KeyId: keyId
+
+        - PollyFullAccessPolicy:
+            LexiconName: name
+
+        - S3FullAccessPolicy:
+            BucketName: name
+
+        - CodePipelineLambdaExecutionPolicy: {}
+
+        - ServerlessRepoReadWriteAccessPolicy: {}
+
+        - EC2CopyImagePolicy:
+            ImageId: id
+
+        - CodePipelineReadOnlyPolicy:
+            PipelineName: pipeline
+
+        - CloudWatchDashboardPolicy: {}
+
+        - RekognitionFacesPolicy: {}
+
+        - RekognitionLabelsPolicy: {}
+
+        - DynamoDBBackupFullAccessPolicy:
+            TableName: table
+
+        - DynamoDBRestoreFromBackupPolicy:
+            TableName: table
+
+        - ComprehendBasicAccessPolicy: {}
+
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn:
+                Fn::Sub: arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:MyTestDatabaseSecret-a1b2c3
+
+        - AWSSecretsManagerRotationPolicy:
+            FunctionName: function
+
+  MyFunction2:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+
+        - SESEmailTemplateCrudPolicy: {}
+
+        - SSMParameterReadPolicy:
+            ParameterName: name
+
+        - MobileAnalyticsWriteOnlyAccessPolicy: {}
+
+        - PinpointEndpointAccessPolicy:
+            PinpointApplicationId: id
+
+        - FirehoseWritePolicy:
+            DeliveryStreamName: deliveryStream
+
+        - FirehoseCrudPolicy:
+            DeliveryStreamName: deliveryStream
+
+        - EKSDescribePolicy: {}
+
+        - CostExplorerReadOnlyPolicy: {}
+
+        - OrganizationsListAccountsPolicy: {}
+
+        - DynamoDBReconfigurePolicy:
+            TableName: table
+
+        - SESBulkTemplatedCrudPolicy:
+            IdentityName: name
+
+        - FilterLogEventsPolicy:
+            LogGroupName: name
+
+        - StepFunctionsExecutionPolicy:
+            StateMachineName: name
+
+        - CodeCommitCrudPolicy:
+            RepositoryName: name
+
+        - CodeCommitReadPolicy:
+            RepositoryName: name
+        
+        - TextractPolicy: {}
+
+        - TextractDetectAnalyzePolicy: {}
+
+        - TextractGetResultPolicy: {}
+
+        - DynamoDBWritePolicy:
+            TableName: name
+
+        - S3WritePolicy:
+            BucketName: name
+
+        - EFSWriteAccessPolicy:
+            AccessPoint: name
+            FileSystem: name
+
+  MyFunction3:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ${codeuri}
+      Handler: hello.handler
+      Runtime: python2.7
+      Policies:
+        - ElasticMapReduceModifyInstanceFleetPolicy:
+            ClusterId: name
+        - ElasticMapReduceSetTerminationProtectionPolicy:
+            ClusterId: name
+        - ElasticMapReduceModifyInstanceGroupsPolicy:
+            ClusterId: name
+        - ElasticMapReduceCancelStepsPolicy:
+            ClusterId: name
+        - ElasticMapReduceTerminateJobFlowsPolicy:
+            ClusterId: name
+        - ElasticMapReduceAddJobFlowStepsPolicy:
+            ClusterId: name
+        - SageMakerCreateEndpointPolicy:
+            EndpointName: name
+        - SageMakerCreateEndpointConfigPolicy:
+            EndpointConfigName: name
+        - EcsRunTaskPolicy:
+            TaskDefinition: name
