@@ -1,3 +1,5 @@
+import json
+
 from mock import Mock
 from unittest import TestCase
 
@@ -86,7 +88,9 @@ class ApiEventSource(TestCase):
             request_template,
             {
                 "application/json": {
-                    "Fn::Sub": '{"input": "$util.escapeJavaScript($input.json(\'$\'))", "stateMachineArn": "${MockStateMachine}"}'
+                    "Fn::Sub": r"""{"input": "$util.escapeJavaScript($input.json('$')).replaceAll(\"\\'\",\"'\")", "stateMachineArn": "${MockStateMachine}"}"""
                 }
             },
         )
+        request = json.loads(request_template["application/json"]["Fn::Sub"])
+        self.assertEqual(request["input"], r"""$util.escapeJavaScript($input.json('$')).replaceAll("\'","'")""")

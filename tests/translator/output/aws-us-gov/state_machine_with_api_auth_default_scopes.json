@@ -28,7 +28,7 @@
                                     "httpMethod": "POST", 
                                     "requestTemplates": {
                                         "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\\\"\\\\'\\\",\\\"'\\\")\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
                                     }, 
                                     "credentials": {
@@ -71,7 +71,7 @@
                                     "httpMethod": "POST", 
                                     "requestTemplates": {
                                         "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\\\"\\\\'\\\",\\\"'\\\")\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
                                     }, 
                                     "credentials": {
@@ -114,7 +114,7 @@
                                     "httpMethod": "POST", 
                                     "requestTemplates": {
                                         "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\\\"\\\\'\\\",\\\"'\\\")\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
                                     }, 
                                     "credentials": {
@@ -157,7 +157,7 @@
                                     "httpMethod": "POST", 
                                     "requestTemplates": {
                                         "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\\\"\\\\'\\\",\\\"'\\\")\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
                                     }, 
                                     "credentials": {
@@ -203,7 +203,7 @@
                                     "httpMethod": "POST", 
                                     "requestTemplates": {
                                         "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\\\"\\\\'\\\",\\\"'\\\")\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
                                     }, 
                                     "credentials": {
@@ -249,7 +249,7 @@
                                     "httpMethod": "POST", 
                                     "requestTemplates": {
                                         "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\\\"\\\\'\\\",\\\"'\\\")\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
                                     }, 
                                     "credentials": {
@@ -295,7 +295,7 @@
                                     "httpMethod": "POST", 
                                     "requestTemplates": {
                                         "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${MyStateMachine}\"}"
+                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$')).replaceAll(\\\"\\\\'\\\",\\\"'\\\")\", \"stateMachineArn\": \"${MyStateMachine}\"}"
                                         }
                                     }, 
                                     "credentials": {

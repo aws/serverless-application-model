@@ -437,7 +437,9 @@ class Api(EventSource):
             "application/json": fnSub(
                 json.dumps(
                     {
-                        "input": "$util.escapeJavaScript($input.json('$'))",
+                        # Need to unescape single quotes escaped by escapeJavaScript
+                        # See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#util-template-reference
+                        "input": r"""$util.escapeJavaScript($input.json('$')).replaceAll("\'","'")""",
                         "stateMachineArn": "${" + resource.logical_id + "}",
                     }
                 )
