@@ -1,4 +1,5 @@
 from integration.helpers.base_test import BaseTest
+import json
 import requests
 
 
@@ -96,3 +97,23 @@ class TestBasicApi(BaseTest):
         self.assertIsNotNone(stage)
         self.assertEqual(stage["tags"]["TagKey1"], "TagValue1")
         self.assertEqual(stage["tags"]["TagKey2"], "")
+
+    def test_state_machine_with_api_single_quotes_input(self):
+        """
+        Pass single quotes in input JSON to a StateMachine
+
+        See https://github.com/aws/serverless-application-model/issues/1895
+        """
+        self.create_and_verify_stack("single/state_machine_with_api")
+
+        stack_output = self.get_stack_outputs()
+        api_endpoint = stack_output.get("ApiEndpoint")
+
+        input = {"hello": "'wor'l'd'''안녕하세요"}
+        response = requests.post(api_endpoint, json=input)
+        execution_arn = response.json()["executionArn"]
+        self.assertEqual(response.status_code, 200)
+
+        execution = self.client_provider.sfn_client.describe_execution(executionArn=execution_arn)
+        execution_input = json.loads(execution["input"])
+        self.assertEqual(execution_input, input)

@@ -435,14 +435,12 @@ class Api(EventSource):
         """
         request_templates = {
             "application/json": fnSub(
-                json.dumps(
-                    {
-                        # Need to unescape single quotes escaped by escapeJavaScript
-                        # See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#util-template-reference
-                        "input": r"""$util.escapeJavaScript($input.json('$')).replaceAll("\'","'")""",
-                        "stateMachineArn": "${" + resource.logical_id + "}",
-                    }
-                )
+                # Need to unescape single quotes escaped by escapeJavaScript.
+                # Also the mapping template isn't valid JSON, so can't use json.dumps().
+                # See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#util-template-reference
+                """{"input": "$util.escapeJavaScript($input.json('$')).replaceAll("\\\\'","'")", "stateMachineArn": "${"""
+                + resource.logical_id
+                + """}"}"""
             )
         }
         return request_templates
