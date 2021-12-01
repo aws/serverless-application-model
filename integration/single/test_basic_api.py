@@ -109,7 +109,7 @@ class TestBasicApi(BaseTest):
         stack_output = self.get_stack_outputs()
         api_endpoint = stack_output.get("ApiEndpoint")
 
-        input = {"hello": "'wor'l'd'''안녕하세요"}
+        input = {"hello": "'wor'l'd'''"}
         response = requests.post(api_endpoint, json=input)
         execution_arn = response.json()["executionArn"]
         self.assertEqual(response.status_code, 200)
