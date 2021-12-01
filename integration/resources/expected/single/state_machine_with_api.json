@@ -8,4 +8,3 @@
   { "LogicalResourceId": "PostPostEchoRole", "ResourceType": "AWS::IAM::Role" },
   { "LogicalResourceId": "PostRole", "ResourceType": "AWS::IAM::Role" }
 ]
-  
