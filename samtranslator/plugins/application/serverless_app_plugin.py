@@ -180,9 +180,6 @@ class ServerlessAppPlugin(BasePlugin):
             warning_message = "{}. Unable to verify access to {}/{}.".format(e, app_id, semver)
             LOG.warning(warning_message)
             self._applications[key] = {"Unable to verify"}
-        except ClientError as e:
-            LOG.exception(e)
-            raise e
 
     def _handle_create_cfn_template_request(self, app_id, semver, key, logical_id):
         """
@@ -197,11 +194,7 @@ class ServerlessAppPlugin(BasePlugin):
         create_cfn_template = lambda app_id, semver: self._sar_client.create_cloud_formation_template(
             ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
         )
-        try:
-            response = self._sar_service_call(create_cfn_template, logical_id, app_id, semver)
-        except ClientError as e:
-            LOG.exception(e)
-            raise e
+        response = self._sar_service_call(create_cfn_template, logical_id, app_id, semver)
 
         LOG.info("Requested to create CFN template {}/{} in serverless application repo.".format(app_id, semver))
         self._applications[key] = response[self.TEMPLATE_URL_KEY]
@@ -311,78 +304,73 @@ class ServerlessAppPlugin(BasePlugin):
         :param dict template: Dictionary of the SAM template
         :return: Nothing
         """
-        if self._wait_for_template_active_status and not self._validate_only:
-            start_time = time()
-            while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
-                temp = self._in_progress_templates
-                self._in_progress_templates = []
-                # it's either our first time in this loop or we just slept SLEEP_TIME_SECONDS so we can
-                # try calling SAR
-                throttled = False
+        if not self._wait_for_template_active_status or self._validate_only:
+            return
 
-                # Check each resource to make sure it's active
-                LOG.info("Checking resources in serverless application repo...")
-                for application_id, template_id in temp:
-                    get_cfn_template = (
-                        lambda application_id, template_id: self._sar_client.get_cloud_formation_template(
-                            ApplicationId=self._sanitize_sar_str_param(application_id),
-                            TemplateId=self._sanitize_sar_str_param(template_id),
-                        )
-                    )
-                    response = {"Status": "PREPARING"}  # default response if we can't reach SAR
-
-                    try:
-                        if not throttled:
-                            response = self._sar_service_call(
-                                get_cfn_template, application_id, application_id, template_id
-                            )
-                    except ClientError as e:
-                        error_code = e.response["Error"]["Code"]
-                        if error_code == "TooManyRequestsException":
-                            # We were throttled by SAR, don't hammer SAR with more calls in this for loop
-                            throttled = True
-                            LOG.debug("SAR call timed out for application id {}".format(application_id))
-                            # don't re-raise, fall through to regular processing as if the template wasn't ready yet
-                        else:
-                            LOG.exception(e)
-                            raise e
-
-                    self._handle_get_cfn_template_response(response, application_id, template_id)
-
-                LOG.info("Finished checking resources in serverless application repo.")
-
-                # Don't sleep if there are no more templates with PREPARING status
-                if len(self._in_progress_templates) == 0:
-                    break
-
-                # Sleep a little so we don't spam service calls
-                sleep(self.SLEEP_TIME_SECONDS)
-
-            # Not all templates reached active status
-            if len(self._in_progress_templates) != 0:
-                application_ids = [items[0] for items in self._in_progress_templates]
-                raise InvalidResourceException(
-                    application_ids, "Timed out waiting for nested stack templates " "to reach ACTIVE status."
+        start_time = time()
+        while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
+            # Check each resource to make sure it's active
+            LOG.info("Checking resources in serverless application repo...")
+            idx = 0
+            while idx < len(self._in_progress_templates):
+                application_id, template_id = self._in_progress_templates[idx]
+                get_cfn_template = lambda application_id, template_id: self._sar_client.get_cloud_formation_template(
+                    ApplicationId=self._sanitize_sar_str_param(application_id),
+                    TemplateId=self._sanitize_sar_str_param(template_id),
                 )
 
-    def _handle_get_cfn_template_response(self, response, application_id, template_id):
+                try:
+                    response = self._sar_service_call(get_cfn_template, application_id, application_id, template_id)
+                except ClientError as e:
+                    error_code = e.response["Error"]["Code"]
+                    if error_code == "TooManyRequestsException":
+                        LOG.debug("SAR call timed out for application id {}".format(application_id))
+                        break  # We were throttled by SAR, break out to a sleep
+                    else:
+                        raise e
+
+                if self._is_template_active(response, application_id, template_id):
+                    self._in_progress_templates.remove((application_id, template_id))
+                else:
+                    idx += 1  # check next template
+
+            LOG.info("Finished checking resources in serverless application repo.")
+
+            # Don't sleep if there are no more templates with PREPARING status
+            if len(self._in_progress_templates) == 0:
+                break
+
+            # Sleep a little so we don't spam service calls
+            sleep(self._get_sleep_time_sec())
+
+        # Not all templates reached active status
+        if len(self._in_progress_templates) != 0:
+            application_ids = [items[0] for items in self._in_progress_templates]
+            raise InvalidResourceException(
+                application_ids, "Timed out waiting for nested stack templates " "to reach ACTIVE status."
+            )
+
+    def _get_sleep_time_sec(self):
+        return self.SLEEP_TIME_SECONDS
+
+    def _is_template_active(self, response, application_id, template_id):
         """
-        Handles the response from the SAR service call
+        Checks the response from a SAR service call; returns True if the template is active,
+        throws an exception if the request expired and returns False in all other cases.
 
         :param dict response: the response dictionary from the app repo
         :param string application_id: the ApplicationId
         :param string template_id: the unique TemplateId for this application
         """
-        status = response["Status"]
-        if status != "ACTIVE":
-            # Other options are PREPARING and EXPIRED.
-            if status == "EXPIRED":
-                message = (
-                    "Template for {} with id {} returned status: {}. Cannot access an expired "
-                    "template.".format(application_id, template_id, status)
-                )
-                raise InvalidResourceException(application_id, message)
-            self._in_progress_templates.append((application_id, template_id))
+        status = response["Status"]  # options: PREPARING, EXPIRED or ACTIVE
+
+        if status == "EXPIRED":
+            message = "Template for {} with id {} returned status: {}. Cannot access an expired " "template.".format(
+                application_id, template_id, status
+            )
+            raise InvalidResourceException(application_id, message)
+
+        return status == "ACTIVE"
 
     @cw_timer(prefix="External", name="SAR")
     def _sar_service_call(self, service_call_lambda, logical_id, *args):

@@ -264,13 +264,15 @@ class TestServerlessAppPlugin_on_after_transform_template(TestCase):
             {"Error": {"Code": "TooManyRequestsException"}}, "GetCloudFormationTemplate"
         )
         plugin = ServerlessAppPlugin(sar_client=client, wait_for_template_active_status=True, validate_only=False)
-        plugin._in_progress_templates = [("appid", "template")]
-        plugin.SLEEP_TIME_SECONDS = 0.05
-        plugin.TEMPLATE_WAIT_TIMEOUT_SECONDS = 0.3
+        plugin._get_sleep_time_sec = Mock()
+        plugin._get_sleep_time_sec.return_value = 0.02
+        plugin._in_progress_templates = [("appid", "template"), ("appid2", "template2")]
+        plugin.TEMPLATE_WAIT_TIMEOUT_SECONDS = 0.2
         with self.assertRaises(InvalidResourceException):
             plugin.on_after_transform_template("template")
-        # confirm we had at least two attempts to call SAR
+        # confirm we had at least two attempts to call SAR and that we executed a sleep
         self.assertGreater(client.get_cloud_formation_template.call_count, 1)
+        self.assertGreaterEqual(plugin._get_sleep_time_sec.call_count, 1)
 
     def test_unexpected_sar_error_stops_processing(self):
         client = Mock()
@@ -286,7 +288,7 @@ class TestServerlessAppPlugin_on_after_transform_template(TestCase):
     def test_sar_success_one_app(self):
         client = Mock()
         client.get_cloud_formation_template = Mock()
-        client.get_cloud_formation_template.return_value = {"Status": "ACTIVE"}
+        client.get_cloud_formation_template.return_value = {"Status": STATUS_ACTIVE}
         plugin = ServerlessAppPlugin(sar_client=client, wait_for_template_active_status=True, validate_only=False)
         plugin._in_progress_templates = [("appid", "template")]
         plugin.on_after_transform_template("template")
@@ -296,9 +298,33 @@ class TestServerlessAppPlugin_on_after_transform_template(TestCase):
     def test_sar_success_two_apps(self):
         client = Mock()
         client.get_cloud_formation_template = Mock()
-        client.get_cloud_formation_template.return_value = {"Status": "ACTIVE"}
+        client.get_cloud_formation_template.return_value = {"Status": STATUS_ACTIVE}
         plugin = ServerlessAppPlugin(sar_client=client, wait_for_template_active_status=True, validate_only=False)
         plugin._in_progress_templates = [("appid1", "template1"), ("appid2", "template2")]
         plugin.on_after_transform_template("template")
         # should have exactly one call to SAR per app
         self.assertEqual(client.get_cloud_formation_template.call_count, 2)
+
+    def test_expired_sar_app_throws(self):
+        client = Mock()
+        client.get_cloud_formation_template = Mock()
+        client.get_cloud_formation_template.return_value = {"Status": STATUS_EXPIRED}
+        plugin = ServerlessAppPlugin(sar_client=client, wait_for_template_active_status=True, validate_only=False)
+        plugin._in_progress_templates = [("appid1", "template1"), ("appid2", "template2")]
+        with self.assertRaises(InvalidResourceException):
+            plugin.on_after_transform_template("template")
+        # should have exactly one call to SAR since the first app will be expired
+        self.assertEqual(client.get_cloud_formation_template.call_count, 1)
+
+    def test_sleep_between_sar_checks(self):
+        client = Mock()
+        client.get_cloud_formation_template = Mock()
+        client.get_cloud_formation_template.side_effect = [{"Status": STATUS_PREPARING}, {"Status": STATUS_ACTIVE}]
+        plugin = ServerlessAppPlugin(sar_client=client, wait_for_template_active_status=True, validate_only=False)
+        plugin._in_progress_templates = [("appid1", "template1")]
+        plugin._get_sleep_time_sec = Mock()
+        plugin._get_sleep_time_sec.return_value = 0.001
+        plugin.on_after_transform_template("template")
+        # should have exactly two calls to SAR
+        self.assertEqual(client.get_cloud_formation_template.call_count, 2)
+        self.assertEqual(plugin._get_sleep_time_sec.call_count, 1)  # make sure we slept once
