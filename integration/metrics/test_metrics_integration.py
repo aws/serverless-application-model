@@ -59,7 +59,7 @@ class MetricsIntegrationTest(TestCase):
             namespace = "SinglePublishTest-{}".format(uuid.uuid1())
 
     def get_metric_data(self, namespace, metric_name, dimensions, start_time, end_time, stat="Sum"):
-        retries = 3
+        retries = 20
         while retries > 0:
             retries -= 1
             response = self.cw_client.get_metric_data(

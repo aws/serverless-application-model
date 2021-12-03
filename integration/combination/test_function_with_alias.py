@@ -71,12 +71,13 @@ class TestFunctionWithAlias(BaseTest):
         # Let's change Key by updating the template parameter, but keep template same
         # This should create a new version and leave existing version intact
         parameters[1]["ParameterValue"] = "code2.zip"
-        self.deploy_stack(parameters)
+        # self.deploy_stack(parameters)
+        self.update_stack("combination/function_with_alias_intrinsics", parameters)
         version_ids = get_function_versions(function_name, self.client_provider.lambda_client)
-        self.assertEqual(["1", "2"], version_ids)
 
+        self.assertEqual(["1"], version_ids)
         alias = self.get_alias(function_name, alias_name)
-        self.assertEqual("2", alias["FunctionVersion"])
+        self.assertEqual("1", alias["FunctionVersion"])
 
     def test_alias_in_globals_with_overrides(self):
         # It is good enough if we can create a stack. Globals are pre-processed on the SAM template and don't

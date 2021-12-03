@@ -1,9 +1,12 @@
 import json
+from unittest.case import skipIf
 
 from integration.helpers.base_test import BaseTest
-from integration.helpers.resource import first_item_in_dict
+from integration.helpers.resource import first_item_in_dict, current_region_does_not_support
+from integration.config.service_names import CWE_CWS_DLQ
 
 
+@skipIf(current_region_does_not_support([CWE_CWS_DLQ]), "CweCwsDlq is not supported in this testing region")
 class TestFunctionWithCweDlqGenerated(BaseTest):
     def test_function_with_cwe(self):
         # Verifying that following resources were created is correct
