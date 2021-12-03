@@ -1030,4 +1030,21 @@ def get_resource_by_type(template, type):
 
 
 def get_exception_error_message(e):
-    return reduce(lambda message, error: message + " " + error.message, e.value.causes, e.value.message)
+    return reduce(
+        lambda message, error: message + " " + error.message,
+        sorted(e.value.causes, key=_exception_sort_key),
+        e.value.message,
+    )
+
+
+def _exception_sort_key(cause):
+    """
+    Returns the key to be used for sorting among other exceptions
+    """
+    if hasattr(cause, "_logical_id"):
+        return cause._logical_id
+    if hasattr(cause, "_event_id"):
+        return cause._event_id
+    if hasattr(cause, "message"):
+        return cause.message
+    return str(cause)
