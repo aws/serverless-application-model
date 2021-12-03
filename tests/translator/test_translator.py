@@ -512,6 +512,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "http_api_description",
                 "http_api_lambda_auth",
                 "http_api_lambda_auth_full",
+                "http_api_multiple_authorizers_old_behavior_py27hash",
             ],
             [
                 ("aws", "ap-southeast-1"),

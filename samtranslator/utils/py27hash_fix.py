@@ -45,8 +45,12 @@ def to_py27_compatible_template(template, parameter_values=None):
     # perform a simple validation here to just make sure the template is minimally safe for conversion.
     Parser.validate_datatypes(template)
 
-    if not _template_has_api_resource(template):
-        # template does not contain any API resource, no need to convert
+    if not _template_has_api_resource(template) and not _template_has_httpapi_resource_with_default_authorizer(
+        template
+    ):
+        # no need to convert when all of the following conditions are true:
+        # 1. template does not contain any API resource
+        # 2. template does not contain any HttpApi resource with DefaultAuthorizer (TODO: remove after py3 migration and fix of security issue)
         return
 
     if "Globals" in template and isinstance(template["Globals"], dict) and "Api" in template["Globals"]:
@@ -71,7 +75,8 @@ def to_py27_compatible_template(template, parameter_values=None):
                 resource_properties = resource_dict.get("Properties")
                 if resource_properties is not None:
                     # We only convert for AWS::Serverless::Api resource
-                    if resource_type == "AWS::Serverless::Api":
+                    if resource_type in ["AWS::Serverless::Api", "AWS::Serverless::HttpApi"]:
+                        print((logical_id, resource_type))
                         resource_dict["Properties"] = _convert_to_py27_type(resource_properties)
                     elif resource_type in ["AWS::Serverless::Function", "AWS::Serverless::StateMachine"]:
                         # properties below could affect swagger generation
@@ -586,5 +591,40 @@ def _template_has_api_resource(template):
                     # An explicit or implicit API is referenced
                     if event_dict and isinstance(event_dict, dict) and event_dict.get("Type") == "Api":
                         return True
+
+    return False
+
+
+def _template_has_httpapi_resource_with_default_authorizer(template):
+    """
+    Returns true if the template contains at least one AWS::Serverless::HttpApi resource with DefaultAuthorizer configured
+    """
+    # Check whether DefaultAuthorizer is defined in Globals.HttpApi
+    has_global_httpapi_default_authorizer = False
+    if "Globals" in template and isinstance(template["Globals"], dict):
+        globals_dict = template["Globals"]
+        if "HttpApi" in globals_dict and isinstance(globals_dict["HttpApi"], dict):
+            globals_httpapi_dict = globals_dict["HttpApi"]
+            if "Auth" in globals_httpapi_dict and isinstance(globals_httpapi_dict["Auth"], dict):
+                has_global_httpapi_default_authorizer = bool(globals_httpapi_dict["Auth"].get("DefaultAuthorizer"))
+
+    # Check if there is explicit HttpApi resource
+    for resource_dict in template.get("Resources", {}).values():
+        if isinstance(resource_dict, dict) and resource_dict.get("Type") == "AWS::Serverless::HttpApi":
+            auth = resource_dict.get("Properties", {}).get("Auth", {})
+            if (
+                auth and isinstance(auth, dict) and auth.get("DefaultAuthorizer")
+            ) or has_global_httpapi_default_authorizer:
+                return True
+
+    # Check if there is any httpapi event for implicit api
+    if has_global_httpapi_default_authorizer:
+        for resource_dict in template.get("Resources", {}).values():
+            if isinstance(resource_dict, dict) and resource_dict.get("Type") == "AWS::Serverless::Function":
+                events = resource_dict.get("Properties", {}).get("Events", {})
+                if isinstance(events, dict):
+                    for event_dict in events.values():
+                        if event_dict and isinstance(event_dict, dict) and event_dict.get("Type") == "HttpApi":
+                            return True
 
     return False

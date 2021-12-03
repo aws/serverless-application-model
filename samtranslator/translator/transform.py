@@ -13,7 +13,7 @@ def transform(input_fragment, parameter_values, managed_policy_loader, feature_t
     """
 
     sam_parser = Parser()
-    to_py27_compatible_template(input_fragment)
+    to_py27_compatible_template(input_fragment, parameter_values)
     translator = Translator(managed_policy_loader.load(), sam_parser)
     transformed = translator.translate(input_fragment, parameter_values=parameter_values, feature_toggle=feature_toggle)
     transformed = undo_mark_unicode_str_in_template(transformed)

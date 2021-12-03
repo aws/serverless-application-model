@@ -690,3 +690,149 @@ class TestToPy27CompatibleTemplate(TestCase):
         }
         to_py27_compatible_template(template)
         _convert_to_py27_type_mock.assert_not_called()
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_explit_httpapi_with_default_authorizer(self, _convert_to_py27_type_mock):
+        template = {
+            "Resources": {
+                "Api": {
+                    "Type": "AWS::Serverless::HttpApi",
+                    "Properties": {
+                        "Stage": "myStage",
+                        "Auth": {"Authorizers": {"Authorizer1": {}}, "DefaultAuthorizer": "Authorizer1"},
+                    },
+                },
+            }
+        }
+        to_py27_compatible_template(template)
+
+        _convert_to_py27_type_mock.assert_called_once_with(
+            {"Stage": "myStage", "Auth": {"Authorizers": {"Authorizer1": {}}, "DefaultAuthorizer": "Authorizer1"}}
+        )
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_explit_httpapi_with_global_default_authorizer(self, _convert_to_py27_type_mock):
+        template = {
+            "Globals": {"HttpApi": {"Auth": {"Authorizers": {"Authorizer1": {}}, "DefaultAuthorizer": "Authorizer1"}}},
+            "Resources": {
+                "Api": {
+                    "Type": "AWS::Serverless::HttpApi",
+                    "Properties": {
+                        "Stage": "myStage",
+                    },
+                },
+            },
+        }
+        to_py27_compatible_template(template)
+
+        _convert_to_py27_type_mock.assert_called_once_with(
+            {
+                "Stage": "myStage",
+            }
+        )
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_explit_httpapi_with_no_default_authorizer(self, _convert_to_py27_type_mock):
+        template = {
+            "Resources": {
+                "Api": {
+                    "Type": "AWS::Serverless::HttpApi",
+                    "Properties": {
+                        "Stage": "myStage",
+                    },
+                },
+            }
+        }
+        to_py27_compatible_template(template)
+
+        _convert_to_py27_type_mock.assert_not_called()
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_explicit_httpapi_with_httpapi_event(self, _convert_to_py27_type_mock):
+        template = {
+            "Resources": {
+                "Api": {
+                    "Type": "AWS::Serverless::HttpApi",
+                    "Properties": {
+                        "Stage": "myStage",
+                        "Auth": {"Authorizers": {"Authorizer1": {}}, "DefaultAuthorizer": "Authorizer1"},
+                    },
+                },
+                "Function": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "FunctionName": "MyFunctionName",
+                        "Events": {
+                            "ApiEvent": {"Type": "HttpApi", "Properties": {"Path": "/user", "Method": "GET"}},
+                            "ApiEvent2": {"Type": "HttpApi", "Properties": {"Path": "/user", "Method": "POST"}},
+                        },
+                    },
+                },
+            }
+        }
+        to_py27_compatible_template(template)
+
+        _convert_to_py27_type_mock.assert_any_call(
+            {"Stage": "myStage", "Auth": {"Authorizers": {"Authorizer1": {}}, "DefaultAuthorizer": "Authorizer1"}}
+        )
+        _convert_to_py27_type_mock.assert_any_call("MyFunctionName")
+        _convert_to_py27_type_mock.assert_any_call(
+            {
+                "ApiEvent": {"Type": "HttpApi", "Properties": {"Path": "/user", "Method": "GET"}},
+                "ApiEvent2": {"Type": "HttpApi", "Properties": {"Path": "/user", "Method": "POST"}},
+            }
+        )
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_implicit_httpapi(self, _convert_to_py27_type_mock):
+        template = {
+            "Globals": {"HttpApi": {"Auth": {"Authorizers": {"Authorizer1": {}}, "DefaultAuthorizer": "Authorizer1"}}},
+            "Resources": {
+                "Function1": {
+                    "Type": "AWS::S3::Bucket",
+                },
+                "Function2": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "FunctionName": "MyFunctionName2",
+                    },
+                },
+                "Function3": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "FunctionName": "MyFunctionName3",
+                        "Events": {
+                            "ApiEvent3": {"Type": "HttpApi", "Properties": {"Path": "/user", "Method": "GET"}},
+                        },
+                    },
+                },
+            },
+        }
+        to_py27_compatible_template(template)
+
+        _convert_to_py27_type_mock.assert_any_call("MyFunctionName2")
+        _convert_to_py27_type_mock.assert_any_call("MyFunctionName3")
+        _convert_to_py27_type_mock.assert_any_call(
+            {
+                "ApiEvent3": {"Type": "HttpApi", "Properties": {"Path": "/user", "Method": "GET"}},
+            }
+        )
+
+    @patch("samtranslator.utils.py27hash_fix._convert_to_py27_type")
+    def test_implicit_httpapi_with_no_globals(self, _convert_to_py27_type_mock):
+        template = {
+            "Resources": {
+                "Function": {
+                    "Type": "AWS::Serverless::Function",
+                    "Properties": {
+                        "FunctionName": "MyFunctionName",
+                        "Events": {
+                            "ApiEvent": {"Type": "HttpApi", "Properties": {"Path": "/user", "Method": "GET"}},
+                        },
+                    },
+                },
+            }
+        }
+
+        to_py27_compatible_template(template)
+        _convert_to_py27_type_mock.assert_not_called()
