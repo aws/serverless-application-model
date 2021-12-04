@@ -182,7 +182,9 @@ class AbstractTestTranslator(TestCase):
 
         def diff(before, after):
             import difflib
+
             return "\n".join(difflib.unified_diff(before.splitlines(), after.splitlines()))
+
         actual = json.dumps(deep_sort_lists(output_fragment), sort_keys=True, indent=2)
         expected = json.dumps(deep_sort_lists(expected), sort_keys=True, indent=2)
         print(diff(expected, actual))
