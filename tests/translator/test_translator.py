@@ -180,7 +180,13 @@ class AbstractTestTranslator(TestCase):
             self._update_logical_id_hash(expected)
             self._update_logical_id_hash(output_fragment)
 
-        self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
+        def diff(before, after):
+            import difflib
+            return "\n".join(difflib.unified_diff(before.splitlines(), after.splitlines()))
+        actual = json.dumps(deep_sort_lists(output_fragment), sort_keys=True, indent=2)
+        expected = json.dumps(deep_sort_lists(expected), sort_keys=True, indent=2)
+        print(diff(expected, actual))
+        self.assertEqual(actual, expected)
 
     def _update_logical_id_hash(self, resources):
         """
