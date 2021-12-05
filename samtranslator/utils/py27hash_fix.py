@@ -75,8 +75,10 @@ def to_py27_compatible_template(template, parameter_values=None):
                 resource_properties = resource_dict.get("Properties")
                 if resource_properties is not None:
                     # We only convert for AWS::Serverless::Api resource
-                    if resource_type in ["AWS::Serverless::Api", "AWS::Serverless::HttpApi"]:
-                        print((logical_id, resource_type))
+                    if resource_type in [
+                        "AWS::Serverless::Api",
+                        "AWS::Serverless::HttpApi",
+                    ]:
                         resource_dict["Properties"] = _convert_to_py27_type(resource_properties)
                     elif resource_type in ["AWS::Serverless::Function", "AWS::Serverless::StateMachine"]:
                         # properties below could affect swagger generation
