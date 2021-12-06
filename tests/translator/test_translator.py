@@ -282,6 +282,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_mq_virtual_host",
                 "simpletable",
                 "simpletable_with_sse",
+                "resource_with_invalid_type",
                 "implicit_api",
                 "explicit_api",
                 "api_description",
