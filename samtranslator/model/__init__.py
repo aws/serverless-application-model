@@ -491,8 +491,7 @@ class ResourceTypeResolver(object):
     def can_resolve(self, resource_dict):
         if (
             not isinstance(resource_dict, dict)
-            or "Type" not in resource_dict
-            or not isinstance(resource_dict["Type"], string_types)
+            or not isinstance(resource_dict.get('Type'), string_types)
         ):
             return False
 
