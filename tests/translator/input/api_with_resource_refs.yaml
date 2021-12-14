@@ -6,8 +6,8 @@ Resources:
     Properties:
       StageName: foo
       DefinitionBody:
-        "this": "is"
-        "a": "swagger"
+        paths: {}
+        openapi: "3.0.1"
 
   MyFunction:
     Type: "AWS::Serverless::Function"

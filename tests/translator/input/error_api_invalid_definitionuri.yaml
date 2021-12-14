@@ -18,5 +18,5 @@ Resources:
       StageName: Prod
       DefinitionUri: s3://foo/bar
       DefinitionBody:
-        a: b
-        c: d
+        paths: {}
+        openapi: "3.0.1"

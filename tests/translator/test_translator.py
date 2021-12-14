@@ -754,7 +754,8 @@ def test_swagger_body_sha_gets_recomputed():
                     "StageName": "Prod",
                     "DefinitionBody": {
                         # Some body property will do
-                        "a": "b"
+                        "paths": {},
+                        "openapi": "3.0.1",
                     },
                 },
             }

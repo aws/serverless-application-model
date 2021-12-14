@@ -1,0 +1,1 @@
+{"errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Structure of the SAM template is invalid. DefinitionBody must have either: (1) a 'swagger' property or (2) an 'openapi' property with version 3.x or 3.x.x"}

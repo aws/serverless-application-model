@@ -99,8 +99,8 @@
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
-          "this": "is",
-          "a": "swagger"
+          "openapi": "3.0.1",
+          "paths": {}
         }
       }
     },

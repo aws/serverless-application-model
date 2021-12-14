@@ -102,8 +102,8 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
-          "this": "is", 
-          "a": "inline swagger"
+          "openapi": "3.0",
+          "paths": {}
         }, 
         "EndpointConfiguration": {
           "Types": [

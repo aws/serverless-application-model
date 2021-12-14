@@ -42,8 +42,7 @@ class SwaggerEditor(object):
         :raises ValueError: If the input Swagger document does not meet the basic Swagger requirements.
         """
 
-        if not SwaggerEditor.is_valid(doc):
-            raise ValueError("Invalid Swagger document")
+        SwaggerEditor.validate_definition_body(doc)
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
@@ -1223,6 +1222,33 @@ class SwaggerEditor(object):
                     SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
         return False
+
+    @staticmethod
+    def validate_definition_body(definition_body):
+        """
+        Checks if definition_body is a valid Swagger document
+
+        :param dict definition_body: Data to be validated
+        :return: True, if definition_body is a valid Swagger document
+        """
+
+        SwaggerEditor.validate_is_dict(definition_body, "DefinitionBody must be a dictionary.")
+        SwaggerEditor.validate_is_dict(
+            definition_body.get("paths"), "The 'paths' property of DefinitionBody must be present and be a dictionary."
+        )
+
+        has_swagger = definition_body.get("swagger")
+        has_openapi3 = definition_body.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_version_3_regex(), definition_body["openapi"]
+        )
+        if not (has_swagger) and not (has_openapi3):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "DefinitionBody must have either: (1) a 'swagger' property or (2) an 'openapi' property with version 3.x or 3.x.x"
+                    )
+                ]
+            )
 
     @staticmethod
     def validate_is_dict(obj, exception_message):
