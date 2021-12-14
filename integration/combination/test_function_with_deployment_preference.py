@@ -1,10 +1,15 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import CODE_DEPLOY
 
 CODEDEPLOY_APPLICATION_LOGICAL_ID = "ServerlessDeploymentApplication"
 LAMBDA_FUNCTION_NAME = "MyLambdaFunction"
 LAMBDA_ALIAS = "Live"
 
 
+@skipIf(current_region_does_not_support([CODE_DEPLOY]), "CodeDeploy is not supported in this testing region")
 class TestFunctionWithDeploymentPreference(BaseTest):
     def test_lambda_function_with_deployment_preference_uses_code_deploy(self):
         self.create_and_verify_stack("combination/function_with_deployment_basic")
@@ -97,7 +102,9 @@ class TestFunctionWithDeploymentPreference(BaseTest):
         ]
 
     def _get_deployments(self, application_name, deployment_group):
-        deployments = self.client_provider.code_deploy_client.list_deployments()["deployments"]
+        deployments = self.client_provider.code_deploy_client.list_deployments(
+            applicationName=application_name, deploymentGroupName=deployment_group
+        )["deployments"]
         deployment_infos = [self._get_deployment_info(deployment_id) for deployment_id in deployments]
         return deployment_infos
 

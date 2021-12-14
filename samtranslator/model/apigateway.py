@@ -169,6 +169,7 @@ class ApiGatewayDomainName(Resource):
         "MutualTlsAuthentication": PropertyType(False, is_type(dict)),
         "SecurityPolicy": PropertyType(False, is_str()),
         "CertificateArn": PropertyType(False, is_str()),
+        "OwnershipVerificationCertificateArn": PropertyType(False, is_str()),
     }
 
 

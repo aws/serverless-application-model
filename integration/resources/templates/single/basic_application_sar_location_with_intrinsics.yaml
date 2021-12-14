@@ -6,7 +6,7 @@ Parameters:
 Mappings:
   SARApplication:
     us-east-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python
+      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
     us-east-2:
       ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
     us-west-1:

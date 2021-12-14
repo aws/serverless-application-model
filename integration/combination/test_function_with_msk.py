@@ -1,15 +1,34 @@
+from unittest.case import skipIf
+
+import pytest
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support, generate_suffix
+from integration.config.service_names import MSK
 
 
+@skipIf(current_region_does_not_support([MSK]), "MSK is not supported in this testing region")
 class TestFunctionWithMsk(BaseTest):
+    @pytest.fixture(autouse=True)
+    def companion_stack_outputs(self, get_companion_stack_outputs):
+        self.companion_stack_outputs = get_companion_stack_outputs
+
     def test_function_with_msk_trigger(self):
-        self._common_validations_for_MSK("combination/function_with_msk")
+        companion_stack_outputs = self.companion_stack_outputs
+        parameters = self.get_parameters(companion_stack_outputs)
+        cluster_name = "MskCluster-" + generate_suffix()
+        parameters.append(self.generate_parameter("MskClusterName", cluster_name))
+        self._common_validations_for_MSK("combination/function_with_msk", parameters)
 
     def test_function_with_msk_trigger_using_manage_policy(self):
-        self._common_validations_for_MSK("combination/function_with_msk_using_managed_policy")
+        companion_stack_outputs = self.companion_stack_outputs
+        parameters = self.get_parameters(companion_stack_outputs)
+        cluster_name = "MskCluster2-" + generate_suffix()
+        parameters.append(self.generate_parameter("MskClusterName2", cluster_name))
+        self._common_validations_for_MSK("combination/function_with_msk_using_managed_policy", parameters)
 
-    def _common_validations_for_MSK(self, file_name):
-        self.create_and_verify_stack(file_name)
+    def _common_validations_for_MSK(self, file_name, parameters):
+        self.create_and_verify_stack(file_name, parameters)
 
         kafka_client = self.client_provider.kafka_client
 
@@ -32,3 +51,9 @@ class TestFunctionWithMsk(BaseTest):
 
         self.assertEqual(event_source_mapping_function_arn, lambda_function_arn)
         self.assertEqual(event_source_mapping_kafka_cluster_arn, msk_cluster_arn)
+
+    def get_parameters(self, dictionary):
+        parameters = []
+        parameters.append(self.generate_parameter("PreCreatedSubnetOne", dictionary["PreCreatedSubnetOne"]))
+        parameters.append(self.generate_parameter("PreCreatedSubnetTwo", dictionary["PreCreatedSubnetTwo"]))
+        return parameters

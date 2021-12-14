@@ -38,7 +38,7 @@ class TestBasicApplication(BaseTest):
         functions = self.get_stack_resources("AWS::Lambda::Function", nested_stack_resource)
 
         self.assertEqual(len(functions), 1)
-        self.assertEqual(functions[0]["LogicalResourceId"], "helloworldpython")
+        self.assertEqual(functions[0]["LogicalResourceId"], "helloworldpython3")
 
     @skipIf(
         current_region_does_not_support(["ServerlessRepo"]), "ServerlessRepo is not supported in this testing region"
@@ -47,7 +47,7 @@ class TestBasicApplication(BaseTest):
         """
         Creates an application with a lambda function with intrinsics
         """
-        expected_function_name = "helloworldpython" if self.get_region() == "us-east-1" else "helloworldpython3"
+        expected_function_name = "helloworldpython3"
         self.create_and_verify_stack("single/basic_application_sar_location_with_intrinsics")
 
         nested_stack_resource = self.get_stack_nested_stack_resources()

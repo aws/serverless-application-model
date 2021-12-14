@@ -12,7 +12,7 @@ Resources:
       Role:
         "Fn::GetAtt": LambdaRole.Arn
       Handler: lambda_function.lambda_handler
-      Runtime: python2.7
+      Runtime: python3.8
       Timeout: 15
       CodeUri: ${codeuri}
 

@@ -1,0 +1,56 @@
+Resources:
+  WrongFilterName:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/filtered_events.zip
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        DynamoDBStreamEvent:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt DynamoDBTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            FilterCriteria:
+              FiltersToUse:
+                - Pattern: '{"name": "value"}'
+
+  NotSupportedPullEvent:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/filtered_events.zip
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        KafkaEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: LATEST
+            Stream: arn:aws:kafka:us-east-1:012345678012:cluster/clusterName/abcdefab-1234-abcd-5678-cdef0123ab01-2
+            Topics: 
+              - MyTopic
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"name": "value"}'
+
+
+  NotSupportedPushEvent:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/filtered_events.zip
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !GetAtt MySnsTopic.Arn
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"name": "value"}'
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+
+  MySnsTopic:
+    Type: AWS::SNS::Topic
