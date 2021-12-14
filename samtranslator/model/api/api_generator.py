@@ -893,12 +893,7 @@ class ApiGenerator(object):
         if not all(isinstance(model, dict) for model in self.models.values()):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Models' property")
 
-        # swagger_editor = SwaggerEditor(self.definition_body)
         self.swagger_editor.add_models(self.models)
-
-        # Assign the Swagger back to template
-
-        # self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
 
     def _openapi_postprocess(self, definition_body):
         """
