@@ -40,25 +40,16 @@ class SwaggerEditor(object):
         modifications on this copy.
 
         :param dict doc: Swagger document as a dictionary
-        :raises ValueError: If the input Swagger document does not meet the basic Swagger requirements.
         """
 
-        SwaggerEditor.validate_definition_body(doc)
-
         self._doc = copy.deepcopy(doc)
-        self.paths = self._doc["paths"]
+        self.paths = self._doc.get("paths")
         self.security_definitions = self._doc.get("securityDefinitions", {})
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
         self.resource_policy = self._doc.get(self._X_APIGW_POLICY, {})
         self.definitions = self._doc.get("definitions", {})
 
-        # https://swagger.io/specification/#path-item-object
-        # According to swagger spec,
-        # each path item object must be a dict (even it is empty).
-        # We can do an early path validation on path item objects,
-        # so we don't need to validate wherever we use them.
-        for path in self.iter_on_path():
-            SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
+        self.validate_definition_body(doc)
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -155,7 +146,6 @@ class SwaggerEditor(object):
 
         :param string path: Path name
         :param string method: HTTP method
-        :raises ValueError: If the value of `path` in Swagger is not a dictionary
         """
         method = self._normalize_method_name(method)
 
@@ -1251,8 +1241,7 @@ class SwaggerEditor(object):
                 )
         return False
 
-    @staticmethod
-    def validate_definition_body(definition_body):
+    def validate_definition_body(self, definition_body):
         """
         Checks if definition_body is a valid Swagger document
 
@@ -1277,6 +1266,14 @@ class SwaggerEditor(object):
                     )
                 ]
             )
+
+        # https://swagger.io/specification/#path-item-object
+        # According to swagger spec,
+        # each path item object must be a dict (even it is empty).
+        # We can do an early path validation on path item objects,
+        # so we don't need to validate wherever we use them.
+        for path in self.iter_on_path():
+            SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
 
     @staticmethod
     def validate_is_dict(obj, exception_message):

@@ -53,7 +53,7 @@ class TestSwaggerEditor_init(TestCase):
     def test_must_fail_with_bad_values_for_path(self, invalid_path_item):
         invalid_swagger = {"openapi": "3.1.1.1", "paths": {"/foo": {}, "/bad": invalid_path_item}}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             SwaggerEditor(invalid_swagger)
 
 
