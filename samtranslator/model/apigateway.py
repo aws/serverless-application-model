@@ -401,7 +401,8 @@ class ApiGatewayAuthorizer(object):
         except AttributeError:
             raise InvalidResourceException(
                 self.api_logical_id,
-                "Auth.Authorizers.Identity must be a dict (LambdaTokenAuthorizationIdentity).",
+                "Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity "
+                "or LambdaRequestAuthorizationIdentity).",
             )
 
         return self.identity.get("Header")

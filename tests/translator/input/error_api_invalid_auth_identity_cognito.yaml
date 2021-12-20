@@ -3,10 +3,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
-      EndpointConfiguration:
-        Type: PRIVATE
-        VPCEndpointIds:
-        - Ref: APIGatewayVpcEndpoint
       Auth:
         Authorizers:
           CognitoAuthorizer:
