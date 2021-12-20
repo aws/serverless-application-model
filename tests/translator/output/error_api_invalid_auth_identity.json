@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [ServerlessApi] is invalid. Auth.Authorizers.Identity must be a dict (LambdaTokenAuthorizationIdentity)."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ServerlessApi] is invalid. Auth.Authorizers.Identity must be a dict (LambdaTokenAuthorizationIdentity)."
+}
