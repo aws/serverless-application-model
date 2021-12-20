@@ -276,6 +276,9 @@ class ApiGenerator(object):
         self._add_binary_media_types()
         self._add_models()
 
+        if self.disable_execute_api_endpoint is not None:
+            self._add_endpoint_extension()
+
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
@@ -291,9 +294,6 @@ class ApiGenerator(object):
 
         if self.mode:
             rest_api.Mode = self.mode
-
-        if self.disable_execute_api_endpoint is not None:
-            self._add_endpoint_extension()
 
         return rest_api
 
