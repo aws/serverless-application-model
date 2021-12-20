@@ -702,6 +702,9 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)
 
         if auth_properties.ResourcePolicy:
+            SwaggerEditor.validate_is_dict(
+                auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
+            )
             for path in swagger_editor.iter_on_path():
                 swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
             if auth_properties.ResourcePolicy.get("CustomStatements"):
