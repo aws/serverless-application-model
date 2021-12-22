@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyFunction] is invalid. Event with id [MyFunctionStreamEvent] is invalid. The only valid values for 'Type' are 'SQS' and 'SNS'"
+    }
+  ], 
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyFunction] is invalid. Event with id [MyFunctionStreamEvent] is invalid. The only valid values for 'Type' are 'SQS' and 'SNS'"
+}

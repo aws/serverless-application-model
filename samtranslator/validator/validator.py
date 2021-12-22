@@ -1,4 +1,5 @@
 import json
+import os
 import re
 
 import jsonschema
@@ -31,9 +32,20 @@ class SamTemplateValidator:
             schema = self._read_json(sam_schema.SCHEMA_NEW_FILE)
 
         # Helps resolve the $Ref to external files
-        # schema content must be passed to resolve local (#/def...) references
-        # Hardcoded "/" as this is an URI, not a Path
-        resolver = jsonschema.RefResolver("file://" + sam_schema.SCHEMA_DIR + "/", schema)
+        # For cross platform resolving, we have to load the sub schemas into
+        # a store and pass it to the Resolver. We cannot use the "file://" style
+        # of referencing inside a "$ref" of a schema as this will lead to mixups
+        # on Windows because of different path separator: \\ instead of /
+        schema_store = {}
+        definitions_dir = os.path.join(sam_schema.SCHEMA_DIR, "definitions")
+
+        for sub_schema in os.listdir(definitions_dir):
+            if sub_schema.endswith(".json"):
+                with open(os.path.join(definitions_dir, sub_schema)) as f:
+                    schema_content = f.read()
+                schema_store[sub_schema] = json.loads(schema_content)
+
+        resolver = jsonschema.RefResolver.from_schema(schema, store=schema_store)
 
         SAMValidator = jsonschema.validators.extend(
             jsonschema.Draft7Validator,

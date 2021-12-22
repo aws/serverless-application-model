@@ -21,6 +21,9 @@ class PullEventSource(ResourceMacro):
     :cvar str policy_arn: The ARN of the AWS managed role policy corresponding to this pull event source
     """
 
+    # Event types that support `FilterCriteria`, stored as a list to keep the alphabetical order
+    RESOURCE_TYPES_WITH_EVENT_FILTERING = ["DynamoDB", "Kinesis", "SQS"]
+
     resource_type = None
     requires_stream_queue_broker = True
     property_types = {
@@ -43,6 +46,7 @@ class PullEventSource(ResourceMacro):
         "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
         "KafkaBootstrapServers": PropertyType(False, is_type(list)),
+        "FilterCriteria": PropertyType(False, is_type(dict)),
     }
 
     def get_policy_arn(self):
@@ -102,6 +106,8 @@ class PullEventSource(ResourceMacro):
         lambda_eventsourcemapping.SourceAccessConfigurations = self.SourceAccessConfigurations
         lambda_eventsourcemapping.TumblingWindowInSeconds = self.TumblingWindowInSeconds
         lambda_eventsourcemapping.FunctionResponseTypes = self.FunctionResponseTypes
+        lambda_eventsourcemapping.FilterCriteria = self.FilterCriteria
+        self._validate_filter_criteria()
 
         if self.KafkaBootstrapServers:
             lambda_eventsourcemapping.SelfManagedEventSource = {
@@ -110,6 +116,9 @@ class PullEventSource(ResourceMacro):
 
         destination_config_policy = None
         if self.DestinationConfig:
+            if self.DestinationConfig.get("OnFailure") is None:
+                raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for 'DestinationConfig'")
+
             # `Type` property is for sam to attach the right policies
             destination_type = self.DestinationConfig.get("OnFailure").get("Type")
 
@@ -120,10 +129,6 @@ class PullEventSource(ResourceMacro):
                 # the values 'SQS' and 'SNS' are allowed. No intrinsics are allowed
                 if destination_type not in ["SQS", "SNS"]:
                     raise InvalidEventException(self.logical_id, "The only valid values for 'Type' are 'SQS' and 'SNS'")
-                if self.DestinationConfig.get("OnFailure") is None:
-                    raise InvalidEventException(
-                        self.logical_id, "'OnFailure' is a required field for " "'DestinationConfig'"
-                    )
                 if destination_type == "SQS":
                     queue_arn = self.DestinationConfig.get("OnFailure").get("Destination")
                     destination_config_policy = IAMRolePolicies().sqs_send_message_role_policy(
@@ -134,6 +139,7 @@ class PullEventSource(ResourceMacro):
                     destination_config_policy = IAMRolePolicies().sns_publish_role_policy(
                         sns_topic_arn, self.logical_id
                     )
+
             lambda_eventsourcemapping.DestinationConfig = self.DestinationConfig
 
         if "role" in kwargs:
@@ -168,6 +174,20 @@ class PullEventSource(ResourceMacro):
                 # do not add the  policy if the same policy document is already present
                 if not destination_config_policy.get("PolicyDocument") in [d["PolicyDocument"] for d in role.Policies]:
                     role.Policies.append(destination_config_policy)
+
+    def _validate_filter_criteria(self):
+        if not self.FilterCriteria or is_intrinsic(self.FilterCriteria):
+            return
+        if self.resource_type not in self.RESOURCE_TYPES_WITH_EVENT_FILTERING:
+            raise InvalidEventException(
+                self.relative_id,
+                "FilterCriteria is only available for {} events.".format(
+                    ", ".join(self.RESOURCE_TYPES_WITH_EVENT_FILTERING)
+                ),
+            )
+        # FilterCriteria is either empty or only has "Filters"
+        if list(self.FilterCriteria.keys()) not in [[], ["Filters"]]:
+            raise InvalidEventException(self.relative_id, "FilterCriteria field has a wrong format")
 
 
 class Kinesis(PullEventSource):

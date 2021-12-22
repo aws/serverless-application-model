@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Bad, bad resource policy
+Resources:
+  APIGatewayVpcEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      SubnetIds:
+      - subnet-01234567
+      - subnet-12345678
+      SecurityGroupIds:
+      - sg-0a0a0a0a0a0a0a0a0
+      ServiceName: com.amazonaws.eu-west-1.execute-api
+      VpcId: vpc-0a0a0a0a
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: false
+  ServerlessApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      EndpointConfiguration:
+        Type: PRIVATE
+        VPCEndpointIds:
+        - Ref: APIGatewayVpcEndpoint
+      Auth:
+        ResourcePolicy: IntrinsicVpceWhitelist:! Ref APIGatewayVpcEndpoint

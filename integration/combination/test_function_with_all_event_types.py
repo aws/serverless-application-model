@@ -1,11 +1,20 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support, generate_suffix
+from integration.config.service_names import IOT, SCHEDULE_EVENT
 
 
+@skipIf(
+    current_region_does_not_support([IOT, SCHEDULE_EVENT]),
+    "IoT, ScheduleEvent is not supported in this testing region",
+)
 class TestFunctionWithAllEventTypes(BaseTest):
     def test_function_with_all_event_types(self):
-        self.create_and_verify_stack("combination/function_with_all_event_types")
+        schedule_name = "TestSchedule" + generate_suffix()
+        parameters = [self.generate_parameter("ScheduleName", schedule_name)]
 
-        stack_outputs = self.get_stack_outputs()
+        self.create_and_verify_stack("combination/function_with_all_event_types", parameters)
 
         # make sure bucket notification configurations are added
         s3_client = self.client_provider.s3_client
@@ -30,7 +39,6 @@ class TestFunctionWithAllEventTypes(BaseTest):
         self.assertEqual(len(rule_names), 2)
 
         # make sure cloudwatch Schedule event has properties: name, state and description
-        schedule_name = stack_outputs["ScheduleName"]
         cw_rule_result = cloudwatch_events_client.describe_rule(Name=schedule_name)
 
         self.assertEqual(cw_rule_result["Name"], schedule_name)

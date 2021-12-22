@@ -358,7 +358,7 @@ class OpenApiEditor(object):
                         continue
                     existing_security = method_definition.get("security", [])
                     if existing_security:
-                        return
+                        continue
                     authorizer_list = []
                     if authorizers:
                         authorizer_list.extend(authorizers.keys())

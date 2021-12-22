@@ -18,7 +18,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException, InvalidDocumentException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -170,6 +170,7 @@ class ApiGenerator(object):
         method_settings=None,
         binary_media=None,
         minimum_compression_size=None,
+        disable_execute_api_endpoint=None,
         cors=None,
         auth=None,
         gateway_responses=None,
@@ -218,6 +219,7 @@ class ApiGenerator(object):
         self.method_settings = method_settings
         self.binary_media = binary_media
         self.minimum_compression_size = minimum_compression_size
+        self.disable_execute_api_endpoint = disable_execute_api_endpoint
         self.cors = cors
         self.auth = auth
         self.gateway_responses = gateway_responses
@@ -274,6 +276,9 @@ class ApiGenerator(object):
         self._add_binary_media_types()
         self._add_models()
 
+        if self.disable_execute_api_endpoint is not None:
+            self._add_endpoint_extension()
+
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
@@ -291,6 +296,22 @@ class ApiGenerator(object):
             rest_api.Mode = self.mode
 
         return rest_api
+
+    def _add_endpoint_extension(self):
+        """Add disableExecuteApiEndpoint if it is set in SAM
+        Note:
+        If neither DefinitionUri nor DefinitionBody are specified,
+        SAM will generate a openapi definition body based on template configuration.
+        https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
+        For this reason, we always put DisableExecuteApiEndpoint into openapi object irrespective of origin of DefinitionBody.
+        """
+        if self.disable_execute_api_endpoint and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
+            )
+        editor = SwaggerEditor(self.definition_body)
+        editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
+        self.definition_body = editor.swagger
 
     def _construct_body_s3_dict(self):
         """Constructs the RestApi's `BodyS3Location property`_, from the SAM Api's DefinitionUri property.
@@ -443,6 +464,9 @@ class ApiGenerator(object):
 
         if self.domain.get("SecurityPolicy", None):
             domain.SecurityPolicy = self.domain["SecurityPolicy"]
+
+        if self.domain.get("OwnershipVerificationCertificateArn", None):
+            domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
 
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
@@ -603,14 +627,17 @@ class ApiGenerator(object):
 
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
-            editor.add_cors(
-                path,
-                properties.AllowOrigin,
-                properties.AllowHeaders,
-                properties.AllowMethods,
-                max_age=properties.MaxAge,
-                allow_credentials=properties.AllowCredentials,
-            )
+            try:
+                editor.add_cors(
+                    path,
+                    properties.AllowOrigin,
+                    properties.AllowHeaders,
+                    properties.AllowMethods,
+                    max_age=properties.MaxAge,
+                    allow_credentials=properties.AllowCredentials,
+                )
+            except InvalidTemplateException as ex:
+                raise InvalidResourceException(self.logical_id, ex.message)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
@@ -675,6 +702,9 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)
 
         if auth_properties.ResourcePolicy:
+            SwaggerEditor.validate_is_dict(
+                auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
+            )
             for path in swagger_editor.iter_on_path():
                 swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
             if auth_properties.ResourcePolicy.get("CustomStatements"):
@@ -697,6 +727,9 @@ class ApiGenerator(object):
         if auth_properties.UsagePlan is None:
             return []
         usage_plan_properties = auth_properties.UsagePlan
+        # throws error if UsagePlan is not a dict
+        if not isinstance(usage_plan_properties, dict):
+            raise InvalidResourceException(self.logical_id, "'UsagePlan' must be a dictionary")
         # throws error if the property invalid/ unsupported for UsagePlan
         if not all(key in UsagePlanProperties._fields for key in usage_plan_properties.keys()):
             raise InvalidResourceException(self.logical_id, "Invalid property for 'UsagePlan'")
@@ -963,32 +996,30 @@ class ApiGenerator(object):
                 del definition_body["definitions"]
             # removes `consumes` and `produces` options for CORS in openapi3 and
             # adds `schema` for the headers in responses for openapi3
-            if definition_body.get("paths"):
-                for path in definition_body.get("paths"):
-                    if definition_body.get("paths").get(path).get("options"):
-                        definition_body_options = definition_body.get("paths").get(path).get("options").copy()
-                        for field in definition_body_options.keys():
+            paths = definition_body.get("paths")
+            if paths:
+                for path, path_item in paths.items():
+                    SwaggerEditor.validate_path_item_is_dict(path_item, path)
+                    if path_item.get("options"):
+                        options = path_item.get("options").copy()
+                        for field, field_val in options.items():
                             # remove unsupported produces and consumes in options for openapi3
                             if field in ["produces", "consumes"]:
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                options_path = definition_body["paths"][path]["options"]
-                                if (
-                                    options_path
-                                    and options_path.get(field).get("200")
-                                    and options_path.get(field).get("200").get("headers")
-                                ):
-                                    headers = definition_body["paths"][path]["options"][field]["200"]["headers"]
-                                    for header in headers.keys():
-                                        header_value = {
-                                            "schema": definition_body["paths"][path]["options"][field]["200"][
-                                                "headers"
-                                            ][header]
-                                        }
+                                SwaggerEditor.validate_is_dict(
+                                    field_val,
+                                    "Value of responses in options method for path {} must be a "
+                                    "dictionary according to Swagger spec.".format(path),
+                                )
+                                if field_val.get("200") and field_val.get("200").get("headers"):
+                                    headers = field_val["200"]["headers"]
+                                    for header, header_val in headers.items():
+                                        new_header_val_with_schema = {"schema": header_val}
                                         definition_body["paths"][path]["options"][field]["200"]["headers"][
                                             header
-                                        ] = header_value
+                                        ] = new_header_val_with_schema
 
         return definition_body
 

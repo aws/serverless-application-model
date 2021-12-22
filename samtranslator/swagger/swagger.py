@@ -25,6 +25,7 @@ class SwaggerEditor(object):
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _X_APIGW_REQUEST_VALIDATORS = "x-amazon-apigateway-request-validators"
     _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validator"
+    _X_ENDPOINT_CONFIG = "x-amazon-apigateway-endpoint-configuration"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -51,6 +52,14 @@ class SwaggerEditor(object):
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
         self.resource_policy = self._doc.get(self._X_APIGW_POLICY, {})
         self.definitions = self._doc.get("definitions", {})
+
+        # https://swagger.io/specification/#path-item-object
+        # According to swagger spec,
+        # each path item object must be a dict (even it is empty).
+        # We can do an early path validation on path item objects,
+        # so we don't need to validate wherever we use them.
+        for path in self.iter_on_path():
+            SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -111,6 +120,19 @@ class SwaggerEditor(object):
             return method[self._CONDITIONAL_IF][1:]
         return [method]
 
+    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):
+        """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG in open api definition as extension
+        Following this guide:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
+        :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
+        """
+        if not self._doc.get(self._X_ENDPOINT_CONFIG):
+            self._doc[self._X_ENDPOINT_CONFIG] = {}
+
+        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
+        set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
+        self._doc[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
+
     def has_integration(self, path, method):
         """
         Checks if an API Gateway integration is already present at the given path/method
@@ -139,16 +161,7 @@ class SwaggerEditor(object):
         method = self._normalize_method_name(method)
 
         path_dict = self.paths.setdefault(path, {})
-
-        if not isinstance(path_dict, dict):
-            # Either customers has provided us an invalid Swagger, or this class has messed it somehow
-            raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
-                    )
-                ]
-            )
+        SwaggerEditor.validate_path_item_is_dict(path_dict, path)
 
         if self._CONDITIONAL_IF in path_dict:
             path_dict = path_dict[self._CONDITIONAL_IF][1]
@@ -321,7 +334,7 @@ class SwaggerEditor(object):
             return
 
         if not allowed_origins:
-            raise ValueError("Invalid input. Value for AllowedOrigins is required")
+            raise InvalidTemplateException("Invalid input. Value for AllowedOrigins is required")
 
         if not allowed_methods:
             # AllowMethods is not given. Let's try to generate the list from the given Swagger.
@@ -532,19 +545,20 @@ class SwaggerEditor(object):
             if normalized_method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                 continue
             if add_default_auth_to_preflight or normalized_method_name != "options":
-                normalized_method_name = self._normalize_method_name(method_name)
+                SwaggerEditor.validate_is_dict(
+                    method,
+                    'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(method_name, method, path),
+                )
                 # It is possible that the method could have two definitions in a Fn::If block.
                 for method_definition in self.get_method_contents(method):
 
+                    SwaggerEditor.validate_is_dict(
+                        method_definition,
+                        'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
+                            method_name, method_definition, path
+                        ),
+                    )
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
-                    if not isinstance(method_definition, dict):
-                        raise InvalidDocumentException(
-                            [
-                                InvalidTemplateException(
-                                    "{} for path {} is not a valid dictionary.".format(method_definition, path)
-                                )
-                            ]
-                        )
                     if not self.method_definition_has_integration(method_definition):
                         continue
                     existing_security = method_definition.get("security", [])
@@ -559,14 +573,9 @@ class SwaggerEditor(object):
                     # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
                     # We want to ensure only a single Authorizer security entry exists while keeping everything else
                     for security in existing_security:
-                        if not isinstance(security, dict):
-                            raise InvalidDocumentException(
-                                [
-                                    InvalidTemplateException(
-                                        "{} in Security for path {} is not a valid dictionary.".format(security, path)
-                                    )
-                                ]
-                            )
+                        SwaggerEditor.validate_is_dict(
+                            security, "{} in Security for path {} is not a valid dictionary.".format(security, path)
+                        )
                         if authorizer_names.isdisjoint(security.keys()):
                             existing_non_authorizer_security.append(security)
                         else:
@@ -912,8 +921,7 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
-        if not isinstance(resource_policy, dict):
-            raise InvalidDocumentException([InvalidTemplateException("Resource Policy is not a valid dictionary.")])
+        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
@@ -1243,6 +1251,31 @@ class SwaggerEditor(object):
                     SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
         return False
+
+    @staticmethod
+    def validate_is_dict(obj, exception_message):
+        """
+        Throws exception if obj is not a dict
+
+        :param obj: object being validated
+        :param exception_message: message to include in exception if obj is not a dict
+        """
+
+        if not isinstance(obj, dict):
+            raise InvalidDocumentException([InvalidTemplateException(exception_message)])
+
+    @staticmethod
+    def validate_path_item_is_dict(path_item, path):
+        """
+        Throws exception if path_item is not a dict
+
+        :param path_item: path_item (value at the path) being validated
+        :param path: path name
+        """
+
+        SwaggerEditor.validate_is_dict(
+            path_item, "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
+        )
 
     @staticmethod
     def gen_skeleton():

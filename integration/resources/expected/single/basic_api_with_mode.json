@@ -1,6 +1,6 @@
 [
         {"LogicalResourceId": "MyApi", "ResourceType": "AWS::ApiGateway::RestApi"},
-        {"LogicalResourceId": "MyApiDeploymenta808f15210", "ResourceType": "AWS::ApiGateway::Deployment"},
+        {"LogicalResourceId": "MyApiDeployment", "ResourceType": "AWS::ApiGateway::Deployment"},
         {"LogicalResourceId": "MyApiMyNewStageNameStage", "ResourceType": "AWS::ApiGateway::Stage"},
         {"LogicalResourceId": "TestFunction", "ResourceType": "AWS::Lambda::Function"},
         {"LogicalResourceId": "TestFunctionAliaslive", "ResourceType": "AWS::Lambda::Alias"},

@@ -1,6 +1,13 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import GATEWAY_RESPONSES
 
 
+@skipIf(
+    current_region_does_not_support([GATEWAY_RESPONSES]), "GatewayResponses is not supported in this testing region"
+)
 class TestApiWithGatewayResponses(BaseTest):
     def test_gateway_responses(self):
         self.create_and_verify_stack("combination/api_with_gateway_responses")

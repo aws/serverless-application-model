@@ -1,0 +1,14 @@
+Resources:
+  FunctionInvalid:
+    Type:
+      AWS::Serverless::Function: invalid_field
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+  FunctionValid:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x

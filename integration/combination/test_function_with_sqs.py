@@ -1,8 +1,13 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import SQS
 
 
-class TestFunctionWithSns(BaseTest):
-    def test_function_with_sns_bucket_trigger(self):
+@skipIf(current_region_does_not_support([SQS]), "SQS is not supported in this testing region")
+class TestFunctionWithSQS(BaseTest):
+    def test_function_with_sqs_bucket_trigger(self):
         self.create_and_verify_stack("combination/function_with_sqs")
 
         sqs_client = self.client_provider.sqs_client

@@ -253,6 +253,12 @@ class HttpApiGenerator(object):
                 "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
             )
         domain_config["EndpointType"] = endpoint
+
+        if self.domain.get("OwnershipVerificationCertificateArn", None):
+            domain_config["OwnershipVerificationCertificateArn"] = self.domain.get(
+                "OwnershipVerificationCertificateArn"
+            )
+
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
         if self.domain.get("SecurityPolicy", None):
             domain_config["SecurityPolicy"] = self.domain.get("SecurityPolicy")
@@ -339,6 +345,10 @@ class HttpApiGenerator(object):
             for path in basepaths:
                 # search for invalid characters in the path and raise error if there are
                 invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
+
+                if not isinstance(path, string_types):
+                    raise InvalidResourceException(self.logical_id, "Basepath must be a string.")
+
                 if re.search(invalid_regex, path) is not None:
                     raise InvalidResourceException(self.logical_id, "Invalid Basepath name provided.")
 

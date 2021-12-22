@@ -422,19 +422,8 @@ class GetAttAction(Action):
         key = self.intrinsic_name
         value = input_dict[key]
 
-        # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
-        # the input to CFN for it to do the "official" validation.
-        if not isinstance(value, list) or len(value) < 2:
+        if not self._check_input_value(value):
             return input_dict
-
-        if not all(isinstance(entry, string_types) for entry in value):
-            raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        "Invalid GetAtt value {}. GetAtt expects an array with 2 strings.".format(value)
-                    )
-                ]
-            )
 
         # Value of GetAtt is an array. It can contain any number of elements, with first being the LogicalId of
         # resource and rest being the attributes. In a SAM template, a reference to a resource can be used in the
@@ -485,9 +474,7 @@ class GetAttAction(Action):
         key = self.intrinsic_name
         value = input_dict[key]
 
-        # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
-        # the input to CFN for it to do the "official" validation.
-        if not isinstance(value, list) or len(value) < 2:
+        if not self._check_input_value(value):
             return input_dict
 
         value_str = self._resource_ref_separator.join(value)
@@ -497,6 +484,20 @@ class GetAttAction(Action):
 
         resolved_value = supported_resource_id_refs.get(logical_id)
         return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)
+
+    def _check_input_value(self, value):
+        # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
+        # the input to CFN for it to do the "official" validation.
+        if not isinstance(value, list) or len(value) < 2:
+            return False
+
+        # If items in value array is not a string, then following join line will fail. So if any element is not a string
+        # we just pass along the input to CFN for doing the validation
+        for item in value:
+            if not isinstance(item, string_types):
+                return False
+
+        return True
 
     def _get_resolved_dictionary(self, input_dict, key, resolved_value, remaining):
         """
