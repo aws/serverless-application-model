@@ -61,6 +61,11 @@ setup(
     packages=find_packages(
         exclude=("tests", "tests.*", "integration", "integration.*", "docs", "examples", "versions")
     ),
+    license_files=(
+        "LICENSE",
+        "NOTICE",
+        "THIRD_PARTY_LICENSES",
+    ),
     install_requires=read_requirements("base.txt"),
     include_package_data=True,
     extras_require={"dev": read_requirements("dev.txt")},
@@ -74,7 +79,6 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",

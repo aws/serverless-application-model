@@ -1,6 +1,11 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import USAGE_PLANS
 
 
+@skipIf(current_region_does_not_support([USAGE_PLANS]), "UsagePlans is not supported in this testing region")
 class TestApiWithUsagePlan(BaseTest):
     def test_api_with_usage_plans(self):
         self.create_and_verify_stack("combination/api_with_usage_plan")
