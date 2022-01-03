@@ -278,6 +278,9 @@ class ApiGenerator(object):
         self._add_binary_media_types()
         self._add_models()
 
+        if self.disable_execute_api_endpoint is not None:
+            self._add_endpoint_extension()
+
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
@@ -293,9 +296,6 @@ class ApiGenerator(object):
 
         if self.mode:
             rest_api.Mode = self.mode
-
-        if self.disable_execute_api_endpoint is not None:
-            self._add_endpoint_extension()
 
         return rest_api
 
@@ -682,6 +682,9 @@ class ApiGenerator(object):
             self._set_default_apikey_required(self.swagger_editor)
 
         if auth_properties.ResourcePolicy:
+            SwaggerEditor.validate_is_dict(
+                auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
+            )
             for path in self.swagger_editor.iter_on_path():
                 self.swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
             if auth_properties.ResourcePolicy.get("CustomStatements"):
