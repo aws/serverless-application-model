@@ -311,9 +311,7 @@ class ApiGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
-        editor = SwaggerEditor(self.definition_body)
-        editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
-        self.definition_body = editor.swagger
+        self.swagger_editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
 
     def _construct_body_s3_dict(self):
         """Constructs the RestApi's `BodyS3Location property`_, from the SAM Api's DefinitionUri property.
