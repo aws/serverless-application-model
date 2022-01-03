@@ -395,15 +395,15 @@ class ApiGatewayAuthorizer(object):
         return "LAMBDA"
 
     def _get_identity_header(self):
-        try:
-            if not self.identity or not self.identity.get("Header"):
-                return "Authorization"
-        except AttributeError:
+        if self.identity and not isinstance(self.identity, dict):
             raise InvalidResourceException(
                 self.api_logical_id,
                 "Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity "
                 "or LambdaRequestAuthorizationIdentity).",
             )
+
+        if not self.identity or not self.identity.get("Header"):
+            return "Authorization"
 
         return self.identity.get("Header")
 
