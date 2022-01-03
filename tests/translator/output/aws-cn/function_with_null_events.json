@@ -1,0 +1,57 @@
+{
+  "Resources": {
+    "FunctionWithNullEvents": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "queues.zip"
+        },
+        "Handler": "handlers.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionWithNullEventsRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "FunctionWithNullEventsRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    }
+  }
+}

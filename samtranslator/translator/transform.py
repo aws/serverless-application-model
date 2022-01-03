@@ -1,5 +1,6 @@
 from samtranslator.translator.translator import Translator
 from samtranslator.parser.parser import Parser
+from samtranslator.utils.py27hash_fix import to_py27_compatible_template, undo_mark_unicode_str_in_template
 
 
 def transform(input_fragment, parameter_values, managed_policy_loader, feature_toggle=None):
@@ -12,5 +13,8 @@ def transform(input_fragment, parameter_values, managed_policy_loader, feature_t
     """
 
     sam_parser = Parser()
+    to_py27_compatible_template(input_fragment, parameter_values)
     translator = Translator(managed_policy_loader.load(), sam_parser)
-    return translator.translate(input_fragment, parameter_values=parameter_values, feature_toggle=feature_toggle)
+    transformed = translator.translate(input_fragment, parameter_values=parameter_values, feature_toggle=feature_toggle)
+    transformed = undo_mark_unicode_str_in_template(transformed)
+    return transformed

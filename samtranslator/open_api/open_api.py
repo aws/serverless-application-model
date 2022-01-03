@@ -6,6 +6,7 @@ from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.intrinsics import is_intrinsic
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 import json
 
 
@@ -15,6 +16,12 @@ class OpenApiEditor(object):
     cares about. It is built to handle "partial Swagger" ie. Swagger that is incomplete and won't
     pass the Swagger spec. But this is necessary for SAM because it iteratively builds the Swagger starting from an
     empty skeleton.
+
+    NOTE (hawflau): To ensure the same logical ID will be generated in Py3 as in Py2 for AWS::Serverless::HttpApi resource,
+    we have to apply py27hash_fix. For any dictionary that is created within the swagger body, we need to initiate it
+    with Py27Dict() instead of {}. We also need to add keys into the Py27Dict instance one by one, so that the input
+    order could be preserved. This is a must for the purpose of preserving the dict key iteration order, which is
+    essential for generating the same logical ID.
     """
 
     _X_APIGW_INTEGRATION = "x-amazon-apigateway-integration"
@@ -43,10 +50,10 @@ class OpenApiEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_schemes = self._doc.get("components", {}).get("securitySchemes", {})
-        self.definitions = self._doc.get("definitions", {})
+        self.security_schemes = self._doc.get("components", Py27Dict()).get("securitySchemes", Py27Dict())
+        self.definitions = self._doc.get("definitions", Py27Dict())
         self.tags = self._doc.get("tags", [])
-        self.info = self._doc.get("info", {})
+        self.info = self._doc.get("info", Py27Dict())
 
     def get_path(self, path):
         """
@@ -89,7 +96,7 @@ class OpenApiEditor(object):
         # Get the method contents
         # We only want the first one in case there are multiple (in a conditional)
         method = self.get_method_contents(path[method_name])[0]
-        integration = method.get(self._X_APIGW_INTEGRATION, {})
+        integration = method.get(self._X_APIGW_INTEGRATION, Py27Dict())
 
         # Extract the integration uri out of a conditional if necessary
         uri = integration.get("uri")
@@ -176,7 +183,7 @@ class OpenApiEditor(object):
         """
         method = self._normalize_method_name(method)
 
-        path_dict = self.paths.setdefault(path, {})
+        path_dict = self.paths.setdefault(path, Py27Dict())
 
         if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
@@ -191,7 +198,7 @@ class OpenApiEditor(object):
         if self._CONDITIONAL_IF in path_dict:
             path_dict = path_dict[self._CONDITIONAL_IF][1]
 
-        path_dict.setdefault(method, {})
+        path_dict.setdefault(method, Py27Dict())
 
     def add_lambda_integration(
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
@@ -217,18 +224,18 @@ class OpenApiEditor(object):
             integration_uri = make_conditional(condition, integration_uri)
 
         path_dict = self.get_path(path)
-        path_dict[method][self._X_APIGW_INTEGRATION] = {
-            "type": "aws_proxy",
-            "httpMethod": "POST",
-            "payloadFormatVersion": "2.0",
-            "uri": integration_uri,
-        }
+        # create as Py27Dict and insert key one by one to preserve input order
+        path_dict[method][self._X_APIGW_INTEGRATION] = Py27Dict()
+        path_dict[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
+        path_dict[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
+        path_dict[method][self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = "2.0"
+        path_dict[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
 
         if path == self._DEFAULT_PATH and method == self._X_ANY_METHOD:
             path_dict[method]["isDefaultRoute"] = True
 
         # If 'responses' key is *not* present, add it with an empty dict as value
-        path_dict[method].setdefault("responses", {})
+        path_dict[method].setdefault("responses", Py27Dict())
 
         # If a condition is present, wrap all method contents up into the condition
         if condition:
@@ -296,7 +303,12 @@ class OpenApiEditor(object):
                     existing_parameter["in"] = "path"
                     existing_parameter["required"] = True
                 else:
-                    parameter = {"name": param, "in": "path", "required": True}
+                    # create as Py27Dict and insert keys one by one to preserve input order
+                    parameter = Py27Dict()
+                    param = Py27UniStr(param) if isinstance(param, str) else param
+                    parameter["name"] = param
+                    parameter["in"] = "path"
+                    parameter["required"] = True
                     method_definition.get("parameters").append(parameter)
 
     def add_payload_format_version_to_method(self, api, path, method_name, payload_format_version="2.0"):
@@ -319,7 +331,7 @@ class OpenApiEditor(object):
 
         :param list authorizers: List of Authorizer configurations which get translated to securityDefinitions.
         """
-        self.security_schemes = self.security_schemes or {}
+        self.security_schemes = self.security_schemes or Py27Dict()
 
         for authorizer_name, authorizer in authorizers.items():
             self.security_schemes[authorizer_name] = authorizer.generate_openapi()
@@ -444,7 +456,10 @@ class OpenApiEditor(object):
                 # overwrite tag value for an existing tag
                 existing_tag[self._X_APIGW_TAG_VALUE] = value
             else:
-                tag = {"name": name, self._X_APIGW_TAG_VALUE: value}
+                # create as Py27Dict and insert key one by one to preserve input order
+                tag = Py27Dict()
+                tag["name"] = name
+                tag[self._X_APIGW_TAG_VALUE] = value
                 self.tags.append(tag)
 
     def add_endpoint_config(self, disable_execute_api_endpoint):
@@ -460,7 +475,7 @@ class OpenApiEditor(object):
 
         DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
 
-        servers_configurations = self._doc.get(self._SERVERS, [{}])
+        servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
         for config in servers_configurations:
             endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, dict())
             endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
@@ -560,7 +575,7 @@ class OpenApiEditor(object):
             self._doc["tags"] = self.tags
 
         if self.security_schemes:
-            self._doc.setdefault("components", {})
+            self._doc.setdefault("components", Py27Dict())
             self._doc["components"]["securitySchemes"] = self.security_schemes
 
         if self.info:
@@ -591,7 +606,14 @@ class OpenApiEditor(object):
 
         :return dict: Dictionary of a skeleton swagger document
         """
-        return {"openapi": "3.0.1", "info": {"version": "1.0", "title": ref("AWS::StackName")}, "paths": {}}
+        # create as Py27Dict and insert key one by one to preserve input order
+        skeleton = Py27Dict()
+        skeleton["openapi"] = "3.0.1"
+        skeleton["info"] = Py27Dict()
+        skeleton["info"]["version"] = "1.0"
+        skeleton["info"]["title"] = ref("AWS::StackName")
+        skeleton["paths"] = Py27Dict()
+        return skeleton
 
     @staticmethod
     def _get_authorization_scopes(authorizers, default_authorizer):
@@ -639,4 +661,7 @@ class OpenApiEditor(object):
 
     @staticmethod
     def get_path_without_trailing_slash(path):
-        return re.sub(r"{([a-zA-Z0-9._-]+|proxy\+)}", "*", path)
+        sub = re.sub(r"{([a-zA-Z0-9._-]+|proxy\+)}", "*", path)
+        if isinstance(path, Py27UniStr):
+            return Py27UniStr(sub)
+        return sub

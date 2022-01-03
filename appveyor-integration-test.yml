@@ -3,8 +3,6 @@ image: Ubuntu
 
 environment:
   matrix:
-  - TOXENV: py27
-    PYTHON_VERSION: '2.7'
   - TOXENV: py36
     PYTHON_VERSION: '3.6'
   - TOXENV: py37

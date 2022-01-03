@@ -27,6 +27,7 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 LOG = logging.getLogger(__name__)
 
@@ -338,7 +339,18 @@ class ApiGenerator(object):
                     "'s3://bucket/key' with optional versionId query parameter.",
                 )
 
-        body_s3 = {"Bucket": s3_pointer["Bucket"], "Key": s3_pointer["Key"]}
+            if isinstance(self.definition_uri, Py27UniStr):
+                # self.defintion_uri is a Py27UniStr instance if it is defined in the template
+                # we need to preserve the Py27UniStr type
+                s3_pointer["Bucket"] = Py27UniStr(s3_pointer["Bucket"])
+                s3_pointer["Key"] = Py27UniStr(s3_pointer["Key"])
+                if "Version" in s3_pointer:
+                    s3_pointer["Version"] = Py27UniStr(s3_pointer["Version"])
+
+        # Construct body_s3 as py27 dict
+        body_s3 = Py27Dict()
+        body_s3["Bucket"] = s3_pointer["Bucket"]
+        body_s3["Key"] = s3_pointer["Key"]
         if "Version" in s3_pointer:
             body_s3["Version"] = s3_pointer["Version"]
         return body_s3
@@ -922,12 +934,13 @@ class ApiGenerator(object):
 
         swagger_editor = SwaggerEditor(self.definition_body)
 
-        gateway_responses = {}
+        # The dicts below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
+        gateway_responses = Py27Dict()
         for response_type, response in self.gateway_responses.items():
             gateway_responses[response_type] = ApiGatewayResponse(
                 api_logical_id=self.logical_id,
-                response_parameters=response.get("ResponseParameters", {}),
-                response_templates=response.get("ResponseTemplates", {}),
+                response_parameters=response.get("ResponseParameters", Py27Dict()),
+                response_templates=response.get("ResponseTemplates", Py27Dict()),
                 status_code=response.get("StatusCode", None),
             )
 
@@ -985,12 +998,12 @@ class ApiGenerator(object):
             SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version
         ):
             if definition_body.get("securityDefinitions"):
-                components = definition_body.get("components", {})
+                components = definition_body.get("components", Py27Dict())
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
                 del definition_body["securityDefinitions"]
             if definition_body.get("definitions"):
-                components = definition_body.get("components", {})
+                components = definition_body.get("components", Py27Dict())
                 components["schemas"] = definition_body["definitions"]
                 definition_body["components"] = components
                 del definition_body["definitions"]
@@ -1016,7 +1029,8 @@ class ApiGenerator(object):
                                 if field_val.get("200") and field_val.get("200").get("headers"):
                                     headers = field_val["200"]["headers"]
                                     for header, header_val in headers.items():
-                                        new_header_val_with_schema = {"schema": header_val}
+                                        new_header_val_with_schema = Py27Dict()
+                                        new_header_val_with_schema["schema"] = header_val
                                         definition_body["paths"][path]["options"][field]["200"]["headers"][
                                             header
                                         ] = new_header_val_with_schema
@@ -1024,7 +1038,8 @@ class ApiGenerator(object):
         return definition_body
 
     def _get_authorizers(self, authorizers_config, default_authorizer=None):
-        authorizers = {}
+        # The dict below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
+        authorizers = Py27Dict()
         if default_authorizer == "AWS_IAM":
             authorizers[default_authorizer] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id, name=default_authorizer, is_aws_iam_authorizer=True

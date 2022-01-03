@@ -7,6 +7,7 @@ from samtranslator.public.plugins import BasePlugin
 from samtranslator.public.exceptions import InvalidDocumentException, InvalidResourceException, InvalidEventException
 from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.utils.py27hash_fix import Py27Dict
 
 
 class ImplicitApiPlugin(BasePlugin):
@@ -122,9 +123,9 @@ class ImplicitApiPlugin(BasePlugin):
             and isinstance(resource.properties.get("Events"), dict)
         ):
             # Resource structure is invalid.
-            return {}
+            return Py27Dict()
 
-        api_events = {}
+        api_events = Py27Dict()
         for event_id, event in resource.properties["Events"].items():
 
             if event and isinstance(event, dict) and event.get("Type") == self.api_event_type:
