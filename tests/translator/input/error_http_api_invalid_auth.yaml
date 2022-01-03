@@ -67,6 +67,24 @@ Resources:
             Auth:
               Authorizer: OIDC
 
+  NonStringAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        GetRoot:
+          Type: HttpApi
+          Properties:
+            ApiId: NonStringAuthFunctionApi
+            Path: /
+            Method: get
+            Auth:
+              # Correct usage: Authorizer: MyAuth
+              Authorizer: !Ref MyAuth
+              InvokeRole: CALLER_CREDENTIALS
+
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -163,3 +181,14 @@ Resources:
             Ref: AWS::StackName
         paths: {}
         openapi: 3.0.1
+
+  NonStringAuthFunctionApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          MyAuth:
+            JwtConfiguration:
+              audience: https://test-sam.com
+              issuer: https://test-sam.com
+            IdentitySource: "$request.header.Authorization"

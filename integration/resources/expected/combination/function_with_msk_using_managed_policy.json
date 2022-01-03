@@ -2,8 +2,5 @@
   { "LogicalResourceId":"MyMskStreamProcessor", "ResourceType":"AWS::Lambda::Function" },
   { "LogicalResourceId":"MyMskStreamProcessorRole", "ResourceType":"AWS::IAM::Role" },
   { "LogicalResourceId":"MyMskCluster", "ResourceType":"AWS::MSK::Cluster" },
-  { "LogicalResourceId":"MyVpc", "ResourceType":"AWS::EC2::VPC" },
-  { "LogicalResourceId":"MySubnetOne", "ResourceType":"AWS::EC2::Subnet" },
-  { "LogicalResourceId":"MySubnetTwo", "ResourceType":"AWS::EC2::Subnet" },
   { "LogicalResourceId":"MyMskStreamProcessorMyMskEvent", "ResourceType":"AWS::Lambda::EventSourceMapping" }
 ]

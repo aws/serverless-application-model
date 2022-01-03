@@ -1,0 +1,29 @@
+Resources:
+  ExplicitApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: SomeStage
+      Auth:
+        DefaultAuthorizer: MyCognitoAuth
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: !GetAtt MyUserPool.Arn
+      DefinitionBody:
+        swagger: 2.0
+        paths:
+          "/":
+            get: null
+
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: UserPoolName
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false

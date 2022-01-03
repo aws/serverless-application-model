@@ -1,0 +1,49 @@
+Resources:
+  FilteredEventsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/filtered_events.zip
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        KinesisStream:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"name": "value"}'
+                - Pattern: '{"name2": "value2"}'
+        DynamoDBStreamEvent:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt DynamoDBTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            FilterCriteria:
+              Filters:
+                - Pattern: '{
+                      "dynamodb": {
+                        "NewImage": {
+                          "value": { "S": ["test"] }
+                        }
+                      }
+                    }'
+        MySqsQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MySqsQueue.Arn
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"name": "value"}'
+
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+
+  MySqsQueue:
+    Type: AWS::SQS::Queue

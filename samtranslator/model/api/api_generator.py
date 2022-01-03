@@ -171,6 +171,7 @@ class ApiGenerator(object):
         method_settings=None,
         binary_media=None,
         minimum_compression_size=None,
+        disable_execute_api_endpoint=None,
         cors=None,
         auth=None,
         gateway_responses=None,
@@ -219,6 +220,7 @@ class ApiGenerator(object):
         self.method_settings = method_settings
         self.binary_media = binary_media
         self.minimum_compression_size = minimum_compression_size
+        self.disable_execute_api_endpoint = disable_execute_api_endpoint
         self.cors = cors
         self.auth = auth
         self.gateway_responses = gateway_responses
@@ -275,6 +277,9 @@ class ApiGenerator(object):
         self._add_binary_media_types()
         self._add_models()
 
+        if self.disable_execute_api_endpoint is not None:
+            self._add_endpoint_extension()
+
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
@@ -292,6 +297,22 @@ class ApiGenerator(object):
             rest_api.Mode = self.mode
 
         return rest_api
+
+    def _add_endpoint_extension(self):
+        """Add disableExecuteApiEndpoint if it is set in SAM
+        Note:
+        If neither DefinitionUri nor DefinitionBody are specified,
+        SAM will generate a openapi definition body based on template configuration.
+        https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
+        For this reason, we always put DisableExecuteApiEndpoint into openapi object irrespective of origin of DefinitionBody.
+        """
+        if self.disable_execute_api_endpoint and not self.definition_body:
+            raise InvalidResourceException(
+                self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
+            )
+        editor = SwaggerEditor(self.definition_body)
+        editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
+        self.definition_body = editor.swagger
 
     def _construct_body_s3_dict(self):
         """Constructs the RestApi's `BodyS3Location property`_, from the SAM Api's DefinitionUri property.
@@ -455,6 +476,9 @@ class ApiGenerator(object):
 
         if self.domain.get("SecurityPolicy", None):
             domain.SecurityPolicy = self.domain["SecurityPolicy"]
+
+        if self.domain.get("OwnershipVerificationCertificateArn", None):
+            domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
 
         # Create BasepathMappings
         if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
@@ -690,6 +714,9 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)
 
         if auth_properties.ResourcePolicy:
+            SwaggerEditor.validate_is_dict(
+                auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
+            )
             for path in swagger_editor.iter_on_path():
                 swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
             if auth_properties.ResourcePolicy.get("CustomStatements"):

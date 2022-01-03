@@ -32,6 +32,7 @@ class SwaggerEditor(object):
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
     _X_APIGW_REQUEST_VALIDATORS = "x-amazon-apigateway-request-validators"
     _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validator"
+    _X_ENDPOINT_CONFIG = "x-amazon-apigateway-endpoint-configuration"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
@@ -58,6 +59,14 @@ class SwaggerEditor(object):
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
         self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())
         self.definitions = self._doc.get("definitions", Py27Dict())
+
+        # https://swagger.io/specification/#path-item-object
+        # According to swagger spec,
+        # each path item object must be a dict (even it is empty).
+        # We can do an early path validation on path item objects,
+        # so we don't need to validate wherever we use them.
+        for path in self.iter_on_path():
+            SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -117,6 +126,19 @@ class SwaggerEditor(object):
         if self._CONDITIONAL_IF in method:
             return method[self._CONDITIONAL_IF][1:]
         return [method]
+
+    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):
+        """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG in open api definition as extension
+        Following this guide:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
+        :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
+        """
+        if not self._doc.get(self._X_ENDPOINT_CONFIG):
+            self._doc[self._X_ENDPOINT_CONFIG] = {}
+
+        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
+        set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
+        self._doc[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
 
     def has_integration(self, path, method):
         """
@@ -565,12 +587,18 @@ class SwaggerEditor(object):
             if normalized_method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                 continue
             if add_default_auth_to_preflight or normalized_method_name != "options":
-                normalized_method_name = self._normalize_method_name(method_name)
+                SwaggerEditor.validate_is_dict(
+                    method,
+                    'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(method_name, method, path),
+                )
                 # It is possible that the method could have two definitions in a Fn::If block.
                 for method_definition in self.get_method_contents(method):
 
                     SwaggerEditor.validate_is_dict(
-                        method_definition, "{} for path {} is not a valid dictionary.".format(method_definition, path)
+                        method_definition,
+                        'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
+                            method_name, method_definition, path
+                        ),
                     )
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                     if not self.method_definition_has_integration(method_definition):

@@ -278,6 +278,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_mq_virtual_host",
                 "simpletable",
                 "simpletable_with_sse",
+                "resource_with_invalid_type",
                 "implicit_api",
                 "explicit_api",
                 "api_description",
@@ -324,6 +325,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_stage_tags",
                 "api_with_mode",
                 "api_with_no_properties",
+                "api_with_disable_api_execute_endpoint",
                 "s3",
                 "s3_create_remove",
                 "s3_existing_lambda_notification_configuration",
@@ -454,6 +456,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_self_managed_kafka",
                 "function_with_auth_mechanism_for_self_managed_kafka",
                 "function_with_vpc_permission_for_self_managed_kafka",
+                "function_with_event_filtering",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -512,7 +515,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "http_api_description",
                 "http_api_lambda_auth",
                 "http_api_lambda_auth_full",
-                "http_api_multiple_authorizers_old_behavior_py27hash",
+                "http_api_multiple_authorizers",
             ],
             [
                 ("aws", "ap-southeast-1"),
