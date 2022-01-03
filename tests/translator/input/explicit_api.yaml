@@ -46,4 +46,4 @@ Resources:
         Ref: MyStageName
       DefinitionBody:
         paths: {}
-        openapi: "3.0.1"
+        swagger: "2.0"
