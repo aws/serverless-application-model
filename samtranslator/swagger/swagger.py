@@ -50,13 +50,21 @@ class SwaggerEditor(object):
         """
 
         self._doc = copy.deepcopy(doc)
+        self.validate_definition_body(doc)
+
         self.paths = self._doc.get("paths")
+        # https://swagger.io/specification/#path-item-object
+        # According to swagger spec,
+        # each path item object must be a dict (even it is empty).
+        # We can do an early path validation on path item objects,
+        # so we don't need to validate wherever we use them.
+        for path in self.iter_on_path():
+            SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
+
         self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
         self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())
         self.definitions = self._doc.get("definitions", Py27Dict())
-
-        self.validate_definition_body(doc)
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -1325,14 +1333,6 @@ class SwaggerEditor(object):
                     )
                 ]
             )
-
-        # https://swagger.io/specification/#path-item-object
-        # According to swagger spec,
-        # each path item object must be a dict (even it is empty).
-        # We can do an early path validation on path item objects,
-        # so we don't need to validate wherever we use them.
-        for path in self.iter_on_path():
-            SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
 
     @staticmethod
     def validate_is_dict(obj, exception_message):
