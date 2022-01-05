@@ -1,1 +1,1 @@
-All example applications have been moved to [aws-samples/serverless-app-examples](https://github.com/aws-samples/serverless-app-examples).
+All example/template applications have been moved to [aws/aws-sam-cli-app-templates](https://github.com/aws/aws-sam-cli-app-templates).
