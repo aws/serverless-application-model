@@ -107,7 +107,7 @@
             "Type": "AWS::ApiGateway::Stage", 
             "Properties": {
                 "DeploymentId": {
-                    "Ref": "ServerlessRestApiDeploymentaeae651245"
+                    "Ref": "ServerlessRestApiDeployment36c8e18056"
                 }, 
                 "RestApiId": {
                     "Ref": "ServerlessRestApi"
@@ -244,13 +244,13 @@
             }, 
             "Condition": "TestCondition"
         }, 
-        "ServerlessRestApiDeploymentaeae651245": {
+        "ServerlessRestApiDeployment36c8e18056": {
             "Type": "AWS::ApiGateway::Deployment", 
             "Properties": {
                 "RestApiId": {
                     "Ref": "ServerlessRestApi"
                 }, 
-                "Description": "RestApi deployment id: aeae651245fe7d417a17f2bea50b255f2727e2b8", 
+                "Description": "RestApi deployment id: 36c8e18056e323dd62485e2085666aa2ab3b4aaa", 
                 "StageName": "Stage"
             }, 
             "Condition": "TestCondition"

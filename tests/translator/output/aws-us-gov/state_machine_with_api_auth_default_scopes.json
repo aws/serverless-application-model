@@ -517,7 +517,7 @@
             "Type": "AWS::ApiGateway::Stage", 
             "Properties": {
                 "DeploymentId": {
-                    "Ref": "MyApiWithCognitoAuthDeployment57b57dfc88"
+                    "Ref": "MyApiWithCognitoAuthDeployment5228af6225"
                 }, 
                 "RestApiId": {
                     "Ref": "MyApiWithCognitoAuth"
@@ -525,13 +525,13 @@
                 "StageName": "Prod"
             }
         }, 
-        "MyApiWithCognitoAuthDeployment57b57dfc88": {
+        "MyApiWithCognitoAuthDeployment5228af6225": {
             "Type": "AWS::ApiGateway::Deployment", 
             "Properties": {
                 "RestApiId": {
                     "Ref": "MyApiWithCognitoAuth"
                 }, 
-                "Description": "RestApi deployment id: 57b57dfc88b1b438a0437eadd869d77e938eedb6"
+                "Description": "RestApi deployment id: 5228af622559737aba2e7ab7fa55d335c5b25f68"
             }
         }, 
         "MyStateMachineCognitoDefaultScopesDefaultAuthorizerRole": {

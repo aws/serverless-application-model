@@ -294,7 +294,7 @@
             "Type": "AWS::ApiGateway::Stage", 
             "Properties": {
                 "DeploymentId": {
-                    "Ref": "ExplicitApiDeployment17065a95ba"
+                    "Ref": "ExplicitApiDeployment8426227ca2"
                 }, 
                 "RestApiId": {
                     "Ref": "ExplicitApi"
@@ -380,13 +380,13 @@
                 ]
             }
         }, 
-        "ExplicitApiDeployment17065a95ba": {
+        "ExplicitApiDeployment8426227ca2": {
             "Type": "AWS::ApiGateway::Deployment", 
             "Properties": {
                 "RestApiId": {
                     "Ref": "ExplicitApi"
                 }, 
-                "Description": "RestApi deployment id: 17065a95bac1ac0e3dc22fef2ff7aa228539b1d2", 
+                "Description": "RestApi deployment id: 8426227ca264faaa3de7b18e9e112f479f7c3a5f", 
                 "StageName": "Stage"
             }
         }, 
