@@ -536,9 +536,7 @@ class ApiGenerator(object):
                 raise InvalidResourceException(
                     self.logical_id,
                     "Invalid property type '{}' for Route53. "
-                    "Expected a map defines an Amazon Route 53 configuration'.".format(
-                        type(route53).__name__
-                    ),
+                    "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53).__name__),
                 )
 
         return domain, basepath_resource_list, record_set_group
