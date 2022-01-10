@@ -25,6 +25,7 @@ import sys
 
 import boto3
 from docopt import docopt
+
 if sys.version_info.major == 3:
     from functools import reduce
 
