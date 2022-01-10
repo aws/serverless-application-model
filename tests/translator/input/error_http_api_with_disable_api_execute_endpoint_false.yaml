@@ -1,6 +1,6 @@
 Resources:
   ApiGatewayApi:
-    Type: AWS::Serverless::Api
+    Type: AWS::Serverless::HttpApi
     Properties:
       StageName: prod
       DisableExecuteApiEndpoint: False
