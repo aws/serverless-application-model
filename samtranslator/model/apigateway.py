@@ -398,8 +398,8 @@ class ApiGatewayAuthorizer(object):
         if self.identity and not isinstance(self.identity, dict):
             raise InvalidResourceException(
                 self.api_logical_id,
-                "Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity "
-                "or LambdaRequestAuthorizationIdentity).",
+                "Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity, "
+                "LambdaRequestAuthorizationIdentity or CognitoAuthorizationIdentity).",
             )
 
         if not self.identity or not self.identity.get("Header"):
