@@ -151,7 +151,11 @@
                     "dynamodb:BatchWriteItem", 
                     "dynamodb:BatchGetItem", 
                     "dynamodb:DescribeTable", 
-                    "dynamodb:ConditionCheckItem"
+                    "dynamodb:ConditionCheckItem",
+                    "dynamodb:PartiQLSelect",
+                    "dynamodb:PartiQLUpdate",
+                    "dynamodb:PartiQLInsert",
+                    "dynamodb:PartiQLDelete"
                   ], 
                   "Resource": [
                     {
@@ -186,7 +190,8 @@
                     "dynamodb:Scan", 
                     "dynamodb:Query", 
                     "dynamodb:BatchGetItem", 
-                    "dynamodb:DescribeTable"
+                    "dynamodb:DescribeTable",
+                    "dynamodb:PartiQLSelect"
                   ], 
                   "Resource": [
                     {
@@ -1526,7 +1531,9 @@
                   "Action": [
                     "dynamodb:PutItem",
                     "dynamodb:UpdateItem",
-                    "dynamodb:BatchWriteItem"
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:PartiQLUpdate",
+                    "dynamodb:PartiQLInsert"
                   ],
                   "Resource": [
                     {
