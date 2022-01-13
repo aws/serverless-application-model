@@ -397,7 +397,9 @@
                   "Action": [
                     "dynamodb:PutItem",
                     "dynamodb:UpdateItem",
-                    "dynamodb:BatchWriteItem"
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:PartiQLUpdate",
+                    "dynamodb:PartiQLInsert"
                   ],
                   "Resource": [
                     {
