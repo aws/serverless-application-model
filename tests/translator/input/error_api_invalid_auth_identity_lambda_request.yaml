@@ -1,0 +1,13 @@
+Resources:
+  ServerlessApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Auth:
+        Authorizers:
+          LambdaRequestAuthorizer:
+            FunctionArn:
+              Fn::GetAtt:
+                - MyAuthFunction
+                - Arn
+            Identity: LambdaRequestAuthorizationIdentity
