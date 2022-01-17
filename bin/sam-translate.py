@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """Convert SAM templates to CloudFormation templates.
 
 Known limitations: cannot transform CodeUri pointing at local directory.
@@ -24,10 +26,9 @@ import subprocess
 import sys
 
 import boto3
-from docopt import docopt
 
-if sys.version_info.major == 3:
-    from functools import reduce
+from docopt import docopt
+from functools import reduce
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
