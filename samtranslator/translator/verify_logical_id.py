@@ -11,6 +11,7 @@ do_not_verify = {
     "AWS::Cognito::UserPool": "AWS::Cognito::UserPool",
     "AWS::ApiGateway::DomainName": "AWS::ApiGateway::DomainName",
     "AWS::ApiGateway::BasePathMapping": "AWS::ApiGateway::BasePathMapping",
+    "AWS::StepFunctions::StateMachine": "AWS::Serverless::StateMachine",
 }
 
 

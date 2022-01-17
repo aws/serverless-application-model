@@ -89,16 +89,53 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
         SamTemplateMock.assert_called_with(template_dict)
         sam_template.set.assert_called_with(IMPLICIT_API_LOGICAL_ID, ImplicitApiResource().to_dict())
 
-        # Make sure this is called only for Functions
-        sam_template.iterate.assert_any_call("AWS::Serverless::Function")
-        sam_template.iterate.assert_any_call("AWS::Serverless::Api")
+        # Make sure this is called only for Functions and State Machines
+        sam_template.iterate.assert_any_call({"AWS::Serverless::Function", "AWS::Serverless::StateMachine"})
+        sam_template.iterate.assert_any_call({"AWS::Serverless::Api"})
 
         self.plugin._get_api_events.assert_has_calls([call(function1), call(function2), call(function3)])
         self.plugin._process_api_events.assert_has_calls(
             [
-                call(function1, ["event1", "event2"], sam_template, None),
-                call(function2, ["event1", "event2"], sam_template, None),
-                call(function3, ["event1", "event2"], sam_template, None),
+                call(function1, ["event1", "event2"], sam_template, None, None, None),
+                call(function2, ["event1", "event2"], sam_template, None, None, None),
+                call(function3, ["event1", "event2"], sam_template, None, None, None),
+            ]
+        )
+
+        self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
+
+    @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
+    def test_must_process_state_machines(self, SamTemplateMock):
+
+        template_dict = {"a": "b"}
+        statemachine1 = SamResource({"Type": "AWS::Serverless::StateMachine"})
+        statemachine2 = SamResource({"Type": "AWS::Serverless::StateMachine"})
+        statemachine3 = SamResource({"Type": "AWS::Serverless::StateMachine"})
+        statemachine_resources = [("id1", statemachine1), ("id2", statemachine2), ("id3", statemachine3)]
+        api_events = ["event1", "event2"]
+
+        sam_template = Mock()
+        SamTemplateMock.return_value = sam_template
+        sam_template.set = Mock()
+        sam_template.iterate = Mock()
+        sam_template.iterate.return_value = statemachine_resources
+        self.plugin._get_api_events.return_value = api_events
+
+        self.plugin.on_before_transform_template(template_dict)
+
+        SamTemplateMock.assert_called_with(template_dict)
+        sam_template.set.assert_called_with(IMPLICIT_API_LOGICAL_ID, ImplicitApiResource().to_dict())
+
+        # Make sure this is called only for Functions and State Machines
+        sam_template.iterate.assert_any_call({"AWS::Serverless::Function", "AWS::Serverless::StateMachine"})
+        sam_template.iterate.assert_any_call({"AWS::Serverless::Api"})
+
+        self.plugin._get_api_events.assert_has_calls([call(statemachine1), call(statemachine2), call(statemachine3)])
+        self.plugin._process_api_events.assert_has_calls(
+            [
+                call(statemachine1, ["event1", "event2"], sam_template, None, None, None),
+                call(statemachine2, ["event1", "event2"], sam_template, None, None, None),
+                call(statemachine3, ["event1", "event2"], sam_template, None, None, None),
             ]
         )
 
@@ -130,10 +167,35 @@ class TestImplicitRestApiPlugin_on_before_transform_template(TestCase):
         self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
 
     @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
-    def test_must_skip_without_functions(self, SamTemplateMock):
+    def test_must_skip_state_machines_without_events(self, SamTemplateMock):
 
         template_dict = {"a": "b"}
-        # NO FUNCTIONS
+        statemachine1 = SamResource({"Type": "AWS::Serverless::StateMachine"})
+        statemachine2 = SamResource({"Type": "AWS::Serverless::StateMachine"})
+        statemachine3 = SamResource({"Type": "AWS::Serverless::StateMachine"})
+        statemachine_resources = [("id1", statemachine1), ("id2", statemachine2), ("id3", statemachine3)]
+        # NO EVENTS for any state machine
+        api_events = []
+
+        sam_template = Mock()
+        SamTemplateMock.return_value = sam_template
+        sam_template.set = Mock()
+        sam_template.iterate = Mock()
+        sam_template.iterate.return_value = statemachine_resources
+        self.plugin._get_api_events.return_value = api_events
+
+        self.plugin.on_before_transform_template(template_dict)
+
+        self.plugin._get_api_events.assert_has_calls([call(statemachine1), call(statemachine2), call(statemachine3)])
+        self.plugin._process_api_events.assert_not_called()
+
+        self.plugin._maybe_remove_implicit_api.assert_called_with(sam_template)
+
+    @patch("samtranslator.plugins.api.implicit_api_plugin.SamTemplate")
+    def test_must_skip_without_functions_or_statemachines(self, SamTemplateMock):
+
+        template_dict = {"a": "b"}
+        # NO FUNCTIONS OR STATE MACHINES
         function_resources = []
 
         sam_template = Mock()
@@ -751,3 +813,38 @@ class TestImplicitRestApiPlugin_maybe_remove_implicit_api(TestCase):
 
         # Must restore original resource
         template.set.assert_called_with(IMPLICIT_API_LOGICAL_ID, resource)
+
+
+class TestImplicitApiPlugin_generate_resource_attributes(TestCase):
+    def setUp(self):
+        self.plugin = ImplicitRestApiPlugin()
+        self.plugin.api_conditions = {}
+
+    def test_maybe_add_condition(self):
+        template_dict = {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api"}}}
+        self.plugin.api_conditions = {"ServerlessRestApi": {"/{proxy+}": {"any": "C1"}}}
+        self.plugin._maybe_add_condition_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(
+            template_dict, {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api", "Condition": "C1"}}}
+        )
+
+    def test_maybe_add_deletion_policies(self):
+        template_dict = {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api"}}}
+        self.plugin.api_deletion_policies = {"ServerlessRestApi": {"Delete", "Retain"}}
+        self.plugin._maybe_add_deletion_policy_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(
+            template_dict,
+            {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api", "DeletionPolicy": "Retain"}}},
+        )
+
+    def test_maybe_add_update_replace_policies(self):
+        template_dict = {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api"}}}
+        self.plugin.api_update_replace_policies = {"ServerlessRestApi": {"Snapshot", "Retain"}}
+        self.plugin._maybe_add_update_replace_policy_to_implicit_api(template_dict)
+        print(template_dict)
+        self.assertEqual(
+            template_dict,
+            {"Resources": {"ServerlessRestApi": {"Type": "AWS::Serverless::Api", "UpdateReplacePolicy": "Retain"}}},
+        )

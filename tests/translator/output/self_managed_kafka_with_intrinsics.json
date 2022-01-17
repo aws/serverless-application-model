@@ -1,0 +1,155 @@
+{
+  "Parameters": {
+    "BatchSizeValue": {
+      "Type": "Number",
+      "Default": 100
+    },
+    "EnableValue": {
+      "Type": "String",
+      "Default": true
+    },
+    "TopicsValue": {
+      "Type": "CommaDelimitedList",
+      "Default": "Topic"
+    },
+    "KafkaBootstrapServersValue": {
+      "Type": "CommaDelimitedList",
+      "Default": "abc.xyz.com:9092,123.45.67.89:9096"
+    }
+  },
+  "Resources": {
+    "KafkaUserSecret": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Name": "KafkaUserPassword",
+        "SecretString": {
+          "Fn::Sub": "{\"username\":\"testBrokerUser\",\"password\":\"testBrokerPassword\"}"
+        }
+      }
+    },
+    "KafkaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "kafka.zip"
+        },
+        "Handler": "index.kafka_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "KafkaFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.9",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "KafkaFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "secretsmanager:GetSecretValue"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "KafkaUserSecret"
+                  }
+                },
+                {
+                  "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DescribeVpcs",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "SelfManagedKafkaExecutionRolePolicy"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "KafkaFunctionMyKafkaCluster": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "BatchSize": {
+          "Ref": "BatchSizeValue"
+        },
+        "Enabled": {
+          "Ref": "EnableValue"
+        },
+        "FunctionName": {
+          "Ref": "KafkaFunction"
+        },
+        "Topics": {
+          "Ref": "TopicsValue"
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "VPC_SUBNET",
+            "URI": "subnet:subnet-12345"
+          },
+          {
+            "Type": "VPC_SECURITY_GROUP",
+            "URI": "security_group:sg-67890"
+          },
+          {
+            "Type": "BASIC_AUTH",
+            "URI": {
+              "Ref": "KafkaUserSecret"
+            }
+          }
+        ],
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": {
+              "Ref": "KafkaBootstrapServersValue"
+            }
+          }
+        }
+      }
+    }
+  }
+}

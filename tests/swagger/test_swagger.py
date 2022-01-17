@@ -1,12 +1,11 @@
 import copy
-import json
 
 from unittest import TestCase
-from mock import Mock, patch
+from mock import Mock
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.model.exceptions import InvalidDocumentException
+from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from tests.translator.test_translator import deep_sort_lists
 
 _X_INTEGRATION = "x-amazon-apigateway-integration"
@@ -50,6 +49,13 @@ class TestSwaggerEditor_init(TestCase):
 
         self.assertEqual(editor.paths, {"/foo": {}, "/bar": {}})
 
+    @parameterized.expand([(None,), ("should-not-be-string",)])
+    def test_must_fail_with_bad_values_for_path(self, invalid_path_item):
+        invalid_swagger = {"openapi": "3.1.1.1", "paths": {"/foo": {}, "/bad": invalid_path_item}}
+
+        with self.assertRaises(ValueError):
+            SwaggerEditor(invalid_swagger)
+
 
 class TestSwaggerEditor_has_path(TestCase):
     def setUp(self):
@@ -58,7 +64,6 @@ class TestSwaggerEditor_has_path(TestCase):
             "paths": {
                 "/foo": {"get": {}, "somemethod": {}},
                 "/bar": {"post": {}, _X_ANY_METHOD: {}},
-                "badpath": "string value",
             },
         }
 
@@ -97,11 +102,6 @@ class TestSwaggerEditor_has_path(TestCase):
         self.assertFalse(self.editor.has_path("/foo", "abc"))
         self.assertFalse(self.editor.has_path("/bar", "get"))
         self.assertFalse(self.editor.has_path("/bar", "xyz"))
-
-    def test_must_not_fail_on_bad_path(self):
-
-        self.assertTrue(self.editor.has_path("badpath"))
-        self.assertFalse(self.editor.has_path("badpath", "somemethod"))
 
 
 class TestSwaggerEditor_has_integration(TestCase):
@@ -146,7 +146,10 @@ class TestSwaggerEditor_add_path(TestCase):
 
         self.original_swagger = {
             "swagger": "2.0",
-            "paths": {"/foo": {"get": {"a": "b"}}, "/bar": {}, "/badpath": "string value"},
+            "paths": {
+                "/foo": {"get": {"a": "b"}},
+                "/bar": {},
+            },
         }
 
         self.editor = SwaggerEditor(self.original_swagger)
@@ -165,14 +168,6 @@ class TestSwaggerEditor_add_path(TestCase):
 
         self.assertTrue(self.editor.has_path(path, method), "must add for " + case)
         self.assertEqual(self.editor.swagger["paths"][path][method], {})
-
-    def test_must_raise_non_dict_path_values(self):
-
-        path = "/badpath"
-        method = "get"
-
-        with self.assertRaises(InvalidDocumentException):
-            self.editor.add_path(path, method)
 
     def test_must_skip_existing_path(self):
         """
@@ -296,14 +291,14 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
 class TestSwaggerEditor_iter_on_path(TestCase):
     def setUp(self):
 
-        self.original_swagger = {"swagger": "2.0", "paths": {"/foo": {}, "/bar": {}, "/baz": "some value"}}
+        self.original_swagger = {"swagger": "2.0", "paths": {"/foo": {}, "/bar": {}}}
 
         self.editor = SwaggerEditor(self.original_swagger)
 
     def test_must_iterate_on_paths(self):
 
-        expected = {"/foo", "/bar", "/baz"}
-        actual = set([path for path in self.editor.iter_on_path()])
+        expected = {"/foo", "/bar"}
+        actual = set(list(self.editor.iter_on_path()))
 
         self.assertEqual(expected, actual)
 
@@ -313,7 +308,10 @@ class TestSwaggerEditor_add_cors(TestCase):
 
         self.original_swagger = {
             "swagger": "2.0",
-            "paths": {"/foo": {}, "/withoptions": {"options": {"some": "value"}}, "/bad": "some value"},
+            "paths": {
+                "/foo": {},
+                "/withoptions": {"options": {"some": "value"}},
+            },
         }
 
         self.editor = SwaggerEditor(self.original_swagger)
@@ -344,16 +342,10 @@ class TestSwaggerEditor_add_cors(TestCase):
         self.editor.add_cors(path, "origins", "headers", "methods")
         self.assertEqual(expected, self.editor.swagger["paths"][path]["options"])
 
-    def test_must_fail_with_bad_values_for_path(self):
-        path = "/bad"
-
-        with self.assertRaises(InvalidDocumentException):
-            self.editor.add_cors(path, "origins", "headers", "methods")
-
     def test_must_fail_for_invalid_allowed_origin(self):
 
         path = "/foo"
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidTemplateException):
             self.editor.add_cors(path, None, "headers", "methods")
 
     def test_must_work_for_optional_allowed_headers(self):
@@ -703,13 +695,13 @@ class TestSwaggerEditor_add_models(TestCase):
 
         models = {"User": {"properties": {"username": {"type": "string"}}}}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_models(models)
 
     def test_must_fail_without_properties_in_model(self):
         models = {"User": {"type": "object"}}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_models(models)
 
 
@@ -832,14 +824,132 @@ class TestSwaggerEditor_add_request_model_to_method(TestCase):
         self.assertEqual(expected, editor.swagger["paths"]["/foo"]["get"]["requestBody"])
 
 
+class TestSwaggerEditor_add_request_validator_to_method(TestCase):
+    def setUp(self):
+
+        self.original_swagger = {
+            "swagger": "2.0",
+            "paths": {
+                "/foo": {
+                    "get": {
+                        "x-amazon-apigateway-integration": {"test": "must have integration"},
+                        "parameters": [{"test": "existing parameter"}],
+                    }
+                }
+            },
+        }
+
+        self.editor = SwaggerEditor(self.original_swagger)
+
+    def test_must_add_validator_parameters_to_method_with_validators_true(self):
+
+        self.editor.add_request_validator_to_method("/foo", "get", True, True)
+        expected = {"body-and-params": {"validateRequestBody": True, "validateRequestParameters": True}}
+
+        self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
+        self.assertEqual(
+            "body-and-params", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+
+    def test_must_add_validator_parameters_to_method_with_validators_false(self):
+
+        self.editor.add_request_validator_to_method("/foo", "get", False, False)
+
+        expected = {"no-validation": {"validateRequestBody": False, "validateRequestParameters": False}}
+
+        self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
+        self.assertEqual(
+            "no-validation", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+
+    def test_must_add_validator_parameters_to_method_with_validators_mixing(self):
+
+        self.editor.add_request_validator_to_method("/foo", "get", True, False)
+
+        expected = {"body-only": {"validateRequestBody": True, "validateRequestParameters": False}}
+
+        self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
+        self.assertEqual(
+            "body-only", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+
+    def test_must_add_validator_parameters_to_method_and_not_duplicate(self):
+        self.original_swagger["paths"].update(
+            {
+                "/bar": {
+                    "get": {
+                        "x-amazon-apigateway-integration": {"test": "must have integration"},
+                        "parameters": [{"test": "existing parameter"}],
+                    }
+                },
+                "/foo-bar": {
+                    "get": {
+                        "x-amazon-apigateway-integration": {"test": "must have integration"},
+                        "parameters": [{"test": "existing parameter"}],
+                    }
+                },
+            }
+        )
+
+        editor = SwaggerEditor(self.original_swagger)
+
+        editor.add_request_validator_to_method("/foo", "get", True, True)
+        editor.add_request_validator_to_method("/bar", "get", True, True)
+        editor.add_request_validator_to_method("/foo-bar", "get", True, True)
+
+        expected = {"body-and-params": {"validateRequestBody": True, "validateRequestParameters": True}}
+
+        self.assertEqual(expected, editor.swagger["x-amazon-apigateway-request-validators"])
+        self.assertEqual(
+            "body-and-params", editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+        self.assertEqual(
+            "body-and-params", editor.swagger["paths"]["/bar"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+        self.assertEqual(
+            "body-and-params", editor.swagger["paths"]["/foo-bar"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+
+        self.assertEqual(1, len(editor.swagger["x-amazon-apigateway-request-validators"].keys()))
+
+    @parameterized.expand(
+        [
+            param(True, False, "body-only"),
+            param(True, True, "body-and-params"),
+            param(False, True, "params-only"),
+            param(False, False, "no-validation"),
+        ]
+    )
+    def test_must_return_validator_names(self, validate_body, validate_request, normalized_name):
+        normalized_validator_name_conversion = SwaggerEditor.get_validator_name(validate_body, validate_request)
+        self.assertEqual(normalized_validator_name_conversion, normalized_name)
+
+    def test_must_add_validator_parameters_to_method_with_validators_false_by_default(self):
+
+        self.editor.add_request_validator_to_method("/foo", "get")
+
+        expected = {"no-validation": {"validateRequestBody": False, "validateRequestParameters": False}}
+
+        self.assertEqual(expected, self.editor.swagger["x-amazon-apigateway-request-validators"])
+        self.assertEqual(
+            "no-validation", self.editor.swagger["paths"]["/foo"]["get"]["x-amazon-apigateway-request-validator"]
+        )
+
+
 class TestSwaggerEditor_add_auth(TestCase):
     def setUp(self):
 
         self.original_swagger = {
             "swagger": "2.0",
             "paths": {
-                "/foo": {"get": {_X_INTEGRATION: {"a": "b"}}, "post": {_X_INTEGRATION: {"a": "b"}}},
-                "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
+                "/foo": {
+                    "summary": "a",
+                    "description": "b",
+                    "parameters": {"a": "b"},
+                    "get": {_X_INTEGRATION: {"a": "b"}},
+                    "post": {_X_INTEGRATION: {"a": "b"}},
+                },
+                "/bar": {"summary": "a", "description": "b", "get": {_X_INTEGRATION: {"a": "b"}}},
             },
         }
 
@@ -860,6 +970,8 @@ class TestSwaggerEditor_add_auth(TestCase):
         self.editor.set_path_default_apikey_required(path)
         methods = self.editor.swagger["paths"][path]
         for method in methods:
+            if method in ["summary", "parameters", "description"]:
+                continue
             self.assertEqual(expected, methods[method]["security"])
 
     def test_add_default_apikey_to_all_paths_correctly_handles_method_level_settings(self):
@@ -1038,7 +1150,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
         ## fails
         resourcePolicy = {"AwsAccountWhitelist": ["123456"]}
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1059,7 +1171,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         resourcePolicy = {"AwsAccountBlacklist": ["123456"]}
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1080,7 +1192,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         resourcePolicy = {"IpRangeWhitelist": ["1.2.3.4"]}
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1113,7 +1225,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         resourcePolicy = {"IpRangeBlacklist": ["1.2.3.4"]}
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1142,11 +1254,13 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    def test_must_add_vpc_allow(self):
+    def test_must_add_vpc_allow_string_only(self):
 
-        resourcePolicy = {"SourceVpcWhitelist": ["vpc-123", "vpce-345"]}
+        resourcePolicy = {
+            "SourceVpcWhitelist": ["vpc-123", "vpce-345"],
+        }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1167,7 +1281,12 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
                         {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
                     ],
                     "Effect": "Deny",
-                    "Condition": {"StringNotEquals": {"aws:SourceVpc": ["vpc-123"], "aws:SourceVpce": ["vpce-345"]}},
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:SourceVpc": ["vpc-123"],
+                            "aws:SourceVpce": ["vpce-345"],
+                        }
+                    },
                     "Principal": "*",
                 },
             ],
@@ -1175,11 +1294,25 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
-    def test_must_add_vpc_deny(self):
+    @parameterized.expand(
+        [
+            param("SourceVpcWhitelist"),
+            param("SourceVpcBlacklist"),
+        ]
+    )
+    def test_must_fail_when_vpc_whitelist_is_non_string(self, resource_policy_key):
+        resource_policy = {resource_policy_key: [{"sub": "somevalue"}]}
 
-        resourcePolicy = {"SourceVpcBlacklist": ["vpc-123"]}
+        with self.assertRaises(InvalidDocumentException):
+            self.editor.add_resource_policy(resource_policy, "/foo", "prod")
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+    def test_must_add_vpc_deny_string_only(self):
+
+        resourcePolicy = {
+            "SourceVpcBlacklist": ["vpc-123"],
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
 
         expected = {
             "Version": "2012-10-17",
@@ -1208,6 +1341,159 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
 
         self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
 
+    def test_must_add_vpc_allow_string_and_instrinic(self):
+
+        resourcePolicy = {
+            "SourceVpcWhitelist": ["vpc-123", "vpce-345", "vpc-678"],
+            "IntrinsicVpcWhitelist": ["Mock-Allowlist-A", "Mock-Allowlist-B"],
+            "IntrinsicVpceWhitelist": ["Mock-Allowlist-C"],
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Allow",
+                    "Principal": "*",
+                },
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Deny",
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:SourceVpc": ["vpc-123", "vpc-678", "Mock-Allowlist-A", "Mock-Allowlist-B"],
+                            "aws:SourceVpce": ["vpce-345", "Mock-Allowlist-C"],
+                        }
+                    },
+                    "Principal": "*",
+                },
+            ],
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    def test_must_add_vpc_deny_string_and_intrinsic(self):
+        resourcePolicy = {
+            "SourceVpcBlacklist": ["vpc-123", "vpce-789", "vpce-abc"],
+            "IntrinsicVpceBlacklist": ["Mock-Denylist-A", "Mock-List-1"],
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Allow",
+                    "Principal": "*",
+                },
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Deny",
+                    "Condition": {
+                        "StringEquals": {
+                            "aws:SourceVpc": ["vpc-123"],
+                            "aws:SourceVpce": ["vpce-789", "vpce-abc", "Mock-Denylist-A", "Mock-List-1"],
+                        }
+                    },
+                    "Principal": "*",
+                },
+            ],
+        }
+
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    def test_must_not_add_non_valid_string_list(self):
+
+        resourcePolicy = {
+            "SourceVpcBlacklist": ["non-valid-endpoint-name-a", "non-valid-endpoint-name-b"],
+            "SourceVpcWhitelist": ["non-valid-endpoint-name-1", "non-valid-endpoint-name-2"],
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
+
+        expected = {}
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
+    def test_must_add_vpc_mixed_lists(self):
+
+        resourcePolicy = {
+            "SourceVpcWhitelist": ["vpc-123", "vpc-abc", "vpce-123", "vpce-ghi"],
+            "IntrinsicVpcWhitelist": ["Mock-Allowlist-A", "Mock-Allowlist-B"],
+            "IntrinsicVpceWhitelist": ["Mock-Allowlist-C"],
+            "SourceVpcBlacklist": ["vpc-456", "vpc-def", "vpce-789", "vpce-abc"],
+            "IntrinsicVpcBlacklist": ["Mock-List-1"],
+            "IntrinsicVpceBlacklist": ["Mock-Denylist-A", "Mock-List-1"],
+        }
+
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
+
+        expected = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Allow",
+                    "Principal": "*",
+                },
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Deny",
+                    "Condition": {
+                        "StringEquals": {
+                            "aws:SourceVpc": ["vpc-456", "vpc-def", "Mock-List-1"],
+                            "aws:SourceVpce": ["vpce-789", "vpce-abc", "Mock-Denylist-A", "Mock-List-1"],
+                        },
+                    },
+                    "Principal": "*",
+                },
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": [
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/PUT/foo", {"__Stage__": "prod"}]},
+                        {"Fn::Sub": ["execute-api:/${__Stage__}/GET/foo", {"__Stage__": "prod"}]},
+                    ],
+                    "Effect": "Deny",
+                    "Condition": {
+                        "StringNotEquals": {
+                            "aws:SourceVpc": ["vpc-123", "vpc-abc", "Mock-Allowlist-A", "Mock-Allowlist-B"],
+                            "aws:SourceVpce": ["vpce-123", "vpce-ghi", "Mock-Allowlist-C"],
+                        }
+                    },
+                    "Principal": "*",
+                },
+            ],
+        }
+        self.assertEqual(deep_sort_lists(expected), deep_sort_lists(self.editor.swagger[_X_POLICY]))
+
     def test_must_add_iam_allow_and_custom(self):
         resourcePolicy = {
             "AwsAccountWhitelist": ["123456"],
@@ -1217,7 +1503,7 @@ class TestSwaggerEditor_add_resource_policy(TestCase):
             ],
         }
 
-        self.editor.add_resource_policy(resourcePolicy, "/foo", "123", "prod")
+        self.editor.add_resource_policy(resourcePolicy, "/foo", "prod")
         self.editor.add_custom_statements(resourcePolicy.get("CustomStatements"))
 
         expected = {

@@ -1,0 +1,40 @@
+Parameters:
+  Env:
+    Type: String
+    Default: "prd"
+Resources:
+  testEventBus:
+    Type: 'AWS::Events::EventBus'
+    Properties:
+      Name: test-event-bus
+  testLambdaFn:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: test-Lambda-prd
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs10.x
+      Events:
+        TestEventBridgeRule:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - 'Fn::Sub': 'test-${Env}'
+              detail:
+                values:
+                  status:
+                    - PENDING_REVIEW
+              detail-type:
+                - 'UPDATED'
+            DeadLetterConfig:
+              Type: SQS
+              QueueLogicalId:
+                'Fn::Sub': 'testLambdaFunctionEBRuleDLQ${Env}'

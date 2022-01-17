@@ -1,0 +1,24 @@
+Resources:
+  SomeHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        paths:
+          "/{domain}":
+            any:
+              responses: {}
+          "/{domain/}{id}":
+            any:
+              responses: {}
+        openapi: 3.0.1
+      Auth:
+        Authorizers:
+          OAuth2Authorizer:
+            AuthorizationScopes:
+            - email
+            JwtConfiguration:
+              audience:
+              - randomnumber
+              issuer: https://some/issuer
+            IdentitySource: "$request.headers.Authorization"
+        DefaultAuthorizer: OAuth2Authorizer

@@ -1,0 +1,48 @@
+Resources:
+  MyFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+
+  ExpressLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStandardStateMachineWithLogging
+      Type: EXPRESS
+      DefinitionUri:
+        Bucket: sam-demo-bucket
+        Key: my-state-machine.asl.json
+        Version: 3
+      DefinitionSubstitutions:
+        my_lambda_arn: !GetAtt MyFunction.Arn
+      Logging:
+        Level: FATAL
+        IncludeExecutionData: False
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt ExpressLogGroup.Arn
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource: !GetAtt MyFunction.Arn
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "logs:CreateLogDelivery"
+                - "logs:GetLogDelivery"
+                - "logs:UpdateLogDelivery"
+                - "logs:DeleteLogDelivery"
+                - "logs:ListLogDeliveries"
+                - "logs:PutResourcePolicy"
+                - "logs:DescribeResourcePolicies"
+                - "logs:DescribeLogGroups"
+              Resource:
+                - "*"

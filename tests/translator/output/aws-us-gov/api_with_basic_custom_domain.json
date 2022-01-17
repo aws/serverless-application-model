@@ -61,7 +61,12 @@
           "Types": [
             "EDGE"
           ]
-        }, 
+        },
+        "MutualTlsAuthentication": {
+          "TruststoreUri": "my-api-truststore-uri",
+          "TruststoreVersion": "my-api-truststore-version"
+        },
+        "SecurityPolicy": "TLS_1_2",
         "DomainName": "api-example.com"
       }
     }, 
@@ -210,13 +215,13 @@
         ]
       }
     }, 
-    "MyApiDeploymentdf7be0d48e": {
+    "MyApiDeploymentb34773e43a": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "MyApi"
         }, 
-        "Description": "RestApi deployment id: df7be0d48edfc5455fdd83e8eec35cf2e9956dc5"
+        "Description": "RestApi deployment id: b34773e43ad9a98f27deed4374d3a49449abd947"
       }
     }, 
     "MyApi": {
@@ -288,7 +293,7 @@
           "Types": [
             "REGIONAL"
           ]
-        }, 
+        },
         "RegionalCertificateArn": "another-api-arn", 
         "DomainName": "another-example.com"
       }
@@ -333,7 +338,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentdf7be0d48e"
+          "Ref": "MyApiDeploymentb34773e43a"
         }, 
         "RestApiId": {
           "Ref": "MyApi"

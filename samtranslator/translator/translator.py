@@ -1,5 +1,15 @@
 import copy
+from six import string_types
+
+from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
+from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
+
+from samtranslator.feature_toggle.feature_toggle import (
+    FeatureToggle,
+    FeatureToggleDefaultConfigProvider,
+)
 from samtranslator.model import ResourceTypeResolver, sam_resources
+from samtranslator.model.api.api_generator import SharedApiUsagePlan
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.model.exceptions import (
@@ -16,16 +26,17 @@ from samtranslator.plugins.application.serverless_app_plugin import ServerlessAp
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
-from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForFunctionPlugin
+from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
+from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.eventsources.push import Api
 
 
 class Translator:
-    """Translates SAM templates into CloudFormation templates
-    """
+    """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None):
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -35,6 +46,13 @@ class Translator:
         self.managed_policy_map = managed_policy_map
         self.plugins = plugins
         self.sam_parser = sam_parser
+        self.feature_toggle = None
+        self.boto_session = boto_session
+        self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
+        MetricsMethodWrapperSingleton.set_instance(self.metrics)
+
+        if self.boto_session:
+            ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
     def _get_function_names(self, resource_dict, intrinsics_resolver):
         """
@@ -51,11 +69,8 @@ class Translator:
                     # adds to the function_names dict with key as the api_name and value as the function_name
                     if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
                         rest_api = item.get("Properties").get("RestApiId")
-                        if isinstance(rest_api, dict):
-                            api_name = item.get("Properties").get("RestApiId").get("Ref")
-                        else:
-                            api_name = item.get("Properties").get("RestApiId")
-                        if api_name:
+                        api_name = Api.get_rest_api_id_string(rest_api)
+                        if isinstance(api_name, string_types):
                             resource_dict_copy = copy.deepcopy(resource_dict)
                             function_name = intrinsics_resolver.resolve_parameter_refs(
                                 resource_dict_copy.get("Properties").get("FunctionName")
@@ -66,7 +81,7 @@ class Translator:
                                 )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values):
+    def translate(self, sam_template, parameter_values, feature_toggle=None):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -81,11 +96,16 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
+        self.feature_toggle = (
+            feature_toggle
+            if feature_toggle
+            else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)
+        )
         self.function_names = dict()
         self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
-        sam_parameter_values.add_pseudo_parameter_values()
+        sam_parameter_values.add_pseudo_parameter_values(self.boto_session)
         parameter_values = sam_parameter_values.parameter_values
         # Create & Install plugins
         sam_plugins = prepare_plugins(self.plugins, parameter_values)
@@ -100,6 +120,7 @@ class Translator:
         )
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
+        shared_api_usage_plan = SharedApiUsagePlan()
         document_errors = []
         changed_logical_ids = {}
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
@@ -119,6 +140,7 @@ class Translator:
                     resource_dict, intrinsics_resolver
                 )
                 kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
+                kwargs["shared_api_usage_plan"] = shared_api_usage_plan
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
@@ -145,7 +167,12 @@ class Translator:
                 template["Resources"].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
-                template["Resources"].update(deployment_preference_collection.deployment_group(logical_id).to_dict())
+                try:
+                    template["Resources"].update(
+                        deployment_preference_collection.deployment_group(logical_id).to_dict()
+                    )
+                except InvalidResourceException as e:
+                    document_errors.append(e)
 
         # Run the after-transform plugin target
         try:
@@ -170,10 +197,11 @@ class Translator:
         Returns a list of resources to iterate, order them based on the following order:
 
             1. AWS::Serverless::Function - because API Events need to modify the corresponding Serverless::Api resource.
-            2. AWS::Serverless::Api
-            3. Anything else
+            2. AWS::Serverless::StateMachine - because API Events need to modify the corresponding Serverless::Api resource.
+            3. AWS::Serverless::Api
+            4. Anything else
 
-        This is necessary because a Function resource with API Events will modify the API resource's Swagger JSON.
+        This is necessary because a Function or State Machine resource with API Events will modify the API resource's Swagger JSON.
         Therefore API resource needs to be parsed only after all the Swagger modifications are complete.
 
         :param dict sam_template: SAM template
@@ -182,6 +210,7 @@ class Translator:
         """
 
         functions = []
+        statemachines = []
         apis = []
         others = []
         resources = sam_template["Resources"]
@@ -195,15 +224,17 @@ class Translator:
                 continue
             elif resource["Type"] == "AWS::Serverless::Function":
                 functions.append(data)
+            elif resource["Type"] == "AWS::Serverless::StateMachine":
+                statemachines.append(data)
             elif resource["Type"] == "AWS::Serverless::Api" or resource["Type"] == "AWS::Serverless::HttpApi":
                 apis.append(data)
             else:
                 others.append(data)
 
-        return functions + apis + others
+        return functions + statemachines + apis + others
 
 
-def prepare_plugins(plugins, parameters={}):
+def prepare_plugins(plugins, parameters=None):
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
@@ -213,6 +244,8 @@ def prepare_plugins(plugins, parameters={}):
     :return samtranslator.plugins.SamPlugins: Instance of `SamPlugins`
     """
 
+    if parameters is None:
+        parameters = {}
     required_plugins = [
         DefaultDefinitionBodyPlugin(),
         make_implicit_rest_api_plugin(),
@@ -250,9 +283,9 @@ def make_policy_template_for_function_plugin():
     """
     Constructs an instance of policy templates processing plugin using default policy templates JSON data
 
-    :return plugins.policies.policy_templates_plugin.PolicyTemplatesForFunctionPlugin: Instance of the plugin
+    :return plugins.policies.policy_templates_plugin.PolicyTemplatesForResourcePlugin: Instance of the plugin
     """
 
     policy_templates = PolicyTemplatesProcessor.get_default_policy_templates_json()
     processor = PolicyTemplatesProcessor(policy_templates)
-    return PolicyTemplatesForFunctionPlugin(processor)
+    return PolicyTemplatesForResourcePlugin(processor)

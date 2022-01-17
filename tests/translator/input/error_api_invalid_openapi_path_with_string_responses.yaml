@@ -1,0 +1,15 @@
+Resources:
+  ApiWithInvalidPath:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors: "'*'"
+      OpenApiVersion: 3.0.1
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: test invalid paths Api
+        paths:
+          /foo:
+            options:
+              responses: invalid

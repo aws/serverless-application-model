@@ -38,3 +38,4 @@ Resources:
             RequestParameters:
               - method.request.querystring.type
               - method.request.path.id
+              - method.request.querystring.full.type

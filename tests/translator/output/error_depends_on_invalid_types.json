@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [Function1BucketEvent] is invalid. Invalid type for field 'DependsOn'. Expected a string or list of strings. Resource with id [Function2BucketEvent] is invalid. Invalid type for field 'DependsOn'. Expected a string or list of strings. Resource with id [Function3BucketEvent] is invalid. Invalid type for field 'DependsOn'. Expected a string or list of strings."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 3. Resource with id [Function1BucketEvent] is invalid. Invalid type for field 'DependsOn'. Expected a string or list of strings. Resource with id [Function2BucketEvent] is invalid. Invalid type for field 'DependsOn'. Expected a string or list of strings. Resource with id [Function3BucketEvent] is invalid. Invalid type for field 'DependsOn'. Expected a string or list of strings."
+}

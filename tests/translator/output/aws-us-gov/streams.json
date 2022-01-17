@@ -42,6 +42,27 @@
         }]
       }
     },
+    "MSKFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "streams.zip"
+        },
+        "Handler": "stream.msk_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MSKFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [{
+          "Value": "SAM",
+          "Key": "lambda:createdBy"
+        }]
+      }
+    },
     "DynamoDBFunctionMyDDBStream": {
       "Type": "AWS::Lambda::EventSourceMapping",
       "Properties": {
@@ -100,6 +121,46 @@
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaKinesisExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Value": "SAM",
+            "Key": "lambda:createdBy"
+          }
+        ],
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Action": [
+              "sts:AssumeRole"
+            ],
+            "Effect": "Allow",
+            "Principal": {
+              "Service": [
+                "lambda.amazonaws.com"
+              ]
+            }
+          }]
+        }
+      }
+    },
+    "MSKFunctionMyMSKStream": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "EventSourceArn": "arn:aws:kafka:us-west-2:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2",
+        "FunctionName": {
+          "Ref": "MSKFunction"
+        },
+        "StartingPosition": "LATEST",
+        "Topics": ["Topic1"]
+      }
+    },
+    "MSKFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaMSKExecutionRole"
         ],
         "Tags": [
           {

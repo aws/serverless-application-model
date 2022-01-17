@@ -79,3 +79,20 @@ Resources:
           properties:
             username:
               type: string
+
+  ModelIsNotString:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MissingModelApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model:
+                - NotString

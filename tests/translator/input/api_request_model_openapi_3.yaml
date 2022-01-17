@@ -27,6 +27,18 @@ Resources:
             Path: /iam
             Auth:
               Authorizer: AWS_IAM
+        AnyIam:
+          Type: Api
+          Properties:
+            RequestModel:
+              Model: User
+              Required: true
+            RestApiId:
+              Ref: HtmlApi
+            Method: any
+            Path: /any/iam
+            Auth:
+              Authorizer: AWS_IAM
 
 
   HtmlApi:

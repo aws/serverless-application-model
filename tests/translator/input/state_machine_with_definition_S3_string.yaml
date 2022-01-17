@@ -1,0 +1,23 @@
+Resources:
+  MyFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      ReservedConcurrentExecutions: 100
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: MyStateMachineWithDefinitionInS3
+      Type: STANDARD
+      DefinitionUri: s3://sam-demo-bucket/my-state-machine.asl.json
+      DefinitionSubstitutions:
+        my_lambda_arn: !GetAtt MyFunction.Arn
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource: !GetAtt MyFunction.Arn

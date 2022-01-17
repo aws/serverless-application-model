@@ -3,9 +3,10 @@ import json
 import re
 from six import string_types
 
-from samtranslator.model.intrinsics import ref, is_intrinsic_no_value
-from samtranslator.model.intrinsics import make_conditional, fnSub, is_intrinsic_if
+from samtranslator.model.intrinsics import ref
+from samtranslator.model.intrinsics import make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 
 class SwaggerEditor(object):
@@ -14,6 +15,12 @@ class SwaggerEditor(object):
     cares about. It is built to handle "partial Swagger" ie. Swagger that is incomplete and won't
     pass the Swagger spec. But this is necessary for SAM because it iteratively builds the Swagger starting from an
     empty skeleton.
+
+    NOTE (hawflau): To ensure the same logical ID will be generate in Py3 as in Py2 for AWS::Serverless::Api resource,
+    we have to apply py27hash_fix. For any dictionary that is created within the swagger body, we need to initiate it
+    with Py27Dict() instead of {}. We also need to add keys into the Py27Dict instance one by one, so that the input
+    order could be preserved. This is a must for the purpose of preserving the dict key iteration order, which is
+    essential for generating the same logical ID.
     """
 
     _OPTIONS_METHOD = "options"
@@ -23,9 +30,13 @@ class SwaggerEditor(object):
     _X_APIGW_GATEWAY_RESPONSES = "x-amazon-apigateway-gateway-responses"
     _X_APIGW_POLICY = "x-amazon-apigateway-policy"
     _X_ANY_METHOD = "x-amazon-apigateway-any-method"
+    _X_APIGW_REQUEST_VALIDATORS = "x-amazon-apigateway-request-validators"
+    _X_APIGW_REQUEST_VALIDATOR = "x-amazon-apigateway-request-validator"
+    _X_ENDPOINT_CONFIG = "x-amazon-apigateway-endpoint-configuration"
     _CACHE_KEY_PARAMETERS = "cacheKeyParameters"
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
     _ALL_HTTP_METHODS = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"]
+    _EXCLUDED_PATHS_FIELDS = ["summary", "description", "parameters"]
     _POLICY_TYPE_IAM = "Iam"
     _POLICY_TYPE_IP = "Ip"
     _POLICY_TYPE_VPC = "Vpc"
@@ -44,10 +55,18 @@ class SwaggerEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_definitions = self._doc.get("securityDefinitions", {})
-        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, {})
-        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, {})
-        self.definitions = self._doc.get("definitions", {})
+        self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
+        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
+        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())
+        self.definitions = self._doc.get("definitions", Py27Dict())
+
+        # https://swagger.io/specification/#path-item-object
+        # According to swagger spec,
+        # each path item object must be a dict (even it is empty).
+        # We can do an early path validation on path item objects,
+        # so we don't need to validate wherever we use them.
+        for path in self.iter_on_path():
+            SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -108,6 +127,19 @@ class SwaggerEditor(object):
             return method[self._CONDITIONAL_IF][1:]
         return [method]
 
+    def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):
+        """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG in open api definition as extension
+        Following this guide:
+        https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
+        :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
+        """
+        if not self._doc.get(self._X_ENDPOINT_CONFIG):
+            self._doc[self._X_ENDPOINT_CONFIG] = {}
+
+        DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
+        set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
+        self._doc[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
+
     def has_integration(self, path, method):
         """
         Checks if an API Gateway integration is already present at the given path/method
@@ -135,22 +167,13 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)
 
-        path_dict = self.paths.setdefault(path, {})
-
-        if not isinstance(path_dict, dict):
-            # Either customers has provided us an invalid Swagger, or this class has messed it somehow
-            raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
-                    )
-                ]
-            )
+        path_dict = self.paths.setdefault(path, Py27Dict())
+        SwaggerEditor.validate_path_item_is_dict(path_dict, path)
 
         if self._CONDITIONAL_IF in path_dict:
             path_dict = path_dict[self._CONDITIONAL_IF][1]
 
-        path_dict.setdefault(method, {})
+        path_dict.setdefault(method, Py27Dict())
 
     def add_lambda_integration(
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
@@ -175,14 +198,14 @@ class SwaggerEditor(object):
             integration_uri = make_conditional(condition, integration_uri)
 
         path_dict = self.get_path(path)
-        path_dict[method][self._X_APIGW_INTEGRATION] = {
-            "type": "aws_proxy",
-            "httpMethod": "POST",
-            "uri": integration_uri,
-        }
+        path_dict[method][self._X_APIGW_INTEGRATION] = Py27Dict()
+        # insert key one by one to preserce input order
+        path_dict[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
+        path_dict[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
+        path_dict[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
 
-        method_auth_config = method_auth_config or {}
-        api_auth_config = api_auth_config or {}
+        method_auth_config = method_auth_config or Py27Dict()
+        api_auth_config = api_auth_config or Py27Dict()
         if (
             method_auth_config.get("Authorizer") == "AWS_IAM"
             or api_auth_config.get("DefaultAuthorizer") == "AWS_IAM"
@@ -201,7 +224,69 @@ class SwaggerEditor(object):
                 self.paths[path][method][self._X_APIGW_INTEGRATION]["credentials"] = credentials
 
         # If 'responses' key is *not* present, add it with an empty dict as value
-        path_dict[method].setdefault("responses", {})
+        path_dict[method].setdefault("responses", Py27Dict())
+
+        # If a condition is present, wrap all method contents up into the condition
+        if condition:
+            path_dict[method] = make_conditional(condition, path_dict[method])
+
+    def add_state_machine_integration(
+        self,
+        path,
+        method,
+        integration_uri,
+        credentials,
+        request_templates=None,
+        condition=None,
+    ):
+        """
+        Adds aws APIGW integration to the given path+method.
+
+        :param string path: Path name
+        :param string method: HTTP Method
+        :param string integration_uri: URI for the integration
+        :param string credentials: Credentials for the integration
+        :param dict request_templates: A map of templates that are applied on the request payload.
+        :param bool condition: Condition for the integration
+        """
+
+        method = self._normalize_method_name(method)
+        if self.has_integration(path, method):
+            raise ValueError("Integration already exists on Path={}, Method={}".format(path, method))
+
+        self.add_path(path, method)
+
+        # Wrap the integration_uri in a Condition if one exists on that state machine
+        # This is necessary so CFN doesn't try to resolve the integration reference.
+        if condition:
+            integration_uri = make_conditional(condition, integration_uri)
+
+        path_dict = self.get_path(path)
+
+        # Responses
+        integration_responses = Py27Dict()
+        # insert key one by one to preserce input order
+        integration_responses["200"] = Py27Dict({"statusCode": "200"})
+        integration_responses["400"] = Py27Dict({"statusCode": "400"})
+
+        default_method_responses = Py27Dict()
+        # insert key one by one to preserce input order
+        default_method_responses["200"] = Py27Dict({"description": "OK"})
+        default_method_responses["400"] = Py27Dict({"description": "Bad Request"})
+
+        path_dict[method][self._X_APIGW_INTEGRATION] = Py27Dict()
+        # insert key one by one to preserce input order
+        path_dict[method][self._X_APIGW_INTEGRATION]["type"] = "aws"
+        path_dict[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
+        path_dict[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
+        path_dict[method][self._X_APIGW_INTEGRATION]["responses"] = integration_responses
+        path_dict[method][self._X_APIGW_INTEGRATION]["credentials"] = credentials
+
+        # If 'responses' key is *not* present, add it with an empty dict as value
+        path_dict[method].setdefault("responses", default_method_responses)
+
+        if request_templates:
+            path_dict[method][self._X_APIGW_INTEGRATION].update({"requestTemplates": request_templates})
 
         # If a condition is present, wrap all method contents up into the condition
         if condition:
@@ -263,7 +348,7 @@ class SwaggerEditor(object):
             return
 
         if not allowed_origins:
-            raise ValueError("Invalid input. Value for AllowedOrigins is required")
+            raise InvalidTemplateException("Invalid input. Value for AllowedOrigins is required")
 
         if not allowed_methods:
             # AllowMethods is not given. Let's try to generate the list from the given Swagger.
@@ -282,7 +367,25 @@ class SwaggerEditor(object):
         )
 
     def add_binary_media_types(self, binary_media_types):
-        bmt = json.loads(json.dumps(binary_media_types).replace("~1", "/"))
+        """
+        Args:
+            binary_media_types: list
+        """
+
+        def replace_recursively(bmt):
+            """replaces "~1" with "/" for the input binary_media_types recursively"""
+            if isinstance(bmt, dict):
+                to_return = Py27Dict()
+                for k, v in bmt.items():
+                    to_return[Py27UniStr(k.replace("~1", "/"))] = replace_recursively(v)
+                return to_return
+            if isinstance(bmt, list):
+                return [replace_recursively(item) for item in bmt]
+            if isinstance(bmt, string_types) or isinstance(bmt, Py27UniStr):
+                return Py27UniStr(bmt.replace("~1", "/"))
+            return bmt
+
+        bmt = replace_recursively(binary_media_types)
         self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = bmt
 
     def _options_method_response_for_cors(
@@ -314,15 +417,19 @@ class SwaggerEditor(object):
         ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
         HEADER_RESPONSE = lambda x: "method.response.header." + x
 
-        response_parameters = {
-            # AllowedOrigin is always required
-            HEADER_RESPONSE(ALLOW_ORIGIN): allowed_origins
-        }
+        response_parameters = Py27Dict(
+            {
+                # AllowedOrigin is always required
+                HEADER_RESPONSE(ALLOW_ORIGIN): allowed_origins
+            }
+        )
 
-        response_headers = {
-            # Allow Origin is always required
-            ALLOW_ORIGIN: {"type": "string"}
-        }
+        response_headers = Py27Dict(
+            {
+                # Allow Origin is always required
+                ALLOW_ORIGIN: {"type": "string"}
+            }
+        )
 
         # Optional values. Skip the header if value is empty
         #
@@ -346,23 +453,24 @@ class SwaggerEditor(object):
             response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = "'true'"
             response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
 
-        return {
-            "summary": "CORS support",
-            "consumes": ["application/json"],
-            "produces": ["application/json"],
-            self._X_APIGW_INTEGRATION: {
-                "type": "mock",
-                "requestTemplates": {"application/json": '{\n  "statusCode" : 200\n}\n'},
-                "responses": {
-                    "default": {
-                        "statusCode": "200",
-                        "responseParameters": response_parameters,
-                        "responseTemplates": {"application/json": "{}\n"},
-                    }
-                },
-            },
-            "responses": {"200": {"description": "Default response for CORS method", "headers": response_headers}},
-        }
+        # construct snippet and insert key one by one to preserce input order
+        to_return = Py27Dict()
+        to_return["summary"] = "CORS support"
+        to_return["consumes"] = ["application/json"]
+        to_return["produces"] = ["application/json"]
+        to_return[self._X_APIGW_INTEGRATION] = Py27Dict()
+        to_return[self._X_APIGW_INTEGRATION]["type"] = "mock"
+        to_return[self._X_APIGW_INTEGRATION]["requestTemplates"] = {"application/json": '{\n  "statusCode" : 200\n}\n'}
+        to_return[self._X_APIGW_INTEGRATION]["responses"] = Py27Dict()
+        to_return[self._X_APIGW_INTEGRATION]["responses"]["default"] = Py27Dict()
+        to_return[self._X_APIGW_INTEGRATION]["responses"]["default"]["statusCode"] = "200"
+        to_return[self._X_APIGW_INTEGRATION]["responses"]["default"]["responseParameters"] = response_parameters
+        to_return[self._X_APIGW_INTEGRATION]["responses"]["default"]["responseTemplates"] = {"application/json": "{}\n"}
+        to_return["responses"] = Py27Dict()
+        to_return["responses"]["200"] = Py27Dict()
+        to_return["responses"]["200"]["description"] = "Default response for CORS method"
+        to_return["responses"]["200"]["headers"] = response_headers
+        return to_return
 
     def _make_cors_allowed_methods_for_path(self, path):
         """
@@ -408,7 +516,7 @@ class SwaggerEditor(object):
 
         :param list authorizers: List of Authorizer configurations which get translated to securityDefinitions.
         """
-        self.security_definitions = self.security_definitions or {}
+        self.security_definitions = self.security_definitions or Py27Dict()
 
         for authorizer_name, authorizer in authorizers.items():
             self.security_definitions[authorizer_name] = authorizer.generate_swagger()
@@ -419,16 +527,15 @@ class SwaggerEditor(object):
         Note: this method is idempotent
         """
 
-        aws_iam_security_definition = {
-            "AWS_IAM": {
-                "x-amazon-apigateway-authtype": "awsSigv4",
-                "type": "apiKey",
-                "name": "Authorization",
-                "in": "header",
-            }
-        }
+        # construct aws_iam_security_definition as Py27Dict and insert key one by one to preserce input order
+        aws_iam_security_definition = Py27Dict()
+        aws_iam_security_definition["AWS_IAM"] = Py27Dict()
+        aws_iam_security_definition["AWS_IAM"]["x-amazon-apigateway-authtype"] = "awsSigv4"
+        aws_iam_security_definition["AWS_IAM"]["type"] = "apiKey"
+        aws_iam_security_definition["AWS_IAM"]["name"] = "Authorization"
+        aws_iam_security_definition["AWS_IAM"]["in"] = "header"
 
-        self.security_definitions = self.security_definitions or {}
+        self.security_definitions = self.security_definitions or Py27Dict()
 
         # Only add the security definition if it doesn't exist.  This helps ensure
         # that we minimize changes to the swagger in the case of user defined swagger
@@ -441,9 +548,15 @@ class SwaggerEditor(object):
         Note: this method is idempotent
         """
 
-        api_key_security_definition = {"api_key": {"type": "apiKey", "name": "x-api-key", "in": "header"}}
+        # construct api_key_security_definiton as py27 dict
+        # and insert keys one by one to preserve input order
+        api_key_security_definition = Py27Dict()
+        api_key_security_definition["api_key"] = Py27Dict()
+        api_key_security_definition["api_key"]["type"] = "apiKey"
+        api_key_security_definition["api_key"]["name"] = "x-api-key"
+        api_key_security_definition["api_key"]["in"] = "header"
 
-        self.security_definitions = self.security_definitions or {}
+        self.security_definitions = self.security_definitions or Py27Dict()
 
         # Only add the security definition if it doesn't exist.  This helps ensure
         # that we minimize changes to the swagger in the case of user defined swagger
@@ -470,14 +583,23 @@ class SwaggerEditor(object):
         for method_name, method in self.get_path(path).items():
             normalized_method_name = self._normalize_method_name(method_name)
 
-            # Excluding parameters section
-            if normalized_method_name == "parameters":
+            # Excluding non-method sections
+            if normalized_method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                 continue
             if add_default_auth_to_preflight or normalized_method_name != "options":
-                normalized_method_name = self._normalize_method_name(method_name)
+                SwaggerEditor.validate_is_dict(
+                    method,
+                    'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(method_name, method, path),
+                )
                 # It is possible that the method could have two definitions in a Fn::If block.
-                for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+                for method_definition in self.get_method_contents(method):
 
+                    SwaggerEditor.validate_is_dict(
+                        method_definition,
+                        'Value of "{}" ({}) for path {} is not a valid dictionary.'.format(
+                            method_name, method_definition, path
+                        ),
+                    )
                     # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                     if not self.method_definition_has_integration(method_definition):
                         continue
@@ -493,6 +615,9 @@ class SwaggerEditor(object):
                     # (e.g. sigv4 (AWS_IAM), api_key (API Key/Usage Plans), NONE (marker for ignoring default))
                     # We want to ensure only a single Authorizer security entry exists while keeping everything else
                     for security in existing_security:
+                        SwaggerEditor.validate_is_dict(
+                            security, "{} in Security for path {} is not a valid dictionary.".format(security, path)
+                        )
                         if authorizer_names.isdisjoint(security.keys()):
                             existing_non_authorizer_security.append(security)
                         else:
@@ -523,7 +648,7 @@ class SwaggerEditor(object):
 
                     # No existing Authorizer found; use default
                     else:
-                        security_dict = {}
+                        security_dict = Py27Dict()
                         security_dict[default_authorizer] = self._get_authorization_scopes(
                             api_authorizers, default_authorizer
                         )
@@ -549,14 +674,13 @@ class SwaggerEditor(object):
         :param string path: Path name
         """
 
-        for method_name, _ in self.get_path(path).items():
-            # Excluding parameters section
-            if method_name == "parameters":
+        for method_name, method in self.get_path(path).items():
+            # Excluding non-method sections
+            if method_name in SwaggerEditor._EXCLUDED_PATHS_FIELDS:
                 continue
 
-            normalized_method_name = self._normalize_method_name(method_name)
             # It is possible that the method could have two definitions in a Fn::If block.
-            for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+            for method_definition in self.get_method_contents(method):
 
                 # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                 if not self.method_definition_has_integration(method_definition):
@@ -596,7 +720,7 @@ class SwaggerEditor(object):
 
                 # No existing ApiKey setting found or it's already set to the default
                 else:
-                    security_dict = {}
+                    security_dict = Py27Dict()
                     security_dict["api_key"] = []
                     apikey_security = [security_dict]
 
@@ -627,7 +751,7 @@ class SwaggerEditor(object):
         if method_apikey_required is not None:
             self._set_method_apikey_handling(path, method_name, method_apikey_required)
 
-    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers={}, method_scopes=None):
+    def _set_method_authorizer(self, path, method_name, authorizer_name, authorizers=None, method_scopes=None):
         """
         Adds the authorizer_name to the security block for each method on this path.
         This is used to configure the authorizer for individual functions.
@@ -637,6 +761,8 @@ class SwaggerEditor(object):
         :param string authorizer_name: Name of the authorizer to use. Must be a key in the
             authorizers param.
         """
+        if authorizers is None:
+            authorizers = Py27Dict()
         normalized_method_name = self._normalize_method_name(method_name)
         # It is possible that the method could have two definitions in a Fn::If block.
         for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
@@ -647,7 +773,7 @@ class SwaggerEditor(object):
 
             existing_security = method_definition.get("security", [])
 
-            security_dict = {}
+            security_dict = Py27Dict()
             security_dict[authorizer_name] = []
             authorizer_security = [security_dict]
 
@@ -655,7 +781,7 @@ class SwaggerEditor(object):
             security = existing_security + authorizer_security
 
             if authorizer_name != "NONE" and authorizers:
-                method_auth_scopes = authorizers.get(authorizer_name, {}).get("AuthorizationScopes")
+                method_auth_scopes = authorizers.get(authorizer_name, Py27Dict()).get("AuthorizationScopes")
                 if method_scopes is not None:
                     method_auth_scopes = method_scopes
                 if authorizers.get(authorizer_name) is not None and method_auth_scopes is not None:
@@ -690,7 +816,7 @@ class SwaggerEditor(object):
 
             if apikey_required:
                 # We want to enable apikey required security
-                security_dict = {}
+                security_dict = Py27Dict()
                 security_dict["api_key"] = []
                 apikey_security = [security_dict]
                 self.add_apikey_security_definition()
@@ -698,7 +824,7 @@ class SwaggerEditor(object):
                 # The method explicitly does NOT require apikey and there is an API default
                 # so let's add a marker 'api_key_false' so that we don't incorrectly override
                 # with the api default
-                security_dict = {}
+                security_dict = Py27Dict()
                 security_dict["api_key_false"] = []
                 apikey_security = [security_dict]
 
@@ -707,6 +833,49 @@ class SwaggerEditor(object):
 
             if security != existing_security:
                 method_definition["security"] = security
+
+    def add_request_validator_to_method(self, path, method_name, validate_body=False, validate_parameters=False):
+        """
+        Adds request model body parameter for this path/method.
+
+        :param string path: Path name
+        :param string method_name: Method name
+        :param bool validate_body: Add validator parameter on the body
+        :param bool validate_parameters: Validate request
+        """
+
+        normalized_method_name = self._normalize_method_name(method_name)
+        validator_name = SwaggerEditor.get_validator_name(validate_body, validate_parameters)
+
+        # Creating validator as py27 dict
+        # and insert keys one by one to preserve input order
+        request_validator_definition = Py27Dict()
+        request_validator_definition[validator_name] = Py27Dict()
+        request_validator_definition[validator_name]["validateRequestBody"] = validate_body
+        request_validator_definition[validator_name]["validateRequestParameters"] = validate_parameters
+
+        if not self._doc.get(self._X_APIGW_REQUEST_VALIDATORS):
+            self._doc[self._X_APIGW_REQUEST_VALIDATORS] = Py27Dict()
+
+        if not self._doc[self._X_APIGW_REQUEST_VALIDATORS].get(validator_name):
+            # Adding only if the validator hasn't been defined already
+            self._doc[self._X_APIGW_REQUEST_VALIDATORS].update(request_validator_definition)
+
+        # It is possible that the method could have two definitions in a Fn::If block.
+        for path_method_name, method in self.get_path(path).items():
+            normalized_path_method_name = self._normalize_method_name(path_method_name)
+
+            # Adding it to only given method to the path
+            if normalized_path_method_name == normalized_method_name:
+                for method_definition in self.get_method_contents(method):
+
+                    # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                    if not self.method_definition_has_integration(method_definition):
+                        continue
+
+                    set_validator_to_method = Py27Dict({self._X_APIGW_REQUEST_VALIDATOR: validator_name})
+                    # Setting validator to the given method
+                    method_definition.update(set_validator_to_method)
 
     def add_request_model_to_method(self, path, method_name, request_model):
         """
@@ -731,11 +900,12 @@ class SwaggerEditor(object):
 
                 existing_parameters = method_definition.get("parameters", [])
 
-                parameter = {
-                    "in": "body",
-                    "name": model_name,
-                    "schema": {"$ref": "#/definitions/{}".format(model_name)},
-                }
+                # construct parameter as py27 dict
+                # and insert keys one by one to preserve input order
+                parameter = Py27Dict()
+                parameter["in"] = "body"
+                parameter["name"] = model_name
+                parameter["schema"] = {"$ref": "#/definitions/{}".format(model_name)}
 
                 if model_required is not None:
                     parameter["required"] = model_required
@@ -760,7 +930,7 @@ class SwaggerEditor(object):
 
         :param dict gateway_responses: Dictionary of GatewayResponse configuration which gets translated.
         """
-        self.gateway_responses = self.gateway_responses or {}
+        self.gateway_responses = self.gateway_responses or Py27Dict()
 
         for response_type, response in gateway_responses.items():
             self.gateway_responses[response_type] = response.generate_swagger()
@@ -773,7 +943,7 @@ class SwaggerEditor(object):
         :return:
         """
 
-        self.definitions = self.definitions or {}
+        self.definitions = self.definitions or Py27Dict()
 
         for model_name, schema in models.items():
 
@@ -781,14 +951,14 @@ class SwaggerEditor(object):
             model_properties = schema.get("properties")
 
             if not model_type:
-                raise ValueError("Invalid input. Value for type is required")
+                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'type'.")])
 
             if not model_properties:
-                raise ValueError("Invalid input. Value for properties is required")
+                raise InvalidDocumentException([InvalidTemplateException("'Models' schema is missing 'properties'.")])
 
             self.definitions[model_name.lower()] = schema
 
-    def add_resource_policy(self, resource_policy, path, api_id, stage):
+    def add_resource_policy(self, resource_policy, path, stage):
         """
         Add resource policy definition to Swagger.
 
@@ -797,6 +967,7 @@ class SwaggerEditor(object):
         """
         if resource_policy is None:
             return
+        SwaggerEditor.validate_is_dict(resource_policy, "Resource Policy is not a valid dictionary.")
 
         aws_account_whitelist = resource_policy.get("AwsAccountWhitelist")
         aws_account_blacklist = resource_policy.get("AwsAccountBlacklist")
@@ -805,29 +976,61 @@ class SwaggerEditor(object):
         source_vpc_whitelist = resource_policy.get("SourceVpcWhitelist")
         source_vpc_blacklist = resource_policy.get("SourceVpcBlacklist")
 
+        # Intrinsic's supported in these properties
+        source_vpc_intrinsic_whitelist = resource_policy.get("IntrinsicVpcWhitelist")
+        source_vpce_intrinsic_whitelist = resource_policy.get("IntrinsicVpceWhitelist")
+        source_vpc_intrinsic_blacklist = resource_policy.get("IntrinsicVpcBlacklist")
+        source_vpce_intrinsic_blacklist = resource_policy.get("IntrinsicVpceBlacklist")
+
         if aws_account_whitelist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            resource_list = self._get_method_path_uri_list(path, stage)
             self._add_iam_resource_policy_for_method(aws_account_whitelist, "Allow", resource_list)
 
         if aws_account_blacklist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            resource_list = self._get_method_path_uri_list(path, stage)
             self._add_iam_resource_policy_for_method(aws_account_blacklist, "Deny", resource_list)
 
         if ip_range_whitelist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            resource_list = self._get_method_path_uri_list(path, stage)
             self._add_ip_resource_policy_for_method(ip_range_whitelist, "NotIpAddress", resource_list)
 
         if ip_range_blacklist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
+            resource_list = self._get_method_path_uri_list(path, stage)
             self._add_ip_resource_policy_for_method(ip_range_blacklist, "IpAddress", resource_list)
 
-        if source_vpc_whitelist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(source_vpc_whitelist, "StringNotEquals", resource_list)
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_blacklist):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "SourceVpcBlacklist must be a list of strings. Use IntrinsicVpcBlacklist instead for values that use Intrinsic Functions"
+                    )
+                ]
+            )
 
-        if source_vpc_blacklist is not None:
-            resource_list = self._get_method_path_uri_list(path, api_id, stage)
-            self._add_vpc_resource_policy_for_method(source_vpc_blacklist, "StringEquals", resource_list)
+        # FIXME: check if this requires py27 dict?
+        blacklist_dict = {
+            "StringEndpointList": source_vpc_blacklist,
+            "IntrinsicVpcList": source_vpc_intrinsic_blacklist,
+            "IntrinsicVpceList": source_vpce_intrinsic_blacklist,
+        }
+        resource_list = self._get_method_path_uri_list(path, stage)
+        self._add_vpc_resource_policy_for_method(blacklist_dict, "StringEquals", resource_list)
+
+        if not SwaggerEditor._validate_list_property_is_resolved(source_vpc_whitelist):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "SourceVpcWhitelist must be a list of strings. Use IntrinsicVpcWhitelist instead for values that use Intrinsic Functions"
+                    )
+                ]
+            )
+
+        whitelist_dict = {
+            "StringEndpointList": source_vpc_whitelist,
+            "IntrinsicVpcList": source_vpc_intrinsic_whitelist,
+            "IntrinsicVpceList": source_vpce_intrinsic_whitelist,
+        }
+        self._add_vpc_resource_policy_for_method(whitelist_dict, "StringNotEquals", resource_list)
 
         self._doc[self._X_APIGW_POLICY] = self.resource_policy
 
@@ -857,11 +1060,11 @@ class SwaggerEditor(object):
             policy_list = [policy_list]
 
         self.resource_policy["Version"] = "2012-10-17"
-        policy_statement = {}
+        policy_statement = Py27Dict()
         policy_statement["Effect"] = effect
         policy_statement["Action"] = "execute-api:Invoke"
         policy_statement["Resource"] = resource_list
-        policy_statement["Principal"] = {"AWS": policy_list}
+        policy_statement["Principal"] = Py27Dict({"AWS": policy_list})
 
         if self.resource_policy.get("Statement") is None:
             self.resource_policy["Statement"] = policy_statement
@@ -872,7 +1075,7 @@ class SwaggerEditor(object):
             statement.extend([policy_statement])
             self.resource_policy["Statement"] = statement
 
-    def _get_method_path_uri_list(self, path, api_id, stage):
+    def _get_method_path_uri_list(self, path, stage):
         """
         It turns out that APIGW doesn't like trailing slashes in paths (#665)
         and removes as a part of their behavior, but this isn't documented.
@@ -886,6 +1089,9 @@ class SwaggerEditor(object):
         for m in methods:
             method = "*" if (m.lower() == self._X_ANY_METHOD or m.lower() == "any") else m.upper()
             resource = "execute-api:/${__Stage__}/" + method + path
+            resource = (
+                Py27UniStr(resource) if isinstance(method, Py27UniStr) or isinstance(path, Py27UniStr) else resource
+            )
             resource = fnSub(resource, {"__Stage__": stage})
             uri_list.extend([resource])
         return uri_list
@@ -906,13 +1112,13 @@ class SwaggerEditor(object):
             raise ValueError("Conditional must be one of {}".format(["IpAddress", "NotIpAddress"]))
 
         self.resource_policy["Version"] = "2012-10-17"
-        allow_statement = {}
+        allow_statement = Py27Dict()
         allow_statement["Effect"] = "Allow"
         allow_statement["Action"] = "execute-api:Invoke"
         allow_statement["Resource"] = resource_list
         allow_statement["Principal"] = "*"
 
-        deny_statement = {}
+        deny_statement = Py27Dict()
         deny_statement["Effect"] = "Deny"
         deny_statement["Action"] = "execute-api:Invoke"
         deny_statement["Resource"] = resource_list
@@ -931,41 +1137,52 @@ class SwaggerEditor(object):
                 statement.extend([deny_statement])
             self.resource_policy["Statement"] = statement
 
-    def _add_vpc_resource_policy_for_method(self, endpoint_list, conditional, resource_list):
+    def _add_vpc_resource_policy_for_method(self, endpoint_dict, conditional, resource_list):
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
         :raises ValueError: If the conditional passed in does not match the allowed values.
         """
-        if not endpoint_list:
-            return
 
         if conditional not in ["StringNotEquals", "StringEquals"]:
             raise ValueError("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))
 
-        vpce_regex = r"^vpce-"
-        vpc_regex = r"^vpc-"
-        vpc_list = []
-        vpce_list = []
-        for endpoint in endpoint_list:
-            if re.match(vpce_regex, endpoint):
-                vpce_list.append(endpoint)
-            if re.match(vpc_regex, endpoint):
-                vpc_list.append(endpoint)
+        condition = Py27Dict()
+        string_endpoint_list = endpoint_dict.get("StringEndpointList")
+        intrinsic_vpc_endpoint_list = endpoint_dict.get("IntrinsicVpcList")
+        intrinsic_vpce_endpoint_list = endpoint_dict.get("IntrinsicVpceList")
 
-        condition = {}
-        if vpc_list:
-            condition["aws:SourceVpc"] = vpc_list
-        if vpce_list:
-            condition["aws:SourceVpce"] = vpce_list
+        if string_endpoint_list is not None:
+            vpce_regex = r"^vpce-"
+            vpc_regex = r"^vpc-"
+            vpc_list = []
+            vpce_list = []
+            for endpoint in string_endpoint_list:
+                if re.match(vpce_regex, endpoint):
+                    vpce_list.append(endpoint)
+                if re.match(vpc_regex, endpoint):
+                    vpc_list.append(endpoint)
+            if vpc_list:
+                condition.setdefault("aws:SourceVpc", []).extend(vpc_list)
+            if vpce_list:
+                condition.setdefault("aws:SourceVpce", []).extend(vpce_list)
+        if intrinsic_vpc_endpoint_list is not None:
+            condition.setdefault("aws:SourceVpc", []).extend(intrinsic_vpc_endpoint_list)
+        if intrinsic_vpce_endpoint_list is not None:
+            condition.setdefault("aws:SourceVpce", []).extend(intrinsic_vpce_endpoint_list)
+
+        # Skip writing to transformed template if both vpc and vpce endpoint lists are empty
+        if (not condition.get("aws:SourceVpc", [])) and (not condition.get("aws:SourceVpce", [])):
+            return
+
         self.resource_policy["Version"] = "2012-10-17"
-        allow_statement = {}
+        allow_statement = Py27Dict()
         allow_statement["Effect"] = "Allow"
         allow_statement["Action"] = "execute-api:Invoke"
         allow_statement["Resource"] = resource_list
         allow_statement["Principal"] = "*"
 
-        deny_statement = {}
+        deny_statement = Py27Dict()
         deny_statement["Effect"] = "Deny"
         deny_statement["Action"] = "execute-api:Invoke"
         deny_statement["Resource"] = resource_list
@@ -1028,12 +1245,19 @@ class SwaggerEditor(object):
 
                 parameter_name = request_parameter["Name"]
                 location_name = parameter_name.replace("method.request.", "")
-                location, name = location_name.split(".")
+
+                location, name = location_name.split(".", 1)
 
                 if location == "querystring":
                     location = "query"
 
-                parameter = {"in": location, "name": name, "required": request_parameter["Required"], "type": "string"}
+                # create parameter as py27 dict
+                # and insert keys one by one to preserve input orders
+                parameter = Py27Dict()
+                parameter["in"] = location
+                parameter["name"] = name
+                parameter["required"] = request_parameter["Required"]
+                parameter["type"] = "string"
 
                 existing_parameters.append(parameter)
 
@@ -1055,7 +1279,10 @@ class SwaggerEditor(object):
         """
 
         # Make sure any changes to the paths are reflected back in output
-        self._doc["paths"] = self.paths
+        # iterate keys to make sure if "paths" is of Py27UniStr type, it won't be overriden as str
+        for key in self._doc.keys():
+            if key == "paths":
+                self._doc[key] = self.paths
 
         if self.security_definitions:
             self._doc["securityDefinitions"] = self.security_definitions
@@ -1085,13 +1312,44 @@ class SwaggerEditor(object):
         return False
 
     @staticmethod
+    def validate_is_dict(obj, exception_message):
+        """
+        Throws exception if obj is not a dict
+
+        :param obj: object being validated
+        :param exception_message: message to include in exception if obj is not a dict
+        """
+
+        if not isinstance(obj, dict):
+            raise InvalidDocumentException([InvalidTemplateException(exception_message)])
+
+    @staticmethod
+    def validate_path_item_is_dict(path_item, path):
+        """
+        Throws exception if path_item is not a dict
+
+        :param path_item: path_item (value at the path) being validated
+        :param path: path name
+        """
+
+        SwaggerEditor.validate_is_dict(
+            path_item, "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
+        )
+
+    @staticmethod
     def gen_skeleton():
         """
         Method to make an empty swagger file, with just some basic structure. Just enough to pass validator.
 
         :return dict: Dictionary of a skeleton swagger document
         """
-        return {"swagger": "2.0", "info": {"version": "1.0", "title": ref("AWS::StackName")}, "paths": {}}
+        skeleton = Py27Dict()
+        skeleton["swagger"] = "2.0"
+        skeleton["info"] = Py27Dict()
+        skeleton["info"]["version"] = "1.0"
+        skeleton["info"]["title"] = ref("AWS::StackName")
+        skeleton["paths"] = Py27Dict()
+        return skeleton
 
     @staticmethod
     def _get_authorization_scopes(authorizers, default_authorizer):
@@ -1144,4 +1402,42 @@ class SwaggerEditor(object):
 
     @staticmethod
     def get_path_without_trailing_slash(path):
-        return re.sub(r"{([a-zA-Z0-9._-]+|proxy\+)}", "*", path)
+        # convert greedy paths to such as {greedy+}, {proxy+} to "*"
+        sub = re.sub(r"{([a-zA-Z0-9._-]+|[a-zA-Z0-9._-]+\+|proxy\+)}", "*", path)
+        if isinstance(path, Py27UniStr):
+            return Py27UniStr(sub)
+        return sub
+
+    @staticmethod
+    def get_validator_name(validate_body, validate_parameters):
+        """
+        Get a readable path name to use as validator name
+
+        :param boolean validate_body: Boolean if validate body
+        :param boolean validate_request: Boolean if validate request
+        :return string: Normalized validator name
+        """
+        if validate_body and validate_parameters:
+            return "body-and-params"
+
+        if validate_body and not validate_parameters:
+            return "body-only"
+
+        if not validate_body and validate_parameters:
+            return "params-only"
+
+        return "no-validation"
+
+    @staticmethod
+    def _validate_list_property_is_resolved(property_list):
+        """
+        Validate if the values of a Property List are all of type string
+
+        :param property_list: Value of a Property List
+        :return bool: True if the property_list is all of type string otherwise False
+        """
+
+        if property_list is not None and not all(isinstance(x, string_types) for x in property_list):
+            return False
+
+        return True

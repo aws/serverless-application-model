@@ -1,0 +1,12 @@
+Resources:
+  ApiWithInvalidPath:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      OpenApiVersion: 3.0.1
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: test invalid paths Api
+        paths:
+          /foo: invalid

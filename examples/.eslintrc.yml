@@ -1,3 +1,0 @@
-extends: standard
-rules:
-  prefer-promise-reject-errors: off # API Gateway expects string response from Lamdba (when using async + Promise.reject)

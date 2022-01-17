@@ -1,0 +1,21 @@
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        openapi: "3.0.1"
+        paths:
+          "/foo": {}
+      Description: my description
+
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.7
+      Handler: index.handler
+      CodeUri: s3://bucket/key
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: HttpApi

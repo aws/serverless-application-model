@@ -1,4 +1,10 @@
 Parameters:
+  CompatibleArchitecturesList:
+    Type: CommaDelimitedList
+    Default: arm64,x86_64
+  CompatibleArchitecturesRef:
+    Type: String
+    Default: 'arm64'
   LayerNameParam:
     Type: String
     Default: SomeLayerName
@@ -7,6 +13,9 @@ Parameters:
     Default: MIT-0 License
   LayerRuntimeList:
     Type: CommaDelimitedList
+  LayerRuntimeRefString:
+    Type: String
+    Default: SomeRuntimeName
 
 Resources:
   LayerWithLicenseIntrinsic:
@@ -21,6 +30,21 @@ Resources:
       ContentUri: s3://sam-demo-bucket/layer.zip
       CompatibleRuntimes:
         Ref: LayerRuntimeList
+
+  LayerWithSingleListRefRuntimesIntrinsic:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      CompatibleRuntimes:
+        - Ref: LayerRuntimeRefString
+
+  LayerWithMixedListRefRuntimesIntrinsic:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      CompatibleRuntimes:
+        - Ref: LayerRuntimeString
+        - 'SomeRuntimeNameString'
 
   LayerWithNameIntrinsic:
     Type: AWS::Serverless::LayerVersion
@@ -45,4 +69,18 @@ Resources:
     Properties:
       ContentUri: s3://sam-demo-bucket/layer.zip
       LayerName: !Sub 'layer-${AWS::Region}'
+
+  LayerWithArchitecturesIntrinsic:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      CompatibleArchitectures:
+        Ref: CompatibleArchitecturesList
+
+  LayerWithSingleListRefArchitecturesIntrinsic:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      CompatibleArchitectures:
+        - Ref: CompatibleArchitecturesRef
 

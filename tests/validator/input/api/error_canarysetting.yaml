@@ -1,0 +1,113 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # CanarySetting is empty
+  ApiCanarySettingEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+
+  # CanarySetting is not an object
+  ApiCanarySettingNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting: 3
+
+  # DeploymentId is empty
+  ApiDeploymentIdEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        DeploymentId:
+
+  # DeploymentId is not a string
+  ApiDeploymentIdNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        DeploymentId: 3
+
+  # PercentTraffic empty
+  ApiPercentTrafficEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        PercentTraffic:
+
+  # PercentTraffic value is not a number
+  ApiPercentTrafficNotNumber:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        PercentTraffic: "3.5"
+
+  # PercentTraffic value is too high
+  ApiPercentTrafficTooHigh:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        PercentTraffic: 101
+
+  # PercentTraffic value is too low
+  ApiPercentTrafficTooLow:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        PercentTraffic: -1
+
+  # StageVariableOverrides is empty
+  ApiStageVariableOverridesEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        StageVariableOverrides:
+
+  # StageVariableOverrides item is empty
+  ApiStageVariableOverridesItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        StageVariableOverrides:
+          MyOverride:
+
+  # StageVariableOverrides item is not a string
+  ApiStageVariableOverridesItemNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        StageVariableOverrides:
+          MyOverride: 3
+
+  # StageVariableOverrides is not an object
+  ApiStageVariableOverridesNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        StageVariableOverrides: "My override"
+
+  # UseStageCache is empty
+  ApiUseStageCacheEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        UseStageCache:
+
+  # UseStageCache is not a boolean
+  ApiUseStageCacheNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage name
+      CanarySetting:
+        UseStageCache: "true"

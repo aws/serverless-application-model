@@ -7,10 +7,11 @@ class LambdaFunction(Resource):
     resource_type = "AWS::Lambda::Function"
     property_types = {
         "Code": PropertyType(True, is_type(dict)),
+        "PackageType": PropertyType(False, is_str()),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "FunctionName": PropertyType(False, is_str()),
-        "Handler": PropertyType(True, is_str()),
+        "Handler": PropertyType(False, is_str()),
         "MemorySize": PropertyType(False, is_type(int)),
         "Role": PropertyType(False, is_str()),
         "Runtime": PropertyType(False, is_str()),
@@ -22,6 +23,10 @@ class LambdaFunction(Resource):
         "KmsKeyArn": PropertyType(False, one_of(is_type(dict), is_str())),
         "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "ReservedConcurrentExecutions": PropertyType(False, any_type()),
+        "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
+        "CodeSigningConfigArn": PropertyType(False, is_str()),
+        "ImageConfig": PropertyType(False, is_type(dict)),
+        "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
@@ -59,7 +64,7 @@ class LambdaEventSourceMapping(Resource):
     property_types = {
         "BatchSize": PropertyType(False, is_type(int)),
         "Enabled": PropertyType(False, is_type(bool)),
-        "EventSourceArn": PropertyType(True, is_str()),
+        "EventSourceArn": PropertyType(False, is_str()),
         "FunctionName": PropertyType(True, is_str()),
         "MaximumBatchingWindowInSeconds": PropertyType(False, is_type(int)),
         "MaximumRetryAttempts": PropertyType(False, is_type(int)),
@@ -68,6 +73,13 @@ class LambdaEventSourceMapping(Resource):
         "DestinationConfig": PropertyType(False, is_type(dict)),
         "ParallelizationFactor": PropertyType(False, is_type(int)),
         "StartingPosition": PropertyType(False, is_str()),
+        "Topics": PropertyType(False, is_type(list)),
+        "Queues": PropertyType(False, is_type(list)),
+        "SourceAccessConfigurations": PropertyType(False, is_type(list)),
+        "TumblingWindowInSeconds": PropertyType(False, is_type(int)),
+        "FunctionResponseTypes": PropertyType(False, is_type(list)),
+        "SelfManagedEventSource": PropertyType(False, is_type(dict)),
+        "FilterCriteria": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}
@@ -97,15 +109,15 @@ class LambdaEventInvokeConfig(Resource):
 
 
 class LambdaLayerVersion(Resource):
-    """ Lambda layer version resource
-    """
+    """Lambda layer version resource"""
 
     resource_type = "AWS::Lambda::LayerVersion"
     property_types = {
         "Content": PropertyType(True, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "LayerName": PropertyType(False, is_str()),
-        "CompatibleRuntimes": PropertyType(False, list_of(is_str())),
+        "CompatibleArchitectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "LicenseInfo": PropertyType(False, is_str()),
     }
 

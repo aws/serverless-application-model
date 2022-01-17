@@ -1,0 +1,31 @@
+name: "Pull Request Labeler"
+on:
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  apply-internal-external-label:
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const maintainers = ['jfuss', 'c2tarun', 'hoffa', 'awood45', 'CoshUS', 'aahung', 'hawflau', 'mndeveci', 'ssenchenko', 'wchengru', 'mingkun2020', 'qingchm', 'moelasmar', 'xazhao', 'mildaniel', 'marekaiv', 'torresxb1']
+            if (maintainers.includes(context.payload.sender.login)) {
+              github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['pr/internal']
+              })
+            } else {
+              github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['pr/external']
+              })
+            }

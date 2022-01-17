@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [['TruststoreUri', 'TruststoreVersion']] is invalid. MutualTlsAuthentication must contains one of the following fields ['TruststoreUri', 'TruststoreVersion']."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [['TruststoreUri', 'TruststoreVersion']] is invalid. MutualTlsAuthentication must be a map with at least one of the following fields ['TruststoreUri', 'TruststoreVersion']."
+}

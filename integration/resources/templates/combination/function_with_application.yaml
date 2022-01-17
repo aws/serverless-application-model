@@ -1,0 +1,33 @@
+Conditions:
+  TrueCondition:
+    Fn::Equals:
+      - true
+      - true
+  FalseCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MyLambdaFunctionWithApplication:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Fn::GetAtt: ["MyNestedApp", "Outputs.TableName"]
+
+  MyNestedApp:
+    Type: AWS::Serverless::Application
+    Condition: TrueCondition
+    Properties:
+      Location: ${templateurl}
+
+  MyNestedAppFalseCondition:
+    Type: AWS::Serverless::Application
+    Condition: FalseCondition
+    Properties:
+      Location: ${templateurl}

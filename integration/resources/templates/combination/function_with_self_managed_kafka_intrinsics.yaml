@@ -1,0 +1,37 @@
+Parameters:
+  TopicsValue:
+    Type: CommaDelimitedList
+    Default: Topic
+
+  KafkaBootstrapServersValue:
+    Type: String
+    Default: abc.xyz.com:9092
+
+Resources:
+  KafkaFunctionWithIntrinsics:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      Events:
+        MyKafkaClusterWithIntrinsics:
+          Type: SelfManagedKafka
+          Properties:
+            KafkaBootstrapServers:
+              - Ref: KafkaBootstrapServersValue
+            Topics:
+              Ref: TopicsValue
+            SourceAccessConfigurations:
+              - Type: BASIC_AUTH
+                URI:
+                  Ref: KafkaUserSecret
+
+  KafkaUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: KafkaUserPassword
+      SecretString:
+        Fn::Sub: '{"username":"testBrokerUserWithInstrinsic","password":"testBrokerPasswordWithInstrinsic"}'
+

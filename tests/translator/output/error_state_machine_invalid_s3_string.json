@@ -1,0 +1,9 @@
+{
+    "errors": [
+      {
+        "errorMessage": "Resource with id [StateMachine] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form 's3://bucket/key' with optional versionId query parameter."
+      }
+    ],
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [StateMachine] is invalid. 'DefinitionUri' is not a valid S3 Uri of the form 's3://bucket/key' with optional versionId query parameter."
+}
+  

@@ -1,0 +1,33 @@
+Resources:
+
+  # Create one API resource. This will be referred to by the Lambda function
+  ExistingRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: "Dev"
+      DefinitionUri: ${definitionuri}
+
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        GetApi:
+          Type: Api
+          Properties:
+            Path: /pathget
+            Method: get
+            RestApiId:
+              Ref: ExistingRestApi
+
+        PostApi:
+          Type: Api
+          Properties:
+            Path: /pathpost
+            Method: post
+            RestApiId:
+              Ref: ExistingRestApi

@@ -59,7 +59,6 @@
     }, 
     "CustomWithFindInMapVersion640128d35d": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
@@ -205,7 +204,6 @@
     }, 
     "CustomWithConditionVersion640128d35d": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
@@ -244,7 +242,6 @@
     }, 
     "CustomWithCondition2Version640128d35d": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
@@ -306,7 +303,6 @@
     }, 
     "NormalWithRefVersion640128d35d": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
@@ -433,7 +429,6 @@
     }, 
     "CustomWithSubVersion640128d35d": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
@@ -596,7 +591,6 @@
     }, 
     "NormalWithSubVersion640128d35d": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
@@ -819,7 +813,6 @@
     }, 
     "MinimalFunctionVersion640128d35d": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {

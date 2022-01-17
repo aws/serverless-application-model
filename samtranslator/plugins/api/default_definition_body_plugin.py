@@ -1,3 +1,4 @@
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.plugins import BasePlugin
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
@@ -20,6 +21,7 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
 
         super(DefaultDefinitionBodyPlugin, self).__init__(DefaultDefinitionBodyPlugin.__name__)
 
+    @cw_timer(prefix="Plugin-DefaultDefinitionBody")
     def on_before_transform_template(self, template_dict):
         """
         Hook method that gets called before the SAM template is processed.
@@ -31,7 +33,7 @@ class DefaultDefinitionBodyPlugin(BasePlugin):
         template = SamTemplate(template_dict)
 
         for api_type in [SamResourceType.Api.value, SamResourceType.HttpApi.value]:
-            for logicalId, api in template.iterate(api_type):
+            for logicalId, api in template.iterate({api_type}):
                 if api.properties.get("DefinitionBody") or api.properties.get("DefinitionUri"):
                     continue
 

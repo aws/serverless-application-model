@@ -1,0 +1,28 @@
+Parameters:
+    Runtimes:
+        Type: CommaDelimitedList
+        Default: nodejs12.x,nodejs10.x
+    LayerName:
+        Type: String
+        Default: MyNamedLayerVersion
+    
+
+Resources:
+    MyLayerVersion:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            ContentUri: ${contenturi}
+            LayerName:
+                Ref: LayerName
+            CompatibleRuntimes:
+                Ref: Runtimes
+            CompatibleArchitectures: [x86_64, arm64]
+
+Outputs:
+    MyLayerArn:
+        Value:
+            Ref: MyLayerVersion
+    LayerName:
+        Value:
+            Ref: LayerName
+            

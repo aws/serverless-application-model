@@ -43,7 +43,9 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         self.api_id_property = "ApiId"
         self.editor = OpenApiEditor
 
-    def _process_api_events(self, function, api_events, template, condition=None):
+    def _process_api_events(
+        self, function, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
+    ):
         """
         Actually process given HTTP API events. Iteratively adds the APIs to OpenApi JSON in the respective
         AWS::Serverless::HttpApi resource from the template
@@ -57,6 +59,13 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         for logicalId, event in api_events.items():
             # api_events only contains HttpApi events
             event_properties = event.get("Properties", {})
+
+            if event_properties and not isinstance(event_properties, dict):
+                raise InvalidEventException(
+                    logicalId,
+                    "Event 'Properties' must be an Object. If you're using YAML, this may be an indentation issue.",
+                )
+
             if not event_properties:
                 event["Properties"] = event_properties
             self._add_implicit_api_id_if_necessary(event_properties)
@@ -78,15 +87,21 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
                 key = "Path" if not isinstance(path, six.string_types) else "Method"
                 raise InvalidEventException(logicalId, "Api Event must have a String specified for '{}'.".format(key))
 
-            # !Ref is resolved by this time. If it is still a dict, we can't parse/use this Api.
-            if isinstance(api_id, dict):
-                raise InvalidEventException(logicalId, "Api Event must reference an Api in the same template.")
+            # !Ref is resolved by this time. If it is not a string, we can't parse/use this Api.
+            if api_id and not isinstance(api_id, six.string_types):
+                raise InvalidEventException(
+                    logicalId, "Api Event's ApiId must be a string referencing an Api in the same template."
+                )
 
-            api_dict = self.api_conditions.setdefault(api_id, {})
-            method_conditions = api_dict.setdefault(path, {})
+            api_dict_condition = self.api_conditions.setdefault(api_id, {})
+            method_conditions = api_dict_condition.setdefault(path, {})
+            method_conditions[method] = condition
 
-            if condition:
-                method_conditions[method] = condition
+            api_dict_deletion = self.api_deletion_policies.setdefault(api_id, set())
+            api_dict_deletion.add(deletion_policy)
+
+            api_dict_update_replace = self.api_update_replace_policies.setdefault(api_id, set())
+            api_dict_update_replace.add(update_replace_policy)
 
             self._add_api_to_swagger(logicalId, event_properties, template)
             if "RouteSettings" in event_properties:

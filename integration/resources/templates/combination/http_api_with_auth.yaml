@@ -1,0 +1,81 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.7
+      InlineCode: |
+        def handler(event, context):
+            return {'body': 'Hello World!', 'statusCode': 200}
+      MemorySize: 128
+      Events:
+        GetApi:
+          Type: HttpApi
+          Properties:
+            Auth:
+              Authorizer: MyOAuth2Auth
+            ApiId: 
+              Ref: MyApi
+            Method: GET
+            Path: /get
+        PostApi:
+          Type: HttpApi
+          Properties:
+            Auth:
+              Authorizer: MyLambdaAuth
+            ApiId: 
+              Ref: MyApi
+            Method: POST
+            Path: /post
+        DefaultApi:
+          Type: HttpApi
+          Properties:
+            ApiId: 
+              Ref: MyApi
+            Method: DEFAULT
+            Path: /default/post
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        print("hello")
+      Handler: index.handler
+      Runtime: nodejs12.x
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
+      Auth:
+        Authorizers:
+          MyLambdaAuth:
+            FunctionArn: 
+              Fn::GetAtt:
+                - MyAuthFn
+                - Arn
+            FunctionInvokeRole:
+              Fn::GetAtt:
+                - MyAuthFnRole
+                - Arn
+            Identity:
+              Context:
+                - contextVar
+              Headers:
+                - Authorization
+              QueryStrings:
+                - petId
+              StageVariables:
+                - stageVar
+              ReauthorizeEvery: 23
+            EnableSimpleResponses: true
+            AuthorizerPayloadFormatVersion: 2.0
+          MyOAuth2Auth:
+            AuthorizationScopes:
+              - scope4
+            JwtConfiguration:
+              issuer: "https://openid-connect.onelogin.com/oidc"
+              audience:
+                - MyApi
+            IdentitySource: "$request.querystring.param"
+        DefaultAuthorizer: MyOAuth2Auth

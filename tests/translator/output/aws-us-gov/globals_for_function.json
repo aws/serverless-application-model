@@ -5,7 +5,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess",
+          "arn:aws-us-gov:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary",
@@ -83,6 +83,7 @@
           }
         ], 
         "ReservedConcurrentExecutions": 100, 
+        "Architectures": ["x86_64"],
         "MemorySize": 512, 
         "Environment": {
           "Variables": {
@@ -107,7 +108,7 @@
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-us-gov:iam::aws:policy/AWSXrayWriteOnlyAccess",
+          "arn:aws-us-gov:iam::aws:policy/AWSXRayDaemonWriteAccess",
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary",
@@ -188,6 +189,7 @@
           }
         ], 
         "ReservedConcurrentExecutions": 50, 
+        "Architectures": ["x86_64"],
         "MemorySize": 1024, 
         "Environment": {
           "Variables": {
@@ -223,7 +225,6 @@
     }, 
     "FunctionWithOverridesVersion096ed3b52b": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
@@ -233,7 +234,6 @@
     }, 
     "MinimalFunctionVersion0a06fc8fb1": {
       "DeletionPolicy": "Retain", 
-      "UpdateReplacePolicy": "Delete",
       "Type": "AWS::Lambda::Version", 
       "Properties": {
         "FunctionName": {
