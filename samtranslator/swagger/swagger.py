@@ -47,6 +47,7 @@ class SwaggerEditor(object):
         modifications on this copy.
 
         :param dict doc: Swagger document as a dictionary
+        :raises InvalidDocumentException if doc is invalid
         """
 
         self._doc = copy.deepcopy(doc)
@@ -1313,7 +1314,7 @@ class SwaggerEditor(object):
         Checks if definition_body is a valid Swagger document
 
         :param dict definition_body: Data to be validated
-        :return: True, if definition_body is a valid Swagger document
+        :raises InvalidDocumentException if definition_body is invalid
         """
 
         SwaggerEditor.validate_is_dict(definition_body, "DefinitionBody must be a dictionary.")
