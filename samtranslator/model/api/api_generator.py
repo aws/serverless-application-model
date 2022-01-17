@@ -999,6 +999,7 @@ class ApiGenerator(object):
         ):
             if definition_body.get("securityDefinitions"):
                 components = definition_body.get("components", Py27Dict())
+                components = components if components else Py27Dict()
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
                 del definition_body["securityDefinitions"]
