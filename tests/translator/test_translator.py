@@ -254,6 +254,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
     @parameterized.expand(
         itertools.product(
             [
+                "congito_userpool_with_sms_configuration",
                 "cognito_userpool_with_event",
                 "s3_with_condition",
                 "function_with_condition",
