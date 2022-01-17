@@ -220,6 +220,15 @@ class TestServerlessAppPlugin_on_before_transform_template_translate(TestCase):
 
         self.assertEqual("value1", output)
 
+    def test_resolve_invalid_mapping(self):
+        self.plugin = ServerlessAppPlugin(parameters={"AWS::Region": "us-east-1"})
+        mappings = {"MapA": {"us-east-1": {"SecondLevelKey1": "value1"}}}
+        input = {"Fn::FindInMap": ["MapA", {"Ref": "AWS::Region"}, "SecondLevelKey2"]}
+        intrinsic_resolvers = self.plugin._get_intrinsic_resolvers(mappings)
+        output = self.plugin._resolve_location_value(input, intrinsic_resolvers)
+
+        self.assertEqual({"Fn::FindInMap": ["MapA", "us-east-1", "SecondLevelKey2"]}, output)
+
 
 class ApplicationResource(object):
     def __init__(self, app_id="app_id", semver="1.3.5"):

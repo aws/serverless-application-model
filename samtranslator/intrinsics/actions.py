@@ -561,9 +561,9 @@ class FindInMapAction(Action):
             return input_dict
 
         if (
-            map_name not in parameters
-            or top_level_key not in parameters[map_name]
-            or second_level_key not in parameters[map_name][top_level_key]
+            not parameters.get(map_name)
+            or not parameters.get(map_name, {}).get(top_level_key)
+            or not parameters.get(map_name, {}).get(top_level_key, {}).get(second_level_key)
         ):
             return input_dict
 
