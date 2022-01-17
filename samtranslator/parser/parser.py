@@ -18,7 +18,7 @@ class Parser:
 
     @staticmethod
     def validate_datatypes(sam_template):
-        """Validates the datatype within the template """
+        """Validates the datatype within the template"""
         if (
             "Resources" not in sam_template
             or not isinstance(sam_template["Resources"], dict)
