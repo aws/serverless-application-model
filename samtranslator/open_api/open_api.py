@@ -455,8 +455,8 @@ class OpenApiEditor(object):
                 raise InvalidDocumentException(
                     [
                         InvalidTemplateException(
-                            "Tags in open api definition needs to be a list. {} is a {} not a list.".format(
-                                self.tags, type(self.tags)
+                            "Tags in OpenApi DefinitionBody needs to be a list. {} is a {} not a list.".format(
+                                self.tags, type(self.tags).__name__
                             )
                         )
                     ]
