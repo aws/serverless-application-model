@@ -458,6 +458,9 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_auth_mechanism_for_self_managed_kafka",
                 "function_with_vpc_permission_for_self_managed_kafka",
                 "function_with_event_filtering",
+                "api_with_security_definition_and_components",
+                "api_with_security_definition_and_none_components",
+                "api_with_security_definition_and_no_components",
             ],
             [
                 ("aws", "ap-southeast-1"),

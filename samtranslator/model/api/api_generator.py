@@ -999,6 +999,10 @@ class ApiGenerator(object):
         ):
             if definition_body.get("securityDefinitions"):
                 components = definition_body.get("components", Py27Dict())
+                # In the previous line, the default value `Py27Dict()` will be only returned only if `components`
+                # property is not in definition_body dict, but if it exist, and its value is None, so None will be
+                # returned and not the default value. That is why the below line is required.
+                components = components if components else Py27Dict()
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
                 del definition_body["securityDefinitions"]
