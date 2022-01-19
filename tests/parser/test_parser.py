@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import patch, Mock, call
+from unittest.mock import patch, Mock, call
 
 from samtranslator.parser.parser import Parser
 from samtranslator.plugins import LifeCycleEvents

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import Mock, MagicMock, patch, call
+from unittest.mock import Mock, MagicMock, patch, call
 
 from samtranslator.plugins import BasePlugin
 from samtranslator.model.resource_policies import PolicyTypes, PolicyEntry

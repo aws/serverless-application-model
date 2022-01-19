@@ -1,7 +1,7 @@
 import copy
 
 from unittest import TestCase
-from mock import patch
+from unittest.mock import patch
 from samtranslator.utils.py27hash_fix import (
     Py27Dict,
     Py27Keys,

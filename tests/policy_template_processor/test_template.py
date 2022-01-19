@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import Mock, patch, ANY
+from unittest.mock import Mock, patch, ANY
 
 from samtranslator.policy_template_processor.template import Template
 from samtranslator.policy_template_processor.exceptions import InvalidParameterValues, InsufficientParameterValues

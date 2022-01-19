@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import mock_open, Mock, patch
+from unittest.mock import mock_open, Mock, patch
 
 import jsonschema
 import json

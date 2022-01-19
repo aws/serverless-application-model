@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import Mock, patch, call
+from unittest.mock import Mock, patch, call
 
 from samtranslator.public.sdk.resource import SamResource, SamResourceType
 from samtranslator.public.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException

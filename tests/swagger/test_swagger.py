@@ -1,7 +1,7 @@
 import copy
 
 from unittest import TestCase
-from mock import Mock
+from unittest.mock import Mock
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
