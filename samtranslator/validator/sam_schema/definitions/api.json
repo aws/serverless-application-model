@@ -38,6 +38,13 @@
               "Auth": {
                 "$ref": "#definitions/AWS::Serverless::Api.Auth"
               },
+              "ApiKeySourceType": {
+                "enum": [
+                  "HEADER",
+                  "AUTHORIZER"
+                ],
+                "type":"string"                                
+              },
               "BinaryMediaTypes": {
                 "items": {
                   "type": [

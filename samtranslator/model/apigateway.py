@@ -24,6 +24,7 @@ class ApiGatewayRestApi(Resource):
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),
         "Mode": PropertyType(False, is_str()),
+        "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
