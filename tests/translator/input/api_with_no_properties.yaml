@@ -1,0 +1,17 @@
+Resources:
+  HtmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: HttpApi
+          Properties:
+            ApiId: HTTPApi
+            Path: /
+            Method: get
+
+  HTTPApi:
+    Type: AWS::Serverless::HttpApi

@@ -1,0 +1,23 @@
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: app.handler
+      Runtime: nodejs14.x
+      Events:
+        CognitoUserPoolPreSignup:
+          Type: Cognito
+          Properties:
+            UserPool:
+              Ref: MyCognitoUserPool
+            Trigger:
+              PreSignUp
+
+  MyCognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: PreSignup
+        SmsConfiguration:
+          SnsCallerArn: !GetAtt UserPoolRole.Arn
+          ExternalId: !Ref ExternalId

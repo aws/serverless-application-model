@@ -1,3 +1,7 @@
+Parameters:
+  ScheduleName:
+    Type: String
+
 Resources:
   MyLambdaFunction:
     Type: AWS::Serverless::Function
@@ -13,25 +17,6 @@ Resources:
               Schedule: 'rate(5 minutes)'
               Input: '{"Hello": "world!"}'
               Name:
-                Fn::Sub:
-                  - TestSchedule${__StackName__}
-                  - __StackName__: 
-                      Fn::Select:
-                        - 3
-                        - Fn::Split:
-                          - "-"
-                          - Ref: AWS::StackName
+                Ref: ScheduleName
               Description: test schedule
               Enabled: True
-Outputs:
-  ScheduleName:
-    Description: "Name of the cw schedule"
-    Value:
-      Fn::Sub:
-        - TestSchedule${__StackName__}
-        - __StackName__: 
-            Fn::Select:
-              - 3
-              - Fn::Split:
-                - "-"
-                - Ref: AWS::StackName

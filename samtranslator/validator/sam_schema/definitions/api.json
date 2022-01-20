@@ -98,6 +98,12 @@
                   "intrinsic"
                 ]
               },
+              "DisableExecuteApiEndpoint": {
+                "type": [
+                  "boolean",
+                  "intrinsic"
+                ]
+              },
               "Domain": {
                 "$ref": "#definitions/AWS::Serverless::Api.DomainConfiguration"
               },
@@ -439,6 +445,12 @@
           "$ref": "#definitions/AWS::Serverless::Api.Route53Configuration"
         },
         "SecurityPolicy": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "OwnershipVerificationCertificateArn": {
           "type": [
             "string",
             "intrinsic"

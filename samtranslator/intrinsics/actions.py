@@ -1,6 +1,7 @@
 import re
 
 from six import string_types
+from samtranslator.utils.py27hash_fix import Py27UniStr
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
 
@@ -375,13 +376,13 @@ class SubAction(Action):
 
         # Find all the pattern, and call the handler to decide how to substitute them.
         # Do the substitution and return the final text
-        return re.sub(
-            ref_pattern,
-            # Pass the handler entire string ${logicalId.property} as first parameter and "logicalId.property"
-            # as second parameter. Return value will be substituted
-            lambda match: handler_method(match.group(0), match.group(1)),
-            text,
-        )
+        # NOTE: in order to make sure Py27UniStr strings won't be converted to plain string,
+        # we need to iterate through each match and do the replacement
+        substituted = text
+        for match in re.finditer(ref_pattern, text):
+            sub_value = handler_method(match.group(0), match.group(1))
+            substituted = substituted.replace(match.group(0), sub_value, 1)
+        return substituted
 
 
 class GetAttAction(Action):
