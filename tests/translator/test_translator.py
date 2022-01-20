@@ -22,7 +22,7 @@ import pytest
 import yaml
 from unittest import TestCase
 from samtranslator.translator.transform import transform
-from mock import Mock, MagicMock, patch
+from unittest.mock import Mock, MagicMock, patch
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"

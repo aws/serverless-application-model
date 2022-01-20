@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import Mock, patch, ANY
+from unittest.mock import Mock, patch, ANY
 
 from samtranslator.metrics.method_decorator import (
     MetricsMethodWrapperSingleton,
