@@ -304,7 +304,7 @@ class ApiGenerator(object):
         https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
         For this reason, we always put DisableExecuteApiEndpoint into openapi object irrespective of origin of DefinitionBody.
         """
-        if self.disable_execute_api_endpoint and not self.definition_body:
+        if self.disable_execute_api_endpoint is not None and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )

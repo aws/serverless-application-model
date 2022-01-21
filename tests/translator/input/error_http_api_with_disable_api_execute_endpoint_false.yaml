@@ -1,0 +1,7 @@
+Resources:
+  ApiGatewayApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      DisableExecuteApiEndpoint: False
+      DefinitionUri: s3://sam-demo-bucket/webpage_swagger.json

@@ -141,7 +141,7 @@ class HttpApiGenerator(object):
         For this reason, we always put DisableExecuteApiEndpoint into openapi object.
 
         """
-        if self.disable_execute_api_endpoint and not self.definition_body:
+        if self.disable_execute_api_endpoint is not None and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
