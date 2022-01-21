@@ -1,5 +1,3 @@
-from six import string_types
-
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
 from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_value
@@ -86,7 +84,7 @@ def construct_role_for_resource(
             #
 
             policy_arn = policy_entry.data
-            if isinstance(policy_entry.data, string_types) and policy_entry.data in managed_policy_map:
+            if isinstance(policy_entry.data, str) and policy_entry.data in managed_policy_map:
                 policy_arn = managed_policy_map[policy_entry.data]
 
             # De-Duplicate managed policy arns before inserting. Mainly useful
