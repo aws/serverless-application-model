@@ -1,8 +1,6 @@
 import logging
 from collections import namedtuple
 
-from six import string_types
-
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
@@ -381,7 +379,7 @@ class ApiGenerator(object):
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
-        stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
+        stage_name_prefix = self.stage_name if isinstance(self.stage_name, str) else ""
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         else:
@@ -481,7 +479,7 @@ class ApiGenerator(object):
             domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
 
         # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
+        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), str):
             basepaths = [self.domain.get("BasePath")]
         elif self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), list):
             basepaths = self.domain.get("BasePath")
@@ -608,7 +606,7 @@ class ApiGenerator(object):
                 self.logical_id, "Cors works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
-        if isinstance(self.cors, string_types) or is_intrinsic(self.cors):
+        if isinstance(self.cors, str) or is_intrinsic(self.cors):
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)
         elif isinstance(self.cors, dict):
@@ -1129,7 +1127,7 @@ class ApiGenerator(object):
         if not default_authorizer:
             return
 
-        if not isinstance(default_authorizer, string_types):
+        if not isinstance(default_authorizer, str):
             raise InvalidResourceException(
                 self.logical_id,
                 "DefaultAuthorizer is not a string.",

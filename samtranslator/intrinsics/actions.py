@@ -1,6 +1,5 @@
 import re
 
-from six import string_types
 from samtranslator.utils.py27hash_fix import Py27UniStr
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
@@ -67,7 +66,7 @@ class Action(object):
         """
         no_result = (None, None)
 
-        if not isinstance(ref_value, string_types):
+        if not isinstance(ref_value, str):
             return no_result
 
         splits = ref_value.split(cls._resource_ref_separator, 1)
@@ -98,7 +97,7 @@ class RefAction(Action):
 
         param_name = input_dict[self.intrinsic_name]
 
-        if not isinstance(param_name, string_types):
+        if not isinstance(param_name, str):
             return input_dict
 
         if param_name in parameters:
@@ -153,7 +152,7 @@ class RefAction(Action):
             return input_dict
 
         ref_value = input_dict[self.intrinsic_name]
-        if not isinstance(ref_value, string_types) or self._resource_ref_separator in ref_value:
+        if not isinstance(ref_value, str) or self._resource_ref_separator in ref_value:
             return input_dict
 
         logical_id = ref_value
@@ -340,11 +339,11 @@ class SubAction(Action):
 
         # Just handle known references within the string to be substituted and return the whole dictionary
         # because that's the best we can do here.
-        if isinstance(sub_value, string_types):
+        if isinstance(sub_value, str):
             # Ex: {Fn::Sub: "some string"}
             sub_value = self._sub_all_refs(sub_value, handler_method)
 
-        elif isinstance(sub_value, list) and len(sub_value) > 0 and isinstance(sub_value[0], string_types):
+        elif isinstance(sub_value, list) and len(sub_value) > 0 and isinstance(sub_value[0], str):
             # Ex: {Fn::Sub: ["some string", {a:b}] }
             sub_value[0] = self._sub_all_refs(sub_value[0], handler_method)
 
@@ -495,7 +494,7 @@ class GetAttAction(Action):
         # If items in value array is not a string, then following join line will fail. So if any element is not a string
         # we just pass along the input to CFN for doing the validation
         for item in value:
-            if not isinstance(item, string_types):
+            if not isinstance(item, str):
                 return False
 
         return True
@@ -553,11 +552,7 @@ class FindInMapAction(Action):
         top_level_key = self.resolve_parameter_refs(value[1], parameters)
         second_level_key = self.resolve_parameter_refs(value[2], parameters)
 
-        if (
-            not isinstance(map_name, string_types)
-            or not isinstance(top_level_key, string_types)
-            or not isinstance(second_level_key, string_types)
-        ):
+        if not isinstance(map_name, str) or not isinstance(top_level_key, str) or not isinstance(second_level_key, str):
             return input_dict
 
         if (

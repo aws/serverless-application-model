@@ -1,5 +1,4 @@
 ﻿""" SAM macro definitions """
-from six import string_types
 import copy
 
 import samtranslator.model.eventsources
@@ -157,7 +156,7 @@ class SamFunction(SamResourceMacro):
             code_sha256 = None
             if self.AutoPublishCodeSha256:
                 code_sha256 = intrinsics_resolver.resolve_parameter_refs(self.AutoPublishCodeSha256)
-                if not isinstance(code_sha256, string_types):
+                if not isinstance(code_sha256, str):
                     raise InvalidResourceException(
                         self.logical_id,
                         "AutoPublishCodeSha256 must be a string",
@@ -389,7 +388,7 @@ class SamFunction(SamResourceMacro):
         # Try to resolve.
         resolved_alias_name = intrinsics_resolver.resolve_parameter_refs(original_alias_value)
 
-        if not isinstance(resolved_alias_name, string_types):
+        if not isinstance(resolved_alias_name, str):
             # This is still a dictionary which means we are not able to completely resolve intrinsics
             raise InvalidResourceException(
                 self.logical_id, "'{}' must be a string or a Ref to a template parameter".format(property_name)

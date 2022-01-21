@@ -1,7 +1,6 @@
 ﻿from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.swagger.swagger import SwaggerEditor
-from six import string_types
 
 
 class Globals(object):
@@ -156,7 +155,7 @@ class Globals(object):
                         SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]
                     )
                 ):
-                    if not isinstance(properties[cls._OPENAPIVERSION], string_types):
+                    if not isinstance(properties[cls._OPENAPIVERSION], str):
                         properties[cls._OPENAPIVERSION] = str(properties[cls._OPENAPIVERSION])
                         resource["Properties"] = properties
                     if "DefinitionBody" in properties:

@@ -1,4 +1,2 @@
 boto3~=1.5
 jsonschema~=3.2
-six~=1.15
-
