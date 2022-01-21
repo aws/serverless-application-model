@@ -854,8 +854,7 @@ class Api(PushEventSource):
 
                     parameters.append(settings)
 
-
-                elif isinstance(parameter, string_types):
+                elif isinstance(parameter, str):
                     if not re.match(r"method\.request\.(querystring|path|header)\.", parameter):
                         raise InvalidEventException(
                             self.relative_id,
