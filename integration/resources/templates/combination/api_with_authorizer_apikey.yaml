@@ -2,22 +2,13 @@ Resources:
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
+      ApiKeySourceType: AUTHORIZER
       StageName: Prod
       Auth:
         Authorizers:
-          MyCognitoAuthorizer:
-            UserPoolArn:
-              Fn::GetAtt: MyCognitoUserPool.Arn
           MyLambdaTokenAuth:
             FunctionArn:
               Fn::GetAtt: MyLambdaAuthFunction.Arn
-          MyLambdaRequestAuth:
-            FunctionPayloadType: REQUEST
-            FunctionArn:
-              Fn::GetAtt: MyLambdaAuthFunction.Arn
-            Identity:
-              QueryStrings:
-                - authorization
 
   MyFunction:
     Type: AWS::Serverless::Function
@@ -39,42 +30,16 @@ Resources:
               Ref: MyApi
             Method: get
             Path: /none
-        Cognito:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: MyApi
-            Method: get
-            Path: /cognito
-            Auth:
-              Authorizer: MyCognitoAuthorizer
         LambdaToken:
           Type: Api
           Properties:
             RestApiId:
               Ref: MyApi
             Method: get
-            Path: /lambda-token
+            Path: /lambda-token-api-key
             Auth:
               Authorizer: MyLambdaTokenAuth
-        LambdaRequest:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: MyApi
-            Method: get
-            Path: /lambda-request
-            Auth:
-              Authorizer: MyLambdaRequestAuth
-        Iam:
-          Type: Api
-          Properties:
-            RestApiId:
-              Ref: MyApi
-            Method: get
-            Path: /iam
-            Auth:
-              Authorizer: AWS_IAM
+              ApiKeyRequired: true
   
   MyLambdaAuthFunction:
     Type: AWS::Serverless::Function
@@ -95,23 +60,43 @@ Resources:
           
           return {
             principalId: 'user',
-            context: {},
+            context: { key: 'at_least_20_characters'},
             policyDocument
           }
         }
 
-  MyCognitoUserPool:
-    Type: AWS::Cognito::UserPool
+  MyFirstApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn:
+      - MyUsagePlan
     Properties:
-      UserPoolName: MyCognitoUserPool
-  
-  MyCognitoUserPoolClient:
-    Type: AWS::Cognito::UserPoolClient
+      Enabled: true
+      Value: at_least_20_characters
+      StageKeys:
+        - RestApiId:
+            Ref: MyApi
+          StageName:
+            Ref: MyApi.Stage
+
+  MyUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn:
+      - MyApi
     Properties:
-      UserPoolId:
-        Ref: MyCognitoUserPool
-      ClientName: MyCognitoUserPoolClient
-      GenerateSecret: false
+      ApiStages:
+        - ApiId:
+            Ref: MyApi
+          Stage:
+            Ref: MyApi.Stage
+
+  MyUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId:
+        Ref: MyFirstApiKey
+      UsagePlanId:
+        Ref: MyUsagePlan
+      KeyType: API_KEY
 
 Outputs:
     ApiUrl:
@@ -123,8 +108,3 @@ Outputs:
       Description: "Authorizer Function Arn"
       Value:
         Fn::GetAtt: MyLambdaAuthFunction.Arn
-
-    CognitoUserPoolArn:
-      Description: "Cognito User Pool Arn"
-      Value:
-        Fn::GetAtt: MyCognitoUserPool.Arn
