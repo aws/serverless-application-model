@@ -831,7 +831,7 @@ class Api(PushEventSource):
 
                     parameter_name, parameter_value = next(iter(parameter.items()))
 
-                    if not re.match("method\.request\.(querystring|path|header)\.", parameter_name):
+                    if not re.match(r"method\.request\.(querystring|path|header)\.", parameter_name):
                         raise InvalidEventException(
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property. Keys must be in the format "
@@ -855,7 +855,7 @@ class Api(PushEventSource):
                     parameters.append(settings)
 
                 elif isinstance(parameter, str):
-                    if not re.match("method\.request\.(querystring|path|header)\.", parameter):
+                    if not re.match(r"method\.request\.(querystring|path|header)\.", parameter):
                         raise InvalidEventException(
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property. Keys must be in the format "

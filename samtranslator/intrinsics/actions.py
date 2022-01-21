@@ -370,8 +370,8 @@ class SubAction(Action):
         """
 
         # RegExp to find pattern "${logicalId.property}" and return the word inside bracket
-        logical_id_regex = "[A-Za-z0-9\.]+|AWS::[A-Z][A-Za-z]*"
-        ref_pattern = re.compile(r"\$\{(" + logical_id_regex + ")\}")
+        logical_id_regex = r"[A-Za-z0-9\.]+|AWS::[A-Z][A-Za-z]*"
+        ref_pattern = re.compile(r"\$\{(" + logical_id_regex + r")\}")
 
         # Find all the pattern, and call the handler to decide how to substitute them.
         # Do the substitution and return the final text

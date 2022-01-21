@@ -107,7 +107,7 @@ class OpenApiEditor(object):
             arn = uri.get("Fn::Sub", "")
 
         # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
-        regex = "([A-Za-z0-9]+\.Arn)"
+        regex = r"([A-Za-z0-9]+\.Arn)"
         matches = re.findall(regex, arn)
         # Prevent IndexError when integration URI doesn't contain .Arn (e.g. a Function with
         # AutoPublishAlias translates to AWS::Lambda::Alias, which make_shorthand represents
