@@ -1,4 +1,3 @@
-from six import string_types
 import json
 
 from samtranslator.metrics.method_decorator import cw_timer
@@ -261,7 +260,7 @@ class Api(EventSource):
         stage_suffix = "AllStages"
         explicit_api = None
         rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
-        if isinstance(rest_api_id, string_types):
+        if isinstance(rest_api_id, str):
 
             if (
                 rest_api_id in resources
@@ -273,7 +272,7 @@ class Api(EventSource):
                 permitted_stage = explicit_api["StageName"]
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, string_types):
+                if isinstance(permitted_stage, str):
                     stage_suffix = permitted_stage
                 else:
                     stage_suffix = "Stage"

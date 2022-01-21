@@ -1,7 +1,6 @@
 import hashlib
 import json
 import sys
-from six import string_types
 
 
 class LogicalIdGenerator(object):
@@ -88,7 +87,7 @@ class LogicalIdGenerator(object):
         :return: string representation of the dictionary
         :rtype string
         """
-        if isinstance(data, string_types):
+        if isinstance(data, str):
             return data
 
         # Get the most compact dictionary (separators) and sort the keys recursively to get a stable output

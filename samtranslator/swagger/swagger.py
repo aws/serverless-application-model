@@ -1,7 +1,6 @@
 ﻿import copy
 import json
 import re
-from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional, fnSub
@@ -381,7 +380,7 @@ class SwaggerEditor(object):
                 return to_return
             if isinstance(bmt, list):
                 return [replace_recursively(item) for item in bmt]
-            if isinstance(bmt, string_types) or isinstance(bmt, Py27UniStr):
+            if isinstance(bmt, str) or isinstance(bmt, Py27UniStr):
                 return Py27UniStr(bmt.replace("~1", "/"))
             return bmt
 
@@ -1377,7 +1376,7 @@ class SwaggerEditor(object):
         :param string method: Name of the HTTP Method
         :return string: Normalized method name
         """
-        if not method or not isinstance(method, string_types):
+        if not method or not isinstance(method, str):
             return method
 
         method = method.lower()
@@ -1437,7 +1436,7 @@ class SwaggerEditor(object):
         :return bool: True if the property_list is all of type string otherwise False
         """
 
-        if property_list is not None and not all(isinstance(x, string_types) for x in property_list):
+        if property_list is not None and not all(isinstance(x, str) for x in property_list):
             return False
 
         return True

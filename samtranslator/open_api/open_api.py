@@ -1,6 +1,5 @@
 import copy
 import re
-from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
@@ -652,7 +651,7 @@ class OpenApiEditor(object):
         :param string method: Name of the HTTP Method
         :return string: Normalized method name
         """
-        if not method or not isinstance(method, string_types):
+        if not method or not isinstance(method, str):
             return method
 
         method = method.lower()
