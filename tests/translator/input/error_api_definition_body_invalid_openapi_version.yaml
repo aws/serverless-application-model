@@ -1,0 +1,13 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        info:
+          version: '1.0'
+          title: 'title'
+        paths:
+          "/some/path": {}
+          "/other": {}
+        openapi: '2.0'

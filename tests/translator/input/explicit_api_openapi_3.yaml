@@ -46,5 +46,5 @@ Resources:
         Ref: MyStageName
       OpenApiVersion: '3.0'
       DefinitionBody:
-        "this": "is"
-        "a": "inline swagger"
+        paths: {}
+        openapi: "3.0"

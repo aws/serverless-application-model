@@ -46,19 +46,13 @@ class SwaggerEditor(object):
         modifications on this copy.
 
         :param dict doc: Swagger document as a dictionary
-        :raises ValueError: If the input Swagger document does not meet the basic Swagger requirements.
+        :raises InvalidDocumentException if doc is invalid
         """
 
-        if not SwaggerEditor.is_valid(doc):
-            raise ValueError("Invalid Swagger document")
-
         self._doc = copy.deepcopy(doc)
-        self.paths = self._doc["paths"]
-        self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
-        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
-        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())
-        self.definitions = self._doc.get("definitions", Py27Dict())
+        self.validate_definition_body(doc)
 
+        self.paths = self._doc.get("paths")
         # https://swagger.io/specification/#path-item-object
         # According to swagger spec,
         # each path item object must be a dict (even it is empty).
@@ -66,6 +60,11 @@ class SwaggerEditor(object):
         # so we don't need to validate wherever we use them.
         for path in self.iter_on_path():
             SwaggerEditor.validate_path_item_is_dict(self.get_path(path), path)
+
+        self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
+        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
+        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())
+        self.definitions = self._doc.get("definitions", Py27Dict())
 
     def get_path(self, path):
         path_dict = self.paths.get(path)
@@ -162,7 +161,6 @@ class SwaggerEditor(object):
 
         :param string path: Path name
         :param string method: HTTP method
-        :raises ValueError: If the value of `path` in Swagger is not a dictionary
         """
         method = self._normalize_method_name(method)
 
@@ -1309,6 +1307,32 @@ class SwaggerEditor(object):
                     SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
         return False
+
+    def validate_definition_body(self, definition_body):
+        """
+        Checks if definition_body is a valid Swagger document
+
+        :param dict definition_body: Data to be validated
+        :raises InvalidDocumentException if definition_body is invalid
+        """
+
+        SwaggerEditor.validate_is_dict(definition_body, "DefinitionBody must be a dictionary.")
+        SwaggerEditor.validate_is_dict(
+            definition_body.get("paths"), "The 'paths' property of DefinitionBody must be present and be a dictionary."
+        )
+
+        has_swagger = definition_body.get("swagger")
+        has_openapi3 = definition_body.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_version_3_regex(), definition_body["openapi"]
+        )
+        if not (has_swagger) and not (has_openapi3):
+            raise InvalidDocumentException(
+                [
+                    InvalidTemplateException(
+                        "DefinitionBody must have either: (1) a 'swagger' property or (2) an 'openapi' property with version 3.x or 3.x.x"
+                    )
+                ]
+            )
 
     @staticmethod
     def validate_is_dict(obj, exception_message):
