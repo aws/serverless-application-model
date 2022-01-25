@@ -1,9 +1,11 @@
+import copy
 import re
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.intrinsics import is_intrinsic
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.utils.fast_copy import fast_copy
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 import json
 
@@ -46,7 +48,7 @@ class OpenApiEditor(object):
                 "Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
             )
 
-        self._doc = json.loads(json.dumps(doc))
+        self._doc = fast_copy(doc)
         self.paths = self._doc["paths"]
         self.security_schemes = self._doc.get("components", Py27Dict()).get("securitySchemes", Py27Dict())
         self.definitions = self._doc.get("definitions", Py27Dict())
@@ -590,7 +592,7 @@ class OpenApiEditor(object):
         if self.info:
             self._doc["info"] = self.info
 
-        return json.loads(json.dumps(self._doc))
+        return fast_copy(self._doc)
 
     @staticmethod
     def is_valid(data):

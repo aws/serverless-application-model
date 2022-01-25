@@ -1,9 +1,11 @@
 ﻿import json
 import re
+import copy
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional, fnSub
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
+from samtranslator.utils.fast_copy import fast_copy
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 
@@ -47,7 +49,7 @@ class SwaggerEditor(object):
         :param dict doc: Swagger document as a dictionary
         :raises InvalidDocumentException if doc is invalid
         """
-        self._doc = json.loads(json.dumps(doc))
+        self._doc = fast_copy(doc)
         self.validate_definition_body(doc)
         self.paths = self._doc.get("paths")
         # https://swagger.io/specification/#path-item-object
@@ -1284,8 +1286,7 @@ class SwaggerEditor(object):
             self._doc[self._X_APIGW_GATEWAY_RESPONSES] = self.gateway_responses
         if self.definitions:
             self._doc["definitions"] = self.definitions
-
-        return json.loads(json.dumps(self._doc))
+        return fast_copy(self._doc)
 
     @staticmethod
     def is_valid(data):
