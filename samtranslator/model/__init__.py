@@ -1,6 +1,4 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
-from six import string_types
-
 import re
 import inspect
 from samtranslator.model.exceptions import InvalidResourceException
@@ -460,7 +458,7 @@ class SamResourceMacro(ResourceMacro):
             return parameter_value
         value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
 
-        if not isinstance(value, string_types) and not isinstance(value, dict):
+        if not isinstance(value, str) and not isinstance(value, dict):
             raise InvalidResourceException(
                 self.logical_id,
                 "Could not resolve parameter for '{}' or parameter is not a String.".format(parameter_name),
@@ -489,7 +487,7 @@ class ResourceTypeResolver(object):
                 self.resource_types[resource_class.resource_type] = resource_class
 
     def can_resolve(self, resource_dict):
-        if not isinstance(resource_dict, dict) or not isinstance(resource_dict.get("Type"), string_types):
+        if not isinstance(resource_dict, dict) or not isinstance(resource_dict.get("Type"), str):
             return False
 
         return resource_dict["Type"] in self.resource_types

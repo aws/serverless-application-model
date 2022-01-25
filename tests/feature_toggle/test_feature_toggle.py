@@ -1,4 +1,4 @@
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 from parameterized import parameterized, param
 from unittest import TestCase
 import os, sys

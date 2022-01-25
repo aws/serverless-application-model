@@ -1,5 +1,4 @@
 import re
-from six import string_types
 
 from samtranslator.model.intrinsics import ref
 from samtranslator.model.intrinsics import make_conditional
@@ -107,7 +106,7 @@ class OpenApiEditor(object):
             arn = uri.get("Fn::Sub", "")
 
         # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
-        regex = "([A-Za-z0-9]+\.Arn)"
+        regex = r"([A-Za-z0-9]+\.Arn)"
         matches = re.findall(regex, arn)
         # Prevent IndexError when integration URI doesn't contain .Arn (e.g. a Function with
         # AutoPublishAlias translates to AWS::Lambda::Alias, which make_shorthand represents
@@ -449,6 +448,17 @@ class OpenApiEditor(object):
         :param dict tags: dictionary of tagName:tagValue pairs.
         """
         for name, value in tags.items():
+            # verify the tags definition is in the right format
+            if not isinstance(self.tags, list):
+                raise InvalidDocumentException(
+                    [
+                        InvalidTemplateException(
+                            "Tags in OpenApi DefinitionBody needs to be a list. {} is a {} not a list.".format(
+                                self.tags, type(self.tags).__name__
+                            )
+                        )
+                    ]
+                )
             # find an existing tag with this name if it exists
             existing_tag = next((existing_tag for existing_tag in self.tags if existing_tag.get("name") == name), None)
             if existing_tag:
@@ -640,7 +650,7 @@ class OpenApiEditor(object):
         :param string method: Name of the HTTP Method
         :return string: Normalized method name
         """
-        if not method or not isinstance(method, string_types):
+        if not method or not isinstance(method, str):
             return method
 
         method = method.lower()

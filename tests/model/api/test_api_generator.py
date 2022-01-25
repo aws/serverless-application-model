@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 
 from parameterized import parameterized
 
@@ -18,7 +18,7 @@ class TestApiGenerator(TestCase):
             Mock(),
             Mock(),
             Mock(),
-            Mock(),
+            {"paths": {}, "openapi": "3.0.1"},
             Mock(),
             Mock(),
             Mock(),
@@ -39,7 +39,7 @@ class TestApiGenerator(TestCase):
             Mock(),
             Mock(),
             Mock(),
-            Mock(),
+            {"paths": {}, "openapi": "3.0.1"},
             Mock(),
             Mock(),
             Mock(),

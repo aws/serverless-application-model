@@ -22,7 +22,7 @@ import pytest
 import yaml
 from unittest import TestCase
 from samtranslator.translator.transform import transform
-from mock import Mock, MagicMock, patch
+from unittest.mock import Mock, MagicMock, patch
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"
@@ -752,7 +752,8 @@ def test_swagger_body_sha_gets_recomputed():
                     "StageName": "Prod",
                     "DefinitionBody": {
                         # Some body property will do
-                        "a": "b"
+                        "paths": {},
+                        "openapi": "3.0.1",
                     },
                 },
             }

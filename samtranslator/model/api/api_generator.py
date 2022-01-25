@@ -1,8 +1,6 @@
 import logging
 from collections import namedtuple
 
-from six import string_types
-
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
@@ -238,6 +236,8 @@ class ApiGenerator(object):
         self.template_conditions = template_conditions
         self.mode = mode
 
+        self.swagger_editor = SwaggerEditor(self.definition_body) if self.definition_body else None
+
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
 
@@ -284,7 +284,7 @@ class ApiGenerator(object):
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
             # # Post Process OpenApi Auth Settings
-            self.definition_body = self._openapi_postprocess(self.definition_body)
+            self.definition_body = self._openapi_postprocess(self.swagger_editor.swagger)
             rest_api.Body = self.definition_body
 
         if self.name:
@@ -306,13 +306,11 @@ class ApiGenerator(object):
         https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
         For this reason, we always put DisableExecuteApiEndpoint into openapi object irrespective of origin of DefinitionBody.
         """
-        if self.disable_execute_api_endpoint and not self.definition_body:
+        if self.disable_execute_api_endpoint is not None and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
-        editor = SwaggerEditor(self.definition_body)
-        editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
-        self.definition_body = editor.swagger
+        self.swagger_editor.add_disable_execute_api_endpoint_extension(self.disable_execute_api_endpoint)
 
     def _construct_body_s3_dict(self):
         """Constructs the RestApi's `BodyS3Location property`_, from the SAM Api's DefinitionUri property.
@@ -381,7 +379,7 @@ class ApiGenerator(object):
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
-        stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
+        stage_name_prefix = self.stage_name if isinstance(self.stage_name, str) else ""
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         else:
@@ -481,7 +479,7 @@ class ApiGenerator(object):
             domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
 
         # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
+        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), str):
             basepaths = [self.domain.get("BasePath")]
         elif self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), list):
             basepaths = self.domain.get("BasePath")
@@ -608,7 +606,7 @@ class ApiGenerator(object):
                 self.logical_id, "Cors works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
-        if isinstance(self.cors, string_types) or is_intrinsic(self.cors):
+        if isinstance(self.cors, str) or is_intrinsic(self.cors):
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)
         elif isinstance(self.cors, dict):
@@ -622,13 +620,6 @@ class ApiGenerator(object):
         else:
             raise InvalidResourceException(self.logical_id, INVALID_ERROR)
 
-        if not SwaggerEditor.is_valid(self.definition_body):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Unable to add Cors configuration because "
-                "'DefinitionBody' does not contain a valid Swagger definition.",
-            )
-
         if properties.AllowCredentials is True and properties.AllowOrigin == _CORS_WILDCARD:
             raise InvalidResourceException(
                 self.logical_id,
@@ -637,10 +628,9 @@ class ApiGenerator(object):
                 "'AllowOrigin' is \"'*'\" or not set",
             )
 
-        editor = SwaggerEditor(self.definition_body)
-        for path in editor.iter_on_path():
+        for path in self.swagger_editor.iter_on_path():
             try:
-                editor.add_cors(
+                self.swagger_editor.add_cors(
                     path,
                     properties.AllowOrigin,
                     properties.AllowHeaders,
@@ -650,9 +640,6 @@ class ApiGenerator(object):
                 )
             except InvalidTemplateException as ex:
                 raise InvalidResourceException(self.logical_id, ex.message)
-
-        # Assign the Swagger back to template
-        self.definition_body = editor.swagger
 
     def _add_binary_media_types(self):
         """
@@ -666,11 +653,7 @@ class ApiGenerator(object):
         if self.binary_media and not self.definition_body:
             return
 
-        editor = SwaggerEditor(self.definition_body)
-        editor.add_binary_media_types(self.binary_media)
-
-        # Assign the Swagger back to template
-        self.definition_body = editor.swagger
+        self.swagger_editor.add_binary_media_types(self.binary_media)
 
     def _add_auth(self):
         """
@@ -689,20 +672,13 @@ class ApiGenerator(object):
         if not all(key in AuthProperties._fields for key in self.auth.keys()):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Auth' property")
 
-        if not SwaggerEditor.is_valid(self.definition_body):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Unable to add Auth configuration because "
-                "'DefinitionBody' does not contain a valid Swagger definition.",
-            )
-        swagger_editor = SwaggerEditor(self.definition_body)
         auth_properties = AuthProperties(**self.auth)
         authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)
 
         if authorizers:
-            swagger_editor.add_authorizers_security_definitions(authorizers)
+            self.swagger_editor.add_authorizers_security_definitions(authorizers)
             self._set_default_authorizer(
-                swagger_editor,
+                self.swagger_editor,
                 authorizers,
                 auth_properties.DefaultAuthorizer,
                 auth_properties.AddDefaultAuthorizerToCorsPreflight,
@@ -710,19 +686,17 @@ class ApiGenerator(object):
             )
 
         if auth_properties.ApiKeyRequired:
-            swagger_editor.add_apikey_security_definition()
-            self._set_default_apikey_required(swagger_editor)
+            self.swagger_editor.add_apikey_security_definition()
+            self._set_default_apikey_required(self.swagger_editor)
 
         if auth_properties.ResourcePolicy:
             SwaggerEditor.validate_is_dict(
                 auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
             )
-            for path in swagger_editor.iter_on_path():
-                swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
+            for path in self.swagger_editor.iter_on_path():
+                self.swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
             if auth_properties.ResourcePolicy.get("CustomStatements"):
-                swagger_editor.add_custom_statements(auth_properties.ResourcePolicy.get("CustomStatements"))
-
-        self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
+                self.swagger_editor.add_custom_statements(auth_properties.ResourcePolicy.get("CustomStatements"))
 
     def _construct_usage_plan(self, rest_api_stage=None):
         """Constructs and returns the ApiGateway UsagePlan, ApiGateway UsagePlanKey, ApiGateway ApiKey for Auth.
@@ -925,15 +899,6 @@ class ApiGenerator(object):
                         ),
                     )
 
-        if not SwaggerEditor.is_valid(self.definition_body):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Unable to add Auth configuration because "
-                "'DefinitionBody' does not contain a valid Swagger definition.",
-            )
-
-        swagger_editor = SwaggerEditor(self.definition_body)
-
         # The dicts below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
         gateway_responses = Py27Dict()
         for response_type, response in self.gateway_responses.items():
@@ -945,10 +910,7 @@ class ApiGenerator(object):
             )
 
         if gateway_responses:
-            swagger_editor.add_gateway_responses(gateway_responses)
-
-        # Assign the Swagger back to template
-        self.definition_body = swagger_editor.swagger
+            self.swagger_editor.add_gateway_responses(gateway_responses)
 
     def _add_models(self):
         """
@@ -964,22 +926,10 @@ class ApiGenerator(object):
                 self.logical_id, "Models works only with inline Swagger specified in " "'DefinitionBody' property."
             )
 
-        if not SwaggerEditor.is_valid(self.definition_body):
-            raise InvalidResourceException(
-                self.logical_id,
-                "Unable to add Models definitions because "
-                "'DefinitionBody' does not contain a valid Swagger definition.",
-            )
-
         if not all(isinstance(model, dict) for model in self.models.values()):
             raise InvalidResourceException(self.logical_id, "Invalid value for 'Models' property")
 
-        swagger_editor = SwaggerEditor(self.definition_body)
-        swagger_editor.add_models(self.models)
-
-        # Assign the Swagger back to template
-
-        self.definition_body = self._openapi_postprocess(swagger_editor.swagger)
+        self.swagger_editor.add_models(self.models)
 
     def _openapi_postprocess(self, definition_body):
         """
@@ -1129,7 +1079,7 @@ class ApiGenerator(object):
         if not default_authorizer:
             return
 
-        if not isinstance(default_authorizer, string_types):
+        if not isinstance(default_authorizer, str):
             raise InvalidResourceException(
                 self.logical_id,
                 "DefaultAuthorizer is not a string.",

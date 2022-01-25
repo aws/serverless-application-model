@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 import os
 from samtranslator.model.sam_resources import SamFunction
 from samtranslator.model.lambda_ import LambdaAlias, LambdaVersion, LambdaFunction
