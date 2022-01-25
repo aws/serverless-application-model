@@ -20,7 +20,8 @@
       }
     }, 
     "ThumbnailFunctionRole": {
-      "Type": "AWS::IAM::Role",
+      "Metadata":{"Foo": "Bar"},
+      "Type": "AWS::IAM::Role", 
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -50,6 +51,7 @@
       }
     }, 
     "ThumbnailFunctionImageBucketPermission": {
+      "Metadata":{"Foo": "Bar"},
       "Type": "AWS::Lambda::Permission", 
       "Properties": {
         "Action": "lambda:InvokeFunction", 
@@ -63,6 +65,7 @@
       }
     }, 
     "ThumbnailFunction": {
+      "Metadata":{"Foo": "Bar"},
       "Type": "AWS::Lambda::Function", 
       "Properties": {
         "Code": {

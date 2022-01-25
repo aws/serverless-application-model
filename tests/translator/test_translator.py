@@ -929,6 +929,37 @@ class TestTemplateValidation(TestCase):
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
 
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_validate_translated_no_metadata(self):
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_no_metadata.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {})
+        self.assertEqual(expected, actual)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_validate_translated_metadata(self):
+        self.maxDiff = None
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_metadata.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {}, passthrough_metadata=True)
+        self.assertEqual(expected, actual)
+
 
 class TestPluginsUsage(TestCase):
     # Tests if plugins are properly injected into the translator
