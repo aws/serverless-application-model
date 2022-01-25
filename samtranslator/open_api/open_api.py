@@ -1,4 +1,3 @@
-import copy
 import re
 from six import string_types
 
@@ -48,7 +47,7 @@ class OpenApiEditor(object):
                 "Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
             )
 
-        self._doc = copy.deepcopy(doc)
+        self._doc = json.loads(json.dumps(doc))
         self.paths = self._doc["paths"]
         self.security_schemes = self._doc.get("components", Py27Dict()).get("securitySchemes", Py27Dict())
         self.definitions = self._doc.get("definitions", Py27Dict())

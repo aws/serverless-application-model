@@ -1,5 +1,4 @@
-﻿import copy
-import json
+﻿import json
 import re
 from six import string_types
 
@@ -53,7 +52,7 @@ class SwaggerEditor(object):
         if not SwaggerEditor.is_valid(doc):
             raise ValueError("Invalid Swagger document")
 
-        self._doc = copy.deepcopy(doc)
+        self._doc = json.loads(json.dumps(doc))
         self.paths = self._doc["paths"]
         self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
         self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
@@ -1291,7 +1290,7 @@ class SwaggerEditor(object):
         if self.definitions:
             self._doc["definitions"] = self.definitions
 
-        return copy.deepcopy(self._doc)
+        return json.loads(json.dumps(self._doc))
 
     @staticmethod
     def is_valid(data):
