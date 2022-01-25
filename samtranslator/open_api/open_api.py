@@ -581,7 +581,7 @@ class OpenApiEditor(object):
         if self.info:
             self._doc["info"] = self.info
 
-        return copy.deepcopy(self._doc)
+        return json.loads(json.dumps(self._doc))
 
     @staticmethod
     def is_valid(data):
