@@ -36,6 +36,7 @@ class Globals(object):
             "Layers",
             "DeploymentPreference",
             "PermissionsBoundary",
+            "RolePath",
             "ReservedConcurrentExecutions",
             "ProvisionedConcurrencyConfig",
             "AssumeRolePolicyDocument",

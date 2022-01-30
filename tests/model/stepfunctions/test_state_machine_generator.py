@@ -20,6 +20,7 @@ class StepFunctionsStateMachine(TestCase):
             "name": None,
             "policies": None,
             "permissions_boundary": None,
+            "role_path": None,
             "definition_substitutions": None,
             "role": None,
             "state_machine_type": None,

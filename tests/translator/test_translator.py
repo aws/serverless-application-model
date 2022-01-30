@@ -444,6 +444,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "state_machine_with_xray_role",
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
+                "function_with_role_path",
+                "state_machine_with_role_path",
                 "version_deletion_policy_precedence",
             ],
             [

@@ -9,6 +9,7 @@
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary",
+        "Path": "/override/",
         "Tags": [
           {
             "Value": "SAM",
@@ -111,6 +112,7 @@
           "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
         ], 
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary",
+        "Path": "/customer/",
         "Tags": [
           {
             "Value": "SAM",

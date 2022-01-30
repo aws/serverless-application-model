@@ -73,6 +73,7 @@ class SamFunction(SamResourceMacro):
         "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
         "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
         "PermissionsBoundary": PropertyType(False, is_str()),
+        "RolePath": PropertyType(False, is_str()),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Tags": PropertyType(False, is_type(dict)),
@@ -493,6 +494,7 @@ class SamFunction(SamResourceMacro):
             managed_policy_arns=managed_policy_arns,
             policy_documents=policy_documents,
             permissions_boundary=self.PermissionsBoundary,
+            role_path=self.RolePath,
             tags=self._construct_tag_list(self.Tags),
         )
         return execution_role
@@ -1264,6 +1266,7 @@ class SamStateMachine(SamResourceMacro):
         "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
         "Tracing": PropertyType(False, is_type(dict)),
         "PermissionsBoundary": PropertyType(False, is_str()),
+        "RolePath": PropertyType(False, is_str()),
     }
     event_resolver = ResourceTypeResolver(
         samtranslator.model.stepfunctions.events,
@@ -1285,6 +1288,7 @@ class SamStateMachine(SamResourceMacro):
             name=self.Name,
             policies=self.Policies,
             permissions_boundary=self.PermissionsBoundary,
+            role_path=self.RolePath,
             definition_substitutions=self.DefinitionSubstitutions,
             role=self.Role,
             state_machine_type=self.Type,

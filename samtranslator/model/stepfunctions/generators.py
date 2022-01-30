@@ -39,6 +39,7 @@ class StateMachineGenerator(object):
         name,
         policies,
         permissions_boundary,
+        role_path,
         definition_substitutions,
         role,
         state_machine_type,
@@ -63,6 +64,7 @@ class StateMachineGenerator(object):
         :param name: Name of the State Machine resource
         :param policies: Policies attached to the execution role
         :param permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
+        :param role_path: Path to be applied to the role
         :param definition_substitutions: Variable-to-value mappings to be replaced in the State Machine definition
         :param role: Role ARN to use for the execution role
         :param state_machine_type: Type of the State Machine
@@ -86,6 +88,7 @@ class StateMachineGenerator(object):
         self.logging = logging
         self.policies = policies
         self.permissions_boundary = permissions_boundary
+        self.role_path = role_path
         self.definition_substitutions = definition_substitutions
         self.role = role
         self.type = state_machine_type
@@ -229,6 +232,7 @@ class StateMachineGenerator(object):
             resource_policies=state_machine_policies,
             tags=self._construct_tag_list(),
             permissions_boundary=self.permissions_boundary,
+            role_path=self.role_path,
         )
         return execution_role
 
@@ -254,6 +258,7 @@ class StateMachineGenerator(object):
                 kwargs = {
                     "intrinsics_resolver": self.intrinsics_resolver,
                     "permissions_boundary": self.permissions_boundary,
+                    "role_path": self.role_path,
                 }
                 try:
                     eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(

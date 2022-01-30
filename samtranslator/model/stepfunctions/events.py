@@ -43,12 +43,13 @@ class EventSource(ResourceMacro):
             logical_id = generator.gen()
         return logical_id
 
-    def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):
+    def _construct_role(self, resource, permissions_boundary=None, role_path=None, prefix=None, suffix=""):
         """Constructs the IAM Role resource allowing the event service to invoke
         the StartExecution API of the state machine resource it is associated with.
 
         :param model.stepfunctions.StepFunctionsStateMachine resource: The state machine resource associated with the event
         :param string permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
+        :param string role_path: Path to be applied to the role
         :param string prefix: Prefix to use for the logical ID of the IAM role
         :param string suffix: Suffix to add for the logical ID of the IAM role
 
@@ -67,6 +68,9 @@ class EventSource(ResourceMacro):
 
         if permissions_boundary:
             event_role.PermissionsBoundary = permissions_boundary
+
+        if role_path:
+            event_role.Path = role_path
 
         return event_role
 
@@ -96,6 +100,7 @@ class Schedule(EventSource):
         resources = []
 
         permissions_boundary = kwargs.get("permissions_boundary")
+        role_path = kwargs.get("role_path")
 
         passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
@@ -107,7 +112,7 @@ class Schedule(EventSource):
         events_rule.Name = self.Name
         events_rule.Description = self.Description
 
-        role = self._construct_role(resource, permissions_boundary)
+        role = self._construct_role(resource, permissions_boundary, role_path)
         resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
@@ -170,6 +175,7 @@ class CloudWatchEvent(EventSource):
         resources = []
 
         permissions_boundary = kwargs.get("permissions_boundary")
+        role_path = kwargs.get("role_path")
 
         passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
@@ -178,7 +184,7 @@ class CloudWatchEvent(EventSource):
 
         resources.append(events_rule)
 
-        role = self._construct_role(resource, permissions_boundary)
+        role = self._construct_role(resource, permissions_boundary, role_path)
         resources.append(role)
 
         source_arn = events_rule.get_runtime_attr("arn")
@@ -303,12 +309,13 @@ class Api(EventSource):
 
         intrinsics_resolver = kwargs.get("intrinsics_resolver")
         permissions_boundary = kwargs.get("permissions_boundary")
+        role_path = kwargs.get("role_path")
 
         if self.Method is not None:
             # Convert to lower case so that user can specify either GET or get
             self.Method = self.Method.lower()
 
-        role = self._construct_role(resource, permissions_boundary)
+        role = self._construct_role(resource, permissions_boundary, role_path)
         resources.append(role)
 
         explicit_api = kwargs["explicit_api"]

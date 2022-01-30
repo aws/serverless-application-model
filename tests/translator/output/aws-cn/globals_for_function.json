@@ -23,6 +23,7 @@
           }
         ],
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/OverridePermissionsBoundary", 
+        "Path": "/override/",
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [
@@ -121,6 +122,7 @@
           }
         ],
         "PermissionsBoundary": "arn:aws:1234:iam:boundary/CustomerCreatedPermissionsBoundary", 
+        "Path": "/customer/",
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17", 
           "Statement": [

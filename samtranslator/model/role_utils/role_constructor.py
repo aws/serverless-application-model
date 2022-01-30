@@ -15,6 +15,7 @@ def construct_role_for_resource(
     managed_policy_arns=None,
     policy_documents=None,
     permissions_boundary=None,
+    role_path=None,
     tags=None,
 ):
     """
@@ -27,6 +28,7 @@ def construct_role_for_resource(
     :param managed_policy_arns: List of managed policy ARNs to be associated with the role
     :param policy_documents: List of policy documents to be associated with the role
     :param permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
+    :param role_path: Path to be applied to the role
     :param tags: Tags to be associated with the role
 
     :returns: the generated IAM Role
@@ -106,6 +108,7 @@ def construct_role_for_resource(
     execution_role.ManagedPolicyArns = list(managed_policy_arns)
     execution_role.Policies = policy_documents or None
     execution_role.PermissionsBoundary = permissions_boundary
+    execution_role.Path = role_path
     execution_role.Tags = tags
 
     return execution_role
