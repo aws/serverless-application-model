@@ -229,6 +229,8 @@ class SamFunction(SamResourceMacro):
         dest_config = {}
         input_dest_config = resolved_event_invoke_config.get("DestinationConfig")
         if input_dest_config and input_dest_config.get("OnSuccess") is not None:
+            if not isinstance(input_dest_config.get("OnSuccess"), dict):
+                raise InvalidResourceException(self.logical_id, "'OnSuccess' has invalid destination configuration")
             resource, on_success, policy = self._validate_and_inject_resource(
                 input_dest_config.get("OnSuccess"), "OnSuccess", logical_id, conditions
             )
@@ -240,6 +242,8 @@ class SamFunction(SamResourceMacro):
                 policy_document.append(policy)
 
         if input_dest_config and input_dest_config.get("OnFailure") is not None:
+            if not isinstance(input_dest_config.get("OnFailure"), dict):
+                raise InvalidResourceException(self.logical_id, "'OnFailure' has invalid destination configuration")
             resource, on_failure, policy = self._validate_and_inject_resource(
                 input_dest_config.get("OnFailure"), "OnFailure", logical_id, conditions
             )

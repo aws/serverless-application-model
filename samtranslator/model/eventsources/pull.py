@@ -117,6 +117,8 @@ class PullEventSource(ResourceMacro):
         if self.DestinationConfig:
             if self.DestinationConfig.get("OnFailure") is None:
                 raise InvalidEventException(self.logical_id, "'OnFailure' is a required field for 'DestinationConfig'")
+            if not isinstance(self.DestinationConfig.get("OnFailure"), dict):
+                raise InvalidEventException(self.logical_id, "'OnFailure' has invalid destination configuration")
 
             # `Type` property is for sam to attach the right policies
             destination_type = self.DestinationConfig.get("OnFailure").get("Type")
