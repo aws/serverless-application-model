@@ -513,6 +513,12 @@ class ApiGenerator(object):
         record_set_group = None
         if self.domain.get("Route53") is not None:
             route53 = self.domain.get("Route53")
+            if not isinstance(route53, dict):
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Invalid property type '{}' for Route53. "
+                    "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53).__name__),
+                )
             if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
                 raise InvalidResourceException(
                     self.logical_id,
