@@ -403,6 +403,9 @@ class S3(PushEventSource):
             lambda_notifications = []
             notification_config["LambdaConfigurations"] = lambda_notifications
 
+        if not isinstance(lambda_notifications, list):
+            raise InvalidResourceException(self.logical_id, "Invalid type for LambdaConfigurations. Must be a list.")
+
         for event_mapping in event_mappings:
             if event_mapping not in lambda_notifications:
                 lambda_notifications.append(event_mapping)
