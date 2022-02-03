@@ -385,8 +385,8 @@ class TestSwaggerEditor_add_cors(TestCase):
         expected = {"some cors": "return value"}
         path = "/foo"
 
-        self.editor._make_cors_allowed_methods_for_path = Mock()
-        self.editor._make_cors_allowed_methods_for_path.return_value = default_allow_methods_value
+        self.editor._make_cors_allowed_methods_for_path_item = Mock()
+        self.editor._make_cors_allowed_methods_for_path_item.return_value = default_allow_methods_value
 
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
@@ -578,45 +578,39 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         self.assertEqual(expected, actual)
 
 
-class TestSwaggerEditor_make_cors_allowed_methods_for_path(TestCase):
+class TestSwaggerEditor_make_cors_allowed_methods_for_path_item(TestCase):
     def setUp(self):
+        self.foo_path_item = {"get": {}, "POST": {}, "DeLeTe": {}}
+        self.withany_path_item = {"head": {}, _X_ANY_METHOD: {}}
+        self.nothing_path_item = {}
+
         self.editor = SwaggerEditor(
             {
                 "swagger": "2.0",
                 "paths": {
-                    "/foo": {"get": {}, "POST": {}, "DeLeTe": {}},
-                    "/withany": {"head": {}, _X_ANY_METHOD: {}},
-                    "/nothing": {},
+                    "/foo": self.foo_path_item,
+                    "/withany": self.withany_path_item,
+                    "/nothing": self.nothing_path_item,
                 },
             }
         )
 
     def test_must_return_all_defined_methods(self):
-        path = "/foo"
         expected = "DELETE,GET,OPTIONS,POST"  # Result should be sorted alphabetically
 
-        actual = self.editor._make_cors_allowed_methods_for_path(path)
+        actual = self.editor._make_cors_allowed_methods_for_path_item(self.foo_path_item)
         self.assertEqual(expected, actual)
 
     def test_must_work_for_any_method(self):
-        path = "/withany"
         expected = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT"  # Result should be sorted alphabetically
 
-        actual = self.editor._make_cors_allowed_methods_for_path(path)
+        actual = self.editor._make_cors_allowed_methods_for_path_item(self.withany_path_item)
         self.assertEqual(expected, actual)
 
     def test_must_work_with_no_methods(self):
-        path = "/nothing"
         expected = "OPTIONS"
 
-        actual = self.editor._make_cors_allowed_methods_for_path(path)
-        self.assertEqual(expected, actual)
-
-    def test_must_skip_non_existent_path(self):
-        path = "/no-path"
-        expected = ""
-
-        actual = self.editor._make_cors_allowed_methods_for_path(path)
+        actual = self.editor._make_cors_allowed_methods_for_path_item(self.nothing_path_item)
         self.assertEqual(expected, actual)
 
 
