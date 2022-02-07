@@ -704,14 +704,9 @@ class Api(PushEventSource):
                             ),
                         )
 
-                    if not isinstance(method_authorizer, str):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because it wasn't defined with acceptable values in the API's Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path
-                            ),
-                        )
+                    _check_valid_authorizer_types(
+                        self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers
+                    )
 
                     if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
                         raise InvalidEventException(
@@ -1198,13 +1193,6 @@ class HttpApi(PushEventSource):
         :param editor: OpenApiEditor object that contains the OpenApi definition
         """
         method_authorizer = self.Auth.get("Authorizer")
-
-        if method_authorizer is not None and not isinstance(method_authorizer, str):
-            raise InvalidEventException(
-                self.relative_id,
-                "'Authorizer' in the 'Auth' section must be a string.",
-            )
-
         api_auth = api.get("Auth", {})
         if not method_authorizer:
             if api_auth.get("DefaultAuthorizer"):
@@ -1220,6 +1208,8 @@ class HttpApi(PushEventSource):
 
         # Default auth should already be applied, so apply any other auth here or scope override to default
         api_authorizers = api_auth and api_auth.get("Authorizers")
+
+        _check_valid_authorizer_types(self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers)
 
         if method_authorizer != "NONE" and not api_authorizers:
             raise InvalidEventException(
@@ -1270,3 +1260,19 @@ def _build_apigw_integration_uri(function, partition):
     if function_arn.get("Fn::GetAtt") and isinstance(function_arn["Fn::GetAtt"][0], Py27UniStr):
         arn = Py27UniStr(arn)
     return Py27Dict(fnSub(arn))
+
+
+def _check_valid_authorizer_types(relative_id, method, path, method_authorizer, api_authorizers):
+    if method_authorizer == "NONE":
+        # If the method authorizer is "NONE" then this check
+        # isn't needed since DefaultAuthorizer needs to be used.
+        return
+
+    if not isinstance(method_authorizer, str) or not isinstance(api_authorizers, dict):
+        raise InvalidEventException(
+            relative_id,
+            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}]. "
+            "The method authorizer must be a string with a corresponding dict entry in the api authorizer.".format(
+                authorizer=method_authorizer, method=method, path=path
+            ),
+        )
