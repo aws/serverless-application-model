@@ -601,6 +601,12 @@ class SwaggerEditor(object):
                     if not self.method_definition_has_integration(method_definition):
                         continue
                     existing_security = method_definition.get("security", [])
+
+                    # In the previous line, the default value `[]` will be only returned only if `existing_security`
+                    # property is not in definition_body dict, but if it exist, and its value is None, so None will be
+                    # returned and not the default value. That is why the below line is required.
+                    existing_security = existing_security if existing_security else []
+
                     authorizer_list = ["AWS_IAM"]
                     if authorizers:
                         authorizer_list.extend(authorizers.keys())
