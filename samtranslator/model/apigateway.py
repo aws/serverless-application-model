@@ -285,7 +285,7 @@ class ApiGatewayAuthorizer(object):
         try:
             ttl_int = int(ttl)
         # this will catch if ttl is None and not convertable to an int
-        except TypeError:
+        except (TypeError, ValueError):
             # previous behavior before trying to read ttl
             return required_properties_missing
 

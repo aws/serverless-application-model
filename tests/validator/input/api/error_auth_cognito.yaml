@@ -43,6 +43,10 @@ Resources:
             Identity:
               ReauthorizeEvery: "3"
             UserPoolArn: User.pool.arn
+          CognitoIdentityReauthorizeEveryValueError:
+            Identity:
+              ReauthorizeEvery: NotANumber
+            UserPoolArn: User.pool.arn
           CognitoIdentityReauthorizeEveryTooHigh:
             Identity:
               ReauthorizeEvery: 3601
