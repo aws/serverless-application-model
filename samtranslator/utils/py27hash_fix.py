@@ -158,6 +158,7 @@ class Py27Keys(object):
     """
 
     DUMMY = ["dummy"]  # marker for deleted keys
+    HashCache = {}
 
     def __init__(self):
         super(Py27Keys, self).__init__()
@@ -171,7 +172,11 @@ class Py27Keys(object):
         """Gets insert location for k"""
         freeslot = None
         # C API uses unsigned values
-        h = ctypes.c_size_t(Hash.hash(k)).value
+        if k in Py27Keys.HashCache:
+            h = Py27Keys.HashCache[k]
+        else:
+            h = ctypes.c_size_t(Hash.hash(k)).value
+            Py27Keys.HashCache[k] = h
         i = h & self.mask
 
         if i not in self.keyorder or self.keyorder[i] == k:
