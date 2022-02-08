@@ -1,6 +1,4 @@
-import copy
 import json
-from os import stat
 
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27Keys, Py27UniStr
 
@@ -39,10 +37,11 @@ def encode_keyorder(keyorder):
         return {}
 
     encoded_keyorder = dict()
-    if keyorder:
-        for i in keyorder:
-            if keyorder[i] == Py27Keys.DUMMY:
-                encoded_keyorder[i] = _KEYORDER_DUMMY_MARKER
+    for i in keyorder:
+        if keyorder[i] == Py27Keys.DUMMY:
+            encoded_keyorder[i] = _KEYORDER_DUMMY_MARKER
+        else:
+            encoded_keyorder[i] = keyorder[i]
     return encoded_keyorder
 
 
@@ -93,4 +92,3 @@ def decode_py27(data):
 def fast_copy(data):
     encoded_string = json.dumps(encode_py27(data))
     return decode_py27(json.loads(encoded_string))
-    

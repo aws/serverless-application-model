@@ -1,4 +1,3 @@
-import copy
 import re
 
 from samtranslator.model.intrinsics import ref
