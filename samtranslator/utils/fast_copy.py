@@ -7,6 +7,7 @@ from samtranslator.utils.py27hash_fix import Py27Dict, Py27Keys, Py27UniStr
 _PY2_MARKER = "\xef\xbb\xbf"
 _KEYORDER_DUMMY_MARKER = _PY2_MARKER + "DUMMY"
 
+
 def encode_py27(data):
     if isinstance(data, Py27UniStr):
         return _PY2_MARKER + data
@@ -14,12 +15,12 @@ def encode_py27(data):
         result = {encode_py27(key): encode_py27(value) for key, value in data.items()}
         keylist = data.keylist
         result[_PY2_MARKER] = {
-            "keylist":{
+            "keylist": {
                 "debug": keylist.debug,
                 "size": keylist.size,
                 "fill": keylist.fill,
                 "mask": keylist.mask,
-                "keyorder": encode_keyorder(keylist.keyorder)
+                "keyorder": encode_keyorder(keylist.keyorder),
             }
         }
         return result
@@ -29,6 +30,7 @@ def encode_py27(data):
     if isinstance(data, dict):
         return {encode_py27(key): encode_py27(value) for key, value in data.items()}
     return data
+
 
 def encode_keyorder(keyorder):
     if keyorder is None:
@@ -42,6 +44,7 @@ def encode_keyorder(keyorder):
             if keyorder[i] == Py27Keys.DUMMY:
                 encoded_keyorder[i] = _KEYORDER_DUMMY_MARKER
     return encoded_keyorder
+
 
 def decode_keyorder(keyorder, keys):
     if keyorder is None:
@@ -57,6 +60,7 @@ def decode_keyorder(keyorder, keys):
             decoded_keyorder[int(i)] = keys[keys.index(keyorder[i])]
     return decoded_keyorder
 
+
 def decode_py27(data):
     if isinstance(data, str) and data.startswith(_PY2_MARKER):
         return Py27UniStr(data[3:])
@@ -64,7 +68,9 @@ def decode_py27(data):
         return [decode_py27(item) for item in data]
     if isinstance(data, dict):
         if _PY2_MARKER in data:
-            py27Dict = Py27Dict({decode_py27(key): decode_py27(value) for key, value in data.items() if key != _PY2_MARKER})
+            py27Dict = Py27Dict(
+                {decode_py27(key): decode_py27(value) for key, value in data.items() if key != _PY2_MARKER}
+            )
             state = data[_PY2_MARKER]
             keylist_state = state["keylist"]
             del data[_PY2_MARKER]
