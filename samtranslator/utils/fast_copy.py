@@ -92,6 +92,5 @@ def decode_py27(data):
 
 def fast_copy(data):
     encoded_string = json.dumps(encode_py27(data))
-    decoded_data = decode_py27(json.loads(encoded_string))
-    decoded_data = copy.deepcopy(data)
-    return decoded_data
+    return decode_py27(json.loads(encoded_string))
+    

@@ -175,6 +175,7 @@ class AbstractTestTranslator(TestCase):
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
         print(json.dumps(output_fragment, indent=2))
+        
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
     def _update_logical_id_hash(self, resources):
