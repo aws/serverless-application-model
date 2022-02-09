@@ -136,23 +136,6 @@ class TestFunctionWithDeploymentPreference(BaseTest):
         )
         return resources_with_this_id["PhysicalResourceId"]
 
-    def _has_custom_deployment_configuration(self, deployment_name):
-        result = self.client_provider.code_deploy_client.list_deployment_configs()["deploymentConfigsList"]
-        return deployment_name in result
-
-    def _delete_deployment_configuration(self, deployment_name):
-        self.client_provider.code_deploy_client.delete_deployment_config(deploymentConfigName=deployment_name)
-
-    def _create_deployment_configuration(self, deployment_name):
-        client = self.client_provider.code_deploy_client
-        traffic_routing_config = {
-            "type": "TimeBasedLinear",
-            "timeBasedLinear": {"linearPercentage": 50, "linearInterval": 1},
-        }
-        client.create_deployment_config(
-            deploymentConfigName=deployment_name, computePlatform="Lambda", trafficRoutingConfig=traffic_routing_config
-        )
-
     def _get_deployment_group_configuration_name(self, deployment_group_name, application_name):
         deployment_group = self.client_provider.code_deploy_client.get_deployment_group(
             applicationName=application_name, deploymentGroupName=deployment_group_name
