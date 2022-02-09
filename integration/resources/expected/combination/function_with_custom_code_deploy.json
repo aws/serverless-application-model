@@ -5,5 +5,6 @@
   { "LogicalResourceId":"MyLambdaFunctionVersion", "ResourceType":"AWS::Lambda::Version" },
   { "LogicalResourceId":"ServerlessDeploymentApplication", "ResourceType":"AWS::CodeDeploy::Application" },
   { "LogicalResourceId":"MyLambdaFunctionDeploymentGroup", "ResourceType":"AWS::CodeDeploy::DeploymentGroup" },
-  { "LogicalResourceId":"DeploymentRole", "ResourceType":"AWS::IAM::Role" }
+  { "LogicalResourceId":"DeploymentRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"CustomDeploymentConfig", "ResourceType":"AWS::CodeDeploy::DeploymentConfig" }
 ]
