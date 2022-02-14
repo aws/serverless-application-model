@@ -1,3 +1,4 @@
+import copy
 import json
 
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27Keys, Py27UniStr
@@ -100,7 +101,7 @@ def decode_py27(data):
             keylist.fill = keylist_state["fill"]
             keylist.mask = keylist_state["mask"]
             keylist.keyorder = decode_keyorder(keylist_state["keyorder"], py27Dict.keys())
-            keylist = keylist.copy()
+            keylist.__setstate__(keylist.__dict__)
 
             py27Dict.keylist = keylist
 
@@ -111,4 +112,5 @@ def decode_py27(data):
 
 def fast_copy(data):
     encoded_string = json.dumps(encode_py27(data))
-    return decode_py27(json.loads(encoded_string))
+    data_copy = decode_py27(json.loads(encoded_string))
+    return data_copy
