@@ -158,7 +158,7 @@ class Py27Keys(object):
     """
 
     DUMMY = ["dummy"]  # marker for deleted keys
-    HashCache = {} # Caching generated hashes corresponding to keys for performance
+    HashCache = {}  # Caching generated hashes corresponding to keys for performance
 
     def __init__(self):
         super(Py27Keys, self).__init__()

@@ -5,7 +5,7 @@ from samtranslator.utils.py27hash_fix import Py27Dict, Py27Keys, Py27UniStr
 
 # Using UTF8 BOM as marker but
 # this can be anything else
-_PY2_MARKER = "\xef\xbb\xbf" 
+_PY2_MARKER = "\xef\xbb\xbf"
 
 # Dummy marker for Py27Keys.DUMMY
 _KEYORDER_DUMMY_MARKER = _PY2_MARKER + "DUMMY"
@@ -44,7 +44,7 @@ def encode_py27(data):
 
 def encode_keyorder(keyorder):
     """Encode keyorder
-    Turn dummy keys into dummy markers for serialization 
+    Turn dummy keys into dummy markers for serialization
     """
     if keyorder is None:
         return None
