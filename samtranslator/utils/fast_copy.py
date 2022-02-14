@@ -2,15 +2,26 @@ import json
 
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27Keys, Py27UniStr
 
-_PY2_MARKER = "\xef\xbb\xbf"
+# Using UTF8 BOM as marker but
+# this can be anything else
+_PY2_MARKER = "\xef\xbb\xbf" 
+
+# Dummy marker for Py27Keys.DUMMY
 _KEYORDER_DUMMY_MARKER = _PY2_MARKER + "DUMMY"
 
 
 def encode_py27(data):
+    """Encode py27 objects into JSON serialization objects
+    Strings will have PY2 Marker prefixed: u"abc" -> "{_PY2_MARKER}abc"
+    Py27Dicts will have keylist saved in the value of dict[_PY2_MARKER]
+    """
     if isinstance(data, Py27UniStr):
         return _PY2_MARKER + data
     if isinstance(data, Py27Dict):
+        # Encode all keys and values as well
         result = {encode_py27(key): encode_py27(value) for key, value in data.items()}
+
+        # Serialize Py27Keys
         keylist = data.keylist
         result[_PY2_MARKER] = {
             "keylist": {
@@ -31,6 +42,9 @@ def encode_py27(data):
 
 
 def encode_keyorder(keyorder):
+    """Encode keyorder
+    Turn dummy keys into dummy markers for serialization 
+    """
     if keyorder is None:
         return None
     if keyorder == {}:
@@ -46,6 +60,10 @@ def encode_keyorder(keyorder):
 
 
 def decode_keyorder(keyorder, keys):
+    """Decode keyorder
+    Turn dummy markers into Py27Keys.DUMMY for exact reference
+    Update keys in keyorder to point to the exact reference in the new Py27Dict
+    """
     if keyorder is None:
         return None
     if keyorder == {}:
@@ -56,6 +74,8 @@ def decode_keyorder(keyorder, keys):
         if keyorder[i] == _KEYORDER_DUMMY_MARKER:
             decoded_keyorder[int(i)] = Py27Keys.DUMMY
         else:
+            # Use the exact reference in the dict keys instead of serialized ones.
+            # This will also fix u"abc" and "abc" keys
             decoded_keyorder[int(i)] = keys[keys.index(keyorder[i])]
     return decoded_keyorder
 
