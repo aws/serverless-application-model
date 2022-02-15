@@ -189,7 +189,7 @@ class PullEventSource(ResourceMacro):
             raise InvalidEventException(self.relative_id, "FilterCriteria field has a wrong format")
 
     def validate_secrets_manager_kms_key_id(self):
-        if not isinstance(self.SecretsManagerKmsKeyId, str):
+        if self.SecretsManagerKmsKeyId and not isinstance(self.SecretsManagerKmsKeyId, str):
             raise InvalidEventException(
                 self.relative_id,
                 "Provided SecretsManagerKmsKeyId should be of type str.",
