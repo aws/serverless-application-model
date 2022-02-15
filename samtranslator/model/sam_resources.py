@@ -593,6 +593,12 @@ class SamFunction(SamResourceMacro):
                 "'DeadLetterQueue' requires Type and TargetArn properties to be specified.".format(valid_dlq_types),
             )
 
+        if not (isinstance(self.DeadLetterQueue.get("Type"), str)):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'DeadLetterQueue' property 'Type' should be of type str.",
+            )
+
         # Validate required Types
         if not self.DeadLetterQueue["Type"] in self.dead_letter_queue_policy_actions:
             raise InvalidResourceException(
