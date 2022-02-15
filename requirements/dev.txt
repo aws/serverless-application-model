@@ -4,7 +4,7 @@ tox~=3.24
 pytest-cov~=2.10.1
 pytest-xdist~=2.5
 pytest-env~=0.6.2
-pylint>=1.7.2,<2.0
+pylint~=2.9.0
 pyyaml~=5.4
 
 # Test requirements
