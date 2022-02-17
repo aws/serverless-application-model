@@ -136,6 +136,12 @@ class Py27UniStr(unicode_string_type):
     def __deepcopy__(self, memo):
         return self  # strings are immutable
 
+    def _get_py27_hash(self):
+        h = getattr(self, "_py27_hash", None)
+        if h is None:
+            self._py27_hash = h = ctypes.c_size_t(Hash.hash(self)).value
+        return h
+
 
 class Py27LongInt(long_int_type):
     """
@@ -185,15 +191,20 @@ class Py27Keys(object):
 
     def _get_key_idx(self, k):
         """Gets insert location for k"""
-        freeslot = None
-        # C API uses unsigned values
-        h = ctypes.c_size_t(Hash.hash(k)).value
+
+        # Py27UniStr caches the hash to improve performance so use its method instead of always computing the hash
+        if isinstance(k, Py27UniStr):
+            h = k._get_py27_hash()
+        else:
+            h = ctypes.c_size_t(Hash.hash(k)).value
+
         i = h & self.mask
 
         if i not in self.keyorder or self.keyorder[i] == k:
             # empty slot or keys match
             return i
 
+        freeslot = None
         if i in self.keyorder and self.keyorder[i] is self.DUMMY:
             # dummy slot
             freeslot = i
