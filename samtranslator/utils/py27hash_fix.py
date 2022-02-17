@@ -133,6 +133,9 @@ class Py27UniStr(unicode_string_type):
     def split(self, sep=None, maxsplit=-1):
         return [Py27UniStr(s) for s in super(Py27UniStr, self).split(sep, maxsplit)]
 
+    def __deepcopy__(self, memo):
+        return self  # strings are immutable
+
 
 class Py27LongInt(long_int_type):
     """
@@ -146,6 +149,9 @@ class Py27LongInt(long_int_type):
         if sys.version_info.major >= 3 and self > Py27LongInt.PY2_MAX_INT:
             return super(Py27LongInt, self).__repr__() + "L"
         return super(Py27LongInt, self).__repr__()
+
+    def __deepcopy__(self, memo):
+        return self  # primitive types (ints) are immutable
 
 
 class Py27Keys(object):
@@ -166,6 +172,16 @@ class Py27Keys(object):
         self.size = 0  # current size of the keys, equivalent to ma_used in dictobject.c
         self.fill = 0  # increment count when a key is added, equivalent to ma_fill in dictobject.c
         self.mask = MINSIZE - 1  # Python2 default dict size
+
+    def __deepcopy__(self, memo):
+        # add keys in the py2 order -- we can't do a straigh-up deep copy of keyorder because
+        # in py2 copy.deepcopy of a dict may result in reordering of the keys
+        ret = Py27Keys()
+        for k in self.keys():
+            if k is self.DUMMY:
+                continue
+            ret.add(copy.deepcopy(k, memo))
+        return ret
 
     def _get_key_idx(self, k):
         """Gets insert location for k"""
@@ -336,6 +352,17 @@ class Py27Dict(dict):
 
         # Initialize base arguments
         self.update(*args, **kwargs)
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        for k, v in self.__dict__.items():
+            setattr(result, k, copy.deepcopy(v, memo))
+
+        for key, value in super(Py27Dict, self).items():
+            super(Py27Dict, result).__setitem__(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
+
+        return result
 
     def __reduce__(self):
         """
