@@ -1,0 +1,178 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "sam-app\nSample SAM Template for sam-app\n",
+    "Conditions": {
+      "TrueCondition": {
+        "Fn::Equals": [
+          true,
+          true
+        ]
+      },
+      "FalseCondition": {
+        "Fn::Equals": [
+          true,
+          false
+        ]
+      }
+    },
+    "Resources": {
+      "MyAuthFnRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": [
+                  "sts:AssumeRole"
+                ],
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": [
+                    "lambda.amazonaws.com"
+                  ]
+                }
+              }
+            ]
+          },
+          "ManagedPolicyArns": [
+            "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          ],
+          "Tags": [
+            {
+              "Key": "lambda:createdBy",
+              "Value": "SAM"
+            }
+          ]
+        }
+      },
+      "MyApiApiGatewayDefaultStage": {
+        "Type": "AWS::ApiGatewayV2::Stage",
+        "Properties": {
+          "ApiId": {
+            "Ref": "MyApi"
+          },
+          "StageName": "$default",
+          "Tags": {
+            "httpapi:createdBy": "SAM"
+          },
+          "AutoDeploy": true
+        }
+      },
+      "MyAuthFn": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Code": {
+            "S3Bucket": "sam-demo-bucket",
+            "S3Key": "hello.zip"
+          },
+          "Handler": "index.handler",
+          "Role": {
+            "Fn::GetAtt": [
+              "MyAuthFnRole",
+              "Arn"
+            ]
+          },
+          "Runtime": "nodejs12.x",
+          "Tags": [
+            {
+              "Key": "lambda:createdBy",
+              "Value": "SAM"
+            }
+          ]
+        }
+      },
+      "MyApi": {
+        "Type": "AWS::ApiGatewayV2::Api",
+        "Properties": {
+          "Body": {
+            "info": {
+              "title": {
+                "Fn::Sub": "${AWS::StackName}-Api"
+              }
+            },
+            "paths": {
+              "/post": {
+                "Fn::If": [
+                  "FalseCondition",
+                  {
+                    "post": {
+                      "x-amazon-apigateway-integration": {
+                        "httpMethod": "POST",
+                        "type": "aws_proxy",
+                        "uri": "https://www.otherURI.co/",
+                        "payloadFormatVersion": "1.0"
+                      },
+                      "security": [
+                        {
+                          "MyLambdaAuthUpdated": []
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "post": {
+                      "x-amazon-apigateway-integration": {
+                        "httpMethod": "POST",
+                        "type": "aws_proxy",
+                        "uri": "https://www.alphavantage.co/",
+                        "payloadFormatVersion": "1.0"
+                      },
+                      "security": [
+                        {
+                          "MyLambdaAuthUpdated": []
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "openapi": "3.0",
+            "components": {
+              "securitySchemes": {
+                "MyLambdaAuthUpdated": {
+                  "type": "apiKey",
+                  "name": "Unused",
+                  "in": "header",
+                  "x-amazon-apigateway-authorizer": {
+                    "type": "request",
+                    "authorizerUri": {
+                      "Fn::Sub": [
+                        "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                        {
+                          "__FunctionArn__": {
+                            "Fn::GetAtt": [
+                              "MyAuthFn",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    "authorizerCredentials": {
+                      "Fn::GetAtt": [
+                        "MyAuthFnRole",
+                        "Arn"
+                      ]
+                    },
+                    "authorizerResultTtlInSeconds": 37,
+                    "identitySource": [
+                      "$request.header.Authorization"
+                    ],
+                    "authorizerPayloadFormatVersion": 1.0
+                  }
+                }
+              }
+            },
+            "tags": [
+              {
+                "name": "httpapi:createdBy",
+                "x-amazon-apigateway-tag-value": "SAM"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }

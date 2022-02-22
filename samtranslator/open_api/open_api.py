@@ -1,9 +1,7 @@
 import copy
 import re
 
-from samtranslator.model.intrinsics import ref
-from samtranslator.model.intrinsics import make_conditional
-from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.intrinsics import ref, make_conditional, is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 import json
@@ -54,79 +52,87 @@ class OpenApiEditor(object):
         self.tags = self._doc.get("tags", [])
         self.info = self._doc.get("info", Py27Dict())
 
-    def get_path(self, path):
+    def get_conditional_contents(self, item):
         """
-        Returns the contents of a path, extracting them out of a condition if necessary
-        :param path: path name
+        Returns the contents of the given item.
+        If a conditional block has been used inside the item, returns a list of the content
+        inside the conditional (both the then and the else cases). Skips {'Ref': 'AWS::NoValue'} content.
+        If there's no conditional block, then returns an list with the single item in it.
+
+        :param dict item: item from which the contents will be extracted
+        :return: list of item content
         """
-        path_dict = self.paths.get(path)
-        if isinstance(path_dict, dict) and self._CONDITIONAL_IF in path_dict:
-            path_dict = path_dict[self._CONDITIONAL_IF][1]
-        return path_dict
+        contents = [item]
+        if isinstance(item, dict) and self._CONDITIONAL_IF in item:
+            contents = item[self._CONDITIONAL_IF][1:]
+            contents = [content for content in contents if not is_intrinsic_no_value(content)]
+        return contents
 
     def has_path(self, path, method=None):
         """
-        Returns True if this OpenApi has the given path and optional method
+        Returns True if this Swagger has the given path and optional method
+        For paths with conditionals, only returns true if both items (true case, and false case) have the method.
 
         :param string path: Path name
         :param string method: HTTP method
         :return: True, if this path/method is present in the document
         """
+        if path not in self.paths:
+            return False
+
         method = self._normalize_method_name(method)
-
-        path_dict = self.get_path(path)
-        path_dict_exists = path_dict is not None
         if method:
-            return path_dict_exists and method in path_dict
-        return path_dict_exists
+            for path_item in self.get_conditional_contents(self.paths.get(path)):
+                if not path_item or method not in path_item:
+                    return False
+        return True
 
-    def get_integration_function_logical_id(self, path_name, method_name):
+    def is_integration_function_logical_id_match(self, path_name, method_name, logical_id):
         """
-        Retrieves the function logical id in a lambda integration if it exists
-        If it doesn't exist, returns false
+        Returns True if the function logical id in a lambda integration matches the passed
+        in logical_id.
+        If there are conditionals (paths, methods, uri), returns True only
+        if they all match the passed in logical_id. False otherwise.
+        If the integration doesn't exist, returns False
         :param path_name: name of the path
         :param method_name: name of the method
+        :param logical_id: logical id to compare against
         """
         if not self.has_integration(path_name, method_name):
             return False
         method_name = self._normalize_method_name(method_name)
-        # Get the path
-        path = self.get_path(path_name)
-        # Get the method contents
-        # We only want the first one in case there are multiple (in a conditional)
-        method = self.get_method_contents(path[method_name])[0]
-        integration = method.get(self._X_APIGW_INTEGRATION, Py27Dict())
 
-        # Extract the integration uri out of a conditional if necessary
-        uri = integration.get("uri")
-        if not isinstance(uri, dict):
-            return ""
-        if self._CONDITIONAL_IF in uri:
-            arn = uri[self._CONDITIONAL_IF][1].get("Fn::Sub")
-        else:
-            arn = uri.get("Fn::Sub", "")
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path_name, method_name, False):
+            integration = method_definition.get(self._X_APIGW_INTEGRATION, Py27Dict())
 
-        # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
-        regex = r"([A-Za-z0-9]+\.Arn)"
-        matches = re.findall(regex, arn)
-        # Prevent IndexError when integration URI doesn't contain .Arn (e.g. a Function with
-        # AutoPublishAlias translates to AWS::Lambda::Alias, which make_shorthand represents
-        # as LogicalId instead of LogicalId.Arn).
-        # TODO: Consistent handling of Functions with and without AutoPublishAlias (see #1901)
-        if not matches:
-            return False
-        match = matches[0].split(".Arn")[0]
-        return match
+            # Extract the integration uri out of a conditional if necessary
+            uri = integration.get("uri")
+            if not isinstance(uri, dict):
+                return False
+            for uri_content in self.get_conditional_contents(uri):
+                arn = uri_content.get("Fn::Sub", "")
+
+                # Extract lambda integration (${LambdaName.Arn}) and split ".Arn" off from it
+                regex = r"([A-Za-z0-9]+\.Arn)"
+                matches = re.findall(regex, arn)
+                # Prevent IndexError when integration URI doesn't contain .Arn (e.g. a Function with
+                # AutoPublishAlias translates to AWS::Lambda::Alias, which make_shorthand represents
+                # as LogicalId instead of LogicalId.Arn).
+                # TODO: Consistent handling of Functions with and without AutoPublishAlias (see #1901)
+                if not matches or matches[0].split(".Arn")[0] != logical_id:
+                    return False
+
+        return True
 
     def method_has_integration(self, method):
         """
         Returns true if the given method contains a valid method definition.
-        This uses the get_method_contents function to handle conditionals.
+        This uses the get_conditional_contents function to handle conditionals.
 
         :param dict method: method dictionary
         :return: true if method has one or multiple integrations
         """
-        for method_definition in self.get_method_contents(method):
+        for method_definition in self.get_conditional_contents(method):
             if self.method_definition_has_integration(method_definition):
                 return True
         return False
@@ -142,22 +148,10 @@ class OpenApiEditor(object):
             return True
         return False
 
-    def get_method_contents(self, method):
-        """
-        Returns the swagger contents of the given method. This checks to see if a conditional block
-        has been used inside of the method, and, if so, returns the method contents that are
-        inside of the conditional.
-
-        :param dict method: method dictionary
-        :return: list of swagger component dictionaries for the method
-        """
-        if self._CONDITIONAL_IF in method:
-            return method[self._CONDITIONAL_IF][1:]
-        return [method]
-
     def has_integration(self, path, method):
         """
-        Checks if an API Gateway integration is already present at the given path/method
+        Checks if an API Gateway integration is already present at the given path/method.
+        For paths with conditionals, it only returns True if both items (true case, false case) have the integration
 
         :param string path: Path name
         :param string method: HTTP method
@@ -165,12 +159,15 @@ class OpenApiEditor(object):
         """
         method = self._normalize_method_name(method)
 
-        path_dict = self.get_path(path)
-        return (
-            self.has_path(path, method)
-            and isinstance(path_dict[method], dict)
-            and self.method_has_integration(path_dict[method])
-        )  # Integration present and non-empty
+        if not self.has_path(path, method):
+            return False
+
+        for path_item in self.get_conditional_contents(self.paths.get(path)):
+            method_definition = path_item.get(method)
+            if not (isinstance(method_definition, dict) and self.method_has_integration(method_definition)):
+                return False
+        # Integration present and non-empty
+        return True
 
     def add_path(self, path, method=None):
         """
@@ -194,10 +191,8 @@ class OpenApiEditor(object):
                 ]
             )
 
-        if self._CONDITIONAL_IF in path_dict:
-            path_dict = path_dict[self._CONDITIONAL_IF][1]
-
-        path_dict.setdefault(method, Py27Dict())
+        for path_item in self.get_conditional_contents(path_dict):
+            path_item.setdefault(method, Py27Dict())
 
     def add_lambda_integration(
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
@@ -222,23 +217,23 @@ class OpenApiEditor(object):
         if condition:
             integration_uri = make_conditional(condition, integration_uri)
 
-        path_dict = self.get_path(path)
-        # create as Py27Dict and insert key one by one to preserve input order
-        path_dict[method][self._X_APIGW_INTEGRATION] = Py27Dict()
-        path_dict[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
-        path_dict[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
-        path_dict[method][self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = "2.0"
-        path_dict[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
+        for path_item in self.get_conditional_contents(self.paths.get(path)):
+            # create as Py27Dict and insert key one by one to preserve input order
+            path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
+            path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
+            path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
+            path_item[method][self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = "2.0"
+            path_item[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
 
-        if path == self._DEFAULT_PATH and method == self._X_ANY_METHOD:
-            path_dict[method]["isDefaultRoute"] = True
+            if path == self._DEFAULT_PATH and method == self._X_ANY_METHOD:
+                path_item[method]["isDefaultRoute"] = True
 
-        # If 'responses' key is *not* present, add it with an empty dict as value
-        path_dict[method].setdefault("responses", Py27Dict())
+            # If 'responses' key is *not* present, add it with an empty dict as value
+            path_item[method].setdefault("responses", Py27Dict())
 
-        # If a condition is present, wrap all method contents up into the condition
-        if condition:
-            path_dict[method] = make_conditional(condition, path_dict[method])
+            # If a condition is present, wrap all method contents up into the condition
+            if condition:
+                path_item[method] = make_conditional(condition, path_item[method])
 
     def make_path_conditional(self, path, condition):
         """
@@ -259,6 +254,46 @@ class OpenApiEditor(object):
         for path, value in self.paths.items():
             yield path
 
+    def iter_on_method_definitions_for_path_at_method(
+        self, path_name, method_name, skip_methods_without_apigw_integration=True
+    ):
+        """
+        Yields all the method definitions for the path+method combinations if path and/or method have IF conditionals.
+        If there are no conditionals, will just yield the single method definition at the given path and method name.
+
+        :param path_name: path name
+        :param method_name: method name
+        :param skip_methods_without_apigw_integration: if True, skips method definitions without apigw integration
+        :yields dict: method definition
+        """
+        normalized_method_name = self._normalize_method_name(method_name)
+
+        for path_item in self.get_conditional_contents(self.paths.get(path_name)):
+            for method_definition in self.get_conditional_contents(path_item.get(normalized_method_name)):
+                if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
+                    method_definition
+                ):
+                    continue
+                yield method_definition
+
+    def iter_on_all_methods_for_path(self, path_name, skip_methods_without_apigw_integration=True):
+        """
+        Yields all the (method name, method definition) tuples for the path, including those inside conditionals.
+
+        :param path_name: path name
+        :param skip_methods_without_apigw_integration: if True, skips method definitions without apigw integration
+        :yields list of (method name, method definition) tuples
+        """
+        for path_item in self.get_conditional_contents(self.paths.get(path_name)):
+            for method_name, method in path_item.items():
+                for method_definition in self.get_conditional_contents(method):
+                    if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
+                        method_definition
+                    ):
+                        continue
+                    normalized_method_name = self._normalize_method_name(method_name)
+                    yield normalized_method_name, method_definition
+
     def add_timeout_to_method(self, api, path, method_name, timeout):
         """
         Adds a timeout to this path/method.
@@ -268,10 +303,8 @@ class OpenApiEditor(object):
         :param string method_name: Method name
         :param int timeout: Timeout amount, in milliseconds
         """
-        normalized_method_name = self._normalize_method_name(method_name)
-        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
-            if self.method_definition_has_integration(method_definition):
-                method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+            method_definition[self._X_APIGW_INTEGRATION]["timeoutInMillis"] = timeout
 
     def add_path_parameters_to_method(self, api, path, method_name, path_parameters):
         """
@@ -282,8 +315,7 @@ class OpenApiEditor(object):
         :param string method_name: Method name
         :param list path_parameters: list of strings of path parameters
         """
-        normalized_method_name = self._normalize_method_name(method_name)
-        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
             # create path parameter list
             # add it here if it doesn't exist, merge with existing otherwise.
             method_definition.setdefault("parameters", [])
@@ -319,10 +351,8 @@ class OpenApiEditor(object):
         :param string method_name: Method name
         :param string payload_format_version: payload format version sent to the integration
         """
-        normalized_method_name = self._normalize_method_name(method_name)
-        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
-            if self.method_definition_has_integration(method_definition):
-                method_definition[self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = payload_format_version
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
+            method_definition[self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = payload_format_version
 
     def add_authorizers_security_definitions(self, authorizers):
         """
@@ -347,42 +377,45 @@ class OpenApiEditor(object):
             authorizers param.
         :param list authorizers: List of Authorizer configurations defined on the related Api.
         """
-        for method_name, method in self.get_path(path).items():
-            normalized_method_name = self._normalize_method_name(method_name)
-            # Excluding parameters section
-            if normalized_method_name == "parameters":
-                continue
-            if normalized_method_name != "options":
+        for path_item in self.get_conditional_contents(self.paths.get(path)):
+            for method_name, method in path_item.items():
                 normalized_method_name = self._normalize_method_name(method_name)
-                # It is possible that the method could have two definitions in a Fn::If block.
-                if normalized_method_name not in self.get_path(path):
-                    raise InvalidDocumentException(
-                        [
-                            InvalidTemplateException(
-                                "Could not find {} in {} within DefinitionBody.".format(normalized_method_name, path)
-                            )
-                        ]
-                    )
-                for method_definition in self.get_method_contents(method):
-                    # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
-                    if not self.method_definition_has_integration(method_definition):
-                        continue
-                    existing_security = method_definition.get("security", [])
-                    if existing_security:
-                        continue
-                    authorizer_list = []
-                    if authorizers:
-                        authorizer_list.extend(authorizers.keys())
-                    security_dict = dict()
-                    security_dict[default_authorizer] = self._get_authorization_scopes(
-                        api_authorizers, default_authorizer
-                    )
-                    authorizer_security = [security_dict]
+                # Excluding parameters section
+                if normalized_method_name == "parameters":
+                    continue
+                if normalized_method_name != "options":
+                    normalized_method_name = self._normalize_method_name(method_name)
+                    # It is possible that the method could have two definitions in a Fn::If block.
+                    if normalized_method_name not in path_item:
+                        raise InvalidDocumentException(
+                            [
+                                InvalidTemplateException(
+                                    "Could not find {} in {} within DefinitionBody.".format(
+                                        normalized_method_name, path
+                                    )
+                                )
+                            ]
+                        )
+                    for method_definition in self.get_conditional_contents(method):
+                        # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
+                        if not self.method_definition_has_integration(method_definition):
+                            continue
+                        existing_security = method_definition.get("security", [])
+                        if existing_security:
+                            continue
+                        authorizer_list = []
+                        if authorizers:
+                            authorizer_list.extend(authorizers.keys())
+                        security_dict = dict()
+                        security_dict[default_authorizer] = self._get_authorization_scopes(
+                            api_authorizers, default_authorizer
+                        )
+                        authorizer_security = [security_dict]
 
-                    security = authorizer_security
+                        security = authorizer_security
 
-                    if security:
-                        method_definition["security"] = security
+                        if security:
+                            method_definition["security"] = security
 
     def add_auth_to_method(self, path, method_name, auth, api):
         """
@@ -415,14 +448,8 @@ class OpenApiEditor(object):
         """
         if authorization_scopes is None:
             authorization_scopes = []
-        normalized_method_name = self._normalize_method_name(method_name)
-        # It is possible that the method could have two definitions in a Fn::If block.
-        for method_definition in self.get_method_contents(self.get_path(path)[normalized_method_name]):
 
-            # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
-            if not self.method_definition_has_integration(method_definition):
-                continue
-
+        for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
             existing_security = method_definition.get("security", [])
 
             security_dict = dict()

@@ -1118,8 +1118,8 @@ class HttpApi(PushEventSource):
         # If this is using the new $default path, keep path blank and add a * permission
         if path == OpenApiEditor._DEFAULT_PATH:
             path = ""
-        elif editor and resources_to_link.get("function").logical_id == editor.get_integration_function_logical_id(
-            OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD
+        elif editor and editor.is_integration_function_logical_id_match(
+            OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD, resources_to_link.get("function").logical_id
         ):
             # Case where default exists for this function, and so the permissions for that will apply here as well
             # This can save us several CFN resources (not duplicating permissions)
