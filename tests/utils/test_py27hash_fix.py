@@ -91,6 +91,16 @@ class TestPy27UniStr(TestCase):
         for c in after:
             self.assertIsInstance(c, Py27UniStr)
 
+    def test_py27_hash(self):
+        a = Py27UniStr("abcdef")
+        self.assertEqual(a._get_py27_hash(), 484452592760221083)
+        # do it twice since _get_py27_hash caches the hash
+        self.assertEqual(a._get_py27_hash(), 484452592760221083)
+
+    def test_deepcopy(self):
+        a = Py27UniStr("abcdef")
+        self.assert_(a is copy.deepcopy(a))  # deepcopy should give back the same object
+
 
 class TestPy27LongInt(TestCase):
     def test_long_int(self):
@@ -110,6 +120,10 @@ class TestPy27LongInt(TestCase):
         i = Py27LongInt(100)
         d = {"num": i}
         self.assertEqual(str(d), "{'num': 100}")
+
+    def test_deepcopy(self):
+        a = Py27LongInt(10)
+        self.assert_(a is copy.deepcopy(a))  # deepcopy should give back the same object
 
 
 class TestPy27Keys(TestCase):
