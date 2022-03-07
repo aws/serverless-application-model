@@ -168,6 +168,11 @@ class ApiGatewayV2Authorizer(object):
                 self.api_logical_id, self.name + " Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
+        if self.identity and not isinstance(self.identity, dict):
+            raise InvalidResourceException(
+                self.api_logical_id, self.name + " Lambda Authorizer property 'identity' is of invalid type."
+            )
+
     def generate_openapi(self):
         """
         Generates OAS for the securitySchemes section
