@@ -36,7 +36,7 @@ class TestApiWithGatewayResponses(BaseTest):
     @retry(AssertionError, exc_raise=AssertionError, exc_raise_msg="Unable to verify GatewayResponse request.")
     def _verify_request_response_and_cors(self, url, expected_response):
         response = self.verify_get_request_response(url, expected_response)
-        access_control_allow_origin = response.headers.get("Access-Control-Allow-Origins", "")
+        access_control_allow_origin = response.headers.get("Access-Control-Allow-Origin", "")
         self.assertEqual(access_control_allow_origin, "*", "Access-Control-Allow-Origin must be '*'")
 
 
