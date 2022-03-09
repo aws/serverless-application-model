@@ -1,0 +1,44 @@
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        SimpleCase:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+        BasePath:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyApi
+            Path: /
+            Method: get
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName:
+        Ref: Stage
+      Auth:
+        DefaultAuthorizer: "LambdaAuthorizer"
+        Authorizers:
+          LambdaAuthorizer:
+            FunctionPayloadType: "REQUEST"
+            Identity:
+              Headers:
+                  - "Authorization"
+      DefinitionBody:
+        openapi: '3.0'
+        info:
+          title: !Sub ${AWS::StackName}-Api
+        paths:
+          /:
+            any:
+              x-amazon-apigateway-integration:
+                httpMethod: ANY
+                type: http_proxy
+                uri: https://www.alphavantage.co/
+                payloadFormatVersion: '1.0'

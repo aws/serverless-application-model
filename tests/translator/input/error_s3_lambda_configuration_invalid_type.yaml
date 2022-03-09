@@ -1,0 +1,24 @@
+Resources:
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: RandomBucket
+            Events: s3:ObjectCreated:*
+
+  RandomBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      NotificationConfiguration:
+        LambdaConfigurations:
+          Event: s3:ObjectCreated:Put
+          Function: arn:aws:iam::...

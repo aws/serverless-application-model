@@ -1,0 +1,8 @@
+Resources:
+  FunctionWithNullEvents:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/queues.zip
+      Handler: handlers.handler
+      Runtime: python3.8
+      Events:

@@ -1,0 +1,88 @@
+Parameters:
+  ValidateParametersBody:
+    Type: String
+    default: true
+    AllowedValues: [true, false]
+  ValidateParametersParameters:
+    Type: String
+    default: true
+    AllowedValues: [true, false]
+
+Conditions:
+  CreateBodyValidator:
+    Fn::Equals:
+      - false
+      - true
+
+
+Resources:
+  HtmlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody: !Ref ValidateParametersBody
+              ValidateParameters: !Ref ValidateParametersParameters
+
+  HtmlFunctionNoValue:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /novalue
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody: AWS::NoValue
+
+  HtmlFunctionWithIfIntrinsics:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/member_portal.zip
+      Handler: index.gethtml
+      Runtime: nodejs12.x
+      Events:
+        GetHtml:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /if/intrinics
+            Method: get
+            RequestModel:
+              Model: User
+              Required: true
+              ValidateBody:
+                Fn::If:
+                  - CreateBodyValidator
+                  - !Ref ValidateParametersBody
+                  - false
+
+
+  HtmlApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string

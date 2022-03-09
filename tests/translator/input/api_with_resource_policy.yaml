@@ -37,5 +37,12 @@ Resources:
               Ref: ExplicitApi
             Path: /three
             Method: put
+        AnyHtml:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: ExplicitApi
+            Path: /any
+            Method: any
 
       

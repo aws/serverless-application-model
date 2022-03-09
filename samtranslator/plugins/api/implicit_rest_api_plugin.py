@@ -1,5 +1,3 @@
-import six
-
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
 from samtranslator.public.swagger import SwaggerEditor
@@ -80,14 +78,16 @@ class ImplicitRestApiPlugin(ImplicitApiPlugin):
             except KeyError as e:
                 raise InvalidEventException(logicalId, "Event is missing key {}.".format(e))
 
-            if not isinstance(path, six.string_types):
+            if not isinstance(path, str):
                 raise InvalidEventException(logicalId, "Api Event must have a String specified for 'Path'.")
-            if not isinstance(method, six.string_types):
+            if not isinstance(method, str):
                 raise InvalidEventException(logicalId, "Api Event must have a String specified for 'Method'.")
 
-            # !Ref is resolved by this time. If it is still a dict, we can't parse/use this Api.
-            if isinstance(api_id, dict):
-                raise InvalidEventException(logicalId, "Api Event must reference an Api in the same template.")
+            # !Ref is resolved by this time. If it is not a string, we can't parse/use this Api.
+            if api_id and not isinstance(api_id, str):
+                raise InvalidEventException(
+                    logicalId, "Api Event's RestApiId must be a string referencing an Api in the same template."
+                )
 
             api_dict_condition = self.api_conditions.setdefault(api_id, {})
             method_conditions = api_dict_condition.setdefault(path, {})

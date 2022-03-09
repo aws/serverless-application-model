@@ -1,0 +1,53 @@
+Parameters:
+  BatchSizeValue:
+    Type: Number
+    Default: 100
+
+  EnableValue:
+    Type: String
+    Default: True
+
+  TopicsValue:
+    Type: CommaDelimitedList
+    Default: Topic
+
+  KafkaBootstrapServersValue:
+    Type: CommaDelimitedList
+    Default: abc.xyz.com:9092,123.45.67.89:9096
+      
+      
+Resources:
+  KafkaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Handler: index.kafka_handler
+      Runtime: python3.9
+      Events:
+        MyKafkaCluster:
+          Type: SelfManagedKafka
+          Properties:
+            KafkaBootstrapServers:
+              Ref: KafkaBootstrapServersValue
+            Topics:
+              Ref: TopicsValue
+            Enabled:
+              Ref: EnableValue
+            BatchSize:
+              Ref: BatchSizeValue
+            SourceAccessConfigurations:
+              - Type: VPC_SUBNET
+                URI: subnet:subnet-12345
+              - Type: VPC_SECURITY_GROUP
+                URI: security_group:sg-67890
+              - Type: BASIC_AUTH
+                URI:
+                  Ref: KafkaUserSecret
+
+  KafkaUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: KafkaUserPassword
+      SecretString:
+        Fn::Sub: '{"username":"testBrokerUser","password":"testBrokerPassword"}'
+

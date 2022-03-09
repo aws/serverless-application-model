@@ -1,7 +1,14 @@
+import json
 import logging
 import os
 
+import botocore
+import pytest
+import requests
+
 from integration.helpers.client_provider import ClientProvider
+from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
+from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
 from samtranslator.yaml_helper import yaml_parse
@@ -13,10 +20,7 @@ except ImportError:
 from unittest.case import TestCase
 
 import boto3
-import pytest
-import yaml
 from botocore.exceptions import ClientError
-from botocore.config import Config
 from integration.helpers.deployer.deployer import Deployer
 from integration.helpers.template import transform_template
 
@@ -28,14 +32,19 @@ S3_BUCKET_PREFIX = "sam-integ-bucket-"
 
 
 class BaseTest(TestCase):
+    @pytest.fixture(autouse=True)
+    def prefix(self, get_prefix):
+        self.pipeline_prefix = get_prefix
+
     @classmethod
+    @pytest.mark.usefixtures("get_prefix")
     def setUpClass(cls):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
-        cls.template_dir = Path(cls.resources_dir, "templates", "single")
+        cls.template_dir = Path(cls.resources_dir, "templates")
         cls.output_dir = Path(cls.tests_integ_dir, "tmp")
-        cls.expected_dir = Path(cls.resources_dir, "expected", "single")
+        cls.expected_dir = Path(cls.resources_dir, "expected")
         cls.code_dir = Path(cls.resources_dir, "code")
         cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
         cls.session = boto3.session.Session()
@@ -125,9 +134,71 @@ class BaseTest(TestCase):
         if os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-    def create_and_verify_stack(self, file_name, parameters=None):
+    def create_stack(self, file_path, parameters=None):
         """
         Creates the Cloud Formation stack and verifies it against the expected
+        result
+
+        Parameters
+        ----------
+        file_path : string
+            Template file name, format "folder_name/file_name"
+        parameters : list
+            List of parameters
+        """
+        folder, file_name = file_path.split("/")
+        self.generate_out_put_file_path(folder, file_name)
+        self.stack_name = (
+            self.pipeline_prefix + STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
+        )
+
+        self._fill_template(folder, file_name)
+        self.transform_template()
+        self.deploy_stack(parameters)
+
+    def create_and_verify_stack(self, file_path, parameters=None):
+        """
+        Creates the Cloud Formation stack and verifies it against the expected
+        result
+
+        Parameters
+        ----------
+        file_path : string
+            Template file name, format "folder_name/file_name"
+        parameters : list
+            List of parameters
+        """
+        folder, file_name = file_path.split("/")
+        self.create_stack(file_path, parameters)
+        self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
+        self.verify_stack()
+
+    def update_stack(self, file_path, parameters=None):
+        """
+        Updates the Cloud Formation stack
+
+        Parameters
+        ----------
+        file_path : string
+            Template file name, format "folder_name/file_name"
+        parameters : list
+            List of parameters
+        """
+        if os.path.exists(self.output_file_path):
+            os.remove(self.output_file_path)
+        if os.path.exists(self.sub_input_file_path):
+            os.remove(self.sub_input_file_path)
+
+        folder, file_name = file_path.split("/")
+        self.generate_out_put_file_path(folder, file_name)
+
+        self._fill_template(folder, file_name)
+        self.transform_template()
+        self.deploy_stack(parameters)
+
+    def update_and_verify_stack(self, file_path, parameters=None):
+        """
+        Updates the Cloud Formation stack and verifies it against the expected
         result
 
         Parameters
@@ -137,14 +208,24 @@ class BaseTest(TestCase):
         parameters : list
             List of parameters
         """
-        self.output_file_path = str(Path(self.output_dir, "cfn_" + file_name + ".yaml"))
-        self.expected_resource_path = str(Path(self.expected_dir, file_name + ".json"))
-        self.stack_name = STACK_NAME_PREFIX + file_name.replace("_", "-") + "-" + generate_suffix()
+        if not self.stack_name:
+            raise Exception("Stack not created.")
 
-        self._fill_template(file_name)
+        folder, file_name = file_path.split("/")
+        self.generate_out_put_file_path(folder, file_name)
+        self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
+
+        self._fill_template(folder, file_name)
         self.transform_template()
         self.deploy_stack(parameters)
-        self.verify_stack()
+        self.verify_stack(end_state="UPDATE_COMPLETE")
+
+    def generate_out_put_file_path(self, folder_name, file_name):
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        self.output_file_path = str(
+            Path(self.output_dir, "cfn_" + folder_name + "_" + file_name + generate_suffix() + ".yaml")
+        )
 
     def transform_template(self):
         transform_template(self.sub_input_file_path, self.output_file_path)
@@ -278,17 +359,21 @@ class BaseTest(TestCase):
 
         return None
 
-    def _fill_template(self, file_name):
+    def _fill_template(self, folder, file_name):
         """
         Replaces the template variables with their value
 
         Parameters
         ----------
+        folder : string
+            The combination/single folder which contains the template
         file_name : string
             Template file name
         """
-        input_file_path = str(Path(self.template_dir, file_name + ".yaml"))
-        updated_template_path = str(Path(self.output_dir, "sub_" + file_name + ".yaml"))
+        input_file_path = str(Path(self.template_dir, folder, file_name + ".yaml"))
+        # add a folder name before file name to avoid possible collisions between
+        # files in the single and combination folder
+        updated_template_path = self.output_file_path.split(".yaml")[0] + "_sub" + ".yaml"
         with open(input_file_path) as f:
             data = f.read()
         for key, _ in self.code_key_to_file.items():
@@ -317,6 +402,21 @@ class BaseTest(TestCase):
         yaml_doc["Resources"][resource_name]["Properties"][property_name] = value
         dump_yaml(self.sub_input_file_path, yaml_doc)
 
+    def remove_template_resource_property(self, resource_name, property_name):
+        """
+        remove a resource property of the current SAM template
+
+        Parameters
+        ----------
+        resource_name: string
+            resource name
+        property_name: string
+            property name
+        """
+        yaml_doc = load_yaml(self.sub_input_file_path)
+        del yaml_doc["Resources"][resource_name]["Properties"][property_name]
+        dump_yaml(self.sub_input_file_path, yaml_doc)
+
     def get_template_resource_property(self, resource_name, property_name):
         yaml_doc = load_yaml(self.sub_input_file_path)
         return yaml_doc["Resources"][resource_name]["Properties"][property_name]
@@ -339,16 +439,78 @@ class BaseTest(TestCase):
             self.deployer.execute_changeset(result["Id"], self.stack_name)
             self.deployer.wait_for_execute(self.stack_name, changeset_type)
 
-        self.stack_description = self.client_provider.cfn_client.describe_stacks(StackName=self.stack_name)
+        self._get_stack_description()
         self.stack_resources = self.client_provider.cfn_client.list_stack_resources(StackName=self.stack_name)
 
-    def verify_stack(self):
+    @retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
+    def _get_stack_description(self):
+        try:
+            self.stack_description = self.client_provider.cfn_client.describe_stacks(StackName=self.stack_name)
+        except botocore.exceptions.ClientError as ex:
+            if "Throttling" in str(ex):
+                raise ThrottlingError(stack_name=self.stack_name, msg=str(ex))
+            raise
+
+    def verify_stack(self, end_state="CREATE_COMPLETE"):
         """
         Gets and compares the Cloud Formation stack against the expect result file
         """
         # verify if the stack was successfully created
-        self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], "CREATE_COMPLETE")
+        self.assertEqual(self.stack_description["Stacks"][0]["StackStatus"], end_state)
+        assert self.stack_description["Stacks"][0]["StackStatus"] == end_state
         # verify if the stack contains the expected resources
         error = verify_stack_resources(self.expected_resource_path, self.stack_resources)
         if error:
             self.fail(error)
+
+    def verify_get_request_response(self, url, expected_status_code):
+        """
+        Verify if the get request to a certain url return the expected status code
+
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        expected_status_code : string
+            the expected status code
+        """
+        print("Making request to " + url)
+        response = requests.get(url)
+        self.assertEqual(response.status_code, expected_status_code, " must return HTTP " + str(expected_status_code))
+        return response
+
+    def get_default_test_template_parameters(self):
+        """
+        get the default template parameters
+        """
+        parameters = [
+            {
+                "ParameterKey": "Bucket",
+                "ParameterValue": self.s3_bucket_name,
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+            {
+                "ParameterKey": "CodeKey",
+                "ParameterValue": "code.zip",
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+            {
+                "ParameterKey": "SwaggerKey",
+                "ParameterValue": "swagger1.json",
+                "UsePreviousValue": False,
+                "ResolvedValue": "string",
+            },
+        ]
+        return parameters
+
+    @staticmethod
+    def generate_parameter(key, value, previous_value=False, resolved_value="string"):
+        parameter = {
+            "ParameterKey": key,
+            "ParameterValue": value,
+            "UsePreviousValue": previous_value,
+            "ResolvedValue": resolved_value,
+        }
+        return parameter

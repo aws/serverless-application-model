@@ -1,0 +1,162 @@
+{
+  "Resources": {
+    "HtmlApiDeployment72be896056": {
+      "Type": "AWS::ApiGateway::Deployment", 
+      "Properties": {
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "Description": "RestApi deployment id: 72be896056aaf46ddbba3a4726d528b56599d1a7", 
+        "StageName": "Stage"
+      }
+    }, 
+    "HtmlFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "HtmlApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage", 
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "HtmlApiDeployment72be896056"
+        }, 
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }, 
+        "StageName": "Prod"
+      }
+    }, 
+    "HtmlFunctionGetHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission", 
+      "Properties": {
+        "Action": "lambda:InvokeFunction", 
+        "Principal": "apigateway.amazonaws.com", 
+        "FunctionName": {
+          "Ref": "HtmlFunction"
+        }, 
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            {
+              "__Stage__": "*", 
+              "__ApiId__": "HtmlApi"
+            }
+          ]
+        }
+      }
+    }, 
+    "HtmlApi": {
+      "Type": "AWS::ApiGateway::RestApi", 
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0", 
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          }, 
+          "paths": {
+            "/": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST", 
+                  "type": "aws_proxy", 
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
+                  }, 
+                  "credentials": "arn:aws:iam::*:user/*"
+                }, 
+                "security": [
+                  {
+                    "AWS_IAM": []
+                  }
+                ], 
+                "responses": {}
+              }
+            }
+          }, 
+          "swagger": "2.0", 
+          "x-amazon-apigateway-policy": {
+            "Version": "2012-10-17", 
+            "Statement": {
+              "Action": "execute-api:Invoke", 
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "execute-api:/${__Stage__}/GET/", 
+                    {
+                      "__Stage__": "Prod"
+                    }
+                  ]
+                }
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "AWS": [
+                  "123456"
+                ]
+              }
+            }
+          }, 
+          "securityDefinitions": {
+            "AWS_IAM": {
+              "x-amazon-apigateway-authtype": "awsSigv4", 
+              "type": "apiKey", 
+              "name": "Authorization", 
+              "in": "header"
+            }
+          }
+        }
+      }
+    }, 
+    "HtmlFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Handler": "index.gethtml", 
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "member_portal.zip"
+        }, 
+        "Role": {
+          "Fn::GetAtt": [
+            "HtmlFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "nodejs12.x", 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }
+  }
+}

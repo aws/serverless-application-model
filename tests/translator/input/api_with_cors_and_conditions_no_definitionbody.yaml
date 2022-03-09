@@ -48,6 +48,13 @@ Resources:
             Path: /
             Method: post
 
+        AnyHtml:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ExplicitApi
+            Path: /any
+            Method: any
+
 
   ExplicitApi:
     Type: AWS::Serverless::Api

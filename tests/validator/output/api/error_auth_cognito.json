@@ -1,0 +1,20 @@
+[
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoAuthorizationScopesEmpty.AuthorizationScopes] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoAuthorizationScopesItemNotString.AuthorizationScopes.0] 3 is not of type 'string'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoAuthorizationScopesNotList.AuthorizationScopes] 'scopes1' is not of type 'array'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityEmpty.Identity] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityHeaderEmpty.Identity.Header] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityHeaderNotString.Identity.Header] 3 is not of type 'string'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityReauthorizeEveryEmpty.Identity.ReauthorizeEvery] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityReauthorizeEveryNotInt.Identity.ReauthorizeEvery] '3' is not of type 'integer', 'intrinsic'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityReauthorizeEveryTooHigh.Identity.ReauthorizeEvery] 3601 is greater than the maximum of 3600",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityReauthorizeEveryTooLow.Identity.ReauthorizeEvery] 0 is less than the minimum of 1",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityReauthorizeEveryValueError.Identity.ReauthorizeEvery] 'NotANumber' is not of type 'integer', 'intrinsic'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityValidationExpressionEmpty.Identity.ValidationExpression] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoIdentityValidationExpressionNotString.Identity.ValidationExpression] 3 is not of type 'string'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoUserPoolArnEmpty.UserPoolArn] Must not be empty",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoUserPoolArnMissing] 'FunctionArn' is a required property",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoUserPoolArnMissing] 'UserPoolArn' is a required property",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoUserPoolArnNotIntrinsic.UserPoolArn] {'Not': 'Intrinsic'} is not of type 'string', 'intrinsic'",
+  "[Resources.MyApi.Properties.Auth.Authorizers.CognitoUserPoolArnNotString.UserPoolArn] 3 is not of type 'string', 'intrinsic'"
+]

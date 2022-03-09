@@ -1,0 +1,27 @@
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        KinesisStream:
+          Type: Kinesis
+          Properties:
+            Stream:
+              # Connect with the stream we have created in this template
+              Fn::GetAtt: [MyStream, Arn]
+
+            BatchSize: 100
+            StartingPosition: LATEST
+            TumblingWindowInSeconds: 120
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+  MyStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      ShardCount: 1

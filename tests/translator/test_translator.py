@@ -3,6 +3,7 @@ import itertools
 import os.path
 import hashlib
 import sys
+import re
 from functools import reduce, cmp_to_key
 
 from samtranslator.translator.translator import Translator, prepare_plugins, make_policy_template_for_function_plugin
@@ -21,7 +22,7 @@ import pytest
 import yaml
 from unittest import TestCase
 from samtranslator.translator.transform import transform
-from mock import Mock, MagicMock, patch
+from unittest.mock import Mock, MagicMock, patch
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"
@@ -32,6 +33,7 @@ DO_NOT_SORT = ["Layers"]
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = os.path.join(BASE_PATH, "input")
+ERROR_FILES_NAMES_FOR_TESTING = [os.path.splitext(f)[0] for f in os.listdir(INPUT_FOLDER) if f.startswith("error_")]
 OUTPUT_FOLDER = os.path.join(BASE_PATH, "output")
 
 
@@ -174,11 +176,6 @@ class AbstractTestTranslator(TestCase):
 
         print(json.dumps(output_fragment, indent=2))
 
-        # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
-
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
     def _update_logical_id_hash(self, resources):
@@ -257,6 +254,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
     @parameterized.expand(
         itertools.product(
             [
+                "congito_userpool_with_sms_configuration",
                 "cognito_userpool_with_event",
                 "s3_with_condition",
                 "function_with_condition",
@@ -267,6 +265,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "application_with_intrinsics",
                 "basic_layer",
                 "cloudwatchevent",
+                "cloudwatchevent_intrinsics",
                 "eventbridgerule",
                 "eventbridgerule_with_dlq",
                 "eventbridgerule_with_retry_policy",
@@ -277,8 +276,10 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "sqs",
                 "function_with_amq",
                 "function_with_amq_kms",
+                "function_with_mq_virtual_host",
                 "simpletable",
                 "simpletable_with_sse",
+                "resource_with_invalid_type",
                 "implicit_api",
                 "explicit_api",
                 "api_description",
@@ -293,6 +294,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_default_aws_iam_auth_and_no_auth_route",
                 "api_with_method_aws_iam_auth",
                 "api_with_aws_iam_auth_overrides",
+                "api_with_swagger_authorizer_none",
                 "api_with_method_settings",
                 "api_with_binary_media_types",
                 "api_with_binary_media_types_definition_body",
@@ -313,29 +315,38 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_gateway_responses_minimal",
                 "api_with_gateway_responses_implicit",
                 "api_with_gateway_responses_string_status_code",
+                "api_with_identity_intrinsic",
                 "api_cache",
                 "api_with_access_log_setting",
+                "api_with_any_method_in_swagger",
                 "api_with_canary_setting",
                 "api_with_xray_tracing",
                 "api_request_model",
+                "api_request_model_with_validator",
                 "api_with_stage_tags",
+                "api_with_mode",
+                "api_with_no_properties",
+                "api_with_disable_api_execute_endpoint",
                 "s3",
                 "s3_create_remove",
                 "s3_existing_lambda_notification_configuration",
                 "s3_existing_other_notification_configuration",
                 "s3_filter",
+                "s3_intrinsics",
                 "s3_multiple_events_same_bucket",
                 "s3_multiple_functions",
                 "s3_with_dependsOn",
                 "sns",
                 "sns_sqs",
                 "sns_existing_sqs",
+                "sns_intrinsics",
                 "sns_outside_sqs",
                 "sns_existing_other_subscription",
                 "sns_topic_outside_template",
                 "alexa_skill",
                 "alexa_skill_with_skill_id",
                 "iot_rule",
+                "kinesis_intrinsics",
                 "layers_with_intrinsics",
                 "layers_all_properties",
                 "layer_deletion_policy_precedence",
@@ -352,6 +363,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_custom_codedeploy_deployment_preference",
                 "function_with_custom_conditional_codedeploy_deployment_preference",
                 "function_with_disabled_deployment_preference",
+                "function_with_disabled_traffic_hook",
                 "function_with_deployment_preference",
                 "function_with_deployment_preference_all_parameters",
                 "function_with_deployment_preference_from_parameters",
@@ -364,6 +376,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_global_layers",
                 "function_with_layers",
                 "function_with_many_layers",
+                "function_with_null_events",
                 "function_with_permissions_boundary",
                 "function_with_policy_templates",
                 "function_with_sns_event_source_all_parameters",
@@ -432,9 +445,31 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "state_machine_with_condition_and_events",
                 "state_machine_with_xray_policies",
                 "state_machine_with_xray_role",
+                "state_machine_with_null_events",
                 "function_with_file_system_config",
                 "state_machine_with_permissions_boundary",
                 "version_deletion_policy_precedence",
+                "api_swagger_integration_with_string_api_id",
+                "api_swagger_integration_with_ref_intrinsic_api_id",
+                "function_with_architectures",
+                "function_with_intrinsic_architecture",
+                "self_managed_kafka_with_intrinsics",
+                "function_with_self_managed_kafka",
+                "function_with_auth_mechanism_for_self_managed_kafka",
+                "function_with_vpc_permission_for_self_managed_kafka",
+                "function_with_event_filtering",
+                "api_with_security_definition_and_components",
+                "api_with_security_definition_and_none_components",
+                "api_with_security_definition_and_no_components",
+                "api_http_paths_with_if_condition",
+                "api_http_paths_with_if_condition_no_value_then_case",
+                "api_http_paths_with_if_condition_no_value_else_case",
+                "api_rest_paths_with_if_condition_swagger",
+                "api_rest_paths_with_if_condition_swagger_no_value_then_case",
+                "api_rest_paths_with_if_condition_swagger_no_value_else_case",
+                "api_rest_paths_with_if_condition_openapi",
+                "api_rest_paths_with_if_condition_openapi_no_value_then_case",
+                "api_rest_paths_with_if_condition_openapi_no_value_else_case",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -469,6 +504,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_auth_all_minimum_openapi",
                 "api_with_swagger_and_openapi_with_auth",
                 "api_with_openapi_definition_body_no_flag",
+                "api_request_model_with_validator_openapi_3",
                 "api_request_model_openapi_3",
                 "api_with_apikey_required_openapi_3",
                 "api_with_basic_custom_domain",
@@ -492,6 +528,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "http_api_description",
                 "http_api_lambda_auth",
                 "http_api_lambda_auth_full",
+                "http_api_multiple_authorizers",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -532,11 +569,6 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
 
         print(json.dumps(output_fragment, indent=2))
-
-        # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
 
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
 
@@ -592,135 +624,55 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
             output_fragment = transform(manifest, parameter_values, mock_policy_loader)
         print(json.dumps(output_fragment, indent=2))
 
-        # Only update the deployment Logical Id hash in Py3.
-        if sys.version_info.major >= 3:
-            self._update_logical_id_hash(expected)
-            self._update_logical_id_hash(output_fragment)
-
         self.assertEqual(deep_sort_lists(output_fragment), deep_sort_lists(expected))
+
+    @parameterized.expand(
+        itertools.product(
+            [
+                (
+                    "usage_plans",
+                    ("api_with_usageplans_shared_no_side_effect_1", "api_with_usageplans_shared_no_side_effect_2"),
+                ),
+            ],
+            [
+                ("aws", "ap-southeast-1"),
+                ("aws-cn", "cn-north-1"),
+                ("aws-us-gov", "us-gov-west-1"),
+            ],
+        )
+    )
+    @patch(
+        "samtranslator.plugins.application.serverless_app_plugin.ServerlessAppPlugin._sar_service_call",
+        mock_sar_service_call,
+    )
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_transform_success_no_side_effect(self, testcase, partition_with_region):
+        """
+        Tests that the transform does not leak/leave data in shared caches/lists between executions
+        Performs the transform of the templates in a row without reinitialization
+        Data from template X should not leak in template X+1
+
+        Parameters
+        ----------
+        testcase : Tuple
+            Test name (unused) and Templates
+        templates : List
+            List of templates to transform
+        """
+        partition = partition_with_region[0]
+        region = partition_with_region[1]
+
+        for template in testcase[1]:
+            print(template, partition, region)
+            manifest = self._read_input(template)
+            expected = self._read_expected_output(template, partition)
+
+            self._compare_transform(manifest, expected, partition, region)
 
 
 @pytest.mark.parametrize(
     "testcase",
-    [
-        "error_state_machine_definition_string",
-        "error_state_machine_invalid_s3_object",
-        "error_state_machine_invalid_s3_string",
-        "error_state_machine_with_api_auth_none",
-        "error_state_machine_with_no_api_authorizers",
-        "error_state_machine_with_undefined_api_authorizer",
-        "error_state_machine_with_invalid_default_authorizer",
-        "error_state_machine_with_schedule_invalid_dlq_type",
-        "error_state_machine_with_schedule_both_dlq_property_provided",
-        "error_state_machine_with_schedule_missing_dlq_property",
-        "error_state_machine_with_cwe_invalid_dlq_type",
-        "error_state_machine_with_cwe_both_dlq_property_provided",
-        "error_state_machine_with_cwe_missing_dlq_property",
-        "error_cognito_userpool_duplicate_trigger",
-        "error_cognito_userpool_not_string",
-        "error_api_duplicate_methods_same_path",
-        "error_api_gateway_responses_nonnumeric_status_code",
-        "error_api_gateway_responses_unknown_responseparameter",
-        "error_api_gateway_responses_unknown_responseparameter_property",
-        "error_api_invalid_auth",
-        "error_api_invalid_path",
-        "error_api_invalid_definitionuri",
-        "error_api_invalid_definitionbody",
-        "error_api_invalid_stagename",
-        "error_api_with_invalid_open_api_version",
-        "error_api_invalid_restapiid",
-        "error_api_invalid_request_model",
-        "error_application_properties",
-        "error_application_does_not_exist",
-        "error_application_no_access",
-        "error_application_preparing_timeout",
-        "error_cors_on_external_swagger",
-        "error_invalid_cors_dict",
-        "error_invalid_findinmap",
-        "error_invalid_getatt",
-        "error_cors_credentials_true_with_wildcard_origin",
-        "error_cors_credentials_true_without_explicit_origin",
-        "error_function_invalid_codeuri",
-        "error_function_invalid_api_event",
-        "error_function_invalid_autopublishalias",
-        "error_function_invalid_event_type",
-        "error_function_invalid_layer",
-        "error_function_no_codeuri",
-        "error_function_no_handler",
-        "error_function_no_runtime",
-        "error_function_with_deployment_preference_invalid_alarms",
-        "error_function_with_deployment_preference_missing_alias",
-        "error_function_with_invalid_deployment_preference_hook_property",
-        "error_function_invalid_request_parameters",
-        "error_function_with_schedule_invalid_dlq_type",
-        "error_function_with_schedule_both_dlq_property_provided",
-        "error_function_with_schedule_missing_dlq_property",
-        "error_function_with_cwe_invalid_dlq_type",
-        "error_function_with_cwe_both_dlq_property_provided",
-        "error_function_with_cwe_missing_dlq_property",
-        "error_invalid_logical_id",
-        "error_layer_invalid_properties",
-        "error_missing_broker",
-        "error_missing_queue",
-        "error_missing_startingposition",
-        "error_missing_stream",
-        "error_multiple_resource_errors",
-        "error_null_application_id",
-        "error_s3_not_in_template",
-        "error_table_invalid_attributetype",
-        "error_table_primary_key_missing_name",
-        "error_table_primary_key_missing_type",
-        "error_invalid_resource_parameters",
-        "error_reserved_sam_tag",
-        "error_existing_event_logical_id",
-        "error_existing_permission_logical_id",
-        "error_existing_role_logical_id",
-        "error_invalid_template",
-        "error_resource_not_dict",
-        "error_resource_properties_not_dict",
-        "error_globals_is_not_dict",
-        "error_globals_unsupported_type",
-        "error_globals_unsupported_property",
-        "error_globals_api_with_stage_name",
-        "error_function_policy_template_with_missing_parameter",
-        "error_function_policy_template_invalid_value",
-        "error_function_with_unknown_policy_template",
-        "error_function_with_invalid_policy_statement",
-        "error_function_with_invalid_condition_name",
-        "error_invalid_document_empty_semantic_version",
-        "error_api_with_invalid_open_api_version_type",
-        "error_api_with_invalid_auth_scopes_openapi",
-        "error_api_with_custom_domains_invalid",
-        "error_api_with_custom_domains_route53_invalid",
-        "error_api_event_import_vaule_reference",
-        "error_function_with_method_auth_and_no_api_auth",
-        "error_function_with_no_alias_provisioned_concurrency",
-        "error_http_api_def_body_uri",
-        "error_http_api_event_invalid_api",
-        "error_http_api_invalid_auth",
-        "error_http_api_invalid_openapi",
-        "error_http_api_tags",
-        "error_http_api_tags_def_uri",
-        "error_implicit_http_api_properties",
-        "error_implicit_http_api_method",
-        "error_implicit_http_api_path",
-        "error_http_api_event_multiple_same_path",
-        "error_function_with_event_dest_invalid",
-        "error_function_with_event_dest_type",
-        "error_function_with_api_key_false",
-        "error_api_with_usage_plan_invalid_parameter",
-        "error_http_api_with_cors_def_uri",
-        "error_http_api_invalid_lambda_auth",
-        "error_api_mtls_configuration_invalid_field",
-        "error_api_mtls_configuration_invalid_type",
-        "error_httpapi_mtls_configuration_invalid_field",
-        "error_httpapi_mtls_configuration_invalid_type",
-        "error_resource_policy_not_dict",
-        "error_implicit_http_api_auth_any_method",
-        "error_invalid_method_definition",
-        "error_mappings_is_null",
-        "error_swagger_security_not_dict",
-    ],
+    ERROR_FILES_NAMES_FOR_TESTING,
 )
 @patch("boto3.session.Session.region_name", "ap-southeast-1")
 @patch(
@@ -739,6 +691,7 @@ def test_transform_invalid_document(testcase):
         transform(manifest, parameter_values, mock_policy_loader)
 
     error_message = get_exception_error_message(e)
+    error_message = re.sub(r"u'([A-Za-z0-9]*)'", r"'\1'", error_message)
 
     assert error_message == expected.get("errorMessage")
 
@@ -808,7 +761,8 @@ def test_swagger_body_sha_gets_recomputed():
                     "StageName": "Prod",
                     "DefinitionBody": {
                         # Some body property will do
-                        "a": "b"
+                        "paths": {},
+                        "openapi": "3.0.1",
                     },
                 },
             }
@@ -984,6 +938,37 @@ class TestTemplateValidation(TestCase):
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
 
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_validate_translated_no_metadata(self):
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_no_metadata.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {})
+        self.assertEqual(expected, actual)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_validate_translated_metadata(self):
+        self.maxDiff = None
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_metadata.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {}, passthrough_metadata=True)
+        self.assertEqual(expected, actual)
+
 
 class TestPluginsUsage(TestCase):
     # Tests if plugins are properly injected into the translator
@@ -1093,4 +1078,21 @@ def get_resource_by_type(template, type):
 
 
 def get_exception_error_message(e):
-    return reduce(lambda message, error: message + " " + error.message, e.value.causes, e.value.message)
+    return reduce(
+        lambda message, error: message + " " + error.message,
+        sorted(e.value.causes, key=_exception_sort_key),
+        e.value.message,
+    )
+
+
+def _exception_sort_key(cause):
+    """
+    Returns the key to be used for sorting among other exceptions
+    """
+    if hasattr(cause, "_logical_id"):
+        return cause._logical_id
+    if hasattr(cause, "_event_id"):
+        return cause._event_id
+    if hasattr(cause, "message"):
+        return cause.message
+    return str(cause)

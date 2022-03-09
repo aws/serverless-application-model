@@ -1,8 +1,10 @@
 import copy
 
+from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
+from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
+
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
-    FeatureToggleLocalConfigProvider,
     FeatureToggleDefaultConfigProvider,
 )
 from samtranslator.model import ResourceTypeResolver, sam_resources
@@ -27,12 +29,13 @@ from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplat
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.eventsources.push import Api
 
 
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None):
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -44,6 +47,9 @@ class Translator:
         self.sam_parser = sam_parser
         self.feature_toggle = None
         self.boto_session = boto_session
+        self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
+        MetricsMethodWrapperSingleton.set_instance(self.metrics)
+        self._translated_resouce_mapping = {}
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
@@ -63,11 +69,8 @@ class Translator:
                     # adds to the function_names dict with key as the api_name and value as the function_name
                     if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
                         rest_api = item.get("Properties").get("RestApiId")
-                        if isinstance(rest_api, dict):
-                            api_name = item.get("Properties").get("RestApiId").get("Ref")
-                        else:
-                            api_name = item.get("Properties").get("RestApiId")
-                        if api_name:
+                        api_name = Api.get_rest_api_id_string(rest_api)
+                        if isinstance(api_name, str):
                             resource_dict_copy = copy.deepcopy(resource_dict)
                             function_name = intrinsics_resolver.resolve_parameter_refs(
                                 resource_dict_copy.get("Properties").get("FunctionName")
@@ -78,7 +81,7 @@ class Translator:
                                 )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values, feature_toggle=None):
+    def translate(self, sam_template, parameter_values, feature_toggle=None, passthrough_metadata=False):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -93,7 +96,11 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
-        self.feature_toggle = feature_toggle if feature_toggle else FeatureToggle(FeatureToggleDefaultConfigProvider())
+        self.feature_toggle = (
+            feature_toggle
+            if feature_toggle
+            else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)
+        )
         self.function_names = dict()
         self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
@@ -145,7 +152,12 @@ class Translator:
                 del template["Resources"][logical_id]
                 for resource in translated:
                     if verify_unique_logical_id(resource, sam_template["Resources"]):
-                        template["Resources"].update(resource.to_dict())
+                        # For each generated resource, pass through existing metadata that may exist on the original SAM resource.
+                        _r = resource.to_dict()
+                        if resource_dict.get("Metadata") and passthrough_metadata:
+                            if not template["Resources"].get(resource.logical_id):
+                                _r[resource.logical_id]["Metadata"] = resource_dict["Metadata"]
+                        template["Resources"].update(_r)
                     else:
                         document_errors.append(
                             DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)

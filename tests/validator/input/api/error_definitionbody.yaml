@@ -1,0 +1,15 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # DefinitionBody is empty
+  ApiDefinitionBodyEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody:
+      StageName: Stage name
+
+  # DefinitionBody is not a string, object, intrinsic
+  ApiDefinitionBodyNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody: 3
+      StageName: Stage name

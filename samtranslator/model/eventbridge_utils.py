@@ -47,6 +47,11 @@ class EventBridgeRuleUtils:
         if dlq_queue_arn is not None:
             return dlq_queue_arn, []
         queue_logical_id = cw_event_source.DeadLetterConfig.get("QueueLogicalId")
+        if queue_logical_id is not None and not isinstance(queue_logical_id, str):
+            raise InvalidEventException(
+                cw_event_source.logical_id,
+                "QueueLogicalId must be a string",
+            )
         dlq_resources = EventBridgeRuleUtils.create_dead_letter_queue_with_policy(
             cw_event_source.logical_id, source_arn, queue_logical_id, attributes
         )

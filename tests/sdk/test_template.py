@@ -1,5 +1,4 @@
 from unittest import TestCase
-from six import assertCountEqual
 
 from samtranslator.sdk.template import SamTemplate
 from samtranslator.sdk.resource import SamResource
@@ -31,7 +30,7 @@ class TestSamTemplate(TestCase):
         ]
 
         actual = [(id, resource.to_dict()) for id, resource in template.iterate()]
-        assertCountEqual(self, expected, actual)
+        self.assertCountEqual(expected, actual)
 
     def test_iterate_must_filter_by_resource_type(self):
 

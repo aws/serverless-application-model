@@ -6,8 +6,8 @@ Resources:
     Properties:
       StageName: foo
       DefinitionBody:
-        "this": "is"
-        "a": "swagger"
+        paths: {}
+        openapi: "3.0.1"
 
   MyFunction:
     Type: "AWS::Serverless::Function"
@@ -21,6 +21,11 @@ Resources:
           Properties:
             Path: /html
             Method: GET
+        GetHtmlAnyMethod:
+          Type: Api
+          Properties:
+            Path: /any/html
+            Method: any
 
 Outputs:
   ImplicitApiDeployment:

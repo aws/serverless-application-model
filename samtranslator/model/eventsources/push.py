@@ -1,7 +1,9 @@
 import copy
 import re
-from six import string_types
+
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
+from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
 from samtranslator.model.intrinsics import ref, fnGetAtt, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
@@ -20,6 +22,7 @@ from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
+from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 CONDITION = "Condition"
 
@@ -99,6 +102,7 @@ class Schedule(PushEventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the EventBridge Rule and Lambda Permission to which this Schedule event source corresponds.
 
@@ -172,6 +176,7 @@ class CloudWatchEvent(PushEventSource):
         "Target": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the CloudWatch Events/EventBridge Rule and Lambda Permission to which
         this CloudWatch Events/EventBridge event source corresponds.
@@ -244,19 +249,20 @@ class S3(PushEventSource):
     principal = "s3.amazonaws.com"
     property_types = {
         "Bucket": PropertyType(True, is_str()),
-        "Events": PropertyType(True, one_of(is_str(), list_of(is_str()))),
+        "Events": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
         "Filter": PropertyType(False, dict_of(is_str(), is_str())),
     }
 
     def resources_to_link(self, resources):
         if isinstance(self.Bucket, dict) and "Ref" in self.Bucket:
             bucket_id = self.Bucket["Ref"]
-            if not isinstance(bucket_id, string_types):
+            if not isinstance(bucket_id, str):
                 raise InvalidEventException(self.relative_id, "'Ref' value in S3 events is not a valid string.")
             if bucket_id in resources:
                 return {"bucket": resources[bucket_id], "bucket_id": bucket_id}
         raise InvalidEventException(self.relative_id, "S3 events must reference an S3 bucket in the same template.")
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda Permission resource allowing S3 to invoke the function this event source triggers.
 
@@ -319,10 +325,17 @@ class S3(PushEventSource):
         depends_on = bucket.get("DependsOn", [])
 
         # DependsOn can be either a list of strings or a scalar string
-        if isinstance(depends_on, string_types):
+        if isinstance(depends_on, str):
             depends_on = [depends_on]
 
-        depends_on_set = set(depends_on)
+        try:
+            depends_on_set = set(depends_on)
+        except TypeError:
+            raise InvalidResourceException(
+                self.logical_id,
+                "Invalid type for field 'DependsOn'. Expected a string or list of strings.",
+            )
+
         depends_on_set.add(permission.logical_id)
         bucket["DependsOn"] = list(depends_on_set)
 
@@ -363,7 +376,7 @@ class S3(PushEventSource):
             base_event_mapping["Filter"] = self.Filter
 
         event_types = self.Events
-        if isinstance(self.Events, string_types):
+        if isinstance(self.Events, str):
             event_types = [self.Events]
 
         event_mappings = []
@@ -390,6 +403,9 @@ class S3(PushEventSource):
             lambda_notifications = []
             notification_config["LambdaConfigurations"] = lambda_notifications
 
+        if not isinstance(lambda_notifications, list):
+            raise InvalidResourceException(self.logical_id, "Invalid type for LambdaConfigurations. Must be a list.")
+
         for event_mapping in event_mappings:
             if event_mapping not in lambda_notifications:
                 lambda_notifications.append(event_mapping)
@@ -408,6 +424,7 @@ class SNS(PushEventSource):
         "SqsSubscription": PropertyType(False, one_of(is_type(bool), is_type(dict))),
     }
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda Permission resource allowing SNS to invoke the function this event source triggers.
 
@@ -532,10 +549,6 @@ class Api(PushEventSource):
         necessary data from the explicit API
         """
 
-        rest_api_id = self.RestApiId
-        if isinstance(rest_api_id, dict) and "Ref" in rest_api_id:
-            rest_api_id = rest_api_id["Ref"]
-
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the Lambda function. If we are unable to resolve the stage name, we will
@@ -545,7 +558,8 @@ class Api(PushEventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        if isinstance(rest_api_id, string_types):
+        rest_api_id = self.get_rest_api_id_string(self.RestApiId)
+        if isinstance(rest_api_id, str):
 
             if (
                 rest_api_id in resources
@@ -557,7 +571,7 @@ class Api(PushEventSource):
                 permitted_stage = explicit_api["StageName"]
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, string_types):
+                if isinstance(permitted_stage, str):
                     if not permitted_stage:
                         raise InvalidResourceException(rest_api_id, "StageName cannot be empty.")
                     stage_suffix = permitted_stage
@@ -573,6 +587,7 @@ class Api(PushEventSource):
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
         API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the
@@ -651,15 +666,8 @@ class Api(PushEventSource):
         if swagger_body is None:
             return
 
-        function_arn = function.get_runtime_attr("arn")
         partition = ArnGenerator.get_partition_name()
-        uri = fnSub(
-            "arn:"
-            + partition
-            + ":apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
-            + make_shorthand(function_arn)
-            + "/invocations"
-        )
+        uri = _build_apigw_integration_uri(function, partition)
 
         editor = SwaggerEditor(swagger_body)
 
@@ -696,14 +704,9 @@ class Api(PushEventSource):
                             ),
                         )
 
-                    if not isinstance(method_authorizer, string_types):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                            "because it wasn't defined with acceptable values in the API's Authorizers.".format(
-                                authorizer=method_authorizer, method=self.Method, path=self.Path
-                            ),
-                        )
+                    _check_valid_authorizer_types(
+                        self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers
+                    )
 
                     if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
                         raise InvalidEventException(
@@ -747,9 +750,7 @@ class Api(PushEventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(
-                    resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
-                )
+                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)
                 if resource_policy.get("CustomStatements"):
                     editor.add_custom_statements(resource_policy.get("CustomStatements"))
 
@@ -766,7 +767,7 @@ class Api(PushEventSource):
                             model=method_model, method=self.Method, path=self.Path
                         ),
                     )
-                if not isinstance(method_model, string_types):
+                if not isinstance(method_model, str):
                     raise InvalidEventException(
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
@@ -788,6 +789,35 @@ class Api(PushEventSource):
                     path=self.Path, method_name=self.Method, request_model=self.RequestModel
                 )
 
+                validate_body = self.RequestModel.get("ValidateBody")
+                validate_parameters = self.RequestModel.get("ValidateParameters")
+
+                # Checking if any of the fields are defined as it can be false we are checking if the field are not None
+                if validate_body is not None or validate_parameters is not None:
+
+                    # as we are setting two different fields we are here setting as default False
+                    # In case one of them are not defined
+                    validate_body = False if validate_body is None else validate_body
+                    validate_parameters = False if validate_parameters is None else validate_parameters
+
+                    # If not type None but any other type it should explicitly invalidate the Spec
+                    # Those fields should be only a boolean
+                    if not isinstance(validate_body, bool) or not isinstance(validate_parameters, bool):
+                        raise InvalidEventException(
+                            self.relative_id,
+                            "Unable to set Validator to RequestModel [{model}] on API method [{method}] for path [{path}] "
+                            "ValidateBody and ValidateParameters must be a boolean type, strings or intrinsics are not supported.".format(
+                                model=method_model, method=self.Method, path=self.Path
+                            ),
+                        )
+
+                    editor.add_request_validator_to_method(
+                        path=self.Path,
+                        method_name=self.Method,
+                        validate_body=validate_body,
+                        validate_parameters=validate_parameters,
+                    )
+
         if self.RequestParameters:
 
             default_value = {"Required": False, "Caching": False}
@@ -799,7 +829,7 @@ class Api(PushEventSource):
 
                     parameter_name, parameter_value = next(iter(parameter.items()))
 
-                    if not re.match("method\.request\.(querystring|path|header)\.", parameter_name):
+                    if not re.match(r"method\.request\.(querystring|path|header)\.", parameter_name):
                         raise InvalidEventException(
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property. Keys must be in the format "
@@ -822,8 +852,8 @@ class Api(PushEventSource):
 
                     parameters.append(settings)
 
-                elif isinstance(parameter, string_types):
-                    if not re.match("method\.request\.(querystring|path|header)\.", parameter):
+                elif isinstance(parameter, str):
+                    if not re.match(r"method\.request\.(querystring|path|header)\.", parameter):
                         raise InvalidEventException(
                             self.relative_id,
                             "Invalid value for 'RequestParameters' property. Keys must be in the format "
@@ -848,6 +878,17 @@ class Api(PushEventSource):
 
         api["DefinitionBody"] = editor.swagger
 
+    @staticmethod
+    def get_rest_api_id_string(rest_api_id):
+        """
+        rest_api_id can be either a string or a dictionary where the actual api id is the value at key "Ref".
+        If rest_api_id is a dictionary with key "Ref", returns value at key "Ref". Otherwise, return rest_api_id.
+
+        :param rest_api_id: a string or dictionary that contains the api id
+        :return: string value of rest_api_id
+        """
+        return rest_api_id["Ref"] if isinstance(rest_api_id, dict) and "Ref" in rest_api_id else rest_api_id
+
 
 class AlexaSkill(PushEventSource):
     resource_type = "AlexaSkill"
@@ -855,6 +896,7 @@ class AlexaSkill(PushEventSource):
 
     property_types = {"SkillId": PropertyType(False, is_str())}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         function = kwargs.get("function")
 
@@ -873,6 +915,7 @@ class IoTRule(PushEventSource):
 
     property_types = {"Sql": PropertyType(True, is_str()), "AwsIotSqlVersion": PropertyType(False, is_str())}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         function = kwargs.get("function")
 
@@ -918,13 +961,13 @@ class Cognito(PushEventSource):
 
     property_types = {
         "UserPool": PropertyType(True, is_str()),
-        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str()))),
+        "Trigger": PropertyType(True, one_of(is_str(), list_of(is_str())), False),
     }
 
     def resources_to_link(self, resources):
         if isinstance(self.UserPool, dict) and "Ref" in self.UserPool:
             userpool_id = self.UserPool["Ref"]
-            if not isinstance(userpool_id, string_types):
+            if not isinstance(userpool_id, str):
                 raise InvalidEventException(
                     self.logical_id,
                     "Ref in Userpool is not a string.",
@@ -935,6 +978,7 @@ class Cognito(PushEventSource):
             self.relative_id, "Cognito events must reference a Cognito UserPool in the same template."
         )
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         function = kwargs.get("function")
 
@@ -965,7 +1009,7 @@ class Cognito(PushEventSource):
 
     def _inject_lambda_config(self, function, userpool):
         event_triggers = self.Trigger
-        if isinstance(self.Trigger, string_types):
+        if isinstance(self.Trigger, str):
             event_triggers = [self.Trigger]
 
         # TODO can these be conditional?
@@ -1016,10 +1060,11 @@ class HttpApi(PushEventSource):
         if isinstance(api_id, dict) and "Ref" in api_id:
             api_id = api_id["Ref"]
 
-        explicit_api = resources[api_id].get("Properties")
+        explicit_api = resources[api_id].get("Properties", {})
 
         return {"explicit_api": explicit_api}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """If the Api event source has a RestApi property, then simply return the Lambda Permission resource allowing
         API Gateway to call the function. If no RestApi is provided, then additionally inject the path, method, and the
@@ -1073,8 +1118,8 @@ class HttpApi(PushEventSource):
         # If this is using the new $default path, keep path blank and add a * permission
         if path == OpenApiEditor._DEFAULT_PATH:
             path = ""
-        elif editor and resources_to_link.get("function").logical_id == editor.get_integration_function_logical_id(
-            OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD
+        elif editor and editor.is_integration_function_logical_id_match(
+            OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD, resources_to_link.get("function").logical_id
         ):
             # Case where default exists for this function, and so the permissions for that will apply here as well
             # This can save us several CFN resources (not duplicating permissions)
@@ -1108,12 +1153,7 @@ class HttpApi(PushEventSource):
         if open_api_body is None:
             return
 
-        function_arn = function.get_runtime_attr("arn")
-        uri = fnSub(
-            "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
-            + make_shorthand(function_arn)
-            + "/invocations"
-        )
+        uri = _build_apigw_integration_uri(function, "${AWS::Partition}")
 
         editor = OpenApiEditor(open_api_body)
 
@@ -1169,6 +1209,8 @@ class HttpApi(PushEventSource):
         # Default auth should already be applied, so apply any other auth here or scope override to default
         api_authorizers = api_auth and api_auth.get("Authorizers")
 
+        _check_valid_authorizer_types(self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers)
+
         if method_authorizer != "NONE" and not api_authorizers:
             raise InvalidEventException(
                 self.relative_id,
@@ -1202,3 +1244,35 @@ class HttpApi(PushEventSource):
                 "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
             )
         editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
+
+
+def _build_apigw_integration_uri(function, partition):
+    function_arn = function.get_runtime_attr("arn")
+    arn = (
+        "arn:"
+        + partition
+        + ":apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/"
+        + make_shorthand(function_arn)
+        + "/invocations"
+    )
+    # function_arn is always of the form {"Fn::GetAtt": ["<function_logical_id>", "Arn"]}.
+    # We only want to check if the function logical id is a Py27UniStr instance.
+    if function_arn.get("Fn::GetAtt") and isinstance(function_arn["Fn::GetAtt"][0], Py27UniStr):
+        arn = Py27UniStr(arn)
+    return Py27Dict(fnSub(arn))
+
+
+def _check_valid_authorizer_types(relative_id, method, path, method_authorizer, api_authorizers):
+    if method_authorizer == "NONE":
+        # If the method authorizer is "NONE" then this check
+        # isn't needed since DefaultAuthorizer needs to be used.
+        return
+
+    if not isinstance(method_authorizer, str) or not isinstance(api_authorizers, dict):
+        raise InvalidEventException(
+            relative_id,
+            "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}]. "
+            "The method authorizer must be a string with a corresponding dict entry in the api authorizer.".format(
+                authorizer=method_authorizer, method=method, path=path
+            ),
+        )

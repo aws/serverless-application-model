@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-app
+
+  Sample SAM Template for sam-app
+
+Globals:
+  Api:
+    Cors: {
+    "Fn::Join": [",", ["www.amazon.com", "www.google.com"]]
+    }
+
+Conditions:
+  TrueCondition:
+    Fn::Equals:
+      - true
+      - true
+  FalseCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Auth:
+        ApiKeyRequired: true
+        Authorizers:
+          MyLambdaAuthUpdated:
+            FunctionArn: 
+              Fn::GetAtt:
+                - MyAuthFn
+                - Arn
+            FunctionInvokeRole:
+              Fn::GetAtt:
+                - MyAuthFnRole
+                - Arn
+            Identity:
+              Headers:
+                - Authorization
+              ReauthorizeEvery: 37
+            EnableSimpleResponses: false
+            AuthorizerPayloadFormatVersion: 1.0
+        DefaultAuthorizer: MyLambdaAuthUpdated
+      DefinitionBody:
+        openapi: '3.0'
+        info:
+          title: !Sub ${AWS::StackName}-Api
+        paths:
+          /post:
+            Fn::If:
+                - FalseCondition
+                - 
+                  post:
+                    x-amazon-apigateway-integration:
+                      httpMethod: POST
+                      type: aws_proxy
+                      uri: https://www.otherURI.co/
+                      payloadFormatVersion: '1.0'
+                - 
+                  post:
+                    x-amazon-apigateway-integration:
+                      httpMethod: POST
+                      type: aws_proxy
+                      uri: https://www.alphavantage.co/
+                      payloadFormatVersion: '1.0'

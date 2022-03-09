@@ -16,4 +16,9 @@ Resources:
           Properties:
             Path: /
             Method: get
+        AnyHtml:
+          Type: Api
+          Properties:
+            Path: /any
+            Method: any
 

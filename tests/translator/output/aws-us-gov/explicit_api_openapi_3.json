@@ -37,7 +37,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiWithInlineSwaggerDeployment74abcb3a5b"
+          "Ref": "ApiWithInlineSwaggerDeployment532ddc6618"
         }, 
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"
@@ -57,13 +57,13 @@
         "StageName": "Stage"
       }
     }, 
-    "ApiWithInlineSwaggerDeployment74abcb3a5b": {
+    "ApiWithInlineSwaggerDeployment532ddc6618": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"
         }, 
-        "Description": "RestApi deployment id: 74abcb3a5bbe7ad58dfc543740af3be156736130"
+        "Description": "RestApi deployment id: 532ddc6618dbe66a96a30ed7082f375de8933a02"
       }
     }, 
     "GetHtmlFunctionRole": {
@@ -102,8 +102,8 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
-          "this": "is", 
-          "a": "inline swagger"
+          "openapi": "3.0",
+          "paths": {}
         }, 
         "EndpointConfiguration": {
           "Types": [

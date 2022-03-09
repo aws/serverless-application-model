@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 """Convert SAM templates to CloudFormation templates.
 
@@ -26,7 +26,9 @@ import subprocess
 import sys
 
 import boto3
+
 from docopt import docopt
+from functools import reduce
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
@@ -99,7 +101,10 @@ def transform_template(input_file_path, output_file_path):
         feature_toggle = FeatureToggle(
             FeatureToggleLocalConfigProvider(
                 os.path.join(my_path, "..", "tests", "feature_toggle", "input", "feature_toggle_config.json")
-            )
+            ),
+            stage=None,
+            account_id=None,
+            region=None,
         )
         cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client), feature_toggle)
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=2)

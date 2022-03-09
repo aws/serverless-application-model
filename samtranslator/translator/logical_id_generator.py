@@ -1,7 +1,6 @@
 import hashlib
 import json
 import sys
-from six import string_types
 
 
 class LogicalIdGenerator(object):
@@ -16,6 +15,7 @@ class LogicalIdGenerator(object):
 
         :param prefix: Prefix for the logicalId
         :param data_obj: Data object to trigger new changes on. If set to None, this is ignored
+        :param data_hash: Pre-computed hash, must be a string
         """
 
         data_str = ""
@@ -87,7 +87,7 @@ class LogicalIdGenerator(object):
         :return: string representation of the dictionary
         :rtype string
         """
-        if isinstance(data, string_types):
+        if isinstance(data, str):
             return data
 
         # Get the most compact dictionary (separators) and sort the keys recursively to get a stable output

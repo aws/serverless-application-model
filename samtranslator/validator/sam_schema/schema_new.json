@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "AWSTemplateFormatVersion": {
+      "enum": [
+        "2010-09-09"
+      ],
+      "type": "string"
+    },
+    "Conditions": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "intrinsic"
+        }
+      },
+      "type": "object"
+    },
+    "Description": {
+      "description": "Template description",
+      "maxLength": 1024,
+      "type": "string"
+    },
+    "Globals": {
+      "type": "object"
+    },
+    "Mappings": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Metadata": {
+      "type": "object"
+    },
+    "Outputs": {
+      "additionalProperties": false,
+      "maxProperties": 60,
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Parameters": {
+      "additionalProperties": false,
+      "maxProperties": 50,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "$ref": "parameter.json#/definitions/Parameter"
+        }
+      },
+      "type": "object"
+    },
+    "Resources": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9]+$": {
+          "allOf": [
+            {
+              "$ref": "api.json#/definitions/AWS::Serverless::Api"
+            },
+            {
+              "if": {
+                "properties": {
+                  "Type": {
+                    "pattern": "^Custom::"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "Type": {
+                    "pattern": "^Custom::[a-zA-Z0-9]+$",
+                    "patternError": "must use format Custom::X"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "Type": {
+                    "pattern": "^[a-zA-Z0-9]+::[a-zA-Z0-9]+::[a-zA-Z0-9]+$",
+                    "patternError": "must use format X::Y::Z"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "Type": {
+                    "pattern": "^AWS::Serverless::"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "Type": {
+                    "enum": [
+                      "AWS::Serverless::Api",
+                      "AWS::Serverless::Application",
+                      "AWS::Serverless::Function",
+                      "AWS::Serverless::HttpApi",
+                      "AWS::Serverless::LayerVersion",
+                      "AWS::Serverless::SimpleTable",
+                      "AWS::Serverless::StateMachine"
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Transform": {
+      "type": [
+        "string",
+        "array"
+      ],
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "Resources"
+  ],
+  "type": "object"
+}

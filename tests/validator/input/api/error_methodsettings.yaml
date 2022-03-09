@@ -1,0 +1,167 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # MethodSettings
+  ApiMethodSettingsEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+      StageName: Stage name
+  ApiMethodSettingsNotList:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings: 3
+      StageName: Stage name
+
+  # MethodSettings Item
+  ApiMethodSettingsItemNotObject:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - 3
+      StageName: Stage name
+  ApiMethodSettingsItemEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        -
+      StageName: Stage name
+
+  # MethodSettings CacheDataEncrypted
+  ApiMethodSettingsCacheDataEncryptedEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - CacheDataEncrypted:
+      StageName: Stage name
+  ApiMethodSettingsCacheDataEncryptedNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - CacheDataEncrypted: 3
+      StageName: Stage name
+
+  # MethodSettings CacheTtlInSeconds
+  ApiMethodSettingsCacheTtlInSecondsEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - CacheTtlInSeconds:
+      StageName: Stage name
+  ApiMethodSettingsCacheTtlInSecondsNotInteger:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - CacheTtlInSeconds: "3"
+      StageName: Stage name
+
+  # MethodSettings CachingEnabled
+  ApiMethodSettingsCachingEnabledEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - CachingEnabled:
+      StageName: Stage name
+  ApiMethodSettingsCachingEnabledNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - CachingEnabled: 3
+      StageName: Stage name
+
+  # MethodSettings DataTraceEnabled
+  ApiMethodSettingsDataTraceEnabledEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - DataTraceEnabled:
+      StageName: Stage name
+  ApiMethodSettingsDataTraceEnabledNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - DataTraceEnabled: 3
+      StageName: Stage name
+
+  # MethodSettings HttpMethod
+  ApiMethodSettingsHttpMethodEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - HttpMethod:
+      StageName: Stage name
+  ApiMethodSettingsHttpMethodNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - HttpMethod: 3
+      StageName: Stage name
+
+  # MethodSettings LoggingLevel
+  ApiMethodSettingsLoggingLevelEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - LoggingLevel:
+      StageName: Stage name
+  ApiMethodSettingsLoggingLevelNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - LoggingLevel: 3
+      StageName: Stage name
+
+  # MethodSettings MetricsEnabled
+  ApiMethodSettingsMetricsEnabledEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - MetricsEnabled:
+      StageName: Stage name
+  ApiMethodSettingsMetricsEnabledNotBoolean:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - MetricsEnabled: 3
+      StageName: Stage name
+
+  # MethodSettings ResourcePath
+  ApiMethodSettingsResourcePathEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - ResourcePath:
+      StageName: Stage name
+  ApiMethodSettingsResourcePathNotString:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - ResourcePath: 3
+      StageName: Stage name
+
+  # MethodSettings ThrottlingBurstLimit
+  ApiMethodSettingsThrottlingBurstLimitEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - ThrottlingBurstLimit:
+      StageName: Stage name
+  ApiMethodSettingsThrottlingBurstLimitNotInteger:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - ThrottlingBurstLimit: "3"
+      StageName: Stage name
+
+  # MethodSettings ThrottlingRateLimit
+  ApiMethodSettingsThrottlingRateLimitEmpty:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - ThrottlingRateLimit:
+      StageName: Stage name
+  ApiMethodSettingsThrottlingRateLimitNotNumber:
+    Type: AWS::Serverless::Api
+    Properties:
+      MethodSettings:
+        - ThrottlingRateLimit: "3"
+      StageName: Stage name

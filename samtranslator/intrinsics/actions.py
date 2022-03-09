@@ -1,6 +1,6 @@
 import re
 
-from six import string_types
+from samtranslator.utils.py27hash_fix import Py27UniStr
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
 
@@ -66,7 +66,7 @@ class Action(object):
         """
         no_result = (None, None)
 
-        if not isinstance(ref_value, string_types):
+        if not isinstance(ref_value, str):
             return no_result
 
         splits = ref_value.split(cls._resource_ref_separator, 1)
@@ -97,7 +97,7 @@ class RefAction(Action):
 
         param_name = input_dict[self.intrinsic_name]
 
-        if not isinstance(param_name, string_types):
+        if not isinstance(param_name, str):
             return input_dict
 
         if param_name in parameters:
@@ -152,7 +152,7 @@ class RefAction(Action):
             return input_dict
 
         ref_value = input_dict[self.intrinsic_name]
-        if not isinstance(ref_value, string_types) or self._resource_ref_separator in ref_value:
+        if not isinstance(ref_value, str) or self._resource_ref_separator in ref_value:
             return input_dict
 
         logical_id = ref_value
@@ -339,11 +339,11 @@ class SubAction(Action):
 
         # Just handle known references within the string to be substituted and return the whole dictionary
         # because that's the best we can do here.
-        if isinstance(sub_value, string_types):
+        if isinstance(sub_value, str):
             # Ex: {Fn::Sub: "some string"}
             sub_value = self._sub_all_refs(sub_value, handler_method)
 
-        elif isinstance(sub_value, list) and len(sub_value) > 0 and isinstance(sub_value[0], string_types):
+        elif isinstance(sub_value, list) and len(sub_value) > 0 and isinstance(sub_value[0], str):
             # Ex: {Fn::Sub: ["some string", {a:b}] }
             sub_value[0] = self._sub_all_refs(sub_value[0], handler_method)
 
@@ -370,18 +370,18 @@ class SubAction(Action):
         """
 
         # RegExp to find pattern "${logicalId.property}" and return the word inside bracket
-        logical_id_regex = "[A-Za-z0-9\.]+|AWS::[A-Z][A-Za-z]*"
-        ref_pattern = re.compile(r"\$\{(" + logical_id_regex + ")\}")
+        logical_id_regex = r"[A-Za-z0-9\.]+|AWS::[A-Z][A-Za-z]*"
+        ref_pattern = re.compile(r"\$\{(" + logical_id_regex + r")\}")
 
         # Find all the pattern, and call the handler to decide how to substitute them.
         # Do the substitution and return the final text
-        return re.sub(
-            ref_pattern,
-            # Pass the handler entire string ${logicalId.property} as first parameter and "logicalId.property"
-            # as second parameter. Return value will be substituted
-            lambda match: handler_method(match.group(0), match.group(1)),
-            text,
-        )
+        # NOTE: in order to make sure Py27UniStr strings won't be converted to plain string,
+        # we need to iterate through each match and do the replacement
+        substituted = text
+        for match in re.finditer(ref_pattern, text):
+            sub_value = handler_method(match.group(0), match.group(1))
+            substituted = substituted.replace(match.group(0), sub_value, 1)
+        return substituted
 
 
 class GetAttAction(Action):
@@ -422,19 +422,8 @@ class GetAttAction(Action):
         key = self.intrinsic_name
         value = input_dict[key]
 
-        # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
-        # the input to CFN for it to do the "official" validation.
-        if not isinstance(value, list) or len(value) < 2:
+        if not self._check_input_value(value):
             return input_dict
-
-        if not all(isinstance(entry, string_types) for entry in value):
-            raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        "Invalid GetAtt value {}. GetAtt expects an array with 2 strings.".format(value)
-                    )
-                ]
-            )
 
         # Value of GetAtt is an array. It can contain any number of elements, with first being the LogicalId of
         # resource and rest being the attributes. In a SAM template, a reference to a resource can be used in the
@@ -485,9 +474,7 @@ class GetAttAction(Action):
         key = self.intrinsic_name
         value = input_dict[key]
 
-        # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
-        # the input to CFN for it to do the "official" validation.
-        if not isinstance(value, list) or len(value) < 2:
+        if not self._check_input_value(value):
             return input_dict
 
         value_str = self._resource_ref_separator.join(value)
@@ -497,6 +484,20 @@ class GetAttAction(Action):
 
         resolved_value = supported_resource_id_refs.get(logical_id)
         return self._get_resolved_dictionary(input_dict, key, resolved_value, remaining)
+
+    def _check_input_value(self, value):
+        # Value must be an array with *at least* two elements. If not, this is invalid GetAtt syntax. We just pass along
+        # the input to CFN for it to do the "official" validation.
+        if not isinstance(value, list) or len(value) < 2:
+            return False
+
+        # If items in value array is not a string, then following join line will fail. So if any element is not a string
+        # we just pass along the input to CFN for doing the validation
+        for item in value:
+            if not isinstance(item, str):
+                return False
+
+        return True
 
     def _get_resolved_dictionary(self, input_dict, key, resolved_value, remaining):
         """
@@ -551,11 +552,7 @@ class FindInMapAction(Action):
         top_level_key = self.resolve_parameter_refs(value[1], parameters)
         second_level_key = self.resolve_parameter_refs(value[2], parameters)
 
-        if (
-            not isinstance(map_name, string_types)
-            or not isinstance(top_level_key, string_types)
-            or not isinstance(second_level_key, string_types)
-        ):
+        if not isinstance(map_name, str) or not isinstance(top_level_key, str) or not isinstance(second_level_key, str):
             return input_dict
 
         if (
