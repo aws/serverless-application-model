@@ -121,6 +121,14 @@ Resources:
       Auth:
         MyBad: Foo
 
+  AuthWithInvalidDefinitionBodyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody: { invalid: true }
+      Auth:
+        DefaultAuthorizer: Foo
+
   AuthWithMissingDefaultAuthorizerApi:
     Type: AWS::Serverless::Api
     Properties:

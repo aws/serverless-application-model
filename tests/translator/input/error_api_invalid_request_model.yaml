@@ -68,6 +68,18 @@ Resources:
             username:
               type: string
 
+  ModelsWithInvalidDefinitionBodyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody: { invalid: true }
+      Models:
+        User:
+          type: object
+          properties:
+            username:
+              type: string
+
   ModelIsNotString:
     Type: AWS::Serverless::Function
     Properties:

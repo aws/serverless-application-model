@@ -18,7 +18,7 @@ class TestSwaggerEditor_init(TestCase):
     def test_must_raise_on_invalid_swagger(self):
 
         invalid_swagger = {"paths": {}}  # Missing "Swagger" keyword
-        with self.assertRaises(InvalidDocumentException):
+        with self.assertRaises(ValueError):
             SwaggerEditor(invalid_swagger)
 
     def test_must_succeed_on_valid_swagger(self):
@@ -32,13 +32,13 @@ class TestSwaggerEditor_init(TestCase):
     def test_must_fail_on_invalid_openapi_version(self):
         invalid_swagger = {"openapi": "2.3.0", "paths": {"/foo": {}, "/bar": {}}}
 
-        with self.assertRaises(InvalidDocumentException):
+        with self.assertRaises(ValueError):
             SwaggerEditor(invalid_swagger)
 
     def test_must_fail_on_invalid_openapi_version_2(self):
         invalid_swagger = {"openapi": "3.1.1.1", "paths": {"/foo": {}, "/bar": {}}}
 
-        with self.assertRaises(InvalidDocumentException):
+        with self.assertRaises(ValueError):
             SwaggerEditor(invalid_swagger)
 
     def test_must_succeed_on_valid_openapi3(self):
@@ -53,7 +53,7 @@ class TestSwaggerEditor_init(TestCase):
     def test_must_fail_with_bad_values_for_path(self, invalid_path_item):
         invalid_swagger = {"openapi": "3.1.1.1", "paths": {"/foo": {}, "/bad": invalid_path_item}}
 
-        with self.assertRaises(InvalidDocumentException):
+        with self.assertRaises(ValueError):
             SwaggerEditor(invalid_swagger)
 
 
