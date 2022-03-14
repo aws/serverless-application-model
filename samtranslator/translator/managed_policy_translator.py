@@ -1,4 +1,5 @@
 import logging
+import botocore
 
 from samtranslator.metrics.method_decorator import cw_timer
 
@@ -32,5 +33,8 @@ class ManagedPolicyLoader(object):
 
     def load(self):
         if self._policy_map is None:
-            self._load_policies_from_iam()
+            try:
+                self._load_policies_from_iam()
+            except botocore.exceptions.ClientError as error:
+                raise error
         return self._policy_map
