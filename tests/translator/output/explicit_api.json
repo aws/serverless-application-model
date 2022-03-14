@@ -37,7 +37,7 @@
       "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
-          "Ref": "ApiWithInlineSwaggerDeployment4fc299d023"
+          "Ref": "ApiWithInlineSwaggerDeployment09cda3d97b"
         }, 
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"
@@ -93,8 +93,8 @@
       "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
-          "swagger": "2.0",
-          "paths": {}
+          "this": "is", 
+          "a": "inline swagger"
         }
       }
     }, 
@@ -149,13 +149,13 @@
         }
       }
     }, 
-    "ApiWithInlineSwaggerDeployment4fc299d023": {
+    "ApiWithInlineSwaggerDeployment09cda3d97b": {
       "Type": "AWS::ApiGateway::Deployment", 
       "Properties": {
         "RestApiId": {
           "Ref": "ApiWithInlineSwagger"
         }, 
-        "Description": "RestApi deployment id: 4fc299d0231d133ea66a1aa4be7d5bcd64d5f900", 
+        "Description": "RestApi deployment id: 09cda3d97b008bed7bd4ebb1b5304ed622492941", 
         "StageName": "Stage"
       }
     }

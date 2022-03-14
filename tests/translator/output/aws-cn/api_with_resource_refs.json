@@ -99,8 +99,8 @@
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
-          "openapi": "3.0.1",
-          "paths": {}
+          "this": "is",
+          "a": "swagger"
         },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
@@ -112,10 +112,10 @@
         }
       }
     },
-    "MyApiDeploymentd7fcdf1086": {
+    "MyApiDeployment359f256a3b": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: d7fcdf1086262180dfe8b7ad5a04cab235490858",
+        "Description": "RestApi deployment id: 359f256a3b3ff2e1102e335a4d603f02df9b4988",
         "RestApiId": {
           "Ref": "MyApi"
         },
@@ -126,7 +126,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeploymentd7fcdf1086"
+          "Ref": "MyApiDeployment359f256a3b"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -218,7 +218,7 @@
     },
     "ExplicitApiDeployment": {
       "Value": {
-        "Ref": "MyApiDeploymentd7fcdf1086"
+        "Ref": "MyApiDeployment359f256a3b"
       }
     },
     "ExplicitApiStage": {

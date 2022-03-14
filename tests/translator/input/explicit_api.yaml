@@ -45,5 +45,5 @@ Resources:
       StageName:
         Ref: MyStageName
       DefinitionBody:
-        paths: {}
-        swagger: "2.0"
+        "this": "is"
+        "a": "inline swagger"
