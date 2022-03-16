@@ -124,7 +124,7 @@ class ServerlessAppPlugin(BasePlugin):
                     self._applications[key] = e
 
     def _make_service_call_with_retry(self, service_call, app_id, semver, key, logical_id):
-        creation_succeeded = False
+        call_succeeded = False
         start_time = time()
         while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
             try:
@@ -137,9 +137,9 @@ class ServerlessAppPlugin(BasePlugin):
                     continue
                 else:
                     raise e
-            creation_succeeded = True
+            call_succeeded = True
             break
-        if not creation_succeeded:
+        if not call_succeeded:
             raise InvalidResourceException(logical_id, "Failed to call SAR, timeout limit exceeded.")
 
     def _replace_value(self, input_dict, key, intrinsic_resolvers):
