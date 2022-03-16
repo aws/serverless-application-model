@@ -118,10 +118,29 @@ class ServerlessAppPlugin(BasePlugin):
                     # Lazy initialization of the client- create it when it is needed
                     if not self._sar_client:
                         self._sar_client = boto3.client("serverlessrepo")
-                    service_call(app_id, semver, key, logical_id)
+                    self._make_service_call_with_retry(service_call, app_id, semver, key, logical_id)
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
                     self._applications[key] = e
+
+    def _make_service_call_with_retry(self, service_call, app_id, semver, key, logical_id):
+        creation_succeeded = False
+        start_time = time()
+        while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
+            try:
+                service_call(app_id, semver, key, logical_id)
+            except ClientError as e:
+                error_code = e.response["Error"]["Code"]
+                if error_code == "TooManyRequestsException":
+                    LOG.debug("SAR call timed out for application id {}".format(app_id))
+                    sleep(self._get_sleep_time_sec())
+                    continue
+                else:
+                    raise e
+            creation_succeeded = True
+            break
+        if not creation_succeeded:
+            raise InvalidResourceException(logical_id, "Failed to call SAR, timeout limit exceeded.")
 
     def _replace_value(self, input_dict, key, intrinsic_resolvers):
         value = self._resolve_location_value(input_dict.get(key), intrinsic_resolvers)

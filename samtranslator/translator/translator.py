@@ -23,7 +23,7 @@ from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
 from samtranslator.plugins import LifeCycleEvents
-from samtranslator.plugins import SamPlugins
+from samtranslator.plugins.sam_plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
