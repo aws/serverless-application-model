@@ -3,6 +3,7 @@ Helper classes to publish metrics
 """
 import logging
 from datetime import datetime
+from aws_embedded_metrics import metric_scope
 
 LOG = logging.getLogger(__name__)
 
@@ -15,6 +16,32 @@ class MetricsPublisher:
 
     def publish(self, namespace, metrics):
         raise NotImplementedError
+
+
+class EMFMetricsPublisher(MetricsPublisher):
+
+    def publish(self, namespace, metrics):
+        """
+        Method to publish all EMF metrics to Cloudwatch.
+
+        :param namespace: namespace applied to all metrics published.
+        :param metrics: list of metrics to be published
+        """
+        metrics_data_list = list(map(lambda m: m.get_metric_data(), metrics))
+
+        for metrics_data in metrics_data_list:
+            try:
+                if metrics_data:
+                    self._publish_emf_metrics(namespace, metrics_data)
+            except Exception as e:
+                LOG.exception("Failed to report {} emf metrics".format(len(metrics_data)), exc_info=e)
+
+    @metric_scope
+    def _publish_emf_metrics(self, namespace, metrics_data, metrics):
+        metrics.set_namespace(namespace)
+        if metrics_data.get("Dimensions"):
+            metrics.set_dimensions(metrics_data.get("Dimensions"))
+        metrics.put_metric(metrics_data.get("MetricName"), metrics_data.get("Value"), metrics_data.get("Unit"))
 
 
 class CWMetricsPublisher(MetricsPublisher):

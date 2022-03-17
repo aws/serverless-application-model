@@ -1,5 +1,7 @@
 import logging
 
+from samtranslator.metrics.metrics import Metrics, EMFMetricsPublisher
+
 from samtranslator.metrics.method_decorator import cw_timer
 
 LOG = logging.getLogger(__name__)
@@ -10,6 +12,8 @@ class ManagedPolicyLoader(object):
         self._iam_client = iam_client
         self._policy_map = None
         self.max_items = 1000
+
+        self.iam_metrics = Metrics(namespace="Downstream-retry", metrics_publisher=EMFMetricsPublisher())
 
     @cw_timer(prefix="External", name="IAM")
     def _load_policies_from_iam(self):
@@ -27,8 +31,16 @@ class ManagedPolicyLoader(object):
         for page in page_iterator:
             name_to_arn_map.update(map(lambda x: (x["PolicyName"], x["Arn"]), page["Policies"]))
 
+            retry_count = page.get("ResponseMetadata", {}).get("RetryAttempts")
+            self.iam_metrics.record_count("Retry", retry_count, {"downstream_service": "iam"})
+
         LOG.info("Finished loading policies from IAM.")
         self._policy_map = name_to_arn_map
+
+        try:
+            self.iam_metrics.publish()
+        except Exception as e:
+            LOG.warning("Failed to publish iam emf metrics: %s", e)
 
     def load(self):
         if self._policy_map is None:
