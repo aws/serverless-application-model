@@ -71,6 +71,7 @@ Currently, the following resources and properties are being supported:
       ReservedConcurrentExecutions:
       EventInvokeConfig:
       Architectures:
+      EphemeralStorage:
 
     Api:
       # Properties of AWS::Serverless::Api

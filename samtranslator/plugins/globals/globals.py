@@ -42,6 +42,7 @@ class Globals(object):
             "FileSystemConfigs",
             "CodeSigningConfigArn",
             "Architectures",
+            "EphemeralStorage",
         ],
         # Everything except
         #   DefinitionBody: because its hard to reason about merge of Swagger dictionaries
