@@ -20,7 +20,7 @@
       }
     }, 
     "ThumbnailFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Type": "AWS::IAM::Role",
       "Properties": {
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

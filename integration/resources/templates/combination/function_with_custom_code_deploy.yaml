@@ -1,16 +1,22 @@
+Parameters:
+  DeployConfigName:
+    Type: String
+
 # Just one function with a deployment preference
 Resources:
   MyLambdaFunction:
+    DependsOn: CustomDeploymentConfig
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: ${codeuri}
       Handler: index.handler
-      Runtime: python2.7
+      Runtime: python3.8
 
       AutoPublishAlias: Live
 
       DeploymentPreference:
-        Type: CustomLambdaDeploymentConfiguration
+        Type:
+          Ref: CustomDeploymentConfig
         Role:
           Fn::GetAtt: [ DeploymentRole, Arn ]
 
@@ -43,3 +49,15 @@ Resources:
                   - "lambda:InvokeFunction"
                   - "s3:Get*"
                   - "sns:Publish"
+
+  CustomDeploymentConfig:
+    Type: AWS::CodeDeploy::DeploymentConfig
+    Properties:
+      DeploymentConfigName:
+        Ref: DeployConfigName
+      ComputePlatform: Lambda
+      TrafficRoutingConfig:
+        Type: TimeBasedLinear
+        TimeBasedLinear:
+          LinearInterval: 1
+          LinearPercentage: 50

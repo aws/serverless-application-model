@@ -1,0 +1,28 @@
+Resources:
+  SignInFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: main.main
+      Runtime: python3.9
+      Events:
+        MainFuncPostV1:
+          Type: HttpApi
+          Properties:
+            Auth:
+              Authorizer:
+                - CognitoAuthorizer
+            Path: /v1/signin
+            ApiId: AuthorizedApi
+            Method: post
+  AuthorizedApi:
+    Type: 'AWS::Serverless::HttpApi'
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: NONE
+        Authorizers:
+          - CognitoAuthorizer: null
+            UserPoolArn: !GetAtt 'CognitoUserPool.Arn'
+            AuthorizationScopes:
+              - aws.cognito.signin.user.admin

@@ -1,5 +1,4 @@
 import copy
-from six import string_types
 
 from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
@@ -50,6 +49,7 @@ class Translator:
         self.boto_session = boto_session
         self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
         MetricsMethodWrapperSingleton.set_instance(self.metrics)
+        self._translated_resouce_mapping = {}
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
@@ -82,7 +82,7 @@ class Translator:
                             )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values, feature_toggle=None):
+    def translate(self, sam_template, parameter_values, feature_toggle=None, passthrough_metadata=False):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -153,7 +153,12 @@ class Translator:
                 del template["Resources"][logical_id]
                 for resource in translated:
                     if verify_unique_logical_id(resource, sam_template["Resources"]):
-                        template["Resources"].update(resource.to_dict())
+                        # For each generated resource, pass through existing metadata that may exist on the original SAM resource.
+                        _r = resource.to_dict()
+                        if resource_dict.get("Metadata") and passthrough_metadata:
+                            if not template["Resources"].get(resource.logical_id):
+                                _r[resource.logical_id]["Metadata"] = resource_dict["Metadata"]
+                        template["Resources"].update(_r)
                     else:
                         document_errors.append(
                             DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)

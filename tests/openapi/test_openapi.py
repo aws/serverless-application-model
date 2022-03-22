@@ -367,7 +367,7 @@ class TestOpenApiEditor_add_auth(TestCase):
         self.editor = OpenApiEditor(self.original_openapi)
 
 
-class TestOpenApiEditor_get_integration_function(TestCase):
+class TestOpenApiEditor_is_integration_function_logical_id_match(TestCase):
     def setUp(self):
 
         self.original_openapi = {
@@ -407,13 +407,14 @@ class TestOpenApiEditor_get_integration_function(TestCase):
 
         self.editor = OpenApiEditor(self.original_openapi)
 
-    def test_must_get_integration_function_if_exists(self):
+    def test_must_match_integration_function_if_exists(self):
 
-        self.assertEqual(
-            self.editor.get_integration_function_logical_id(OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD),
-            "HttpApiFunction",
+        self.assertTrue(
+            self.editor.is_integration_function_logical_id_match(
+                OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD, "HttpApiFunction"
+            ),
         )
-        self.assertFalse(self.editor.get_integration_function_logical_id("/bar", "get"))
+        self.assertFalse(self.editor.is_integration_function_logical_id_match("/bar", "get", "HttpApiFunction"))
 
 
 class TestOpenApiEdit_add_description(TestCase):
@@ -439,7 +440,7 @@ class TestOpenApiEdit_add_description(TestCase):
         self.assertEqual(editor.openapi["info"]["description"], "Existing Description")
 
 
-class TestOpenApiEditor_get_integration_function_of_alias(TestCase):
+class TestOpenApiEditor_is_integration_function_logical_id_match_with_alias(TestCase):
     def setUp(self):
 
         self.original_openapi = {
@@ -479,8 +480,10 @@ class TestOpenApiEditor_get_integration_function_of_alias(TestCase):
 
         self.editor = OpenApiEditor(self.original_openapi)
 
-    def test_no_logical_id_if_alias(self):
+    def test_no_match_if_alias(self):
 
         self.assertFalse(
-            self.editor.get_integration_function_logical_id(OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD),
+            self.editor.is_integration_function_logical_id_match(
+                OpenApiEditor._DEFAULT_PATH, OpenApiEditor._X_ANY_METHOD, "HttpApiFunctionAlias"
+            ),
         )

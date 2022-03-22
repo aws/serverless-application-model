@@ -1,7 +1,7 @@
 import pytest
 
 from unittest import TestCase
-from mock import Mock, call, ANY
+from unittest.mock import Mock, call, ANY
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model import PropertyType, Resource, SamResourceMacro, ResourceTypeResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences

@@ -1,6 +1,3 @@
-from six import string_types
-
-
 class SupportedResourceReferences(object):
     """
     Class that contains information about the resource references supported in this SAM template, along with the
@@ -32,7 +29,7 @@ class SupportedResourceReferences(object):
         if not logical_id or not property:
             raise ValueError("LogicalId and property must be a non-empty string")
 
-        if not value or not isinstance(value, string_types):
+        if not value or not isinstance(value, str):
             raise ValueError("Property value must be a non-empty string")
 
         if logical_id not in self._refs:

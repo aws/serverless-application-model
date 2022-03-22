@@ -36,6 +36,7 @@ import botocore
 
 from integration.helpers.deployer.utils.colors import DeployColor
 from integration.helpers.deployer.exceptions import exceptions as deploy_exceptions
+from integration.helpers.deployer.utils.retry import retry, retry_with_exponential_backoff_and_jitter
 from integration.helpers.deployer.utils.table_print import (
     pprint_column_names,
     pprint_columns,
@@ -428,17 +429,22 @@ class Deployer:
         # Poll every 30 seconds. Polling too frequently risks hitting rate limits
         # on CloudFormation's DescribeStacks API
         waiter_config = {"Delay": 30, "MaxAttempts": 120}
-
-        try:
-            waiter.wait(StackName=stack_name, WaiterConfig=waiter_config)
-        except botocore.exceptions.WaiterError as ex:
-            LOG.debug("Execute changeset waiter exception", exc_info=ex)
-
-            raise deploy_exceptions.DeployFailedError(stack_name=stack_name, msg=str(ex))
+        self._wait(stack_name, waiter, waiter_config)
 
         outputs = self.get_stack_outputs(stack_name=stack_name, echo=False)
         if outputs:
             self._display_stack_outputs(outputs)
+
+    @retry_with_exponential_backoff_and_jitter(deploy_exceptions.ThrottlingError, 5, 360)
+    def _wait(self, stack_name, waiter, waiter_config):
+        try:
+            waiter.wait(StackName=stack_name, WaiterConfig=waiter_config)
+        except botocore.exceptions.WaiterError as ex:
+            LOG.debug("Execute changeset waiter exception", exc_info=ex)
+            if "Throttling" in str(ex):
+                raise deploy_exceptions.ThrottlingError(stack_name=stack_name, msg=str(ex))
+            else:
+                raise deploy_exceptions.DeployFailedError(stack_name=stack_name, msg=str(ex))
 
     def create_and_wait_for_changeset(
         self, stack_name, cfn_template, parameter_values, capabilities, role_arn, notification_arns, s3_uploader, tags
@@ -477,6 +483,7 @@ class Deployer:
                 )
             newline_per_item(stack_outputs, counter)
 
+    @retry_with_exponential_backoff_and_jitter(deploy_exceptions.ThrottlingError, 5, 360)
     def get_stack_outputs(self, stack_name, echo=True):
         try:
             stacks_description = self._client.describe_stacks(StackName=stack_name)
@@ -491,4 +498,7 @@ class Deployer:
                 return None
 
         except botocore.exceptions.ClientError as ex:
-            raise deploy_exceptions.DeployStackOutPutFailedError(stack_name=stack_name, msg=str(ex))
+            if "Throttling" in str(ex):
+                raise deploy_exceptions.ThrottlingError(stack_name=stack_name, msg=str(ex))
+            else:
+                raise deploy_exceptions.DeployStackOutPutFailedError(stack_name=stack_name, msg=str(ex))

@@ -1,5 +1,4 @@
 ﻿""" SAM macro definitions """
-from six import string_types
 import copy
 
 import samtranslator.model.eventsources
@@ -157,7 +156,7 @@ class SamFunction(SamResourceMacro):
             code_sha256 = None
             if self.AutoPublishCodeSha256:
                 code_sha256 = intrinsics_resolver.resolve_parameter_refs(self.AutoPublishCodeSha256)
-                if not isinstance(code_sha256, string_types):
+                if not isinstance(code_sha256, str):
                     raise InvalidResourceException(
                         self.logical_id,
                         "AutoPublishCodeSha256 must be a string",
@@ -389,7 +388,7 @@ class SamFunction(SamResourceMacro):
         # Try to resolve.
         resolved_alias_name = intrinsics_resolver.resolve_parameter_refs(original_alias_value)
 
-        if not isinstance(resolved_alias_name, string_types):
+        if not isinstance(resolved_alias_name, str):
             # This is still a dictionary which means we are not able to completely resolve intrinsics
             raise InvalidResourceException(
                 self.logical_id, "'{}' must be a string or a Ref to a template parameter".format(property_name)
@@ -592,6 +591,12 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 "'DeadLetterQueue' requires Type and TargetArn properties to be specified.".format(valid_dlq_types),
+            )
+
+        if not (isinstance(self.DeadLetterQueue.get("Type"), str)):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'DeadLetterQueue' property 'Type' should be of type str.",
             )
 
         # Validate required Types
@@ -878,6 +883,7 @@ class SamApi(SamResourceMacro):
         "Domain": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
         "Mode": PropertyType(False, is_str()),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
     referable_properties = {
@@ -925,6 +931,7 @@ class SamApi(SamResourceMacro):
             method_settings=self.MethodSettings,
             binary_media=self.BinaryMediaTypes,
             minimum_compression_size=self.MinimumCompressionSize,
+            disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
             cors=self.Cors,
             auth=self.Auth,
             gateway_responses=self.GatewayResponses,

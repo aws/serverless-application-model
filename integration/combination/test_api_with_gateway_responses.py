@@ -1,6 +1,14 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.deployer.utils.retry import retry
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import GATEWAY_RESPONSES
 
 
+@skipIf(
+    current_region_does_not_support([GATEWAY_RESPONSES]), "GatewayResponses is not supported in this testing region"
+)
 class TestApiWithGatewayResponses(BaseTest):
     def test_gateway_responses(self):
         self.create_and_verify_stack("combination/api_with_gateway_responses")
@@ -23,8 +31,12 @@ class TestApiWithGatewayResponses(BaseTest):
         self.assertEqual(gateway_response.get("statusCode"), None, "gatewayResponse: status code must be none")
 
         base_url = stack_outputs["ApiUrl"]
-        response = self.verify_get_request_response(base_url + "iam", 403)
-        access_control_allow_origin = response.headers["Access-Control-Allow-Origin"]
+        self._verify_request_response_and_cors(base_url + "iam", 403)
+
+    @retry(AssertionError, exc_raise=AssertionError, exc_raise_msg="Unable to verify GatewayResponse request.")
+    def _verify_request_response_and_cors(self, url, expected_response):
+        response = self.verify_get_request_response(url, expected_response)
+        access_control_allow_origin = response.headers.get("Access-Control-Allow-Origin", "")
         self.assertEqual(access_control_allow_origin, "*", "Access-Control-Allow-Origin must be '*'")
 
 

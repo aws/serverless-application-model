@@ -26,31 +26,32 @@ class RegionConfiguration(object):
         ]
 
     @classmethod
-    def is_sar_supported(cls):
+    def is_service_supported(cls, service, region=None):
         """
-        SAR is not supported in some regions.
+        Not all services are supported in all regions.  This method returns whether a given
+        service is supported in a given region.  If no region is specified, the current region
+        (as identified by boto3) is used.
         https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/
-        https://docs.aws.amazon.com/general/latest/gr/serverlessrepo.html
 
-        :return: True, if SAR is supported in current region.
+        :param service: service code (string used to obtain a boto3 client for the service)
+        :param region: region identifier (e.g., us-east-1)
+        :return: True, if the service is supported in the region
         """
 
         session = boto3.Session()
 
-        # get the current region
-        region = session.region_name
+        if not region:
+            # get the current region
+            region = session.region_name
 
-        # need to handle when region is None so that it won't break
-        if region is None:
-            if ArnGenerator.BOTO_SESSION_REGION_NAME is not None:
-                region = ArnGenerator.BOTO_SESSION_REGION_NAME
-            else:
-                raise NoRegionFound("AWS Region cannot be found")
+            # need to handle when region is None so that it won't break
+            if region is None:
+                if ArnGenerator.BOTO_SESSION_REGION_NAME is not None:
+                    region = ArnGenerator.BOTO_SESSION_REGION_NAME
+                else:
+                    raise NoRegionFound("AWS Region cannot be found")
 
-        # boto3 get_available_regions call won't return us-gov and cn regions even if SAR is available
-        if region.startswith("cn") or region.startswith("us-gov"):
-            return True
-
-        # get all regions where SAR are available
-        available_regions = session.get_available_regions("serverlessrepo")
+        # check if the service is available in region
+        partition = session.get_partition_for_region(region)
+        available_regions = session.get_available_regions(service, partition_name=partition)
         return region in available_regions

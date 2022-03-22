@@ -1,7 +1,7 @@
 from parameterized import parameterized
 
 from unittest import TestCase
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 from samtranslator.plugins.globals.globals import GlobalProperties, Globals, InvalidGlobalsSectionException
 

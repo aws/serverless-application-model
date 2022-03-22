@@ -1,25 +1,26 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support, generate_suffix
+from integration.config.service_names import CODE_DEPLOY
 
 CODEDEPLOY_APPLICATION_LOGICAL_ID = "ServerlessDeploymentApplication"
 LAMBDA_FUNCTION_NAME = "MyLambdaFunction"
 LAMBDA_ALIAS = "Live"
 
 
+@skipIf(current_region_does_not_support([CODE_DEPLOY]), "CodeDeploy is not supported in this testing region")
 class TestFunctionWithDeploymentPreference(BaseTest):
     def test_lambda_function_with_deployment_preference_uses_code_deploy(self):
         self.create_and_verify_stack("combination/function_with_deployment_basic")
         self._verify_no_deployment_then_update_and_verify_deployment()
 
     def test_lambda_function_with_custom_deployment_preference(self):
-        custom_deployment_config_name = "CustomLambdaDeploymentConfiguration"
-        # Want to delete / recreate custom deployment resource to make sure it exists and hasn't changed
-        if self._has_custom_deployment_configuration(custom_deployment_config_name):
-            self._delete_deployment_configuration(custom_deployment_config_name)
+        custom_deployment_config_name = "CustomLambdaDeploymentConfiguration" + generate_suffix()
+        parameters = [self.generate_parameter("DeployConfigName", custom_deployment_config_name)]
 
-        self._create_deployment_configuration(custom_deployment_config_name)
-
-        self.create_and_verify_stack("combination/function_with_custom_code_deploy")
-        self._verify_no_deployment_then_update_and_verify_deployment()
+        self.create_and_verify_stack("combination/function_with_custom_code_deploy", parameters)
+        self._verify_no_deployment_then_update_and_verify_deployment(parameters)
 
     def test_use_default_manage_policy(self):
         self.create_and_verify_stack("combination/function_with_deployment_default_role_managed_policy")
@@ -97,7 +98,9 @@ class TestFunctionWithDeploymentPreference(BaseTest):
         ]
 
     def _get_deployments(self, application_name, deployment_group):
-        deployments = self.client_provider.code_deploy_client.list_deployments()["deployments"]
+        deployments = self.client_provider.code_deploy_client.list_deployments(
+            applicationName=application_name, deploymentGroupName=deployment_group
+        )["deployments"]
         deployment_infos = [self._get_deployment_info(deployment_id) for deployment_id in deployments]
         return deployment_infos
 
@@ -132,23 +135,6 @@ class TestFunctionWithDeploymentPreference(BaseTest):
             (x for x in resources_with_this_type if x["LogicalResourceId"] == logical_id), None
         )
         return resources_with_this_id["PhysicalResourceId"]
-
-    def _has_custom_deployment_configuration(self, deployment_name):
-        result = self.client_provider.code_deploy_client.list_deployment_configs()["deploymentConfigsList"]
-        return deployment_name in result
-
-    def _delete_deployment_configuration(self, deployment_name):
-        self.client_provider.code_deploy_client.delete_deployment_config(deploymentConfigName=deployment_name)
-
-    def _create_deployment_configuration(self, deployment_name):
-        client = self.client_provider.code_deploy_client
-        traffic_routing_config = {
-            "type": "TimeBasedLinear",
-            "timeBasedLinear": {"linearPercentage": 50, "linearInterval": 1},
-        }
-        client.create_deployment_config(
-            deploymentConfigName=deployment_name, computePlatform="Lambda", trafficRoutingConfig=traffic_routing_config
-        )
 
     def _get_deployment_group_configuration_name(self, deployment_group_name, application_name):
         deployment_group = self.client_provider.code_deploy_client.get_deployment_group(

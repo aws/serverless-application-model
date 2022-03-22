@@ -1,6 +1,5 @@
 import re
 from collections import namedtuple
-from six import string_types
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt
@@ -142,7 +141,7 @@ class HttpApiGenerator(object):
         For this reason, we always put DisableExecuteApiEndpoint into openapi object.
 
         """
-        if self.disable_execute_api_endpoint and not self.definition_body:
+        if self.disable_execute_api_endpoint is not None and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
@@ -253,6 +252,12 @@ class HttpApiGenerator(object):
                 "EndpointConfiguration for Custom Domains must be one of {}.".format(["REGIONAL"]),
             )
         domain_config["EndpointType"] = endpoint
+
+        if self.domain.get("OwnershipVerificationCertificateArn", None):
+            domain_config["OwnershipVerificationCertificateArn"] = self.domain.get(
+                "OwnershipVerificationCertificateArn"
+            )
+
         domain_config["CertificateArn"] = self.domain.get("CertificateArn")
         if self.domain.get("SecurityPolicy", None):
             domain_config["SecurityPolicy"] = self.domain.get("SecurityPolicy")
@@ -288,7 +293,7 @@ class HttpApiGenerator(object):
                 )
 
         # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
+        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), str):
             basepaths = [self.domain.get("BasePath")]
         elif self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), list):
             basepaths = self.domain.get("BasePath")
@@ -340,7 +345,7 @@ class HttpApiGenerator(object):
                 # search for invalid characters in the path and raise error if there are
                 invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
 
-                if not isinstance(path, string_types):
+                if not isinstance(path, str):
                     raise InvalidResourceException(self.logical_id, "Basepath must be a string.")
 
                 if re.search(invalid_regex, path) is not None:
@@ -574,7 +579,7 @@ class HttpApiGenerator(object):
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
-        stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
+        stage_name_prefix = self.stage_name if isinstance(self.stage_name, str) else ""
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         elif stage_name_prefix == DefaultStageName:
