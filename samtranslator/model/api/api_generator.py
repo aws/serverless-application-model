@@ -1,8 +1,6 @@
 import logging
 from collections import namedtuple
 
-from six import string_types
-
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
@@ -18,7 +16,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException, InvalidDocumentException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -27,6 +25,7 @@ from samtranslator.model.lambda_ import LambdaPermission
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
+from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
 
 LOG = logging.getLogger(__name__)
 
@@ -276,6 +275,9 @@ class ApiGenerator(object):
         self._add_binary_media_types()
         self._add_models()
 
+        if self.disable_execute_api_endpoint is not None:
+            self._add_endpoint_extension()
+
         if self.definition_uri:
             rest_api.BodyS3Location = self._construct_body_s3_dict()
         elif self.definition_body:
@@ -292,9 +294,6 @@ class ApiGenerator(object):
         if self.mode:
             rest_api.Mode = self.mode
 
-        if self.disable_execute_api_endpoint is not None:
-            self._add_endpoint_extension()
-
         return rest_api
 
     def _add_endpoint_extension(self):
@@ -305,7 +304,7 @@ class ApiGenerator(object):
         https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
         For this reason, we always put DisableExecuteApiEndpoint into openapi object irrespective of origin of DefinitionBody.
         """
-        if self.disable_execute_api_endpoint and not self.definition_body:
+        if self.disable_execute_api_endpoint is not None and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
@@ -338,7 +337,18 @@ class ApiGenerator(object):
                     "'s3://bucket/key' with optional versionId query parameter.",
                 )
 
-        body_s3 = {"Bucket": s3_pointer["Bucket"], "Key": s3_pointer["Key"]}
+            if isinstance(self.definition_uri, Py27UniStr):
+                # self.defintion_uri is a Py27UniStr instance if it is defined in the template
+                # we need to preserve the Py27UniStr type
+                s3_pointer["Bucket"] = Py27UniStr(s3_pointer["Bucket"])
+                s3_pointer["Key"] = Py27UniStr(s3_pointer["Key"])
+                if "Version" in s3_pointer:
+                    s3_pointer["Version"] = Py27UniStr(s3_pointer["Version"])
+
+        # Construct body_s3 as py27 dict
+        body_s3 = Py27Dict()
+        body_s3["Bucket"] = s3_pointer["Bucket"]
+        body_s3["Key"] = s3_pointer["Key"]
         if "Version" in s3_pointer:
             body_s3["Version"] = s3_pointer["Version"]
         return body_s3
@@ -369,7 +379,7 @@ class ApiGenerator(object):
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
-        stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
+        stage_name_prefix = self.stage_name if isinstance(self.stage_name, str) else ""
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         else:
@@ -469,7 +479,7 @@ class ApiGenerator(object):
             domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
 
         # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
+        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), str):
             basepaths = [self.domain.get("BasePath")]
         elif self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), list):
             basepaths = self.domain.get("BasePath")
@@ -503,6 +513,12 @@ class ApiGenerator(object):
         record_set_group = None
         if self.domain.get("Route53") is not None:
             route53 = self.domain.get("Route53")
+            if not isinstance(route53, dict):
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Invalid property type '{}' for Route53. "
+                    "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53).__name__),
+                )
             if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
                 raise InvalidResourceException(
                     self.logical_id,
@@ -596,7 +612,7 @@ class ApiGenerator(object):
                 self.logical_id, "Cors works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
-        if isinstance(self.cors, string_types) or is_intrinsic(self.cors):
+        if isinstance(self.cors, str) or is_intrinsic(self.cors):
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)
         elif isinstance(self.cors, dict):
@@ -627,14 +643,17 @@ class ApiGenerator(object):
 
         editor = SwaggerEditor(self.definition_body)
         for path in editor.iter_on_path():
-            editor.add_cors(
-                path,
-                properties.AllowOrigin,
-                properties.AllowHeaders,
-                properties.AllowMethods,
-                max_age=properties.MaxAge,
-                allow_credentials=properties.AllowCredentials,
-            )
+            try:
+                editor.add_cors(
+                    path,
+                    properties.AllowOrigin,
+                    properties.AllowHeaders,
+                    properties.AllowMethods,
+                    max_age=properties.MaxAge,
+                    allow_credentials=properties.AllowCredentials,
+                )
+            except InvalidTemplateException as ex:
+                raise InvalidResourceException(self.logical_id, ex.message)
 
         # Assign the Swagger back to template
         self.definition_body = editor.swagger
@@ -699,6 +718,9 @@ class ApiGenerator(object):
             self._set_default_apikey_required(swagger_editor)
 
         if auth_properties.ResourcePolicy:
+            SwaggerEditor.validate_is_dict(
+                auth_properties.ResourcePolicy, "ResourcePolicy must be a map (ResourcePolicyStatement)."
+            )
             for path in swagger_editor.iter_on_path():
                 swagger_editor.add_resource_policy(auth_properties.ResourcePolicy, path, self.stage_name)
             if auth_properties.ResourcePolicy.get("CustomStatements"):
@@ -916,12 +938,13 @@ class ApiGenerator(object):
 
         swagger_editor = SwaggerEditor(self.definition_body)
 
-        gateway_responses = {}
+        # The dicts below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
+        gateway_responses = Py27Dict()
         for response_type, response in self.gateway_responses.items():
             gateway_responses[response_type] = ApiGatewayResponse(
                 api_logical_id=self.logical_id,
-                response_parameters=response.get("ResponseParameters", {}),
-                response_templates=response.get("ResponseTemplates", {}),
+                response_parameters=response.get("ResponseParameters", Py27Dict()),
+                response_templates=response.get("ResponseTemplates", Py27Dict()),
                 status_code=response.get("StatusCode", None),
             )
 
@@ -979,48 +1002,52 @@ class ApiGenerator(object):
             SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version
         ):
             if definition_body.get("securityDefinitions"):
-                components = definition_body.get("components", {})
+                components = definition_body.get("components", Py27Dict())
+                # In the previous line, the default value `Py27Dict()` will be only returned only if `components`
+                # property is not in definition_body dict, but if it exist, and its value is None, so None will be
+                # returned and not the default value. That is why the below line is required.
+                components = components if components else Py27Dict()
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
                 del definition_body["securityDefinitions"]
             if definition_body.get("definitions"):
-                components = definition_body.get("components", {})
+                components = definition_body.get("components", Py27Dict())
                 components["schemas"] = definition_body["definitions"]
                 definition_body["components"] = components
                 del definition_body["definitions"]
             # removes `consumes` and `produces` options for CORS in openapi3 and
             # adds `schema` for the headers in responses for openapi3
-            if definition_body.get("paths"):
-                for path in definition_body.get("paths"):
-                    if definition_body.get("paths").get(path).get("options"):
-                        definition_body_options = definition_body.get("paths").get(path).get("options").copy()
-                        for field in definition_body_options.keys():
+            paths = definition_body.get("paths")
+            if paths:
+                for path, path_item in paths.items():
+                    SwaggerEditor.validate_path_item_is_dict(path_item, path)
+                    if path_item.get("options"):
+                        options = path_item.get("options").copy()
+                        for field, field_val in options.items():
                             # remove unsupported produces and consumes in options for openapi3
                             if field in ["produces", "consumes"]:
                                 del definition_body["paths"][path]["options"][field]
                             # add schema for the headers in options section for openapi3
                             if field in ["responses"]:
-                                options_path = definition_body["paths"][path]["options"]
-                                if (
-                                    options_path
-                                    and options_path.get(field).get("200")
-                                    and options_path.get(field).get("200").get("headers")
-                                ):
-                                    headers = definition_body["paths"][path]["options"][field]["200"]["headers"]
-                                    for header in headers.keys():
-                                        header_value = {
-                                            "schema": definition_body["paths"][path]["options"][field]["200"][
-                                                "headers"
-                                            ][header]
-                                        }
+                                SwaggerEditor.validate_is_dict(
+                                    field_val,
+                                    "Value of responses in options method for path {} must be a "
+                                    "dictionary according to Swagger spec.".format(path),
+                                )
+                                if field_val.get("200") and field_val.get("200").get("headers"):
+                                    headers = field_val["200"]["headers"]
+                                    for header, header_val in headers.items():
+                                        new_header_val_with_schema = Py27Dict()
+                                        new_header_val_with_schema["schema"] = header_val
                                         definition_body["paths"][path]["options"][field]["200"]["headers"][
                                             header
-                                        ] = header_value
+                                        ] = new_header_val_with_schema
 
         return definition_body
 
     def _get_authorizers(self, authorizers_config, default_authorizer=None):
-        authorizers = {}
+        # The dict below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
+        authorizers = Py27Dict()
         if default_authorizer == "AWS_IAM":
             authorizers[default_authorizer] = ApiGatewayAuthorizer(
                 api_logical_id=self.logical_id, name=default_authorizer, is_aws_iam_authorizer=True
@@ -1106,7 +1133,7 @@ class ApiGenerator(object):
         if not default_authorizer:
             return
 
-        if not isinstance(default_authorizer, string_types):
+        if not isinstance(default_authorizer, str):
             raise InvalidResourceException(
                 self.logical_id,
                 "DefaultAuthorizer is not a string.",

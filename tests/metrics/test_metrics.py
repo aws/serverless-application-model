@@ -1,6 +1,6 @@
 from parameterized import parameterized, param
 from unittest import TestCase
-from mock import MagicMock, call, ANY
+from unittest.mock import MagicMock, call, ANY
 from samtranslator.metrics.metrics import (
     Metrics,
     MetricsPublisher,

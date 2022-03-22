@@ -1,4 +1,4 @@
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 from unittest import TestCase
 
 from samtranslator.model.function_policies import FunctionPolicies, PolicyTypes, PolicyEntry

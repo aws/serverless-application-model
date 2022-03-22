@@ -1,6 +1,11 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import HTTP_API
 
 
+@skipIf(current_region_does_not_support([HTTP_API]), "HttpApi is not supported in this testing region")
 class TestHttpApiWithCors(BaseTest):
     def test_cors(self):
         self.create_and_verify_stack("combination/http_api_with_cors")
@@ -29,7 +34,7 @@ class TestHttpApiWithCors(BaseTest):
 
         # Every HttpApi should have a default tag created by SAM (httpapi:createdby: SAM)
         tags = api_result["Tags"]
-        self.assertEqual(len(tags), 1)
+        self.assertGreaterEqual(len(tags), 1)
         self.assertEqual(tags["httpapi:createdBy"], "SAM")
 
         # verifying if TimeoutInMillis is set properly in the integration

@@ -5,5 +5,6 @@ recursive-include samtranslator/validator/sam_schema *.json
 include samtranslator/policy_templates_data/policy_templates.json
 include samtranslator/policy_templates_data/schema.json
 include README.md
+include THIRD_PARTY_LICENSES
 
 prune tests

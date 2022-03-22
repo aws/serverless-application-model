@@ -44,6 +44,11 @@ regions:
     - IoT
     - GatewayResponses
     - HttpApi
+    - MSK
+    - MQ
+    - CodeSign
+    - CweCwsDlq
+    - Mode
     - ARM
   cn-northwest-1:
     - ServerlessRepo

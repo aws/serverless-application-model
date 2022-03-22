@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 """Convert SAM templates to CloudFormation templates.
 
@@ -26,7 +26,9 @@ import subprocess
 import sys
 
 import boto3
+
 from docopt import docopt
+from functools import reduce
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")

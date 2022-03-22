@@ -1,7 +1,12 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
 from integration.helpers.common_api import get_policy_statements
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import SQS
 
 
+@skipIf(current_region_does_not_support([SQS]), "SQS is not supported in this testing region")
 class TestStateMachineWithPolicyTemplates(BaseTest):
     def test_with_policy_templates(self):
         self.create_and_verify_stack("combination/state_machine_with_policy_templates")
