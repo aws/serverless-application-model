@@ -63,7 +63,7 @@ class Translator:
         """
         if resource_dict.get("Type", "").strip() == "AWS::Serverless::Function":
             events_properties = resource_dict.get("Properties", {}).get("Events", {})
-            events = list(events_properties.values())
+            events = list(events_properties.values()) if events_properties else []
             for item in events:
                 # If the function event type is `Api` then gets the function name and
                 # adds to the function_names dict with key as the api_name and value as the function_name
@@ -71,7 +71,7 @@ class Translator:
                 if item.get("Type") == "Api" and item_properties.get("RestApiId"):
                     rest_api = item_properties.get("RestApiId")
                     api_name = Api.get_rest_api_id_string(rest_api)
-                    if isinstance(api_name, string_types):
+                    if isinstance(api_name, str):
                         resource_dict_copy = copy.deepcopy(resource_dict)
                         function_name = intrinsics_resolver.resolve_parameter_refs(
                             resource_dict_copy.get("Properties").get("FunctionName")
