@@ -5,7 +5,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
-from samtranslator.model.intrinsics import ref, fnGetAtt, fnSub, make_shorthand, make_conditional
+from samtranslator.model.intrinsics import is_intrinsic, ref, fnGetAtt, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.s3 import S3Bucket
@@ -764,6 +764,14 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because the related API does not define any Models.".format(
+                            model=method_model, method=self.Method, path=self.Path
+                        ),
+                    )
+                if not is_intrinsic(api_models) and not isinstance(api_models, dict):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
+                        "because the related API Models defined is of invalid type.".format(
                             model=method_model, method=self.Method, path=self.Path
                         ),
                     )
