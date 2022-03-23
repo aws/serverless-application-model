@@ -1,16 +1,16 @@
 Parameters:
-  MyDomainName:
+  MyRestRegionalDomainName:
     Type: String
-  MyDomainCert:
+  MyRestRegionalDomainCert:
     Type: String
 
 Globals:
-  HttpApi:
+  Api:
     Domain:
       DomainName:
-        Ref: MyDomainName
+        Ref: MyRestRegionalDomainName
       CertificateArn:
-        Ref: MyDomainCert
+        Ref: MyRestRegionalDomainCert
       EndpointConfiguration: REGIONAL
       MutualTlsAuthentication:
         TruststoreUri: ${mtlsuri}
@@ -38,20 +38,12 @@ Resources:
       Runtime: nodejs12.x
       Events:
         ImplicitGet:
-          Type: HttpApi
+          Type: Api
           Properties:
             Method: Get
             Path: /get
-            ApiId: 
-              Ref: MyApi
         ImplicitPost:
-          Type: HttpApi
+          Type: Api
           Properties:
             Method: Post
             Path: /post
-            ApiId: 
-              Ref: MyApi
-  MyApi:
-    Type: AWS::Serverless::HttpApi
-    Properties:
-      StageName: Prod

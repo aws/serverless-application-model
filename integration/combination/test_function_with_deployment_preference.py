@@ -41,8 +41,7 @@ class TestFunctionWithDeploymentPreference(BaseTest):
         pref["Enabled"] = "True"
         self.set_template_resource_property("MyLambdaFunction", "DeploymentPreference", pref)
 
-        self.transform_template()
-        self.deploy_stack(self.get_default_test_template_parameters())
+        self.update_stack(self.get_default_test_template_parameters())
 
         self._verify_no_deployment_then_update_and_verify_deployment(self.get_default_test_template_parameters())
 
@@ -77,8 +76,7 @@ class TestFunctionWithDeploymentPreference(BaseTest):
         self.set_template_resource_property(
             LAMBDA_FUNCTION_NAME, "CodeUri", self.file_to_s3_uri_map["code2.zip"]["uri"]
         )
-        self.transform_template()
-        self.deploy_stack(parameters)
+        self.update_stack(parameters)
 
         for deployment_group in deployment_groups:
             deployments = self._get_deployments(application_name, deployment_group)

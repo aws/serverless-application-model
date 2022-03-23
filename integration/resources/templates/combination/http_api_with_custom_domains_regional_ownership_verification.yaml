@@ -1,16 +1,18 @@
 Parameters:
-  MyDomainName:
+  MyRegionalDomainName:
     Type: String
-  MyDomainCert:
+  MyRegionalDomainCert:
+    Type: String
+  MyOwnershipVerificationCert:
     Type: String
 
 Globals:
   HttpApi:
     Domain:
       DomainName:
-        Ref: MyDomainName
+        Ref: MyRegionalDomainName
       CertificateArn:
-        Ref: MyDomainCert
+        Ref: MyRegionalDomainCert
       EndpointConfiguration: REGIONAL
       MutualTlsAuthentication:
         TruststoreUri: ${mtlsuri}
@@ -21,6 +23,8 @@ Globals:
         - /post
       Route53:
         HostedZoneId: Z1DTV8GVAVOHDR
+      OwnershipVerificationCertificateArn:
+        Ref: MyOwnershipVerificationCert
 
 Resources:
   MyFunction:
@@ -42,14 +46,14 @@ Resources:
           Properties:
             Method: Get
             Path: /get
-            ApiId: 
+            ApiId:
               Ref: MyApi
         ImplicitPost:
           Type: HttpApi
           Properties:
             Method: Post
             Path: /post
-            ApiId: 
+            ApiId:
               Ref: MyApi
   MyApi:
     Type: AWS::Serverless::HttpApi

@@ -1,16 +1,17 @@
 from unittest.case import skipIf
 
+from integration.config.service_names import LAYERS, ARM
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
 
 
+@skipIf(current_region_does_not_support([LAYERS]), "Layers is not supported in this testing region")
 class TestBasicLayerVersion(BaseTest):
     """
     Basic AWS::Lambda::LayerVersion tests
     """
 
-    @skipIf(current_region_does_not_support(["Layers"]), "Layers is not supported in this testing region")
-    def test_basic_layer_version(self, filename):
+    def test_basic_layer_version(self):
         """
         Creates a basic lambda layer version
         """
@@ -19,14 +20,13 @@ class TestBasicLayerVersion(BaseTest):
         layer_logical_id_1 = self.get_logical_id_by_type("AWS::Lambda::LayerVersion")
 
         self.set_template_resource_property("MyLayerVersion", "Description", "A basic layer")
-        self.transform_template()
-        self.deploy_stack()
+
+        self.update_stack()
 
         layer_logical_id_2 = self.get_logical_id_by_type("AWS::Lambda::LayerVersion")
 
         self.assertFalse(layer_logical_id_1 == layer_logical_id_2)
 
-    @skipIf(current_region_does_not_support(["Layers"]), "Layers is not supported in this testing region")
     def test_basic_layer_with_parameters(self):
         """
         Creates a basic lambda layer version with parameters
@@ -47,8 +47,7 @@ class TestBasicLayerVersion(BaseTest):
         self.assertEqual(layer_version_result["LicenseInfo"], license)
         self.assertEqual(layer_version_result["Description"], description)
 
-    @skipIf(current_region_does_not_support(["Layers"]), "Layers is not supported in this testing region")
-    @skipIf(current_region_does_not_support(["ARM"]), "ARM is not supported in this testing region")
+    @skipIf(current_region_does_not_support([ARM]), "ARM is not supported in this testing region")
     def test_basic_layer_with_architecture(self):
         """
         Creates a basic lambda layer version specifying compatible architecture
