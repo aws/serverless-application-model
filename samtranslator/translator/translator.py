@@ -61,24 +61,25 @@ class Translator:
         :return: a dictionary containing api_logical_id as the key and concatenated String of all function_names
                  associated with this api as the value
         """
-        if resource_dict.get("Type") and resource_dict.get("Type").strip() == "AWS::Serverless::Function":
-            if resource_dict.get("Properties") and resource_dict.get("Properties").get("Events"):
-                events = list(resource_dict.get("Properties").get("Events").values())
-                for item in events:
-                    # If the function event type is `Api` then gets the function name and
-                    # adds to the function_names dict with key as the api_name and value as the function_name
-                    if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
-                        rest_api = item.get("Properties").get("RestApiId")
-                        api_name = Api.get_rest_api_id_string(rest_api)
-                        if isinstance(api_name, str):
-                            resource_dict_copy = copy.deepcopy(resource_dict)
-                            function_name = intrinsics_resolver.resolve_parameter_refs(
-                                resource_dict_copy.get("Properties").get("FunctionName")
+        if resource_dict.get("Type", "").strip() == "AWS::Serverless::Function":
+            events_properties = resource_dict.get("Properties", {}).get("Events", {})
+            events = list(events_properties.values()) if events_properties else []
+            for item in events:
+                # If the function event type is `Api` then gets the function name and
+                # adds to the function_names dict with key as the api_name and value as the function_name
+                item_properties = item.get("Properties", {})
+                if item.get("Type") == "Api" and item_properties.get("RestApiId"):
+                    rest_api = item_properties.get("RestApiId")
+                    api_name = Api.get_rest_api_id_string(rest_api)
+                    if isinstance(api_name, str):
+                        resource_dict_copy = copy.deepcopy(resource_dict)
+                        function_name = intrinsics_resolver.resolve_parameter_refs(
+                            resource_dict_copy.get("Properties").get("FunctionName")
+                        )
+                        if function_name:
+                            self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
+                                function_name
                             )
-                            if function_name:
-                                self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
-                                    function_name
-                                )
         return self.function_names
 
     def translate(self, sam_template, parameter_values, feature_toggle=None, passthrough_metadata=False):
