@@ -122,6 +122,7 @@ def check_internal(request):
         internal = True
     return internal
 
+
 @pytest.fixture()
 def parameter_values(request):
     parameter_values = {}
@@ -152,13 +153,13 @@ def pytest_addoption(parser):
     parser.addoption(
         "--parameter-values",
         default=None,
-        help="YAML file path which will contain parameter values that could be passed during deployment of the stack"
+        help="YAML file path which will contain parameter values that could be passed during deployment of the stack",
     )
 
 
 @retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
 def _stack_exists(stack_name):
-    cloudformation = boto3.resource('cloudformation')
+    cloudformation = boto3.resource("cloudformation")
     stack = cloudformation.Stack(stack_name)
     try:
         stack.stack_status

@@ -7,10 +7,10 @@ from integration.helpers.resource import current_region_not_included
 
 
 @skipIf(
-    current_region_not_included([CUSTOM_DOMAIN]), "CustomDomain is not supported in this testing region",
+    current_region_not_included([CUSTOM_DOMAIN]),
+    "CustomDomain is not supported in this testing region",
 )
 class TestCustomHttpApiDomains(BaseInternalTest):
-
     def test_custom_http_api_domains_regional(self):
         self.create_and_verify_stack("combination/http_api_with_custom_domains_regional")
 

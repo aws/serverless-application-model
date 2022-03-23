@@ -7,10 +7,10 @@ from integration.helpers.resource import current_region_not_included
 
 
 @skipIf(
-    current_region_not_included([CUSTOM_DOMAIN]), "CustomDomain is not supported in this testing region",
+    current_region_not_included([CUSTOM_DOMAIN]),
+    "CustomDomain is not supported in this testing region",
 )
 class TestCustomRestApiDomains(BaseInternalTest):
-
     def test_custom_rest_api_domains_edge(self):
         self.create_and_verify_stack("combination/api_with_custom_domains_edge")
         domain_name_list = self.get_stack_resources("AWS::ApiGateway::DomainName")

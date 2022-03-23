@@ -32,12 +32,14 @@ class BaseInternalTest(BaseTest):
 
         test_parameters = []
         for parameter_key, parameter_value in raw_test_parameters.items():
-            test_parameters.append({
-                "ParameterKey": parameter_key,
-                "ParameterValue": parameter_value,
-                "UsePreviousValue": False,
-                "ResolvedValue": "string"
-            })
+            test_parameters.append(
+                {
+                    "ParameterKey": parameter_key,
+                    "ParameterValue": parameter_value,
+                    "UsePreviousValue": False,
+                    "ResolvedValue": "string",
+                }
+            )
 
         return test_parameters
 

@@ -123,7 +123,7 @@ class ClientProvider:
         """
         with self._lock:
             if not self._cloudwatch_client:
-                self._cloudwatch_client = boto3.client('cloudwatch')
+                self._cloudwatch_client = boto3.client("cloudwatch")
         return self._cloudwatch_client
 
     @property

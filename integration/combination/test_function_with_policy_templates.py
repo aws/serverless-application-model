@@ -43,8 +43,12 @@ class TestFunctionWithPolicyTemplates(BaseTest):
         )
 
         # Verify the contents of third policy
-        cloud_watch_put_metric_policy = get_policy_statements(role_name, "MyFunctionRolePolicy2", self.client_provider.iam_client)
-        self.assertEqual(len(cloud_watch_put_metric_policy), 1, "Only one statement must be in CloudWatchPutMetricPolicy")
+        cloud_watch_put_metric_policy = get_policy_statements(
+            role_name, "MyFunctionRolePolicy2", self.client_provider.iam_client
+        )
+        self.assertEqual(
+            len(cloud_watch_put_metric_policy), 1, "Only one statement must be in CloudWatchPutMetricPolicy"
+        )
 
         cloud_watch_put_metric_statement = cloud_watch_put_metric_policy[0]
         self.assertEqual(cloud_watch_put_metric_statement.get("Resource"), "*")
@@ -64,8 +68,3 @@ class TestFunctionWithPolicyTemplates(BaseTest):
 
         expected_num_polices = 69
         self.assertEqual(actual_num_polices, expected_num_polices)
-
-
-
-
-

@@ -94,7 +94,16 @@ class Deployer:
         self.deploy_color = DeployColor()
 
     def create_changeset(
-        self, stack_name, cfn_template, parameter_values, capabilities, role_arn, notification_arns, s3_uploader, tags, changeset_type
+        self,
+        stack_name,
+        cfn_template,
+        parameter_values,
+        capabilities,
+        role_arn,
+        notification_arns,
+        s3_uploader,
+        tags,
+        changeset_type,
     ):
         """
         Call Cloudformation to create a changeset and wait for it to complete
@@ -122,8 +131,6 @@ class Deployer:
             # For such parameters, users should either override with new value,
             # or set a Default value in template to successfully create a stack.
             parameter_values = [x for x in parameter_values if not x.get("UsePreviousValue", False)]
-
-
 
         # Each changeset will get a unique name based on time.
         # Description is also setup based on current date and that SAM CLI is used.
@@ -410,11 +417,28 @@ class Deployer:
                 raise deploy_exceptions.DeployFailedError(stack_name=stack_name, msg=str(ex))
 
     def create_and_wait_for_changeset(
-        self, stack_name, cfn_template, parameter_values, capabilities, role_arn, notification_arns, s3_uploader, tags, changeset_type
+        self,
+        stack_name,
+        cfn_template,
+        parameter_values,
+        capabilities,
+        role_arn,
+        notification_arns,
+        s3_uploader,
+        tags,
+        changeset_type,
     ):
         try:
             result, changeset_type = self.create_changeset(
-                stack_name, cfn_template, parameter_values, capabilities, role_arn, notification_arns, s3_uploader, tags, changeset_type
+                stack_name,
+                cfn_template,
+                parameter_values,
+                capabilities,
+                role_arn,
+                notification_arns,
+                s3_uploader,
+                tags,
+                changeset_type,
             )
             self.wait_for_changeset(result["Id"], stack_name)
             self.describe_changeset(result["Id"], stack_name)

@@ -13,6 +13,7 @@ class S3Uploader:
     """
     Class to upload objects to S3 bucket.
     """
+
     def __init__(
         self,
         s3_client: Any,
