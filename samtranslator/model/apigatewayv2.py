@@ -177,8 +177,8 @@ class ApiGatewayV2Authorizer(object):
                 raise InvalidResourceException(
                     self.api_logical_id, self.name + " Lambda Authorizer property 'identity' is of invalid type."
                 )
-            if self.identity.get("Headers"):
-                headers = self.identity.get("Headers")
+            headers = self.identity.get("Headers")
+            if headers:
                 if not isinstance(headers, list) or any([not isinstance(header, str) for header in headers]):
                     raise InvalidResourceException(
                         self.api_logical_id,
