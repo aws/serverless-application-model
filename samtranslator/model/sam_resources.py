@@ -33,6 +33,8 @@ from samtranslator.model.lambda_ import (
     LambdaAlias,
     LambdaLayerVersion,
     LambdaEventInvokeConfig,
+    LambdaUrl,
+    LambdaPermission,
 )
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
 from samtranslator.translator import logical_id_generator
@@ -93,6 +95,7 @@ class SamFunction(SamResourceMacro):
         "ImageConfig": PropertyType(False, is_type(dict)),
         "CodeSigningConfigArn": PropertyType(False, is_str()),
         "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "FunctionUrlConfig": PropertyType(False, is_type(dict)),
     }
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -168,6 +171,13 @@ class SamFunction(SamResourceMacro):
             lambda_alias = self._construct_alias(alias_name, lambda_function, lambda_version)
             resources.append(lambda_version)
             resources.append(lambda_alias)
+
+        if self.FunctionUrlConfig:
+            lambda_url = self._construct_function_url(lambda_function, lambda_alias)
+            resources.append(lambda_url)
+            url_permission = self._construct_url_permission(lambda_function)
+            if url_permission:
+                resources.append(url_permission)
 
         if self.DeploymentPreference:
             self._validate_deployment_preference_and_add_update_policy(
@@ -849,6 +859,116 @@ class SamFunction(SamResourceMacro):
             lambda_alias.set_resource_attribute(
                 "UpdatePolicy", deployment_preference_collection.update_policy(self.logical_id).to_dict()
             )
+
+    def _construct_function_url(self, lambda_function, lambda_alias):
+        """
+        This method is used to construct a lambda url resource
+
+        Parameters
+        ----------
+        lambda_function : LambdaFunction
+            Lambda Function resource
+        lambda_alias : LambdaAlias
+            Lambda Alias resource
+
+        Returns
+        -------
+        LambdaUrl
+            Lambda Url resource
+        """
+        self._validate_function_url_params(lambda_function)
+
+        logical_id = f"{lambda_function.logical_id}Url"
+        lambda_url = LambdaUrl(logical_id=logical_id)
+
+        cors = self.FunctionUrlConfig.get("Cors")
+        if cors:
+            lambda_url.Cors = cors
+        lambda_url.AuthType = self.FunctionUrlConfig.get("AuthType")
+        lambda_url.TargetFunctionArn = (
+            lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
+        )
+        return lambda_url
+
+    def _validate_function_url_params(self, lambda_function):
+        """
+        Validate parameters provided to configure Lambda Urls
+        """
+        self._validate_url_auth_type(lambda_function)
+        self._validate_cors_config_parameter(lambda_function)
+
+    def _validate_url_auth_type(self, lambda_function):
+        if is_intrinsic(self.FunctionUrlConfig):
+            return
+
+        auth_type = self.FunctionUrlConfig.get("AuthType")
+        if auth_type and is_intrinsic(auth_type):
+            return
+
+        if not auth_type or auth_type not in ["AWS_IAM", "NONE"]:
+            raise InvalidResourceException(
+                lambda_function.logical_id,
+                "AuthType is required to configure function property `FunctionUrlConfig`. Please provide either AWS_IAM or NONE.",
+            )
+
+    def _validate_cors_config_parameter(self, lambda_function):
+        if is_intrinsic(self.FunctionUrlConfig):
+            return
+
+        cors_property_data_type = {
+            "AllowOrigins": list,
+            "AllowMethods": list,
+            "AllowCredentials": bool,
+            "AllowHeaders": list,
+            "ExposeHeaders": list,
+            "MaxAge": int,
+        }
+
+        cors = self.FunctionUrlConfig.get("Cors")
+
+        if not cors or is_intrinsic(cors):
+            return
+
+        for prop_name, prop_value in cors.items():
+            if prop_name not in cors_property_data_type:
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "{} is not a valid property for configuring Cors.".format(prop_name),
+                )
+            prop_type = cors_property_data_type.get(prop_name)
+            if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "{} must be of type {}.".format(prop_name, str(prop_type).split("'")[1]),
+                )
+
+    def _construct_url_permission(self, lambda_function):
+        """
+        Construct the lambda permission associated with the function url resource in a case
+        for public access when AuthType is NONE
+
+        Parameters
+        ----------
+        lambda_function : LambdaUrl
+            Lambda Function resource
+
+        Returns
+        -------
+        LambdaPermission
+            The lambda permission appended to a function url resource with public access
+        """
+        auth_type = self.FunctionUrlConfig.get("AuthType")
+
+        if auth_type not in ["NONE"] or is_intrinsic(self.FunctionUrlConfig):
+            return None
+
+        logical_id = f"{lambda_function.logical_id}UrlPublicPermissions"
+        lambda_permission = LambdaPermission(logical_id=logical_id)
+        lambda_permission.Action = "lambda:InvokeFunctionUrl"
+        lambda_permission.FunctionName = lambda_function.get_runtime_attr("name")
+        lambda_permission.Principal = "*"
+        lambda_permission.FunctionUrlAuthType = auth_type
+        return lambda_permission
 
 
 class SamApi(SamResourceMacro):
