@@ -83,6 +83,7 @@ class SamFunction(SamResourceMacro):
         "ReservedConcurrentExecutions": PropertyType(False, any_type()),
         "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "EventInvokeConfig": PropertyType(False, is_type(dict)),
+        "EphemeralStorage": PropertyType(False, is_type(dict)),
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(is_str())),
         "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
@@ -426,6 +427,7 @@ class SamFunction(SamResourceMacro):
         lambda_function.ImageConfig = self.ImageConfig
         lambda_function.PackageType = self.PackageType
         lambda_function.Architectures = self.Architectures
+        lambda_function.EphemeralStorage = self.EphemeralStorage
 
         if self.Tracing:
             lambda_function.TracingConfig = {"Mode": self.Tracing}

@@ -355,6 +355,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "intrinsic_functions",
                 "basic_function_with_tags",
                 "depends_on",
+                "function_with_ephemeral_storage",
                 "function_event_conditions",
                 "function_with_dlq",
                 "function_with_kmskeyarn",
