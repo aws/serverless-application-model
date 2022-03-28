@@ -121,6 +121,7 @@ class SelfManagedKafkaEventSource(TestCase):
         self.kafka_event_source.Enabled = True
         self.kafka_event_source.BatchSize = 1
         self.kafka_event_source.SecretsManagerKmsKeyId = "SECRET_KEY"
+        self.kafka_event_source.SecretsManagerKmsKeyId = "1abc23d4-567f-8ab9-cde0-1fab234c5d67"
 
         policy_statements = self.kafka_event_source.get_policy_statements()
         expected_policy_document = [
