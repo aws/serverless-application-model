@@ -1,6 +1,7 @@
 from unittest import TestCase
 from samtranslator.model.eventsources.pull import SelfManagedKafka
 from samtranslator.model.exceptions import InvalidEventException
+from parameterized import parameterized
 
 
 class SelfManagedKafkaEventSource(TestCase):
@@ -294,3 +295,27 @@ class SelfManagedKafkaEventSource(TestCase):
             self.kafka_event_source.SourceAccessConfigurations = config
             with self.assertRaises(InvalidEventException):
                 self.kafka_event_source.get_policy_statements()
+
+    @parameterized.expand(
+        [
+            (1,),
+            (True,),
+            (["1abc23d4-567f-8ab9-cde0-1fab234c5d67"],),
+            ({"KmsKeyId": "1abc23d4-567f-8ab9-cde0-1fab234c5d67"},),
+        ]
+    )
+    def test_must_validate_secrets_manager_kms_key_id(self, kms_key_id_value):
+        self.kafka_event_source.SourceAccessConfigurations = [
+            {"Type": "SASL_SCRAM_256_AUTH", "URI": "SECRET_URI"},
+            {"Type": "VPC_SUBNET", "URI": "SECRET_URI"},
+            {"Type": "VPC_SECURITY_GROUP", "URI": "SECRET_URI"},
+        ]
+        self.kafka_event_source.Topics = ["Topics"]
+        self.kafka_event_source.KafkaBootstrapServers = ["endpoint1", "endpoint2"]
+        self.kafka_event_source.Enabled = True
+        self.kafka_event_source.BatchSize = 1
+        self.kafka_event_source.SecretsManagerKmsKeyId = kms_key_id_value
+        error_message = "(None, 'Provided SecretsManagerKmsKeyId should be of type str.')"
+        with self.assertRaises(InvalidEventException) as error:
+            self.kafka_event_source.get_policy_statements()
+        self.assertEqual(error_message, str(error.exception))
