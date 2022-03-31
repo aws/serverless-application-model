@@ -1,2 +1,2 @@
-boto3~=1.5
+boto3~=1.20
 jsonschema~=3.2
