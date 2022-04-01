@@ -63,13 +63,15 @@ class TestApiWithAuthorizerApiKey(BaseTest):
 
         self.verify_authorized_request(base_url + "none", 200)
         self.verify_authorized_request(base_url + "lambda-token-api-key", 401)
+        # ApiKeySourceType is AUTHORIZER. This will trigger the Lambda Authorizer and in turn returns the api key
         self.verify_authorized_request(base_url + "lambda-token-api-key", 200, "Authorization", "allow")
 
         api_key_id = stack_outputs["ApiKeyId"]
         key = apigw_client.get_api_key(apiKey=api_key_id, includeValue=True)
 
-        self.verify_authorized_request(base_url + "lambda-token-api-key", 403)
-        self.verify_authorized_request(base_url + "llambda-token-api-key", 403, "x-api-key", key["value"])
+        self.verify_authorized_request(base_url + "lambda-token-api-key", 401)
+        # ApiKeySourceType is AUTHORIZER. Passing api key via x-api-key will not get authorized
+        self.verify_authorized_request(base_url + "lambda-token-api-key", 401, "x-api-key", key["value"])
 
     @retry(StatusCodeError, 10)
     def verify_authorized_request(
