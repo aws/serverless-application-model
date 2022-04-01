@@ -34,7 +34,7 @@ class TestHttpApiWithCors(BaseTest):
 
         # Every HttpApi should have a default tag created by SAM (httpapi:createdby: SAM)
         tags = api_result["Tags"]
-        self.assertEqual(len(tags), 1)
+        self.assertGreaterEqual(len(tags), 1)
         self.assertEqual(tags["httpapi:createdBy"], "SAM")
 
         # verifying if TimeoutInMillis is set properly in the integration

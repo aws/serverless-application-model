@@ -111,7 +111,7 @@ class ServerlessAppPlugin(BasePlugin):
 
             if key not in self._applications:
                 try:
-                    if not RegionConfiguration.is_sar_supported():
+                    if not RegionConfiguration.is_service_supported("serverlessrepo"):
                         raise InvalidResourceException(
                             logical_id, "Serverless Application Repository is not available in this region."
                         )

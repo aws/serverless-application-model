@@ -1,5 +1,3 @@
-import six
-
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
@@ -83,12 +81,12 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
                 key = "Path" if not path else "Method"
                 raise InvalidEventException(logicalId, "Event is missing key '{}'.".format(key))
 
-            if not isinstance(path, six.string_types) or not isinstance(method, six.string_types):
-                key = "Path" if not isinstance(path, six.string_types) else "Method"
+            if not isinstance(path, str) or not isinstance(method, str):
+                key = "Path" if not isinstance(path, str) else "Method"
                 raise InvalidEventException(logicalId, "Api Event must have a String specified for '{}'.".format(key))
 
             # !Ref is resolved by this time. If it is not a string, we can't parse/use this Api.
-            if api_id and not isinstance(api_id, six.string_types):
+            if api_id and not isinstance(api_id, str):
                 raise InvalidEventException(
                     logicalId, "Api Event's ApiId must be a string referencing an Api in the same template."
                 )

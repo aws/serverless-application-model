@@ -1,4 +1,3 @@
-from six import string_types
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
@@ -189,6 +188,13 @@ class PullEventSource(ResourceMacro):
         if list(self.FilterCriteria.keys()) not in [[], ["Filters"]]:
             raise InvalidEventException(self.relative_id, "FilterCriteria field has a wrong format")
 
+    def validate_secrets_manager_kms_key_id(self):
+        if self.SecretsManagerKmsKeyId and not isinstance(self.SecretsManagerKmsKeyId, str):
+            raise InvalidEventException(
+                self.relative_id,
+                "Provided SecretsManagerKmsKeyId should be of type str.",
+            )
+
 
 class Kinesis(PullEventSource):
     """Kinesis event source."""
@@ -305,6 +311,7 @@ class MQ(PullEventSource):
             },
         }
         if self.SecretsManagerKmsKeyId:
+            self.validate_secrets_manager_kms_key_id()
             kms_policy = {
                 "Action": "kms:Decrypt",
                 "Effect": "Allow",
@@ -368,6 +375,7 @@ class SelfManagedKafka(PullEventSource):
             statements.append(vpc_permissions)
 
         if self.SecretsManagerKmsKeyId:
+            self.validate_secrets_manager_kms_key_id()
             kms_policy = self.get_kms_policy()
             statements.append(kms_policy)
 
@@ -423,7 +431,7 @@ class SelfManagedKafka(PullEventSource):
                 "No {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(msg),
             )
 
-        if not isinstance(config.get("URI"), string_types) and not is_intrinsic(config.get("URI")):
+        if not isinstance(config.get("URI"), str) and not is_intrinsic(config.get("URI")):
             raise InvalidEventException(
                 self.relative_id,
                 "Wrong Type for {} URI property specified in SourceAccessConfigurations for self managed kafka event.".format(

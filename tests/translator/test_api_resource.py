@@ -2,7 +2,7 @@ import json
 import os
 
 from unittest import TestCase
-from mock import MagicMock, patch
+from unittest.mock import MagicMock, patch
 from tests.translator.helpers import get_template_parameter_values
 from samtranslator.translator.transform import transform
 from samtranslator.model.apigateway import ApiGatewayDeployment

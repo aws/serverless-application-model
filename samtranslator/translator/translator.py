@@ -1,5 +1,4 @@
 import copy
-from six import string_types
 
 from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
 from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
@@ -50,6 +49,7 @@ class Translator:
         self.boto_session = boto_session
         self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
         MetricsMethodWrapperSingleton.set_instance(self.metrics)
+        self._translated_resouce_mapping = {}
 
         if self.boto_session:
             ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
@@ -61,27 +61,28 @@ class Translator:
         :return: a dictionary containing api_logical_id as the key and concatenated String of all function_names
                  associated with this api as the value
         """
-        if resource_dict.get("Type") and resource_dict.get("Type").strip() == "AWS::Serverless::Function":
-            if resource_dict.get("Properties") and resource_dict.get("Properties").get("Events"):
-                events = list(resource_dict.get("Properties").get("Events").values())
-                for item in events:
-                    # If the function event type is `Api` then gets the function name and
-                    # adds to the function_names dict with key as the api_name and value as the function_name
-                    if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
-                        rest_api = item.get("Properties").get("RestApiId")
-                        api_name = Api.get_rest_api_id_string(rest_api)
-                        if isinstance(api_name, string_types):
-                            resource_dict_copy = copy.deepcopy(resource_dict)
-                            function_name = intrinsics_resolver.resolve_parameter_refs(
-                                resource_dict_copy.get("Properties").get("FunctionName")
+        if resource_dict.get("Type", "").strip() == "AWS::Serverless::Function":
+            events_properties = resource_dict.get("Properties", {}).get("Events", {})
+            events = list(events_properties.values()) if events_properties else []
+            for item in events:
+                # If the function event type is `Api` then gets the function name and
+                # adds to the function_names dict with key as the api_name and value as the function_name
+                item_properties = item.get("Properties", {})
+                if item.get("Type") == "Api" and item_properties.get("RestApiId"):
+                    rest_api = item_properties.get("RestApiId")
+                    api_name = Api.get_rest_api_id_string(rest_api)
+                    if isinstance(api_name, str):
+                        resource_dict_copy = copy.deepcopy(resource_dict)
+                        function_name = intrinsics_resolver.resolve_parameter_refs(
+                            resource_dict_copy.get("Properties").get("FunctionName")
+                        )
+                        if function_name:
+                            self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
+                                function_name
                             )
-                            if function_name:
-                                self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
-                                    function_name
-                                )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values, feature_toggle=None):
+    def translate(self, sam_template, parameter_values, feature_toggle=None, passthrough_metadata=False):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -152,7 +153,12 @@ class Translator:
                 del template["Resources"][logical_id]
                 for resource in translated:
                     if verify_unique_logical_id(resource, sam_template["Resources"]):
-                        template["Resources"].update(resource.to_dict())
+                        # For each generated resource, pass through existing metadata that may exist on the original SAM resource.
+                        _r = resource.to_dict()
+                        if resource_dict.get("Metadata") and passthrough_metadata:
+                            if not template["Resources"].get(resource.logical_id):
+                                _r[resource.logical_id]["Metadata"] = resource_dict["Metadata"]
+                        template["Resources"].update(_r)
                     else:
                         document_errors.append(
                             DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)

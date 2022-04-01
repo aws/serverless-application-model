@@ -3,12 +3,14 @@ image: Ubuntu
 
 environment:
   matrix:
-  - TOXENV: py36
-    PYTHON_VERSION: '3.6'
   - TOXENV: py37
     PYTHON_VERSION: '3.7'
   - TOXENV: py38
     PYTHON_VERSION: '3.8'
+  - TOXENV: py39
+    PYTHON_VERSION: '3.9'
+  - TOXENV: py310
+    PYTHON_VERSION: '3.10'
 
 build: off
 

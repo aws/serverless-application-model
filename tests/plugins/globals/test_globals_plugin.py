@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import patch
+from unittest.mock import patch
 
 from samtranslator.public.exceptions import InvalidDocumentException
 from samtranslator.public.plugins import BasePlugin

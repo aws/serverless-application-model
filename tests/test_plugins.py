@@ -2,7 +2,7 @@ from enum import Enum
 from samtranslator.plugins import SamPlugins, BasePlugin, LifeCycleEvents
 
 from unittest import TestCase
-from mock import Mock, patch, call
+from unittest.mock import Mock, patch, call
 
 
 class TestSamPluginsRegistration(TestCase):

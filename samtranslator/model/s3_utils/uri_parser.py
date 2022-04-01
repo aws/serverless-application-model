@@ -1,5 +1,4 @@
-from six import string_types
-from six.moves.urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 from samtranslator.model.exceptions import InvalidResourceException
 
 
@@ -9,7 +8,7 @@ def parse_s3_uri(uri):
     :return: a BodyS3Location dict or None if not an S3 Uri
     :rtype: dict
     """
-    if not isinstance(uri, string_types):
+    if not isinstance(uri, str):
         return None
 
     url = urlparse(uri)

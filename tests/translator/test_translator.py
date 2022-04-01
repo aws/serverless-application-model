@@ -22,7 +22,7 @@ import pytest
 import yaml
 from unittest import TestCase
 from samtranslator.translator.transform import transform
-from mock import Mock, MagicMock, patch
+from unittest.mock import Mock, MagicMock, patch
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"
@@ -355,6 +355,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "intrinsic_functions",
                 "basic_function_with_tags",
                 "depends_on",
+                "function_with_ephemeral_storage",
                 "function_event_conditions",
                 "function_with_dlq",
                 "function_with_kmskeyarn",
@@ -462,6 +463,15 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_security_definition_and_components",
                 "api_with_security_definition_and_none_components",
                 "api_with_security_definition_and_no_components",
+                "api_http_paths_with_if_condition",
+                "api_http_paths_with_if_condition_no_value_then_case",
+                "api_http_paths_with_if_condition_no_value_else_case",
+                "api_rest_paths_with_if_condition_swagger",
+                "api_rest_paths_with_if_condition_swagger_no_value_then_case",
+                "api_rest_paths_with_if_condition_swagger_no_value_else_case",
+                "api_rest_paths_with_if_condition_openapi",
+                "api_rest_paths_with_if_condition_openapi_no_value_then_case",
+                "api_rest_paths_with_if_condition_openapi_no_value_else_case",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -928,6 +938,37 @@ class TestTemplateValidation(TestCase):
             sam_parser = Parser()
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_validate_translated_no_metadata(self):
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_no_metadata.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {})
+        self.assertEqual(expected, actual)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_validate_translated_metadata(self):
+        self.maxDiff = None
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_metadata.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {}, passthrough_metadata=True)
+        self.assertEqual(expected, actual)
 
 
 class TestPluginsUsage(TestCase):

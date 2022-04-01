@@ -1,0 +1,8 @@
+{
+  "errors": [
+    {
+      "errorMessage": "Resource with id [AppFunctionS3Event] is invalid. Invalid type for LambdaConfigurations. Must be a list."
+    }
+  ],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [AppFunctionS3Event] is invalid. Invalid type for LambdaConfigurations. Must be a list."
+} 

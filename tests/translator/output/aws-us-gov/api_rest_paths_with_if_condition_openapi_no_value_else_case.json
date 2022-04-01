@@ -1,0 +1,261 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "sam-app\nSample SAM Template for sam-app\n",
+  "Conditions": {
+    "TrueCondition": {
+      "Fn::Equals": [
+        true,
+        true
+      ]
+    },
+    "FalseCondition": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    }
+  },
+  "Resources": {
+    "MyApiMyLambdaAuthUpdatedAuthorizerPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MyAuthFn",
+            "Arn"
+          ]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
+            {
+              "__ApiId__": {
+                "Ref": "MyApi"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MyApidevStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyApiDeploymentd912e8ed8f"
+        },
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "dev"
+      }
+    },
+    "MyApiDeploymentd912e8ed8f": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "Description": "RestApi deployment id: d912e8ed8f7e209db2137ff3ce50c6bbe2acc72a",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      }
+    },
+    "MyAuthFnRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "MyAuthFn": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MyAuthFnRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "MyApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Fn::Sub": "${AWS::StackName}-Api"
+            }
+          },
+          "paths": {
+            "/post": {
+              "Fn::If": [
+                "FalseCondition",
+                {
+                  "post": {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "type": "aws_proxy",
+                      "uri": "https://www.otherURI.co/",
+                      "payloadFormatVersion": "1.0"
+                    },
+                    "security": [
+                      {
+                        "MyLambdaAuthUpdated": []
+                      },
+                      {
+                        "api_key": []
+                      }
+                    ]
+                  },
+                  "options": {
+                    "responses": {
+                      "200": {
+                        "headers": {
+                          "Access-Control-Allow-Origin": {
+                            "type": "string"
+                          },
+                          "Access-Control-Allow-Methods": {
+                            "type": "string"
+                          }
+                        },
+                        "description": "Default response for CORS method"
+                      }
+                    },
+                    "produces": [
+                      "application/json"
+                    ],
+                    "x-amazon-apigateway-integration": {
+                      "type": "mock",
+                      "requestTemplates": {
+                        "application/json": "{\n  \"statusCode\" : 200\n}\n"
+                      },
+                      "responses": {
+                        "default": {
+                          "statusCode": "200",
+                          "responseTemplates": {
+                            "application/json": "{}\n"
+                          },
+                          "responseParameters": {
+                            "method.response.header.Access-Control-Allow-Origin": {
+                              "Fn::Join": [
+                                ",",
+                                [
+                                  "www.amazon.com",
+                                  "www.google.com"
+                                ]
+                              ]
+                            },
+                            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                          }
+                        }
+                      }
+                    },
+                    "summary": "CORS support",
+                    "security": [
+                      {
+                        "MyLambdaAuthUpdated": []
+                      },
+                      {
+                        "api_key": []
+                      }
+                    ],
+                    "consumes": [
+                      "application/json"
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
+            }
+          },
+          "openapi": "3.0",
+          "components": {
+            "securitySchemes": {
+              "api_key": {
+                "type": "apiKey",
+                "name": "x-api-key",
+                "in": "header"
+              },
+              "MyLambdaAuthUpdated": {
+                "in": "header",
+                "type": "apiKey",
+                "name": "Authorization",
+                "x-amazon-apigateway-authorizer": {
+                  "type": "token",
+                  "authorizerResultTtlInSeconds": 37,
+                  "authorizerUri": {
+                    "Fn::Sub": [
+                      "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      {
+                        "__FunctionArn__": {
+                          "Fn::GetAtt": [
+                            "MyAuthFn",
+                            "Arn"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "authorizerCredentials": {
+                    "Fn::GetAtt": [
+                      "MyAuthFnRole",
+                      "Arn"
+                    ]
+                  }
+                },
+                "x-amazon-apigateway-authtype": "custom"
+              }
+            }
+          }
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        }
+      }
+    }
+  }
+}

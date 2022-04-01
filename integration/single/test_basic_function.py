@@ -204,3 +204,22 @@ class TestBasicFunction(BaseTest):
             "PassThrough",
             "Expecting tracing config mode to be set to PassThrough.",
         )
+
+    @parameterized.expand(
+        [
+            "single/function_with_ephemeral_storage",
+        ]
+    )
+    def test_function_with_ephemeral_storage(self, file_name):
+        """
+        Creates a basic function with ephemeral storage
+        """
+        self.create_and_verify_stack(file_name)
+
+        function_id = self.get_physical_id_by_logical_id("MyLambdaFunction")
+
+        function_configuration_result = self.client_provider.lambda_client.get_function_configuration(
+            FunctionName=function_id
+        )
+
+        self.assertEqual(function_configuration_result.get("EphemeralStorage", {}).get("Size", 0), 1024)
