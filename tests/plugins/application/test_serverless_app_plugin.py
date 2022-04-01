@@ -438,3 +438,42 @@ class TestServerlessAppPlugin_on_after_transform_template(TestCase):
         # should have exactly two calls to SAR
         self.assertEqual(client.get_cloud_formation_template.call_count, 2)
         self.assertEqual(plugin._get_sleep_time_sec.call_count, 1)  # make sure we slept once
+
+
+class TestServerlessAppPlugin_on_before_and_on_after_transform_template(TestCase):
+    @patch("samtranslator.plugins.application.serverless_app_plugin.SamTemplate")
+    def test_time_limit_exceeds_between_combined_sar_calls(self, SamTemplateMock):
+        template_dict = {"a": "b"}
+        app_resources = [
+            ("id1", ApplicationResource(app_id="id1", semver="1.0.0", location=True)),
+        ]
+
+        sam_template = Mock()
+        SamTemplateMock.return_value = sam_template
+        sam_template.iterate = Mock()
+        sam_template.iterate.return_value = app_resources
+
+        client = Mock()
+        client.get_cloud_formation_template = Mock()
+        client.get_cloud_formation_template.side_effect = [
+            ClientError({"Error": {"Code": "TooManyRequestsException"}}, "GetCloudFormationTemplate"),
+            {"Status": STATUS_ACTIVE},
+        ]
+        client.create_cloud_formation_template = Mock()
+        client.create_cloud_formation_template.side_effect = [
+            ClientError({"Error": {"Code": "TooManyRequestsException"}}, "CreateCloudFormationTemplate"),
+            {"TemplateUrl": "/URL", "Status": STATUS_ACTIVE},
+        ]
+        plugin = ServerlessAppPlugin(sar_client=client, wait_for_template_active_status=True, validate_only=False)
+        plugin._get_sleep_time_sec = Mock()
+        plugin._get_sleep_time_sec.return_value = 0.04
+        plugin._in_progress_templates = [("appid", "template"), ("appid2", "template2")]
+        plugin.TEMPLATE_WAIT_TIMEOUT_SECONDS = 0.08
+
+        plugin.on_before_transform_template(template_dict)
+        with self.assertRaises(InvalidResourceException):
+            plugin.on_after_transform_template(template_dict)
+        # confirm we had at least two attempts to call SAR and that we executed a sleep
+        self.assertEqual(client.get_cloud_formation_template.call_count, 1)
+        self.assertEqual(client.create_cloud_formation_template.call_count, 2)
+        self.assertGreaterEqual(plugin._get_sleep_time_sec.call_count, 2)

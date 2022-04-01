@@ -63,6 +63,7 @@ class ServerlessAppPlugin(BasePlugin):
         self._wait_for_template_active_status = wait_for_template_active_status
         self._validate_only = validate_only
         self._parameters = parameters
+        self._total_wait_time = 0
 
         # make sure the flag combination makes sense
         if self._validate_only is True and self._wait_for_template_active_status is True:
@@ -125,15 +126,16 @@ class ServerlessAppPlugin(BasePlugin):
 
     def _make_service_call_with_retry(self, service_call, app_id, semver, key, logical_id):
         call_succeeded = False
-        start_time = time()
-        while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
+        while self._total_wait_time < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
             try:
                 service_call(app_id, semver, key, logical_id)
             except ClientError as e:
                 error_code = e.response["Error"]["Code"]
                 if error_code == "TooManyRequestsException":
                     LOG.debug("SAR call timed out for application id {}".format(app_id))
-                    sleep(self._get_sleep_time_sec())
+                    sleep_time = self._get_sleep_time_sec()
+                    sleep(sleep_time)
+                    self._total_wait_time += sleep_time
                     continue
                 else:
                     raise e
@@ -326,8 +328,7 @@ class ServerlessAppPlugin(BasePlugin):
         if not self._wait_for_template_active_status or self._validate_only:
             return
 
-        start_time = time()
-        while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
+        while self._total_wait_time < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
             # Check each resource to make sure it's active
             LOG.info("Checking resources in serverless application repo...")
             idx = 0
@@ -360,7 +361,9 @@ class ServerlessAppPlugin(BasePlugin):
                 break
 
             # Sleep a little so we don't spam service calls
-            sleep(self._get_sleep_time_sec())
+            sleep_time = self._get_sleep_time_sec()
+            sleep(sleep_time)
+            self._total_wait_time += sleep_time
 
         # Not all templates reached active status
         if len(self._in_progress_templates) != 0:
