@@ -1,5 +1,6 @@
 from enum import Enum
-from samtranslator.plugins import SamPlugins, BasePlugin, LifeCycleEvents
+from samtranslator.plugins import BasePlugin, LifeCycleEvents
+from samtranslator.plugins.sam_plugins import SamPlugins
 
 from unittest import TestCase
 from unittest.mock import Mock, patch, call

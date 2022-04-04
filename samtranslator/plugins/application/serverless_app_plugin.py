@@ -63,6 +63,7 @@ class ServerlessAppPlugin(BasePlugin):
         self._wait_for_template_active_status = wait_for_template_active_status
         self._validate_only = validate_only
         self._parameters = parameters
+        self._total_wait_time = 0
 
         # make sure the flag combination makes sense
         if self._validate_only is True and self._wait_for_template_active_status is True:
@@ -118,10 +119,30 @@ class ServerlessAppPlugin(BasePlugin):
                     # Lazy initialization of the client- create it when it is needed
                     if not self._sar_client:
                         self._sar_client = boto3.client("serverlessrepo")
-                    service_call(app_id, semver, key, logical_id)
+                    self._make_service_call_with_retry(service_call, app_id, semver, key, logical_id)
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
                     self._applications[key] = e
+
+    def _make_service_call_with_retry(self, service_call, app_id, semver, key, logical_id):
+        call_succeeded = False
+        while self._total_wait_time < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
+            try:
+                service_call(app_id, semver, key, logical_id)
+            except ClientError as e:
+                error_code = e.response["Error"]["Code"]
+                if error_code == "TooManyRequestsException":
+                    LOG.debug("SAR call timed out for application id {}".format(app_id))
+                    sleep_time = self._get_sleep_time_sec()
+                    sleep(sleep_time)
+                    self._total_wait_time += sleep_time
+                    continue
+                else:
+                    raise e
+            call_succeeded = True
+            break
+        if not call_succeeded:
+            raise InvalidResourceException(logical_id, "Failed to call SAR, timeout limit exceeded.")
 
     def _replace_value(self, input_dict, key, intrinsic_resolvers):
         value = self._resolve_location_value(input_dict.get(key), intrinsic_resolvers)
@@ -307,8 +328,7 @@ class ServerlessAppPlugin(BasePlugin):
         if not self._wait_for_template_active_status or self._validate_only:
             return
 
-        start_time = time()
-        while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
+        while self._total_wait_time < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
             # Check each resource to make sure it's active
             LOG.info("Checking resources in serverless application repo...")
             idx = 0
@@ -341,7 +361,9 @@ class ServerlessAppPlugin(BasePlugin):
                 break
 
             # Sleep a little so we don't spam service calls
-            sleep(self._get_sleep_time_sec())
+            sleep_time = self._get_sleep_time_sec()
+            sleep(sleep_time)
+            self._total_wait_time += sleep_time
 
         # Not all templates reached active status
         if len(self._in_progress_templates) != 0:
