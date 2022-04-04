@@ -151,26 +151,26 @@ class ApiGatewayV2Authorizer(object):
     def _validate_jwt_authorizer(self):
         if not self.jwt_configuration:
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " OAuth2 Authorizer must define 'JwtConfiguration'."
+                self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'JwtConfiguration'."
             )
         if not self.id_source:
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " OAuth2 Authorizer must define 'IdentitySource'."
+                self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'IdentitySource'."
             )
 
     def _validate_lambda_authorizer(self):
         if not self.function_arn:
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " Lambda Authorizer must define 'FunctionArn'."
+                self.api_logical_id, f"{self.name} Lambda Authorizer must define 'FunctionArn'."
             )
         if not self.authorizer_payload_format_version:
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
+                self.api_logical_id, f"{self.name} Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
         if self.identity and not isinstance(self.identity, dict):
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " Lambda Authorizer property 'identity' is of invalid type."
+                self.api_logical_id, f"{self.name} Lambda Authorizer property 'identity' is of invalid type."
             )
 
     def generate_openapi(self):

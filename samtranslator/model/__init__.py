@@ -327,7 +327,7 @@ class Resource(object):
         if attr_name in self.runtime_attrs:
             return self.runtime_attrs[attr_name](self)
         else:
-            raise NotImplementedError(attr_name + " attribute is not implemented for resource " + self.resource_type)
+            raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
 
     def get_passthrough_resource_attributes(self):
         """
@@ -447,7 +447,7 @@ class SamResourceMacro(ResourceMacro):
         if reserved_tag_name in tags:
             raise InvalidResourceException(
                 self.logical_id,
-                reserved_tag_name + " is a reserved Tag key name and "
+                f"{reserved_tag_name} is a reserved Tag key name and "
                 "cannot be set on your resource. "
                 "Please change the tag key in the "
                 "input.",
