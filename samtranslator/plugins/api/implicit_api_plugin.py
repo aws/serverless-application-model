@@ -189,10 +189,8 @@ class ImplicitApiPlugin(BasePlugin):
         if isinstance(api_id, dict) or is_referencing_http_from_api_event:
             raise InvalidEventException(
                 event_id,
-                self.api_id_property
-                + " must be a valid reference to an '"
-                + self._get_api_resource_type_name()
-                + "' resource in same template.",
+                f"{self.api_id_property} must be a valid reference to an '{self._get_api_resource_type_name()}'"
+                " resource in same template.",
             )
 
         # Make sure Swagger is valid
