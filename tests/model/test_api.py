@@ -3,6 +3,7 @@ import pytest
 
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.apigateway import ApiGatewayAuthorizer
+from samtranslator.utils.py27hash_fix import Py27Dict
 
 
 class TestApiGatewayAuthorizer(TestCase):
@@ -23,6 +24,14 @@ class TestApiGatewayAuthorizer(TestCase):
                 name="authName",
                 identity={"ReauthorizeEvery": 10},
                 function_payload_type="REQUEST",
+            )
+
+    def test_create_authorizer_fails_with_invalid_function_payload_type(self):
+        with self.assertRaises(InvalidResourceException):
+            ApiGatewayAuthorizer(
+                api_logical_id="logicalId",
+                name="authName",
+                function_payload_type=Py27Dict({"key": "value"}),
             )
 
     def test_create_authorizer_fails_with_empty_identity(self):
