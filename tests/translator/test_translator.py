@@ -471,6 +471,11 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_rest_paths_with_if_condition_openapi",
                 "api_rest_paths_with_if_condition_openapi_no_value_then_case",
                 "api_rest_paths_with_if_condition_openapi_no_value_else_case",
+                "function_with_function_url_config",
+                "function_with_function_url_config_with_intrinsics",
+                "function_with_function_url_config_with_iam_authorization_type",
+                "function_with_function_url_config_without_cors_config",
+                "function_with_function_url_config_and_autopublishalias",
             ],
             [
                 ("aws", "ap-southeast-1"),

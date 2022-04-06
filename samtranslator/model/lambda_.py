@@ -95,6 +95,7 @@ class LambdaPermission(Resource):
         "SourceAccount": PropertyType(False, is_str()),
         "SourceArn": PropertyType(False, is_str()),
         "EventSourceToken": PropertyType(False, is_str()),
+        "FunctionUrlAuthType": PropertyType(False, is_str()),
     }
 
 
@@ -123,3 +124,12 @@ class LambdaLayerVersion(Resource):
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
+
+
+class LambdaUrl(Resource):
+    resource_type = "AWS::Lambda::Url"
+    property_types = {
+        "TargetFunctionArn": PropertyType(True, one_of(is_str(), is_type(dict))),
+        "AuthType": PropertyType(True, is_str()),
+        "Cors": PropertyType(False, is_type(dict)),
+    }
