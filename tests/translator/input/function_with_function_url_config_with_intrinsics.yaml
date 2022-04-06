@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: 
+  AuthorizationTypeRef:
+      Type: String
+      Default: NONE
+
+  AllowOriginsRef:
+      Type: CommaDelimitedList
+      Default: "https://example.com"
+
+  AllowMethodsRef:
+      Type: CommaDelimitedList
+      Default: "GET"
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: Created by SAM
+      Handler: index.handler
+      MemorySize: 1024
+      Runtime: nodejs12.x
+      Timeout: 3
+      FunctionUrlConfig:
+        AuthType: !Ref AuthorizationTypeRef
+        Cors:
+            AllowOrigins: !Ref AllowOriginsRef
+            AllowMethods: !Ref AllowMethodsRef
+            
+
