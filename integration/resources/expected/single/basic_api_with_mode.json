@@ -7,5 +7,5 @@
         {"LogicalResourceId": "TestFunctionGetPermissionMyNewStageName", "ResourceType": "AWS::Lambda::Permission"},
         {"LogicalResourceId": "TestFunctionPutPermissionMyNewStageName", "ResourceType": "AWS::Lambda::Permission"},
         {"LogicalResourceId": "TestFunctionRole", "ResourceType": "AWS::IAM::Role"},
-        {"LogicalResourceId": "TestFunctionVersione9898fd501", "ResourceType": "AWS::Lambda::Version"}
+        {"LogicalResourceId": "TestFunctionVersion", "ResourceType": "AWS::Lambda::Version"}
     ]

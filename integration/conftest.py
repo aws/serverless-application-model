@@ -9,6 +9,7 @@ from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.stack import Stack
+from integration.helpers.yaml_utils import load_yaml
 
 try:
     from pathlib import Path
@@ -106,11 +107,53 @@ def get_prefix(request):
     return prefix
 
 
+@pytest.fixture()
+def get_stage(request):
+    stage = ""
+    if request.config.getoption("--stage"):
+        stage = request.config.getoption("--stage")
+    return stage
+
+
+@pytest.fixture()
+def check_internal(request):
+    internal = False
+    if request.config.getoption("--internal"):
+        internal = True
+    return internal
+
+
+@pytest.fixture()
+def parameter_values(request):
+    parameter_values = {}
+    parameter_values_option = request.config.getoption("--parameter-values")
+    if parameter_values_option:
+        parameter_values = load_yaml(parameter_values_option)
+    return parameter_values
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--prefix",
         default=None,
+        action="store",
         help="the prefix of the stack",
+    )
+    parser.addoption(
+        "--stage",
+        default=None,
+        action="store",
+        help="the stage of the stack",
+    )
+    parser.addoption(
+        "--internal",
+        action="store_true",
+        help="run internal tests",
+    )
+    parser.addoption(
+        "--parameter-values",
+        default=None,
+        help="YAML file path which will contain parameter values that could be passed during deployment of the stack",
     )
 
 

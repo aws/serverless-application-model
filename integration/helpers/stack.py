@@ -41,7 +41,7 @@ class Stack:
         Deploys the current cloud formation stack
         """
         with open(output_file_path) as cfn_file:
-            result, changeset_type = self.deployer.create_and_wait_for_changeset(
+            result = self.deployer.create_and_wait_for_changeset(
                 stack_name=self.stack_name,
                 cfn_template=cfn_file.read(),
                 parameter_values=[] if parameters is None else parameters,
@@ -50,9 +50,10 @@ class Stack:
                 notification_arns=[],
                 s3_uploader=None,
                 tags=[],
+                changeset_type="CREATE",
             )
             self.deployer.execute_changeset(result["Id"], self.stack_name)
-            self.deployer.wait_for_execute(self.stack_name, changeset_type)
+            self.deployer.wait_for_execute(self.stack_name, "CREATE")
 
         self._get_stack_description()
         self.stack_resources = self.cfn_client.list_stack_resources(StackName=self.stack_name)

@@ -1,16 +1,18 @@
 Parameters:
   MyDomainName:
     Type: String
-  MyDomainCert:
+  MyDomainCertificate:
+    Type: String
+  MyDomainOwnershipVerificationCertificate:
     Type: String
 
 Globals:
-  HttpApi:
+  Api:
     Domain:
       DomainName:
         Ref: MyDomainName
       CertificateArn:
-        Ref: MyDomainCert
+        arn:aws:acm:us-east-1:830899278857:certificate/7c9b4aa7-4262-4b20-85c0-ec45d8d55fa6
       EndpointConfiguration: REGIONAL
       MutualTlsAuthentication:
         TruststoreUri: ${mtlsuri}
@@ -21,6 +23,8 @@ Globals:
         - /post
       Route53:
         HostedZoneId: Z1DTV8GVAVOHDR
+      OwnershipVerificationCertificateArn:
+        Fn::Sub: arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/798c74e5-dc55-48b6-b1d8-13d2d7b3d265
 
 Resources:
   MyFunction:
@@ -38,20 +42,12 @@ Resources:
       Runtime: nodejs12.x
       Events:
         ImplicitGet:
-          Type: HttpApi
+          Type: Api
           Properties:
             Method: Get
             Path: /get
-            ApiId: 
-              Ref: MyApi
         ImplicitPost:
-          Type: HttpApi
+          Type: Api
           Properties:
             Method: Post
             Path: /post
-            ApiId: 
-              Ref: MyApi
-  MyApi:
-    Type: AWS::Serverless::HttpApi
-    Properties:
-      StageName: Prod
