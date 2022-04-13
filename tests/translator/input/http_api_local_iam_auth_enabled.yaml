@@ -1,0 +1,77 @@
+Globals:
+  HttpApi:
+    Auth:
+      EnableIamAuthorizer: false
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        # The following events use the defined AWS::Serverless::HttpApi, MyDefaultIamAuthHttpApi, further down.
+        # This HttpApi has Iam auth enabled AND set as the default.
+        # Should not have any auth enabled as the authorizer is specifically set to "NONE".
+        MyDefaultIamAuthHttpApiNoAuthEvent:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyDefaultIamAuthHttpApi
+            Auth:
+              Authorizer: NONE
+            Path: /no-auth
+            Method: GET
+        # Should have Iam auth as it is set as the default for the Api.
+        MyDefaultIamAuthHttpApiDefaultAuthEvent:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyDefaultIamAuthHttpApi
+            Path: /default-auth
+            Method: GET
+        # Should have Iam auth as it is set here.
+        MyDefaultIamAuthHttpApiIamAuthEvent:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyDefaultIamAuthHttpApi
+            Auth:
+              Authorizer: AWS_IAM
+            Path: /iam-auth
+            Method: GET
+        # The following events use the defined AWS::Serverless::HttpApi, MyIamAuthEnabledHttpApi, further down.
+        # This HttpApi has Iam auth enabled but NOT set as the default.
+        # Should not have any auth enabled because there is no one set as the default.
+        MyIamAuthEnabledHttpApiDefaultAuthEvent:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyIamAuthEnabledHttpApi
+            Path: /default-auth
+            Method: GET
+        # Should have Iam auth as it is set here.
+        MyIamAuthEnabledHttpApiIamAuthEvent:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyIamAuthEnabledHttpApi
+            Auth:
+              Authorizer: AWS_IAM
+            Path: /iam-auth
+            Method: GET
+
+  # HTTP API resource with the Iam authorizer enabled and set to the default.
+  MyDefaultIamAuthHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        EnableIamAuthorizer: true
+        DefaultAuthorizer: AWS_IAM
+
+  # HTTP API resource with the Iam authorizer enabled and NOT set to the default.
+  MyIamAuthEnabledHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        EnableIamAuthorizer: true

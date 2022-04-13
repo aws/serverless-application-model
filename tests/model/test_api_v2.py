@@ -7,6 +7,10 @@ from samtranslator.model.apigatewayv2 import ApiGatewayV2Authorizer
 
 
 class TestApiGatewayV2Authorizer(TestCase):
+    def test_create_iam_auth(self):
+        auth = ApiGatewayV2Authorizer(is_aws_iam_authorizer=True)
+        self.assertEqual(auth.is_aws_iam_authorizer, True)
+
     def test_create_oauth2_auth(self):
         auth = ApiGatewayV2Authorizer(
             api_logical_id="logicalId",

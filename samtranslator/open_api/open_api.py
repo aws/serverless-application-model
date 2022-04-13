@@ -455,7 +455,8 @@ class OpenApiEditor(object):
             security_dict = dict()
             security_dict[authorizer_name] = []
 
-            if authorizer_name != "NONE":
+            # Neither the NONE nor the AWS_IAM built-in authorizers support authorization scopes.
+            if authorizer_name not in ["NONE", "AWS_IAM"]:
                 method_authorization_scopes = authorizers[authorizer_name].get("AuthorizationScopes")
                 if authorization_scopes:
                     method_authorization_scopes = authorization_scopes

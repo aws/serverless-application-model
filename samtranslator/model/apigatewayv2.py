@@ -73,6 +73,7 @@ class ApiGatewayV2Authorizer(object):
         identity=None,
         authorizer_payload_format_version=None,
         enable_simple_responses=None,
+        is_aws_iam_authorizer=False,
     ):
         """
         Creates an authorizer for use in V2 Http Apis
@@ -87,6 +88,7 @@ class ApiGatewayV2Authorizer(object):
         self.identity = identity
         self.authorizer_payload_format_version = authorizer_payload_format_version
         self.enable_simple_responses = enable_simple_responses
+        self.is_aws_iam_authorizer = is_aws_iam_authorizer
 
         self._validate_input_parameters()
 
@@ -100,6 +102,8 @@ class ApiGatewayV2Authorizer(object):
             self._validate_lambda_authorizer()
 
     def _get_auth_type(self):
+        if self.is_aws_iam_authorizer:
+            return "AWS_IAM"
         if self.jwt_configuration:
             return "JWT"
         return "REQUEST"
@@ -178,6 +182,14 @@ class ApiGatewayV2Authorizer(object):
         Generates OAS for the securitySchemes section
         """
         authorizer_type = self._get_auth_type()
+
+        if authorizer_type == "AWS_IAM":
+            openapi = {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+                "x-amazon-apigateway-authtype": "awsSigv4",
+            }
 
         if authorizer_type == "JWT":
             openapi = {"type": "oauth2"}
