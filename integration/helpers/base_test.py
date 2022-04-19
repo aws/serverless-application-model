@@ -6,9 +6,11 @@ import botocore
 import pytest
 import requests
 
+from integration.config.logger_configurations import LoggerConfigurations
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
+from integration.helpers.request_utils import RequestUtils
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.s3_uploader import S3Uploader
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
@@ -28,6 +30,8 @@ from integration.helpers.template import transform_template
 from integration.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
+REQUEST_LOG = logging.getLogger(f"{__name__}.requests")
+LoggerConfigurations.configure_request_logging(REQUEST_LOG)
 STACK_NAME_PREFIX = "sam-integ-stack-"
 S3_BUCKET_PREFIX = "sam-integ-bucket-"
 
@@ -507,9 +511,12 @@ class BaseTest(TestCase):
         expected_status_code : string
             the expected status code
         """
-        print("Making request to " + url)
+        REQUEST_LOG.info("Making request to " + url)
         response = requests.get(url)
-        self.assertEqual(response.status_code, expected_status_code, " must return HTTP " + str(expected_status_code))
+        status = response.status_code
+        amazon_headers = RequestUtils(response).get_amazon_headers()
+        REQUEST_LOG.info("Calling API Gateway", extra={"status": status, "headers": amazon_headers})
+        self.assertEqual(status, expected_status_code, " must return HTTP " + str(expected_status_code))
         return response
 
     def get_default_test_template_parameters(self):

@@ -1,12 +1,18 @@
 from unittest.case import skipIf
 
+import logging
 import requests
 
+from integration.config.logger_configurations import LoggerConfigurations
 from integration.helpers.base_test import BaseTest
 from integration.helpers.deployer.utils.retry import retry
 from integration.helpers.exception import StatusCodeError
+from integration.helpers.request_utils import RequestUtils
 from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import COGNITO
+
+LOG = logging.getLogger(__name__)
+LoggerConfigurations.configure_request_logging(LOG)
 
 
 @skipIf(current_region_does_not_support([COGNITO]), "Cognito is not supported in this testing region")
@@ -441,6 +447,9 @@ class TestApiWithAuthorizers(BaseTest):
             headers = {header_key: header_value}
             response = requests.get(url, headers=headers)
         status = response.status_code
+        amazon_headers = RequestUtils(response).get_amazon_headers()
+        LOG.info("Calling API Gateway", extra={"status": status, "headers": amazon_headers})
+
         if status != expected_status_code:
             raise StatusCodeError(
                 "Request to {} failed with status: {}, expected status: {}".format(url, status, expected_status_code)
