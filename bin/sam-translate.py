@@ -107,7 +107,7 @@ def transform_template(input_file_path, output_file_path):
             region=None,
         )
         cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client), feature_toggle)
-        cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=2)
+        cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=1)
 
         with open(output_file_path, "w") as f:
             f.write(cloud_formation_template_prettified)
