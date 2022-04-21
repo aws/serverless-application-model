@@ -106,6 +106,7 @@ class TestHttpApiGenerator(TestCase):
             },
         }
         self.kwargs["definition_body"] = OpenApiEditor.gen_skeleton()
+        self.kwargs["definition_uri"] = None
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         self.assertEqual(
             http_api.Body["components"]["securitySchemes"],
