@@ -183,6 +183,7 @@ class ApiGenerator(object):
         domain=None,
         description=None,
         mode=None,
+        api_key_source_type=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -235,6 +236,7 @@ class ApiGenerator(object):
         self.shared_api_usage_plan = shared_api_usage_plan
         self.template_conditions = template_conditions
         self.mode = mode
+        self.api_key_source_type = api_key_source_type
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -293,6 +295,9 @@ class ApiGenerator(object):
 
         if self.mode:
             rest_api.Mode = self.mode
+
+        if self.api_key_source_type:
+            rest_api.ApiKeySourceType = self.api_key_source_type
 
         return rest_api
 

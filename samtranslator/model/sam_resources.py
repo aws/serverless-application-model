@@ -1006,6 +1006,7 @@ class SamApi(SamResourceMacro):
         "Description": PropertyType(False, is_str()),
         "Mode": PropertyType(False, is_str()),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
+        "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -1067,6 +1068,7 @@ class SamApi(SamResourceMacro):
             domain=self.Domain,
             description=self.Description,
             mode=self.Mode,
+            api_key_source_type=self.ApiKeySourceType,
         )
 
         (
