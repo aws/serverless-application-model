@@ -851,7 +851,9 @@ class SamFunction(SamResourceMacro):
             raise ValueError("deployment_preference_collection required for parsing the deployment preference")
 
         deployment_preference_collection.add(
-            self.logical_id, self.DeploymentPreference, condition,
+            self.logical_id,
+            self.DeploymentPreference,
+            condition,
         )
 
         if deployment_preference_collection.get(self.logical_id).enabled:

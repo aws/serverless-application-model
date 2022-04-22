@@ -11,7 +11,7 @@ from samtranslator.model.intrinsics import (
     validate_intrinsic_if_items,
     make_combined_condition,
     ref,
-    fnGetAtt
+    fnGetAtt,
 )
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
