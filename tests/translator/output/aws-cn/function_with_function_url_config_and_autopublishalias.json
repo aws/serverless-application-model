@@ -85,7 +85,7 @@
             "Properties": {
                 "Action": "lambda:InvokeFunctionUrl",
                 "FunctionName": {
-                    "Ref": "MyFunction"
+                    "Ref": "MyFunctionAliaslive"
                 },
                 "Principal": "*",
                 "FunctionUrlAuthType": "NONE"
