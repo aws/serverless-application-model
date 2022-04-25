@@ -879,7 +879,8 @@ class SamFunction(SamResourceMacro):
         self._validate_function_url_params(lambda_function)
 
         logical_id = f"{lambda_function.logical_id}Url"
-        lambda_url = LambdaUrl(logical_id=logical_id)
+        lambda_url_attributes = self.get_passthrough_resource_attributes()
+        lambda_url = LambdaUrl(logical_id=logical_id, attributes=lambda_url_attributes)
 
         cors = self.FunctionUrlConfig.get("Cors")
         if cors:
@@ -963,7 +964,8 @@ class SamFunction(SamResourceMacro):
             return None
 
         logical_id = f"{lambda_function.logical_id}UrlPublicPermissions"
-        lambda_permission = LambdaPermission(logical_id=logical_id)
+        lambda_permission_attributes = self.get_passthrough_resource_attributes()
+        lambda_permission = LambdaPermission(logical_id=logical_id, attributes=lambda_permission_attributes)
         lambda_permission.Action = "lambda:InvokeFunctionUrl"
         lambda_permission.FunctionName = lambda_function.get_runtime_attr("name")
         lambda_permission.Principal = "*"
