@@ -19,7 +19,7 @@ from samtranslator.model.iot import IotTopicRule
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
+from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -1119,7 +1119,7 @@ class HttpApi(PushEventSource):
         if resources_to_link["explicit_api"].get("DefinitionBody"):
             try:
                 editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))
-            except ValueError as e:
+            except InvalidDocumentException as e:
                 api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId
                 raise InvalidResourceException(api_logical_id, e)
 

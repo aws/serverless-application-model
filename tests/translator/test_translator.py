@@ -408,6 +408,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_auth_and_conditions_all_max",
                 "api_with_apikey_default_override",
                 "api_with_apikey_required",
+                "api_with_apikey_source",
                 "api_with_path_parameters",
                 "function_with_event_source_mapping",
                 "function_with_event_dest",

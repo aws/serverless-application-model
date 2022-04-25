@@ -1,0 +1,116 @@
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      ApiKeySourceType: AUTHORIZER
+      StageName: Prod
+      Auth:
+        Authorizers:
+          MyLambdaTokenAuth:
+            FunctionArn:
+              Fn::GetAtt: MyLambdaAuthFunction.Arn
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          return {
+            statusCode: 200,
+            body: 'Success'
+          }
+        }
+      Events:
+        None:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /none
+        LambdaToken:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Method: get
+            Path: /lambda-token-api-key
+            Auth:
+              Authorizer: MyLambdaTokenAuth
+              ApiKeyRequired: true
+  
+  MyLambdaAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      InlineCode: |
+        exports.handler = async (event, context, callback) => {
+          console.log(event);
+          const token = event.type === 'TOKEN' ? event.authorizationToken : event.queryStringParameters.authorization
+          const policyDocument = {
+            Version: '2012-10-17',
+            Statement: [{
+              Action: 'execute-api:Invoke',
+              Effect: token && token.toLowerCase() === 'allow' ? 'Allow' : 'Deny',
+              Resource: event.methodArn
+            }]
+          }
+          
+          return {
+            principalId: 'user',
+            usageIdentifierKey: 'at_least_20_characters',
+            context: { },
+            policyDocument
+          }
+        }
+
+  MyFirstApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn:
+      - MyUsagePlan
+    Properties:
+      Enabled: true
+      Value: at_least_20_characters
+      StageKeys:
+        - RestApiId:
+            Ref: MyApi
+          StageName:
+            Ref: MyApi.Stage
+
+  MyUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn:
+      - MyApi
+    Properties:
+      ApiStages:
+        - ApiId:
+            Ref: MyApi
+          Stage:
+            Ref: MyApi.Stage
+
+  MyUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId:
+        Ref: MyFirstApiKey
+      UsagePlanId:
+        Ref: MyUsagePlan
+      KeyType: API_KEY
+
+Outputs:
+    ApiKeyId:
+      Description: "API Key ID"
+      Value:
+        Fn::GetAtt: MyFirstApiKey.APIKeyId
+    ApiUrl:
+      Description: "API endpoint URL for Prod environment"
+      Value:
+        Fn::Sub: 'https://${MyApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'
+
+    AuthorizerFunctionArn:
+      Description: "Authorizer Function Arn"
+      Value:
+        Fn::GetAtt: MyLambdaAuthFunction.Arn
