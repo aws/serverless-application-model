@@ -1,5 +1,7 @@
 import hashlib
 
+from integration.config.logger_configurations import CustomLoggers
+
 try:
     from pathlib import Path
 except ImportError:
@@ -9,6 +11,8 @@ import requests
 from parameterized import parameterized
 
 from integration.helpers.base_test import BaseTest
+
+REQUEST_LOG = CustomLoggers.get_request_logger(__name__)
 
 
 class TestApiSettings(BaseTest):

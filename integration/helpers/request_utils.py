@@ -1,4 +1,13 @@
 # Utils for requests
+import logging
+
+import requests
+
+from integration.config.logger_configurations import CustomLoggers
+
+
+REQUEST_LOGGER = logging.getLogger(__name__)
+CustomLoggers.configure_request_logger(REQUEST_LOGGER)
 
 # Relevant headers that should be captured for debugging
 AMAZON_HEADERS = [
@@ -12,11 +21,11 @@ AMAZON_HEADERS = [
 
 class RequestUtils:
 
-    def __init__(self, response):
-        self.response = response
-        self.headers = self._normalize_response_headers()
+    def __init__(self):
+        self.response = None
+        self.headers = None
 
-    def get_amazon_headers(self):
+    def _get_amazon_headers(self):
         """
         Get a list of relevant amazon headers that could be useful for debugging
         """
@@ -36,3 +45,12 @@ class RequestUtils:
             return {}
 
         return dict((k.lower(), v) for k, v in self.response.headers.items())
+
+    def do_get_request_with_logging(self, url):
+        REQUEST_LOGGER.info("Making request to " + url)
+        self.response = requests.get(url)
+        self.headers = self._normalize_response_headers()
+        status = self.response.status_code
+        amazon_headers = self._get_amazon_headers()
+        REQUEST_LOGGER.info("Calling API Gateway", extra={"status": status, "headers": amazon_headers})
+        return self.response
