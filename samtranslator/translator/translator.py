@@ -16,6 +16,7 @@ from samtranslator.model.exceptions import (
     InvalidResourceException,
     DuplicateLogicalIdException,
     InvalidEventException,
+    InvalidTemplateException,
 )
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
@@ -163,7 +164,7 @@ class Translator:
                         document_errors.append(
                             DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)
                         )
-            except (InvalidResourceException, InvalidEventException) as e:
+            except (InvalidResourceException, InvalidEventException, InvalidTemplateException) as e:
                 document_errors.append(e)
 
         if deployment_preference_collection.any_enabled():
@@ -183,7 +184,7 @@ class Translator:
         # Run the after-transform plugin target
         try:
             sam_plugins.act(LifeCycleEvents.after_transform_template, template)
-        except (InvalidDocumentException, InvalidResourceException) as e:
+        except (InvalidDocumentException, InvalidResourceException, InvalidTemplateException) as e:
             document_errors.append(e)
 
         # Cleanup
