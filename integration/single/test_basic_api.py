@@ -2,7 +2,6 @@ import time
 from unittest.case import skipIf
 
 from integration.helpers.base_test import BaseTest
-import requests
 
 from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import MODE
@@ -40,17 +39,17 @@ class TestBasicApi(BaseTest):
 
         stack_output = self.get_stack_outputs()
         api_endpoint = stack_output.get("ApiEndpoint")
-        response = requests.get(f"{api_endpoint}/get")
+        response = BaseTest.do_get_request_with_logging(f"{api_endpoint}/get")
         self.assertEqual(response.status_code, 200)
 
         # Removes get from the API
         self.update_and_verify_stack(file_path="single/basic_api_with_mode_update")
-        response = requests.get(f"{api_endpoint}/get")
+        response = BaseTest.do_get_request_with_logging(f"{api_endpoint}/get")
         # API Gateway by default returns 403 if a path do not exist
         retries = 20
         while retries > 0:
             retries -= 1
-            response = requests.get(f"{api_endpoint}/get")
+            response = BaseTest.do_get_request_with_logging(f"{api_endpoint}/get")
             if response.status_code != 500:
                 break
             time.sleep(5)

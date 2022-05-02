@@ -1,7 +1,5 @@
 from unittest.case import skipIf
 
-import requests
-
 from integration.config.service_names import KMS, XRAY, ARM
 from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
@@ -42,7 +40,7 @@ class TestBasicFunction(BaseTest):
 
         endpoint = self.get_api_v2_endpoint("MyHttpApi")
 
-        self.assertEqual(requests.get(endpoint).text, self.FUNCTION_OUTPUT)
+        self.assertEqual(BaseTest.do_get_request_with_logging(endpoint).text, self.FUNCTION_OUTPUT)
 
     @parameterized.expand(
         [
