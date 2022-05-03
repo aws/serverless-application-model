@@ -1,5 +1,5 @@
 import logging
-from samtranslator.model.exceptions import InvalidResourceException, InvalidDocumentException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidDocumentException, InvalidTemplateException
 from samtranslator.plugins import BasePlugin, LifeCycleEvents
 
 LOG = logging.getLogger(__name__)
@@ -130,7 +130,7 @@ class SamPlugins(object):
 
             try:
                 getattr(plugin, method_name)(*args, **kwargs)
-            except (InvalidResourceException, InvalidDocumentException) as ex:
+            except (InvalidResourceException, InvalidDocumentException, InvalidTemplateException) as ex:
                 # Don't need to log these because they don't result in crashes
                 raise ex
             except Exception as ex:
