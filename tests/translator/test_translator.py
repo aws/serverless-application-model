@@ -151,7 +151,7 @@ class AbstractTestTranslator(TestCase):
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
         return json.load(open(expected_filepath, "r"))
 
-    def _compare_transform(self, manifest, expected, partition, region):
+    def _compare_transform(self, manifest, expected, partition, region, feature_toggle=None):
         with patch("boto3.session.Session.region_name", region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
@@ -172,7 +172,7 @@ class AbstractTestTranslator(TestCase):
                     "AWSXRayDaemonWriteAccess"
                 ] = "arn:{}:iam::aws:policy/AWSXRayDaemonWriteAccess".format(partition)
 
-            output_fragment = transform(manifest, parameter_values, mock_policy_loader)
+            output_fragment = transform(manifest, parameter_values, mock_policy_loader, feature_toggle=feature_toggle)
 
         print(json.dumps(output_fragment, indent=2))
 
@@ -367,6 +367,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_disabled_traffic_hook",
                 "function_with_deployment_preference",
                 "function_with_deployment_preference_condition",
+                "function_with_deployment_preference_condition_without_condition_fix",
                 "function_with_deployment_preference_all_parameters",
                 "function_with_deployment_preference_from_parameters",
                 "function_with_deployment_preference_multiple_combinations",
@@ -499,7 +500,19 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         manifest = self._read_input(testcase)
         expected = self._read_expected_output(testcase, partition)
 
-        self._compare_transform(manifest, expected, partition, region)
+        def is_enabled(feature_name):
+            if feature_name == "deployment_preference_condition_fix" and testcase in [
+                "function_with_deployment_no_service_role",
+                "function_with_deployment_preference_condition",
+                "function_with_deployment_preference_multiple_combinations_conditions",
+            ]:
+                return True
+            return False
+
+        feature_toggle_mock = Mock()
+        feature_toggle_mock.is_enabled.side_effect = is_enabled
+
+        self._compare_transform(manifest, expected, partition, region, feature_toggle_mock)
 
     @parameterized.expand(
         itertools.product(

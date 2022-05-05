@@ -43,12 +43,13 @@ class DeploymentPreferenceCollection(object):
     resources.
     """
 
-    def __init__(self):
+    def __init__(self, use_condition_fix=False):
         """
         This collection stores an internal dict of the deployment preferences for each function's
         deployment preference in the SAM Template.
         """
         self._resource_preferences = {}
+        self._use_condition_fix = use_condition_fix
 
     def add(self, logical_id, deployment_preference_dict, condition=None):
         """
@@ -67,7 +68,9 @@ class DeploymentPreferenceCollection(object):
             )
 
         self._resource_preferences[logical_id] = DeploymentPreference.from_dict(
-            logical_id, deployment_preference_dict, condition
+            logical_id,
+            deployment_preference_dict,
+            condition=condition if self._use_condition_fix else None,
         )
 
     def get(self, logical_id):

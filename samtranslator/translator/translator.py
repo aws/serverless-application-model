@@ -119,7 +119,9 @@ class Translator:
         mappings_resolver = IntrinsicsResolver(
             template.get("Mappings", {}), {FindInMapAction.intrinsic_name: FindInMapAction()}
         )
-        deployment_preference_collection = DeploymentPreferenceCollection()
+        deployment_preference_collection = DeploymentPreferenceCollection(
+            use_condition_fix=self.feature_toggle.is_enabled("deployment_preference_condition_fix")
+        )
         supported_resource_refs = SupportedResourceReferences()
         shared_api_usage_plan = SharedApiUsagePlan()
         document_errors = []
