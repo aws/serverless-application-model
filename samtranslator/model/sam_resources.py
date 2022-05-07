@@ -139,6 +139,7 @@ class SamFunction(SamResourceMacro):
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         mappings_resolver = kwargs.get("mappings_resolver", None)
         conditions = kwargs.get("conditions", {})
+        feature_toggle = kwargs.get("feature_toggle")
 
         if self.DeadLetterQueue:
             self._validate_dlq()
@@ -186,6 +187,7 @@ class SamFunction(SamResourceMacro):
                 intrinsics_resolver,
                 mappings_resolver,
                 self.get_passthrough_resource_attributes(),
+                feature_toggle,
             )
         event_invoke_policies = []
         if self.EventInvokeConfig:
@@ -828,7 +830,13 @@ class SamFunction(SamResourceMacro):
         return alias
 
     def _validate_deployment_preference_and_add_update_policy(
-        self, deployment_preference_collection, lambda_alias, intrinsics_resolver, mappings_resolver, condition
+        self,
+        deployment_preference_collection,
+        lambda_alias,
+        intrinsics_resolver,
+        mappings_resolver,
+        passthrough_resource_attributes,
+        feature_toggle=None,
     ):
         if "Enabled" in self.DeploymentPreference:
             # resolve intrinsics and mappings for Type
@@ -844,8 +852,10 @@ class SamFunction(SamResourceMacro):
             preference_type = mappings_resolver.resolve_parameter_refs(preference_type)
             self.DeploymentPreference["Type"] = preference_type
 
-        if condition:
-            condition = condition.get("Condition")
+        should_passthrough_condition = self.DeploymentPreference.get("PassthroughCondition", False) or (
+            feature_toggle and feature_toggle.is_enabled("deployment_preference_condition_fix")
+        )
+        condition = passthrough_resource_attributes.get("Condition") if should_passthrough_condition else None
 
         if deployment_preference_collection is None:
             raise ValueError("deployment_preference_collection required for parsing the deployment preference")

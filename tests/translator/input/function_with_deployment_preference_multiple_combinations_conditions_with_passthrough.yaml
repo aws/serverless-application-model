@@ -28,6 +28,7 @@ Resources:
       AutoPublishAlias: live
       DeploymentPreference:
         Type: Linear10PercentEvery2Minutes
+        PassthroughCondition: true
 
   MinimalFunctionWithMinimalDeploymentPreference:
     Type: 'AWS::Serverless::Function'
@@ -39,6 +40,7 @@ Resources:
       AutoPublishAlias: livewithdeployment
       DeploymentPreference:
         Type: Canary10Percent5Minutes
+        PassthroughCondition: true
 
   MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarms:
     Type: 'AWS::Serverless::Function'
@@ -55,6 +57,7 @@ Resources:
           PostTraffic: !Ref MyValidationTestFunction
         Alarms:
           - !Ref MyCloudWatchAlarm
+        PassthroughCondition: true
 
   MySanityTestFunction:
     Type: 'AWS::Serverless::Function'
@@ -65,6 +68,7 @@ Resources:
       CodeUri: s3://my-bucket/mySanityTestFunction.zip
       DeploymentPreference:
         Enabled: False
+        PassthroughCondition: true
 
   MyValidationTestFunction:
     Type: 'AWS::Serverless::Function'
@@ -74,13 +78,14 @@ Resources:
       CodeUri: s3://my-bucket/myValidationTestFunction.zip
       DeploymentPreference:
         Enabled: !Ref MyFalseParameter
+        PassthroughCondition: true
 
   MyCloudWatchAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-     ComparisonOperator: GreaterThanThreshold
-     EvaluationPeriods: 1
-     MetricName: MyMetric
-     Namespace: AWS/EC2
-     Period: 300
-     Threshold: 10
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 1
+      MetricName: MyMetric
+      Namespace: AWS/EC2
+      Period: 300
+      Threshold: 10
