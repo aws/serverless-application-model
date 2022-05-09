@@ -852,9 +852,18 @@ class SamFunction(SamResourceMacro):
             preference_type = mappings_resolver.resolve_parameter_refs(preference_type)
             self.DeploymentPreference["Type"] = preference_type
 
-        should_passthrough_condition = self.DeploymentPreference.get("PassthroughCondition", False) or (
-            feature_toggle and feature_toggle.is_enabled("deployment_preference_condition_fix")
-        )
+        if "PassthroughCondition" in self.DeploymentPreference:
+            should_passthrough_condition = self.DeploymentPreference.get("PassthroughCondition", False)
+        elif feature_toggle:
+            should_passthrough_condition = feature_toggle.is_enabled("deployment_preference_condition_fix")
+        else:  # default behaviour - no condition passthrough
+            should_passthrough_condition = False
+
+        if not isinstance(should_passthrough_condition, bool):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'DeploymentPreference.PassthroughCondition' must be a boolean value and does not support intrinsic.",
+            )
         condition = passthrough_resource_attributes.get("Condition") if should_passthrough_condition else None
 
         if deployment_preference_collection is None:
