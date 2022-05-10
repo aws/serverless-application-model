@@ -839,7 +839,7 @@ class SamFunction(SamResourceMacro):
         feature_toggle=None,
     ):
         if "Enabled" in self.DeploymentPreference:
-            # resolve intrinsics and mappings for Type
+            # resolve intrinsics and mappings for Enabled
             enabled = self.DeploymentPreference["Enabled"]
             enabled = intrinsics_resolver.resolve_parameter_refs(enabled)
             enabled = mappings_resolver.resolve_parameter_refs(enabled)
@@ -853,18 +853,17 @@ class SamFunction(SamResourceMacro):
             self.DeploymentPreference["Type"] = preference_type
 
         if "PassthroughCondition" in self.DeploymentPreference:
-            should_passthrough_condition = self.DeploymentPreference.get("PassthroughCondition", False)
+            # resolve intrinsics and mappings for PassthroughCondition
+            passthrough_condition = self.DeploymentPreference["PassthroughCondition"]
+            passthrough_condition = intrinsics_resolver.resolve_parameter_refs(passthrough_condition)
+            passthrough_condition = mappings_resolver.resolve_parameter_refs(passthrough_condition)
+            self.DeploymentPreference["PassthroughCondition"] = passthrough_condition
         elif feature_toggle:
-            should_passthrough_condition = feature_toggle.is_enabled("deployment_preference_condition_fix")
-        else:  # default behaviour - no condition passthrough
-            should_passthrough_condition = False
-
-        if not isinstance(should_passthrough_condition, bool):
-            raise InvalidResourceException(
-                self.logical_id,
-                "'DeploymentPreference.PassthroughCondition' must be a boolean value and does not support intrinsic.",
+            self.DeploymentPreference["PassthroughCondition"] = feature_toggle.is_enabled(
+                "deployment_preference_condition_fix"
             )
-        condition = passthrough_resource_attributes.get("Condition") if should_passthrough_condition else None
+        else:
+            self.DeploymentPreference["PassthroughCondition"] = False
 
         if deployment_preference_collection is None:
             raise ValueError("deployment_preference_collection required for parsing the deployment preference")
@@ -872,7 +871,7 @@ class SamFunction(SamResourceMacro):
         deployment_preference_collection.add(
             self.logical_id,
             self.DeploymentPreference,
-            condition,
+            passthrough_resource_attributes.get("Condition"),
         )
 
         if deployment_preference_collection.get(self.logical_id).enabled:
