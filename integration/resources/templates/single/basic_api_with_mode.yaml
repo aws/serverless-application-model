@@ -9,7 +9,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: python3.6
+      Runtime: python3.8
       AutoPublishAlias: live
       InlineCode: |
         import json
