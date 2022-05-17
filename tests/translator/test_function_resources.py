@@ -501,7 +501,10 @@ class TestVersionsAndAliases(TestCase):
 
     @parameterized.expand(
         [
-            ({"Fn::Sub": ["${Hello}", {"Hello": "helloworld"}]}, "Resource with id [foo] is invalid. Unsupported intrinsic: the only intrinsic functions supported for property PassthroughCondition are FindInMap and parameter Refs."),
+            (
+                {"Fn::Sub": ["${Hello}", {"Hello": "helloworld"}]},
+                "Resource with id [foo] is invalid. Unsupported intrinsic: the only intrinsic functions supported for property PassthroughCondition are FindInMap and parameter Refs.",
+            ),
             ("my_string", "Resource with id [foo] is invalid. Invalid value for property PassthroughCondition."),
         ]
     )
