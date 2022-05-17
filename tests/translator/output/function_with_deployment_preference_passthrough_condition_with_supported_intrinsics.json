@@ -1,0 +1,649 @@
+{
+    "Mappings": {
+        "HelloWorldMap": {
+            "hello": {
+                "key1": true,
+                "key2": false
+            },
+            "world": {
+                "key1": false,
+                "key2": true
+            }
+        }
+    },
+    "Parameters": {
+        "FnName": {
+            "Type": "String"
+        },
+        "ProvisionedConcurrency": {
+            "Type": "String",
+            "Default": 10
+        },
+        "EnableAliasProvisionedConcurrency": {
+            "Type": "String",
+            "AllowedValues": [
+                true,
+                false
+            ],
+            "Default": true
+        },
+        "DefaultTrueParam": {
+            "Type": "String",
+            "Default": "true"
+        },
+        "DefaultFalseParam": {
+            "Type": "String",
+            "Default": "false"
+        },
+        "HelloParam": {
+            "Type": "String",
+            "Default": "hello"
+        },
+        "WorldParam": {
+            "Type": "String",
+            "Default": "world"
+        }
+    },
+    "Conditions": {
+        "AliasProvisionedConcurrencyEnabled": {
+            "Fn::Equals": [
+                {
+                    "Ref": "EnableAliasProvisionedConcurrency"
+                },
+                true
+            ]
+        },
+        "FunctionCondition": {
+            "Fn::Equals": [
+                true,
+                true
+            ]
+        }
+    },
+    "Resources": {
+        "TrueRef": {
+            "Type": "AWS::Lambda::Function",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": "sam-demo-bucket",
+                    "S3Key": "hello.zip"
+                },
+                "Handler": "hello.handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "TrueRefRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python2.7",
+                "Tags": [
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        },
+        "TrueRefVersion640128d35d": {
+            "Type": "AWS::Lambda::Version",
+            "Condition": "FunctionCondition",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "TrueRef"
+                }
+            }
+        },
+        "TrueRefAliaslive": {
+            "Type": "AWS::Lambda::Alias",
+            "Condition": "FunctionCondition",
+            "UpdatePolicy": {
+                "CodeDeployLambdaAliasUpdate": {
+                    "ApplicationName": {
+                        "Ref": "ServerlessDeploymentApplication"
+                    },
+                    "DeploymentGroupName": {
+                        "Ref": "TrueRefDeploymentGroup"
+                    }
+                }
+            },
+            "Properties": {
+                "Name": "live",
+                "FunctionName": {
+                    "Ref": "TrueRef"
+                },
+                "FunctionVersion": {
+                    "Fn::GetAtt": [
+                        "TrueRefVersion640128d35d",
+                        "Version"
+                    ]
+                },
+                "ProvisionedConcurrencyConfig": {
+                    "Fn::If": [
+                        "AliasProvisionedConcurrencyEnabled",
+                        {
+                            "ProvisionedConcurrentExecutions": {
+                                "Ref": "ProvisionedConcurrency"
+                            }
+                        },
+                        {
+                            "Ref": "AWS::NoValue"
+                        }
+                    ]
+                }
+            }
+        },
+        "TrueRefRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                ],
+                "Tags": [
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        },
+        "FalseRef": {
+            "Type": "AWS::Lambda::Function",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": "sam-demo-bucket",
+                    "S3Key": "hello.zip"
+                },
+                "Handler": "hello.handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "FalseRefRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python2.7",
+                "Tags": [
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        },
+        "FalseRefVersion640128d35d": {
+            "Type": "AWS::Lambda::Version",
+            "Condition": "FunctionCondition",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "FalseRef"
+                }
+            }
+        },
+        "FalseRefAliaslive": {
+            "Type": "AWS::Lambda::Alias",
+            "Condition": "FunctionCondition",
+            "UpdatePolicy": {
+                "CodeDeployLambdaAliasUpdate": {
+                    "ApplicationName": {
+                        "Ref": "ServerlessDeploymentApplication"
+                    },
+                    "DeploymentGroupName": {
+                        "Ref": "FalseRefDeploymentGroup"
+                    }
+                }
+            },
+            "Properties": {
+                "Name": "live",
+                "FunctionName": {
+                    "Ref": "FalseRef"
+                },
+                "FunctionVersion": {
+                    "Fn::GetAtt": [
+                        "FalseRefVersion640128d35d",
+                        "Version"
+                    ]
+                },
+                "ProvisionedConcurrencyConfig": {
+                    "Fn::If": [
+                        "AliasProvisionedConcurrencyEnabled",
+                        {
+                            "ProvisionedConcurrentExecutions": {
+                                "Ref": "ProvisionedConcurrency"
+                            }
+                        },
+                        {
+                            "Ref": "AWS::NoValue"
+                        }
+                    ]
+                }
+            }
+        },
+        "FalseRefRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                ],
+                "Tags": [
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        },
+        "TrueFindInMap": {
+            "Type": "AWS::Lambda::Function",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": "sam-demo-bucket",
+                    "S3Key": "hello.zip"
+                },
+                "Handler": "hello.handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "TrueFindInMapRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python2.7",
+                "Tags": [
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        },
+        "TrueFindInMapVersion640128d35d": {
+            "Type": "AWS::Lambda::Version",
+            "Condition": "FunctionCondition",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "TrueFindInMap"
+                }
+            }
+        },
+        "TrueFindInMapAliaslive": {
+            "Type": "AWS::Lambda::Alias",
+            "Condition": "FunctionCondition",
+            "UpdatePolicy": {
+                "CodeDeployLambdaAliasUpdate": {
+                    "ApplicationName": {
+                        "Ref": "ServerlessDeploymentApplication"
+                    },
+                    "DeploymentGroupName": {
+                        "Ref": "TrueFindInMapDeploymentGroup"
+                    }
+                }
+            },
+            "Properties": {
+                "Name": "live",
+                "FunctionName": {
+                    "Ref": "TrueFindInMap"
+                },
+                "FunctionVersion": {
+                    "Fn::GetAtt": [
+                        "TrueFindInMapVersion640128d35d",
+                        "Version"
+                    ]
+                },
+                "ProvisionedConcurrencyConfig": {
+                    "Fn::If": [
+                        "AliasProvisionedConcurrencyEnabled",
+                        {
+                            "ProvisionedConcurrentExecutions": {
+                                "Ref": "ProvisionedConcurrency"
+                            }
+                        },
+                        {
+                            "Ref": "AWS::NoValue"
+                        }
+                    ]
+                }
+            }
+        },
+        "TrueFindInMapRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                ],
+                "Tags": [
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        },
+        "FalseFindInMap": {
+            "Type": "AWS::Lambda::Function",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": "sam-demo-bucket",
+                    "S3Key": "hello.zip"
+                },
+                "Handler": "hello.handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "FalseFindInMapRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python2.7",
+                "Tags": [
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        },
+        "FalseFindInMapVersion640128d35d": {
+            "Type": "AWS::Lambda::Version",
+            "Condition": "FunctionCondition",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "FalseFindInMap"
+                }
+            }
+        },
+        "FalseFindInMapAliaslive": {
+            "Type": "AWS::Lambda::Alias",
+            "Condition": "FunctionCondition",
+            "UpdatePolicy": {
+                "CodeDeployLambdaAliasUpdate": {
+                    "ApplicationName": {
+                        "Ref": "ServerlessDeploymentApplication"
+                    },
+                    "DeploymentGroupName": {
+                        "Ref": "FalseFindInMapDeploymentGroup"
+                    }
+                }
+            },
+            "Properties": {
+                "Name": "live",
+                "FunctionName": {
+                    "Ref": "FalseFindInMap"
+                },
+                "FunctionVersion": {
+                    "Fn::GetAtt": [
+                        "FalseFindInMapVersion640128d35d",
+                        "Version"
+                    ]
+                },
+                "ProvisionedConcurrencyConfig": {
+                    "Fn::If": [
+                        "AliasProvisionedConcurrencyEnabled",
+                        {
+                            "ProvisionedConcurrentExecutions": {
+                                "Ref": "ProvisionedConcurrency"
+                            }
+                        },
+                        {
+                            "Ref": "AWS::NoValue"
+                        }
+                    ]
+                }
+            }
+        },
+        "FalseFindInMapRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                ],
+                "Tags": [
+                    {
+                        "Key": "lambda:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        },
+        "ServerlessDeploymentApplication": {
+            "Type": "AWS::CodeDeploy::Application",
+            "Properties": {
+                "ComputePlatform": "Lambda"
+            }
+        },
+        "CodeDeployServiceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "codedeploy.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+                ]
+            }
+        },
+        "TrueRefDeploymentGroup": {
+            "Type": "AWS::CodeDeploy::DeploymentGroup",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "ServerlessDeploymentApplication"
+                },
+                "AutoRollbackConfiguration": {
+                    "Enabled": true,
+                    "Events": [
+                        "DEPLOYMENT_FAILURE",
+                        "DEPLOYMENT_STOP_ON_ALARM",
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "DeploymentConfigName": {
+                    "Fn::Sub": [
+                        "CodeDeployDefault.Lambda${ConfigName}",
+                        {
+                            "ConfigName": "Linear10PercentEvery3Minutes"
+                        }
+                    ]
+                },
+                "DeploymentStyle": {
+                    "DeploymentType": "BLUE_GREEN",
+                    "DeploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "ServiceRoleArn": {
+                    "Fn::GetAtt": [
+                        "CodeDeployServiceRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "FalseRefDeploymentGroup": {
+            "Type": "AWS::CodeDeploy::DeploymentGroup",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "ServerlessDeploymentApplication"
+                },
+                "AutoRollbackConfiguration": {
+                    "Enabled": true,
+                    "Events": [
+                        "DEPLOYMENT_FAILURE",
+                        "DEPLOYMENT_STOP_ON_ALARM",
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "DeploymentConfigName": {
+                    "Fn::Sub": [
+                        "CodeDeployDefault.Lambda${ConfigName}",
+                        {
+                            "ConfigName": "Linear10PercentEvery3Minutes"
+                        }
+                    ]
+                },
+                "DeploymentStyle": {
+                    "DeploymentType": "BLUE_GREEN",
+                    "DeploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "ServiceRoleArn": {
+                    "Fn::GetAtt": [
+                        "CodeDeployServiceRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "TrueFindInMapDeploymentGroup": {
+            "Type": "AWS::CodeDeploy::DeploymentGroup",
+            "Condition": "FunctionCondition",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "ServerlessDeploymentApplication"
+                },
+                "AutoRollbackConfiguration": {
+                    "Enabled": true,
+                    "Events": [
+                        "DEPLOYMENT_FAILURE",
+                        "DEPLOYMENT_STOP_ON_ALARM",
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "DeploymentConfigName": {
+                    "Fn::Sub": [
+                        "CodeDeployDefault.Lambda${ConfigName}",
+                        {
+                            "ConfigName": "Linear10PercentEvery3Minutes"
+                        }
+                    ]
+                },
+                "DeploymentStyle": {
+                    "DeploymentType": "BLUE_GREEN",
+                    "DeploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "ServiceRoleArn": {
+                    "Fn::GetAtt": [
+                        "CodeDeployServiceRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "FalseFindInMapDeploymentGroup": {
+            "Type": "AWS::CodeDeploy::DeploymentGroup",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "ServerlessDeploymentApplication"
+                },
+                "AutoRollbackConfiguration": {
+                    "Enabled": true,
+                    "Events": [
+                        "DEPLOYMENT_FAILURE",
+                        "DEPLOYMENT_STOP_ON_ALARM",
+                        "DEPLOYMENT_STOP_ON_REQUEST"
+                    ]
+                },
+                "DeploymentConfigName": {
+                    "Fn::Sub": [
+                        "CodeDeployDefault.Lambda${ConfigName}",
+                        {
+                            "ConfigName": "Linear10PercentEvery3Minutes"
+                        }
+                    ]
+                },
+                "DeploymentStyle": {
+                    "DeploymentType": "BLUE_GREEN",
+                    "DeploymentOption": "WITH_TRAFFIC_CONTROL"
+                },
+                "ServiceRoleArn": {
+                    "Fn::GetAtt": [
+                        "CodeDeployServiceRole",
+                        "Arn"
+                    ]
+                }
+            }
+        }
+    }
+}

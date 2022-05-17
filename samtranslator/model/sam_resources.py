@@ -1,5 +1,7 @@
 ﻿""" SAM macro definitions """
 import copy
+from typing import Union
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -853,11 +855,12 @@ class SamFunction(SamResourceMacro):
             self.DeploymentPreference["Type"] = preference_type
 
         if "PassthroughCondition" in self.DeploymentPreference:
-            # resolve intrinsics and mappings for PassthroughCondition
-            passthrough_condition = self.DeploymentPreference["PassthroughCondition"]
-            passthrough_condition = intrinsics_resolver.resolve_parameter_refs(passthrough_condition)
-            passthrough_condition = mappings_resolver.resolve_parameter_refs(passthrough_condition)
-            self.DeploymentPreference["PassthroughCondition"] = passthrough_condition
+            self.DeploymentPreference["PassthroughCondition"] = self._resolve_property_to_boolean(
+                self.DeploymentPreference["PassthroughCondition"],
+                "PassthroughCondition",
+                intrinsics_resolver,
+                mappings_resolver,
+            )
         elif feature_toggle:
             self.DeploymentPreference["PassthroughCondition"] = feature_toggle.is_enabled(
                 "deployment_preference_condition_fix"
@@ -885,6 +888,40 @@ class SamFunction(SamResourceMacro):
             lambda_alias.set_resource_attribute(
                 "UpdatePolicy", deployment_preference_collection.update_policy(self.logical_id).to_dict()
             )
+
+    def _resolve_property_to_boolean(
+        self,
+        property_value: Union[bool, str, dict],
+        property_name: str,
+        intrinsics_resolver: IntrinsicsResolver,
+        mappings_resolver: IntrinsicsResolver,
+    ) -> bool:
+        """
+        Resolves intrinsics, if any, and/or converts string in a given property to boolean.
+        Raises InvalidResourceException if can't resolve intrinsic or can't resolve string to boolean
+
+        :param property_value: property value to resolve
+        :param property_name: name/key of property to resolve
+        :param intrinsics_resolver: resolves intrinsics
+        :param mappings_resolver: resolves FindInMap
+        :return bool: resolved boolean value
+        """
+        processed_property_value = intrinsics_resolver.resolve_parameter_refs(property_value)
+        processed_property_value = mappings_resolver.resolve_parameter_refs(processed_property_value)
+
+        # FIXME: We should support not only true/false, but also yes/no, on/off? See https://yaml.org/type/bool.html
+        if processed_property_value in [True, "true", "True"]:
+            return True
+        elif processed_property_value in [False, "false", "False"]:
+            return False
+        elif is_intrinsic(processed_property_value):  # couldn't resolve intrinsic
+            raise InvalidResourceException(
+                self.logical_id,
+                f"Unsupported intrinsic: the only intrinsic functions supported for "
+                f"property {property_name} are FindInMap and parameter Refs.",
+            )
+        else:
+            raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
 
     def _construct_function_url(self, lambda_function, lambda_alias):
         """

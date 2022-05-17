@@ -436,6 +436,7 @@ class TestVersionsAndAliases(TestCase):
             "S3Key": "key",
             "S3ObjectVersion": "version",
         }
+        self.mappings_resolver_mock.resolve_parameter_refs.return_value = True
         resources = sam_func.to_cloudformation(**kwargs)
 
         deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
@@ -453,7 +454,7 @@ class TestVersionsAndAliases(TestCase):
     def test_sam_function_with_deployment_preference_passthrough_condition_through_feature_flag(
         self, get_resolved_alias_name_mock
     ):
-        deploy_preference_dict = {"Type": "LINEAR", "PassthroughCondition": True}
+        deploy_preference_dict = {"Type": "LINEAR"}
         alias_name = "AliasName"
         func = {
             "Type": "AWS::Serverless::Function",

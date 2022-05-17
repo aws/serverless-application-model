@@ -75,8 +75,6 @@ class DeploymentPreference(DeploymentPreferenceTuple):
         role = deployment_preference_dict.get("Role", None)
         trigger_configurations = deployment_preference_dict.get("TriggerConfigurations", None)
         passthrough_condition = deployment_preference_dict.get("PassthroughCondition", False)
-        # FIXME: We should support not only true/false, but also yes/no, on/off? See https://yaml.org/type/bool.html 
-        passthrough_condition = True if passthrough_condition in [True, "true", "True"] else False
 
         return DeploymentPreference(
             deployment_type,

@@ -374,6 +374,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_deployment_preference_alarms_intrinsic_if",
                 "function_with_deployment_preference_multiple_combinations_conditions_with_passthrough",
                 "function_with_deployment_preference_multiple_combinations_conditions_without_passthrough",
+                "function_with_deployment_preference_passthrough_condition_with_supported_intrinsics",
                 "function_with_alias_and_event_sources",
                 "function_with_resource_refs",
                 "function_with_deployment_and_custom_role",
