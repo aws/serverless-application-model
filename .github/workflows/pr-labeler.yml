@@ -26,6 +26,6 @@ jobs:
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                labels: ['pr/external']
+                labels: ['pr/external', 'stage/needs-triage']
               })
             }
