@@ -275,7 +275,7 @@ class TestBasicFunction(BaseTest):
         """
         request_params = {
             "FunctionName": function_name,
-            "Payload": '{}',
+            "Payload": "{}",
         }
         if qualifier:
             request_params["Qualifier"] = qualifier
