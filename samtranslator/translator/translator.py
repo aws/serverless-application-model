@@ -143,6 +143,7 @@ class Translator:
                 )
                 kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
                 kwargs["shared_api_usage_plan"] = shared_api_usage_plan
+                kwargs["feature_toggle"] = self.feature_toggle
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
@@ -168,10 +169,14 @@ class Translator:
                 document_errors.append(e)
 
         if deployment_preference_collection.any_enabled():
-            template["Resources"].update(deployment_preference_collection.codedeploy_application.to_dict())
+            template["Resources"].update(deployment_preference_collection.get_codedeploy_application().to_dict())
+            if deployment_preference_collection.needs_resource_condition():
+                new_conditions = deployment_preference_collection.create_aggregate_deployment_condition()
+                if new_conditions:
+                    template.get("Conditions").update(new_conditions)
 
             if not deployment_preference_collection.can_skip_service_role():
-                template["Resources"].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
+                template["Resources"].update(deployment_preference_collection.get_codedeploy_iam_role().to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 try:
