@@ -178,7 +178,7 @@ class SamFunction(SamResourceMacro):
         if self.FunctionUrlConfig:
             lambda_url = self._construct_function_url(lambda_function, lambda_alias)
             resources.append(lambda_url)
-            url_permission = self._construct_url_permission(lambda_function)
+            url_permission = self._construct_url_permission(lambda_function, lambda_alias)
             if url_permission:
                 resources.append(url_permission)
 
@@ -1006,7 +1006,7 @@ class SamFunction(SamResourceMacro):
                     "{} must be of type {}.".format(prop_name, str(prop_type).split("'")[1]),
                 )
 
-    def _construct_url_permission(self, lambda_function):
+    def _construct_url_permission(self, lambda_function, lambda_alias):
         """
         Construct the lambda permission associated with the function url resource in a case
         for public access when AuthType is NONE
@@ -1015,6 +1015,9 @@ class SamFunction(SamResourceMacro):
         ----------
         lambda_function : LambdaUrl
             Lambda Function resource
+
+        llambda_alias : LambdaAlias
+            Lambda Alias resource
 
         Returns
         -------
@@ -1030,7 +1033,9 @@ class SamFunction(SamResourceMacro):
         lambda_permission_attributes = self.get_passthrough_resource_attributes()
         lambda_permission = LambdaPermission(logical_id=logical_id, attributes=lambda_permission_attributes)
         lambda_permission.Action = "lambda:InvokeFunctionUrl"
-        lambda_permission.FunctionName = lambda_function.get_runtime_attr("name")
+        lambda_permission.FunctionName = (
+            lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
+        )
         lambda_permission.Principal = "*"
         lambda_permission.FunctionUrlAuthType = auth_type
         return lambda_permission
