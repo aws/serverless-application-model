@@ -1,8 +1,8 @@
 ---
 name: Feature request
 about: Suggest an idea/feature/enhancement for the SAM Translator
-title: ''
-labels: ''
+title: "Feature request: TITLE"
+labels: ['type/feature', 'stage/needs-triage']
 assignees: ''
 
 ---
