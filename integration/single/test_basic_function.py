@@ -98,6 +98,7 @@ class TestBasicFunction(BaseTest):
 
         self.assertEqual(function_url_config["AuthType"], "NONE")
         self.assertEqual(function_url_config["Cors"], cors_config)
+        self._assert_invoke(lambda_client, function_name, qualifier, 200)
 
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
         self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")
@@ -256,3 +257,28 @@ class TestBasicFunction(BaseTest):
         )
 
         self.assertEqual(function_configuration_result.get("EphemeralStorage", {}).get("Size", 0), 1024)
+
+    def _assert_invoke(self, lambda_client, function_name, qualifier=None, expected_status_code=200):
+        """
+        Assert if a Lambda invocation returns the expected status code
+
+        Parameters
+        ----------
+        lambda_client : boto3.BaseClient
+            boto3 Lambda client
+        function_name : string
+            Function name
+        qualifier : string
+            Specify a version or alias to invoke a published version of the function
+        expected_status_code : int
+            Expected status code from the invocation
+        """
+        request_params = {
+            "FunctionName": function_name,
+            "Payload": "{}",
+        }
+        if qualifier:
+            request_params["Qualifier"] = qualifier
+
+        response = lambda_client.invoke(**request_params)
+        self.assertEqual(response.get("StatusCode"), expected_status_code)

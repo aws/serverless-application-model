@@ -14,7 +14,7 @@ parameterized~=0.7.4
 # Integration tests
 click~=7.1
 dateparser~=0.7
-boto3~=1.17
+boto3>=1.23,<2
 
 # Requirements for examples
 requests~=2.24.0
