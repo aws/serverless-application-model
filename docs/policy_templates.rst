@@ -15,7 +15,7 @@ For Example:
     Properties:
       ...
       Policies:
-        # Give DynamoDB Full Access to your Lambda Function
+        # Give your Lambda Function Full Access to DynamoDB 
         - AmazonDynamoDBFullAccess
       ...
 
