@@ -1,7 +1,5 @@
 from unittest.case import skipIf
 
-import requests
-
 from integration.helpers.base_test import BaseTest
 from integration.helpers.deployer.utils.retry import retry
 from integration.helpers.exception import StatusCodeError
@@ -436,11 +434,12 @@ class TestApiWithAuthorizers(BaseTest):
         header_value=None,
     ):
         if not header_key or not header_value:
-            response = requests.get(url)
+            response = BaseTest.do_get_request_with_logging(url)
         else:
             headers = {header_key: header_value}
-            response = requests.get(url, headers=headers)
+            response = BaseTest.do_get_request_with_logging(url, headers)
         status = response.status_code
+
         if status != expected_status_code:
             raise StatusCodeError(
                 "Request to {} failed with status: {}, expected status: {}".format(url, status, expected_status_code)

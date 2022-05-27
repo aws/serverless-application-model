@@ -5,7 +5,6 @@ try:
 except ImportError:
     from pathlib2 import Path
 
-import requests
 from parameterized import parameterized
 
 from integration.helpers.base_test import BaseTest
@@ -158,7 +157,7 @@ class TestApiSettings(BaseTest):
 
     def verify_binary_media_request(self, url, expected_status_code):
         headers = {"accept": "image/png"}
-        response = requests.get(url, headers=headers)
+        response = BaseTest.do_get_request_with_logging(url, headers)
 
         status = response.status_code
         expected_file_path = str(Path(self.code_dir, "AWS_logo_RGB.png"))
