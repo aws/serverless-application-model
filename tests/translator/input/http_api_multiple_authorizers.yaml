@@ -30,6 +30,14 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref MyApi
+        HelloAWSIAMAuth:
+          Type: HttpApi
+          Properties:
+            Path: /hello-aws-iam-auth
+            Method: get
+            ApiId: !Ref MyApi
+            Auth:
+              Authorizer: AWS_IAM
 
   MyAuthFn:
     Type: AWS::Serverless::Function
@@ -59,3 +67,4 @@ Resources:
                 - audience2
               issuer: "https://www.example.com/v1/connect/oidc"
         DefaultAuthorizer: LambdaAuth
+        EnableIamAuthorizer: true

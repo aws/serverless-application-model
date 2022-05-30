@@ -1,7 +1,7 @@
 import copy
 
 from unittest import TestCase
-from mock import Mock
+from unittest.mock import Mock
 from parameterized import parameterized, param
 
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -18,7 +18,7 @@ class TestSwaggerEditor_init(TestCase):
     def test_must_raise_on_invalid_swagger(self):
 
         invalid_swagger = {"paths": {}}  # Missing "Swagger" keyword
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             SwaggerEditor(invalid_swagger)
 
     def test_must_succeed_on_valid_swagger(self):
@@ -32,13 +32,13 @@ class TestSwaggerEditor_init(TestCase):
     def test_must_fail_on_invalid_openapi_version(self):
         invalid_swagger = {"openapi": "2.3.0", "paths": {"/foo": {}, "/bar": {}}}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             SwaggerEditor(invalid_swagger)
 
     def test_must_fail_on_invalid_openapi_version_2(self):
         invalid_swagger = {"openapi": "3.1.1.1", "paths": {"/foo": {}, "/bar": {}}}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             SwaggerEditor(invalid_swagger)
 
     def test_must_succeed_on_valid_openapi3(self):
@@ -53,7 +53,7 @@ class TestSwaggerEditor_init(TestCase):
     def test_must_fail_with_bad_values_for_path(self, invalid_path_item):
         invalid_swagger = {"openapi": "3.1.1.1", "paths": {"/foo": {}, "/bad": invalid_path_item}}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             SwaggerEditor(invalid_swagger)
 
 
@@ -261,7 +261,7 @@ class TestSwaggerEditor_add_lambda_integration(TestCase):
 
     def test_must_raise_on_existing_integration(self):
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             self.editor.add_lambda_integration("/bar", "get", "integrationUri")
 
     def test_must_add_credentials_to_the_integration(self):
@@ -385,8 +385,8 @@ class TestSwaggerEditor_add_cors(TestCase):
         expected = {"some cors": "return value"}
         path = "/foo"
 
-        self.editor._make_cors_allowed_methods_for_path = Mock()
-        self.editor._make_cors_allowed_methods_for_path.return_value = default_allow_methods_value
+        self.editor._make_cors_allowed_methods_for_path_item = Mock()
+        self.editor._make_cors_allowed_methods_for_path_item.return_value = default_allow_methods_value
 
         self.editor._options_method_response_for_cors = Mock()
         self.editor._options_method_response_for_cors.return_value = expected
@@ -578,45 +578,39 @@ class TestSwaggerEditor_options_method_response_for_cors(TestCase):
         self.assertEqual(expected, actual)
 
 
-class TestSwaggerEditor_make_cors_allowed_methods_for_path(TestCase):
+class TestSwaggerEditor_make_cors_allowed_methods_for_path_item(TestCase):
     def setUp(self):
+        self.foo_path_item = {"get": {}, "POST": {}, "DeLeTe": {}}
+        self.withany_path_item = {"head": {}, _X_ANY_METHOD: {}}
+        self.nothing_path_item = {}
+
         self.editor = SwaggerEditor(
             {
                 "swagger": "2.0",
                 "paths": {
-                    "/foo": {"get": {}, "POST": {}, "DeLeTe": {}},
-                    "/withany": {"head": {}, _X_ANY_METHOD: {}},
-                    "/nothing": {},
+                    "/foo": self.foo_path_item,
+                    "/withany": self.withany_path_item,
+                    "/nothing": self.nothing_path_item,
                 },
             }
         )
 
     def test_must_return_all_defined_methods(self):
-        path = "/foo"
         expected = "DELETE,GET,OPTIONS,POST"  # Result should be sorted alphabetically
 
-        actual = self.editor._make_cors_allowed_methods_for_path(path)
+        actual = self.editor._make_cors_allowed_methods_for_path_item(self.foo_path_item)
         self.assertEqual(expected, actual)
 
     def test_must_work_for_any_method(self):
-        path = "/withany"
         expected = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT"  # Result should be sorted alphabetically
 
-        actual = self.editor._make_cors_allowed_methods_for_path(path)
+        actual = self.editor._make_cors_allowed_methods_for_path_item(self.withany_path_item)
         self.assertEqual(expected, actual)
 
     def test_must_work_with_no_methods(self):
-        path = "/nothing"
         expected = "OPTIONS"
 
-        actual = self.editor._make_cors_allowed_methods_for_path(path)
-        self.assertEqual(expected, actual)
-
-    def test_must_skip_non_existent_path(self):
-        path = "/no-path"
-        expected = ""
-
-        actual = self.editor._make_cors_allowed_methods_for_path(path)
+        actual = self.editor._make_cors_allowed_methods_for_path_item(self.nothing_path_item)
         self.assertEqual(expected, actual)
 
 

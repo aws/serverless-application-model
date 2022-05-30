@@ -13,9 +13,6 @@ from samtranslator.feature_toggle.dialup import (
 )
 from samtranslator.metrics.method_decorator import cw_timer
 
-my_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, my_path + "/..")
-
 LOG = logging.getLogger(__name__)
 
 

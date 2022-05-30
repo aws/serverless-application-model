@@ -1,10 +1,8 @@
 Parameters:
   MyDomainName:
     Type: String
-    Default: httpapi.sam-gamma-regional.com
   MyDomainCert:
     Type: String
-    Default: arn:aws:acm:us-east-1:830899278857:certificate/ae8c894b-4e41-42a6-8817-85d05665d043
 
 Globals:
   HttpApi:

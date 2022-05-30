@@ -1,0 +1,22 @@
+Resources:
+    MyLambdaFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: index.handler
+            Runtime: nodejs12.x
+            CodeUri: ${codeuri}
+            MemorySize: 128
+            AutoPublishAlias: live
+            FunctionUrlConfig:
+                AuthType: NONE
+                Cors:
+                    AllowOrigins: 
+                        - "https://foo.com"
+                    AllowMethods: 
+                        - "POST"
+                    AllowCredentials: true
+                    AllowHeaders: 
+                        - "x-Custom-Header"
+                    ExposeHeaders: 
+                        - "x-amzn-header"
+                    MaxAge: 10

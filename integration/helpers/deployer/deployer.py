@@ -31,6 +31,7 @@ from collections import OrderedDict
 import logging
 import time
 from datetime import datetime
+from integration.helpers.resource import generate_suffix
 
 import botocore
 
@@ -92,49 +93,17 @@ class Deployer:
         self.max_attempts = 3
         self.deploy_color = DeployColor()
 
-    def has_stack(self, stack_name):
-        """
-        Checks if a CloudFormation stack with given name exists
-
-        :param stack_name: Name or ID of the stack
-        :return: True if stack exists. False otherwise
-        """
-        try:
-            resp = self._client.describe_stacks(StackName=stack_name)
-            if not resp["Stacks"]:
-                return False
-
-            # When you run CreateChangeSet on a a stack that does not exist,
-            # CloudFormation will create a stack and set it's status
-            # REVIEW_IN_PROGRESS. However this stack is cannot be manipulated
-            # by "update" commands. Under this circumstances, we treat like
-            # this stack does not exist and call CreateChangeSet will
-            # ChangeSetType set to CREATE and not UPDATE.
-            stack = resp["Stacks"][0]
-            return stack["StackStatus"] != "REVIEW_IN_PROGRESS"
-
-        except botocore.exceptions.ClientError as e:
-            # If a stack does not exist, describe_stacks will throw an
-            # exception. Unfortunately we don't have a better way than parsing
-            # the exception msg to understand the nature of this exception.
-
-            if "Stack with id {0} does not exist".format(stack_name) in str(e):
-                LOG.debug("Stack with id %s does not exist", stack_name)
-                return False
-        except botocore.exceptions.BotoCoreError as e:
-            # If there are credentials, environment errors,
-            # catch that and throw a deploy failed error.
-
-            LOG.debug("Botocore Exception : %s", str(e))
-            raise deploy_exceptions.DeployFailedError(stack_name=stack_name, msg=str(e))
-
-        except Exception as e:
-            # We don't know anything about this exception. Don't handle
-            LOG.debug("Unable to get stack details.", exc_info=e)
-            raise e
-
     def create_changeset(
-        self, stack_name, cfn_template, parameter_values, capabilities, role_arn, notification_arns, s3_uploader, tags
+        self,
+        stack_name,
+        cfn_template,
+        parameter_values,
+        capabilities,
+        role_arn,
+        notification_arns,
+        s3_uploader,
+        tags,
+        changeset_type,
     ):
         """
         Call Cloudformation to create a changeset and wait for it to complete
@@ -144,16 +113,11 @@ class Deployer:
         :param parameter_values: Template parameters object
         :param capabilities: Array of capabilities passed to CloudFormation
         :param tags: Array of tags passed to CloudFormation
+        :param tags: the type of the changeset
         :return:
         """
-        if not self.has_stack(stack_name):
-            changeset_type = "CREATE"
-            # When creating a new stack, UsePreviousValue=True is invalid.
-            # For such parameters, users should either override with new value,
-            # or set a Default value in template to successfully create a stack.
-            parameter_values = [x for x in parameter_values if not x.get("UsePreviousValue", False)]
-        else:
-            changeset_type = "UPDATE"
+
+        if type == "UPDATE":
             # UsePreviousValue not valid if parameter is new
             summary = self._client.get_template_summary(StackName=stack_name)
             existing_parameters = [parameter["ParameterKey"] for parameter in summary["Parameters"]]
@@ -162,6 +126,11 @@ class Deployer:
                 for x in parameter_values
                 if not (x.get("UsePreviousValue", False) and x["ParameterKey"] not in existing_parameters)
             ]
+        else:
+            # When creating a new stack, UsePreviousValue=True is invalid.
+            # For such parameters, users should either override with new value,
+            # or set a Default value in template to successfully create a stack.
+            parameter_values = [x for x in parameter_values if not x.get("UsePreviousValue", False)]
 
         # Each changeset will get a unique name based on time.
         # Description is also setup based on current date and that SAM CLI is used.
@@ -183,11 +152,12 @@ class Deployer:
                 temporary_file.write(kwargs.pop("TemplateBody"))
                 temporary_file.flush()
 
+                # add random suffix to file_name to enable multiple tests run in the same time
+                template_file_name = "template" + generate_suffix()
+
                 # TemplateUrl property requires S3 URL to be in path-style format
-                parts = parse_s3_url(
-                    s3_uploader.upload_with_dedup(temporary_file.name, "template"), version_property="Version"
-                )
-                kwargs["TemplateURL"] = s3_uploader.to_path_style_s3_url(parts["Key"], parts.get("Version", None))
+                s3_uploader.upload_file(template_file_name, temporary_file.name)
+                kwargs["TemplateURL"] = s3_uploader.get_s3_uri(template_file_name)
 
         # don't set these arguments if not specified to use existing values
         if role_arn is not None:
@@ -447,15 +417,32 @@ class Deployer:
                 raise deploy_exceptions.DeployFailedError(stack_name=stack_name, msg=str(ex))
 
     def create_and_wait_for_changeset(
-        self, stack_name, cfn_template, parameter_values, capabilities, role_arn, notification_arns, s3_uploader, tags
+        self,
+        stack_name,
+        cfn_template,
+        parameter_values,
+        capabilities,
+        role_arn,
+        notification_arns,
+        s3_uploader,
+        tags,
+        changeset_type,
     ):
         try:
             result, changeset_type = self.create_changeset(
-                stack_name, cfn_template, parameter_values, capabilities, role_arn, notification_arns, s3_uploader, tags
+                stack_name,
+                cfn_template,
+                parameter_values,
+                capabilities,
+                role_arn,
+                notification_arns,
+                s3_uploader,
+                tags,
+                changeset_type,
             )
             self.wait_for_changeset(result["Id"], stack_name)
             self.describe_changeset(result["Id"], stack_name)
-            return result, changeset_type
+            return result
         except botocore.exceptions.ClientError as ex:
             raise deploy_exceptions.DeployFailedError(stack_name=stack_name, msg=str(ex))
 

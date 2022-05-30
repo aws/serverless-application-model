@@ -1,15 +1,18 @@
-import json
 import logging
 import os
+import requests
+import shutil
 
 import botocore
 import pytest
-import requests
 
+from integration.config.logger_configurations import LoggingConfiguration
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
+from integration.helpers.request_utils import RequestUtils
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
+from integration.helpers.s3_uploader import S3Uploader
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
 from samtranslator.yaml_helper import yaml_parse
 
@@ -27,6 +30,10 @@ from integration.helpers.template import transform_template
 from integration.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
+
+REQUEST_LOGGER = logging.getLogger(f"{__name__}.requests")
+LoggingConfiguration.configure_request_logger(REQUEST_LOGGER)
+
 STACK_NAME_PREFIX = "sam-integ-stack-"
 S3_BUCKET_PREFIX = "sam-integ-bucket-"
 
@@ -36,14 +43,18 @@ class BaseTest(TestCase):
     def prefix(self, get_prefix):
         self.pipeline_prefix = get_prefix
 
+    @pytest.fixture(autouse=True)
+    def stage(self, get_stage):
+        self.pipeline_stage = get_stage
+
     @classmethod
-    @pytest.mark.usefixtures("get_prefix")
+    @pytest.mark.usefixtures("get_prefix", "get_stage", "check_internal", "parameter_values")
     def setUpClass(cls):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
         cls.resources_dir = Path(cls.tests_integ_dir, "resources")
         cls.template_dir = Path(cls.resources_dir, "templates")
-        cls.output_dir = Path(cls.tests_integ_dir, "tmp")
+        cls.output_dir = Path(cls.tests_integ_dir, "tmp" + "-" + generate_suffix())
         cls.expected_dir = Path(cls.resources_dir, "expected")
         cls.code_dir = Path(cls.resources_dir, "code")
         cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
@@ -61,6 +72,7 @@ class BaseTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls._clean_bucket()
+        shutil.rmtree(cls.output_dir)
 
     @classmethod
     def _clean_bucket(cls):
@@ -126,15 +138,17 @@ class BaseTest(TestCase):
 
     def setUp(self):
         self.deployer = Deployer(self.client_provider.cfn_client)
+        self.s3_uploader = S3Uploader(self.client_provider.s3_client, self.s3_bucket_name)
 
     def tearDown(self):
-        self.client_provider.cfn_client.delete_stack(StackName=self.stack_name)
-        if os.path.exists(self.output_file_path):
+        if self.stack_name:
+            self.client_provider.cfn_client.delete_stack(StackName=self.stack_name)
+        if self.output_file_path and os.path.exists(self.output_file_path):
             os.remove(self.output_file_path)
-        if os.path.exists(self.sub_input_file_path):
+        if self.sub_input_file_path and os.path.exists(self.sub_input_file_path):
             os.remove(self.sub_input_file_path)
 
-    def create_stack(self, file_path, parameters=None):
+    def create_stack(self, file_path, parameters=None, s3_uploader=None):
         """
         Creates the Cloud Formation stack and verifies it against the expected
         result
@@ -145,6 +159,8 @@ class BaseTest(TestCase):
             Template file name, format "folder_name/file_name"
         parameters : list
             List of parameters
+        s3_uploader: S3Uploader object
+            Object for uploading files to s3
         """
         folder, file_name = file_path.split("/")
         self.generate_out_put_file_path(folder, file_name)
@@ -154,9 +170,9 @@ class BaseTest(TestCase):
 
         self._fill_template(folder, file_name)
         self.transform_template()
-        self.deploy_stack(parameters)
+        self._create_stack(parameters, s3_uploader)
 
-    def create_and_verify_stack(self, file_path, parameters=None):
+    def create_and_verify_stack(self, file_path, parameters=None, s3_uploader=None):
         """
         Creates the Cloud Formation stack and verifies it against the expected
         result
@@ -167,57 +183,61 @@ class BaseTest(TestCase):
             Template file name, format "folder_name/file_name"
         parameters : list
             List of parameters
+        s3_uploader: S3Uploader object
+            Object for uploading files to s3
         """
         folder, file_name = file_path.split("/")
-        self.create_stack(file_path, parameters)
+
+        # If template is too large, calling the method with self.s3_uploader to send the template to s3 then deploy
+        self.create_stack(file_path, parameters, s3_uploader)
         self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
         self.verify_stack()
 
-    def update_stack(self, file_path, parameters=None):
+    def update_stack(self, parameters=None, file_path=None):
         """
         Updates the Cloud Formation stack
 
         Parameters
         ----------
+        parameters : list
+            List of parameters
         file_path : string
             Template file name, format "folder_name/file_name"
-        parameters : list
-            List of parameters
-        """
-        if os.path.exists(self.output_file_path):
-            os.remove(self.output_file_path)
-        if os.path.exists(self.sub_input_file_path):
-            os.remove(self.sub_input_file_path)
-
-        folder, file_name = file_path.split("/")
-        self.generate_out_put_file_path(folder, file_name)
-
-        self._fill_template(folder, file_name)
-        self.transform_template()
-        self.deploy_stack(parameters)
-
-    def update_and_verify_stack(self, file_path, parameters=None):
-        """
-        Updates the Cloud Formation stack and verifies it against the expected
-        result
-
-        Parameters
-        ----------
-        file_name : string
-            Template file name
-        parameters : list
-            List of parameters
         """
         if not self.stack_name:
             raise Exception("Stack not created.")
 
+        if file_path:
+            if os.path.exists(self.output_file_path):
+                os.remove(self.output_file_path)
+            if os.path.exists(self.sub_input_file_path):
+                os.remove(self.sub_input_file_path)
+
+            folder, file_name = file_path.split("/")
+            self.generate_out_put_file_path(folder, file_name)
+
+            self._fill_template(folder, file_name)
+
+        self.transform_template()
+        self._update_stack(parameters)
+
+    def update_and_verify_stack(self, parameters=None, file_path=None):
+        """
+        Updates the Cloud Formation stack with new template and verifies it against the expected
+        result
+
+        Parameters
+        ----------
+        parameters : list
+            List of parameters
+        file_path : string
+            Template file name, format "folder_name/file_name"
+        """
+        self.update_stack(file_path=file_path, parameters=parameters)
+
         folder, file_name = file_path.split("/")
         self.generate_out_put_file_path(folder, file_name)
         self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
-
-        self._fill_template(folder, file_name)
-        self.transform_template()
-        self.deploy_stack(parameters)
         self.verify_stack(end_state="UPDATE_COMPLETE")
 
     def generate_out_put_file_path(self, folder_name, file_name):
@@ -228,7 +248,22 @@ class BaseTest(TestCase):
         )
 
     def transform_template(self):
-        transform_template(self.sub_input_file_path, self.output_file_path)
+        if not self.pipeline_stage:
+            transform_template(self.sub_input_file_path, self.output_file_path)
+        else:
+            transform_name = "AWS::Serverless-2016-10-31"
+            if self.pipeline_stage == "beta":
+                transform_name = "AWS::Serverless-2016-10-31-Beta"
+            elif self.pipeline_stage == "gamma":
+                transform_name = "AWS::Serverless-2016-10-31-Gamma"
+            elif self.pipeline_stage == "test":
+                transform_name = "AWS::Serverless-2016-10-31-test"
+            template = load_yaml(self.sub_input_file_path)
+            template["AWSTemplateFormatVersion"] = "2010-09-09"
+            template["Transform"] = transform_name
+
+            dump_yaml(self.output_file_path, template)
+            print("Wrote transformed CloudFormation template to: " + self.output_file_path)
 
     def get_region(self):
         return self.my_region
@@ -421,20 +456,24 @@ class BaseTest(TestCase):
         yaml_doc = load_yaml(self.sub_input_file_path)
         return yaml_doc["Resources"][resource_name]["Properties"][property_name]
 
-    def deploy_stack(self, parameters=None):
-        """
-        Deploys the current cloud formation stack
-        """
+    def _create_stack(self, parameters=None, s3_uploader=None):
+        self._create_and_execute_changeset_with_type("CREATE", parameters, s3_uploader)
+
+    def _update_stack(self, parameters=None):
+        self._create_and_execute_changeset_with_type("UPDATE", parameters)
+
+    def _create_and_execute_changeset_with_type(self, changeset_type, parameters=None, s3_uploader=None):
         with open(self.output_file_path) as cfn_file:
-            result, changeset_type = self.deployer.create_and_wait_for_changeset(
+            result = self.deployer.create_and_wait_for_changeset(
                 stack_name=self.stack_name,
                 cfn_template=cfn_file.read(),
                 parameter_values=[] if parameters is None else parameters,
                 capabilities=["CAPABILITY_IAM", "CAPABILITY_AUTO_EXPAND"],
                 role_arn=None,
                 notification_arns=[],
-                s3_uploader=None,
+                s3_uploader=s3_uploader,
                 tags=[],
+                changeset_type=changeset_type,
             )
             self.deployer.execute_changeset(result["Id"], self.stack_name)
             self.deployer.wait_for_execute(self.stack_name, changeset_type)
@@ -463,7 +502,7 @@ class BaseTest(TestCase):
         if error:
             self.fail(error)
 
-    def verify_get_request_response(self, url, expected_status_code):
+    def verify_get_request_response(self, url, expected_status_code, headers=None):
         """
         Verify if the get request to a certain url return the expected status code
 
@@ -473,9 +512,10 @@ class BaseTest(TestCase):
             the url for the get request
         expected_status_code : string
             the expected status code
+        headers : dict
+            headers to use in request
         """
-        print("Making request to " + url)
-        response = requests.get(url)
+        response = BaseTest.do_get_request_with_logging(url, headers)
         self.assertEqual(response.status_code, expected_status_code, " must return HTTP " + str(expected_status_code))
         return response
 
@@ -514,3 +554,19 @@ class BaseTest(TestCase):
             "ResolvedValue": resolved_value,
         }
         return parameter
+
+    @staticmethod
+    def do_get_request_with_logging(url, headers=None):
+        """
+        Perform a get request to an APIGW endpoint and log relevant info
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        headers : dict
+            headers to use in request
+        """
+        response = requests.get(url, headers=headers) if headers else requests.get(url)
+        amazon_headers = RequestUtils(response).get_amazon_headers()
+        REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
+        return response

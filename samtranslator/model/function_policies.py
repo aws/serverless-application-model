@@ -1,8 +1,6 @@
 from enum import Enum
 from collections import namedtuple
 
-from six import string_types
-
 from samtranslator.model.intrinsics import (
     is_intrinsic,
     is_intrinsic_if,
@@ -123,7 +121,7 @@ class FunctionPolicies(object):
         # Must handle intrinsic functions. Policy could be a primitive type or an intrinsic function
 
         # Managed policies are of type string
-        if isinstance(policy, string_types):
+        if isinstance(policy, str):
             return PolicyTypes.MANAGED_POLICY
 
         # Handle the special case for 'if' intrinsic function

@@ -1,0 +1,113 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "MyCondition": {
+      "Fn::Equals": [
+        true,
+        true
+      ]
+    }
+  },
+  "Parameters": {},
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Condition": "MyCondition",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "Created by SAM",
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 3,
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "MyFunctionUrl": {
+      "Type": "AWS::Lambda::Url",
+      "Condition": "MyCondition",
+      "Properties": {
+        "TargetFunctionArn": {
+          "Ref": "MyFunction"
+        },
+        "AuthType": "NONE",
+        "Cors": {
+          "AllowOrigins": [
+            "https://example.com",
+            "example1.com",
+            "example2.com",
+            "example2.com"
+          ],
+          "AllowMethods": [
+            "GET"
+          ],
+          "AllowCredentials": true,
+          "AllowHeaders": [
+            "x-Custom-Header"
+          ],
+          "ExposeHeaders": [
+            "x-amzn-header"
+          ],
+          "MaxAge": 10
+        }
+      }
+    },
+    "MyFunctionUrlPublicPermissions": {
+      "Type": "AWS::Lambda::Permission",
+      "Condition": "MyCondition",
+      "Properties": {
+        "Action": "lambda:InvokeFunctionUrl",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "Principal": "*",
+        "FunctionUrlAuthType": "NONE"
+      }
+    },
+    "MyFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Condition": "MyCondition",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,8 +1,6 @@
 import logging
 from collections import namedtuple
 
-from six import string_types
-
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt, make_or_condition
 from samtranslator.model.apigateway import (
@@ -185,6 +183,7 @@ class ApiGenerator(object):
         domain=None,
         description=None,
         mode=None,
+        api_key_source_type=None,
     ):
         """Constructs an API Generator class that generates API Gateway resources
 
@@ -237,6 +236,7 @@ class ApiGenerator(object):
         self.shared_api_usage_plan = shared_api_usage_plan
         self.template_conditions = template_conditions
         self.mode = mode
+        self.api_key_source_type = api_key_source_type
 
     def _construct_rest_api(self):
         """Constructs and returns the ApiGateway RestApi.
@@ -296,6 +296,9 @@ class ApiGenerator(object):
         if self.mode:
             rest_api.Mode = self.mode
 
+        if self.api_key_source_type:
+            rest_api.ApiKeySourceType = self.api_key_source_type
+
         return rest_api
 
     def _add_endpoint_extension(self):
@@ -306,7 +309,7 @@ class ApiGenerator(object):
         https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-api.html#sam-api-definitionbody
         For this reason, we always put DisableExecuteApiEndpoint into openapi object irrespective of origin of DefinitionBody.
         """
-        if self.disable_execute_api_endpoint and not self.definition_body:
+        if self.disable_execute_api_endpoint is not None and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
@@ -381,7 +384,7 @@ class ApiGenerator(object):
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
-        stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
+        stage_name_prefix = self.stage_name if isinstance(self.stage_name, str) else ""
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         else:
@@ -481,7 +484,7 @@ class ApiGenerator(object):
             domain.OwnershipVerificationCertificateArn = self.domain["OwnershipVerificationCertificateArn"]
 
         # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
+        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), str):
             basepaths = [self.domain.get("BasePath")]
         elif self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), list):
             basepaths = self.domain.get("BasePath")
@@ -515,6 +518,12 @@ class ApiGenerator(object):
         record_set_group = None
         if self.domain.get("Route53") is not None:
             route53 = self.domain.get("Route53")
+            if not isinstance(route53, dict):
+                raise InvalidResourceException(
+                    self.logical_id,
+                    "Invalid property type '{}' for Route53. "
+                    "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53).__name__),
+                )
             if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
                 raise InvalidResourceException(
                     self.logical_id,
@@ -608,7 +617,7 @@ class ApiGenerator(object):
                 self.logical_id, "Cors works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
-        if isinstance(self.cors, string_types) or is_intrinsic(self.cors):
+        if isinstance(self.cors, str) or is_intrinsic(self.cors):
             # Just set Origin property. Others will be defaults
             properties = CorsProperties(AllowOrigin=self.cors)
         elif isinstance(self.cors, dict):
@@ -999,6 +1008,10 @@ class ApiGenerator(object):
         ):
             if definition_body.get("securityDefinitions"):
                 components = definition_body.get("components", Py27Dict())
+                # In the previous line, the default value `Py27Dict()` will be only returned only if `components`
+                # property is not in definition_body dict, but if it exist, and its value is None, so None will be
+                # returned and not the default value. That is why the below line is required.
+                components = components if components else Py27Dict()
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
                 del definition_body["securityDefinitions"]
@@ -1125,7 +1138,7 @@ class ApiGenerator(object):
         if not default_authorizer:
             return
 
-        if not isinstance(default_authorizer, string_types):
+        if not isinstance(default_authorizer, str):
             raise InvalidResourceException(
                 self.logical_id,
                 "DefaultAuthorizer is not a string.",

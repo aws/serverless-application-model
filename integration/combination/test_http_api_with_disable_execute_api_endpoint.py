@@ -3,11 +3,11 @@ from unittest.case import skipIf
 from parameterized import parameterized
 
 from integration.helpers.base_test import BaseTest
-from integration.helpers.resource import current_region_does_not_support
+from integration.helpers.resource import current_region_not_included
 from integration.config.service_names import CUSTOM_DOMAIN
 
 
-@skipIf(current_region_does_not_support([CUSTOM_DOMAIN]), "CustomDomain is not supported in this testing region")
+@skipIf(current_region_not_included([CUSTOM_DOMAIN]), "CustomDomain is not supported in this testing region")
 class TestHttpApiWithDisableExecuteApiEndpoint(BaseTest):
     @parameterized.expand(
         [

@@ -1,6 +1,5 @@
 import re
 from collections import namedtuple
-from six import string_types
 
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.intrinsics import ref, fnGetAtt
@@ -25,8 +24,8 @@ CorsProperties = namedtuple(
 )
 CorsProperties.__new__.__defaults__ = (None, None, None, None, None, False)
 
-AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
-AuthProperties.__new__.__defaults__ = (None, None)
+AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer", "EnableIamAuthorizer"])
+AuthProperties.__new__.__defaults__ = (None, None, False)
 DefaultStageName = "$default"
 HttpApiTagName = "httpapi:createdBy"
 
@@ -142,7 +141,7 @@ class HttpApiGenerator(object):
         For this reason, we always put DisableExecuteApiEndpoint into openapi object.
 
         """
-        if self.disable_execute_api_endpoint and not self.definition_body:
+        if self.disable_execute_api_endpoint is not None and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id, "DisableExecuteApiEndpoint works only within 'DefinitionBody' property."
             )
@@ -294,7 +293,7 @@ class HttpApiGenerator(object):
                 )
 
         # Create BasepathMappings
-        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), string_types):
+        if self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), str):
             basepaths = [self.domain.get("BasePath")]
         elif self.domain.get("BasePath") and isinstance(self.domain.get("BasePath"), list):
             basepaths = self.domain.get("BasePath")
@@ -346,7 +345,7 @@ class HttpApiGenerator(object):
                 # search for invalid characters in the path and raise error if there are
                 invalid_regex = r"[^0-9a-zA-Z\/\-\_]+"
 
-                if not isinstance(path, string_types):
+                if not isinstance(path, str):
                     raise InvalidResourceException(self.logical_id, "Basepath must be a string.")
 
                 if re.search(invalid_regex, path) is not None:
@@ -423,7 +422,7 @@ class HttpApiGenerator(object):
             )
         open_api_editor = OpenApiEditor(self.definition_body)
         auth_properties = AuthProperties(**self.auth)
-        authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)
+        authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.EnableIamAuthorizer)
 
         # authorizers is guaranteed to return a value or raise an exception
         open_api_editor.add_authorizers_security_definitions(authorizers)
@@ -495,13 +494,20 @@ class HttpApiGenerator(object):
                 path, default_authorizer, authorizers=authorizers, api_authorizers=api_authorizers
             )
 
-    def _get_authorizers(self, authorizers_config, default_authorizer=None):
+    def _get_authorizers(self, authorizers_config, enable_iam_authorizer=False):
         """
         Returns all authorizers for an API as an ApiGatewayV2Authorizer object
         :param authorizers_config: authorizer configuration from the API Auth section
-        :param default_authorizer: name of the default authorizer
+        :param enable_iam_authorizer: if True add an "AWS_IAM" authorizer
         """
         authorizers = {}
+
+        if enable_iam_authorizer is True:
+            authorizers["AWS_IAM"] = ApiGatewayV2Authorizer(is_aws_iam_authorizer=True)
+
+        # If all the customer wants to do is enable the IAM authorizer the authorizers_config will be None.
+        if not authorizers_config:
+            return authorizers
 
         if not isinstance(authorizers_config, dict):
             raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")
@@ -580,7 +586,7 @@ class HttpApiGenerator(object):
 
         # If StageName is some intrinsic function, then don't prefix the Stage's logical ID
         # This will NOT create duplicates because we allow only ONE stage per API resource
-        stage_name_prefix = self.stage_name if isinstance(self.stage_name, string_types) else ""
+        stage_name_prefix = self.stage_name if isinstance(self.stage_name, str) else ""
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         elif stage_name_prefix == DefaultStageName:

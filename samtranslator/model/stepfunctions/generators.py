@@ -2,8 +2,6 @@ import json
 from uuid import uuid4
 from copy import deepcopy
 
-from six import string_types
-
 import samtranslator.model.eventsources.push
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceTypeResolver

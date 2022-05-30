@@ -2,7 +2,7 @@ from parameterized import parameterized, param
 
 from unittest import TestCase
 from samtranslator.sdk.parameter import SamParameterValues
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 from samtranslator.translator.arn_generator import NoRegionFound
 

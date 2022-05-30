@@ -1,6 +1,4 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
-from six import string_types
-
 import re
 import inspect
 from samtranslator.model.exceptions import InvalidResourceException
@@ -329,7 +327,7 @@ class Resource(object):
         if attr_name in self.runtime_attrs:
             return self.runtime_attrs[attr_name](self)
         else:
-            raise NotImplementedError(attr_name + " attribute is not implemented for resource " + self.resource_type)
+            raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
 
     def get_passthrough_resource_attributes(self):
         """
@@ -449,7 +447,7 @@ class SamResourceMacro(ResourceMacro):
         if reserved_tag_name in tags:
             raise InvalidResourceException(
                 self.logical_id,
-                reserved_tag_name + " is a reserved Tag key name and "
+                f"{reserved_tag_name} is a reserved Tag key name and "
                 "cannot be set on your resource. "
                 "Please change the tag key in the "
                 "input.",
@@ -460,7 +458,7 @@ class SamResourceMacro(ResourceMacro):
             return parameter_value
         value = intrinsics_resolver.resolve_parameter_refs(parameter_value)
 
-        if not isinstance(value, string_types) and not isinstance(value, dict):
+        if not isinstance(value, str) and not isinstance(value, dict):
             raise InvalidResourceException(
                 self.logical_id,
                 "Could not resolve parameter for '{}' or parameter is not a String.".format(parameter_name),
@@ -489,7 +487,7 @@ class ResourceTypeResolver(object):
                 self.resource_types[resource_class.resource_type] = resource_class
 
     def can_resolve(self, resource_dict):
-        if not isinstance(resource_dict, dict) or not isinstance(resource_dict.get("Type"), string_types):
+        if not isinstance(resource_dict, dict) or not isinstance(resource_dict.get("Type"), str):
             return False
 
         return resource_dict["Type"] in self.resource_types

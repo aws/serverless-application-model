@@ -9,6 +9,9 @@ from samtranslator.model.intrinsics import (
     is_intrinsic_if,
     is_intrinsic_no_value,
     validate_intrinsic_if_items,
+    make_combined_condition,
+    ref,
+    fnGetAtt,
 )
 from samtranslator.model.update_policy import UpdatePolicy
 from samtranslator.translator.arn_generator import ArnGenerator
@@ -27,6 +30,7 @@ CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST = [
     "Linear10PercentEvery10Minutes",
     "AllAtOnce",
 ]
+CODE_DEPLOY_CONDITION_NAME = "ServerlessCodeDeployCondition"
 
 
 class DeploymentPreferenceCollection(object):
@@ -41,20 +45,19 @@ class DeploymentPreferenceCollection(object):
 
     def __init__(self):
         """
-        This collection stores an intenral dict of the deployment preferences for each function's
-            deployment preference in the SAM Template.
+        This collection stores an internal dict of the deployment preferences for each function's
+        deployment preference in the SAM Template.
         """
         self._resource_preferences = {}
-        self.codedeploy_application = self._codedeploy_application()
-        self.codedeploy_iam_role = self._codedeploy_iam_role()
 
-    def add(self, logical_id, deployment_preference_dict):
+    def add(self, logical_id, deployment_preference_dict, condition=None):
         """
         Add this deployment preference to the collection
 
         :raise ValueError if an existing logical id already exists in the _resource_preferences
         :param logical_id: logical id of the resource where this deployment preference applies
         :param deployment_preference_dict: the input SAM template deployment preference mapping
+        :param condition: the condition (if it exists) on the serverless function
         """
         if logical_id in self._resource_preferences:
             raise ValueError(
@@ -63,7 +66,9 @@ class DeploymentPreferenceCollection(object):
                 )
             )
 
-        self._resource_preferences[logical_id] = DeploymentPreference.from_dict(logical_id, deployment_preference_dict)
+        self._resource_preferences[logical_id] = DeploymentPreference.from_dict(
+            logical_id, deployment_preference_dict, condition
+        )
 
     def get(self, logical_id):
         """
@@ -85,18 +90,52 @@ class DeploymentPreferenceCollection(object):
         """
         return all(preference.role or not preference.enabled for preference in self._resource_preferences.values())
 
+    def needs_resource_condition(self):
+        """
+        If all preferences have a condition, all code deploy resources need to be conditionally created
+        :return: True, if a condition needs to be created
+        """
+        # If there are any enabled deployment preferences without conditions, return false
+        return self._resource_preferences and not any(
+            not preference.condition and preference.enabled for preference in self._resource_preferences.values()
+        )
+
+    def get_all_deployment_conditions(self):
+        """
+        Returns a list of all conditions associated with the deployment preference resources
+        :return: List of condition names
+        """
+        conditions_set = set([preference.condition for preference in self._resource_preferences.values()])
+        if None in conditions_set:
+            # None can exist if there are disabled deployment preference(s)
+            conditions_set.remove(None)
+        return list(conditions_set)
+
+    def create_aggregate_deployment_condition(self):
+        """
+        Creates an aggregate deployment condition if necessary
+        :return: None if <2 conditions are found, otherwise a dictionary of new conditions to add to template
+        """
+        return make_combined_condition(self.get_all_deployment_conditions(), CODE_DEPLOY_CONDITION_NAME)
+
     def enabled_logical_ids(self):
         """
         :return: only the logical id's for the deployment preferences in this collection which are enabled
         """
         return [logical_id for logical_id, preference in self._resource_preferences.items() if preference.enabled]
 
-    def _codedeploy_application(self):
+    def get_codedeploy_application(self):
         codedeploy_application_resource = CodeDeployApplication(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         codedeploy_application_resource.ComputePlatform = "Lambda"
+        if self.needs_resource_condition():
+            conditions = self.get_all_deployment_conditions()
+            condition_name = CODE_DEPLOY_CONDITION_NAME
+            if len(conditions) <= 1:
+                condition_name = conditions.pop()
+            codedeploy_application_resource.set_resource_attribute("Condition", condition_name)
         return codedeploy_application_resource
 
-    def _codedeploy_iam_role(self):
+    def get_codedeploy_iam_role(self):
         iam_role = IAMRole(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID)
         iam_role.AssumeRolePolicyDocument = {
             "Version": "2012-10-17",
@@ -120,6 +159,12 @@ class DeploymentPreferenceCollection(object):
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSCodeDeployRoleForLambda")
             ]
 
+        if self.needs_resource_condition():
+            conditions = self.get_all_deployment_conditions()
+            condition_name = CODE_DEPLOY_CONDITION_NAME
+            if len(conditions) <= 1:
+                condition_name = conditions.pop()
+            iam_role.set_resource_attribute("Condition", condition_name)
         return iam_role
 
     def deployment_group(self, function_logical_id):
@@ -137,7 +182,7 @@ class DeploymentPreferenceCollection(object):
         except ValueError as e:
             raise InvalidResourceException(function_logical_id, str(e))
 
-        deployment_group.ApplicationName = self.codedeploy_application.get_runtime_attr("name")
+        deployment_group.ApplicationName = ref(CODEDEPLOY_APPLICATION_LOGICAL_ID)
         deployment_group.AutoRollbackConfiguration = {
             "Enabled": True,
             "Events": ["DEPLOYMENT_FAILURE", "DEPLOYMENT_STOP_ON_ALARM", "DEPLOYMENT_STOP_ON_REQUEST"],
@@ -149,12 +194,15 @@ class DeploymentPreferenceCollection(object):
 
         deployment_group.DeploymentStyle = {"DeploymentType": "BLUE_GREEN", "DeploymentOption": "WITH_TRAFFIC_CONTROL"}
 
-        deployment_group.ServiceRoleArn = self.codedeploy_iam_role.get_runtime_attr("arn")
+        deployment_group.ServiceRoleArn = fnGetAtt(CODE_DEPLOY_SERVICE_ROLE_LOGICAL_ID, "Arn")
         if deployment_preference.role:
             deployment_group.ServiceRoleArn = deployment_preference.role
 
         if deployment_preference.trigger_configurations:
             deployment_group.TriggerConfigurations = deployment_preference.trigger_configurations
+
+        if deployment_preference.condition:
+            deployment_group.set_resource_attribute("Condition", deployment_preference.condition)
 
         return deployment_group
 
@@ -240,7 +288,7 @@ class DeploymentPreferenceCollection(object):
         deployment_preference = self.get(function_logical_id)
 
         return UpdatePolicy(
-            self.codedeploy_application.get_runtime_attr("name"),
+            ref(CODEDEPLOY_APPLICATION_LOGICAL_ID),
             self.deployment_group(function_logical_id).get_runtime_attr("name"),
             deployment_preference.pre_traffic_hook,
             deployment_preference.post_traffic_hook,

@@ -1,0 +1,72 @@
+# Tests unsupported intrinsic and invalid type in the PassthroughCondition property
+
+Mappings:
+  HelloWorldMap:
+    hello:
+      key1: true
+      key2: false
+    world:
+      key1: false
+      key2: true
+
+Parameters:
+  FnName:
+    Type: String
+  ProvisionedConcurrency:
+    Type: String
+    Default: 10
+  EnableAliasProvisionedConcurrency:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: true
+  DefaultTrueParam:
+    Type: String
+    Default: "true"
+  DefaultFalseParam:
+    Type: String
+    Default: "false"
+  HelloWorldParam:
+    Type: String
+    Default: "hello"
+
+Conditions:
+  AliasProvisionedConcurrencyEnabled: !Equals [!Ref EnableAliasProvisionedConcurrency, true]
+  FunctionCondition: !Equals [true, true]
+
+Resources:
+  InvalidType:
+    Type: 'AWS::Serverless::Function'
+    Condition: FunctionCondition
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: Linear10PercentEvery3Minutes
+        PassthroughCondition: ["hello"]
+      ProvisionedConcurrencyConfig: !If
+        - AliasProvisionedConcurrencyEnabled
+        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+        - !Ref 'AWS::NoValue'
+
+  UnsupportedIntrinsic:
+    Type: 'AWS::Serverless::Function'
+    Condition: FunctionCondition
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: Linear10PercentEvery3Minutes
+        PassthroughCondition: !If
+          - AliasProvisionedConcurrencyEnabled
+          - true
+          - false 
+      ProvisionedConcurrencyConfig: !If
+        - AliasProvisionedConcurrencyEnabled
+        - ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+        - !Ref 'AWS::NoValue'

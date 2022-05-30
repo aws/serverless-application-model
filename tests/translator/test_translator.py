@@ -22,7 +22,7 @@ import pytest
 import yaml
 from unittest import TestCase
 from samtranslator.translator.transform import transform
-from mock import Mock, MagicMock, patch
+from unittest.mock import Mock, MagicMock, patch
 
 BASE_PATH = os.path.dirname(__file__)
 INPUT_FOLDER = BASE_PATH + "/input"
@@ -254,6 +254,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
     @parameterized.expand(
         itertools.product(
             [
+                "congito_userpool_with_sms_configuration",
                 "cognito_userpool_with_event",
                 "s3_with_condition",
                 "function_with_condition",
@@ -354,6 +355,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "intrinsic_functions",
                 "basic_function_with_tags",
                 "depends_on",
+                "function_with_ephemeral_storage",
                 "function_event_conditions",
                 "function_with_dlq",
                 "function_with_kmskeyarn",
@@ -364,14 +366,20 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_disabled_deployment_preference",
                 "function_with_disabled_traffic_hook",
                 "function_with_deployment_preference",
+                "function_with_deployment_preference_condition_with_passthrough",
+                "function_with_deployment_preference_condition_without_passthrough",
                 "function_with_deployment_preference_all_parameters",
                 "function_with_deployment_preference_from_parameters",
                 "function_with_deployment_preference_multiple_combinations",
                 "function_with_deployment_preference_alarms_intrinsic_if",
+                "function_with_deployment_preference_multiple_combinations_conditions_with_passthrough",
+                "function_with_deployment_preference_multiple_combinations_conditions_without_passthrough",
+                "function_with_deployment_preference_passthrough_condition_with_supported_intrinsics",
                 "function_with_alias_and_event_sources",
                 "function_with_resource_refs",
                 "function_with_deployment_and_custom_role",
-                "function_with_deployment_no_service_role",
+                "function_with_deployment_no_service_role_with_passthrough",
+                "function_with_deployment_no_service_role_without_passthrough",
                 "function_with_global_layers",
                 "function_with_layers",
                 "function_with_many_layers",
@@ -406,6 +414,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_auth_and_conditions_all_max",
                 "api_with_apikey_default_override",
                 "api_with_apikey_required",
+                "api_with_apikey_source",
                 "api_with_path_parameters",
                 "function_with_event_source_mapping",
                 "function_with_event_dest",
@@ -457,6 +466,24 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_auth_mechanism_for_self_managed_kafka",
                 "function_with_vpc_permission_for_self_managed_kafka",
                 "function_with_event_filtering",
+                "api_with_security_definition_and_components",
+                "api_with_security_definition_and_none_components",
+                "api_with_security_definition_and_no_components",
+                "api_http_paths_with_if_condition",
+                "api_http_paths_with_if_condition_no_value_then_case",
+                "api_http_paths_with_if_condition_no_value_else_case",
+                "api_rest_paths_with_if_condition_swagger",
+                "api_rest_paths_with_if_condition_swagger_no_value_then_case",
+                "api_rest_paths_with_if_condition_swagger_no_value_else_case",
+                "api_rest_paths_with_if_condition_openapi",
+                "api_rest_paths_with_if_condition_openapi_no_value_then_case",
+                "api_rest_paths_with_if_condition_openapi_no_value_else_case",
+                "function_with_function_url_config",
+                "function_with_function_url_config_conditions",
+                "function_with_function_url_config_with_intrinsics",
+                "function_with_function_url_config_with_iam_authorization_type",
+                "function_with_function_url_config_without_cors_config",
+                "function_with_function_url_config_and_autopublishalias",
             ],
             [
                 ("aws", "ap-southeast-1"),
@@ -511,10 +538,15 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "http_api_explicit_stage",
                 "http_api_def_uri",
                 "explicit_http_api",
+                "http_api_custom_iam_auth",
                 "http_api_with_cors",
                 "http_api_description",
+                "http_api_global_iam_auth_enabled_with_existing_conflicting_authorizer",
+                "http_api_global_iam_auth_enabled",
                 "http_api_lambda_auth",
                 "http_api_lambda_auth_full",
+                "http_api_local_iam_auth_enabled_with_existing_conflicting_authorizer",
+                "http_api_local_iam_auth_enabled",
                 "http_api_multiple_authorizers",
             ],
             [
@@ -923,6 +955,37 @@ class TestTemplateValidation(TestCase):
             sam_parser = Parser()
             translator = Translator({}, sam_parser)
             translator.translate(template, {})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_validate_translated_no_metadata(self):
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_no_metadata.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {})
+        self.assertEqual(expected, actual)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_validate_translated_metadata(self):
+        self.maxDiff = None
+        with open(os.path.join(INPUT_FOLDER, "translate_convert_metadata.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_convert_metadata.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {}, passthrough_metadata=True)
+        self.assertEqual(expected, actual)
 
 
 class TestPluginsUsage(TestCase):

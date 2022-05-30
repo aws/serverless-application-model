@@ -121,7 +121,7 @@ class TestValidatorTranslatorTemplates(TestValidatorBase):
             "function_with_alias_and_event_sources",
             "function_with_alias_intrinsics",
             "function_with_deployment_and_custom_role",
-            "function_with_deployment_no_service_role",
+            "function_with_deployment_no_service_role_with_passthrough",
             "function_with_deployment_preference",
             "function_with_deployment_preference_all_parameters",
             "function_with_deployment_preference_from_parameters",

@@ -24,6 +24,7 @@ class ApiGatewayRestApi(Resource):
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),
         "Mode": PropertyType(False, is_str()),
+        "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
@@ -247,13 +248,13 @@ class ApiGatewayAuthorizer(object):
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(
                 api_logical_id,
-                name + " Authorizer has invalid " "'FunctionPayloadType': " + function_payload_type + ".",
+                f"{name} Authorizer has invalid 'FunctionPayloadType': {function_payload_type}.",
             )
 
         if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):
             raise InvalidResourceException(
                 api_logical_id,
-                name + " Authorizer must specify Identity with at least one "
+                f"{name} Authorizer must specify Identity with at least one "
                 "of Headers, QueryStrings, StageVariables, or Context.",
             )
 
@@ -285,7 +286,7 @@ class ApiGatewayAuthorizer(object):
         try:
             ttl_int = int(ttl)
         # this will catch if ttl is None and not convertable to an int
-        except TypeError:
+        except (TypeError, ValueError):
             # previous behavior before trying to read ttl
             return required_properties_missing
 
@@ -405,6 +406,13 @@ class ApiGatewayAuthorizer(object):
         return "LAMBDA"
 
     def _get_identity_header(self):
+        if self.identity and not isinstance(self.identity, dict):
+            raise InvalidResourceException(
+                self.api_logical_id,
+                "Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity, "
+                "LambdaRequestAuthorizationIdentity or CognitoAuthorizationIdentity).",
+            )
+
         if not self.identity or not self.identity.get("Header"):
             return "Authorization"
 

@@ -24,6 +24,8 @@ Globals:
     ReservedConcurrentExecutions: 50
     Architectures:
       - x86_64
+    EphemeralStorage: 
+      Size: 1024
 
 Resources:
   MinimalFunction:

@@ -9,6 +9,8 @@ regions:
     - GatewayResponses
     - HttpApi
     - ARM
+    - MSK
+    - MQ
   ap-east-1:
     - Cognito
     - IoT
@@ -26,8 +28,35 @@ regions:
     - CodeDeploy
     - HttpApi
     - ARM
+    - MSK
+    - MQ
+    - EFS
+    - StateMachineCweCws
+    - CodeSign
   ap-south-1:
     - HttpApi
+  ap-southeast-3:
+    - ServerlessRepo
+    - CodeDeploy
+    - Cognito
+    - GatewayResponses
+    - Layers
+    - IoT
+    - XRay
+    - SQS
+    - HttpApi
+    - UsagePlans
+    - MSK
+    - MQ
+    - Kinesis
+    - DynamoDB
+    - CodeSign
+    - EFS
+    - CweCwsDlq
+    - StateMachineInlineDefinition
+    - StateMachineCweCws
+    - StateMachineWithApis
+    - LambdaEnvVars
   ap-southeast-1:
     - HttpApi
   ca-central-1:
@@ -60,6 +89,11 @@ regions:
     - GatewayResponses
     - HttpApi
     - ARM
+    - MSK
+    - MQ
+    - CodeSign
+    - CweCwsDlq
+    - Mode
   eu-north-1:
     - ServerlessRepo
     - Cognito
@@ -77,6 +111,8 @@ regions:
     - GatewayResponses
     - HttpApi
     - ARM
+    - MSK
+    - MQ
   eu-west-2:
     - HttpApi
   eu-west-3:
@@ -98,7 +134,98 @@ regions:
     - ARM
   us-east-2:
     - HttpApi
+  us-gov-east-1:
+    - ServerlessRepo
+    - Cognito
+    - XRay
+    - IoT
+    - GatewayResponses
+    - CodeDeploy
+    - HttpApi
+    - MSK
+    - MQ
+    - Kinesis
+    - DynamoDB
+    - CodeSign
+    - CweCwsDlq
+    - Mode
+  us-gov-west-1:
+    - ServerlessRepo
+    - Cognito
+    - XRay
+    - IoT
+    - GatewayResponses
+    - HttpApi
+    - MSK
+    - MQ
+    - Kinesis
+    - DynamoDB
+    - CodeSign
+    - CweCwsDlq
+    - Mode
+  us-iso-east-1:
+    - ServerlessRepo
+    - CodeDeploy
+    - Cognito
+    - GatewayResponses
+    - Layers
+    - IoT
+    - XRay
+    - SQS
+    - HttpApi
+    - UsagePlans
+    - MSK
+    - MQ
+    - Kinesis
+    - DynamoDB
+    - CodeSign
+    - EFS
+    - CweCwsDlq
+    - StateMachineInlineDefinition
+    - StateMachineCweCws
+    - StateMachineWithApis
+    - LambdaEnvVars
+  us-iso-west-1:
+    - ServerlessRepo
+    - CodeDeploy
+    - Cognito
+    - GatewayResponses
+    - Layers
+    - IoT
+    - XRay
+    - SQS
+    - HttpApi
+    - UsagePlans
+    - MSK
+    - MQ
+    - Kinesis
+    - DynamoDB
+    - CodeSign
+    - EFS
+    - CweCwsDlq
+    - StateMachineInlineDefinition
+    - StateMachineCweCws
+    - StateMachineWithApis
+    - LambdaEnvVars
+  us-isob-east-1:
+    - ServerlessRepo
+    - Cognito
+    - CodeDeploy
+    - XRay
+    - GatewayResponses
+    - Layers
+    - IoT
+    - SQS
+    - HttpApi
+    - UsagePlans
+    - MSK
+    - MQ
+    - Kinesis
+    - DynamoDB
+    - CodeSign
+    - EFS
+    - CweCwsDlq
+    - StateMachineInlineDefinition
   us-west-1:
     - Cognito
     - IoT
-    - ARM

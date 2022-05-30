@@ -125,7 +125,9 @@ class Metrics:
     def __del__(self):
         if len(self.metrics_cache) > 0:
             # attempting to publish if user forgot to call publish in code
-            LOG.warn("There are unpublished metrics. Please make sure you call publish after you record all metrics.")
+            LOG.warning(
+                "There are unpublished metrics. Please make sure you call publish after you record all metrics."
+            )
             self.publish()
 
     def _record_metric(self, name, value, unit, dimensions=None):
