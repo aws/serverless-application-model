@@ -412,7 +412,7 @@ class ApiGenerator(object):
 
         return stage
 
-    def _construct_api_domain(self, rest_api):
+    def _construct_api_domain(self, rest_api, route53_record_set_groups):
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
@@ -529,17 +529,24 @@ class ApiGenerator(object):
                     self.logical_id,
                     "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
                 )
-            logical_id = logical_id_generator.LogicalIdGenerator(
-                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
-            ).gen()
-            record_set_group = Route53RecordSetGroup(
-                "RecordSetGroup" + logical_id, attributes=self.passthrough_resource_attributes
+            logical_id = (
+                "RecordSetGroup"
+                + logical_id_generator.LogicalIdGenerator(
+                    "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
+                ).gen()
             )
-            if "HostedZoneId" in route53:
-                record_set_group.HostedZoneId = route53.get("HostedZoneId")
-            if "HostedZoneName" in route53:
-                record_set_group.HostedZoneName = route53.get("HostedZoneName")
-            record_set_group.RecordSets = self._construct_record_sets_for_domain(self.domain)
+
+            record_set_group = route53_record_set_groups.get(logical_id)
+            if not record_set_group:
+                record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
+                if "HostedZoneId" in route53:
+                    record_set_group.HostedZoneId = route53.get("HostedZoneId")
+                if "HostedZoneName" in route53:
+                    record_set_group.HostedZoneName = route53.get("HostedZoneName")
+                record_set_group.RecordSets = []
+                route53_record_set_groups[logical_id] = record_set_group
+
+            record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain)
 
         return domain, basepath_resource_list, record_set_group
 
@@ -580,14 +587,14 @@ class ApiGenerator(object):
         return alias_target
 
     @cw_timer(prefix="Generator", name="Api")
-    def to_cloudformation(self, redeploy_restapi_parameters):
+    def to_cloudformation(self, redeploy_restapi_parameters, route53_record_set_groups):
         """Generates CloudFormation resources from a SAM API resource
 
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
         rest_api = self._construct_rest_api()
-        domain, basepath_mapping, route53 = self._construct_api_domain(rest_api)
+        domain, basepath_mapping, route53 = self._construct_api_domain(rest_api, route53_record_set_groups)
         deployment = self._construct_deployment(rest_api)
 
         swagger = None

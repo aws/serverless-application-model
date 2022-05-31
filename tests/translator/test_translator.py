@@ -525,6 +525,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_basic_custom_domain_intrinsics",
                 "api_with_custom_domain_route53",
                 "api_with_custom_domain_route53_hosted_zone_name",
+                "api_with_custom_domain_route53_multiple",
                 "api_with_basic_custom_domain_http",
                 "api_with_basic_custom_domain_intrinsics_http",
                 "api_with_custom_domain_route53_http",

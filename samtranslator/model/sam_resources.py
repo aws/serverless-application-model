@@ -1106,6 +1106,7 @@ class SamApi(SamResourceMacro):
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
         shared_api_usage_plan = kwargs.get("shared_api_usage_plan")
         template_conditions = kwargs.get("conditions")
+        route53_record_set_groups = kwargs.get("route53_record_set_groups", {})
 
         api_generator = ApiGenerator(
             self.logical_id,
@@ -1150,7 +1151,7 @@ class SamApi(SamResourceMacro):
             basepath_mapping,
             route53,
             usage_plan_resources,
-        ) = api_generator.to_cloudformation(redeploy_restapi_parameters)
+        ) = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
