@@ -484,6 +484,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "function_with_function_url_config_with_iam_authorization_type",
                 "function_with_function_url_config_without_cors_config",
                 "function_with_function_url_config_and_autopublishalias",
+                "definition_body_intrinsics_support",
             ],
             [
                 ("aws", "ap-southeast-1"),

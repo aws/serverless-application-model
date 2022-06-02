@@ -4,6 +4,8 @@ Description: >
   DefinitionBody currently only supports intrinsics when SwaggerEditor/OpenApiEditor is not used (as of 2022-05-30).
   Let's add tests to make sure we keep this support, because we've had a regression where we accidentally
   removed this intrinsics support by using the SwaggerEditor.
+  Note that the only supported intrinsic function for DefinitionBody is Fn::If. Other intrinsics are not supported
+  because they don't resolve to dictionary. 
 
 Conditions:
   FalseCondition:
@@ -77,25 +79,3 @@ Resources:
                       type: aws_proxy
                       uri: https://www.otheruri.co/
                       payloadFormatVersion: '1.0'
-
-  # Rest Api with DefinitionBody under Transform with AWS::Include, SwaggerEditor not used
-  RestApiAwsIncludeNoSwaggerEditor:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: prod
-      DefinitionBody:
-        'Fn::Transform':
-          Name: AWS::Include
-          Parameters:
-            Location: s3://bucket/swagger.yaml
-
-  # HttpApi with DefinitionBody under Transform with AWS::Include, OpenApiEditor not used
-  HttpApiAwsIncludeAndNoOpenApiEditor:
-    Type: AWS::Serverless::HttpApi
-    Properties:
-      StageName: prod
-      DefinitionBody:
-        'Fn::Transform':
-          Name: AWS::Include
-          Parameters:
-            Location: s3://bucket/openapi.yaml
