@@ -559,7 +559,10 @@ class FindInMapAction(Action):
             not isinstance(parameters, dict)
             or not parameters.get(map_name)
             or not isinstance(parameters.get(map_name), dict)
-            or not parameters.get(map_name, {}).get(top_level_key)
+        ):
+            return input_dict
+        if (
+            not parameters.get(map_name, {}).get(top_level_key)
             or not isinstance(parameters.get(map_name, {}).get(top_level_key), dict)
             or not parameters.get(map_name, {}).get(top_level_key, {}).get(second_level_key)
         ):
