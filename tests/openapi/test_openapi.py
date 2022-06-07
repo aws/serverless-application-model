@@ -210,7 +210,7 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
         self.editor = OpenApiEditor(self.original_openapi)
 
     def test_must_override_null_path(self):
-        path = "/newpath"
+        path = "/nullmethod"
         method = "get"
         integration_uri = "something"
         expected = {
