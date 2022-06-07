@@ -1,5 +1,7 @@
 ﻿""" SAM macro definitions """
 import copy
+from typing import Union
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -139,6 +141,7 @@ class SamFunction(SamResourceMacro):
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         mappings_resolver = kwargs.get("mappings_resolver", None)
         conditions = kwargs.get("conditions", {})
+        feature_toggle = kwargs.get("feature_toggle")
 
         if self.DeadLetterQueue:
             self._validate_dlq()
@@ -175,7 +178,7 @@ class SamFunction(SamResourceMacro):
         if self.FunctionUrlConfig:
             lambda_url = self._construct_function_url(lambda_function, lambda_alias)
             resources.append(lambda_url)
-            url_permission = self._construct_url_permission(lambda_function)
+            url_permission = self._construct_url_permission(lambda_function, lambda_alias)
             if url_permission:
                 resources.append(url_permission)
 
@@ -185,6 +188,8 @@ class SamFunction(SamResourceMacro):
                 lambda_alias,
                 intrinsics_resolver,
                 mappings_resolver,
+                self.get_passthrough_resource_attributes(),
+                feature_toggle,
             )
         event_invoke_policies = []
         if self.EventInvokeConfig:
@@ -827,10 +832,16 @@ class SamFunction(SamResourceMacro):
         return alias
 
     def _validate_deployment_preference_and_add_update_policy(
-        self, deployment_preference_collection, lambda_alias, intrinsics_resolver, mappings_resolver
+        self,
+        deployment_preference_collection,
+        lambda_alias,
+        intrinsics_resolver,
+        mappings_resolver,
+        passthrough_resource_attributes,
+        feature_toggle=None,
     ):
         if "Enabled" in self.DeploymentPreference:
-            # resolve intrinsics and mappings for Type
+            # resolve intrinsics and mappings for Enabled
             enabled = self.DeploymentPreference["Enabled"]
             enabled = intrinsics_resolver.resolve_parameter_refs(enabled)
             enabled = mappings_resolver.resolve_parameter_refs(enabled)
@@ -843,10 +854,28 @@ class SamFunction(SamResourceMacro):
             preference_type = mappings_resolver.resolve_parameter_refs(preference_type)
             self.DeploymentPreference["Type"] = preference_type
 
+        if "PassthroughCondition" in self.DeploymentPreference:
+            self.DeploymentPreference["PassthroughCondition"] = self._resolve_property_to_boolean(
+                self.DeploymentPreference["PassthroughCondition"],
+                "PassthroughCondition",
+                intrinsics_resolver,
+                mappings_resolver,
+            )
+        elif feature_toggle:
+            self.DeploymentPreference["PassthroughCondition"] = feature_toggle.is_enabled(
+                "deployment_preference_condition_fix"
+            )
+        else:
+            self.DeploymentPreference["PassthroughCondition"] = False
+
         if deployment_preference_collection is None:
             raise ValueError("deployment_preference_collection required for parsing the deployment preference")
 
-        deployment_preference_collection.add(self.logical_id, self.DeploymentPreference)
+        deployment_preference_collection.add(
+            self.logical_id,
+            self.DeploymentPreference,
+            passthrough_resource_attributes.get("Condition"),
+        )
 
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
@@ -859,6 +888,40 @@ class SamFunction(SamResourceMacro):
             lambda_alias.set_resource_attribute(
                 "UpdatePolicy", deployment_preference_collection.update_policy(self.logical_id).to_dict()
             )
+
+    def _resolve_property_to_boolean(
+        self,
+        property_value: Union[bool, str, dict],
+        property_name: str,
+        intrinsics_resolver: IntrinsicsResolver,
+        mappings_resolver: IntrinsicsResolver,
+    ) -> bool:
+        """
+        Resolves intrinsics, if any, and/or converts string in a given property to boolean.
+        Raises InvalidResourceException if can't resolve intrinsic or can't resolve string to boolean
+
+        :param property_value: property value to resolve
+        :param property_name: name/key of property to resolve
+        :param intrinsics_resolver: resolves intrinsics
+        :param mappings_resolver: resolves FindInMap
+        :return bool: resolved boolean value
+        """
+        processed_property_value = intrinsics_resolver.resolve_parameter_refs(property_value)
+        processed_property_value = mappings_resolver.resolve_parameter_refs(processed_property_value)
+
+        # FIXME: We should support not only true/false, but also yes/no, on/off? See https://yaml.org/type/bool.html
+        if processed_property_value in [True, "true", "True"]:
+            return True
+        elif processed_property_value in [False, "false", "False"]:
+            return False
+        elif is_intrinsic(processed_property_value):  # couldn't resolve intrinsic
+            raise InvalidResourceException(
+                self.logical_id,
+                f"Unsupported intrinsic: the only intrinsic functions supported for "
+                f"property {property_name} are FindInMap and parameter Refs.",
+            )
+        else:
+            raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
 
     def _construct_function_url(self, lambda_function, lambda_alias):
         """
@@ -879,7 +942,8 @@ class SamFunction(SamResourceMacro):
         self._validate_function_url_params(lambda_function)
 
         logical_id = f"{lambda_function.logical_id}Url"
-        lambda_url = LambdaUrl(logical_id=logical_id)
+        lambda_url_attributes = self.get_passthrough_resource_attributes()
+        lambda_url = LambdaUrl(logical_id=logical_id, attributes=lambda_url_attributes)
 
         cors = self.FunctionUrlConfig.get("Cors")
         if cors:
@@ -942,7 +1006,7 @@ class SamFunction(SamResourceMacro):
                     "{} must be of type {}.".format(prop_name, str(prop_type).split("'")[1]),
                 )
 
-    def _construct_url_permission(self, lambda_function):
+    def _construct_url_permission(self, lambda_function, lambda_alias):
         """
         Construct the lambda permission associated with the function url resource in a case
         for public access when AuthType is NONE
@@ -951,6 +1015,9 @@ class SamFunction(SamResourceMacro):
         ----------
         lambda_function : LambdaUrl
             Lambda Function resource
+
+        llambda_alias : LambdaAlias
+            Lambda Alias resource
 
         Returns
         -------
@@ -963,9 +1030,12 @@ class SamFunction(SamResourceMacro):
             return None
 
         logical_id = f"{lambda_function.logical_id}UrlPublicPermissions"
-        lambda_permission = LambdaPermission(logical_id=logical_id)
+        lambda_permission_attributes = self.get_passthrough_resource_attributes()
+        lambda_permission = LambdaPermission(logical_id=logical_id, attributes=lambda_permission_attributes)
         lambda_permission.Action = "lambda:InvokeFunctionUrl"
-        lambda_permission.FunctionName = lambda_function.get_runtime_attr("name")
+        lambda_permission.FunctionName = (
+            lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
+        )
         lambda_permission.Principal = "*"
         lambda_permission.FunctionUrlAuthType = auth_type
         return lambda_permission
@@ -1006,6 +1076,7 @@ class SamApi(SamResourceMacro):
         "Description": PropertyType(False, is_str()),
         "Mode": PropertyType(False, is_str()),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
+        "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -1067,6 +1138,7 @@ class SamApi(SamResourceMacro):
             domain=self.Domain,
             description=self.Description,
             mode=self.Mode,
+            api_key_source_type=self.ApiKeySourceType,
         )
 
         (

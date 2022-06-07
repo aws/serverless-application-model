@@ -16,6 +16,7 @@ from samtranslator.model.exceptions import (
     InvalidResourceException,
     DuplicateLogicalIdException,
     InvalidEventException,
+    InvalidTemplateException,
 )
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
@@ -23,7 +24,7 @@ from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
 from samtranslator.plugins import LifeCycleEvents
-from samtranslator.plugins import SamPlugins
+from samtranslator.plugins.sam_plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
@@ -61,24 +62,25 @@ class Translator:
         :return: a dictionary containing api_logical_id as the key and concatenated String of all function_names
                  associated with this api as the value
         """
-        if resource_dict.get("Type") and resource_dict.get("Type").strip() == "AWS::Serverless::Function":
-            if resource_dict.get("Properties") and resource_dict.get("Properties").get("Events"):
-                events = list(resource_dict.get("Properties").get("Events").values())
-                for item in events:
-                    # If the function event type is `Api` then gets the function name and
-                    # adds to the function_names dict with key as the api_name and value as the function_name
-                    if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
-                        rest_api = item.get("Properties").get("RestApiId")
-                        api_name = Api.get_rest_api_id_string(rest_api)
-                        if isinstance(api_name, str):
-                            resource_dict_copy = copy.deepcopy(resource_dict)
-                            function_name = intrinsics_resolver.resolve_parameter_refs(
-                                resource_dict_copy.get("Properties").get("FunctionName")
+        if resource_dict.get("Type", "").strip() == "AWS::Serverless::Function":
+            events_properties = resource_dict.get("Properties", {}).get("Events", {})
+            events = list(events_properties.values()) if events_properties else []
+            for item in events:
+                # If the function event type is `Api` then gets the function name and
+                # adds to the function_names dict with key as the api_name and value as the function_name
+                item_properties = item.get("Properties", {})
+                if item.get("Type") == "Api" and item_properties.get("RestApiId"):
+                    rest_api = item_properties.get("RestApiId")
+                    api_name = Api.get_rest_api_id_string(rest_api)
+                    if isinstance(api_name, str):
+                        resource_dict_copy = copy.deepcopy(resource_dict)
+                        function_name = intrinsics_resolver.resolve_parameter_refs(
+                            resource_dict_copy.get("Properties").get("FunctionName")
+                        )
+                        if function_name:
+                            self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
+                                function_name
                             )
-                            if function_name:
-                                self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
-                                    function_name
-                                )
         return self.function_names
 
     def translate(self, sam_template, parameter_values, feature_toggle=None, passthrough_metadata=False):
@@ -141,6 +143,7 @@ class Translator:
                 )
                 kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
                 kwargs["shared_api_usage_plan"] = shared_api_usage_plan
+                kwargs["feature_toggle"] = self.feature_toggle
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
@@ -162,14 +165,18 @@ class Translator:
                         document_errors.append(
                             DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)
                         )
-            except (InvalidResourceException, InvalidEventException) as e:
+            except (InvalidResourceException, InvalidEventException, InvalidTemplateException) as e:
                 document_errors.append(e)
 
         if deployment_preference_collection.any_enabled():
-            template["Resources"].update(deployment_preference_collection.codedeploy_application.to_dict())
+            template["Resources"].update(deployment_preference_collection.get_codedeploy_application().to_dict())
+            if deployment_preference_collection.needs_resource_condition():
+                new_conditions = deployment_preference_collection.create_aggregate_deployment_condition()
+                if new_conditions:
+                    template.get("Conditions").update(new_conditions)
 
             if not deployment_preference_collection.can_skip_service_role():
-                template["Resources"].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
+                template["Resources"].update(deployment_preference_collection.get_codedeploy_iam_role().to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 try:
@@ -182,7 +189,7 @@ class Translator:
         # Run the after-transform plugin target
         try:
             sam_plugins.act(LifeCycleEvents.after_transform_template, template)
-        except (InvalidDocumentException, InvalidResourceException) as e:
+        except (InvalidDocumentException, InvalidResourceException, InvalidTemplateException) as e:
             document_errors.append(e)
 
         # Cleanup

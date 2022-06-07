@@ -2,6 +2,7 @@ from unittest.case import skipIf
 
 import requests
 
+from integration.config.service_names import KMS, XRAY, ARM
 from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
@@ -26,8 +27,7 @@ class TestBasicFunction(BaseTest):
         self.create_and_verify_stack(file_name)
 
         self.set_template_resource_property("MyLambdaFunction", "Timeout", 10)
-        self.transform_template()
-        self.deploy_stack()
+        self.update_stack()
 
         self.assertEqual(self.get_resource_status_by_logical_id("MyLambdaFunction"), "UPDATE_COMPLETE")
 
@@ -53,7 +53,7 @@ class TestBasicFunction(BaseTest):
             ("single/basic_function_with_x86_architecture", ["x86_64"]),
         ]
     )
-    @skipIf(current_region_does_not_support(["ARM"]), "ARM is not supported in this testing region")
+    @skipIf(current_region_does_not_support([ARM]), "ARM is not supported in this testing region")
     def test_basic_function_with_architecture(self, file_name, architecture):
         """
         Creates a basic lambda function
@@ -98,6 +98,7 @@ class TestBasicFunction(BaseTest):
 
         self.assertEqual(function_url_config["AuthType"], "NONE")
         self.assertEqual(function_url_config["Cors"], cors_config)
+        self._assert_invoke(lambda_client, function_name, qualifier, 200)
 
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
         self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")
@@ -133,7 +134,7 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(statements[0]["Resource"], dlq_arn)
         self.assertEqual(statements[0]["Effect"], "Allow")
 
-    @skipIf(current_region_does_not_support(["KMS"]), "KMS is not supported in this testing region")
+    @skipIf(current_region_does_not_support([KMS]), "KMS is not supported in this testing region")
     def test_basic_function_with_kms_key_arn(self):
         """
         Creates a basic lambda function with KMS key arn
@@ -208,7 +209,7 @@ class TestBasicFunction(BaseTest):
             "MaximumRetryAttempts value is not set or incorrect.",
         )
 
-    @skipIf(current_region_does_not_support(["XRay"]), "XRay is not supported in this testing region")
+    @skipIf(current_region_does_not_support([XRAY]), "XRay is not supported in this testing region")
     def test_basic_function_with_tracing(self):
         """
         Creates a basic lambda function with tracing
@@ -256,3 +257,28 @@ class TestBasicFunction(BaseTest):
         )
 
         self.assertEqual(function_configuration_result.get("EphemeralStorage", {}).get("Size", 0), 1024)
+
+    def _assert_invoke(self, lambda_client, function_name, qualifier=None, expected_status_code=200):
+        """
+        Assert if a Lambda invocation returns the expected status code
+
+        Parameters
+        ----------
+        lambda_client : boto3.BaseClient
+            boto3 Lambda client
+        function_name : string
+            Function name
+        qualifier : string
+            Specify a version or alias to invoke a published version of the function
+        expected_status_code : int
+            Expected status code from the invocation
+        """
+        request_params = {
+            "FunctionName": function_name,
+            "Payload": "{}",
+        }
+        if qualifier:
+            request_params["Qualifier"] = qualifier
+
+        response = lambda_client.invoke(**request_params)
+        self.assertEqual(response.get("StatusCode"), expected_status_code)

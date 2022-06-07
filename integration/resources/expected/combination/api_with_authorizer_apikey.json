@@ -1,0 +1,15 @@
+[
+  { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"MyApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"MyApiMyLambdaTokenAuthAuthorizerPermission", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"MyApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
+  { "LogicalResourceId":"MyFirstApiKey", "ResourceType":"AWS::ApiGateway::ApiKey" },
+  { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyFunctionLambdaTokenPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"MyFunctionNonePermissionProd", "ResourceType":"AWS::Lambda::Permission" },
+  { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyLambdaAuthFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaAuthFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyUsagePlan", "ResourceType":"AWS::ApiGateway::UsagePlan" },
+  { "LogicalResourceId":"MyUsagePlanKey", "ResourceType":"AWS::ApiGateway::UsagePlanKey" }
+]

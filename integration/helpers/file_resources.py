@@ -16,4 +16,5 @@ CODE_KEY_TO_FILE_MAP = {
     "definitionuri": "swagger1.json",
     "templateurl": "template.yaml",
     "binaryMediaCodeUri": "binary-media.zip",
+    "mtlsuri": "MTLSCert.pem",
 }

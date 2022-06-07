@@ -114,7 +114,9 @@ Running Tests
 
 ### Unit testing with one Python version
 
-If you're trying to do a quick run, it's ok to use the current python version.  Run `make pr`.
+If you're trying to do a quick run, it's ok to use the current python version.
+Run `make test` or `make test-fast`. Once all tests pass make sure to run
+`make pr` before sending out your PR.
 
 ### Unit testing with multiple Python versions
 

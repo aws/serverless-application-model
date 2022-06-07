@@ -2,6 +2,7 @@
 Utilities for table pretty printing using click
 This was ported over from the sam-cli repo
 """
+import shutil
 from itertools import count
 
 try:
@@ -50,7 +51,7 @@ def pprint_column_names(format_string, format_kwargs, margin=None, table_header=
 
     def pprint_wrap(func):
         # Calculate terminal width, number of columns in the table
-        width, _ = click.get_terminal_size()
+        width, _ = shutil.get_terminal_size()
         # For UX purposes, set a minimum width for the table to be usable
         # and usable_width keeps margins in mind.
         width = max(width, min_width)

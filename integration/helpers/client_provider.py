@@ -15,6 +15,7 @@ class ClientProvider:
         self._sfn_client = None
         self._cloudwatch_log_client = None
         self._cloudwatch_event_client = None
+        self._cloudwatch_client = None
         self._sqs_client = None
         self._sns_client = None
         self._dynamoDB_streams_client = None
@@ -114,6 +115,16 @@ class ClientProvider:
             if not self._cloudwatch_event_client:
                 self._cloudwatch_event_client = boto3.client("events")
         return self._cloudwatch_event_client
+
+    @property
+    def cloudwatch_client(self):
+        """
+        CloudWatch Client
+        """
+        with self._lock:
+            if not self._cloudwatch_client:
+                self._cloudwatch_client = boto3.client("cloudwatch")
+        return self._cloudwatch_client
 
     @property
     def sqs_client(self):

@@ -1,9 +1,16 @@
+Conditions:
+  Condition1:
+    Fn::Equals:
+      - true
+      - true
+
 Globals:
   Function:
     AutoPublishAlias: live
     DeploymentPreference:
       Type: AllAtOnce
       Role: !Ref DeploymentRole
+      PassthroughCondition: true
 
 Resources:
 
@@ -15,6 +22,7 @@ Resources:
       Runtime: python2.7
 
   OtherFunction:
+    Condition: Condition1
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: s3://sam-demo-bucket/hello.zip

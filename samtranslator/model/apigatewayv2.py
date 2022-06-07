@@ -73,6 +73,7 @@ class ApiGatewayV2Authorizer(object):
         identity=None,
         authorizer_payload_format_version=None,
         enable_simple_responses=None,
+        is_aws_iam_authorizer=False,
     ):
         """
         Creates an authorizer for use in V2 Http Apis
@@ -87,6 +88,7 @@ class ApiGatewayV2Authorizer(object):
         self.identity = identity
         self.authorizer_payload_format_version = authorizer_payload_format_version
         self.enable_simple_responses = enable_simple_responses
+        self.is_aws_iam_authorizer = is_aws_iam_authorizer
 
         self._validate_input_parameters()
 
@@ -100,6 +102,8 @@ class ApiGatewayV2Authorizer(object):
             self._validate_lambda_authorizer()
 
     def _get_auth_type(self):
+        if self.is_aws_iam_authorizer:
+            return "AWS_IAM"
         if self.jwt_configuration:
             return "JWT"
         return "REQUEST"
@@ -151,26 +155,26 @@ class ApiGatewayV2Authorizer(object):
     def _validate_jwt_authorizer(self):
         if not self.jwt_configuration:
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " OAuth2 Authorizer must define 'JwtConfiguration'."
+                self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'JwtConfiguration'."
             )
         if not self.id_source:
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " OAuth2 Authorizer must define 'IdentitySource'."
+                self.api_logical_id, f"{self.name} OAuth2 Authorizer must define 'IdentitySource'."
             )
 
     def _validate_lambda_authorizer(self):
         if not self.function_arn:
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " Lambda Authorizer must define 'FunctionArn'."
+                self.api_logical_id, f"{self.name} Lambda Authorizer must define 'FunctionArn'."
             )
         if not self.authorizer_payload_format_version:
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
+                self.api_logical_id, f"{self.name} Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
         if self.identity and not isinstance(self.identity, dict):
             raise InvalidResourceException(
-                self.api_logical_id, self.name + " Lambda Authorizer property 'identity' is of invalid type."
+                self.api_logical_id, f"{self.name} Lambda Authorizer property 'identity' is of invalid type."
             )
 
     def generate_openapi(self):
@@ -178,6 +182,14 @@ class ApiGatewayV2Authorizer(object):
         Generates OAS for the securitySchemes section
         """
         authorizer_type = self._get_auth_type()
+
+        if authorizer_type == "AWS_IAM":
+            openapi = {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+                "x-amazon-apigateway-authtype": "awsSigv4",
+            }
 
         if authorizer_type == "JWT":
             openapi = {"type": "oauth2"}

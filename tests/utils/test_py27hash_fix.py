@@ -99,7 +99,7 @@ class TestPy27UniStr(TestCase):
 
     def test_deepcopy(self):
         a = Py27UniStr("abcdef")
-        self.assert_(a is copy.deepcopy(a))  # deepcopy should give back the same object
+        self.assertTrue(a is copy.deepcopy(a))  # deepcopy should give back the same object
 
 
 class TestPy27LongInt(TestCase):
@@ -123,7 +123,7 @@ class TestPy27LongInt(TestCase):
 
     def test_deepcopy(self):
         a = Py27LongInt(10)
-        self.assert_(a is copy.deepcopy(a))  # deepcopy should give back the same object
+        self.assertTrue(a is copy.deepcopy(a))  # deepcopy should give back the same object
 
 
 class TestPy27Keys(TestCase):

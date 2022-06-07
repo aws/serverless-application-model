@@ -55,7 +55,7 @@ class TestFunctionWithUserPoolEvent(BaseTest):
         self.assertEqual(oauth_2_auth["IdentitySource"][0], "$request.querystring.param")
 
         # Test updating stack
-        self.update_stack("combination/http_api_with_auth_updated")
+        self.update_stack(file_path="combination/http_api_with_auth_updated")
 
         http_api_list_updated = self.get_stack_resources("AWS::ApiGatewayV2::Api")
         self.assertEqual(len(http_api_list_updated), 1)

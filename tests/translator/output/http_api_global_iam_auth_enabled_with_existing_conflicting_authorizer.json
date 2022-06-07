@@ -1,0 +1,44 @@
+{
+  "Resources": {
+    "MyApi": {
+      "Properties": {
+        "Body": {
+          "components": {
+            "securitySchemes": {
+              "AWS_IAM": {
+                "type": "oauth2",
+                "x-amazon-apigateway-authorizer": {
+                  "identitySource": "$request.header.Authorization",
+                  "jwtConfiguration": {
+                    "audience": ["audience1", "audience2"],
+                    "issuer": "https://www.example.com/v1/connect/oidc"
+                  },
+                  "type": "jwt"
+                }
+              }
+            }
+          },
+          "info": { "title": { "Ref": "AWS::StackName" }, "version": "1.0" },
+          "openapi": "3.0.1",
+          "paths": {},
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MyApiApiGatewayDefaultStage": {
+      "Properties": {
+        "ApiId": { "Ref": "MyApi" },
+        "AutoDeploy": true,
+        "StageName": "$default",
+        "Tags": { "httpapi:createdBy": "SAM" }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    }
+  }
+}

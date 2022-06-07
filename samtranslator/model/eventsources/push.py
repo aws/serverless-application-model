@@ -5,7 +5,7 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from samtranslator.model.types import is_type, list_of, dict_of, one_of, is_str
-from samtranslator.model.intrinsics import ref, fnGetAtt, fnSub, make_shorthand, make_conditional
+from samtranslator.model.intrinsics import is_intrinsic, ref, fnGetAtt, fnSub, make_shorthand, make_conditional
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.s3 import S3Bucket
@@ -19,7 +19,7 @@ from samtranslator.model.iot import IotTopicRule
 from samtranslator.model.cognito import CognitoUserPool
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
-from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
+from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException, InvalidDocumentException
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -705,7 +705,7 @@ class Api(PushEventSource):
                         )
 
                     _check_valid_authorizer_types(
-                        self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers
+                        self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers, False
                     )
 
                     if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
@@ -764,6 +764,14 @@ class Api(PushEventSource):
                         self.relative_id,
                         "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
                         "because the related API does not define any Models.".format(
+                            model=method_model, method=self.Method, path=self.Path
+                        ),
+                    )
+                if not is_intrinsic(api_models) and not isinstance(api_models, dict):
+                    raise InvalidEventException(
+                        self.relative_id,
+                        "Unable to set RequestModel [{model}] on API method [{method}] for path [{path}] "
+                        "because the related API Models defined is of invalid type.".format(
                             model=method_model, method=self.Method, path=self.Path
                         ),
                     )
@@ -1111,7 +1119,7 @@ class HttpApi(PushEventSource):
         if resources_to_link["explicit_api"].get("DefinitionBody"):
             try:
                 editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))
-            except ValueError as e:
+            except InvalidDocumentException as e:
                 api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId
                 raise InvalidResourceException(api_logical_id, e)
 
@@ -1209,40 +1217,51 @@ class HttpApi(PushEventSource):
         # Default auth should already be applied, so apply any other auth here or scope override to default
         api_authorizers = api_auth and api_auth.get("Authorizers")
 
-        _check_valid_authorizer_types(self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers)
+        # The IAM authorizer is built-in and not defined as a regular Authorizer.
+        iam_authorizer_enabled = api_auth and api_auth.get("EnableIamAuthorizer", False) is True
 
-        if method_authorizer != "NONE" and not api_authorizers:
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                "because the related API does not define any Authorizers.".format(
-                    authorizer=method_authorizer, method=self.Method, path=self.Path
-                ),
-            )
+        _check_valid_authorizer_types(
+            self.relative_id, self.Method, self.Path, method_authorizer, api_authorizers, iam_authorizer_enabled
+        )
 
-        if method_authorizer != "NONE" and not api_authorizers.get(method_authorizer):
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
-                "because it wasn't defined in the API's Authorizers.".format(
-                    authorizer=method_authorizer, method=self.Method, path=self.Path
-                ),
-            )
+        if method_authorizer == "NONE":
+            if not api_auth.get("DefaultAuthorizer"):
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
+                    "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
+                        method=self.Method, path=self.Path
+                    ),
+                )
+        # If the method authorizer is "AWS_IAM" but it's not enabled it's possible that's a custom authorizer, not the "official" one.
+        # In that case a check needs to be performed to make sure that such an authorizer is defined.
+        # The "official" AWS IAM authorizer is not defined as a normal authorizer so it won't exist in api_authorizer.
+        elif (method_authorizer == "AWS_IAM" and not iam_authorizer_enabled) or method_authorizer != "AWS_IAM":
+            if not api_authorizers:
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because the related API does not define any Authorizers.".format(
+                        authorizer=method_authorizer, method=self.Method, path=self.Path
+                    ),
+                )
 
-        if method_authorizer == "NONE" and not api_auth.get("DefaultAuthorizer"):
-            raise InvalidEventException(
-                self.relative_id,
-                "Unable to set Authorizer on API method [{method}] for path [{path}] because 'NONE' "
-                "is only a valid value when a DefaultAuthorizer on the API is specified.".format(
-                    method=self.Method, path=self.Path
-                ),
-            )
+            if not api_authorizers.get(method_authorizer):
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Unable to set Authorizer [{authorizer}] on API method [{method}] for path [{path}] "
+                    "because it wasn't defined in the API's Authorizers.".format(
+                        authorizer=method_authorizer, method=self.Method, path=self.Path
+                    ),
+                )
+
         if self.Auth.get("AuthorizationScopes") and not isinstance(self.Auth.get("AuthorizationScopes"), list):
             raise InvalidEventException(
                 self.relative_id,
                 "Unable to set Authorizer on API method [{method}] for path [{path}] because "
                 "'AuthorizationScopes' must be a list of strings.".format(method=self.Method, path=self.Path),
             )
+
         editor.add_auth_to_method(api=api, path=self.Path, method_name=self.Method, auth=self.Auth)
 
 
@@ -1262,10 +1281,17 @@ def _build_apigw_integration_uri(function, partition):
     return Py27Dict(fnSub(arn))
 
 
-def _check_valid_authorizer_types(relative_id, method, path, method_authorizer, api_authorizers):
+def _check_valid_authorizer_types(
+    relative_id, method, path, method_authorizer, api_authorizers, iam_authorizer_enabled
+):
     if method_authorizer == "NONE":
         # If the method authorizer is "NONE" then this check
         # isn't needed since DefaultAuthorizer needs to be used.
+        return
+
+    if method_authorizer == "AWS_IAM" and iam_authorizer_enabled:
+        # The "official" AWS IAM authorizer is not defined as a normal authorizer so it won't exist in api_authorizers.
+        # So we can safety skip this check.
         return
 
     if not isinstance(method_authorizer, str) or not isinstance(api_authorizers, dict):

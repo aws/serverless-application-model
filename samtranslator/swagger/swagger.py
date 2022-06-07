@@ -1,5 +1,4 @@
 ﻿import copy
-import json
 import re
 
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub, is_intrinsic_no_value
@@ -45,11 +44,11 @@ class SwaggerEditor(object):
         modifications on this copy.
 
         :param dict doc: Swagger document as a dictionary
-        :raises ValueError: If the input Swagger document does not meet the basic Swagger requirements.
+        :raises InvalidDocumentException: If the input Swagger document does not meet the basic Swagger requirements.
         """
 
         if not SwaggerEditor.is_valid(doc):
-            raise ValueError("Invalid Swagger document")
+            raise InvalidDocumentException("Invalid Swagger document")
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
@@ -187,7 +186,9 @@ class SwaggerEditor(object):
 
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
-            raise ValueError("Lambda integration already exists on Path={}, Method={}".format(path, method))
+            raise InvalidDocumentException(
+                "Lambda integration already exists on Path={}, Method={}".format(path, method)
+            )
 
         self.add_path(path, method)
 
@@ -251,7 +252,7 @@ class SwaggerEditor(object):
 
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
-            raise ValueError("Integration already exists on Path={}, Method={}".format(path, method))
+            raise InvalidDocumentException("Integration already exists on Path={}, Method={}".format(path, method))
 
         self.add_path(path, method)
 
@@ -388,7 +389,7 @@ class SwaggerEditor(object):
         :param integer/dict max_age: Maximum duration to cache the CORS Preflight request. Value is set on
             Access-Control-Max-Age header. Value can also be an intrinsic function dict.
         :param bool/None allow_credentials: Flags whether request is allowed to contain credentials.
-        :raises ValueError: When values for one of the allowed_* variables is empty
+        :raises InvalidTemplateException: When values for one of the allowed_* variables is empty
         """
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
@@ -1022,13 +1023,13 @@ class SwaggerEditor(object):
         """
         This method generates a policy statement to grant/deny specific IAM users access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
-        :raises ValueError: If the effect passed in does not match the allowed values.
+        :raises InvalidDocumentException: If the effect passed in does not match the allowed values.
         """
         if not policy_list:
             return
 
         if effect not in ["Allow", "Deny"]:
-            raise ValueError("Effect must be one of {}".format(["Allow", "Deny"]))
+            raise InvalidDocumentException("Effect must be one of {}".format(["Allow", "Deny"]))
 
         if not isinstance(policy_list, (dict, list)):
             raise InvalidDocumentException(
@@ -1081,7 +1082,7 @@ class SwaggerEditor(object):
         """
         This method generates a policy statement to grant/deny specific IP address ranges access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
-        :raises ValueError: If the conditional passed in does not match the allowed values.
+        :raises InvalidDocumentException: If the conditional passed in does not match the allowed values.
         """
         if not ip_list:
             return
@@ -1090,7 +1091,7 @@ class SwaggerEditor(object):
             ip_list = [ip_list]
 
         if conditional not in ["IpAddress", "NotIpAddress"]:
-            raise ValueError("Conditional must be one of {}".format(["IpAddress", "NotIpAddress"]))
+            raise InvalidDocumentException("Conditional must be one of {}".format(["IpAddress", "NotIpAddress"]))
 
         self.resource_policy["Version"] = "2012-10-17"
         allow_statement = Py27Dict()
@@ -1122,11 +1123,11 @@ class SwaggerEditor(object):
         """
         This method generates a policy statement to grant/deny specific VPC/VPCE access to the API method and
         appends it to the swagger under `x-amazon-apigateway-policy`
-        :raises ValueError: If the conditional passed in does not match the allowed values.
+        :raises InvalidDocumentException: If the conditional passed in does not match the allowed values.
         """
 
         if conditional not in ["StringNotEquals", "StringEquals"]:
-            raise ValueError("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))
+            raise InvalidDocumentException("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))
 
         condition = Py27Dict()
         string_endpoint_list = endpoint_dict.get("StringEndpointList")

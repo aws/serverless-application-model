@@ -20,13 +20,13 @@ class TestOpenApiEditor_init(TestCase):
             "swagger": "2.0",  # "openapi": "2.1.0"
             "paths": {"/foo": {}, "/bar": {}},
         }  # missing openapi key word
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             OpenApiEditor(valid_swagger)
 
     def test_must_raise_on_invalid_openapi(self):
 
         invalid_openapi = {"paths": {}}  # Missing "openapi" keyword
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             OpenApiEditor(invalid_openapi)
 
     def test_must_succeed_on_valid_openapi(self):
@@ -40,13 +40,13 @@ class TestOpenApiEditor_init(TestCase):
     def test_must_fail_on_invalid_openapi_version(self):
         invalid_openapi = {"openapi": "2.3.0", "paths": {"/foo": {}, "/bar": {}}}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             OpenApiEditor(invalid_openapi)
 
     def test_must_fail_on_invalid_openapi_version_2(self):
         invalid_openapi = {"openapi": "3.1.1.1", "paths": {"/foo": {}, "/bar": {}}}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidDocumentException):
             OpenApiEditor(invalid_openapi)
 
     def test_must_succeed_on_valid_openapi3(self):

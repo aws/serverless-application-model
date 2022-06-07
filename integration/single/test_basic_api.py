@@ -23,8 +23,7 @@ class TestBasicApi(BaseTest):
         self.assertEqual(len(first_dep_ids), 1)
 
         self.set_template_resource_property("MyApi", "DefinitionUri", self.get_s3_uri("swagger2.json"))
-        self.transform_template()
-        self.deploy_stack()
+        self.update_stack()
 
         second_dep_ids = self.get_stack_deployment_ids()
         self.assertEqual(len(second_dep_ids), 1)
@@ -45,8 +44,8 @@ class TestBasicApi(BaseTest):
         self.assertEqual(response.status_code, 200)
 
         # Removes get from the API
-        self.update_and_verify_stack("single/basic_api_with_mode_update")
-
+        self.update_and_verify_stack(file_path="single/basic_api_with_mode_update")
+        response = requests.get(f"{api_endpoint}/get")
         # API Gateway by default returns 403 if a path do not exist
         retries = 20
         while retries > 0:
@@ -70,8 +69,7 @@ class TestBasicApi(BaseTest):
         body = self.get_template_resource_property("MyApi", "DefinitionBody")
         body["basePath"] = "/newDemo"
         self.set_template_resource_property("MyApi", "DefinitionBody", body)
-        self.transform_template()
-        self.deploy_stack()
+        self.update_stack()
 
         second_dep_ids = self.get_stack_deployment_ids()
         self.assertEqual(len(second_dep_ids), 1)
@@ -90,8 +88,7 @@ class TestBasicApi(BaseTest):
         body = self.get_template_resource_property("MyApi", "DefinitionBody")
         body["basePath"] = "/newDemo"
         self.set_template_resource_property("MyApi", "DefinitionBody", body)
-        self.transform_template()
-        self.deploy_stack()
+        self.update_stack()
 
         second_dep_ids = self.get_stack_deployment_ids()
         self.assertEqual(len(second_dep_ids), 1)

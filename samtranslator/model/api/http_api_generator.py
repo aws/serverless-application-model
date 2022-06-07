@@ -24,8 +24,8 @@ CorsProperties = namedtuple(
 )
 CorsProperties.__new__.__defaults__ = (None, None, None, None, None, False)
 
-AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer"])
-AuthProperties.__new__.__defaults__ = (None, None)
+AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer", "EnableIamAuthorizer"])
+AuthProperties.__new__.__defaults__ = (None, None, False)
 DefaultStageName = "$default"
 HttpApiTagName = "httpapi:createdBy"
 
@@ -422,7 +422,7 @@ class HttpApiGenerator(object):
             )
         open_api_editor = OpenApiEditor(self.definition_body)
         auth_properties = AuthProperties(**self.auth)
-        authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.DefaultAuthorizer)
+        authorizers = self._get_authorizers(auth_properties.Authorizers, auth_properties.EnableIamAuthorizer)
 
         # authorizers is guaranteed to return a value or raise an exception
         open_api_editor.add_authorizers_security_definitions(authorizers)
@@ -494,13 +494,20 @@ class HttpApiGenerator(object):
                 path, default_authorizer, authorizers=authorizers, api_authorizers=api_authorizers
             )
 
-    def _get_authorizers(self, authorizers_config, default_authorizer=None):
+    def _get_authorizers(self, authorizers_config, enable_iam_authorizer=False):
         """
         Returns all authorizers for an API as an ApiGatewayV2Authorizer object
         :param authorizers_config: authorizer configuration from the API Auth section
-        :param default_authorizer: name of the default authorizer
+        :param enable_iam_authorizer: if True add an "AWS_IAM" authorizer
         """
         authorizers = {}
+
+        if enable_iam_authorizer is True:
+            authorizers["AWS_IAM"] = ApiGatewayV2Authorizer(is_aws_iam_authorizer=True)
+
+        # If all the customer wants to do is enable the IAM authorizer the authorizers_config will be None.
+        if not authorizers_config:
+            return authorizers
 
         if not isinstance(authorizers_config, dict):
             raise InvalidResourceException(self.logical_id, "Authorizers must be a dictionary.")

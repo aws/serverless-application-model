@@ -18,8 +18,7 @@ class TestFunctionWithAlias(BaseTest):
 
         # Changing CodeUri should create a new version, and leave the existing version in tact
         self.set_template_resource_property("MyLambdaFunction", "CodeUri", self.file_to_s3_uri_map["code2.zip"]["uri"])
-        self.transform_template()
-        self.deploy_stack()
+        self.update_stack()
 
         version_ids = self.get_function_version_by_name(function_name)
         self.assertEqual(["1", "2"], version_ids)
@@ -43,8 +42,7 @@ class TestFunctionWithAlias(BaseTest):
         # Check that the DeletionPolicy on Lambda Version holds good
         # Remove alias, update stack, and verify the version still exists by calling Lambda APIs
         self.remove_template_resource_property("MyLambdaFunction", "AutoPublishAlias")
-        self.transform_template()
-        self.deploy_stack()
+        self.update_stack()
 
         # Make sure both Lambda version & alias resource does not exist in stack
         alias = self.get_stack_resources("AWS::Lambda::Alias")
@@ -71,13 +69,13 @@ class TestFunctionWithAlias(BaseTest):
         # Let's change Key by updating the template parameter, but keep template same
         # This should create a new version and leave existing version intact
         parameters[1]["ParameterValue"] = "code2.zip"
-        # self.deploy_stack(parameters)
-        self.update_stack("combination/function_with_alias_intrinsics", parameters)
-        version_ids = get_function_versions(function_name, self.client_provider.lambda_client)
 
-        self.assertEqual(["1"], version_ids)
+        self.update_stack(parameters)
+        version_ids = get_function_versions(function_name, self.client_provider.lambda_client)
+        self.assertEqual(["1", "2"], version_ids)
+
         alias = self.get_alias(function_name, alias_name)
-        self.assertEqual("1", alias["FunctionVersion"])
+        self.assertEqual("2", alias["FunctionVersion"])
 
     def test_alias_in_globals_with_overrides(self):
         # It is good enough if we can create a stack. Globals are pre-processed on the SAM template and don't
@@ -111,8 +109,7 @@ class TestFunctionWithAlias(BaseTest):
 
         # Remove the alias, deploy the stack, and verify that *all* permission entities transfer to the function
         self.remove_template_resource_property("MyAwesomeFunction", "AutoPublishAlias")
-        self.transform_template()
-        self.deploy_stack()
+        self.update_stack()
 
         # Get the policies on both function & alias
         # Alias should have *no* policies

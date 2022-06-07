@@ -37,10 +37,10 @@ class OpenApiEditor(object):
         modifications on this copy.
 
         :param dict doc: OpenApi document as a dictionary
-        :raises ValueError: If the input OpenApi document does not meet the basic OpenApi requirements.
+        :raises InvalidDocumentException: If the input OpenApi document does not meet the basic OpenApi requirements.
         """
         if not OpenApiEditor.is_valid(doc):
-            raise ValueError(
+            raise InvalidDocumentException(
                 "Invalid OpenApi document. "
                 "Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
             )
@@ -175,7 +175,7 @@ class OpenApiEditor(object):
 
         :param string path: Path name
         :param string method: HTTP method
-        :raises ValueError: If the value of `path` in Swagger is not a dictionary
+        :raises InvalidDocumentException: If the value of `path` in Swagger is not a dictionary
         """
         method = self._normalize_method_name(method)
 
@@ -455,7 +455,8 @@ class OpenApiEditor(object):
             security_dict = dict()
             security_dict[authorizer_name] = []
 
-            if authorizer_name != "NONE":
+            # Neither the NONE nor the AWS_IAM built-in authorizers support authorization scopes.
+            if authorizer_name not in ["NONE", "AWS_IAM"]:
                 method_authorization_scopes = authorizers[authorizer_name].get("AuthorizationScopes")
                 if authorization_scopes:
                     method_authorization_scopes = authorization_scopes

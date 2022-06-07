@@ -58,7 +58,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
             # api_events only contains HttpApi events
             event_properties = event.get("Properties", {})
 
-            if event_properties and not isinstance(event_properties, dict):
+            if not isinstance(event_properties, dict):
                 raise InvalidEventException(
                     logicalId,
                     "Event 'Properties' must be an Object. If you're using YAML, this may be an indentation issue.",

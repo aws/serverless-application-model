@@ -24,6 +24,7 @@ class ApiGatewayRestApi(Resource):
         "BinaryMediaTypes": PropertyType(False, is_type(list)),
         "MinimumCompressionSize": PropertyType(False, is_type(int)),
         "Mode": PropertyType(False, is_str()),
+        "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
     runtime_attrs = {"rest_api_id": lambda self: ref(self.logical_id)}
@@ -247,13 +248,13 @@ class ApiGatewayAuthorizer(object):
         if function_payload_type not in ApiGatewayAuthorizer._VALID_FUNCTION_PAYLOAD_TYPES:
             raise InvalidResourceException(
                 api_logical_id,
-                name + " Authorizer has invalid " "'FunctionPayloadType': " + function_payload_type + ".",
+                f"{name} Authorizer has invalid 'FunctionPayloadType': {function_payload_type}.",
             )
 
         if function_payload_type == "REQUEST" and self._is_missing_identity_source(identity):
             raise InvalidResourceException(
                 api_logical_id,
-                name + " Authorizer must specify Identity with at least one "
+                f"{name} Authorizer must specify Identity with at least one "
                 "of Headers, QueryStrings, StageVariables, or Context.",
             )
 

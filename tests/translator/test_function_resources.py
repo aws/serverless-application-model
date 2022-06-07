@@ -1,5 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch, Mock
+from parameterized import parameterized
+
 import os
 from samtranslator.model.sam_resources import SamFunction
 from samtranslator.model.lambda_ import LambdaAlias, LambdaVersion, LambdaFunction
@@ -144,7 +146,9 @@ class TestVersionsAndAliases(TestCase):
         resources = sam_func.to_cloudformation(**kwargs)
 
         deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
-        deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id, deploy_preference_dict)
+        deployment_preference_collection.add.assert_called_once_with(
+            self.sam_func.logical_id, deploy_preference_dict, None
+        )
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
 
@@ -222,7 +226,7 @@ class TestVersionsAndAliases(TestCase):
 
         resources = sam_func.to_cloudformation(**kwargs)
 
-        preference_collection.add.assert_called_once_with(sam_func.logical_id, deploy_preference_dict)
+        preference_collection.add.assert_called_once_with(sam_func.logical_id, deploy_preference_dict, None)
         preference_collection.get.assert_called_once_with(sam_func.logical_id)
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_called_with(enabled)
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
@@ -318,7 +322,9 @@ class TestVersionsAndAliases(TestCase):
         resources = sam.to_cloudformation(**kwargs)
 
         deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
-        deployment_preference_collection.add.assert_called_once_with(self.sam_func.logical_id, deploy_preference_dict)
+        deployment_preference_collection.add.assert_called_once_with(
+            self.sam_func.logical_id, deploy_preference_dict, None
+        )
         self.intrinsics_resolver_mock.resolve_parameter_refs.assert_any_call(enabled)
 
         aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
@@ -394,6 +400,161 @@ class TestVersionsAndAliases(TestCase):
 
         sam_func.to_cloudformation(**kwargs)
         self.assertTrue(sam_func.DeploymentPreference["Enabled"])
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch.object(SamFunction, "_get_resolved_alias_name")
+    def test_sam_function_with_deployment_preference_passthrough_condition_through_property(
+        self, get_resolved_alias_name_mock
+    ):
+        deploy_preference_dict = {"Type": "LINEAR", "PassthroughCondition": True}
+        alias_name = "AliasName"
+        func = {
+            "Type": "AWS::Serverless::Function",
+            "Condition": "Condition1",
+            "Properties": {
+                "CodeUri": self.code_uri,
+                "Runtime": "nodejs12.x",
+                "Handler": "index.handler",
+                "AutoPublishAlias": alias_name,
+                "DeploymentPreference": deploy_preference_dict,
+            },
+        }
+
+        sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
+
+        kwargs = dict()
+        kwargs["managed_policy_map"] = {"a": "b"}
+        kwargs["event_resources"] = []
+        kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        deployment_preference_collection = self._make_deployment_preference_collection()
+        kwargs["deployment_preference_collection"] = deployment_preference_collection
+        get_resolved_alias_name_mock.return_value = alias_name
+
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
+            "S3Bucket": "bucket",
+            "S3Key": "key",
+            "S3ObjectVersion": "version",
+        }
+        self.mappings_resolver_mock.resolve_parameter_refs.return_value = True
+        resources = sam_func.to_cloudformation(**kwargs)
+
+        deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
+        deployment_preference_collection.add.assert_called_once_with(
+            self.sam_func.logical_id, deploy_preference_dict, "Condition1"
+        )
+
+        aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
+
+        self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
+        self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch.object(SamFunction, "_get_resolved_alias_name")
+    def test_sam_function_with_deployment_preference_passthrough_condition_through_feature_flag(
+        self, get_resolved_alias_name_mock
+    ):
+        deploy_preference_dict = {"Type": "LINEAR"}
+        alias_name = "AliasName"
+        func = {
+            "Type": "AWS::Serverless::Function",
+            "Condition": "Condition1",
+            "Properties": {
+                "CodeUri": self.code_uri,
+                "Runtime": "nodejs12.x",
+                "Handler": "index.handler",
+                "AutoPublishAlias": alias_name,
+                "DeploymentPreference": deploy_preference_dict,
+            },
+        }
+
+        sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
+
+        kwargs = dict()
+        kwargs["managed_policy_map"] = {"a": "b"}
+        kwargs["event_resources"] = []
+        kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        deployment_preference_collection = self._make_deployment_preference_collection()
+        kwargs["deployment_preference_collection"] = deployment_preference_collection
+        get_resolved_alias_name_mock.return_value = alias_name
+        feature_toggle_mock = Mock()
+        feature_toggle_mock.is_enabled.side_effect = lambda x: x == "deployment_preference_condition_fix"
+        kwargs["feature_toggle"] = feature_toggle_mock
+
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
+            "S3Bucket": "bucket",
+            "S3Key": "key",
+            "S3ObjectVersion": "version",
+        }
+        resources = sam_func.to_cloudformation(**kwargs)
+
+        deployment_preference_collection.update_policy.assert_called_once_with(self.sam_func.logical_id)
+        deployment_preference_collection.add.assert_called_once_with(
+            self.sam_func.logical_id, deploy_preference_dict, "Condition1"
+        )
+
+        aliases = [r.to_dict() for r in resources if r.resource_type == LambdaAlias.resource_type]
+
+        self.assertTrue("UpdatePolicy" in list(aliases[0].values())[0])
+        self.assertEqual(list(aliases[0].values())[0]["UpdatePolicy"], self.update_policy().to_dict())
+
+    @parameterized.expand(
+        [
+            (
+                {"Fn::Sub": ["${Hello}", {"Hello": "helloworld"}]},
+                "Resource with id [foo] is invalid. Unsupported intrinsic: the only intrinsic functions supported for property PassthroughCondition are FindInMap and parameter Refs.",
+            ),
+            ("my_string", "Resource with id [foo] is invalid. Invalid value for property PassthroughCondition."),
+        ]
+    )
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch.object(SamFunction, "_get_resolved_alias_name")
+    def test_sam_function_with_deployment_preference_passthrough_condition_invalid_input(
+        self, invalid_passthrough_condition, expected_exception_message, get_resolved_alias_name_mock
+    ):
+        deploy_preference_dict = {"Type": "LINEAR", "PassthroughCondition": invalid_passthrough_condition}
+        alias_name = "AliasName"
+        func = {
+            "Type": "AWS::Serverless::Function",
+            "Condition": "Condition1",
+            "Properties": {
+                "CodeUri": self.code_uri,
+                "Runtime": "nodejs12.x",
+                "Handler": "index.handler",
+                "AutoPublishAlias": alias_name,
+                "DeploymentPreference": deploy_preference_dict,
+            },
+        }
+
+        sam_func = SamFunction.from_dict(logical_id="foo", resource_dict=func)
+
+        kwargs = dict()
+        kwargs["managed_policy_map"] = {"a": "b"}
+        kwargs["event_resources"] = []
+        kwargs["intrinsics_resolver"] = self.intrinsics_resolver_mock
+        kwargs["mappings_resolver"] = self.mappings_resolver_mock
+        deployment_preference_collection = self._make_deployment_preference_collection()
+        kwargs["deployment_preference_collection"] = deployment_preference_collection
+        get_resolved_alias_name_mock.return_value = alias_name
+        feature_toggle_mock = Mock()
+        feature_toggle_mock.is_enabled.side_effect = lambda x: x == "deployment_preference_condition_fix"
+        kwargs["feature_toggle"] = feature_toggle_mock
+
+        self.intrinsics_resolver_mock.resolve_parameter_refs.return_value = {
+            "S3Bucket": "bucket",
+            "S3Key": "key",
+            "S3ObjectVersion": "version",
+        }
+        self.mappings_resolver_mock.resolve_parameter_refs.return_value = invalid_passthrough_condition
+
+        with self.assertRaises(InvalidResourceException) as e:
+            sam_func.to_cloudformation(**kwargs)
+
+        self.assertEqual(
+            e.exception.message,
+            expected_exception_message,
+        )
 
     @patch("samtranslator.translator.logical_id_generator.LogicalIdGenerator")
     def test_version_creation(self, LogicalIdGeneratorMock):

@@ -9,10 +9,7 @@
         },
         "Handler": "index.restapi",
         "Role": {
-          "Fn::GetAtt": [
-            "HttpApiFunctionRole",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["HttpApiFunctionRole", "Arn"]
         },
         "Runtime": "python3.7",
         "Tags": [
@@ -30,14 +27,10 @@
           "Version": "2012-10-17",
           "Statement": [
             {
-              "Action": [
-                "sts:AssumeRole"
-              ],
+              "Action": ["sts:AssumeRole"],
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+                "Service": ["lambda.amazonaws.com"]
               }
             }
           ]
@@ -83,10 +76,7 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": [
-            "MyAuthFnRole",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["MyAuthFnRole", "Arn"]
         },
         "Runtime": "nodejs12.x",
         "Tags": [
@@ -104,14 +94,10 @@
           "Version": "2012-10-17",
           "Statement": [
             {
-              "Action": [
-                "sts:AssumeRole"
-              ],
+              "Action": ["sts:AssumeRole"],
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+                "Service": ["lambda.amazonaws.com"]
               }
             }
           ]
@@ -168,9 +154,7 @@
                 "responses": {},
                 "security": [
                   {
-                    "MyOauth2Authorizer": [
-                      "scope"
-                    ]
+                    "MyOauth2Authorizer": ["scope"]
                   }
                 ]
               },
@@ -187,6 +171,24 @@
                 "security": [
                   {
                     "LambdaAuth": []
+                  }
+                ]
+              }
+            },
+            "/hello-aws-iam-auth": {
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "payloadFormatVersion": "2.0",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HttpApiFunction.Arn}/invocations"
+                  }
+                },
+                "responses": {},
+                "security": [
+                  {
+                    "AWS_IAM": []
                   }
                 ]
               }
@@ -213,6 +215,12 @@
           },
           "components": {
             "securitySchemes": {
+              "AWS_IAM": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+                "x-amazon-apigateway-authtype": "awsSigv4"
+              },
               "LambdaAuth": {
                 "type": "apiKey",
                 "name": "Unused",
@@ -224,10 +232,7 @@
                       "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                       {
                         "__FunctionArn__": {
-                          "Fn::GetAtt": [
-                            "MyAuthFn",
-                            "Arn"
-                          ]
+                          "Fn::GetAtt": ["MyAuthFn", "Arn"]
                         }
                       }
                     ]
@@ -239,10 +244,7 @@
                 "type": "oauth2",
                 "x-amazon-apigateway-authorizer": {
                   "jwtConfiguration": {
-                    "audience": [
-                      "audience1",
-                      "audience2"
-                    ],
+                    "audience": ["audience1", "audience2"],
                     "issuer": "https://www.example.com/v1/connect/oidc"
                   },
                   "identitySource": "$request.header.Authorization",
