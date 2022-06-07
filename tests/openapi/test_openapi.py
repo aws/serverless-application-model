@@ -203,8 +203,8 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
             "paths": {
                 "/foo": {"post": {"a": [1, 2, "b"], "responses": {"something": "is already here"}}},
                 "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
-                "/nullmethod": {"get": None}
-            }
+                "/nullmethod": {"get": None},
+            },
         }
 
         self.editor = OpenApiEditor(self.original_openapi)
