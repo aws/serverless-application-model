@@ -1211,8 +1211,6 @@ class SamHttpApi(SamResourceMacro):
         resources = []
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)
-
-        intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
 
         api_generator = HttpApiGenerator(
@@ -1242,7 +1240,7 @@ class SamHttpApi(SamResourceMacro):
             domain,
             basepath_mapping,
             route53,
-        ) = api_generator.to_cloudformation()
+        ) = api_generator.to_cloudformation(kwargs.get("route53_record_set_groups", {}))
 
         resources.append(http_api)
         if domain:
