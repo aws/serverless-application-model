@@ -400,7 +400,11 @@ class OpenApiEditor(object):
                         # check if there is any method_definition given by customer
                         if not method_definition:
                             raise InvalidDocumentException(
-                                [InvalidTemplateException(f"Invalid method definition ({method}) for path: {path}")]
+                                [
+                                    InvalidTemplateException(
+                                        f"Invalid method definition ({normalized_method_name}) for path: {path}"
+                                    )
+                                ]
                             )
                         # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                         if not self.method_definition_has_integration(method_definition):
