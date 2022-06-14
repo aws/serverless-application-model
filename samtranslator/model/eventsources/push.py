@@ -1121,7 +1121,7 @@ class HttpApi(PushEventSource):
                 editor = OpenApiEditor(resources_to_link["explicit_api"].get("DefinitionBody"))
             except InvalidDocumentException as e:
                 api_logical_id = self.ApiId.get("Ref") if isinstance(self.ApiId, dict) else self.ApiId
-                raise InvalidResourceException(api_logical_id, e)
+                raise InvalidResourceException(api_logical_id, " ".join(ex.message for ex in e.causes))
 
         # If this is using the new $default path, keep path blank and add a * permission
         if path == OpenApiEditor._DEFAULT_PATH:
