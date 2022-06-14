@@ -41,8 +41,11 @@ class OpenApiEditor(object):
         """
         if not OpenApiEditor.is_valid(doc):
             raise InvalidDocumentException(
-                "Invalid OpenApi document. "
-                "Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
+                [
+                    InvalidTemplateException(
+                        "Invalid OpenApi document. Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
+                    )
+                ]
             )
 
         self._doc = copy.deepcopy(doc)

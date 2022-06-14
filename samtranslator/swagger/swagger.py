@@ -48,7 +48,7 @@ class SwaggerEditor(object):
         """
 
         if not SwaggerEditor.is_valid(doc):
-            raise InvalidDocumentException("Invalid Swagger document")
+            raise InvalidDocumentException([InvalidTemplateException("Invalid Swagger document")])
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
@@ -187,7 +187,11 @@ class SwaggerEditor(object):
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
             raise InvalidDocumentException(
-                "Lambda integration already exists on Path={}, Method={}".format(path, method)
+                [
+                    InvalidTemplateException(
+                        "Lambda integration already exists on Path={}, Method={}".format(path, method)
+                    )
+                ]
             )
 
         self.add_path(path, method)
@@ -252,7 +256,9 @@ class SwaggerEditor(object):
 
         method = self._normalize_method_name(method)
         if self.has_integration(path, method):
-            raise InvalidDocumentException("Integration already exists on Path={}, Method={}".format(path, method))
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Integration already exists on Path={}, Method={}".format(path, method))]
+            )
 
         self.add_path(path, method)
 
@@ -1029,7 +1035,9 @@ class SwaggerEditor(object):
             return
 
         if effect not in ["Allow", "Deny"]:
-            raise InvalidDocumentException("Effect must be one of {}".format(["Allow", "Deny"]))
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Effect must be one of {}".format(["Allow", "Deny"]))]
+            )
 
         if not isinstance(policy_list, (dict, list)):
             raise InvalidDocumentException(
@@ -1091,7 +1099,9 @@ class SwaggerEditor(object):
             ip_list = [ip_list]
 
         if conditional not in ["IpAddress", "NotIpAddress"]:
-            raise InvalidDocumentException("Conditional must be one of {}".format(["IpAddress", "NotIpAddress"]))
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Conditional must be one of {}".format(["IpAddress", "NotIpAddress"]))]
+            )
 
         self.resource_policy["Version"] = "2012-10-17"
         allow_statement = Py27Dict()
@@ -1127,7 +1137,9 @@ class SwaggerEditor(object):
         """
 
         if conditional not in ["StringNotEquals", "StringEquals"]:
-            raise InvalidDocumentException("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))
+            raise InvalidDocumentException(
+                [InvalidTemplateException("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))]
+            )
 
         condition = Py27Dict()
         string_endpoint_list = endpoint_dict.get("StringEndpointList")
