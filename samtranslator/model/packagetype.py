@@ -1,0 +1,2 @@
+IMAGE = "Image"
+ZIP = "Zip"

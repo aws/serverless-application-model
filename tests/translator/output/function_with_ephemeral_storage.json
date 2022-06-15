@@ -1,0 +1,123 @@
+{
+  "Resources": {
+    "FunctionWithIntrinsicRef": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "EphemeralStorage": {
+          "Size": {
+            "Ref": "EphemeralStorageSizeRef"
+          }
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionWithIntrinsicRefRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7"
+      }
+    }, 
+    "FunctionWithIntrinsicRefRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MinimalFunctionRole": {
+      "Type": "AWS::IAM::Role", 
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17", 
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ], 
+              "Effect": "Allow", 
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        }, 
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ], 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ]
+      }
+    }, 
+    "MinimalFunction": {
+      "Type": "AWS::Lambda::Function", 
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket", 
+          "S3Key": "hello.zip"
+        }, 
+        "Tags": [
+          {
+            "Value": "SAM", 
+            "Key": "lambda:createdBy"
+          }
+        ], 
+        "EphemeralStorage": {
+          "Size": 1024
+        }, 
+        "Handler": "hello.handler", 
+        "Role": {
+          "Fn::GetAtt": [
+            "MinimalFunctionRole", 
+            "Arn"
+          ]
+        }, 
+        "Runtime": "python2.7"
+      }
+    }
+  }, 
+  "Parameters": {
+    "EphemeralStorageSizeRef": {
+      "Type": "Number"
+    }
+  }
+}

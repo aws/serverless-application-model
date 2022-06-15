@@ -1,0 +1,36 @@
+Conditions:
+  MyCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: MyBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              Fn::If:
+                - MyCondition
+                - S3Key:
+                    Rules:
+                      - Name: prefix
+                        Value: object_prefix
+                - S3Key:
+                    Rules:
+                      - Name: suffix
+                        Value: object_suffix
+
+  MyBucket:
+    Type: AWS::S3::Bucket

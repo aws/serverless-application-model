@@ -1,0 +1,44 @@
+# This test-case tests what happens when an AWS_IAM authorizer is defined on an HttpApi but not enabled anywhere else.
+# While the defined authorizer isn't really a true Iam authorizer (it's just a poorly-named OAuth authorizer) this shouldn't cause an error.
+Resources:
+  HttpApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/todo_list.zip
+      Handler: index.restapi
+      Runtime: python3.7
+      Events:
+        HelloAWSIAMAuth:
+          Type: HttpApi
+          Properties:
+            Path: /hello-aws-iam-auth
+            Method: get
+            ApiId: !Ref MyApi
+            Auth:
+              Authorizer: AWS_IAM
+
+  MyAuthFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://bucket/key
+      Handler: index.handler
+      Runtime: nodejs12.x
+
+  MyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Tags:
+        Tag1: value1
+        Tag2: value2
+      Auth:
+        Authorizers:
+          AWS_IAM:
+            AuthorizationScopes:
+              - scope
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              audience:
+                - audience1
+                - audience2
+              issuer: "https://www.example.com/v1/connect/oidc"
+        DefaultAuthorizer: AWS_IAM

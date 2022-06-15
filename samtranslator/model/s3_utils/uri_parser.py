@@ -1,5 +1,4 @@
-from six import string_types
-from six.moves.urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 from samtranslator.model.exceptions import InvalidResourceException
 
 
@@ -9,7 +8,7 @@ def parse_s3_uri(uri):
     :return: a BodyS3Location dict or None if not an S3 Uri
     :rtype: dict
     """
-    if not isinstance(uri, string_types):
+    if not isinstance(uri, str):
         return None
 
     url = urlparse(uri)
@@ -43,6 +42,24 @@ def to_s3_uri(code_dict):
         uri += "?versionId=" + version
 
     return uri
+
+
+def construct_image_code_object(image_uri, logical_id, property_name):
+    """Constructs a Lambda `Code` or `Content` property, from the SAM `ImageUri` property.
+    This follows the current scheme for Lambda Functions.
+
+    :param string image_uri: string
+    :param string logical_id: logical_id of the resource calling this function
+    :param string property_name: name of the property which is used as an input to this function.
+    :returns: a Code dict, containing the ImageUri.
+    :rtype: dict
+    """
+    if not image_uri:
+        raise InvalidResourceException(
+            logical_id, "'{}' requires that a image hosted at a registry be specified.".format(property_name)
+        )
+
+    return {"ImageUri": image_uri}
 
 
 def construct_s3_location_object(location_uri, logical_id, property_name):

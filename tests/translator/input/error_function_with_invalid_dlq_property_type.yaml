@@ -1,0 +1,17 @@
+Transform: "AWS::Serverless-2016-10-31"
+Parameter:
+  DeadLetterQueueType:
+    Type: String
+    Default: SQS
+
+Resources:
+  MySqsDlqLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python2.7
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      DeadLetterQueue:
+        Type:
+          Ref: DeadLetterQueueType
+        TargetArn: arn

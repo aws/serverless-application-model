@@ -1,0 +1,18 @@
+Resources:
+  MinimalLayer:
+    Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+      RetentionPolicy: Retain
+
+  MinimalLayer2:
+    Type: 'AWS::Serverless::LayerVersion'
+    DeletionPolicy: Delete
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip
+
+  MinimalLayer3:
+    Type: 'AWS::Serverless::LayerVersion'
+    Properties:
+      ContentUri: s3://sam-demo-bucket/layer.zip

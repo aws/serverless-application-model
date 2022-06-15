@@ -1,3 +1,4 @@
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.plugins import BasePlugin
 from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
 from samtranslator.model.exceptions import InvalidResourceException
@@ -30,6 +31,7 @@ class PolicyTemplatesForResourcePlugin(BasePlugin):
 
         self._policy_template_processor = policy_template_processor
 
+    @cw_timer(prefix="Plugin-PolicyTemplates")
     def on_before_transform_resource(self, logical_id, resource_type, resource_properties):
         """
         Hook method that gets called before "each" SAM resource gets processed

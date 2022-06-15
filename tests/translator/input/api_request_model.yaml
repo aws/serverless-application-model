@@ -15,6 +15,15 @@ Resources:
             RequestModel:
               Model: User
               Required: true
+        AnyPath:
+          Type: Api
+          Properties:
+            RestApiId: HtmlApi
+            Path: /any
+            Method: any
+            RequestModel:
+              Model: User
+              Required: true
 
   HtmlApi:
     Type: AWS::Serverless::Api

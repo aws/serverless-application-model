@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  MyHttpApiGateway:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          MyAuthorizer:
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              issuer:
+                Ref: MyOAuth2Issuer
+        DefaultAuthorizer: MyAuthorizer
+      DefinitionBody:
+        openapi: 3.0.1
+        paths:
+          /test:
+            post: null

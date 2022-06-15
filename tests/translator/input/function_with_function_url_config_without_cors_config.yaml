@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters: {}
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Description: Created by SAM
+      Handler: index.handler
+      MemorySize: 1024
+      Runtime: nodejs12.x
+      Timeout: 3
+      FunctionUrlConfig:
+        AuthType: NONE
+

@@ -1,0 +1,820 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "type": "object",
+  "definitions": {
+    "AWS::Serverless::Api": {
+      "if": {
+        "properties": {
+          "Type": {
+            "const": "AWS::Serverless::Api"
+          }
+        },
+        "required": [
+          "Type"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "properties": {
+          "Condition": {
+            "$ref": "common.json#definitions/Condition"
+          },
+          "DeletionPolicy": {
+            "$ref": "common.json#definitions/DeletionPolicy"
+          },
+          "DependsOn": {
+            "$ref": "common.json#definitions/DependsOn"
+          },
+          "Metadata": {
+            "type": "object"
+          },
+          "Properties": {
+            "additionalProperties": false,
+            "properties": {
+              "AccessLogSetting": {
+                "$ref": "cfn.json#definitions/AWS::ApiGateway::Stage.AccessLogSetting"
+              },
+              "Auth": {
+                "$ref": "#definitions/AWS::Serverless::Api.Auth"
+              },
+              "ApiKeySourceType": {
+                "enum": [
+                  "HEADER",
+                  "AUTHORIZER"
+                ],
+                "type":"string"                                
+              },
+              "BinaryMediaTypes": {
+                "items": {
+                  "type": [
+                    "string",
+                    "intrinsic"
+                  ]
+                },
+                "type": [
+                  "array",
+                  "intrinsic"
+                ]
+              },
+              "CacheClusterEnabled": {
+                "type": [
+                  "boolean",
+                  "intrinsic"
+                ]
+              },
+              "CacheClusterSize": {
+                "type": [
+                  "string",
+                  "intrinsic"
+                ]
+              },
+              "CanarySetting": {
+                "$ref": "cfn.json#definitions/AWS::ApiGateway::Stage.CanarySetting"
+              },
+              "Cors": {
+                "if": {
+                  "type": "object"
+                },
+                "then": {
+                  "$ref": "#definitions/AWS::Serverless::Api.CorsConfiguration"
+                },
+                "type": [
+                  "string",
+                  "object",
+                  "intrinsic"
+                ]
+              },
+              "DefinitionBody": {
+                "type": [
+                  "string",
+                  "object",
+                  "intrinsic"
+                ]
+              },
+              "DefinitionUri": {
+                "type": [
+                  "string",
+                  "object"
+                ],
+                "$ref": "#definitions/AWS::Serverless::Api.S3Location"
+              },
+              "Description": {
+                "type": [
+                  "string",
+                  "intrinsic"
+                ]
+              },
+              "DisableExecuteApiEndpoint": {
+                "type": [
+                  "boolean",
+                  "intrinsic"
+                ]
+              },
+              "Domain": {
+                "$ref": "#definitions/AWS::Serverless::Api.DomainConfiguration"
+              },
+              "EndpointConfiguration": {
+                "$ref": "#definitions/AWS::Serverless::Api.EndpointConfiguration"
+              },
+              "GatewayResponses": {
+                "$ref": "common.json#definitions/GatewayResponses",
+                "references": [
+                  "https://docs.aws.amazon.com/apigateway/api-reference/resource/gateway-response/"
+                ]
+              },
+              "MethodSettings": {
+                "if": {
+                  "type": "array"
+                },
+                "then": {
+                  "items": {
+                    "$ref": "cfn.json#definitions/AWS::ApiGateway::Stage.MethodSetting"
+                  }
+                },
+                "type": [
+                  "array",
+                  "intrinsic"
+                ]
+              },
+              "MinimumCompressionSize": {
+                "type": [
+                  "integer",
+                  "intrinsic",
+                  "null"
+                ],
+                "maximum": 10485760,
+                "minimum": 0
+              },
+              "Models": {
+                "additionalProperties": {
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "Name": {
+                "type": [
+                  "string",
+                  "intrinsic"
+                ]
+              },
+              "OpenApiVersion": {
+                "type": "string",
+                "pattern": "^(2\\.0|3\\.\\d\\.\\d)?$",
+                "patternError": "must match 2.x or 3.x.x"
+              },
+              "StageName": {
+                "type": [
+                  "string",
+                  "intrinsic"
+                ]
+              },
+              "Tags": {
+                "$ref": "common.json#definitions/TagsMap"
+              },
+              "TracingEnabled": {
+                "type": [
+                  "boolean",
+                  "intrinsic"
+                ]
+              },
+              "Variables": {
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^[a-zA-Z0-9]+$": {
+                    "pattern": "[A-Za-z0-9._~:/?#&=,-]+",
+                    "type": [
+                      "string",
+                      "intrinsic"
+                    ]
+                  }
+                },
+                "type": [
+                  "object",
+                  "intrinsic"
+                ]
+              }
+            },
+            "required": [
+              "StageName"
+            ],
+            "type": "object"
+          },
+          "Type": {
+            "const": "AWS::Serverless::Api"
+          },
+          "UpdatePolicy": {
+            "$ref": "common.json#definitions/UpdatePolicy"
+          },
+          "UpdateReplacePolicy": {
+            "$ref": "common.json#definitions/UpdateReplacePolicy"
+          }
+        },
+        "required": [
+          "Type",
+          "Properties"
+        ],
+        "type": "object"
+      }
+    },
+    "AWS::Serverless::Api.ApiUsagePlan": {
+      "additionalProperties": false,
+      "properties": {
+        "CreateUsagePlan": {
+          "enum": [
+            "PER_API",
+            "SHARED",
+            "NONE"
+          ],
+          "type": "string"
+        },
+        "Description": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "Quota": {
+          "$ref": "cfn.json#definitions/AWS::ApiGateway::UsagePlan.QuotaSettings"
+        },
+        "Tags": {
+          "$ref": "common.json#definitions/TagsList"
+        },
+        "Throttle": {
+          "$ref": "cfn.json#definitions/AWS::ApiGateway::UsagePlan.ThrottleSettings"
+        },
+        "UsagePlanName": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        }
+      },
+      "required": [
+        "CreateUsagePlan"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Api.Auth": {
+      "additionalProperties": false,
+      "properties": {
+        "AddDefaultAuthorizerToCorsPreflight": {
+          "type": "boolean"
+        },
+        "ApiKeyRequired": {
+          "type": "boolean"
+        },
+        "Authorizers": {
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z0-9]+$": {
+              "allOf": [
+                {
+                  "$ref": "#definitions/AWS::Serverless::Api.CognitoAuthorizer"
+                },
+                {
+                  "$ref": "#definitions/AWS::Serverless::Api.LambdaAuthorizer"
+                },
+                {
+                  "if": {
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "UserPoolArn"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "FunctionArn"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "UserPoolArn",
+                      "FunctionArn"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "DefaultAuthorizer": {
+          "type": "string"
+        },
+        "InvokeRole": {
+          "enum": [
+            "CALLER_CREDENTIALS",
+            "NONE",
+            "IAMRoleArn"
+          ],
+          "type": "string"
+        },
+        "ResourcePolicy": {
+          "$ref": "#definitions/AWS::Serverless::Api.ResourcePolicyStatement"
+        },
+        "UsagePlan": {
+          "$ref": "#definitions/AWS::Serverless::Api.ApiUsagePlan"
+        }
+      },
+      "type": [
+        "object",
+        "intrinsic"
+      ]
+    },
+    "AWS::Serverless::Api.CognitoAuthorizer": {
+      "if": {
+        "required": [
+          "UserPoolArn"
+        ]
+      },
+      "then": {
+        "additionalProperties": false,
+        "properties": {
+          "AuthorizationScopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "Identity": {
+            "$ref": "#definitions/AWS::Serverless::Api.CognitoAuthorizationIdentity"
+          },
+          "UserPoolArn": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          }
+        },
+        "required": [
+          "UserPoolArn"
+        ],
+        "type": "object"
+      }
+    },
+    "AWS::Serverless::Api.CognitoAuthorizationIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "Header": {
+          "type": "string"
+        },
+        "ReauthorizeEvery": {
+          "type": [
+            "integer",
+            "intrinsic"
+          ],
+          "maximum": 3600,
+          "minimum": 1
+        },
+        "ValidationExpression": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::Serverless::Api.CorsConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "AllowCredentials": {
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
+        },
+        "AllowHeaders": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "AllowMethods": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "AllowOrigin": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "MaxAge": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        }
+      },
+      "required": [
+        "AllowOrigin"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Api.DomainConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "BasePath": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "CertificateArn": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "DomainName": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "EndpointConfiguration": {
+          "enum": [
+            "REGIONAL",
+            "EDGE"
+          ],
+          "type": "string"
+        },
+        "MutualTlsAuthentication": {
+          "$ref": "cfn.json#definitions/AWS::ApiGatewayV2::DomainName.MutualTlsAuthentication"
+        },
+        "Route53": {
+          "$ref": "#definitions/AWS::Serverless::Api.Route53Configuration"
+        },
+        "SecurityPolicy": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "OwnershipVerificationCertificateArn": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        }
+      },
+      "required": [
+        "CertificateArn",
+        "DomainName"
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Api.EndpointConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "if": {
+            "type": "string"
+          },
+          "then": {
+            "enum": [
+              "REGIONAL",
+              "EDGE",
+              "PRIVATE"
+            ]
+          },
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "VPCEndpointIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "intrinsic"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "AWS::Serverless::Api.LambdaAuthorizer": {
+      "if": {
+        "required": [
+          "FunctionArn"
+        ]
+      },
+      "then": {
+        "properties": {
+          "AuthorizationScopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "FunctionArn": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "FunctionInvokeRole": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "FunctionPayloadType": {
+            "enum": [
+              "TOKEN",
+              "REQUEST"
+            ],
+            "type": "string"
+          }
+        },
+        "if": {
+          "properties": {
+            "FunctionPayloadType": {
+              "const": "TOKEN"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "Identity": {
+              "$ref": "#definitions/AWS::Serverless::Api.LambdaTokenAuthorizationIdentity"
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "Identity": {
+              "$ref": "#definitions/AWS::Serverless::Api.LambdaRequestAuthorizationIdentity"
+            }
+          }
+        },
+        "required": [
+          "FunctionArn"
+        ],
+        "type": "object"
+      }
+    },
+    "AWS::Serverless::Api.LambdaRequestAuthorizationIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "Context": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Headers": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "QueryStrings": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ReauthorizeEvery": {
+          "type": [
+            "integer",
+            "intrinsic"
+          ],
+          "maximum": 3600,
+          "minimum": 1
+        },
+        "StageVariables": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "Context"
+          ]
+        },
+        {
+          "required": [
+            "Headers"
+          ]
+        },
+        {
+          "required": [
+            "QueryStrings"
+          ]
+        },
+        {
+          "required": [
+            "ReauthorizeEvery"
+          ]
+        },
+        {
+          "required": [
+            "StageVariables"
+          ]
+        }
+      ],
+      "type": "object"
+    },
+    "AWS::Serverless::Api.LambdaTokenAuthorizationIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "ReauthorizeEvery": {
+          "type": [
+            "integer",
+            "intrinsic"
+          ],
+          "maximum": 3600,
+          "minimum": 1
+        },
+        "ValidationExpression": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::Serverless::Api.ResourcePolicyStatement": {
+      "additionalProperties": false,
+      "properties": {
+        "AwsAccountBlacklist": {
+          "items": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "type": [
+            "array",
+            "object",
+            "intrinsic"
+          ]
+        },
+        "AwsAccountWhitelist": {
+          "items": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "type": [
+            "array",
+            "object",
+            "intrinsic"
+          ]
+        },
+        "CustomStatements": {
+          "items": {
+            "type": [
+              "object",
+              "intrinsic"
+            ]
+          },
+          "type": [
+            "array",
+            "object",
+            "intrinsic"
+          ]
+        },
+        "IntrinsicVpcBlacklist": {
+          "items": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "type": "array"
+        },
+        "IntrinsicVpcWhitelist": {
+          "items": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "type": "array"
+        },
+        "IntrinsicVpceBlacklist": {
+          "items": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "type": "array"
+        },
+        "IntrinsicVpceWhitelist": {
+          "items": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "type": "array"
+        },
+        "IpRangeBlacklist": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "IpRangeWhitelist": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "SourceVpcBlacklist": {
+          "items": {
+            "type": "string",
+            "pattern": "^vpce?-",
+            "patternError": "must start with 'vpc-' or 'vpce-'"
+          },
+          "type": "array"
+        },
+        "SourceVpcWhitelist": {
+          "items": {
+            "type": "string",
+            "pattern": "^vpce?-",
+            "patternError": "must start with 'vpc-' or 'vpce-'"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AWS::Serverless::Api.Route53Configuration": {
+      "additionalProperties": false,
+      "properties": {
+        "DistributionDomainName": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "EvaluateTargetHealth": {
+          "type": [
+            "boolean",
+            "intrinsic"
+          ]
+        },
+        "IpV6": {
+          "type": "boolean"
+        },
+        "HostedZoneId": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        },
+        "HostedZoneName": {
+          "type": [
+            "string",
+            "intrinsic"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "AWS::Serverless::Api.S3Location": {
+      "if": {
+        "type": "object"
+      },
+      "then": {
+        "additionalProperties": false,
+        "properties": {
+          "Bucket": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "Key": {
+            "type": [
+              "string",
+              "intrinsic"
+            ]
+          },
+          "Version": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "Bucket",
+          "Key"
+        ],
+        "type": "object"
+      }
+    }
+  }
+}

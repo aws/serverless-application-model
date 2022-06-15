@@ -24,7 +24,9 @@ def fnAnd(argument_list):
     return {"Fn::And": argument_list}
 
 
-def make_conditional(condition, true_data, false_data={"Ref": "AWS::NoValue"}):
+def make_conditional(condition, true_data, false_data=None):
+    if false_data is None:
+        false_data = {"Ref": "AWS::NoValue"}
     return {"Fn::If": [condition, true_data, false_data]}
 
 
@@ -160,6 +162,24 @@ def is_intrinsic_if(input):
 
     key = list(input.keys())[0]
     return key == "Fn::If"
+
+
+def validate_intrinsic_if_items(items):
+    """
+    Validates Fn::If items
+
+    Parameters
+    ----------
+    items : list
+        Fn::If items
+
+    Raises
+    ------
+    ValueError
+        If the items are invalid
+    """
+    if not isinstance(items, list) or len(items) != 3:
+        raise ValueError("Fn::If requires 3 arguments")
 
 
 def is_intrinsic_no_value(input):

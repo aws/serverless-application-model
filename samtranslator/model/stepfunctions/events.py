@@ -1,6 +1,6 @@
-from six import string_types
 import json
 
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, ResourceMacro
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
@@ -8,11 +8,14 @@ from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of
 from samtranslator.model.intrinsics import fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
+from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
+from samtranslator.model.eventsources.push import Api as PushApi
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
 
 CONDITION = "Condition"
+SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
 
 
 class EventSource(ResourceMacro):
@@ -42,11 +45,12 @@ class EventSource(ResourceMacro):
             logical_id = generator.gen()
         return logical_id
 
-    def _construct_role(self, resource, prefix=None, suffix=""):
-        """Constructs the IAM Role resource allowing the event service to invoke 
+    def _construct_role(self, resource, permissions_boundary=None, prefix=None, suffix=""):
+        """Constructs the IAM Role resource allowing the event service to invoke
         the StartExecution API of the state machine resource it is associated with.
 
         :param model.stepfunctions.StepFunctionsStateMachine resource: The state machine resource associated with the event
+        :param string permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
         :param string prefix: Prefix to use for the logical ID of the IAM role
         :param string suffix: Suffix to add for the logical ID of the IAM role
 
@@ -63,6 +67,9 @@ class EventSource(ResourceMacro):
             IAMRolePolicies.step_functions_start_execution_role_policy(state_machine_arn, role_logical_id)
         ]
 
+        if permissions_boundary:
+            event_role.PermissionsBoundary = permissions_boundary
+
         return event_role
 
 
@@ -77,8 +84,11 @@ class Schedule(EventSource):
         "Enabled": PropertyType(False, is_type(bool)),
         "Name": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
         """Returns the EventBridge Rule and IAM Role to which this Schedule event source corresponds.
 
@@ -88,7 +98,10 @@ class Schedule(EventSource):
         """
         resources = []
 
-        events_rule = EventsRule(self.logical_id)
+        permissions_boundary = kwargs.get("permissions_boundary")
+
+        passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
@@ -96,16 +109,23 @@ class Schedule(EventSource):
             events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
         events_rule.Name = self.Name
         events_rule.Description = self.Description
-        if CONDITION in resource.resource_attributes:
-            events_rule.set_resource_attribute(CONDITION, resource.resource_attributes[CONDITION])
 
-        role = self._construct_role(resource)
+        role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
-        events_rule.Targets = [self._construct_target(resource, role)]
+
+        source_arn = events_rule.get_runtime_attr("arn")
+        dlq_queue_arn = None
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+                self, source_arn, passthrough_resource_attributes
+            )
+            resources.extend(dlq_resources)
+        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
 
         return resources
 
-    def _construct_target(self, resource, role):
+    def _construct_target(self, resource, role, dead_letter_queue_arn=None):
         """Constructs the Target property for the EventBridge Rule.
 
         :returns: the Target property
@@ -118,6 +138,12 @@ class Schedule(EventSource):
         }
         if self.Input is not None:
             target["Input"] = self.Input
+
+        if self.DeadLetterConfig is not None:
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
+
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
 
         return target
 
@@ -132,10 +158,13 @@ class CloudWatchEvent(EventSource):
         "Pattern": PropertyType(False, is_type(dict)),
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
+        "DeadLetterConfig": PropertyType(False, is_type(dict)),
+        "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
-        """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this 
+        """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
 
         :param dict kwargs: no existing resources need to be modified
@@ -144,21 +173,32 @@ class CloudWatchEvent(EventSource):
         """
         resources = []
 
-        events_rule = EventsRule(self.logical_id)
+        permissions_boundary = kwargs.get("permissions_boundary")
+
+        passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
-        if CONDITION in resource.resource_attributes:
-            events_rule.set_resource_attribute(CONDITION, resource.resource_attributes[CONDITION])
 
         resources.append(events_rule)
 
-        role = self._construct_role(resource)
+        role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
-        events_rule.Targets = [self._construct_target(resource, role)]
+
+        source_arn = events_rule.get_runtime_attr("arn")
+        dlq_queue_arn = None
+        if self.DeadLetterConfig is not None:
+            EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+                self, source_arn, passthrough_resource_attributes
+            )
+            resources.extend(dlq_resources)
+
+        events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
 
         return resources
 
-    def _construct_target(self, resource, role):
+    def _construct_target(self, resource, role, dead_letter_queue_arn=None):
         """Constructs the Target property for the CloudWatch Events/EventBridge Rule.
 
         :returns: the Target property
@@ -174,6 +214,13 @@ class CloudWatchEvent(EventSource):
 
         if self.InputPath is not None:
             target["InputPath"] = self.InputPath
+
+        if self.DeadLetterConfig is not None:
+            target["DeadLetterConfig"] = {"Arn": dead_letter_queue_arn}
+
+        if self.RetryPolicy is not None:
+            target["RetryPolicy"] = self.RetryPolicy
+
         return target
 
 
@@ -203,10 +250,6 @@ class Api(EventSource):
         necessary data from the explicit API
         """
 
-        rest_api_id = self.RestApiId
-        if isinstance(rest_api_id, dict) and "Ref" in rest_api_id:
-            rest_api_id = rest_api_id["Ref"]
-
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the State Machine. If we are unable to resolve the stage name, we will
@@ -216,7 +259,8 @@ class Api(EventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        if isinstance(rest_api_id, string_types):
+        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
+        if isinstance(rest_api_id, str):
 
             if (
                 rest_api_id in resources
@@ -228,7 +272,7 @@ class Api(EventSource):
                 permitted_stage = explicit_api["StageName"]
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, string_types):
+                if isinstance(permitted_stage, str):
                     stage_suffix = permitted_stage
                 else:
                     stage_suffix = "Stage"
@@ -242,10 +286,11 @@ class Api(EventSource):
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
-        """If the Api event source has a RestApi property, then simply return the IAM role resource 
-        allowing API Gateway to start the state machine execution. If no RestApi is provided, then 
-        additionally inject the path, method, and the x-amazon-apigateway-integration into the 
+        """If the Api event source has a RestApi property, then simply return the IAM role resource
+        allowing API Gateway to start the state machine execution. If no RestApi is provided, then
+        additionally inject the path, method, and the x-amazon-apigateway-integration into the
         Swagger body for a provided implicit API.
 
         :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine \
@@ -259,12 +304,13 @@ class Api(EventSource):
         resources = []
 
         intrinsics_resolver = kwargs.get("intrinsics_resolver")
+        permissions_boundary = kwargs.get("permissions_boundary")
 
         if self.Method is not None:
             # Convert to lower case so that user can specify either GET or get
             self.Method = self.Method.lower()
 
-        role = self._construct_role(resource)
+        role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
 
         explicit_api = kwargs["explicit_api"]
@@ -370,19 +416,17 @@ class Api(EventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(
-                    resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
-                )
+                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)
                 if resource_policy.get("CustomStatements"):
                     editor.add_custom_statements(resource_policy.get("CustomStatements"))
 
         api["DefinitionBody"] = editor.swagger
 
     def _generate_request_template(self, resource):
-        """Generates the Body mapping request template for the Api. This allows for the input 
+        """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
 
-        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine 
+        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine
                 resource to which the Api event source must be associated
 
         :returns: a body mapping request which passes the Api input to the state machine execution

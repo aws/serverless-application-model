@@ -15,7 +15,7 @@ For Example:
     Properties:
       ...
       Policies:
-        # Give DynamoDB Full Access to your Lambda Function
+        # Give your Lambda Function Full Access to DynamoDB 
         - AmazonDynamoDBFullAccess
       ...
 
@@ -74,4 +74,4 @@ folder.
       - CloudWatchPutMetricPolicy: {}      
 
 .. _policy_templates.json: https://github.com/awslabs/serverless-application-model/blob/develop/samtranslator/policy_templates_data/policy_templates.json
-.. _all_policy_templates.yaml: https://github.com/awslabs/serverless-application-model/blob/develop/examples/2016-10-31/policy_templates/all_policy_templates.yaml
+.. _all_policy_templates.yaml: https://github.com/awslabs/serverless-application-model/blob/develop/tests/translator/input/all_policy_templates.yaml

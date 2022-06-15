@@ -22,6 +22,10 @@ Globals:
     Layers:
       - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:MyLayer:1
     ReservedConcurrentExecutions: 50
+    Architectures:
+      - x86_64
+    EphemeralStorage: 
+      Size: 1024
 
 Resources:
   MinimalFunction:

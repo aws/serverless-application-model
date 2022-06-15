@@ -1,9 +1,12 @@
 from enum import Enum
 from collections import namedtuple
 
-from six import string_types
-
-from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_if, is_intrinsic_no_value
+from samtranslator.model.intrinsics import (
+    is_intrinsic,
+    is_intrinsic_if,
+    is_intrinsic_no_value,
+    validate_intrinsic_if_items,
+)
 from samtranslator.model.exceptions import InvalidTemplateException
 
 PolicyEntry = namedtuple("PolicyEntry", "data type")
@@ -118,7 +121,7 @@ class FunctionPolicies(object):
         # Must handle intrinsic functions. Policy could be a primitive type or an intrinsic function
 
         # Managed policies are of type string
-        if isinstance(policy, string_types):
+        if isinstance(policy, str):
             return PolicyTypes.MANAGED_POLICY
 
         # Handle the special case for 'if' intrinsic function
@@ -165,8 +168,10 @@ class FunctionPolicies(object):
         """
         intrinsic_if_value = policy["Fn::If"]
 
-        if not len(intrinsic_if_value) == 3:
-            raise InvalidTemplateException("Fn::If requires 3 arguments")
+        try:
+            validate_intrinsic_if_items(intrinsic_if_value)
+        except ValueError as e:
+            raise InvalidTemplateException(e)
 
         if_data = intrinsic_if_value[1]
         else_data = intrinsic_if_value[2]

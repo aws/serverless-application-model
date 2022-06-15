@@ -21,6 +21,11 @@ Resources:
           Properties:
             Path: /html
             Method: GET
+        GetHtmlAnyMethod:
+          Type: Api
+          Properties:
+            Path: /any/html
+            Method: any
 
 Outputs:
   ImplicitApiDeployment:

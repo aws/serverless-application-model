@@ -1,0 +1,14 @@
+[
+  { "LogicalResourceId":"MyTestFunction2", "ResourceType":"AWS::Lambda::Function"},
+  { "LogicalResourceId":"MyTestFunction2EventInvokeConfigOnSuccessTopic", "ResourceType":"AWS::SNS::Topic" },
+  { "LogicalResourceId":"MyTestFunctionRole", "ResourceType":"AWS::IAM::Role"},
+  { "LogicalResourceId":"MyTestFunction", "ResourceType":"AWS::Lambda::Function"},
+  { "LogicalResourceId":"MyTestFunction2Aliaslive", "ResourceType":"AWS::Lambda::Alias"},
+  { "LogicalResourceId":"MyTestFunctionEventInvokeConfigOnSuccessQueue", "ResourceType":"AWS::SQS::Queue"},
+  { "LogicalResourceId":"MyTestFunction2Role", "ResourceType":"AWS::IAM::Role"},
+  { "LogicalResourceId":"DestinationLambda", "ResourceType":"AWS::Lambda::Function"},
+  { "LogicalResourceId":"MyTestFunction2EventInvokeConfig", "ResourceType":"AWS::Lambda::EventInvokeConfig"},
+  { "LogicalResourceId":"MyTestFunction2Version", "ResourceType":"AWS::Lambda::Version"},
+  { "LogicalResourceId":"MyTestFunctionEventInvokeConfig", "ResourceType":"AWS::Lambda::EventInvokeConfig"},
+  { "LogicalResourceId":"DestinationLambdaRole", "ResourceType":"AWS::IAM::Role"}
+]

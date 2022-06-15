@@ -1,0 +1,3 @@
+{
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ImplicitApiFunction] is invalid. Event with id [ImplicitApiFunctionOneTrigger] is invalid. Ref in Userpool is not a string."
+}

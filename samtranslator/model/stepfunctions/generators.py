@@ -2,9 +2,8 @@ import json
 from uuid import uuid4
 from copy import deepcopy
 
-from six import string_types
-
 import samtranslator.model.eventsources.push
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceTypeResolver
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMRolePolicies
@@ -17,6 +16,7 @@ from samtranslator.model.intrinsics import fnJoin
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
 from samtranslator.model.intrinsics import is_intrinsic
+from samtranslator.model.xray_utils import get_xray_managed_policy_name
 from samtranslator.utils.cfn_dynamic_references import is_dynamic_reference
 
 
@@ -37,9 +37,11 @@ class StateMachineGenerator(object):
         logging,
         name,
         policies,
+        permissions_boundary,
         definition_substitutions,
         role,
         state_machine_type,
+        tracing,
         events,
         event_resources,
         event_resolver,
@@ -53,15 +55,17 @@ class StateMachineGenerator(object):
         :param logical_id: Logical id of the SAM State Machine Resource
         :param depends_on: Any resources that need to be depended on
         :param managed_policy_map: Map of managed policy names to the ARNs
-        :param intrinsics_resolver: Instance of the resolver that knows how to resolve parameter references 
+        :param intrinsics_resolver: Instance of the resolver that knows how to resolve parameter references
         :param definition: State Machine definition
         :param definition_uri: URI to State Machine definition
         :param logging: Logging configuration for the State Machine
         :param name: Name of the State Machine resource
         :param policies: Policies attached to the execution role
+        :param permissions_boundary: The ARN of the policy used to set the permissions boundary for the role
         :param definition_substitutions: Variable-to-value mappings to be replaced in the State Machine definition
         :param role: Role ARN to use for the execution role
         :param state_machine_type: Type of the State Machine
+        :param tracing: Tracing configuration for the State Machine
         :param events: List of event sources for the State Machine
         :param event_resources: Event resources to link
         :param event_resolver: Resolver that maps Event types to Event classes
@@ -80,9 +84,11 @@ class StateMachineGenerator(object):
         self.name = name
         self.logging = logging
         self.policies = policies
+        self.permissions_boundary = permissions_boundary
         self.definition_substitutions = definition_substitutions
         self.role = role
         self.type = state_machine_type
+        self.tracing = tracing
         self.events = events
         self.event_resources = event_resources
         self.event_resolver = event_resolver
@@ -92,6 +98,7 @@ class StateMachineGenerator(object):
         )
         self.substitution_counter = 1
 
+    @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):
         """
         Constructs and returns the State Machine resource and any additional resources associated with it.
@@ -144,6 +151,7 @@ class StateMachineGenerator(object):
         self.state_machine.StateMachineName = self.name
         self.state_machine.StateMachineType = self.type
         self.state_machine.LoggingConfiguration = self.logging
+        self.state_machine.TracingConfiguration = self.tracing
         self.state_machine.Tags = self._construct_tag_list()
 
         event_resources = self._generate_event_resources()
@@ -203,8 +211,12 @@ class StateMachineGenerator(object):
         :returns: the generated IAM Role
         :rtype: model.iam.IAMRole
         """
+        policies = self.policies[:]
+        if self.tracing and self.tracing.get("Enabled") is True:
+            policies.append(get_xray_managed_policy_name())
+
         state_machine_policies = ResourcePolicies(
-            {"Policies": self.policies},
+            {"Policies": policies},
             # No support for policy templates in the "core"
             policy_template_processor=None,
         )
@@ -216,6 +228,7 @@ class StateMachineGenerator(object):
             assume_role_policy_document=IAMRolePolicies.stepfunctions_assume_role_policy(),
             resource_policies=state_machine_policies,
             tags=self._construct_tag_list(),
+            permissions_boundary=self.permissions_boundary,
         )
         return execution_role
 
@@ -238,7 +251,10 @@ class StateMachineGenerator(object):
         resources = []
         if self.events:
             for logical_id, event_dict in self.events.items():
-                kwargs = {"intrinsics_resolver": self.intrinsics_resolver}
+                kwargs = {
+                    "intrinsics_resolver": self.intrinsics_resolver,
+                    "permissions_boundary": self.permissions_boundary,
+                }
                 try:
                     eventsource = self.event_resolver.resolve_resource_type(event_dict).from_dict(
                         self.state_machine.logical_id + logical_id, event_dict, logical_id
@@ -270,7 +286,7 @@ class StateMachineGenerator(object):
             location[path[-1]] = sub_key
         return substitution_map
 
-    def _get_paths_to_intrinsics(self, input, path=[]):
+    def _get_paths_to_intrinsics(self, input, path=None):
         """
         Returns all paths to dynamic values within a dictionary
 
@@ -278,6 +294,8 @@ class StateMachineGenerator(object):
         :param path: Optional list to keep track of the path to the input dictionary
         :returns list: List of keys that defines the path to a dynamic value within the input dictionary
         """
+        if path is None:
+            path = []
         dynamic_value_paths = []
         if isinstance(input, dict):
             iterator = input.items()

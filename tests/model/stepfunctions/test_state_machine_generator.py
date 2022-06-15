@@ -1,4 +1,4 @@
-from mock import Mock
+from unittest.mock import Mock
 from unittest import TestCase
 
 from samtranslator.model import ResourceTypeResolver
@@ -19,9 +19,11 @@ class StepFunctionsStateMachine(TestCase):
             "logging": None,
             "name": None,
             "policies": None,
+            "permissions_boundary": None,
             "definition_substitutions": None,
             "role": None,
             "state_machine_type": None,
+            "tracing": None,
             "events": None,
             "event_resources": None,
             "event_resolver": None,

@@ -1,8 +1,10 @@
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType
 from samtranslator.model.intrinsics import fnSub
 from samtranslator.model.log import SubscriptionFilter
 from samtranslator.model.types import is_str
 from samtranslator.translator.arn_generator import ArnGenerator
+from . import FUNCTION_EVETSOURCE_METRIC_PREFIX
 from .push import PushEventSource
 
 
@@ -13,6 +15,7 @@ class CloudWatchLogs(PushEventSource):
     principal = "logs.amazonaws.com"
     property_types = {"LogGroupName": PropertyType(True, is_str()), "FilterPattern": PropertyType(True, is_str())}
 
+    @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, **kwargs):
         """Returns the CloudWatch Logs Subscription Filter and Lambda Permission to which this CloudWatch Logs event source
         corresponds.
@@ -43,11 +46,13 @@ class CloudWatchLogs(PushEventSource):
         )
 
     def get_subscription_filter(self, function, permission):
-        subscription_filter = SubscriptionFilter(self.logical_id, depends_on=[permission.logical_id])
+        subscription_filter = SubscriptionFilter(
+            self.logical_id,
+            depends_on=[permission.logical_id],
+            attributes=function.get_passthrough_resource_attributes(),
+        )
         subscription_filter.LogGroupName = self.LogGroupName
         subscription_filter.FilterPattern = self.FilterPattern
         subscription_filter.DestinationArn = function.get_runtime_attr("arn")
-        if "Condition" in function.resource_attributes:
-            subscription_filter.set_resource_attribute("Condition", function.resource_attributes["Condition"])
 
         return subscription_filter

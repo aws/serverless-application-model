@@ -1,7 +1,7 @@
 import pytest
 
 from unittest import TestCase
-from mock import Mock, call, ANY
+from unittest.mock import Mock, call, ANY
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model import PropertyType, Resource, SamResourceMacro, ResourceTypeResolver
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
@@ -101,12 +101,20 @@ class TestResourceAttributes(TestCase):
         property_types = {}
 
     def test_to_dict(self):
-        """Tests if resource attributes are correctly set and converted to dictionary
-        """
+        """Tests if resource attributes are correctly set and converted to dictionary"""
 
         empty_resource_dict = {"id": {"Type": "foo", "Properties": {}}}
         dict_with_attributes = {
             "id": {"Type": "foo", "Properties": {}, "UpdatePolicy": "update", "DeletionPolicy": {"foo": "bar"}}
+        }
+        dict_with_attributes2 = {
+            "id": {
+                "Type": "foo",
+                "Properties": {},
+                "UpdateReplacePolicy": "update",
+                "Metadata": {"foo": "bar"},
+                "Condition": "con",
+            }
         }
 
         r = self.MyResource("id")
@@ -114,6 +122,11 @@ class TestResourceAttributes(TestCase):
 
         r = self.MyResource("id", attributes={"UpdatePolicy": "update", "DeletionPolicy": {"foo": "bar"}})
         self.assertEqual(r.to_dict(), dict_with_attributes)
+
+        r = self.MyResource(
+            "id", attributes={"UpdateReplacePolicy": "update", "Metadata": {"foo": "bar"}, "Condition": "con"}
+        )
+        self.assertEqual(r.to_dict(), dict_with_attributes2)
 
     def test_invalid_attr(self):
 
@@ -141,6 +154,9 @@ class TestResourceAttributes(TestCase):
             "Properties": {},
             "UpdatePolicy": "update",
             "DeletionPolicy": [1, 2, 3],
+            "UpdateReplacePolicy": "update",
+            "Metadata": {"foo": "bar"},
+            "Condition": "con",
         }
 
         r = self.MyResource.from_dict("id", resource_dict=no_attribute)
@@ -149,6 +165,9 @@ class TestResourceAttributes(TestCase):
         r = self.MyResource.from_dict("id", resource_dict=all_supported_attributes)
         self.assertEqual(r.get_resource_attribute("DeletionPolicy"), [1, 2, 3])
         self.assertEqual(r.get_resource_attribute("UpdatePolicy"), "update")
+        self.assertEqual(r.get_resource_attribute("UpdateReplacePolicy"), "update")
+        self.assertEqual(r.get_resource_attribute("Metadata"), {"foo": "bar"})
+        self.assertEqual(r.get_resource_attribute("Condition"), "con")
 
 
 class TestResourceRuntimeAttributes(TestCase):

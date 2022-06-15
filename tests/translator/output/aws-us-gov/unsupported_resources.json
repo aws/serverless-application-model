@@ -1,15 +1,15 @@
 {
   "Resources": {
-    "InvalidResourceTypeShouldBeAccepted": {
-      "Type": "AWS::Serverless::ABCD", 
+    "UnknownTypeShouldBeAccepted": {
+      "Type": "AWS::Other::ABCD",
       "Properties": {
-        "StageName": "Prod", 
+        "StageName": "Prod",
         "DefinitionUri": "s3://sam-demo-bucket/webpage_swagger.json"
       }
-    }, 
+    },
     "ResourceMissingTypeShouldBeAccepted": {
       "Properties": {
-        "StageName": "Prod", 
+        "StageName": "Prod",
         "DefinitionUri": "s3://sam-demo-bucket/webpage_swagger.json"
       }
     }

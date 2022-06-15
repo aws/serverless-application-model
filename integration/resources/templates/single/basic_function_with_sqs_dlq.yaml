@@ -1,0 +1,15 @@
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn:
+          Fn::GetAtt: ["MyQueue", "Arn"]
+
+  MyQueue:
+    Type: AWS::SQS::Queue

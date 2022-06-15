@@ -37,3 +37,29 @@ Resources:
             Auth:
               Authorizer: AWS_IAM
               InvokeRole: CALLER_CREDENTIALS
+        MyApiWithAwsIamAuthAnyMethod:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApiWithoutAuth
+            Path: /any/one
+            Method: any
+            Auth:
+              Authorizer: AWS_IAM
+          MyApiWithAwsIamAuthAndCustomInvokeRoleAnyMethod:
+            Type: Api
+            Properties:
+              RestApiId: !Ref MyApiWithoutAuth
+              Path: /any/two
+              Method: any
+              Auth:
+                Authorizer: AWS_IAM
+                InvokeRole: rn:aws:iam::123:role/AUTH_AWS_IAM
+          MyApiWithAwsIamAuthAndDefaultInvokeRoleAnyMethod:
+            Type: Api
+            Properties:
+              RestApiId: !Ref MyApiWithoutAuth
+              Path: /any/three
+              Method: any
+              Auth:
+                Authorizer: AWS_IAM
+                InvokeRole: CALLER_CREDENTIALS

@@ -58,7 +58,15 @@ setup(
     url="https://github.com/awslabs/serverless-application-model",
     license="Apache License 2.0",
     # Exclude all but the code folders
-    packages=find_packages(exclude=("tests", "tests.*", "docs", "examples", "versions")),
+    packages=find_packages(
+        exclude=("tests", "tests.*", "integration", "integration.*", "docs", "examples", "versions")
+    ),
+    license_files=(
+        "LICENSE",
+        "NOTICE",
+        "THIRD_PARTY_LICENSES",
+    ),
+    python_requires=">=3.7, <=4.0, !=4.0",
     install_requires=read_requirements("base.txt"),
     include_package_data=True,
     extras_require={"dev": read_requirements("dev.txt")},
@@ -72,10 +80,10 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Internet",
         "Topic :: Software Development :: Build Tools",
         "Topic :: Utilities",

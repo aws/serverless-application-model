@@ -1,0 +1,22 @@
+Parameters:
+  ScheduleName:
+    Type: String
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+      Events:
+        Repeat:
+          Type: Schedule
+          Properties:
+              Schedule: 'rate(5 minutes)'
+              Input: '{"Hello": "world!"}'
+              Name:
+                Ref: ScheduleName
+              Description: test schedule
+              Enabled: True

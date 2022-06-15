@@ -1,5 +1,7 @@
 ﻿""" SAM macro definitions """
-from six import string_types
+import copy
+from typing import Union
+from samtranslator.intrinsics.resolver import IntrinsicsResolver
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -7,8 +9,10 @@ import samtranslator.model.eventsources.push
 import samtranslator.model.eventsources.cloudwatchlogs
 from .api.api_generator import ApiGenerator
 from .api.http_api_generator import HttpApiGenerator
-from .s3_utils.uri_parser import construct_s3_location_object
+from .packagetype import ZIP, IMAGE
+from .s3_utils.uri_parser import construct_s3_location_object, construct_image_code_object
 from .tags.resource_tagging import get_tag_list
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, SamResourceMacro, ResourceTypeResolver
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
@@ -19,6 +23,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.apigatewayv2 import ApiGatewayV2Stage, ApiGatewayV2DomainName
+from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
@@ -30,11 +35,14 @@ from samtranslator.model.lambda_ import (
     LambdaAlias,
     LambdaLayerVersion,
     LambdaEventInvokeConfig,
+    LambdaUrl,
+    LambdaPermission,
 )
 from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of, any_type
 from samtranslator.translator import logical_id_generator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.intrinsics import (
+    is_intrinsic,
     is_intrinsic_if,
     is_intrinsic_no_value,
     ref,
@@ -46,18 +54,20 @@ from samtranslator.model.sqs import SQSQueue
 from samtranslator.model.sns import SNSTopic
 from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
+from samtranslator.model.xray_utils import get_xray_managed_policy_name
 
 
 class SamFunction(SamResourceMacro):
-    """SAM function macro.
-    """
+    """SAM function macro."""
 
     resource_type = "AWS::Serverless::Function"
     property_types = {
         "FunctionName": PropertyType(False, one_of(is_str(), is_type(dict))),
-        "Handler": PropertyType(True, is_str()),
-        "Runtime": PropertyType(True, is_str()),
+        "Handler": PropertyType(False, is_str()),
+        "Runtime": PropertyType(False, is_str()),
         "CodeUri": PropertyType(False, one_of(is_str(), is_type(dict))),
+        "ImageUri": PropertyType(False, is_str()),
+        "PackageType": PropertyType(False, is_str()),
         "InlineCode": PropertyType(False, one_of(is_str(), is_type(dict))),
         "DeadLetterQueue": PropertyType(False, is_type(dict)),
         "Description": PropertyType(False, is_str()),
@@ -66,7 +76,7 @@ class SamFunction(SamResourceMacro):
         "VpcConfig": PropertyType(False, is_type(dict)),
         "Role": PropertyType(False, is_str()),
         "AssumeRolePolicyDocument": PropertyType(False, is_type(dict)),
-        "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "Policies": PropertyType(False, one_of(is_str(), is_type(dict), list_of(one_of(is_str(), is_type(dict))))),
         "PermissionsBoundary": PropertyType(False, is_str()),
         "Environment": PropertyType(False, dict_of(is_str(), is_type(dict))),
         "Events": PropertyType(False, dict_of(is_str(), is_type(dict))),
@@ -77,12 +87,17 @@ class SamFunction(SamResourceMacro):
         "ReservedConcurrentExecutions": PropertyType(False, any_type()),
         "Layers": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "EventInvokeConfig": PropertyType(False, is_type(dict)),
+        "EphemeralStorage": PropertyType(False, is_type(dict)),
         # Intrinsic functions in value of Alias property are not supported, yet
         "AutoPublishAlias": PropertyType(False, one_of(is_str())),
         "AutoPublishCodeSha256": PropertyType(False, one_of(is_str())),
         "VersionDescription": PropertyType(False, is_str()),
         "ProvisionedConcurrencyConfig": PropertyType(False, is_type(dict)),
         "FileSystemConfigs": PropertyType(False, list_of(is_type(dict))),
+        "ImageConfig": PropertyType(False, is_type(dict)),
+        "CodeSigningConfigArn": PropertyType(False, is_str()),
+        "Architectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "FunctionUrlConfig": PropertyType(False, is_type(dict)),
     }
     event_resolver = ResourceTypeResolver(
         samtranslator.model.eventsources,
@@ -113,6 +128,7 @@ class SamFunction(SamResourceMacro):
         except InvalidEventException as e:
             raise InvalidResourceException(self.logical_id, e.message)
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda function, role, and event resources to which this SAM Function corresponds.
 
@@ -125,6 +141,7 @@ class SamFunction(SamResourceMacro):
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         mappings_resolver = kwargs.get("mappings_resolver", None)
         conditions = kwargs.get("conditions", {})
+        feature_toggle = kwargs.get("feature_toggle")
 
         if self.DeadLetterQueue:
             self._validate_dlq()
@@ -146,6 +163,11 @@ class SamFunction(SamResourceMacro):
             code_sha256 = None
             if self.AutoPublishCodeSha256:
                 code_sha256 = intrinsics_resolver.resolve_parameter_refs(self.AutoPublishCodeSha256)
+                if not isinstance(code_sha256, str):
+                    raise InvalidResourceException(
+                        self.logical_id,
+                        "AutoPublishCodeSha256 must be a string",
+                    )
             lambda_version = self._construct_version(
                 lambda_function, intrinsics_resolver=intrinsics_resolver, code_sha256=code_sha256
             )
@@ -153,12 +175,21 @@ class SamFunction(SamResourceMacro):
             resources.append(lambda_version)
             resources.append(lambda_alias)
 
+        if self.FunctionUrlConfig:
+            lambda_url = self._construct_function_url(lambda_function, lambda_alias)
+            resources.append(lambda_url)
+            url_permission = self._construct_url_permission(lambda_function, lambda_alias)
+            if url_permission:
+                resources.append(url_permission)
+
         if self.DeploymentPreference:
             self._validate_deployment_preference_and_add_update_policy(
                 kwargs.get("deployment_preference_collection", None),
                 lambda_alias,
                 intrinsics_resolver,
                 mappings_resolver,
+                self.get_passthrough_resource_attributes(),
+                feature_toggle,
             )
         event_invoke_policies = []
         if self.EventInvokeConfig:
@@ -274,13 +305,17 @@ class SamFunction(SamResourceMacro):
         )
         if dest_config.get("Destination") is None or property_condition is not None:
             combined_condition = self._make_and_conditions(
-                self.get_passthrough_resource_attributes(), property_condition, conditions
+                self.get_passthrough_resource_attributes().get("Condition"), property_condition, conditions
             )
             if dest_config.get("Type") in auto_inject_list:
                 if dest_config.get("Type") == "SQS":
-                    resource = SQSQueue(resource_logical_id + "Queue")
+                    resource = SQSQueue(
+                        resource_logical_id + "Queue", attributes=self.get_passthrough_resource_attributes()
+                    )
                 if dest_config.get("Type") == "SNS":
-                    resource = SNSTopic(resource_logical_id + "Topic")
+                    resource = SNSTopic(
+                        resource_logical_id + "Topic", attributes=self.get_passthrough_resource_attributes()
+                    )
                 if combined_condition:
                     resource.set_resource_attribute("Condition", combined_condition)
                 if property_condition:
@@ -308,12 +343,10 @@ class SamFunction(SamResourceMacro):
             return property_condition
 
         if property_condition is None:
-            return resource_condition["Condition"]
+            return resource_condition
 
-        and_condition = make_and_condition([resource_condition, {"Condition": property_condition}])
-        condition_name = self._make_gen_condition_name(
-            resource_condition.get("Condition") + "AND" + property_condition, self.logical_id
-        )
+        and_condition = make_and_condition([{"Condition": resource_condition}, {"Condition": property_condition}])
+        condition_name = self._make_gen_condition_name(resource_condition + "AND" + property_condition, self.logical_id)
         conditions[condition_name] = and_condition
 
         return condition_name
@@ -371,7 +404,7 @@ class SamFunction(SamResourceMacro):
         # Try to resolve.
         resolved_alias_name = intrinsics_resolver.resolve_parameter_refs(original_alias_value)
 
-        if not isinstance(resolved_alias_name, string_types):
+        if not isinstance(resolved_alias_name, str):
             # This is still a dictionary which means we are not able to completely resolve intrinsics
             raise InvalidResourceException(
                 self.logical_id, "'{}' must be a string or a Ref to a template parameter".format(property_name)
@@ -406,6 +439,10 @@ class SamFunction(SamResourceMacro):
         lambda_function.Tags = self._construct_tag_list(self.Tags)
         lambda_function.Layers = self.Layers
         lambda_function.FileSystemConfigs = self.FileSystemConfigs
+        lambda_function.ImageConfig = self.ImageConfig
+        lambda_function.PackageType = self.PackageType
+        lambda_function.Architectures = self.Architectures
+        lambda_function.EphemeralStorage = self.EphemeralStorage
 
         if self.Tracing:
             lambda_function.TracingConfig = {"Mode": self.Tracing}
@@ -413,6 +450,10 @@ class SamFunction(SamResourceMacro):
         if self.DeadLetterQueue:
             lambda_function.DeadLetterConfig = {"TargetArn": self.DeadLetterQueue["TargetArn"]}
 
+        lambda_function.CodeSigningConfigArn = self.CodeSigningConfigArn
+
+        self._validate_package_type(lambda_function)
+        self._validate_architectures(lambda_function)
         return lambda_function
 
     def _add_event_invoke_managed_policy(self, dest_config, logical_id, condition, dest_arn):
@@ -444,7 +485,8 @@ class SamFunction(SamResourceMacro):
 
         managed_policy_arns = [ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaBasicExecutionRole")]
         if self.Tracing:
-            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn("AWSXrayWriteOnlyAccess"))
+            managed_policy_name = get_xray_managed_policy_name()
+            managed_policy_arns.append(ArnGenerator.generate_aws_managed_policy_arn(managed_policy_name))
         if self.VpcConfig:
             managed_policy_arns.append(
                 ArnGenerator.generate_aws_managed_policy_arn("service-role/AWSLambdaVPCAccessExecutionRole")
@@ -482,6 +524,80 @@ class SamFunction(SamResourceMacro):
         )
         return execution_role
 
+    def _validate_package_type(self, lambda_function):
+        """
+        Validates Function based on the existence of Package type
+        """
+        packagetype = lambda_function.PackageType or ZIP
+
+        if packagetype not in [ZIP, IMAGE]:
+            raise InvalidResourceException(
+                lambda_function.logical_id,
+                "PackageType needs to be `{zip}` or `{image}`".format(zip=ZIP, image=IMAGE),
+            )
+
+        def _validate_package_type_zip():
+            if not all([lambda_function.Runtime, lambda_function.Handler]):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "Runtime and Handler needs to be present when PackageType is of type `{zip}`".format(zip=ZIP),
+                )
+
+            if any([lambda_function.Code.get("ImageUri", False), lambda_function.ImageConfig]):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "ImageUri or ImageConfig cannot be present when PackageType is of type `{zip}`".format(zip=ZIP),
+                )
+
+        def _validate_package_type_image():
+            if any([lambda_function.Handler, lambda_function.Runtime, lambda_function.Layers]):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "Runtime, Handler, Layers cannot be present when PackageType is of type `{image}`".format(
+                        image=IMAGE
+                    ),
+                )
+            if not lambda_function.Code.get("ImageUri"):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "ImageUri needs to be present when PackageType is of type `{image}`".format(image=IMAGE),
+                )
+
+        _validate_per_package_type = {ZIP: _validate_package_type_zip, IMAGE: _validate_package_type_image}
+
+        # Call appropriate validation function based on the package type.
+        return _validate_per_package_type[packagetype]()
+
+    def _validate_architectures(self, lambda_function):
+        """
+        Validates Function based on the existence of architecture type
+
+        parameters
+        ----------
+        lambda_function: LambdaFunction
+            Object of function properties supported on AWS Lambda
+
+        Raises
+        ------
+        InvalidResourceException
+            Raised when the Architectures property is invalid
+        """
+
+        architectures = [X86_64] if lambda_function.Architectures is None else lambda_function.Architectures
+
+        if is_intrinsic(architectures):
+            return
+
+        if (
+            not isinstance(architectures, list)
+            or len(architectures) != 1
+            or (not is_intrinsic(architectures[0]) and (architectures[0] not in [X86_64, ARM64]))
+        ):
+            raise InvalidResourceException(
+                lambda_function.logical_id,
+                "Architectures needs to be a list with one string, either `{}` or `{}`.".format(X86_64, ARM64),
+            )
+
     def _validate_dlq(self):
         """Validates whether the DeadLetterQueue LogicalId is validation
         :raise: InvalidResourceException
@@ -492,6 +608,12 @@ class SamFunction(SamResourceMacro):
             raise InvalidResourceException(
                 self.logical_id,
                 "'DeadLetterQueue' requires Type and TargetArn properties to be specified.".format(valid_dlq_types),
+            )
+
+        if not (isinstance(self.DeadLetterQueue.get("Type"), str)):
+            raise InvalidResourceException(
+                self.logical_id,
+                "'DeadLetterQueue' property 'Type' should be of type str.",
             )
 
         # Validate required Types
@@ -568,12 +690,59 @@ class SamFunction(SamResourceMacro):
         return resources
 
     def _construct_code_dict(self):
-        if self.InlineCode:
+        """Constructs Lambda Code Dictionary based on the accepted SAM artifact properties such
+        as `InlineCode`, `CodeUri` and `ImageUri` and also raises errors if more than one of them is
+        defined. `PackageType` determines which artifacts are considered.
+
+        :raises InvalidResourceException when conditions on the SAM artifact properties are not met.
+        """
+        # list of accepted artifacts
+        packagetype = self.PackageType or ZIP
+        artifacts = {}
+
+        if packagetype == ZIP:
+            artifacts = {"InlineCode": self.InlineCode, "CodeUri": self.CodeUri}
+        elif packagetype == IMAGE:
+            artifacts = {"ImageUri": self.ImageUri}
+
+        if packagetype not in [ZIP, IMAGE]:
+            raise InvalidResourceException(self.logical_id, "invalid 'PackageType' : {}".format(packagetype))
+
+        # Inline function for transformation of inline code.
+        # It accepts arbitrary argumemnts, because the arguments do not matter for the result.
+        def _construct_inline_code(*args, **kwargs):
             return {"ZipFile": self.InlineCode}
-        elif self.CodeUri:
-            return construct_s3_location_object(self.CodeUri, self.logical_id, "CodeUri")
+
+        # dispatch mechanism per artifact on how it needs to be transformed.
+        artifact_dispatch = {
+            "InlineCode": _construct_inline_code,
+            "CodeUri": construct_s3_location_object,
+            "ImageUri": construct_image_code_object,
+        }
+
+        filtered_artifacts = dict(filter(lambda x: x[1] != None, artifacts.items()))
+        # There are more than one allowed artifact types present, raise an Error.
+        # There are no valid artifact types present, also raise an Error.
+        if len(filtered_artifacts) > 1 or len(filtered_artifacts) == 0:
+            if packagetype == ZIP and len(filtered_artifacts) == 0:
+                raise InvalidResourceException(self.logical_id, "Only one of 'InlineCode' or 'CodeUri' can be set.")
+            elif packagetype == IMAGE:
+                raise InvalidResourceException(self.logical_id, "'ImageUri' must be set.")
+
+        filtered_keys = [key for key in filtered_artifacts.keys()]
+        # NOTE(sriram-mv): This precedence order is important. It is protect against python2 vs python3
+        # dictionary ordering when getting the key values with .keys() on a dictionary.
+        # Do not change this precedence order.
+        if "InlineCode" in filtered_keys:
+            filtered_key = "InlineCode"
+        elif "CodeUri" in filtered_keys:
+            filtered_key = "CodeUri"
+        elif "ImageUri" in filtered_keys:
+            filtered_key = "ImageUri"
         else:
-            raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set")
+            raise InvalidResourceException(self.logical_id, "Either 'InlineCode' or 'CodeUri' must be set.")
+        dispatch_function = artifact_dispatch[filtered_key]
+        return dispatch_function(artifacts[filtered_key], self.logical_id, filtered_key)
 
     def _construct_version(self, function, intrinsics_resolver, code_sha256=None):
         """Constructs a Lambda Version resource that will be auto-published when CodeUri of the function changes.
@@ -630,7 +799,8 @@ class SamFunction(SamResourceMacro):
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
             attributes = {}
-        attributes["DeletionPolicy"] = "Retain"
+        if "DeletionPolicy" not in attributes:
+            attributes["DeletionPolicy"] = "Retain"
 
         lambda_version = LambdaVersion(logical_id=logical_id, attributes=attributes)
         lambda_version.FunctionName = function.get_runtime_attr("name")
@@ -662,10 +832,16 @@ class SamFunction(SamResourceMacro):
         return alias
 
     def _validate_deployment_preference_and_add_update_policy(
-        self, deployment_preference_collection, lambda_alias, intrinsics_resolver, mappings_resolver
+        self,
+        deployment_preference_collection,
+        lambda_alias,
+        intrinsics_resolver,
+        mappings_resolver,
+        passthrough_resource_attributes,
+        feature_toggle=None,
     ):
         if "Enabled" in self.DeploymentPreference:
-            # resolve intrinsics and mappings for Type
+            # resolve intrinsics and mappings for Enabled
             enabled = self.DeploymentPreference["Enabled"]
             enabled = intrinsics_resolver.resolve_parameter_refs(enabled)
             enabled = mappings_resolver.resolve_parameter_refs(enabled)
@@ -678,10 +854,28 @@ class SamFunction(SamResourceMacro):
             preference_type = mappings_resolver.resolve_parameter_refs(preference_type)
             self.DeploymentPreference["Type"] = preference_type
 
+        if "PassthroughCondition" in self.DeploymentPreference:
+            self.DeploymentPreference["PassthroughCondition"] = self._resolve_property_to_boolean(
+                self.DeploymentPreference["PassthroughCondition"],
+                "PassthroughCondition",
+                intrinsics_resolver,
+                mappings_resolver,
+            )
+        elif feature_toggle:
+            self.DeploymentPreference["PassthroughCondition"] = feature_toggle.is_enabled(
+                "deployment_preference_condition_fix"
+            )
+        else:
+            self.DeploymentPreference["PassthroughCondition"] = False
+
         if deployment_preference_collection is None:
             raise ValueError("deployment_preference_collection required for parsing the deployment preference")
 
-        deployment_preference_collection.add(self.logical_id, self.DeploymentPreference)
+        deployment_preference_collection.add(
+            self.logical_id,
+            self.DeploymentPreference,
+            passthrough_resource_attributes.get("Condition"),
+        )
 
         if deployment_preference_collection.get(self.logical_id).enabled:
             if self.AutoPublishAlias is None:
@@ -695,10 +889,160 @@ class SamFunction(SamResourceMacro):
                 "UpdatePolicy", deployment_preference_collection.update_policy(self.logical_id).to_dict()
             )
 
+    def _resolve_property_to_boolean(
+        self,
+        property_value: Union[bool, str, dict],
+        property_name: str,
+        intrinsics_resolver: IntrinsicsResolver,
+        mappings_resolver: IntrinsicsResolver,
+    ) -> bool:
+        """
+        Resolves intrinsics, if any, and/or converts string in a given property to boolean.
+        Raises InvalidResourceException if can't resolve intrinsic or can't resolve string to boolean
+
+        :param property_value: property value to resolve
+        :param property_name: name/key of property to resolve
+        :param intrinsics_resolver: resolves intrinsics
+        :param mappings_resolver: resolves FindInMap
+        :return bool: resolved boolean value
+        """
+        processed_property_value = intrinsics_resolver.resolve_parameter_refs(property_value)
+        processed_property_value = mappings_resolver.resolve_parameter_refs(processed_property_value)
+
+        # FIXME: We should support not only true/false, but also yes/no, on/off? See https://yaml.org/type/bool.html
+        if processed_property_value in [True, "true", "True"]:
+            return True
+        elif processed_property_value in [False, "false", "False"]:
+            return False
+        elif is_intrinsic(processed_property_value):  # couldn't resolve intrinsic
+            raise InvalidResourceException(
+                self.logical_id,
+                f"Unsupported intrinsic: the only intrinsic functions supported for "
+                f"property {property_name} are FindInMap and parameter Refs.",
+            )
+        else:
+            raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
+
+    def _construct_function_url(self, lambda_function, lambda_alias):
+        """
+        This method is used to construct a lambda url resource
+
+        Parameters
+        ----------
+        lambda_function : LambdaFunction
+            Lambda Function resource
+        lambda_alias : LambdaAlias
+            Lambda Alias resource
+
+        Returns
+        -------
+        LambdaUrl
+            Lambda Url resource
+        """
+        self._validate_function_url_params(lambda_function)
+
+        logical_id = f"{lambda_function.logical_id}Url"
+        lambda_url_attributes = self.get_passthrough_resource_attributes()
+        lambda_url = LambdaUrl(logical_id=logical_id, attributes=lambda_url_attributes)
+
+        cors = self.FunctionUrlConfig.get("Cors")
+        if cors:
+            lambda_url.Cors = cors
+        lambda_url.AuthType = self.FunctionUrlConfig.get("AuthType")
+        lambda_url.TargetFunctionArn = (
+            lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
+        )
+        return lambda_url
+
+    def _validate_function_url_params(self, lambda_function):
+        """
+        Validate parameters provided to configure Lambda Urls
+        """
+        self._validate_url_auth_type(lambda_function)
+        self._validate_cors_config_parameter(lambda_function)
+
+    def _validate_url_auth_type(self, lambda_function):
+        if is_intrinsic(self.FunctionUrlConfig):
+            return
+
+        auth_type = self.FunctionUrlConfig.get("AuthType")
+        if auth_type and is_intrinsic(auth_type):
+            return
+
+        if not auth_type or auth_type not in ["AWS_IAM", "NONE"]:
+            raise InvalidResourceException(
+                lambda_function.logical_id,
+                "AuthType is required to configure function property `FunctionUrlConfig`. Please provide either AWS_IAM or NONE.",
+            )
+
+    def _validate_cors_config_parameter(self, lambda_function):
+        if is_intrinsic(self.FunctionUrlConfig):
+            return
+
+        cors_property_data_type = {
+            "AllowOrigins": list,
+            "AllowMethods": list,
+            "AllowCredentials": bool,
+            "AllowHeaders": list,
+            "ExposeHeaders": list,
+            "MaxAge": int,
+        }
+
+        cors = self.FunctionUrlConfig.get("Cors")
+
+        if not cors or is_intrinsic(cors):
+            return
+
+        for prop_name, prop_value in cors.items():
+            if prop_name not in cors_property_data_type:
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "{} is not a valid property for configuring Cors.".format(prop_name),
+                )
+            prop_type = cors_property_data_type.get(prop_name)
+            if not is_intrinsic(prop_value) and not isinstance(prop_value, prop_type):
+                raise InvalidResourceException(
+                    lambda_function.logical_id,
+                    "{} must be of type {}.".format(prop_name, str(prop_type).split("'")[1]),
+                )
+
+    def _construct_url_permission(self, lambda_function, lambda_alias):
+        """
+        Construct the lambda permission associated with the function url resource in a case
+        for public access when AuthType is NONE
+
+        Parameters
+        ----------
+        lambda_function : LambdaUrl
+            Lambda Function resource
+
+        llambda_alias : LambdaAlias
+            Lambda Alias resource
+
+        Returns
+        -------
+        LambdaPermission
+            The lambda permission appended to a function url resource with public access
+        """
+        auth_type = self.FunctionUrlConfig.get("AuthType")
+
+        if auth_type not in ["NONE"] or is_intrinsic(self.FunctionUrlConfig):
+            return None
+
+        logical_id = f"{lambda_function.logical_id}UrlPublicPermissions"
+        lambda_permission_attributes = self.get_passthrough_resource_attributes()
+        lambda_permission = LambdaPermission(logical_id=logical_id, attributes=lambda_permission_attributes)
+        lambda_permission.Action = "lambda:InvokeFunctionUrl"
+        lambda_permission.FunctionName = (
+            lambda_alias.get_runtime_attr("arn") if lambda_alias else lambda_function.get_runtime_attr("name")
+        )
+        lambda_permission.Principal = "*"
+        lambda_permission.FunctionUrlAuthType = auth_type
+        return lambda_permission
+
 
 class SamApi(SamResourceMacro):
-    """SAM rest API macro.
-    """
+    """SAM rest API macro."""
 
     resource_type = "AWS::Serverless::Api"
     property_types = {
@@ -729,6 +1073,10 @@ class SamApi(SamResourceMacro):
         "OpenApiVersion": PropertyType(False, is_str()),
         "Models": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
+        "Description": PropertyType(False, is_str()),
+        "Mode": PropertyType(False, is_str()),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
+        "ApiKeySourceType": PropertyType(False, is_str()),
     }
 
     referable_properties = {
@@ -740,6 +1088,7 @@ class SamApi(SamResourceMacro):
         "ApiKey": ApiGatewayApiKey.resource_type,
     }
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the API Gateway RestApi, Deployment, and Stage to which this SAM Api corresponds.
 
@@ -755,6 +1104,8 @@ class SamApi(SamResourceMacro):
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
         self.Auth = intrinsics_resolver.resolve_parameter_refs(self.Auth)
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
+        shared_api_usage_plan = kwargs.get("shared_api_usage_plan")
+        template_conditions = kwargs.get("conditions")
 
         api_generator = ApiGenerator(
             self.logical_id,
@@ -766,11 +1117,14 @@ class SamApi(SamResourceMacro):
             self.DefinitionUri,
             self.Name,
             self.StageName,
+            shared_api_usage_plan,
+            template_conditions,
             tags=self.Tags,
             endpoint_configuration=self.EndpointConfiguration,
             method_settings=self.MethodSettings,
             binary_media=self.BinaryMediaTypes,
             minimum_compression_size=self.MinimumCompressionSize,
+            disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
             cors=self.Cors,
             auth=self.Auth,
             gateway_responses=self.GatewayResponses,
@@ -782,6 +1136,9 @@ class SamApi(SamResourceMacro):
             open_api_version=self.OpenApiVersion,
             models=self.Models,
             domain=self.Domain,
+            description=self.Description,
+            mode=self.Mode,
+            api_key_source_type=self.ApiKeySourceType,
         )
 
         (
@@ -810,8 +1167,7 @@ class SamApi(SamResourceMacro):
 
 
 class SamHttpApi(SamResourceMacro):
-    """SAM rest API macro.
-    """
+    """SAM rest API macro."""
 
     resource_type = "AWS::Serverless::HttpApi"
     property_types = {
@@ -833,6 +1189,8 @@ class SamHttpApi(SamResourceMacro):
         "RouteSettings": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
         "FailOnWarnings": PropertyType(False, is_type(bool)),
+        "Description": PropertyType(False, is_str()),
+        "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
     }
 
     referable_properties = {
@@ -840,6 +1198,7 @@ class SamHttpApi(SamResourceMacro):
         "DomainName": ApiGatewayV2DomainName.resource_type,
     }
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the API GatewayV2 Api, Deployment, and Stage to which this SAM Api corresponds.
 
@@ -872,9 +1231,17 @@ class SamHttpApi(SamResourceMacro):
             passthrough_resource_attributes=self.get_passthrough_resource_attributes(),
             domain=self.Domain,
             fail_on_warnings=self.FailOnWarnings,
+            description=self.Description,
+            disable_execute_api_endpoint=self.DisableExecuteApiEndpoint,
         )
 
-        (http_api, stage, domain, basepath_mapping, route53,) = api_generator.to_cloudformation()
+        (
+            http_api,
+            stage,
+            domain,
+            basepath_mapping,
+            route53,
+        ) = api_generator.to_cloudformation()
 
         resources.append(http_api)
         if domain:
@@ -892,8 +1259,7 @@ class SamHttpApi(SamResourceMacro):
 
 
 class SamSimpleTable(SamResourceMacro):
-    """SAM simple table macro.
-    """
+    """SAM simple table macro."""
 
     resource_type = "AWS::Serverless::SimpleTable"
     property_types = {
@@ -905,6 +1271,7 @@ class SamSimpleTable(SamResourceMacro):
     }
     attribute_type_conversions = {"String": "S", "Number": "N", "Binary": "B"}
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         dynamodb_resources = self._construct_dynamodb_table()
 
@@ -952,8 +1319,7 @@ class SamSimpleTable(SamResourceMacro):
 
 
 class SamApplication(SamResourceMacro):
-    """SAM application macro.
-    """
+    """SAM application macro."""
 
     APPLICATION_ID_KEY = "ApplicationId"
     SEMANTIC_VERSION_KEY = "SemanticVersion"
@@ -970,15 +1336,14 @@ class SamApplication(SamResourceMacro):
         "TimeoutInMinutes": PropertyType(False, is_type(int)),
     }
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
-        """Returns the stack with the proper parameters for this application
-        """
+        """Returns the stack with the proper parameters for this application"""
         nested_stack = self._construct_nested_stack()
         return [nested_stack]
 
     def _construct_nested_stack(self):
-        """Constructs a AWS::CloudFormation::Stack resource
-        """
+        """Constructs a AWS::CloudFormation::Stack resource"""
         nested_stack = NestedStack(
             self.logical_id, depends_on=self.depends_on, attributes=self.get_passthrough_resource_attributes()
         )
@@ -992,8 +1357,7 @@ class SamApplication(SamResourceMacro):
         return nested_stack
 
     def _get_application_tags(self):
-        """Adds tags to the stack if this resource is using the serverless app repo
-        """
+        """Adds tags to the stack if this resource is using the serverless app repo"""
         application_tags = {}
         if isinstance(self.Location, dict):
             if self.APPLICATION_ID_KEY in self.Location.keys() and self.Location[self.APPLICATION_ID_KEY] is not None:
@@ -1007,15 +1371,15 @@ class SamApplication(SamResourceMacro):
 
 
 class SamLayerVersion(SamResourceMacro):
-    """ SAM Layer macro
-    """
+    """SAM Layer macro"""
 
     resource_type = "AWS::Serverless::LayerVersion"
     property_types = {
         "LayerName": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Description": PropertyType(False, is_str()),
         "ContentUri": PropertyType(True, one_of(is_str(), is_type(dict))),
-        "CompatibleRuntimes": PropertyType(False, list_of(is_str())),
+        "CompatibleArchitectures": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
+        "CompatibleRuntimes": PropertyType(False, list_of(one_of(is_str(), is_type(dict)))),
         "LicenseInfo": PropertyType(False, is_str()),
         "RetentionPolicy": PropertyType(False, is_str()),
     }
@@ -1024,6 +1388,7 @@ class SamLayerVersion(SamResourceMacro):
     DELETE = "Delete"
     retention_policy_options = [RETAIN.lower(), DELETE.lower()]
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         """Returns the Lambda layer to which this SAM Layer corresponds.
 
@@ -1054,15 +1419,29 @@ class SamLayerVersion(SamResourceMacro):
             intrinsics_resolver, self.RetentionPolicy, "RetentionPolicy"
         )
 
+        # If nothing defined, this will be set to Retain
         retention_policy_value = self._get_retention_policy_value()
 
         attributes = self.get_passthrough_resource_attributes()
         if attributes is None:
             attributes = {}
-        attributes["DeletionPolicy"] = retention_policy_value
+        if "DeletionPolicy" not in attributes:
+            attributes["DeletionPolicy"] = self.RETAIN
+        if retention_policy_value is not None:
+            attributes["DeletionPolicy"] = retention_policy_value
 
         old_logical_id = self.logical_id
-        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, self.to_dict()).gen()
+
+        # This is to prevent the passthrough resource attributes to be included for hashing
+        hash_dict = copy.deepcopy(self.to_dict())
+        if "DeletionPolicy" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["DeletionPolicy"]
+        if "UpdateReplacePolicy" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["UpdateReplacePolicy"]
+        if "Metadata" in hash_dict.get(old_logical_id):
+            del hash_dict[old_logical_id]["Metadata"]
+
+        new_logical_id = logical_id_generator.LogicalIdGenerator(old_logical_id, hash_dict).gen()
         self.logical_id = new_logical_id
 
         lambda_layer = LambdaLayerVersion(self.logical_id, depends_on=self.depends_on, attributes=attributes)
@@ -1082,6 +1461,9 @@ class SamLayerVersion(SamResourceMacro):
         lambda_layer.LayerName = self.LayerName
         lambda_layer.Description = self.Description
         lambda_layer.Content = construct_s3_location_object(self.ContentUri, self.logical_id, "ContentUri")
+
+        lambda_layer.CompatibleArchitectures = self.CompatibleArchitectures
+        self._validate_architectures(lambda_layer)
         lambda_layer.CompatibleRuntimes = self.CompatibleRuntimes
         lambda_layer.LicenseInfo = self.LicenseInfo
 
@@ -1094,20 +1476,55 @@ class SamLayerVersion(SamResourceMacro):
         :return: value for the DeletionPolicy attribute.
         """
 
-        if self.RetentionPolicy is None or self.RetentionPolicy.lower() == self.RETAIN.lower():
+        if is_intrinsic(self.RetentionPolicy):
+            # RetentionPolicy attribute of AWS::Serverless::LayerVersion does set the DeletionPolicy
+            # attribute. And DeletionPolicy attribute does not support intrinsic values.
+            raise InvalidResourceException(
+                self.logical_id,
+                "'RetentionPolicy' does not accept intrinsic functions, "
+                "please use one of the following options: {}".format([self.RETAIN, self.DELETE]),
+            )
+
+        if self.RetentionPolicy is None:
+            return None
+        elif self.RetentionPolicy.lower() == self.RETAIN.lower():
             return self.RETAIN
         elif self.RetentionPolicy.lower() == self.DELETE.lower():
             return self.DELETE
         elif self.RetentionPolicy.lower() not in self.retention_policy_options:
             raise InvalidResourceException(
                 self.logical_id,
-                "'{}' must be one of the following options: {}.".format("RetentionPolicy", [self.RETAIN, self.DELETE]),
+                "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
             )
+
+    def _validate_architectures(self, lambda_layer):
+        """Validate the values inside the CompatibleArchitectures field of a layer
+
+        Parameters
+        ----------
+        lambda_layer: SamLayerVersion
+            The AWS Lambda layer version to validate
+
+        Raises
+        ------
+        InvalidResourceException
+            If any of the architectures is not valid
+        """
+        architectures = lambda_layer.CompatibleArchitectures or [X86_64]
+        # Intrinsics are not validated
+        if is_intrinsic(architectures):
+            return
+        for arq in architectures:
+            # We validate the values only if we they're not intrinsics
+            if not is_intrinsic(arq) and not arq in [ARM64, X86_64]:
+                raise InvalidResourceException(
+                    lambda_layer.logical_id,
+                    "CompatibleArchitectures needs to be a list of '{}' or '{}'".format(X86_64, ARM64),
+                )
 
 
 class SamStateMachine(SamResourceMacro):
-    """SAM state machine macro.
-    """
+    """SAM state machine macro."""
 
     resource_type = "AWS::Serverless::StateMachine"
     property_types = {
@@ -1121,9 +1538,14 @@ class SamStateMachine(SamResourceMacro):
         "Type": PropertyType(False, is_str()),
         "Tags": PropertyType(False, is_type(dict)),
         "Policies": PropertyType(False, one_of(is_str(), list_of(one_of(is_str(), is_type(dict), is_type(dict))))),
+        "Tracing": PropertyType(False, is_type(dict)),
+        "PermissionsBoundary": PropertyType(False, is_str()),
     }
-    event_resolver = ResourceTypeResolver(samtranslator.model.stepfunctions.events,)
+    event_resolver = ResourceTypeResolver(
+        samtranslator.model.stepfunctions.events,
+    )
 
+    @cw_timer
     def to_cloudformation(self, **kwargs):
         managed_policy_map = kwargs.get("managed_policy_map", {})
         intrinsics_resolver = kwargs["intrinsics_resolver"]
@@ -1139,9 +1561,11 @@ class SamStateMachine(SamResourceMacro):
             logging=self.Logging,
             name=self.Name,
             policies=self.Policies,
+            permissions_boundary=self.PermissionsBoundary,
             definition_substitutions=self.DefinitionSubstitutions,
             role=self.Role,
             state_machine_type=self.Type,
+            tracing=self.Tracing,
             events=self.Events,
             event_resources=event_resources,
             event_resolver=self.event_resolver,

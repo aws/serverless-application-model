@@ -1,7 +1,11 @@
+import logging
+
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException
 from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.public.sdk.template import SamTemplate
+
+LOG = logging.getLogger(__name__)
 
 
 class Parser:
@@ -12,16 +16,9 @@ class Parser:
         self._validate(sam_template, parameter_values)
         sam_plugins.act(LifeCycleEvents.before_transform_template, sam_template)
 
-    # private methods
-    def _validate(self, sam_template, parameter_values):
-        """ Validates the template and parameter values and raises exceptions if there's an issue
-
-        :param dict sam_template: SAM template
-        :param dict parameter_values: Dictionary of parameter values provided by the user
-        """
-        if parameter_values is None:
-            raise ValueError("`parameter_values` argument is required")
-
+    @staticmethod
+    def validate_datatypes(sam_template):
+        """Validates the datatype within the template"""
         if (
             "Resources" not in sam_template
             or not isinstance(sam_template["Resources"], dict)
@@ -55,4 +52,23 @@ class Parser:
                     ]
                 )
 
-        SamTemplateValidator.validate(sam_template)
+    # private methods
+    def _validate(self, sam_template, parameter_values):
+        """Validates the template and parameter values and raises exceptions if there's an issue
+
+        :param dict sam_template: SAM template
+        :param dict parameter_values: Dictionary of parameter values provided by the user
+        """
+        if parameter_values is None:
+            raise ValueError("`parameter_values` argument is required")
+
+        Parser.validate_datatypes(sam_template)
+
+        try:
+            validator = SamTemplateValidator()
+            validation_errors = validator.validate(sam_template)
+            if validation_errors:
+                LOG.warning("Template schema validation reported the following errors: %s", validation_errors)
+        except Exception as e:
+            # Catching any exception and not re-raising to make sure any validation process won't break transform
+            LOG.exception("Exception from SamTemplateValidator: %s", e)
