@@ -117,6 +117,12 @@
               "EndpointConfiguration": {
                 "$ref": "#definitions/AWS::Serverless::Api.EndpointConfiguration"
               },
+              "FailOnWarnings": {
+                "type": [
+                  "boolean",
+                  "intrinsic"
+                ]
+              },
               "GatewayResponses": {
                 "$ref": "common.json#definitions/GatewayResponses",
                 "references": [

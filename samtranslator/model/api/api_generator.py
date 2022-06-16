@@ -181,6 +181,7 @@ class ApiGenerator(object):
         open_api_version=None,
         models=None,
         domain=None,
+        fail_on_warnings=None,
         description=None,
         mode=None,
         api_key_source_type=None,
@@ -232,6 +233,7 @@ class ApiGenerator(object):
         self.remove_extra_stage = open_api_version
         self.models = models
         self.domain = domain
+        self.fail_on_warnings = fail_on_warnings
         self.description = description
         self.shared_api_usage_plan = shared_api_usage_plan
         self.template_conditions = template_conditions
@@ -276,6 +278,9 @@ class ApiGenerator(object):
         self._add_gateway_responses()
         self._add_binary_media_types()
         self._add_models()
+
+        if self.fail_on_warnings:
+            rest_api.FailOnWarnings = self.fail_on_warnings
 
         if self.disable_execute_api_endpoint is not None:
             self._add_endpoint_extension()
