@@ -222,6 +222,8 @@ class OpenApiEditor(object):
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
             # create as Py27Dict and insert key one by one to preserve input order
+            if path_item[method] is None:
+                path_item[method] = Py27Dict()
             path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
