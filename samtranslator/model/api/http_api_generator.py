@@ -13,7 +13,7 @@ from samtranslator.model.apigatewayv2 import (
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.translator import logical_id_generator
+from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
@@ -231,7 +231,7 @@ class HttpApiGenerator(object):
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
-            "ApiGatewayDomainNameV2", logical_id_generator.LogicalIdGenerator("", self.domain.get("DomainName")).gen()
+            "ApiGatewayDomainNameV2", LogicalIdGenerator("", self.domain.get("DomainName")).gen()
         )
 
         domain = ApiGatewayV2DomainName(
@@ -321,12 +321,9 @@ class HttpApiGenerator(object):
                 self.logical_id,
                 "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
             )
-        logical_id = (
-            "RecordSetGroup"
-            + logical_id_generator.LogicalIdGenerator(
-                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
-            ).gen()
-        )
+
+        logical_id_suffix = LogicalIdGenerator("", route53.get("HostedZoneId") or route53.get("HostedZoneName")).gen()
+        logical_id = "RecordSetGroup" + logical_id_suffix
 
         record_set_group = route53_record_set_groups.get(logical_id)
         if not record_set_group:
@@ -604,7 +601,7 @@ class HttpApiGenerator(object):
         elif stage_name_prefix == DefaultStageName:
             stage_logical_id = self.logical_id + "ApiGatewayDefaultStage"
         else:
-            generator = logical_id_generator.LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
+            generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
             stage_logical_id = generator.gen()
         stage = ApiGatewayV2Stage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.ApiId = ref(self.logical_id)

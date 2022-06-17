@@ -22,7 +22,7 @@ from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_intrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
-from samtranslator.translator import logical_id_generator
+from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -388,7 +388,7 @@ class ApiGenerator(object):
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         else:
-            generator = logical_id_generator.LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
+            generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
             stage_logical_id = generator.gen()
         stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
@@ -425,7 +425,7 @@ class ApiGenerator(object):
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
-            "ApiGatewayDomainName", logical_id_generator.LogicalIdGenerator("", self.domain.get("DomainName")).gen()
+            "ApiGatewayDomainName", LogicalIdGenerator("", self.domain.get("DomainName")).gen()
         )
 
         domain = ApiGatewayDomainName(self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes)
@@ -529,12 +529,11 @@ class ApiGenerator(object):
                     self.logical_id,
                     "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
                 )
-            logical_id = (
-                "RecordSetGroup"
-                + logical_id_generator.LogicalIdGenerator(
-                    "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
-                ).gen()
-            )
+
+            logical_id_suffix = LogicalIdGenerator(
+                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
+            ).gen()
+            logical_id = "RecordSetGroup" + logical_id_suffix
 
             record_set_group = route53_record_set_groups.get(logical_id)
             if not record_set_group:
