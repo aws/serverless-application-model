@@ -550,6 +550,7 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "http_api_local_iam_auth_enabled",
                 "http_api_multiple_authorizers",
                 "http_api_with_custom_domain_route53_multiple",
+                "mixed_api_with_custom_domain_route53_multiple",
             ],
             [
                 ("aws", "ap-southeast-1"),
