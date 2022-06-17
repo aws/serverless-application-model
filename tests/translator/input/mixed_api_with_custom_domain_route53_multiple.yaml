@@ -27,7 +27,7 @@ Resources:
           ResourcePath: '/*'
           HttpMethod: '*'
       Domain:
-        DomainName: admin.one.amazon.com
+        DomainName: admin.two.amazon.com
         CertificateArn: arn::cert::abc
         EndpointConfiguration: REGIONAL
         Route53:
