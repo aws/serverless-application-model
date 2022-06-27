@@ -878,7 +878,7 @@ class SamFunction(SamResourceMacro):
         )
 
         if deployment_preference_collection.get(self.logical_id).enabled:
-            if self.AutoPublishAlias is None:
+            if not self.AutoPublishAlias:
                 raise InvalidResourceException(
                     self.logical_id, "'DeploymentPreference' requires AutoPublishAlias property to be specified."
                 )
