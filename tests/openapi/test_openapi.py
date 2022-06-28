@@ -203,10 +203,31 @@ class TestOpenApiEditor_add_lambda_integration(TestCase):
             "paths": {
                 "/foo": {"post": {"a": [1, 2, "b"], "responses": {"something": "is already here"}}},
                 "/bar": {"get": {_X_INTEGRATION: {"a": "b"}}},
+                "/nullmethod": {"get": None},
             },
         }
 
         self.editor = OpenApiEditor(self.original_openapi)
+
+    def test_must_override_null_path(self):
+        path = "/nullmethod"
+        method = "get"
+        integration_uri = "something"
+        expected = {
+            "responses": {},
+            _X_INTEGRATION: {
+                "type": "aws_proxy",
+                "httpMethod": "POST",
+                "payloadFormatVersion": "2.0",
+                "uri": integration_uri,
+            },
+        }
+
+        self.editor.add_lambda_integration(path, method, integration_uri)
+
+        self.assertTrue(self.editor.has_path(path, method))
+        actual = self.editor.openapi["paths"][path][method]
+        self.assertEqual(expected, actual)
 
     def test_must_add_new_integration_to_new_path(self):
         path = "/newpath"
