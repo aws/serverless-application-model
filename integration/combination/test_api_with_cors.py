@@ -1,6 +1,9 @@
 import requests
+from unittest.case import skipIf
 
 from integration.helpers.base_test import BaseTest
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import REST_API
 from integration.helpers.deployer.utils.retry import retry
 from parameterized import parameterized
 
@@ -9,6 +12,7 @@ from integration.helpers.exception import StatusCodeError
 ALL_METHODS = "DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT"
 
 
+@skipIf(current_region_does_not_support([REST_API]), "Rest API is not supported in this testing region")
 class TestApiWithCors(BaseTest):
     @parameterized.expand(
         [
