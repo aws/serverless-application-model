@@ -303,7 +303,6 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_basic_custom_domain_intrinsics_http",
                 "api_with_custom_domain_route53_http",
                 "api_with_custom_domain_route53_hosted_zone_name_http",
-                "api_with_fail_on_warnings",
                 "implicit_http_api",
                 "explicit_http_api_minimum",
                 "implicit_http_api_auth_and_simple_case",
