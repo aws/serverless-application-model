@@ -6,7 +6,7 @@
   { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGatewayV2::Api" },
   { "LogicalResourceId":"RecordSetGroupddfc299be2", "ResourceType":"AWS::Route53::RecordSetGroup" },
   { "LogicalResourceId":"MyApiProdStage", "ResourceType":"AWS::ApiGatewayV2::Stage" },
-  { "LogicalResourceId":"ApiGatewayDomainNameV2e7a0af471b", "ResourceType":"AWS::ApiGatewayV2::DomainName" },
+  { "LogicalResourceId":"ApiGatewayDomainNameV2804ee5e222", "ResourceType":"AWS::ApiGatewayV2::DomainName" },
   { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
   { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" }
 ]
