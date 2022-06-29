@@ -1,9 +1,14 @@
+import logging
 from unittest.case import skipIf
 
-from integration.config.service_names import KMS, XRAY, ARM
+import pytest
+
+from integration.config.service_names import KMS, XRAY, ARM, CODE_DEPLOY, HTTP_API
 from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
+
+LOG = logging.getLogger(__name__)
 
 
 class TestBasicFunction(BaseTest):
@@ -35,12 +40,14 @@ class TestBasicFunction(BaseTest):
             "single/function_alias_with_http_api_events",
         ]
     )
+    @pytest.mark.flaky(reruns=5)
+    @skipIf(current_region_does_not_support([HTTP_API]), "HTTP API is not supported in this testing region")
     def test_function_with_http_api_events(self, file_name):
         self.create_and_verify_stack(file_name)
 
         endpoint = self.get_api_v2_endpoint("MyHttpApi")
 
-        self.assertEqual(BaseTest.do_get_request_with_logging(endpoint).text, self.FUNCTION_OUTPUT)
+        self.verify_get_request(endpoint, self.FUNCTION_OUTPUT)
 
     @parameterized.expand(
         [
@@ -64,40 +71,7 @@ class TestBasicFunction(BaseTest):
 
         self.assertEqual(function_architecture, architecture)
 
-    @parameterized.expand(
-        [
-            ("single/basic_function_with_function_url_config", None),
-            ("single/basic_function_with_function_url_with_autopuplishalias", "live"),
-        ]
-    )
-    @skipIf(current_region_does_not_support(["Url"]), "Url is not supported in this testing region")
-    def test_basic_function_with_url_config(self, file_name, qualifier):
-        """
-        Creates a basic lambda function with Function Url enabled
-        """
-        self.create_and_verify_stack(file_name)
-
-        lambda_client = self.client_provider.lambda_client
-
-        function_name = self.get_physical_id_by_type("AWS::Lambda::Function")
-        function_url_config = (
-            lambda_client.get_function_url_config(FunctionName=function_name, Qualifier=qualifier)
-            if qualifier
-            else lambda_client.get_function_url_config(FunctionName=function_name)
-        )
-        cors_config = {
-            "AllowOrigins": ["https://foo.com"],
-            "AllowMethods": ["POST"],
-            "AllowCredentials": True,
-            "AllowHeaders": ["x-custom-header"],
-            "ExposeHeaders": ["x-amzn-header"],
-            "MaxAge": 10,
-        }
-
-        self.assertEqual(function_url_config["AuthType"], "NONE")
-        self.assertEqual(function_url_config["Cors"], cors_config)
-        self._assert_invoke(lambda_client, function_name, qualifier, 200)
-
+    @skipIf(current_region_does_not_support([CODE_DEPLOY]), "CodeDeploy is not supported in this testing region")
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
         self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")
 
@@ -237,46 +211,6 @@ class TestBasicFunction(BaseTest):
             "Expecting tracing config mode to be set to PassThrough.",
         )
 
-    @parameterized.expand(
-        [
-            "single/function_with_ephemeral_storage",
-        ]
-    )
-    def test_function_with_ephemeral_storage(self, file_name):
-        """
-        Creates a basic function with ephemeral storage
-        """
-        self.create_and_verify_stack(file_name)
-
-        function_id = self.get_physical_id_by_logical_id("MyLambdaFunction")
-
-        function_configuration_result = self.client_provider.lambda_client.get_function_configuration(
-            FunctionName=function_id
-        )
-
-        self.assertEqual(function_configuration_result.get("EphemeralStorage", {}).get("Size", 0), 1024)
-
-    def _assert_invoke(self, lambda_client, function_name, qualifier=None, expected_status_code=200):
-        """
-        Assert if a Lambda invocation returns the expected status code
-
-        Parameters
-        ----------
-        lambda_client : boto3.BaseClient
-            boto3 Lambda client
-        function_name : string
-            Function name
-        qualifier : string
-            Specify a version or alias to invoke a published version of the function
-        expected_status_code : int
-            Expected status code from the invocation
-        """
-        request_params = {
-            "FunctionName": function_name,
-            "Payload": "{}",
-        }
-        if qualifier:
-            request_params["Qualifier"] = qualifier
-
-        response = lambda_client.invoke(**request_params)
-        self.assertEqual(response.get("StatusCode"), expected_status_code)
+    def verify_get_request(self, url, expected_text):
+        response = self.verify_get_request_response(url, 200, "AWS::ApiGatewayV2::Api")
+        self.assertEqual(response.text, expected_text)
