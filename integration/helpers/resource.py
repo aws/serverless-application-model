@@ -41,7 +41,9 @@ def verify_stack_resources(expected_file_path, stack_resources):
     parsed_resources = _sort_resources(stack_resources["StackResourceSummaries"])
 
     if len(expected_resources) != len(parsed_resources):
-        return "'{}' resources expected, '{}' found".format(len(expected_resources), len(parsed_resources))
+        return "'{}' resources expected, '{}' found: \n{}".format(
+            len(expected_resources), len(parsed_resources), json.dumps(parsed_resources, default=str)
+        )
 
     for i in range(len(expected_resources)):
         exp = expected_resources[i]
@@ -55,7 +57,7 @@ def verify_stack_resources(expected_file_path, stack_resources):
                 "ResourceType": parsed["ResourceType"],
             }
 
-            return "'{}' expected, '{}' found (Resources must appear in the same order, don't include the LogicalId random suffix)".format(
+            return "'{}' expected, '{}' found (Don't include the LogicalId random suffix)".format(
                 exp, parsed_trimed_down
             )
         if exp["ResourceType"] != parsed["ResourceType"]:
@@ -79,7 +81,8 @@ def generate_suffix():
 
 def _sort_resources(resources):
     """
-    Sorts a stack's resources by LogicalResourceId
+    Filters and sorts a stack's resources by LogicalResourceId.
+    Keeps only the LogicalResourceId and ResourceType properties
 
     Parameters
     ----------
@@ -93,7 +96,12 @@ def _sort_resources(resources):
     """
     if resources is None:
         return []
-    return sorted(resources, key=lambda d: d["LogicalResourceId"])
+
+    filtered_resources = map(
+        lambda x: {"LogicalResourceId": x["LogicalResourceId"], "ResourceType": x["ResourceType"]}, resources
+    )
+
+    return sorted(filtered_resources, key=lambda d: d["LogicalResourceId"])
 
 
 def create_bucket(bucket_name, region):
@@ -123,6 +131,21 @@ def create_bucket(bucket_name, region):
         s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
 
 
+def _get_region():
+    """Returns current region from boto3 session object"""
+    session = boto3.session.Session()
+    region = session.region_name
+    return region
+
+
+def _read_test_config_file(filename):
+    """Reads test inclusion or exclusion file and returns the contents"""
+    tests_integ_dir = Path(__file__).resolve().parents[1]
+    test_config_file_path = str(Path(tests_integ_dir, "config", filename))
+    test_config = load_yaml(test_config_file_path)
+    return test_config
+
+
 def current_region_does_not_support(services):
     """
     Decide if a test should be skipped in the current testing region with the specific resources
@@ -138,16 +161,46 @@ def current_region_does_not_support(services):
         If skip return true otherwise false
     """
 
-    session = boto3.session.Session()
-    region = session.region_name
-
-    tests_integ_dir = Path(__file__).resolve().parents[1]
-    config_dir = Path(tests_integ_dir, "config")
-    region_exclude_services_file = str(Path(config_dir, "region_service_exclusion.yaml"))
-    region_exclude_services = load_yaml(region_exclude_services_file)
+    region = _get_region()
+    region_exclude_services = _read_test_config_file("region_service_exclusion.yaml")
 
     if region not in region_exclude_services["regions"]:
         return False
 
     # check if any one of the services is in the excluded services for current testing region
     return bool(set(services).intersection(set(region_exclude_services["regions"][region])))
+
+
+def current_region_not_included(services):
+    """
+    Opposite of current_region_does_not_support.
+    Decides which tests should only be run in certain regions
+    """
+    region = _get_region()
+    region_include_services = _read_test_config_file("region_service_inclusion.yaml")
+
+    if region not in region_include_services["regions"]:
+        return True
+
+    # check if any one of the services is in the excluded services for current testing region
+    return not bool(set(services).intersection(set(region_include_services["regions"][region])))
+
+
+def first_item_in_dict(dictionary):
+    """
+    return the first key-value pair in dictionary
+
+    Parameters
+    ----------
+    dictionary : Dictionary
+        the dictionary used to grab the first tiem
+
+    Returns
+    -------
+    Tuple
+        the first key-value pair in the dictionary
+    """
+    if not dictionary:
+        return None
+    first_key = list(dictionary.keys())[0]
+    return first_key, dictionary[first_key]

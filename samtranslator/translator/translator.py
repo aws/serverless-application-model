@@ -1,11 +1,14 @@
 import copy
 
+from samtranslator.metrics.method_decorator import MetricsMethodWrapperSingleton
+from samtranslator.metrics.metrics import DummyMetricsPublisher, Metrics
+
 from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
-    FeatureToggleLocalConfigProvider,
     FeatureToggleDefaultConfigProvider,
 )
 from samtranslator.model import ResourceTypeResolver, sam_resources
+from samtranslator.model.api.api_generator import SharedApiUsagePlan
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
 from samtranslator.model.exceptions import (
@@ -13,6 +16,7 @@ from samtranslator.model.exceptions import (
     InvalidResourceException,
     DuplicateLogicalIdException,
     InvalidEventException,
+    InvalidTemplateException,
 )
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
@@ -20,18 +24,19 @@ from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.plugins.api.default_definition_body_plugin import DefaultDefinitionBodyPlugin
 from samtranslator.plugins.application.serverless_app_plugin import ServerlessAppPlugin
 from samtranslator.plugins import LifeCycleEvents
-from samtranslator.plugins import SamPlugins
+from samtranslator.plugins.sam_plugins import SamPlugins
 from samtranslator.plugins.globals.globals_plugin import GlobalsPlugin
 from samtranslator.plugins.policies.policy_templates_plugin import PolicyTemplatesForResourcePlugin
 from samtranslator.policy_template_processor.processor import PolicyTemplatesProcessor
 from samtranslator.sdk.parameter import SamParameterValues
 from samtranslator.translator.arn_generator import ArnGenerator
+from samtranslator.model.eventsources.push import Api
 
 
 class Translator:
     """Translates SAM templates into CloudFormation templates"""
 
-    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None):
+    def __init__(self, managed_policy_map, sam_parser, plugins=None, boto_session=None, metrics=None):
         """
         :param dict managed_policy_map: Map of managed policy names to the ARNs
         :param sam_parser: Instance of a SAM Parser
@@ -43,8 +48,12 @@ class Translator:
         self.sam_parser = sam_parser
         self.feature_toggle = None
         self.boto_session = boto_session
+        self.metrics = metrics if metrics else Metrics("ServerlessTransform", DummyMetricsPublisher())
+        MetricsMethodWrapperSingleton.set_instance(self.metrics)
+        self._translated_resouce_mapping = {}
 
-        ArnGenerator.class_boto_session = self.boto_session
+        if self.boto_session:
+            ArnGenerator.BOTO_SESSION_REGION_NAME = self.boto_session.region_name
 
     def _get_function_names(self, resource_dict, intrinsics_resolver):
         """
@@ -53,30 +62,28 @@ class Translator:
         :return: a dictionary containing api_logical_id as the key and concatenated String of all function_names
                  associated with this api as the value
         """
-        if resource_dict.get("Type") and resource_dict.get("Type").strip() == "AWS::Serverless::Function":
-            if resource_dict.get("Properties") and resource_dict.get("Properties").get("Events"):
-                events = list(resource_dict.get("Properties").get("Events").values())
-                for item in events:
-                    # If the function event type is `Api` then gets the function name and
-                    # adds to the function_names dict with key as the api_name and value as the function_name
-                    if item.get("Type") == "Api" and item.get("Properties") and item.get("Properties").get("RestApiId"):
-                        rest_api = item.get("Properties").get("RestApiId")
-                        if isinstance(rest_api, dict):
-                            api_name = item.get("Properties").get("RestApiId").get("Ref")
-                        else:
-                            api_name = item.get("Properties").get("RestApiId")
-                        if api_name:
-                            resource_dict_copy = copy.deepcopy(resource_dict)
-                            function_name = intrinsics_resolver.resolve_parameter_refs(
-                                resource_dict_copy.get("Properties").get("FunctionName")
+        if resource_dict.get("Type", "").strip() == "AWS::Serverless::Function":
+            events_properties = resource_dict.get("Properties", {}).get("Events", {})
+            events = list(events_properties.values()) if events_properties else []
+            for item in events:
+                # If the function event type is `Api` then gets the function name and
+                # adds to the function_names dict with key as the api_name and value as the function_name
+                item_properties = item.get("Properties", {})
+                if item.get("Type") == "Api" and item_properties.get("RestApiId"):
+                    rest_api = item_properties.get("RestApiId")
+                    api_name = Api.get_rest_api_id_string(rest_api)
+                    if isinstance(api_name, str):
+                        resource_dict_copy = copy.deepcopy(resource_dict)
+                        function_name = intrinsics_resolver.resolve_parameter_refs(
+                            resource_dict_copy.get("Properties").get("FunctionName")
+                        )
+                        if function_name:
+                            self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
+                                function_name
                             )
-                            if function_name:
-                                self.function_names[api_name] = str(self.function_names.get(api_name, "")) + str(
-                                    function_name
-                                )
         return self.function_names
 
-    def translate(self, sam_template, parameter_values, feature_toggle=None):
+    def translate(self, sam_template, parameter_values, feature_toggle=None, passthrough_metadata=False):
         """Loads the SAM resources from the given SAM manifest, replaces them with their corresponding
         CloudFormation resources, and returns the resulting CloudFormation template.
 
@@ -91,7 +98,11 @@ class Translator:
         :returns: a copy of the template with SAM resources replaced with the corresponding CloudFormation, which may \
                 be dumped into a valid CloudFormation JSON or YAML template
         """
-        self.feature_toggle = feature_toggle if feature_toggle else FeatureToggle(FeatureToggleDefaultConfigProvider())
+        self.feature_toggle = (
+            feature_toggle
+            if feature_toggle
+            else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)
+        )
         self.function_names = dict()
         self.redeploy_restapi_parameters = dict()
         sam_parameter_values = SamParameterValues(parameter_values)
@@ -111,6 +122,7 @@ class Translator:
         )
         deployment_preference_collection = DeploymentPreferenceCollection()
         supported_resource_refs = SupportedResourceReferences()
+        shared_api_usage_plan = SharedApiUsagePlan()
         document_errors = []
         changed_logical_ids = {}
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
@@ -130,6 +142,8 @@ class Translator:
                     resource_dict, intrinsics_resolver
                 )
                 kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
+                kwargs["shared_api_usage_plan"] = shared_api_usage_plan
+                kwargs["feature_toggle"] = self.feature_toggle
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
@@ -141,19 +155,28 @@ class Translator:
                 del template["Resources"][logical_id]
                 for resource in translated:
                     if verify_unique_logical_id(resource, sam_template["Resources"]):
-                        template["Resources"].update(resource.to_dict())
+                        # For each generated resource, pass through existing metadata that may exist on the original SAM resource.
+                        _r = resource.to_dict()
+                        if resource_dict.get("Metadata") and passthrough_metadata:
+                            if not template["Resources"].get(resource.logical_id):
+                                _r[resource.logical_id]["Metadata"] = resource_dict["Metadata"]
+                        template["Resources"].update(_r)
                     else:
                         document_errors.append(
                             DuplicateLogicalIdException(logical_id, resource.logical_id, resource.resource_type)
                         )
-            except (InvalidResourceException, InvalidEventException) as e:
+            except (InvalidResourceException, InvalidEventException, InvalidTemplateException) as e:
                 document_errors.append(e)
 
         if deployment_preference_collection.any_enabled():
-            template["Resources"].update(deployment_preference_collection.codedeploy_application.to_dict())
+            template["Resources"].update(deployment_preference_collection.get_codedeploy_application().to_dict())
+            if deployment_preference_collection.needs_resource_condition():
+                new_conditions = deployment_preference_collection.create_aggregate_deployment_condition()
+                if new_conditions:
+                    template.get("Conditions").update(new_conditions)
 
             if not deployment_preference_collection.can_skip_service_role():
-                template["Resources"].update(deployment_preference_collection.codedeploy_iam_role.to_dict())
+                template["Resources"].update(deployment_preference_collection.get_codedeploy_iam_role().to_dict())
 
             for logical_id in deployment_preference_collection.enabled_logical_ids():
                 try:
@@ -166,7 +189,7 @@ class Translator:
         # Run the after-transform plugin target
         try:
             sam_plugins.act(LifeCycleEvents.after_transform_template, template)
-        except (InvalidDocumentException, InvalidResourceException) as e:
+        except (InvalidDocumentException, InvalidResourceException, InvalidTemplateException) as e:
             document_errors.append(e)
 
         # Cleanup
@@ -223,7 +246,7 @@ class Translator:
         return functions + statemachines + apis + others
 
 
-def prepare_plugins(plugins, parameters={}):
+def prepare_plugins(plugins, parameters=None):
     """
     Creates & returns a plugins object with the given list of plugins installed. In addition to the given plugins,
     we will also install a few "required" plugins that are necessary to provide complete support for SAM template spec.
@@ -233,6 +256,8 @@ def prepare_plugins(plugins, parameters={}):
     :return samtranslator.plugins.SamPlugins: Instance of `SamPlugins`
     """
 
+    if parameters is None:
+        parameters = {}
     required_plugins = [
         DefaultDefinitionBodyPlugin(),
         make_implicit_rest_api_plugin(),

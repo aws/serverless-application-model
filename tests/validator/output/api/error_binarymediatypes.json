@@ -1,0 +1,6 @@
+[
+  "[Resources.ApiBinaryMediaTypesEmpty.Properties.BinaryMediaTypes] Must not be empty",
+  "[Resources.ApiBinaryMediaTypesItemNotString.Properties.BinaryMediaTypes.0] 3 is not of type 'string', 'intrinsic'",
+  "[Resources.ApiBinaryMediaTypesNotIntrinsic.Properties.BinaryMediaTypes] {'Not': 'Intrinsic'} is not of type 'array', 'intrinsic'",
+  "[Resources.ApiBinaryMediaTypesNotList.Properties.BinaryMediaTypes] 'My binary media type' is not of type 'array', 'intrinsic'"
+]

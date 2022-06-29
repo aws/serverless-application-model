@@ -1,4 +1,4 @@
-from mock import Mock
+from unittest.mock import Mock
 from unittest import TestCase
 from samtranslator.model.stepfunctions.events import Schedule
 from samtranslator.model.exceptions import InvalidEventException
@@ -138,3 +138,9 @@ class ScheduleEventSource(TestCase):
         self.assertEqual(len(resources), 4)
         event_rule = resources[0]
         self.assertEqual(event_rule.Targets[0]["DeadLetterConfig"], dead_letter_config_translated)
+
+    def test_to_cloudformation_with_dlq_generated_with_intrinsic_function_custom_logical_id_raises_exception(self):
+        dead_letter_config = {"Type": "SQS", "QueueLogicalId": {"Fn::Sub": "MyDLQ${Env}"}}
+        self.schedule_event_source.DeadLetterConfig = dead_letter_config
+        with self.assertRaises(InvalidEventException):
+            self.schedule_event_source.to_cloudformation(resource=self.state_machine)

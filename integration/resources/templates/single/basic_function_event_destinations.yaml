@@ -42,7 +42,7 @@ Resources:
                   }
                 };
             Handler: index.handler
-            Runtime: nodejs10.x
+            Runtime: nodejs14.x
             MemorySize: 1024
     MyTestFunction2:
         Type: AWS::Serverless::Function
@@ -74,7 +74,7 @@ Resources:
                   }
                 };
             Handler: index.handler
-            Runtime: nodejs10.x
+            Runtime: nodejs14.x
             MemorySize: 1024
     DestinationLambda:
         Type: AWS::Serverless::Function
@@ -88,7 +88,7 @@ Resources:
                   return response;
                 };
             Handler: index.handler
-            Runtime: nodejs10.x
+            Runtime: nodejs14.x
             MemorySize: 1024
     DestinationSQS:
         Condition: QueueCreationDisabled

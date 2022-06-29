@@ -1,0 +1,7 @@
+[
+  { "LogicalResourceId":"MyLambdaFunction", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
+  { "LogicalResourceId":"MyApi", "ResourceType":"AWS::ApiGateway::RestApi" },
+  { "LogicalResourceId":"MyApiFancyNameStage", "ResourceType":"AWS::ApiGateway::Stage" }
+]

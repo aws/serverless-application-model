@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  DefinitionBody currently only supports intrinsics when SwaggerEditor/OpenApiEditor is not used (as of 2022-05-30).
+  Let's add tests to make sure we keep this support, because we've had a regression where we accidentally
+  removed this intrinsics support by using the SwaggerEditor.
+  Note that the only supported intrinsic function for DefinitionBody is Fn::If. Other intrinsics are not supported
+  because they don't resolve to dictionary. 
+
+Conditions:
+  FalseCondition:
+    Fn::Equals:
+      - true
+      - false
+
+Resources:
+  # Rest Api with DefinitionBody under If intrinsic, SwaggerEditor not used
+  RestApiIfIntrinsicAndNoSwaggerEditor:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      DefinitionBody:
+          Fn::If:
+            - FalseCondition
+            - 
+              swagger: '2.0'
+              info:
+                title: !Sub ${AWS::StackName}-Api
+              paths:
+                /post:
+                  post:
+                    x-amazon-apigateway-integration:
+                      httpMethod: POST
+                      type: aws_proxy
+                      uri: https://www.alphavantage.co/
+                      payloadFormatVersion: '1.0'
+            - 
+              swagger: '2.0'
+              info:
+                title: !Sub ${AWS::StackName}-Api
+              paths:
+                /post:
+                  post:
+                    x-amazon-apigateway-integration:
+                      httpMethod: POST
+                      type: aws_proxy
+                      uri: https://www.otheruri.co/
+                      payloadFormatVersion: '1.0'
+
+  # HttpApi with DefinitionBody under If intrinsic, OpenApiEditor not used
+  HttpApiIfIntrinsicAndNoOpenApiEditor:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      DefinitionBody:
+          Fn::If:
+            - FalseCondition
+            - 
+              openapi: '3.0'
+              info:
+                title: !Sub ${AWS::StackName}-Api
+              paths:
+                /post:
+                  post:
+                    x-amazon-apigateway-integration:
+                      httpMethod: POST
+                      type: aws_proxy
+                      uri: https://www.alphavantage.co/
+                      payloadFormatVersion: '1.0'
+            - 
+              openapi: '3.0'
+              info:
+                title: !Sub ${AWS::StackName}-Api
+              paths:
+                /post:
+                  post:
+                    x-amazon-apigateway-integration:
+                      httpMethod: POST
+                      type: aws_proxy
+                      uri: https://www.otheruri.co/
+                      payloadFormatVersion: '1.0'

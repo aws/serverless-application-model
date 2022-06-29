@@ -1,0 +1,5 @@
+[
+  { "LogicalResourceId":"MyLambdaFunctionWithLayer", "ResourceType":"AWS::Lambda::Function" },
+  { "LogicalResourceId":"MyLambdaFunctionWithLayerRole", "ResourceType":"AWS::IAM::Role" },
+  { "LogicalResourceId":"MyLambdaLayer", "ResourceType":"AWS::Lambda::LayerVersion" }
+]

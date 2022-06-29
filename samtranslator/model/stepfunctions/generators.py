@@ -2,9 +2,8 @@ import json
 from uuid import uuid4
 from copy import deepcopy
 
-from six import string_types
-
 import samtranslator.model.eventsources.push
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceTypeResolver
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMRolePolicies
@@ -99,6 +98,7 @@ class StateMachineGenerator(object):
         )
         self.substitution_counter = 1
 
+    @cw_timer(prefix="Generator", name="StateMachine")
     def to_cloudformation(self):
         """
         Constructs and returns the State Machine resource and any additional resources associated with it.
@@ -286,7 +286,7 @@ class StateMachineGenerator(object):
             location[path[-1]] = sub_key
         return substitution_map
 
-    def _get_paths_to_intrinsics(self, input, path=[]):
+    def _get_paths_to_intrinsics(self, input, path=None):
         """
         Returns all paths to dynamic values within a dictionary
 
@@ -294,6 +294,8 @@ class StateMachineGenerator(object):
         :param path: Optional list to keep track of the path to the input dictionary
         :returns list: List of keys that defines the path to a dynamic value within the input dictionary
         """
+        if path is None:
+            path = []
         dynamic_value_paths = []
         if isinstance(input, dict):
             iterator = input.items()

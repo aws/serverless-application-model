@@ -1,0 +1,62 @@
+Conditions:
+  IsChina:
+    Fn::Equals:
+      - Ref: "AWS::Partition"
+      - "aws-cn"
+
+Globals:
+  Api:
+    OpenApiVersion: "3.0.1"
+    Auth:
+      ResourcePolicy:
+        CustomStatements: [{
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "execute-api:*/*/*"
+        }]
+        SourceVpcWhitelist: ['vpc-1234']
+        SourceVpcBlacklist: ['vpce-5678']
+        IpRangeWhitelist: ['1.2.3.4']
+
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ${codeuri}
+      MemorySize: 128
+
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /apione
+            Method: any
+        AnotherApi:
+          Type: Api
+          Properties:
+            Path: /apitwo
+            Method: get
+
+Outputs:
+  Region:
+    Description: "Region"
+    Value: 
+      Ref: AWS::Region
+
+  AccountId:
+    Description: "Account Id"
+    Value: 
+      Ref: AWS::AccountId
+  
+  Partition:
+    Description: "Partition"
+    Value: 
+      Ref: AWS::Partition
+
+  ApiUrl:
+    Description: URL of your API endpoint
+    Value:
+      Fn::Sub: 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/'

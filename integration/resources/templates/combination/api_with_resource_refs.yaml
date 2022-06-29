@@ -1,0 +1,22 @@
+# Test to verify that resource references available on the Api resource are properly resolved
+
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionUri: ${definitionuri}
+
+Outputs:
+  StageName:
+    Value:
+      Ref: MyApi.Stage
+
+  ApiId:
+    Value:
+      Ref: MyApi
+
+  DeploymentId:
+    Value:
+      Ref: MyApi.Deployment
+

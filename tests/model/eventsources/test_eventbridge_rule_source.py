@@ -1,4 +1,4 @@
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 from unittest import TestCase
 
 from samtranslator.model.eventsources.push import EventBridgeRule
@@ -76,3 +76,9 @@ class EventBridgeRuleSourceTests(TestCase):
         self.assertEqual(len(resources), 4)
         event_rule = resources[2]
         self.assertEqual(event_rule.Targets[0]["DeadLetterConfig"], dead_letter_config_translated)
+
+    def test_to_cloudformation_with_dlq_generated_with_intrinsic_function_custom_logical_id_raises_exception(self):
+        dead_letter_config = {"Type": "SQS", "QueueLogicalId": {"Fn::Sub": "MyDLQ${Env}"}}
+        self.eb_event_source.DeadLetterConfig = dead_letter_config
+        with self.assertRaises(InvalidEventException):
+            self.eb_event_source.to_cloudformation(function=self.func)

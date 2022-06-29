@@ -7,7 +7,7 @@ class InvalidDocumentException(Exception):
     """
 
     def __init__(self, causes):
-        self._causes = sorted(causes)
+        self._causes = causes
 
     @property
     def message(self):

@@ -1,6 +1,6 @@
-from six import string_types
 import json
 
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, ResourceMacro
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
@@ -9,11 +9,13 @@ from samtranslator.model.intrinsics import fnSub
 from samtranslator.translator import logical_id_generator
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
+from samtranslator.model.eventsources.push import Api as PushApi
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.open_api.open_api import OpenApiEditor
 
 CONDITION = "Condition"
+SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
 
 
 class EventSource(ResourceMacro):
@@ -86,6 +88,7 @@ class Schedule(EventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
         """Returns the EventBridge Rule and IAM Role to which this Schedule event source corresponds.
 
@@ -97,7 +100,8 @@ class Schedule(EventSource):
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
-        events_rule = EventsRule(self.logical_id)
+        passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
@@ -105,8 +109,6 @@ class Schedule(EventSource):
             events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
         events_rule.Name = self.Name
         events_rule.Description = self.Description
-        if CONDITION in resource.resource_attributes:
-            events_rule.set_resource_attribute(CONDITION, resource.resource_attributes[CONDITION])
 
         role = self._construct_role(resource, permissions_boundary)
         resources.append(role)
@@ -115,7 +117,9 @@ class Schedule(EventSource):
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+                self, source_arn, passthrough_resource_attributes
+            )
             resources.extend(dlq_resources)
         events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
 
@@ -158,6 +162,7 @@ class CloudWatchEvent(EventSource):
         "RetryPolicy": PropertyType(False, is_type(dict)),
     }
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
         """Returns the CloudWatch Events/EventBridge Rule and IAM Role to which this
         CloudWatch Events/EventBridge event source corresponds.
@@ -170,11 +175,10 @@ class CloudWatchEvent(EventSource):
 
         permissions_boundary = kwargs.get("permissions_boundary")
 
-        events_rule = EventsRule(self.logical_id)
+        passthrough_resource_attributes = resource.get_passthrough_resource_attributes()
+        events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
-        if CONDITION in resource.resource_attributes:
-            events_rule.set_resource_attribute(CONDITION, resource.resource_attributes[CONDITION])
 
         resources.append(events_rule)
 
@@ -185,7 +189,9 @@ class CloudWatchEvent(EventSource):
         dlq_queue_arn = None
         if self.DeadLetterConfig is not None:
             EventBridgeRuleUtils.validate_dlq_config(self.logical_id, self.DeadLetterConfig)
-            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(self, source_arn)
+            dlq_queue_arn, dlq_resources = EventBridgeRuleUtils.get_dlq_queue_arn_and_resources(
+                self, source_arn, passthrough_resource_attributes
+            )
             resources.extend(dlq_resources)
 
         events_rule.Targets = [self._construct_target(resource, role, dlq_queue_arn)]
@@ -244,10 +250,6 @@ class Api(EventSource):
         necessary data from the explicit API
         """
 
-        rest_api_id = self.RestApiId
-        if isinstance(rest_api_id, dict) and "Ref" in rest_api_id:
-            rest_api_id = rest_api_id["Ref"]
-
         # If RestApiId is a resource in the same template, then we try find the StageName by following the reference
         # Otherwise we default to a wildcard. This stage name is solely used to construct the permission to
         # allow this stage to invoke the State Machine. If we are unable to resolve the stage name, we will
@@ -257,7 +259,8 @@ class Api(EventSource):
         permitted_stage = "*"
         stage_suffix = "AllStages"
         explicit_api = None
-        if isinstance(rest_api_id, string_types):
+        rest_api_id = PushApi.get_rest_api_id_string(self.RestApiId)
+        if isinstance(rest_api_id, str):
 
             if (
                 rest_api_id in resources
@@ -269,7 +272,7 @@ class Api(EventSource):
                 permitted_stage = explicit_api["StageName"]
 
                 # Stage could be a intrinsic, in which case leave the suffix to default value
-                if isinstance(permitted_stage, string_types):
+                if isinstance(permitted_stage, str):
                     stage_suffix = permitted_stage
                 else:
                     stage_suffix = "Stage"
@@ -283,6 +286,7 @@ class Api(EventSource):
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
 
+    @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
     def to_cloudformation(self, resource, **kwargs):
         """If the Api event source has a RestApi property, then simply return the IAM role resource
         allowing API Gateway to start the state machine execution. If no RestApi is provided, then
@@ -412,9 +416,7 @@ class Api(EventSource):
 
             if self.Auth.get("ResourcePolicy"):
                 resource_policy = self.Auth.get("ResourcePolicy")
-                editor.add_resource_policy(
-                    resource_policy=resource_policy, path=self.Path, api_id=self.RestApiId.get("Ref"), stage=self.Stage
-                )
+                editor.add_resource_policy(resource_policy=resource_policy, path=self.Path, stage=self.Stage)
                 if resource_policy.get("CustomStatements"):
                     editor.add_custom_statements(resource_policy.get("CustomStatements"))
 

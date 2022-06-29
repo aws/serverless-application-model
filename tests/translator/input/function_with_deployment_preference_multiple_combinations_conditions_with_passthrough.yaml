@@ -1,0 +1,91 @@
+Conditions:
+  Condition1:
+    Fn::Equals:
+      - true
+      - true
+  Condition2:
+    Fn::Equals:
+      - true
+      - false
+  Condition3:
+    Fn::Equals:
+      - true
+      - false
+
+Parameters:
+  MyFalseParameter:
+    Type: String
+    Default: False
+
+Resources:
+  MinimalFunction:
+    Condition: Condition1
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: Linear10PercentEvery2Minutes
+        PassthroughCondition: true
+
+  MinimalFunctionWithMinimalDeploymentPreference:
+    Type: 'AWS::Serverless::Function'
+    Condition: Condition2
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: livewithdeployment
+      DeploymentPreference:
+        Type: Canary10Percent5Minutes
+        PassthroughCondition: true
+
+  MinimalFunctionWithDeploymentPreferenceWithHooksAndAlarms:
+    Type: 'AWS::Serverless::Function'
+    Condition: Condition2
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip
+      Handler: hello.handler
+      Runtime: python2.7
+      AutoPublishAlias: livewithdeploymentwithhooksandalarms
+      DeploymentPreference:
+        Type: Linear10PercentEvery2Minutes
+        Hooks:
+          PreTraffic: !Ref MySanityTestFunction
+          PostTraffic: !Ref MyValidationTestFunction
+        Alarms:
+          - !Ref MyCloudWatchAlarm
+        PassthroughCondition: true
+
+  MySanityTestFunction:
+    Type: 'AWS::Serverless::Function'
+    Condition: Condition3
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://my-bucket/mySanityTestFunction.zip
+      DeploymentPreference:
+        Enabled: False
+        PassthroughCondition: true
+
+  MyValidationTestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: hello.handler
+      Runtime: python2.7
+      CodeUri: s3://my-bucket/myValidationTestFunction.zip
+      DeploymentPreference:
+        Enabled: !Ref MyFalseParameter
+        PassthroughCondition: true
+
+  MyCloudWatchAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ComparisonOperator: GreaterThanThreshold
+      EvaluationPeriods: 1
+      MetricName: MyMetric
+      Namespace: AWS/EC2
+      Period: 300
+      Threshold: 10

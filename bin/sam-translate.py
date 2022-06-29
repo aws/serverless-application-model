@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 """Convert SAM templates to CloudFormation templates.
 
@@ -26,7 +26,9 @@ import subprocess
 import sys
 
 import boto3
+
 from docopt import docopt
+from functools import reduce
 
 my_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, my_path + "/..")
@@ -35,7 +37,6 @@ from samtranslator.public.translator import ManagedPolicyLoader
 from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 from samtranslator.model.exceptions import InvalidDocumentException
-from samtranslator.feature_toggle.feature_toggle import FeatureToggleLocalConfigProvider, FeatureToggle
 
 LOG = logging.getLogger(__name__)
 cli_options = docopt(__doc__)
@@ -96,13 +97,8 @@ def transform_template(input_file_path, output_file_path):
         sam_template = yaml_parse(f)
 
     try:
-        feature_toggle = FeatureToggle(
-            FeatureToggleLocalConfigProvider(
-                os.path.join(my_path, "..", "tests", "feature_toggle", "input", "feature_toggle_config.json")
-            )
-        )
-        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client), feature_toggle)
-        cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=2)
+        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))
+        cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=1)
 
         with open(output_file_path, "w") as f:
             f.write(cloud_formation_template_prettified)

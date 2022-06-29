@@ -1,0 +1,9 @@
+{
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Structure of the SAM template is invalid. Tags in OpenApi DefinitionBody needs to be a list. {'name': 'tag1'} is a dict not a list.",
+  "errors": [
+    {
+      "errorMessage": "Structure of the SAM template is invalid. Tags in OpenApi DefinitionBody needs to be a list. {'name': 'tag1'} is a dict not a list."
+    }
+  ]
+}
+  

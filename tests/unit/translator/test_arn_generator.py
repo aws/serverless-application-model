@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mock import patch
+from unittest.mock import patch
 from parameterized import parameterized
 
 from samtranslator.translator.arn_generator import ArnGenerator

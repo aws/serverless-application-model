@@ -1,0 +1,12 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  EmptyResource:
+
+  TypeMissingSemiColon:
+    Type: AWS::Serverless:Api
+
+  TypeUnknownServerless:
+    Type: AWS::Serverless::UnknownType
+
+  TypeCustomThreePartsInsteadOfTwo:
+    Type: Custom::My::Custom

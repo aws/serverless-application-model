@@ -1,0 +1,6 @@
+{
+  "errors": [{
+    "errorMessage": "Resource with id [MQFunction] is invalid. Event with id [MyMQQueue] is invalid. Invalid property specified in SourceAccessConfigurations for Amazon MQ event."
+  }],
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MQFunction] is invalid. Event with id [MyMQQueue] is invalid. Invalid property specified in SourceAccessConfigurations for Amazon MQ event."
+}

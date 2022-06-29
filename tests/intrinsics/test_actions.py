@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 from samtranslator.intrinsics.actions import Action, RefAction, SubAction, GetAttAction, FindInMapAction
 from samtranslator.intrinsics.resource_refs import SupportedResourceReferences
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
@@ -693,6 +693,15 @@ class TestGetAttCanResolveResourceIdRefs(TestCase):
         }
 
         expected = {"Fn::GetAtt": {"a": "b"}}
+
+        getatt = GetAttAction()
+        output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)
+
+        self.assertEqual(expected, output)
+
+    def test_must_ignore_non_string_types(self):
+        input = {"Fn::GetAtt": ["a", {"c": "d"}]}
+        expected = {"Fn::GetAtt": ["a", {"c": "d"}]}
 
         getatt = GetAttAction()
         output = getatt.resolve_resource_id_refs(input, self.supported_resource_id_refs)

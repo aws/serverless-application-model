@@ -5,6 +5,7 @@ import logging
 from time import sleep, time
 import copy
 
+from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import BasePlugin
 from samtranslator.plugins.exceptions import InvalidPluginException
@@ -12,8 +13,11 @@ from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.sdk.template import SamTemplate
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.intrinsics.actions import FindInMapAction
+from samtranslator.region_configuration import RegionConfiguration
 
 LOG = logging.getLogger(__name__)
+
+PLUGIN_METRICS_PREFIX = "Plugin-ServerlessApp"
 
 
 class ServerlessAppPlugin(BasePlugin):
@@ -41,7 +45,7 @@ class ServerlessAppPlugin(BasePlugin):
     LOCATION_KEY = "Location"
     TEMPLATE_URL_KEY = "TemplateUrl"
 
-    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False, parameters={}):
+    def __init__(self, sar_client=None, wait_for_template_active_status=False, validate_only=False, parameters=None):
         """
         Initialize the plugin.
 
@@ -51,18 +55,22 @@ class ServerlessAppPlugin(BasePlugin):
         :param bool validate_only: Flag to only validate application access (uses get_application API instead)
         """
         super(ServerlessAppPlugin, self).__init__(ServerlessAppPlugin.__name__)
+        if parameters is None:
+            parameters = {}
         self._applications = {}
         self._in_progress_templates = []
         self._sar_client = sar_client
         self._wait_for_template_active_status = wait_for_template_active_status
         self._validate_only = validate_only
         self._parameters = parameters
+        self._total_wait_time = 0
 
         # make sure the flag combination makes sense
         if self._validate_only is True and self._wait_for_template_active_status is True:
             message = "Cannot set both validate_only and wait_for_template_active_status flags to True."
             raise InvalidPluginException(ServerlessAppPlugin.__name__, message)
 
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_before_transform_template(self, template_dict):
         """
         Hook method that gets called before the SAM template is processed.
@@ -104,13 +112,37 @@ class ServerlessAppPlugin(BasePlugin):
 
             if key not in self._applications:
                 try:
+                    if not RegionConfiguration.is_service_supported("serverlessrepo"):
+                        raise InvalidResourceException(
+                            logical_id, "Serverless Application Repository is not available in this region."
+                        )
                     # Lazy initialization of the client- create it when it is needed
                     if not self._sar_client:
                         self._sar_client = boto3.client("serverlessrepo")
-                    service_call(app_id, semver, key, logical_id)
+                    self._make_service_call_with_retry(service_call, app_id, semver, key, logical_id)
                 except InvalidResourceException as e:
                     # Catch all InvalidResourceExceptions, raise those in the before_resource_transform target.
                     self._applications[key] = e
+
+    def _make_service_call_with_retry(self, service_call, app_id, semver, key, logical_id):
+        call_succeeded = False
+        while self._total_wait_time < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
+            try:
+                service_call(app_id, semver, key, logical_id)
+            except ClientError as e:
+                error_code = e.response["Error"]["Code"]
+                if error_code == "TooManyRequestsException":
+                    LOG.debug("SAR call timed out for application id {}".format(app_id))
+                    sleep_time = self._get_sleep_time_sec()
+                    sleep(sleep_time)
+                    self._total_wait_time += sleep_time
+                    continue
+                else:
+                    raise e
+            call_succeeded = True
+            break
+        if not call_succeeded:
+            raise InvalidResourceException(logical_id, "Failed to call SAR, timeout limit exceeded.")
 
     def _replace_value(self, input_dict, key, intrinsic_resolvers):
         value = self._resolve_location_value(input_dict.get(key), intrinsic_resolvers)
@@ -184,6 +216,7 @@ class ServerlessAppPlugin(BasePlugin):
             ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
         )
         response = self._sar_service_call(create_cfn_template, logical_id, app_id, semver)
+
         LOG.info("Requested to create CFN template {}/{} in serverless application repo.".format(app_id, semver))
         self._applications[key] = response[self.TEMPLATE_URL_KEY]
         if response["Status"] != "ACTIVE":
@@ -204,6 +237,7 @@ class ServerlessAppPlugin(BasePlugin):
             return None
         return str(param)
 
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_before_transform_resource(self, logical_id, resource_type, resource_properties):
         """
         Hook method that gets called before "each" SAM resource gets processed
@@ -281,6 +315,7 @@ class ServerlessAppPlugin(BasePlugin):
                     logical_id, "Resource is missing the required [{}] " "property.".format(key)
                 )
 
+    @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
     def on_after_transform_template(self, template):
         """
         Hook method that gets called after the template is processed
@@ -290,58 +325,76 @@ class ServerlessAppPlugin(BasePlugin):
         :param dict template: Dictionary of the SAM template
         :return: Nothing
         """
-        if self._wait_for_template_active_status and not self._validate_only:
-            start_time = time()
-            while (time() - start_time) < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
-                temp = self._in_progress_templates
-                self._in_progress_templates = []
+        if not self._wait_for_template_active_status or self._validate_only:
+            return
 
-                # Check each resource to make sure it's active
-                LOG.info("Checking resources in serverless application repo...")
-                for application_id, template_id in temp:
-                    get_cfn_template = (
-                        lambda application_id, template_id: self._sar_client.get_cloud_formation_template(
-                            ApplicationId=self._sanitize_sar_str_param(application_id),
-                            TemplateId=self._sanitize_sar_str_param(template_id),
-                        )
-                    )
-                    response = self._sar_service_call(get_cfn_template, application_id, application_id, template_id)
-                    self._handle_get_cfn_template_response(response, application_id, template_id)
-                LOG.info("Finished checking resources in serverless application repo.")
-
-                # Don't sleep if there are no more templates with PREPARING status
-                if len(self._in_progress_templates) == 0:
-                    break
-
-                # Sleep a little so we don't spam service calls
-                sleep(self.SLEEP_TIME_SECONDS)
-
-            # Not all templates reached active status
-            if len(self._in_progress_templates) != 0:
-                application_ids = [items[0] for items in self._in_progress_templates]
-                raise InvalidResourceException(
-                    application_ids, "Timed out waiting for nested stack templates " "to reach ACTIVE status."
+        while self._total_wait_time < self.TEMPLATE_WAIT_TIMEOUT_SECONDS:
+            # Check each resource to make sure it's active
+            LOG.info("Checking resources in serverless application repo...")
+            idx = 0
+            while idx < len(self._in_progress_templates):
+                application_id, template_id = self._in_progress_templates[idx]
+                get_cfn_template = lambda application_id, template_id: self._sar_client.get_cloud_formation_template(
+                    ApplicationId=self._sanitize_sar_str_param(application_id),
+                    TemplateId=self._sanitize_sar_str_param(template_id),
                 )
 
-    def _handle_get_cfn_template_response(self, response, application_id, template_id):
+                try:
+                    response = self._sar_service_call(get_cfn_template, application_id, application_id, template_id)
+                except ClientError as e:
+                    error_code = e.response["Error"]["Code"]
+                    if error_code == "TooManyRequestsException":
+                        LOG.debug("SAR call timed out for application id {}".format(application_id))
+                        break  # We were throttled by SAR, break out to a sleep
+                    else:
+                        raise e
+
+                if self._is_template_active(response, application_id, template_id):
+                    self._in_progress_templates.remove((application_id, template_id))
+                else:
+                    idx += 1  # check next template
+
+            LOG.info("Finished checking resources in serverless application repo.")
+
+            # Don't sleep if there are no more templates with PREPARING status
+            if len(self._in_progress_templates) == 0:
+                break
+
+            # Sleep a little so we don't spam service calls
+            sleep_time = self._get_sleep_time_sec()
+            sleep(sleep_time)
+            self._total_wait_time += sleep_time
+
+        # Not all templates reached active status
+        if len(self._in_progress_templates) != 0:
+            application_ids = [items[0] for items in self._in_progress_templates]
+            raise InvalidResourceException(
+                application_ids, "Timed out waiting for nested stack templates " "to reach ACTIVE status."
+            )
+
+    def _get_sleep_time_sec(self):
+        return self.SLEEP_TIME_SECONDS
+
+    def _is_template_active(self, response, application_id, template_id):
         """
-        Handles the response from the SAR service call
+        Checks the response from a SAR service call; returns True if the template is active,
+        throws an exception if the request expired and returns False in all other cases.
 
         :param dict response: the response dictionary from the app repo
         :param string application_id: the ApplicationId
         :param string template_id: the unique TemplateId for this application
         """
-        status = response["Status"]
-        if status != "ACTIVE":
-            # Other options are PREPARING and EXPIRED.
-            if status == "EXPIRED":
-                message = (
-                    "Template for {} with id {} returned status: {}. Cannot access an expired "
-                    "template.".format(application_id, template_id, status)
-                )
-                raise InvalidResourceException(application_id, message)
-            self._in_progress_templates.append((application_id, template_id))
+        status = response["Status"]  # options: PREPARING, EXPIRED or ACTIVE
 
+        if status == "EXPIRED":
+            message = "Template for {} with id {} returned status: {}. Cannot access an expired " "template.".format(
+                application_id, template_id, status
+            )
+            raise InvalidResourceException(application_id, message)
+
+        return status == "ACTIVE"
+
+    @cw_timer(prefix="External", name="SAR")
     def _sar_service_call(self, service_call_lambda, logical_id, *args):
         """
         Handles service calls and exception management for service calls
@@ -353,15 +406,11 @@ class ServerlessAppPlugin(BasePlugin):
         """
         try:
             response = service_call_lambda(*args)
-            LOG.info(response)
             return response
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code in ("AccessDeniedException", "NotFoundException"):
                 raise InvalidResourceException(logical_id, e.response["Error"]["Message"])
-
-            # 'ForbiddenException'- SAR rejects connection
-            LOG.exception(e)
             raise e
 
     def _resource_is_supported(self, resource_type):

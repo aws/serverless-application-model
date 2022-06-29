@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mock import patch
+from unittest.mock import patch
 from parameterized import parameterized
 
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
@@ -20,7 +20,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         ) as get_partition_name_patch:
             get_partition_name_patch.return_value = partition
 
-            iam_role = DeploymentPreferenceCollection().codedeploy_iam_role
+            iam_role = DeploymentPreferenceCollection().get_codedeploy_iam_role()
 
             self.assertIn(
                 "arn:{}:iam::aws:policy/service-role/AWSCodeDeployRoleForLambdaLimited".format(partition),
@@ -41,7 +41,7 @@ class TestDeploymentPreferenceCollection(TestCase):
         ) as get_partition_name_patch:
             get_partition_name_patch.return_value = partition
 
-            iam_role = DeploymentPreferenceCollection().codedeploy_iam_role
+            iam_role = DeploymentPreferenceCollection().get_codedeploy_iam_role()
 
             self.assertIn(
                 "arn:{}:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda".format(partition),

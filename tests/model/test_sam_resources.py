@@ -1,16 +1,83 @@
 from unittest import TestCase
-from mock import patch
+from unittest.mock import patch
 import pytest
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 from samtranslator.model import InvalidResourceException
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
-from samtranslator.model.lambda_ import LambdaFunction, LambdaVersion
+from samtranslator.model.lambda_ import LambdaFunction, LambdaLayerVersion, LambdaVersion, LambdaUrl, LambdaPermission
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.packagetype import IMAGE, ZIP
-from samtranslator.model.sam_resources import SamFunction, SamApi, SamHttpApi
+from samtranslator.model.sam_resources import SamFunction, SamLayerVersion, SamApi, SamHttpApi
+
+
+class TestArchitecture(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_unknown_architectures(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        invalid_architectures = [["arm"], [1], "arm", 1, {"my": "value"}, True, [], {}]
+        for architecture in invalid_architectures:
+            function.Architectures = architecture
+            with pytest.raises(InvalidResourceException) as e:
+                function.to_cloudformation(**self.kwargs)
+            self.assertEqual(
+                str(e.value.message),
+                "Resource with id [foo] is invalid. Architectures needs to be a list with one string, either `x86_64` or `arm64`.",
+            )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_multiple_architectures(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.Architectures = ["arm64", "x86_64"]
+
+        with pytest.raises(InvalidResourceException) as e:
+            function.to_cloudformation(**self.kwargs)
+        self.assertEqual(
+            str(e.value.message),
+            "Resource with id [foo] is invalid. Architectures needs to be a list with one string, either `x86_64` or `arm64`.",
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_validate_architecture_with_intrinsic(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.Architectures = {"Ref": "MyRef"}
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedFunctionList = [x for x in cfnResources if isinstance(x, LambdaFunction)]
+        self.assertEqual(generatedFunctionList.__len__(), 1)
+        self.assertEqual(generatedFunctionList[0].Architectures, {"Ref": "MyRef"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_valid_architectures(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        valid_architectures = (["arm64"], ["x86_64"])
+
+        for architecture in valid_architectures:
+            function.Architectures = architecture
+            cfnResources = function.to_cloudformation(**self.kwargs)
+            generatedFunctionList = [x for x in cfnResources if isinstance(x, LambdaFunction)]
+            self.assertEqual(generatedFunctionList.__len__(), 1)
+            self.assertEqual(generatedFunctionList[0].Architectures, architecture)
 
 
 class TestCodeUriandImageUri(TestCase):
@@ -167,6 +234,34 @@ class TestVersionDescription(TestCase):
         cfnResources = function.to_cloudformation(**self.kwargs)
         generateFunctionVersion = [x for x in cfnResources if isinstance(x, LambdaVersion)]
         self.assertEqual(generateFunctionVersion[0].Description, test_description)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_autopublish_bad_hash(self):
+        function = SamFunction("foo")
+        test_description = "foobar"
+
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.AutoPublishAlias = "live"
+        function.AutoPublishCodeSha256 = {"Fn::Sub": "${parameter1}"}
+
+        with pytest.raises(InvalidResourceException):
+            function.to_cloudformation(**self.kwargs)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_autopublish_good_hash(self):
+        function = SamFunction("foo")
+        test_description = "foobar"
+
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.AutoPublishAlias = "live"
+        function.AutoPublishCodeSha256 = "08240bdc52933ca4f88d5f75fc88cd3228a48feffa9920c735602433b94767ad"
+
+        # confirm no exception thrown
+        function.to_cloudformation(**self.kwargs)
 
 
 class TestOpenApi(TestCase):
@@ -332,3 +427,198 @@ class TestHttpApiDescription(TestCase):
         resources = sam_http_api.to_cloudformation(**self.kwargs)
         http_api = [x for x in resources if isinstance(x, ApiGatewayV2HttpApi)]
         self.assertEqual(http_api[0].Body.get("info", {}).get("description"), "new description")
+
+
+class TestPassthroughResourceAttributes(TestCase):
+    def test_with_passthrough_resource_attributes(self):
+        expected = {"DeletionPolicy": "Delete", "UpdateReplacePolicy": "Retain", "Condition": "C1"}
+        function = SamFunction("foo", attributes=expected)
+        attributes = function.get_passthrough_resource_attributes()
+        self.assertEqual(attributes, expected)
+
+
+class TestLayers(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    def test_basic_layer(self):
+        layer = SamLayerVersion("foo")
+        layer.ContentUri = "s3://foobar/foo.zip"
+        cfnResources = layer.to_cloudformation(**self.kwargs)
+        generatedLayerList = [x for x in cfnResources if isinstance(x, LambdaLayerVersion)]
+        self.assertEqual(cfnResources.__len__(), 1)
+        self.assertTrue(isinstance(cfnResources[0], LambdaLayerVersion))
+        self.assertEqual(cfnResources[0].Content, {"S3Key": "foo.zip", "S3Bucket": "foobar"})
+
+    def test_invalid_compatible_architectures(self):
+        layer = SamLayerVersion("foo")
+        layer.ContentUri = "s3://foobar/foo.zip"
+        invalid_architectures = [["arm"], [1], "arm", 1, True]
+        for architecturea in invalid_architectures:
+            layer.CompatibleArchitectures = architecturea
+            with pytest.raises(InvalidResourceException):
+                layer.to_cloudformation(**self.kwargs)
+
+
+class TestFunctionUrlConfig(TestCase):
+    kwargs = {
+        "intrinsics_resolver": IntrinsicsResolver({}),
+        "event_resources": [],
+        "managed_policy_map": {"foo": "bar"},
+    }
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_function_url_config_with_no_authorization_type(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"Cors": {"AllowOrigins": ["example1.com"]}}
+        with pytest.raises(InvalidResourceException) as e:
+            function.to_cloudformation(**self.kwargs)
+        self.assertEqual(
+            str(e.value.message),
+            "Resource with id [foo] is invalid. AuthType is required to configure"
+            + " function property `FunctionUrlConfig`. Please provide either AWS_IAM or NONE.",
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_function_url_config_with_no_cors_config(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": "AWS_IAM"}
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
+        self.assertEqual(generatedUrlList.__len__(), 1)
+        self.assertEqual(generatedUrlList[0].AuthType, "AWS_IAM")
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_validate_function_url_config_properties_with_intrinsic(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": {"Ref": "AWS_IAM"}, "Cors": {"Ref": "MyCorConfigRef"}}
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
+        self.assertEqual(generatedUrlList.__len__(), 1)
+        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
+        self.assertEqual(generatedUrlList.__len__(), 1)
+        self.assertEqual(generatedUrlList[0].AuthType, {"Ref": "AWS_IAM"})
+        self.assertEqual(generatedUrlList[0].Cors, {"Ref": "MyCorConfigRef"})
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_valid_function_url_config(self):
+        cors = {
+            "AllowOrigins": ["example1.com", "example2.com", "example2.com"],
+            "AllowMethods": ["GET"],
+            "AllowCredentials": True,
+            "AllowHeaders": ["X-Custom-Header"],
+            "ExposeHeaders": ["x-amzn-header"],
+            "MaxAge": 10,
+        }
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": "NONE", "Cors": cors}
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
+        self.assertEqual(generatedUrlList.__len__(), 1)
+        self.assertEqual(generatedUrlList[0].TargetFunctionArn, {"Ref": "foo"})
+        self.assertEqual(generatedUrlList[0].AuthType, "NONE")
+        self.assertEqual(generatedUrlList[0].Cors, cors)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_valid_function_url_config_with_Intrinsics(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"Ref": "MyFunctionUrlConfig"}
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
+        self.assertEqual(generatedUrlList.__len__(), 1)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_function_url_config_with_invalid_cors_parameter(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": "NONE", "Cors": {"AllowOrigin": ["example1.com"]}}
+        with pytest.raises(InvalidResourceException) as e:
+            function.to_cloudformation(**self.kwargs)
+        self.assertEqual(
+            str(e.value.message),
+            "Resource with id [foo] is invalid. AllowOrigin is not a valid property for configuring Cors.",
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_function_url_config_with_invalid_cors_parameter_data_type(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": "NONE", "Cors": {"AllowOrigins": "example1.com"}}
+        with pytest.raises(InvalidResourceException) as e:
+            function.to_cloudformation(**self.kwargs)
+        self.assertEqual(
+            str(e.value.message),
+            "Resource with id [foo] is invalid. AllowOrigins must be of type list.",
+        )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_valid_function_url_config_with(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": "NONE", "Cors": {"AllowOrigins": ["example1.com"]}}
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaUrl)]
+        self.assertEqual(generatedUrlList.__len__(), 1)
+        expected_url_logicalid = {"Ref": "foo"}
+        self.assertEqual(generatedUrlList[0].TargetFunctionArn, expected_url_logicalid)
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_valid_function_url_config_with_lambda_permission(self):
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": "NONE", "Cors": {"AllowOrigins": ["example1.com"]}}
+
+        cfnResources = function.to_cloudformation(**self.kwargs)
+        generatedUrlList = [x for x in cfnResources if isinstance(x, LambdaPermission)]
+        self.assertEqual(generatedUrlList.__len__(), 1)
+        self.assertEqual(generatedUrlList[0].Action, "lambda:InvokeFunctionUrl")
+        self.assertEqual(generatedUrlList[0].FunctionName, {"Ref": "foo"})
+        self.assertEqual(generatedUrlList[0].Principal, "*")
+        self.assertEqual(generatedUrlList[0].FunctionUrlAuthType, "NONE")
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    def test_with_invalid_function_url_config_with_authorization_type_value_as_None(self):
+
+        function = SamFunction("foo")
+        function.CodeUri = "s3://foobar/foo.zip"
+        function.Runtime = "foo"
+        function.Handler = "bar"
+        function.FunctionUrlConfig = {"AuthType": None}
+
+        with pytest.raises(InvalidResourceException) as e:
+            cfnResources = function.to_cloudformation(**self.kwargs)
+        self.assertEqual(
+            str(e.value.message),
+            "Resource with id [foo] is invalid. AuthType is required to configure function property "
+            + "`FunctionUrlConfig`. Please provide either AWS_IAM or NONE.",
+        )
