@@ -57,6 +57,7 @@ regions:
     - StateMachineCweCws
     - StateMachineWithApis
     - LambdaEnvVars
+    - ARM
   ap-southeast-1:
     - HttpApi
   ca-central-1:
@@ -149,6 +150,7 @@ regions:
     - CodeSign
     - CweCwsDlq
     - Mode
+    - ARM
   us-gov-west-1:
     - ServerlessRepo
     - Cognito
@@ -163,6 +165,7 @@ regions:
     - CodeSign
     - CweCwsDlq
     - Mode
+    - ARM
   us-iso-east-1:
     - ServerlessRepo
     - CodeDeploy
@@ -229,3 +232,4 @@ regions:
   us-west-1:
     - Cognito
     - IoT
+    - ARM
