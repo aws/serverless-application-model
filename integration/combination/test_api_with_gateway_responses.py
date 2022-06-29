@@ -6,6 +6,7 @@ from tenacity import stop_after_attempt, retry_if_exception_type, after_log, wai
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import GATEWAY_RESPONSES
+
 LOG = logging.getLogger(__name__)
 
 
@@ -41,7 +42,7 @@ class TestApiWithGatewayResponses(BaseTest):
         wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
         retry=retry_if_exception_type(AssertionError),
         after=after_log(LOG, logging.WARNING),
-        reraise=True
+        reraise=True,
     )
     def _verify_request_response_and_cors(self, url, expected_response):
         response = self.verify_get_request_response(url, expected_response)

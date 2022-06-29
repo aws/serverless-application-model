@@ -5,7 +5,9 @@ from tenacity import (
     retry,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type, after_log, wait_random,
+    retry_if_exception_type,
+    after_log,
+    wait_random,
 )
 
 LOG = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ LOG = logging.getLogger(__name__)
     wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
     retry=retry_if_exception_type(KeyError),
     after=after_log(LOG, logging.WARNING),
-    reraise=True
+    reraise=True,
 )
 def get_queue_policy(queue_url, sqs_client):
     result = sqs_client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=["Policy"])

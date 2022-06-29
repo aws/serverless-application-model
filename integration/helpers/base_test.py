@@ -21,7 +21,9 @@ from tenacity import (
     retry,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type, after_log, wait_random,
+    retry_if_exception_type,
+    after_log,
+    wait_random,
 )
 
 try:
@@ -515,7 +517,7 @@ class BaseTest(TestCase):
         wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
         retry=retry_if_exception_type(StatusCodeError),
         after=after_log(LOG, logging.WARNING),
-        reraise=True
+        reraise=True,
     )
     def verify_get_request_response(self, url, expected_status_code, headers=None):
         """
@@ -533,8 +535,9 @@ class BaseTest(TestCase):
         response = BaseTest.do_get_request_with_logging(url, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
-                "Request to {} failed with status: {}, expected status: {}".format(url, response.status_code,
-                                                                                   expected_status_code)
+                "Request to {} failed with status: {}, expected status: {}".format(
+                    url, response.status_code, expected_status_code
+                )
             )
         return response
 
@@ -543,7 +546,7 @@ class BaseTest(TestCase):
         wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
         retry=retry_if_exception_type(StatusCodeError),
         after=after_log(LOG, logging.WARNING),
-        reraise=True
+        reraise=True,
     )
     def verify_options_request(self, url, expected_status_code, headers=None):
         """
@@ -561,8 +564,9 @@ class BaseTest(TestCase):
         response = BaseTest.do_options_request_with_logging(url, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
-                "Request to {} failed with status: {}, expected status: {}".format(url, response.status_code,
-                                                                                   expected_status_code)
+                "Request to {} failed with status: {}, expected status: {}".format(
+                    url, response.status_code, expected_status_code
+                )
             )
         return response
 
