@@ -3,10 +3,10 @@
   { "LogicalResourceId":"ServerlessRestApiDeployment", "ResourceType":"AWS::ApiGateway::Deployment" },
   { "LogicalResourceId":"ServerlessRestApipostBasePathMapping", "ResourceType":"AWS::ApiGateway::BasePathMapping" },
   { "LogicalResourceId":"ServerlessRestApi", "ResourceType":"AWS::ApiGateway::RestApi" },
-  { "LogicalResourceId":"RecordSetGroup", "ResourceType":"AWS::Route53::RecordSetGroup" },
+  { "LogicalResourceId":"RecordSetGroupddfc299be2", "ResourceType":"AWS::Route53::RecordSetGroup" },
   { "LogicalResourceId":"ServerlessRestApiProdStage", "ResourceType":"AWS::ApiGateway::Stage" },
   { "LogicalResourceId":"ServerlessRestApigetBasePathMapping", "ResourceType":"AWS::ApiGateway::BasePathMapping" },
-  { "LogicalResourceId":"ApiGatewayDomainName", "ResourceType":"AWS::ApiGateway::DomainName" },
+  { "LogicalResourceId":"ApiGatewayDomainNamec6418178e6", "ResourceType":"AWS::ApiGateway::DomainName" },
   { "LogicalResourceId":"MyFunction", "ResourceType":"AWS::Lambda::Function" },
   { "LogicalResourceId":"MyFunctionImplicitPostPermissionProd", "ResourceType":"AWS::Lambda::Permission" },
   { "LogicalResourceId":"MyFunctionRole", "ResourceType":"AWS::IAM::Role" }
