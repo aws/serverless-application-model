@@ -141,8 +141,10 @@ def _get_region():
 def _read_test_config_file(filename):
     """Reads test inclusion or exclusion file and returns the contents"""
     tests_integ_dir = Path(__file__).resolve().parents[1]
-    test_config_file_path = str(Path(tests_integ_dir, "config", filename))
-    test_config = load_yaml(test_config_file_path)
+    test_config_file_path = Path(tests_integ_dir, "config", filename)
+    if not test_config_file_path.is_file():
+        return {}
+    test_config = load_yaml(str(test_config_file_path))
     return test_config
 
 
@@ -164,7 +166,7 @@ def current_region_does_not_support(services):
     region = _get_region()
     region_exclude_services = _read_test_config_file("region_service_exclusion.yaml")
 
-    if region not in region_exclude_services["regions"]:
+    if region not in region_exclude_services.get("regions", {}):
         return False
 
     # check if any one of the services is in the excluded services for current testing region
@@ -179,7 +181,7 @@ def current_region_not_included(services):
     region = _get_region()
     region_include_services = _read_test_config_file("region_service_inclusion.yaml")
 
-    if region not in region_include_services["regions"]:
+    if region not in region_include_services.get("regions", {}):
         return True
 
     # check if any one of the services is in the excluded services for current testing region
