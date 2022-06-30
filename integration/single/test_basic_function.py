@@ -1,6 +1,6 @@
 from unittest.case import skipIf
 
-from integration.config.service_names import KMS, XRAY, ARM
+from integration.config.service_names import KMS, XRAY, ARM, CODE_DEPLOY
 from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
@@ -98,6 +98,7 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(function_url_config["Cors"], cors_config)
         self._assert_invoke(lambda_client, function_name, qualifier, 200)
 
+    @skipIf(current_region_does_not_support([CODE_DEPLOY]), "CodeDeploy is not supported in this testing region")
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
         self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")
 
