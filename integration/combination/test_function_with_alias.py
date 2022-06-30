@@ -1,8 +1,11 @@
 import json
+from unittest.case import skipIf
 
 from botocore.exceptions import ClientError
 from integration.helpers.base_test import BaseTest, LOG
 from integration.helpers.common_api import get_function_versions
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import REST_API
 
 
 class TestFunctionWithAlias(BaseTest):
@@ -82,6 +85,7 @@ class TestFunctionWithAlias(BaseTest):
         # add any extra runtime behavior that needs to be verified
         self.create_and_verify_stack("combination/function_with_alias_globals")
 
+    @skipIf(current_region_does_not_support([REST_API]), "Rest API is not supported in this testing region")
     def test_alias_with_event_sources_get_correct_permissions(self):
         # There are two parts to testing Event Source integrations:
         #    1. Check if all event sources get wired to the alias
