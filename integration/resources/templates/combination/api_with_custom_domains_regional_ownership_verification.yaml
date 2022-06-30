@@ -12,7 +12,7 @@ Globals:
       DomainName:
         Ref: MyDomainName
       CertificateArn:
-        arn:aws:acm:us-east-1:830899278857:certificate/7c9b4aa7-4262-4b20-85c0-ec45d8d55fa6
+        Ref: MyDomainCertificate
       EndpointConfiguration: REGIONAL
       MutualTlsAuthentication:
         TruststoreUri: ${mtlsuri}
@@ -24,7 +24,7 @@ Globals:
       Route53:
         HostedZoneId: Z1DTV8GVAVOHDR
       OwnershipVerificationCertificateArn:
-        Fn::Sub: arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/798c74e5-dc55-48b6-b1d8-13d2d7b3d265
+        Ref: MyDomainOwnershipVerificationCertificate
 
 Resources:
   MyFunction:
