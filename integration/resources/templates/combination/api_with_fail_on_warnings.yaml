@@ -1,0 +1,34 @@
+Parameters:
+  FailOnWarningsValue:
+    Type: String
+    AllowedValues: [true, false]
+
+Resources:
+  RestApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      FailOnWarnings:
+        Ref: FailOnWarningsValue
+
+  RestApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        exports.handler = async (event) => {
+          const response = {
+            statusCode: 200,
+            body: JSON.stringify('Hello from Lambda!'),
+          };
+          return response;
+        };
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Events:
+        Iam:
+          Type: Api
+          Properties:
+            RestApiId: 
+              Ref: RestApiGateway
+            Method: GET
+            Path: /

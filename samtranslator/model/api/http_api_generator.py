@@ -48,7 +48,7 @@ class HttpApiGenerator(object):
         resource_attributes=None,
         passthrough_resource_attributes=None,
         domain=None,
-        fail_on_warnings=False,
+        fail_on_warnings=None,
         description=None,
         disable_execute_api_endpoint=None,
     ):
