@@ -1,7 +1,9 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
-
-
 from integration.helpers.common_api import get_function_versions
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import REST_API
 
 
 # Tests resource references support of SAM Function resource
@@ -35,6 +37,7 @@ class TestResourceReferences(BaseTest):
         self.assertEqual(stack_outputs["VersionNumber"], version_number)
         self.assertEqual(stack_outputs["VersionArn"], version_arn)
 
+    @skipIf(current_region_does_not_support([REST_API]), "Rest API is not supported in this testing region")
     def test_api_with_resource_references(self):
         self.create_and_verify_stack("combination/api_with_resource_refs")
 
