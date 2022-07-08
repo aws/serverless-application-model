@@ -22,7 +22,7 @@ from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
 from samtranslator.model.intrinsics import is_intrinsic, fnSub
 from samtranslator.model.lambda_ import LambdaPermission
-from samtranslator.translator import logical_id_generator
+from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.utils.py27hash_fix import Py27Dict, Py27UniStr
@@ -393,7 +393,7 @@ class ApiGenerator(object):
         if stage_name_prefix.isalnum():
             stage_logical_id = self.logical_id + stage_name_prefix + "Stage"
         else:
-            generator = logical_id_generator.LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
+            generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
             stage_logical_id = generator.gen()
         stage = ApiGatewayStage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.RestApiId = ref(self.logical_id)
@@ -417,7 +417,7 @@ class ApiGenerator(object):
 
         return stage
 
-    def _construct_api_domain(self, rest_api):
+    def _construct_api_domain(self, rest_api, route53_record_set_groups):
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
@@ -430,7 +430,7 @@ class ApiGenerator(object):
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
-            "ApiGatewayDomainName", logical_id_generator.LogicalIdGenerator("", self.domain.get("DomainName")).gen()
+            "ApiGatewayDomainName", LogicalIdGenerator("", self.domain.get("DomainName")).gen()
         )
 
         domain = ApiGatewayDomainName(self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes)
@@ -534,17 +534,23 @@ class ApiGenerator(object):
                     self.logical_id,
                     "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
                 )
-            logical_id = logical_id_generator.LogicalIdGenerator(
+
+            logical_id_suffix = LogicalIdGenerator(
                 "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
             ).gen()
-            record_set_group = Route53RecordSetGroup(
-                "RecordSetGroup" + logical_id, attributes=self.passthrough_resource_attributes
-            )
-            if "HostedZoneId" in route53:
-                record_set_group.HostedZoneId = route53.get("HostedZoneId")
-            if "HostedZoneName" in route53:
-                record_set_group.HostedZoneName = route53.get("HostedZoneName")
-            record_set_group.RecordSets = self._construct_record_sets_for_domain(self.domain)
+            logical_id = "RecordSetGroup" + logical_id_suffix
+
+            record_set_group = route53_record_set_groups.get(logical_id)
+            if not record_set_group:
+                record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
+                if "HostedZoneId" in route53:
+                    record_set_group.HostedZoneId = route53.get("HostedZoneId")
+                if "HostedZoneName" in route53:
+                    record_set_group.HostedZoneName = route53.get("HostedZoneName")
+                record_set_group.RecordSets = []
+                route53_record_set_groups[logical_id] = record_set_group
+
+            record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain)
 
         return domain, basepath_resource_list, record_set_group
 
@@ -585,14 +591,14 @@ class ApiGenerator(object):
         return alias_target
 
     @cw_timer(prefix="Generator", name="Api")
-    def to_cloudformation(self, redeploy_restapi_parameters):
+    def to_cloudformation(self, redeploy_restapi_parameters, route53_record_set_groups):
         """Generates CloudFormation resources from a SAM API resource
 
         :returns: a tuple containing the RestApi, Deployment, and Stage for an empty Api.
         :rtype: tuple
         """
         rest_api = self._construct_rest_api()
-        domain, basepath_mapping, route53 = self._construct_api_domain(rest_api)
+        domain, basepath_mapping, route53 = self._construct_api_domain(rest_api, route53_record_set_groups)
         deployment = self._construct_deployment(rest_api)
 
         swagger = None

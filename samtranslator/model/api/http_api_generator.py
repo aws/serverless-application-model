@@ -13,7 +13,7 @@ from samtranslator.model.apigatewayv2 import (
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
-from samtranslator.translator import logical_id_generator
+from samtranslator.translator.logical_id_generator import LogicalIdGenerator
 from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
@@ -218,7 +218,7 @@ class HttpApiGenerator(object):
         # Assign the OpenApi back to template
         self.definition_body = editor.openapi
 
-    def _construct_api_domain(self, http_api):
+    def _construct_api_domain(self, http_api, route53_record_set_groups):
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
@@ -231,7 +231,7 @@ class HttpApiGenerator(object):
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
-            "ApiGatewayDomainNameV2", logical_id_generator.LogicalIdGenerator("", self.domain.get("DomainName")).gen()
+            "ApiGatewayDomainNameV2", LogicalIdGenerator("", self.domain.get("DomainName")).gen()
         )
 
         domain = ApiGatewayV2DomainName(
@@ -302,31 +302,40 @@ class HttpApiGenerator(object):
         basepath_resource_list = self._construct_basepath_mappings(basepaths, http_api)
 
         # Create the Route53 RecordSetGroup resource
-        record_set_group = self._construct_route53_recordsetgroup()
+        record_set_group = self._construct_route53_recordsetgroup(route53_record_set_groups)
 
         return domain, basepath_resource_list, record_set_group
 
-    def _construct_route53_recordsetgroup(self):
-        record_set_group = None
-        if self.domain.get("Route53") is not None:
-            route53 = self.domain.get("Route53")
-            if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
-                raise InvalidResourceException(
-                    self.logical_id,
-                    "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
-                )
-            logical_id = logical_id_generator.LogicalIdGenerator(
-                "", route53.get("HostedZoneId") or route53.get("HostedZoneName")
-            ).gen()
-            record_set_group = Route53RecordSetGroup(
-                "RecordSetGroup" + logical_id, attributes=self.passthrough_resource_attributes
+    def _construct_route53_recordsetgroup(self, route53_record_set_groups):
+        if self.domain.get("Route53") is None:
+            return
+        route53 = self.domain.get("Route53")
+        if not isinstance(route53, dict):
+            raise InvalidResourceException(
+                self.logical_id,
+                "Invalid property type '{}' for Route53. "
+                "Expected a map defines an Amazon Route 53 configuration'.".format(type(route53).__name__),
             )
+        if route53.get("HostedZoneId") is None and route53.get("HostedZoneName") is None:
+            raise InvalidResourceException(
+                self.logical_id,
+                "HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
+            )
+
+        logical_id_suffix = LogicalIdGenerator("", route53.get("HostedZoneId") or route53.get("HostedZoneName")).gen()
+        logical_id = "RecordSetGroup" + logical_id_suffix
+
+        record_set_group = route53_record_set_groups.get(logical_id)
+        if not record_set_group:
+            record_set_group = Route53RecordSetGroup(logical_id, attributes=self.passthrough_resource_attributes)
             if "HostedZoneId" in route53:
                 record_set_group.HostedZoneId = route53.get("HostedZoneId")
             elif "HostedZoneName" in route53:
                 record_set_group.HostedZoneName = route53.get("HostedZoneName")
-            record_set_group.RecordSets = self._construct_record_sets_for_domain(self.domain)
+            record_set_group.RecordSets = []
+            route53_record_set_groups[logical_id] = record_set_group
 
+        record_set_group.RecordSets += self._construct_record_sets_for_domain(self.domain)
         return record_set_group
 
     def _construct_basepath_mappings(self, basepaths, http_api):
@@ -592,7 +601,7 @@ class HttpApiGenerator(object):
         elif stage_name_prefix == DefaultStageName:
             stage_logical_id = self.logical_id + "ApiGatewayDefaultStage"
         else:
-            generator = logical_id_generator.LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
+            generator = LogicalIdGenerator(self.logical_id + "Stage", stage_name_prefix)
             stage_logical_id = generator.gen()
         stage = ApiGatewayV2Stage(stage_logical_id, attributes=self.passthrough_resource_attributes)
         stage.ApiId = ref(self.logical_id)
@@ -628,14 +637,14 @@ class HttpApiGenerator(object):
         self.definition_body = open_api_editor.openapi
 
     @cw_timer(prefix="Generator", name="HttpApi")
-    def to_cloudformation(self):
+    def to_cloudformation(self, route53_record_set_groups):
         """Generates CloudFormation resources from a SAM HTTP API resource
 
         :returns: a tuple containing the HttpApi and Stage for an empty Api.
         :rtype: tuple
         """
         http_api = self._construct_http_api()
-        domain, basepath_mapping, route53 = self._construct_api_domain(http_api)
+        domain, basepath_mapping, route53 = self._construct_api_domain(http_api, route53_record_set_groups)
         stage = self._construct_stage()
 
         return http_api, stage, domain, basepath_mapping, route53
