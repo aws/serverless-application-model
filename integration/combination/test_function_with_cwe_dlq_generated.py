@@ -2,6 +2,7 @@ import json
 from unittest.case import skipIf
 
 from integration.helpers.base_test import BaseTest
+from integration.helpers.common_api import get_queue_policy
 from integration.helpers.resource import first_item_in_dict, current_region_does_not_support
 from integration.config.service_names import CWE_CWS_DLQ
 
@@ -30,9 +31,7 @@ class TestFunctionWithCweDlqGenerated(BaseTest):
 
         # checking if the generated dead-letter queue has necessary resource based policy attached to it
         sqs_client = self.client_provider.sqs_client
-        dlq_policy_result = sqs_client.get_queue_attributes(QueueUrl=lambda_target_dlq_url, AttributeNames=["Policy"])
-        dlq_policy_doc = dlq_policy_result["Attributes"]["Policy"]
-        dlq_policy = json.loads(dlq_policy_doc)["Statement"]
+        dlq_policy = get_queue_policy(queue_url=lambda_target_dlq_url, sqs_client=sqs_client)
         self.assertEqual(len(dlq_policy), 1, "Only one statement must be in Dead-letter queue policy")
         dlq_policy_statement = dlq_policy[0]
 

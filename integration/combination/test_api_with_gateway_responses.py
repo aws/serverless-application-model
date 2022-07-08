@@ -1,9 +1,13 @@
+import logging
 from unittest.case import skipIf
 
+from tenacity import stop_after_attempt, retry_if_exception_type, after_log, wait_exponential, retry, wait_random
+
 from integration.helpers.base_test import BaseTest
-from integration.helpers.deployer.utils.retry import retry
 from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import GATEWAY_RESPONSES
+
+LOG = logging.getLogger(__name__)
 
 
 @skipIf(
@@ -33,7 +37,13 @@ class TestApiWithGatewayResponses(BaseTest):
         base_url = stack_outputs["ApiUrl"]
         self._verify_request_response_and_cors(base_url + "iam", 403)
 
-    @retry(AssertionError, exc_raise=AssertionError, exc_raise_msg="Unable to verify GatewayResponse request.")
+    @retry(
+        stop=stop_after_attempt(5),
+        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        retry=retry_if_exception_type(AssertionError),
+        after=after_log(LOG, logging.WARNING),
+        reraise=True,
+    )
     def _verify_request_response_and_cors(self, url, expected_response):
         response = self.verify_get_request_response(url, expected_response)
         access_control_allow_origin = response.headers.get("Access-Control-Allow-Origin", "")

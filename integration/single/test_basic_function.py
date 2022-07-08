@@ -42,7 +42,7 @@ class TestBasicFunction(BaseTest):
 
         endpoint = self.get_api_v2_endpoint("MyHttpApi")
 
-        self.assertEqual(BaseTest.do_get_request_with_logging(endpoint).text, self.FUNCTION_OUTPUT)
+        self._verify_get_request(endpoint, self.FUNCTION_OUTPUT)
 
     @parameterized.expand(
         [
@@ -283,3 +283,7 @@ class TestBasicFunction(BaseTest):
 
         response = lambda_client.invoke(**request_params)
         self.assertEqual(response.get("StatusCode"), expected_status_code)
+
+    def _verify_get_request(self, url, expected_text):
+        response = self.verify_get_request_response(url, 200)
+        self.assertEqual(response.text, expected_text)

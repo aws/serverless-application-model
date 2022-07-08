@@ -1,6 +1,25 @@
 import json
+import logging
+
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    after_log,
+    wait_random,
+)
+
+LOG = logging.getLogger(__name__)
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+    retry=retry_if_exception_type(KeyError),
+    after=after_log(LOG, logging.WARNING),
+    reraise=True,
+)
 def get_queue_policy(queue_url, sqs_client):
     result = sqs_client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=["Policy"])
     policy_document = result["Attributes"]["Policy"]
