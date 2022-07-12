@@ -10,11 +10,21 @@ from integration.config.logger_configurations import LoggingConfiguration
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
+from integration.helpers.exception import StatusCodeError
 from integration.helpers.request_utils import RequestUtils
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.s3_uploader import S3Uploader
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
 from samtranslator.yaml_helper import yaml_parse
+
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    after_log,
+    wait_random,
+)
 
 try:
     from pathlib import Path
@@ -502,6 +512,13 @@ class BaseTest(TestCase):
         if error:
             self.fail(error)
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        retry=retry_if_exception_type(StatusCodeError),
+        after=after_log(LOG, logging.WARNING),
+        reraise=True,
+    )
     def verify_get_request_response(self, url, expected_status_code, headers=None):
         """
         Verify if the get request to a certain url return the expected status code
@@ -510,13 +527,47 @@ class BaseTest(TestCase):
         ----------
         url : string
             the url for the get request
-        expected_status_code : string
+        expected_status_code : int
             the expected status code
         headers : dict
             headers to use in request
         """
         response = BaseTest.do_get_request_with_logging(url, headers)
-        self.assertEqual(response.status_code, expected_status_code, " must return HTTP " + str(expected_status_code))
+        if response.status_code != expected_status_code:
+            raise StatusCodeError(
+                "Request to {} failed with status: {}, expected status: {}".format(
+                    url, response.status_code, expected_status_code
+                )
+            )
+        return response
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        retry=retry_if_exception_type(StatusCodeError),
+        after=after_log(LOG, logging.WARNING),
+        reraise=True,
+    )
+    def verify_options_request(self, url, expected_status_code, headers=None):
+        """
+        Verify if the option request to a certain url return the expected status code
+
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        expected_status_code : int
+            the expected status code
+        headers : dict
+            headers to use in request
+        """
+        response = BaseTest.do_options_request_with_logging(url, headers)
+        if response.status_code != expected_status_code:
+            raise StatusCodeError(
+                "Request to {} failed with status: {}, expected status: {}".format(
+                    url, response.status_code, expected_status_code
+                )
+            )
         return response
 
     def get_default_test_template_parameters(self):
@@ -567,6 +618,22 @@ class BaseTest(TestCase):
             headers to use in request
         """
         response = requests.get(url, headers=headers) if headers else requests.get(url)
+        amazon_headers = RequestUtils(response).get_amazon_headers()
+        REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
+        return response
+
+    @staticmethod
+    def do_options_request_with_logging(url, headers=None):
+        """
+        Perform a options request to an APIGW endpoint and log relevant info
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        headers : dict
+            headers to use in request
+        """
+        response = requests.options(url, headers=headers) if headers else requests.get(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
         REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
         return response

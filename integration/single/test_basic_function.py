@@ -47,7 +47,7 @@ class TestBasicFunction(BaseTest):
 
         endpoint = self.get_api_v2_endpoint("MyHttpApi")
 
-        self.verify_get_request(endpoint, self.FUNCTION_OUTPUT)
+        self._verify_get_request(endpoint, self.FUNCTION_OUTPUT)
 
     @parameterized.expand(
         [
@@ -245,6 +245,50 @@ class TestBasicFunction(BaseTest):
             "Expecting tracing config mode to be set to PassThrough.",
         )
 
-    def verify_get_request(self, url, expected_text):
-        response = self.verify_get_request_response(url, 200, "AWS::ApiGatewayV2::Api")
+    @parameterized.expand(
+        [
+            "single/function_with_ephemeral_storage",
+        ]
+    )
+    def test_function_with_ephemeral_storage(self, file_name):
+        """
+        Creates a basic function with ephemeral storage
+        """
+        self.create_and_verify_stack(file_name)
+
+        function_id = self.get_physical_id_by_logical_id("MyLambdaFunction")
+
+        function_configuration_result = self.client_provider.lambda_client.get_function_configuration(
+            FunctionName=function_id
+        )
+
+        self.assertEqual(function_configuration_result.get("EphemeralStorage", {}).get("Size", 0), 1024)
+
+    def _assert_invoke(self, lambda_client, function_name, qualifier=None, expected_status_code=200):
+        """
+        Assert if a Lambda invocation returns the expected status code
+
+        Parameters
+        ----------
+        lambda_client : boto3.BaseClient
+            boto3 Lambda client
+        function_name : string
+            Function name
+        qualifier : string
+            Specify a version or alias to invoke a published version of the function
+        expected_status_code : int
+            Expected status code from the invocation
+        """
+        request_params = {
+            "FunctionName": function_name,
+            "Payload": "{}",
+        }
+        if qualifier:
+            request_params["Qualifier"] = qualifier
+
+        response = lambda_client.invoke(**request_params)
+        self.assertEqual(response.get("StatusCode"), expected_status_code)
+
+    def _verify_get_request(self, url, expected_text):
+        response = self.verify_get_request_response(url, 200)
         self.assertEqual(response.text, expected_text)

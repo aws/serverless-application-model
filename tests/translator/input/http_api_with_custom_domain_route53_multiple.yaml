@@ -1,0 +1,30 @@
+Resources:
+  MyApi1:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Domain:
+        DomainName: admin.one.amazon.com
+        CertificateArn: arn::cert::abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: "abc123456"
+
+  MyApi2:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Domain:
+        DomainName: admin.two.amazon.com
+        CertificateArn: arn::cert::abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: "abc123456"
+
+  MyApi3:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Domain:
+        DomainName: admin.three.amazon.com
+        CertificateArn: arn::cert::abc
+        EndpointConfiguration: REGIONAL
+        Route53:
+          HostedZoneId: "abc123456"
