@@ -1,10 +1,14 @@
+import logging
 from unittest.case import skipIf
 
-from integration.config.service_names import KMS, XRAY, ARM, CODE_DEPLOY, HTTP_API
+import pytest
 
+from integration.config.service_names import KMS, XRAY, ARM, CODE_DEPLOY, HTTP_API
 from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
+
+LOG = logging.getLogger(__name__)
 
 
 class TestBasicFunction(BaseTest):
@@ -36,6 +40,7 @@ class TestBasicFunction(BaseTest):
             "single/function_alias_with_http_api_events",
         ]
     )
+    @pytest.mark.flaky(reruns=5)
     @skipIf(current_region_does_not_support([HTTP_API]), "HTTP API is not supported in this testing region")
     def test_function_with_http_api_events(self, file_name):
         self.create_and_verify_stack(file_name)

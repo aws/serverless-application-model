@@ -22,10 +22,10 @@ class Stack:
         self.stack_description = None
         self.stack_resources = None
 
-    def create(self):
+    def create_or_update(self, update):
         output_template_path = self._generate_output_file_path(self.template_path, self.output_dir)
         transform_template(self.template_path, output_template_path)
-        self._deploy_stack(output_template_path)
+        self._deploy_stack(output_template_path, update)
 
     def delete(self):
         self.cfn_client.delete_stack(StackName=self.stack_name)
@@ -36,7 +36,7 @@ class Stack:
         output_list = self.stack_description["Stacks"][0]["Outputs"]
         return {output["OutputKey"]: output["OutputValue"] for output in output_list}
 
-    def _deploy_stack(self, output_file_path, parameters=None):
+    def _deploy_stack(self, output_file_path, update, parameters=None):
         """
         Deploys the current cloud formation stack
         """
@@ -50,10 +50,11 @@ class Stack:
                 notification_arns=[],
                 s3_uploader=None,
                 tags=[],
-                changeset_type="CREATE",
+                changeset_type="UPDATE" if update else "CREATE",
             )
-            self.deployer.execute_changeset(result["Id"], self.stack_name)
-            self.deployer.wait_for_execute(self.stack_name, "CREATE")
+            if result:
+                self.deployer.execute_changeset(result["Id"], self.stack_name)
+                self.deployer.wait_for_execute(self.stack_name, "UPDATE" if update else "CREATE")
 
         self._get_stack_description()
         self.stack_resources = self.cfn_client.list_stack_resources(StackName=self.stack_name)

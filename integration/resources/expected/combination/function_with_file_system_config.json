@@ -3,8 +3,6 @@
   { "LogicalResourceId":"MountTarget", "ResourceType":"AWS::EFS::MountTarget" },
   { "LogicalResourceId":"AccessPoint", "ResourceType":"AWS::EFS::AccessPoint" },
   { "LogicalResourceId":"LambdaFunctionWithEfs", "ResourceType":"AWS::Lambda::Function" },
-  { "LogicalResourceId":"MyVpc", "ResourceType":"AWS::EC2::VPC" },
   { "LogicalResourceId":"MySecurityGroup", "ResourceType":"AWS::EC2::SecurityGroup" },
-  { "LogicalResourceId":"MySubnet", "ResourceType":"AWS::EC2::Subnet" },
   { "LogicalResourceId":"LambdaFunctionWithEfsRole", "ResourceType":"AWS::IAM::Role" }
 ]

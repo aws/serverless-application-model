@@ -70,6 +70,16 @@ class ThrottlingError(UserException):
         self.stack_name = stack_name
         self.msg = msg
 
-        message_fmt = "Throttling Issue occurred: {stack_name}, {msg}"
+        message_fmt = "Throttling issue occurred: {stack_name}, {msg}"
 
         super(ThrottlingError, self).__init__(message=message_fmt.format(stack_name=self.stack_name, msg=msg))
+
+
+class S3DoesNotExistException(UserException):
+    def __init__(self, bucket_name, msg):
+        self.bucket_name = bucket_name
+        self.msg = msg
+
+        message_fmt = "Companion S3 bucket used for resource upload does not exist: {bucket_name}, {msg}"
+
+        super(S3DoesNotExistException, self).__init__(message=message_fmt.format(bucket_name=self.bucket_name, msg=msg))

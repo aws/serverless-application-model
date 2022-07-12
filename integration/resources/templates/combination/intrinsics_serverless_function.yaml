@@ -14,6 +14,10 @@ Parameters:
   AutoPublishSha:
     Type: String
     Default: AnyRandomStringWillActuallyDo
+  PreCreatedSubnetOne:
+    Type: String
+  PreCreatedVpc:
+    Type: String
 
 Conditions:
   TrueCondition:
@@ -68,7 +72,7 @@ Resources:
         SecurityGroupIds:
           - "Fn::GetAtt": ["MySecurityGroup", "GroupId"]
         SubnetIds:
-          - Ref: "MySubnet"
+          - Ref: PreCreatedSubnetOne
 
   # Additional resources to reference inside the Function resource
   MyNewRole:
@@ -87,25 +91,12 @@ Resources:
             Service:
             - lambda.amazonaws.com
 
-
-  MyVpc:
-    Type: "AWS::EC2::VPC"
-    Properties:
-      CidrBlock: "10.0.0.0/16"
-
   MySecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "my test group"
       VpcId:
-        Ref: MyVpc
-
-  MySubnet:
-    Type: "AWS::EC2::Subnet"
-    Properties:
-      VpcId:
-        Ref: MyVpc
-      CidrBlock: "10.0.0.0/24"
+        Ref: PreCreatedVpc
 
   # False condition, shouldn't be created
   MyFunctionFalseCondition:

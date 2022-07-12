@@ -6,10 +6,11 @@ import logging
 
 from integration.helpers.base_test import S3_BUCKET_PREFIX
 from integration.helpers.client_provider import ClientProvider
-from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
+from integration.helpers.deployer.exceptions.exceptions import S3DoesNotExistException, ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.stack import Stack
 from integration.helpers.yaml_utils import load_yaml
+from integration.helpers.resource import read_test_config_file, write_test_config_file_to_json
 
 try:
     from pathlib import Path
@@ -63,10 +64,57 @@ def setup_companion_stack_once(tmpdir_factory, get_prefix):
     cfn_client = ClientProvider().cfn_client
     output_dir = tmpdir_factory.mktemp("data")
     stack_name = get_prefix + COMPANION_STACK_NAME
-    if _stack_exists(stack_name):
-        return
     companion_stack = Stack(stack_name, companion_stack_tempalte_path, cfn_client, output_dir)
-    companion_stack.create()
+    companion_stack.create_or_update(_stack_exists(stack_name))
+
+
+@pytest.fixture()
+def upload_resources(get_s3):
+    """
+    Creates the bucket and uploads the files used by the tests to it
+    """
+    s3_bucket = get_s3
+    if not _s3_exists(s3_bucket):
+        raise S3DoesNotExistException(get_s3, "Check companion stack status")
+    code_dir = Path(__file__).resolve().parents[0].joinpath("resources").joinpath("code")
+    file_to_s3_uri_map = read_test_config_file("file_to_s3_map.json")
+
+    if not file_to_s3_uri_map or not file_to_s3_uri_map.items():
+        LOG.debug("No resources to upload")
+        return
+
+    current_file_name = ""
+
+    try:
+        s3_client = ClientProvider().s3_client
+        session = boto3.session.Session()
+        region = session.region_name
+        for file_name, file_info in file_to_s3_uri_map.items():
+            current_file_name = file_name
+            code_path = str(Path(code_dir, file_name))
+            LOG.debug("Uploading file %s to bucket %s", file_name, s3_bucket)
+            s3_client.upload_file(code_path, s3_bucket, file_name)
+            LOG.debug("File %s uploaded successfully to bucket %s", file_name, s3_bucket)
+            file_info["uri"] = get_s3_uri(file_name, file_info["type"], s3_bucket, region)
+    except ClientError as error:
+        LOG.error("Upload of file %s to bucket %s failed", current_file_name, s3_bucket, exc_info=error)
+        raise error
+
+    write_test_config_file_to_json("file_to_s3_map_modified.json", file_to_s3_uri_map)
+
+
+def get_s3_uri(file_name, uri_type, bucket, region):
+    if uri_type == "s3":
+        return "s3://{}/{}".format(bucket, file_name)
+
+    if region == "us-east-1":
+        return "https://s3.amazonaws.com/{}/{}".format(bucket, file_name)
+    if region == "us-iso-east-1":
+        return "https://s3.us-iso-east-1.c2s.ic.gov/{}/{}".format(bucket, file_name)
+    if region == "us-isob-east-1":
+        return "https://s3.us-isob-east-1.sc2s.sgov.gov/{}/{}".format(bucket, file_name)
+
+    return "https://s3-{}.amazonaws.com/{}/{}".format(region, bucket, file_name)
 
 
 @pytest.fixture()
@@ -97,6 +145,12 @@ def get_stack_outputs(stack_description):
 def get_companion_stack_outputs(get_prefix):
     companion_stack_description = get_stack_description(get_prefix + COMPANION_STACK_NAME)
     return get_stack_outputs(companion_stack_description)
+
+
+@pytest.fixture()
+def get_s3(get_companion_stack_outputs):
+    s3_bucket = get_companion_stack_outputs.get("PreCreatedS3Bucket")
+    return str(s3_bucket)
 
 
 @pytest.fixture()
@@ -169,5 +223,17 @@ def _stack_exists(stack_name):
         if "Throttling" in str(ex):
             raise ThrottlingError(stack_name=stack_name, msg=str(ex))
         raise ex
+
+    return True
+
+
+@retry_with_exponential_backoff_and_jitter(ThrottlingError, 5, 360)
+def _s3_exists(s3_bucket):
+    s3 = boto3.resource("s3")
+    bucket = s3.Bucket(s3_bucket)
+    try:
+        s3.meta.client.head_bucket(Bucket=bucket.name)
+    except ClientError:
+        return False
 
     return True

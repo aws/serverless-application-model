@@ -12,6 +12,7 @@ class TestFunctionWithImplicitHttpApi(BaseTest):
 
         stack_outputs = self.get_stack_outputs()
         base_url = stack_outputs["ApiUrl"]
-        self.verify_get_request_response(base_url, 200)
-        self.verify_get_request_response(base_url + "something", 200)
-        self.verify_get_request_response(base_url + "another/endpoint", 200)
+        resource_type = "AWS::ApiGatewayV2::Api"
+        self.verify_get_request_response(base_url, 200, resource_type)
+        self.verify_get_request_response(base_url + "something", 200, resource_type)
+        self.verify_get_request_response(base_url + "another/endpoint", 200, resource_type)

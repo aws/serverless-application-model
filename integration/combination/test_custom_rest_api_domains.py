@@ -2,7 +2,6 @@ from unittest.case import skipIf
 
 from integration.config.service_names import CUSTOM_DOMAIN
 from integration.helpers.base_internal_test import BaseInternalTest
-from integration.helpers.file_resources import FILE_TO_S3_URI_MAP
 from integration.helpers.resource import current_region_not_included
 
 
@@ -47,7 +46,7 @@ class TestCustomRestApiDomains(BaseInternalTest):
         self.assertEqual("REGIONAL", end_point_types[0])
 
         mtls_auth_config = result["mutualTlsAuthentication"]
-        self.assertEqual(FILE_TO_S3_URI_MAP["MTLSCert.pem"]["uri"], mtls_auth_config["truststoreUri"])
+        self.assertEqual(self.file_to_s3_uri_map["MTLSCert.pem"]["uri"], mtls_auth_config["truststoreUri"])
 
     def test_custom_rest_api_domains_regional_ownership_verification(self):
         self.create_and_verify_stack("combination/api_with_custom_domains_regional_ownership_verification")

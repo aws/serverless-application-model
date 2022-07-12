@@ -1,5 +1,5 @@
-from parameterized import parameterized
 from unittest.case import skipIf
+import pytest
 
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
@@ -8,18 +8,24 @@ from integration.config.service_names import REST_API
 
 @skipIf(current_region_does_not_support([REST_API]), "Rest API is not supported in this testing region")
 class TestIntrinsicFunctionsSupport(BaseTest):
+    @pytest.fixture(autouse=True)
+    def companion_stack_outputs(self, get_companion_stack_outputs):
+        self.companion_stack_outputs = get_companion_stack_outputs
 
-    # test code definition uri object and serverless function properties support
-    @parameterized.expand(
-        [
-            "combination/intrinsics_code_definition_uri",
-            "combination/intrinsics_serverless_function",
-        ]
-    )
-    def test_common_support(self, file_name):
+    # test serverless function properties support
+    def test_serverless_function_property_support(self):
         # Just a simple deployment will validate that Code & Swagger files were accessible
         # Just a simple deployment will validate that all properties were resolved expected
-        self.create_and_verify_stack(file_name, self.get_default_test_template_parameters())
+        parameters = self.get_parameters(self.companion_stack_outputs)
+        parameters.extend(self.get_default_test_template_parameters())
+        self.create_and_verify_stack("combination/intrinsics_serverless_function", parameters)
+
+    # test code definition uri object support
+    def test_definition_uri_support(self):
+        # Just a simple deployment will validate that Code & Swagger files were accessible
+        # Just a simple deployment will validate that all properties were resolved expected
+        parameters = self.get_default_test_template_parameters()
+        self.create_and_verify_stack("combination/intrinsics_code_definition_uri", parameters)
 
     def test_severless_api_properties_support(self):
         self.create_and_verify_stack(
@@ -62,3 +68,9 @@ class TestIntrinsicFunctionsSupport(BaseTest):
         self.assertEqual(tags["lambda:createdBy"], "SAM", "Expected 'SAM' tag value, but not found.")
         self.assertTrue("TagKey1" in tags)
         self.assertEqual(tags["TagKey1"], api_stage_name)
+
+    def get_parameters(self, dictionary):
+        parameters = []
+        parameters.append(self.generate_parameter("PreCreatedSubnetOne", dictionary["PreCreatedSubnetOne"]))
+        parameters.append(self.generate_parameter("PreCreatedVpc", dictionary["PreCreatedVpc"]))
+        return parameters

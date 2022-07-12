@@ -120,15 +120,17 @@ def create_bucket(bucket_name, region):
     NoRegionError
         If region is not specified
     """
+    s3 = boto3.resource("s3")
     if region is None:
         raise NoRegionError()
+
     if region == "us-east-1":
-        s3_client = boto3.client("s3")
-        s3_client.create_bucket(Bucket=bucket_name)
+        bucket = s3.create_bucket(Bucket=bucket_name)
     else:
-        s3_client = boto3.client("s3", region_name=region)
         location = {"LocationConstraint": region}
-        s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
+        bucket = s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
+
+    bucket.wait_until_exists()
 
 
 def _get_region():
@@ -138,14 +140,22 @@ def _get_region():
     return region
 
 
-def _read_test_config_file(filename):
-    """Reads test inclusion or exclusion file and returns the contents"""
+def read_test_config_file(filename):
+    """Reads test config file and returns the contents"""
     tests_integ_dir = Path(__file__).resolve().parents[1]
     test_config_file_path = Path(tests_integ_dir, "config", filename)
     if not test_config_file_path.is_file():
         return {}
     test_config = load_yaml(str(test_config_file_path))
     return test_config
+
+
+def write_test_config_file_to_json(filename, input):
+    """Reads test config file and returns the contents"""
+    tests_integ_dir = Path(__file__).resolve().parents[1]
+    test_config_file_path = Path(tests_integ_dir, "config", filename)
+    with open(test_config_file_path, "w") as f:
+        json.dump(input, f)
 
 
 def current_region_does_not_support(services):
@@ -164,7 +174,7 @@ def current_region_does_not_support(services):
     """
 
     region = _get_region()
-    region_exclude_services = _read_test_config_file("region_service_exclusion.yaml")
+    region_exclude_services = read_test_config_file("region_service_exclusion.yaml")
 
     if region not in region_exclude_services.get("regions", {}):
         return False
@@ -179,7 +189,7 @@ def current_region_not_included(services):
     Decides which tests should only be run in certain regions
     """
     region = _get_region()
-    region_include_services = _read_test_config_file("region_service_inclusion.yaml")
+    region_include_services = read_test_config_file("region_service_inclusion.yaml")
 
     if region not in region_include_services.get("regions", {}):
         return True
