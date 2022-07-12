@@ -41,8 +41,11 @@ class OpenApiEditor(object):
         """
         if not OpenApiEditor.is_valid(doc):
             raise InvalidDocumentException(
-                "Invalid OpenApi document. "
-                "Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
+                [
+                    InvalidTemplateException(
+                        "Invalid OpenApi document. Invalid values or missing keys for 'openapi' or 'paths' in 'DefinitionBody'."
+                    )
+                ]
             )
 
         self._doc = copy.deepcopy(doc)
@@ -219,6 +222,8 @@ class OpenApiEditor(object):
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):
             # create as Py27Dict and insert key one by one to preserve input order
+            if path_item[method] is None:
+                path_item[method] = Py27Dict()
             path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
@@ -397,6 +402,15 @@ class OpenApiEditor(object):
                             ]
                         )
                     for method_definition in self.get_conditional_contents(method):
+                        # check if there is any method_definition given by customer
+                        if not method_definition:
+                            raise InvalidDocumentException(
+                                [
+                                    InvalidTemplateException(
+                                        f"Invalid method definition ({normalized_method_name}) for path: {path}"
+                                    )
+                                ]
+                            )
                         # If no integration given, then we don't need to process this definition (could be AWS::NoValue)
                         if not self.method_definition_has_integration(method_definition):
                             continue

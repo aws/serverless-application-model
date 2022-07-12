@@ -172,10 +172,18 @@ class ApiGatewayV2Authorizer(object):
                 self.api_logical_id, f"{self.name} Lambda Authorizer must define 'AuthorizerPayloadFormatVersion'."
             )
 
-        if self.identity and not isinstance(self.identity, dict):
-            raise InvalidResourceException(
-                self.api_logical_id, f"{self.name} Lambda Authorizer property 'identity' is of invalid type."
-            )
+        if self.identity:
+            if not isinstance(self.identity, dict):
+                raise InvalidResourceException(
+                    self.api_logical_id, self.name + " Lambda Authorizer property 'identity' is of invalid type."
+                )
+            headers = self.identity.get("Headers")
+            if headers:
+                if not isinstance(headers, list) or any([not isinstance(header, str) for header in headers]):
+                    raise InvalidResourceException(
+                        self.api_logical_id,
+                        self.name + " Lambda Authorizer property identity's 'Headers' is of invalid type.",
+                    )
 
     def generate_openapi(self):
         """

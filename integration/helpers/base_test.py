@@ -1,14 +1,16 @@
 import logging
 import os
+import requests
 import shutil
 
 import botocore
 import pytest
-import requests
 
+from integration.config.logger_configurations import LoggingConfiguration
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
+from integration.helpers.request_utils import RequestUtils
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.s3_uploader import S3Uploader
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
@@ -28,6 +30,10 @@ from integration.helpers.template import transform_template
 from integration.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
+
+REQUEST_LOGGER = logging.getLogger(f"{__name__}.requests")
+LoggingConfiguration.configure_request_logger(REQUEST_LOGGER)
+
 STACK_NAME_PREFIX = "sam-integ-stack-"
 S3_BUCKET_PREFIX = "sam-integ-bucket-"
 
@@ -496,7 +502,7 @@ class BaseTest(TestCase):
         if error:
             self.fail(error)
 
-    def verify_get_request_response(self, url, expected_status_code):
+    def verify_get_request_response(self, url, expected_status_code, headers=None):
         """
         Verify if the get request to a certain url return the expected status code
 
@@ -506,9 +512,10 @@ class BaseTest(TestCase):
             the url for the get request
         expected_status_code : string
             the expected status code
+        headers : dict
+            headers to use in request
         """
-        print("Making request to " + url)
-        response = requests.get(url)
+        response = BaseTest.do_get_request_with_logging(url, headers)
         self.assertEqual(response.status_code, expected_status_code, " must return HTTP " + str(expected_status_code))
         return response
 
@@ -547,3 +554,19 @@ class BaseTest(TestCase):
             "ResolvedValue": resolved_value,
         }
         return parameter
+
+    @staticmethod
+    def do_get_request_with_logging(url, headers=None):
+        """
+        Perform a get request to an APIGW endpoint and log relevant info
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        headers : dict
+            headers to use in request
+        """
+        response = requests.get(url, headers=headers) if headers else requests.get(url)
+        amazon_headers = RequestUtils(response).get_amazon_headers()
+        REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
+        return response
