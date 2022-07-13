@@ -570,7 +570,7 @@ class BaseTest(TestCase):
         headers : dict
             headers to use in request
         """
-        response = requests.options(url, headers=headers) if headers else requests.get(url)
+        response = requests.options(url, headers=headers) if headers else requests.options(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
         REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
         return response
