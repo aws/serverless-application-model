@@ -34,6 +34,14 @@ If you haven't done so already, run the following command in a terminal at the r
 make init
 ```
 
+### Setting up a companion stack
+
+To run the tests, a companion stack first needs to be created. This stack houses some resources that are required by the tests, such as an S3 bucket.
+
+```
+make prepare-companion-stack
+```
+
 ### Running all the tests
 
 From the root of the repository, run:

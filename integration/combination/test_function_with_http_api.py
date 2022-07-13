@@ -18,7 +18,6 @@ class TestFunctionWithHttpApi(BaseTest):
 
         stack_outputs = self.get_stack_outputs()
         base_url = stack_outputs["ApiUrl"]
-        resource_type = "AWS::ApiGatewayV2::Api"
-        self.verify_get_request_response(base_url + "some/path", 200, resource_type)
-        self.verify_get_request_response(base_url + "something", 404, resource_type)
-        self.verify_get_request_response(base_url + "another/endpoint", 404, resource_type)
+        self.verify_get_request_response(base_url + "some/path", 200)
+        self.verify_get_request_response(base_url + "something", 404)
+        self.verify_get_request_response(base_url + "another/endpoint", 404)

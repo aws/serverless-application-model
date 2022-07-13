@@ -40,8 +40,6 @@ Resources:
   PreCreatedS3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
-    Properties:
-      BucketName: sam-integ-bucket-companion-bucket
 
 Outputs:
   PreCreatedVpc:

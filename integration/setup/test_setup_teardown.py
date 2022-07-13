@@ -4,7 +4,6 @@ from integration.helpers.resource import read_test_config_file
 
 @pytest.mark.setup
 def test_setup(setup_companion_stack_once, upload_resources, get_s3):
-    assert get_s3 == "sam-integ-bucket-companion-bucket"
     assert s3_upload_successful()
 
 
