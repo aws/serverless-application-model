@@ -37,6 +37,10 @@ Resources:
       InternetGatewayId:
         Ref: PreCreatedInternetGateway
 
+  PreCreatedS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+
 Outputs:
   PreCreatedVpc:
     Description: "Pre-created VPC that can be used inside other tests"
@@ -58,3 +62,7 @@ Outputs:
     Description: "Pre-created Attach Gateway that can be used inside other tests"
     Value:
       Ref: PreCreatedAttachGateway
+  PreCreatedS3Bucket:
+    Description: "Pre-created S3 Bucket that can be used inside other tests"
+    Value: 
+      Ref: PreCreatedS3Bucket

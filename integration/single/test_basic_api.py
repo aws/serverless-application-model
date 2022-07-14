@@ -1,10 +1,15 @@
-import time
+import logging
 from unittest.case import skipIf
 
+from tenacity import stop_after_attempt, wait_exponential, retry_if_exception_type, after_log, wait_random
+
 from integration.helpers.base_test import BaseTest
+from integration.helpers.exception import StatusCodeError
 
 from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import MODE, REST_API
+
+LOG = logging.getLogger(__name__)
 
 
 @skipIf(current_region_does_not_support([REST_API]), "Rest API is not supported in this testing region")
@@ -40,22 +45,22 @@ class TestBasicApi(BaseTest):
 
         stack_output = self.get_stack_outputs()
         api_endpoint = stack_output.get("ApiEndpoint")
-        response = BaseTest.do_get_request_with_logging(f"{api_endpoint}/get")
-        self.assertEqual(response.status_code, 200)
+
+        self.verify_get_request_response(f"{api_endpoint}/get", 200)
 
         # Removes get from the API
         self.update_and_verify_stack(file_path="single/basic_api_with_mode_update")
-        response = BaseTest.do_get_request_with_logging(f"{api_endpoint}/get")
-        # API Gateway by default returns 403 if a path do not exist
-        retries = 20
-        while retries > 0:
-            retries -= 1
-            response = BaseTest.do_get_request_with_logging(f"{api_endpoint}/get")
-            if response.status_code != 500:
-                break
-            time.sleep(5)
 
-        self.assertEqual(response.status_code, 403)
+        # API Gateway by default returns 403 if a path do not exist
+        self.verify_get_request_response.retry_with(
+            stop=stop_after_attempt(20),
+            wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+            retry=retry_if_exception_type(StatusCodeError),
+            after=after_log(LOG, logging.WARNING),
+            reraise=True,
+        )(self, f"{api_endpoint}/get", 403)
+
+        LOG.log(msg=f"retry times {self.verify_get_request_response.retry.statistics}", level=logging.WARNING)
 
     def test_basic_api_inline_openapi(self):
         """
