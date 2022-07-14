@@ -58,7 +58,7 @@ class TestBasicApi(BaseTest):
             retry=retry_if_exception_type(StatusCodeError),
             after=after_log(LOG, logging.WARNING),
             reraise=True,
-        )(self, f"{api_endpoint}/get", 403, "AWS::ApiGateway::RestApi")
+        )(self, f"{api_endpoint}/get", 403)
 
         LOG.log(msg=f"retry times {self.verify_get_request_response.retry.statistics}", level=logging.WARNING)
 
