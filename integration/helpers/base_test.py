@@ -165,7 +165,7 @@ class BaseTest(TestCase):
 
             self._fill_template(folder, file_name)
 
-        self.transform_template(parameters)
+        self.transform_template()
         self._update_stack(parameters)
 
     def update_and_verify_stack(self, parameters=None, file_path=None):
@@ -194,9 +194,9 @@ class BaseTest(TestCase):
             Path(self.output_dir, "cfn_" + folder_name + "_" + file_name + generate_suffix() + ".yaml")
         )
 
-    def transform_template(self, parameters=None):
+    def transform_template(self):
         if not self.pipeline_stage:
-            transform_template(self.sub_input_file_path, self.output_file_path, parameters)
+            transform_template(self.sub_input_file_path, self.output_file_path)
         else:
             transform_name = "AWS::Serverless-2016-10-31"
             if self.pipeline_stage == "beta":

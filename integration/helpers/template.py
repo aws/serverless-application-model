@@ -10,7 +10,7 @@ from samtranslator.translator.transform import transform
 from samtranslator.yaml_helper import yaml_parse
 
 
-def transform_template(sam_template_path, cfn_output_path, parameters=None):
+def transform_template(sam_template_path, cfn_output_path):
     """
     Locally transforms a SAM template to a Cloud Formation template
 
@@ -20,10 +20,7 @@ def transform_template(sam_template_path, cfn_output_path, parameters=None):
         SAM template input path
     cfn_output_path : Path
         Cloud formation template output path
-    parameters : Dict
-        Template parameters that will be used during transform
     """
-    parameters = parameters or {}
     LOG = logging.getLogger(__name__)
     iam_client = boto3.client("iam")
 
@@ -31,7 +28,7 @@ def transform_template(sam_template_path, cfn_output_path, parameters=None):
         sam_template = yaml_parse(f)
 
     try:
-        cloud_formation_template = transform(sam_template, parameters, ManagedPolicyLoader(iam_client))
+        cloud_formation_template = transform(sam_template, {}, ManagedPolicyLoader(iam_client))
         cloud_formation_template_prettified = json.dumps(cloud_formation_template, indent=2)
 
         with open(cfn_output_path, "w") as f:
