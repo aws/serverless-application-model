@@ -46,7 +46,7 @@ class TestBasicApi(BaseTest):
         stack_output = self.get_stack_outputs()
         api_endpoint = stack_output.get("ApiEndpoint")
 
-        self.verify_get_request_response(f"{api_endpoint}/get", 200, "AWS::ApiGateway::RestApi")
+        self.verify_get_request_response(f"{api_endpoint}/get", 200)
 
         # Removes get from the API
         self.update_and_verify_stack(file_path="single/basic_api_with_mode_update")
