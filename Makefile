@@ -28,7 +28,7 @@ lint:
 	pylint --rcfile .pylintrc samtranslator
 
 prepare-companion-stack:
-	pytest -v integration/setup -m setup
+	pytest -v --no-cov integration/setup -m setup
 
 # Command to run everytime you make changes to verify everything works
 dev: test
