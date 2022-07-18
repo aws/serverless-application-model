@@ -541,6 +541,7 @@ class Api(PushEventSource):
         "Auth": PropertyType(False, is_type(dict)),
         "RequestModel": PropertyType(False, is_type(dict)),
         "RequestParameters": PropertyType(False, is_type(list)),
+        "RequestValidators": PropertyType(False, is_type(dict)),
     }
 
     def resources_to_link(self, resources):
@@ -656,6 +657,33 @@ class Api(PushEventSource):
         )
 
         return self._construct_permission(resources_to_link["function"], source_arn=source_arn, suffix=suffix)
+
+    def _add_validators(self, editor, validate_body, validate_parameters):
+        # Checking if any of the fields are defined as it can be false we are checking if the field are not None
+        if validate_body is not None or validate_parameters is not None:
+
+            # as we are setting two different fields we are here setting as default False
+            # In case one of them are not defined
+            validate_body = False if validate_body is None else validate_body
+            validate_parameters = False if validate_parameters is None else validate_parameters
+
+            # If not type None but any other type it should explicitly invalidate the Spec
+            # Those fields should be only a boolean
+            if not isinstance(validate_body, bool) or not isinstance(validate_parameters, bool):
+                raise InvalidEventException(
+                    self.relative_id,
+                    "Unable to set Validator on API method [{method}] for path [{path}] "
+                    "ValidateBody and ValidateParameters must be a boolean type, strings or intrinsics are not supported.".format(
+                        method=self.Method, path=self.Path
+                    ),
+                )
+
+            editor.add_request_validator_to_method(
+                path=self.Path,
+                method_name=self.Method,
+                validate_body=validate_body,
+                validate_parameters=validate_parameters,
+            )
 
     def _add_swagger_integration(self, api, function, intrinsics_resolver):
         """Adds the path and method for this Api event source to the Swagger body for the provided RestApi.
@@ -800,41 +828,24 @@ class Api(PushEventSource):
                 validate_body = self.RequestModel.get("ValidateBody")
                 validate_parameters = self.RequestModel.get("ValidateParameters")
 
-                # Checking if any of the fields are defined as it can be false we are checking if the field are not None
-                if validate_body is not None or validate_parameters is not None:
+                self._add_validators(editor, validate_body, validate_parameters)
 
-                    # as we are setting two different fields we are here setting as default False
-                    # In case one of them are not defined
-                    validate_body = False if validate_body is None else validate_body
-                    validate_parameters = False if validate_parameters is None else validate_parameters
-
-                    # If not type None but any other type it should explicitly invalidate the Spec
-                    # Those fields should be only a boolean
-                    if not isinstance(validate_body, bool) or not isinstance(validate_parameters, bool):
-                        raise InvalidEventException(
-                            self.relative_id,
-                            "Unable to set Validator to RequestModel [{model}] on API method [{method}] for path [{path}] "
-                            "ValidateBody and ValidateParameters must be a boolean type, strings or intrinsics are not supported.".format(
-                                model=method_model, method=self.Method, path=self.Path
-                            ),
-                        )
-
-                    editor.add_request_validator_to_method(
-                        path=self.Path,
-                        method_name=self.Method,
-                        validate_body=validate_body,
-                        validate_parameters=validate_parameters,
-                    )
+        if self.RequestValidators:
+            # default is no Validators
+            validators = {"ValidateBody": None, "ValidateParameters": None}
+            # if we have validator configured to a request parameter
+            # we want to add it to the editor but remove it from original dict before it iterates
+            validators["ValidateBody"] = self.RequestValidators.get("ValidateBody")
+            validators["ValidateParameters"] = self.RequestValidators.get("ValidateParameters")
+            # If validators is present or not, this method will handle the check
+            self._add_validators(editor, validators["ValidateBody"], validators["ValidateParameters"])
 
         if self.RequestParameters:
-
             default_value = {"Required": False, "Caching": False}
 
             parameters = []
             for parameter in self.RequestParameters:
-
                 if isinstance(parameter, dict):
-
                     parameter_name, parameter_value = next(iter(parameter.items()))
 
                     if not re.match(r"method\.request\.(querystring|path|header)\.", parameter_name):
