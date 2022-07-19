@@ -841,6 +841,7 @@ class Api(PushEventSource):
             self._add_validators(editor, validators["ValidateBody"], validators["ValidateParameters"])
 
         if self.RequestParameters:
+
             default_value = {"Required": False, "Caching": False}
 
             parameters = []
