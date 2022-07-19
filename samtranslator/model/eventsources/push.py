@@ -845,7 +845,9 @@ class Api(PushEventSource):
 
             parameters = []
             for parameter in self.RequestParameters:
+
                 if isinstance(parameter, dict):
+
                     parameter_name, parameter_value = next(iter(parameter.items()))
 
                     if not re.match(r"method\.request\.(querystring|path|header)\.", parameter_name):
