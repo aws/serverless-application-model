@@ -1,0 +1,35 @@
+Transform: "AWS::Serverless-2016-10-31"
+Parameters:
+  ScheduleState:
+    Type: String
+    Default: Disabled
+
+Resources:
+  ScheduledFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: s3://sam-demo-bucket/hello.zip?versionId=3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO
+      Handler: hello.handler
+      Runtime: python3.10
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+            Name: test-schedule
+            Description: Test Schedule
+            State: "Enabled"
+        Schedule2:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+            Name: test-schedule
+            Description: Test Schedule
+            State: !Sub "Enabled"
+        Schedule3:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+            Name: test-schedule
+            Description: Test Schedule
+            State: !Ref ScheduleState

@@ -96,6 +96,7 @@ class Schedule(PushEventSource):
         "Schedule": PropertyType(True, is_str()),
         "Input": PropertyType(False, is_str()),
         "Enabled": PropertyType(False, is_type(bool)),
+        "State": PropertyType(False, is_str()),
         "Name": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
@@ -122,6 +123,13 @@ class Schedule(PushEventSource):
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
+
+        if self.State and self.Enabled:
+            raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
+
+        if self.State:
+            events_rule.State = self.State
+
         if self.Enabled is not None:
             if isinstance(self.Enabled, bool):
                 events_rule.State = "ENABLED" if self.Enabled else "DISABLED"

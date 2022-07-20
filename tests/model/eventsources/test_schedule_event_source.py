@@ -1,19 +1,3 @@
-
-# class SnsEventSource(TestCase):
-#     def setUp(self):
-#         self.logical_id = "ExampleCron"
-
-#         self.schedule_event_source = Schedule(self.logical_id)
-#         self.schedule_event_source.Schedule = "cron(1 2 3 4 ? *)"
-
-#         self.function = Mock()
-#         self.function.get_runtime_attr = Mock()
-#         self.function.get_runtime_attr.return_value = "arn:aws:lambda:mock"
-#         self.function.resource_attributes = {}
-#         self.function.get_passthrough_resource_attributes = Mock()
-#         self.function.get_passthrough_resource_attributes.return_value = {}
-
-from unittest.mock import Mock, patch
 from unittest import TestCase
 
 from samtranslator.model.eventsources.push import Schedule
@@ -110,5 +94,11 @@ class ScheduleEventSource(TestCase):
     def test_to_cloudformation_with_dlq_generated_with_intrinsic_function_custom_logical_id_raises_exception(self):
         dead_letter_config = {"Type": "SQS", "QueueLogicalId": {"Fn::Sub": "MyDLQ${Env}"}}
         self.schedule_event_source.DeadLetterConfig = dead_letter_config
+        with self.assertRaises(InvalidEventException):
+            self.schedule_event_source.to_cloudformation(function=self.func)
+
+    def test_to_cloudformation_invalid_defined_both_enabled_and_state_provided(self):
+        self.schedule_event_source.Enabled = True
+        self.schedule_event_source.State = "Enabled"
         with self.assertRaises(InvalidEventException):
             self.schedule_event_source.to_cloudformation(function=self.func)
