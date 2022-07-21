@@ -124,17 +124,15 @@ class Schedule(PushEventSource):
 
         events_rule.ScheduleExpression = self.Schedule
 
-        if self.State and self.Enabled:
+        if self.State and self.Enabled is not None:
             raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
 
         if self.State:
             events_rule.State = self.State
 
         if self.Enabled is not None:
-            if isinstance(self.Enabled, bool):
-                events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
-            else:
-                events_rule.State = self.Enabled
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+
         events_rule.Name = self.Name
         events_rule.Description = self.Description
 

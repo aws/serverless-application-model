@@ -3,6 +3,7 @@ from unittest import TestCase
 from samtranslator.model.eventsources.push import Schedule
 from samtranslator.model.lambda_ import LambdaFunction
 from samtranslator.model.exceptions import InvalidEventException
+from parameterized import parameterized
 
 
 class ScheduleEventSource(TestCase):
@@ -32,12 +33,6 @@ class ScheduleEventSource(TestCase):
         resources = self.schedule_event_source.to_cloudformation(function=self.func)
         schedule = resources[0]
         self.assertEqual(schedule.State, "DISABLED")
-
-    def test_to_cloudformation_passes_enabled_to_state(self):
-        self.schedule_event_source.Enabled = {"Fn:If": [1, 2, 3]}
-        resources = self.schedule_event_source.to_cloudformation(function=self.func)
-        schedule = resources[0]
-        self.assertEqual(schedule.State, {"Fn:If": [1, 2, 3]})
 
     def test_to_cloudformation_with_retry_policy(self):
         retry_policy = {"MaximumRetryAttempts": "10", "MaximumEventAgeInSeconds": "300"}
@@ -97,8 +92,18 @@ class ScheduleEventSource(TestCase):
         with self.assertRaises(InvalidEventException):
             self.schedule_event_source.to_cloudformation(function=self.func)
 
-    def test_to_cloudformation_invalid_defined_both_enabled_and_state_provided(self):
-        self.schedule_event_source.Enabled = True
-        self.schedule_event_source.State = "Enabled"
+    @parameterized.expand(
+        [
+            (True, "Enabled"),
+            (True, "Disabled"),
+            (True, {"FN:FakeIntrinsic": "something"}),
+            (False, "Enabled"),
+            (False, "Disabled"),
+            (False, {"FN:FakeIntrinsic": "something"}),
+        ]
+    )
+    def test_to_cloudformation_invalid_defined_both_enabled_and_state_provided(self, enabled_value, state_value):
+        self.schedule_event_source.Enabled = enabled_value
+        self.schedule_event_source.State = state_value
         with self.assertRaises(InvalidEventException):
             self.schedule_event_source.to_cloudformation(function=self.func)
