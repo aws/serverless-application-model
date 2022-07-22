@@ -1,0 +1,8 @@
+{
+    "errors": [
+      {
+        "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ScheduledFunction] is invalid. Event with id [Schedule1] is invalid. State and Enabled Properties cannot both be specified."
+      }
+    ], 
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ScheduledFunction] is invalid. Event with id [Schedule1] is invalid. State and Enabled Properties cannot both be specified."
+  }
