@@ -511,6 +511,10 @@
             "Type": "AWS::CodeDeploy::DeploymentGroup",
             "Condition": "FunctionCondition",
             "Properties": {
+                "AlarmConfiguration": {
+                  "Enabled": false,
+                  "Alarms": []
+                },
                 "ApplicationName": {
                     "Ref": "ServerlessDeploymentApplication"
                 },
@@ -545,6 +549,10 @@
         "FalseRefDeploymentGroup": {
             "Type": "AWS::CodeDeploy::DeploymentGroup",
             "Properties": {
+                "AlarmConfiguration": {
+                  "Enabled": false,
+                  "Alarms": []
+                },
                 "ApplicationName": {
                     "Ref": "ServerlessDeploymentApplication"
                 },
@@ -580,6 +588,10 @@
             "Type": "AWS::CodeDeploy::DeploymentGroup",
             "Condition": "FunctionCondition",
             "Properties": {
+                "AlarmConfiguration": {
+                  "Enabled": false,
+                  "Alarms": []
+                },
                 "ApplicationName": {
                     "Ref": "ServerlessDeploymentApplication"
                 },
@@ -614,6 +626,10 @@
         "FalseFindInMapDeploymentGroup": {
             "Type": "AWS::CodeDeploy::DeploymentGroup",
             "Properties": {
+                "AlarmConfiguration": {
+                  "Enabled": false,
+                  "Alarms": []
+                },
                 "ApplicationName": {
                     "Ref": "ServerlessDeploymentApplication"
                 },

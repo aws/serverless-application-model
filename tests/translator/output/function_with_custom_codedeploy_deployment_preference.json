@@ -69,9 +69,13 @@
     "CustomWithCondition2DeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup", 
       "Properties": {
+        "AlarmConfiguration": {
+          "Enabled": false,
+          "Alarms": []
+        },
         "ApplicationName": {
           "Ref": "ServerlessDeploymentApplication"
-        }, 
+        },
         "AutoRollbackConfiguration": {
           "Enabled": true, 
           "Events": [
@@ -214,6 +218,10 @@
     "CustomWithSubDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup", 
       "Properties": {
+        "AlarmConfiguration": {
+          "Enabled": false,
+          "Alarms": []
+        },
         "ApplicationName": {
           "Ref": "ServerlessDeploymentApplication"
         }, 
@@ -313,6 +321,10 @@
     "NormalWithSubDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup", 
       "Properties": {
+        "AlarmConfiguration": {
+          "Enabled": false,
+          "Alarms": []
+        },
         "ApplicationName": {
           "Ref": "ServerlessDeploymentApplication"
         }, 
@@ -371,6 +383,10 @@
     "NormalWithRefDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup", 
       "Properties": {
+        "AlarmConfiguration": {
+          "Enabled": false,
+          "Alarms": []
+        },
         "ApplicationName": {
           "Ref": "ServerlessDeploymentApplication"
         }, 
@@ -499,6 +515,10 @@
     "CustomWithConditionDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup", 
       "Properties": {
+        "AlarmConfiguration": {
+          "Enabled": false,
+          "Alarms": []
+        },
         "ApplicationName": {
           "Ref": "ServerlessDeploymentApplication"
         }, 
@@ -702,6 +722,10 @@
     "MinimalFunctionDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup", 
       "Properties": {
+        "AlarmConfiguration": {
+          "Enabled": false,
+          "Alarms": []
+        },
         "ApplicationName": {
           "Ref": "ServerlessDeploymentApplication"
         }, 
@@ -823,6 +847,10 @@
     "CustomWithFindInMapDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup", 
       "Properties": {
+        "AlarmConfiguration": {
+          "Enabled": false,
+          "Alarms": []
+        },
         "ApplicationName": {
           "Ref": "ServerlessDeploymentApplication"
         }, 

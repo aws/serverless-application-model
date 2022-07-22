@@ -36,6 +36,10 @@
       "MinimalFunctionDeploymentGroup": {
         "Type": "AWS::CodeDeploy::DeploymentGroup",
         "Properties": {
+          "AlarmConfiguration": {
+            "Enabled": false,
+            "Alarms": []
+          },
           "ApplicationName": {
             "Ref": "ServerlessDeploymentApplication"
           },

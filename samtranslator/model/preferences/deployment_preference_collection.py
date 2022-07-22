@@ -226,7 +226,13 @@ class DeploymentPreferenceCollection(object):
             If Alarms is in the wrong format
         """
         if not preference_alarms or is_intrinsic_no_value(preference_alarms):
-            return None
+            # return the empty alarms configuration in case if there is no alarms at all defined in the
+            # DeploymentPreference to force CFN to update the deployment group and remove the alarms values from the
+            # created DeploymentGroup. Check issue https://github.com/aws/serverless-application-model/issues/2452
+            return {
+                "Enabled": False,
+                "Alarms": [],
+            }
 
         if is_intrinsic_if(preference_alarms):
             processed_alarms = copy.deepcopy(preference_alarms)
