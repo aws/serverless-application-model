@@ -14,6 +14,7 @@ class TestFunctionWithHttpApiAndAuth(BaseTest):
     """
     AWS::Lambda::Function tests with http api events and auth
     """
+
     @retry(
         stop=stop_after_attempt(5),
         wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
