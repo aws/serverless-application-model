@@ -67,10 +67,7 @@ class TestDeploymentPreferenceCollection(TestCase):
     def test_deployment_group_with_minimal_parameters(self):
         expected_deployment_group = CodeDeployDeploymentGroup(self.function_logical_id + "DeploymentGroup")
         expected_deployment_group.ApplicationName = {"Ref": CODEDEPLOY_APPLICATION_LOGICAL_ID}
-        expected_deployment_group.AlarmConfiguration = {
-            "Enabled": False,
-            "Alarms": []
-        }
+        expected_deployment_group.AlarmConfiguration = {"Enabled": False, "Alarms": []}
         expected_deployment_group.AutoRollbackConfiguration = {
             "Enabled": True,
             "Events": ["DEPLOYMENT_FAILURE", "DEPLOYMENT_STOP_ON_ALARM", "DEPLOYMENT_STOP_ON_REQUEST"],
