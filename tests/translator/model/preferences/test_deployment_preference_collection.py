@@ -67,6 +67,10 @@ class TestDeploymentPreferenceCollection(TestCase):
     def test_deployment_group_with_minimal_parameters(self):
         expected_deployment_group = CodeDeployDeploymentGroup(self.function_logical_id + "DeploymentGroup")
         expected_deployment_group.ApplicationName = {"Ref": CODEDEPLOY_APPLICATION_LOGICAL_ID}
+        expected_deployment_group.AlarmConfiguration = {
+            "Enabled": False,
+            "Alarms": []
+        }
         expected_deployment_group.AutoRollbackConfiguration = {
             "Enabled": True,
             "Events": ["DEPLOYMENT_FAILURE", "DEPLOYMENT_STOP_ON_ALARM", "DEPLOYMENT_STOP_ON_REQUEST"],
@@ -269,7 +273,9 @@ class TestDeploymentPreferenceCollection(TestCase):
         deployment_preference_collection.add(self.function_logical_id, deployment_preference)
         deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
 
-        self.assertIsNone(deployment_group.AlarmConfiguration)
+        self.assertIsNotNone(deployment_group.AlarmConfiguration)
+        self.assertFalse(deployment_group.AlarmConfiguration.get("Enabled"))
+        self.assertTrue(len(deployment_group.AlarmConfiguration.get("Alarms")), 0)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_deployment_preference_with_alarms_empty(self):
@@ -281,7 +287,9 @@ class TestDeploymentPreferenceCollection(TestCase):
         deployment_preference_collection.add(self.function_logical_id, deployment_preference)
         deployment_group = deployment_preference_collection.deployment_group(self.function_logical_id)
 
-        self.assertIsNone(deployment_group.AlarmConfiguration)
+        self.assertIsNotNone(deployment_group.AlarmConfiguration)
+        self.assertFalse(deployment_group.AlarmConfiguration.get("Enabled"))
+        self.assertTrue(len(deployment_group.AlarmConfiguration.get("Alarms")), 0)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_deployment_preference_with_alarms_not_list(self):
