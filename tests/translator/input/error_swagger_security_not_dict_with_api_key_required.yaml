@@ -1,0 +1,45 @@
+transformId: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  AuthFunction:
+    Type: AWS::Serverless::Function
+  AccessingPartyAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: REGIONAL
+      StageName: demo
+      Auth:
+        ApiKeyRequired: true
+
+      DefinitionBody:
+        paths:
+          "/path":
+            put:
+              responses:
+                '201':
+                  content:
+                    application/json:
+                      schema:
+                        "$ref": "abcd"
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                responses:
+                  default:
+                    statusCode: '200'
+                uri:
+                  Fn::Sub: foobar
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                type: aws_proxy
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      required:
+                      - readoutId
+                      - status
+                      type: object
+              security:
+                - []
+
+        openapi: 3.0.3
