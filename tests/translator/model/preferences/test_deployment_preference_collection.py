@@ -272,7 +272,7 @@ class TestDeploymentPreferenceCollection(TestCase):
 
         self.assertIsNotNone(deployment_group.AlarmConfiguration)
         self.assertFalse(deployment_group.AlarmConfiguration.get("Enabled"))
-        self.assertTrue(len(deployment_group.AlarmConfiguration.get("Alarms")), 0)
+        self.assertEqual(len(deployment_group.AlarmConfiguration.get("Alarms")), 0)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_deployment_preference_with_alarms_empty(self):
@@ -286,7 +286,7 @@ class TestDeploymentPreferenceCollection(TestCase):
 
         self.assertIsNotNone(deployment_group.AlarmConfiguration)
         self.assertFalse(deployment_group.AlarmConfiguration.get("Enabled"))
-        self.assertTrue(len(deployment_group.AlarmConfiguration.get("Alarms")), 0)
+        self.assertEqual(len(deployment_group.AlarmConfiguration.get("Alarms")), 0)
 
     @patch("boto3.session.Session.region_name", "ap-southeast-1")
     def test_deployment_preference_with_alarms_not_list(self):
