@@ -10,11 +10,22 @@ from integration.config.logger_configurations import LoggingConfiguration
 from integration.helpers.client_provider import ClientProvider
 from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
+from integration.helpers.exception import StatusCodeError
 from integration.helpers.request_utils import RequestUtils
 from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
 from integration.helpers.s3_uploader import S3Uploader
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
+from integration.helpers.resource import read_test_config_file
 from samtranslator.yaml_helper import yaml_parse
+
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    after_log,
+    wait_random,
+)
 
 try:
     from pathlib import Path
@@ -23,11 +34,9 @@ except ImportError:
 from unittest.case import TestCase
 
 import boto3
-from botocore.exceptions import ClientError
 from integration.helpers.deployer.deployer import Deployer
 from integration.helpers.template import transform_template
 
-from integration.helpers.file_resources import FILE_TO_S3_URI_MAP, CODE_KEY_TO_FILE_MAP
 
 LOG = logging.getLogger(__name__)
 
@@ -47,8 +56,12 @@ class BaseTest(TestCase):
     def stage(self, get_stage):
         self.pipeline_stage = get_stage
 
+    @pytest.fixture(autouse=True)
+    def s3_bucket(self, get_s3):
+        self.s3_bucket_name = get_s3
+
     @classmethod
-    @pytest.mark.usefixtures("get_prefix", "get_stage", "check_internal", "parameter_values")
+    @pytest.mark.usefixtures("get_prefix", "get_stage", "check_internal", "parameter_values", "get_s3")
     def setUpClass(cls):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
@@ -57,84 +70,18 @@ class BaseTest(TestCase):
         cls.output_dir = Path(cls.tests_integ_dir, "tmp" + "-" + generate_suffix())
         cls.expected_dir = Path(cls.resources_dir, "expected")
         cls.code_dir = Path(cls.resources_dir, "code")
-        cls.s3_bucket_name = S3_BUCKET_PREFIX + generate_suffix()
         cls.session = boto3.session.Session()
         cls.my_region = cls.session.region_name
         cls.client_provider = ClientProvider()
-        cls.file_to_s3_uri_map = FILE_TO_S3_URI_MAP
-        cls.code_key_to_file = CODE_KEY_TO_FILE_MAP
+        cls.file_to_s3_uri_map = read_test_config_file("file_to_s3_map_modified.json")
+        cls.code_key_to_file = read_test_config_file("code_key_to_file_map.json")
 
         if not cls.output_dir.exists():
             os.mkdir(str(cls.output_dir))
 
-        cls._upload_resources(FILE_TO_S3_URI_MAP)
-
     @classmethod
     def tearDownClass(cls):
-        cls._clean_bucket()
         shutil.rmtree(cls.output_dir)
-
-    @classmethod
-    def _clean_bucket(cls):
-        """
-        Empties and deletes the bucket used for the tests
-        """
-        s3 = boto3.resource("s3")
-        bucket = s3.Bucket(cls.s3_bucket_name)
-        object_summary_iterator = bucket.objects.all()
-
-        for object_summary in object_summary_iterator:
-            try:
-                cls.client_provider.s3_client.delete_object(Key=object_summary.key, Bucket=cls.s3_bucket_name)
-            except ClientError as e:
-                LOG.error(
-                    "Unable to delete object %s from bucket %s", object_summary.key, cls.s3_bucket_name, exc_info=e
-                )
-        try:
-            cls.client_provider.s3_client.delete_bucket(Bucket=cls.s3_bucket_name)
-        except ClientError as e:
-            LOG.error("Unable to delete bucket %s", cls.s3_bucket_name, exc_info=e)
-
-    @classmethod
-    def _upload_resources(cls, file_to_s3_uri_map):
-        """
-        Creates the bucket and uploads the files used by the tests to it
-        """
-        if not file_to_s3_uri_map or not file_to_s3_uri_map.items():
-            LOG.debug("No resources to upload")
-            return
-
-        create_bucket(cls.s3_bucket_name, region=cls.my_region)
-
-        current_file_name = ""
-
-        try:
-            for file_name, file_info in file_to_s3_uri_map.items():
-                current_file_name = file_name
-                code_path = str(Path(cls.code_dir, file_name))
-                LOG.debug("Uploading file %s to bucket %s", file_name, cls.s3_bucket_name)
-                s3_client = cls.client_provider.s3_client
-                s3_client.upload_file(code_path, cls.s3_bucket_name, file_name)
-                LOG.debug("File %s uploaded successfully to bucket %s", file_name, cls.s3_bucket_name)
-                file_info["uri"] = cls._get_s3_uri(file_name, file_info["type"])
-        except ClientError as error:
-            LOG.error("Upload of file %s to bucket %s failed", current_file_name, cls.s3_bucket_name, exc_info=error)
-            cls._clean_bucket()
-            raise error
-
-    @classmethod
-    def _get_s3_uri(cls, file_name, uri_type):
-        if uri_type == "s3":
-            return "s3://{}/{}".format(cls.s3_bucket_name, file_name)
-
-        if cls.my_region == "us-east-1":
-            return "https://s3.amazonaws.com/{}/{}".format(cls.s3_bucket_name, file_name)
-        if cls.my_region == "us-iso-east-1":
-            return "https://s3.us-iso-east-1.c2s.ic.gov/{}/{}".format(cls.s3_bucket_name, file_name)
-        if cls.my_region == "us-isob-east-1":
-            return "https://s3.us-isob-east-1.sc2s.sgov.gov/{}/{}".format(cls.s3_bucket_name, file_name)
-
-        return "https://s3-{}.amazonaws.com/{}/{}".format(cls.my_region, cls.s3_bucket_name, file_name)
 
     def setUp(self):
         self.deployer = Deployer(self.client_provider.cfn_client)
@@ -502,6 +449,13 @@ class BaseTest(TestCase):
         if error:
             self.fail(error)
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        retry=retry_if_exception_type(StatusCodeError),
+        after=after_log(LOG, logging.WARNING),
+        reraise=True,
+    )
     def verify_get_request_response(self, url, expected_status_code, headers=None):
         """
         Verify if the get request to a certain url return the expected status code
@@ -510,13 +464,47 @@ class BaseTest(TestCase):
         ----------
         url : string
             the url for the get request
-        expected_status_code : string
+        expected_status_code : int
             the expected status code
         headers : dict
             headers to use in request
         """
         response = BaseTest.do_get_request_with_logging(url, headers)
-        self.assertEqual(response.status_code, expected_status_code, " must return HTTP " + str(expected_status_code))
+        if response.status_code != expected_status_code:
+            raise StatusCodeError(
+                "Request to {} failed with status: {}, expected status: {}".format(
+                    url, response.status_code, expected_status_code
+                )
+            )
+        return response
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        retry=retry_if_exception_type(StatusCodeError),
+        after=after_log(LOG, logging.WARNING),
+        reraise=True,
+    )
+    def verify_options_request(self, url, expected_status_code, headers=None):
+        """
+        Verify if the option request to a certain url return the expected status code
+
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        expected_status_code : int
+            the expected status code
+        headers : dict
+            headers to use in request
+        """
+        response = BaseTest.do_options_request_with_logging(url, headers)
+        if response.status_code != expected_status_code:
+            raise StatusCodeError(
+                "Request to {} failed with status: {}, expected status: {}".format(
+                    url, response.status_code, expected_status_code
+                )
+            )
         return response
 
     def get_default_test_template_parameters(self):
@@ -567,6 +555,22 @@ class BaseTest(TestCase):
             headers to use in request
         """
         response = requests.get(url, headers=headers) if headers else requests.get(url)
+        amazon_headers = RequestUtils(response).get_amazon_headers()
+        REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
+        return response
+
+    @staticmethod
+    def do_options_request_with_logging(url, headers=None):
+        """
+        Perform a options request to an APIGW endpoint and log relevant info
+        Parameters
+        ----------
+        url : string
+            the url for the get request
+        headers : dict
+            headers to use in request
+        """
+        response = requests.options(url, headers=headers) if headers else requests.options(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
         REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
         return response

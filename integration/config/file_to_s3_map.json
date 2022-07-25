@@ -1,0 +1,11 @@
+{
+    "code.zip": {"type": "s3", "uri": ""},
+    "code2.zip": {"type": "s3", "uri": ""},
+    "layer1.zip": {"type": "s3", "uri": ""},
+    "swagger1.json": {"type": "s3", "uri": ""},
+    "swagger2.json": {"type": "s3", "uri": ""},
+    "binary-media.zip": {"type": "s3", "uri": ""},
+    "template.yaml": {"type": "http", "uri": ""},
+    "MTLSCert.pem": {"type": "s3", "uri": ""},
+    "MTLSCert-Updated.pem": {"type": "s3", "uri": ""}
+}

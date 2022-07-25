@@ -299,6 +299,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "api_with_basic_custom_domain_intrinsics",
                 "api_with_custom_domain_route53",
                 "api_with_custom_domain_route53_hosted_zone_name",
+                "api_with_custom_domain_route53_multiple",
+                "api_with_custom_domain_route53_multiple_intrinsic_hostedzoneid",
                 "api_with_basic_custom_domain_http",
                 "api_with_basic_custom_domain_intrinsics_http",
                 "api_with_custom_domain_route53_http",
@@ -322,6 +324,8 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
                 "http_api_local_iam_auth_enabled_with_existing_conflicting_authorizer",
                 "http_api_local_iam_auth_enabled",
                 "http_api_multiple_authorizers",
+                "http_api_with_custom_domain_route53_multiple",
+                "mixed_api_with_custom_domain_route53_multiple",
             ],
             [
                 ("aws", "ap-southeast-1"),

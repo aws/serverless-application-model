@@ -125,6 +125,7 @@ class Translator:
         shared_api_usage_plan = SharedApiUsagePlan()
         document_errors = []
         changed_logical_ids = {}
+        route53_record_set_groups = {}
         for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
                 macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(
@@ -144,6 +145,7 @@ class Translator:
                 kwargs["redeploy_restapi_parameters"] = self.redeploy_restapi_parameters
                 kwargs["shared_api_usage_plan"] = shared_api_usage_plan
                 kwargs["feature_toggle"] = self.feature_toggle
+                kwargs["route53_record_set_groups"] = route53_record_set_groups
                 translated = macro.to_cloudformation(**kwargs)
 
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)

@@ -27,6 +27,9 @@ lint:
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
 
+prepare-companion-stack:
+	pytest -v --no-cov integration/setup -m setup
+
 # Command to run everytime you make changes to verify everything works
 dev: test
 
@@ -43,5 +46,6 @@ TARGETS
 	integ-test  Run the Integration tests.
 	dev         Run all development tests after a change.
 	pr          Perform all checks before submitting a Pull Request.
+	prepare-companion-stack    Create or update the companion stack for running integration tests.
 
 endef

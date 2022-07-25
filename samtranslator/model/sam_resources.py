@@ -1073,6 +1073,7 @@ class SamApi(SamResourceMacro):
         "OpenApiVersion": PropertyType(False, is_str()),
         "Models": PropertyType(False, is_type(dict)),
         "Domain": PropertyType(False, is_type(dict)),
+        "FailOnWarnings": PropertyType(False, is_type(bool)),
         "Description": PropertyType(False, is_str()),
         "Mode": PropertyType(False, is_str()),
         "DisableExecuteApiEndpoint": PropertyType(False, is_type(bool)),
@@ -1106,6 +1107,7 @@ class SamApi(SamResourceMacro):
         redeploy_restapi_parameters = kwargs.get("redeploy_restapi_parameters")
         shared_api_usage_plan = kwargs.get("shared_api_usage_plan")
         template_conditions = kwargs.get("conditions")
+        route53_record_set_groups = kwargs.get("route53_record_set_groups", {})
 
         api_generator = ApiGenerator(
             self.logical_id,
@@ -1136,6 +1138,7 @@ class SamApi(SamResourceMacro):
             open_api_version=self.OpenApiVersion,
             models=self.Models,
             domain=self.Domain,
+            fail_on_warnings=self.FailOnWarnings,
             description=self.Description,
             mode=self.Mode,
             api_key_source_type=self.ApiKeySourceType,
@@ -1150,7 +1153,7 @@ class SamApi(SamResourceMacro):
             basepath_mapping,
             route53,
             usage_plan_resources,
-        ) = api_generator.to_cloudformation(redeploy_restapi_parameters)
+        ) = api_generator.to_cloudformation(redeploy_restapi_parameters, route53_record_set_groups)
 
         resources.extend([rest_api, deployment, stage])
         resources.extend(permissions)
@@ -1210,8 +1213,6 @@ class SamHttpApi(SamResourceMacro):
         resources = []
         intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.CorsConfiguration = intrinsics_resolver.resolve_parameter_refs(self.CorsConfiguration)
-
-        intrinsics_resolver = kwargs["intrinsics_resolver"]
         self.Domain = intrinsics_resolver.resolve_parameter_refs(self.Domain)
 
         api_generator = HttpApiGenerator(
@@ -1241,7 +1242,7 @@ class SamHttpApi(SamResourceMacro):
             domain,
             basepath_mapping,
             route53,
-        ) = api_generator.to_cloudformation()
+        ) = api_generator.to_cloudformation(kwargs.get("route53_record_set_groups", {}))
 
         resources.append(http_api)
         if domain:

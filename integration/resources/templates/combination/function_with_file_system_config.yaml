@@ -1,5 +1,11 @@
 Description: SAM + Lambda + EFS
 
+Parameters:
+  PreCreatedSubnetOne:
+    Type: String
+  PreCreatedVpc:
+    Type: String
+
 Resources:
   EfsFileSystem:
     Type: AWS::EFS::FileSystem
@@ -10,7 +16,7 @@ Resources:
       FileSystemId:
         Ref: EfsFileSystem
       SubnetId:
-        Ref: MySubnet
+        Ref: PreCreatedSubnetOne
       SecurityGroups:
         -
           Fn::GetAtt: MySecurityGroup.GroupId
@@ -45,27 +51,15 @@ Resources:
             Fn::GetAtt: MySecurityGroup.GroupId
         SubnetIds:
           -
-            Ref: MySubnet
+            Ref: PreCreatedSubnetOne
       FileSystemConfigs:
         - Arn:
             Fn::GetAtt: AccessPoint.Arn
           LocalMountPath: /mnt/EFS
-
-  MyVpc:
-    Type: "AWS::EC2::VPC"
-    Properties:
-      CidrBlock: "10.0.0.0/16"
 
   MySecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "my test group"
       VpcId:
-        Ref: MyVpc
-
-  MySubnet:
-    Type: "AWS::EC2::Subnet"
-    Properties:
-      VpcId:
-        Ref: MyVpc
-      CidrBlock: "10.0.0.0/24"
+        Ref: PreCreatedVpc

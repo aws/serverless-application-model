@@ -1,9 +1,14 @@
+import logging
 from unittest.case import skipIf
 
-from integration.config.service_names import KMS, XRAY, ARM
+import pytest
+
+from integration.config.service_names import KMS, XRAY, ARM, CODE_DEPLOY, HTTP_API
 from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
+
+LOG = logging.getLogger(__name__)
 
 
 class TestBasicFunction(BaseTest):
@@ -35,12 +40,14 @@ class TestBasicFunction(BaseTest):
             "single/function_alias_with_http_api_events",
         ]
     )
+    @pytest.mark.flaky(reruns=5)
+    @skipIf(current_region_does_not_support([HTTP_API]), "HTTP API is not supported in this testing region")
     def test_function_with_http_api_events(self, file_name):
         self.create_and_verify_stack(file_name)
 
         endpoint = self.get_api_v2_endpoint("MyHttpApi")
 
-        self.assertEqual(BaseTest.do_get_request_with_logging(endpoint).text, self.FUNCTION_OUTPUT)
+        self._verify_get_request(endpoint, self.FUNCTION_OUTPUT)
 
     @parameterized.expand(
         [
@@ -98,6 +105,7 @@ class TestBasicFunction(BaseTest):
         self.assertEqual(function_url_config["Cors"], cors_config)
         self._assert_invoke(lambda_client, function_name, qualifier, 200)
 
+    @skipIf(current_region_does_not_support([CODE_DEPLOY]), "CodeDeploy is not supported in this testing region")
     def test_function_with_deployment_preference_alarms_intrinsic_if(self):
         self.create_and_verify_stack("single/function_with_deployment_preference_alarms_intrinsic_if")
 
@@ -280,3 +288,7 @@ class TestBasicFunction(BaseTest):
 
         response = lambda_client.invoke(**request_params)
         self.assertEqual(response.get("StatusCode"), expected_status_code)
+
+    def _verify_get_request(self, url, expected_text):
+        response = self.verify_get_request_response(url, 200)
+        self.assertEqual(response.text, expected_text)

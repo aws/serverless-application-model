@@ -216,11 +216,14 @@ class TestCustomDomains(TestCase):
         "passthrough_resource_attributes": None,
         "domain": None,
     }
+    route53_record_set_groups = {}
 
     def test_no_domain(self):
         self.kwargs["domain"] = None
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
-        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(
+            http_api, self.route53_record_set_groups
+        )
         self.assertIsNone(domain)
         self.assertIsNone(basepath)
         self.assertIsNone(route)
@@ -229,7 +232,7 @@ class TestCustomDomains(TestCase):
         self.kwargs["domain"] = {"CertificateArn": "someurl"}
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
-            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api, self.route53_record_set_groups)
         self.assertEqual(
             e.value.message,
             "Resource with id [HttpApiId] is invalid. "
@@ -240,7 +243,7 @@ class TestCustomDomains(TestCase):
         self.kwargs["domain"] = {"DomainName": "example.com"}
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
-            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api, self.route53_record_set_groups)
         self.assertEqual(
             e.value.message,
             "Resource with id [HttpApiId] is invalid. "
@@ -250,7 +253,9 @@ class TestCustomDomains(TestCase):
     def test_basic_domain_default_endpoint(self):
         self.kwargs["domain"] = {"DomainName": "example.com", "CertificateArn": "some-url"}
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
-        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(
+            http_api, self.route53_record_set_groups
+        )
         self.assertIsNotNone(domain, None)
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 1)
@@ -264,7 +269,9 @@ class TestCustomDomains(TestCase):
             "EndpointConfiguration": "REGIONAL",
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
-        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(
+            http_api, self.route53_record_set_groups
+        )
         self.assertIsNotNone(domain, None)
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 1)
@@ -279,7 +286,7 @@ class TestCustomDomains(TestCase):
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
-            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api, self.route53_record_set_groups)
         self.assertEqual(
             e.value.message,
             "Resource with id [HttpApiId] is invalid. EndpointConfiguration for Custom Domains must be one of ['REGIONAL'].",
@@ -293,7 +300,7 @@ class TestCustomDomains(TestCase):
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
-            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api, self.route53_record_set_groups)
         self.assertEqual(
             e.value.message,
             "Resource with id [HttpApiId] is invalid. "
@@ -307,7 +314,9 @@ class TestCustomDomains(TestCase):
             "Route53": {"HostedZoneId": "xyz"},
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
-        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(
+            http_api, self.route53_record_set_groups
+        )
         self.assertIsNotNone(domain, None)
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 1)
@@ -322,7 +331,9 @@ class TestCustomDomains(TestCase):
             "Route53": {"HostedZoneId": "xyz"},
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
-        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(
+            http_api, self.route53_record_set_groups
+        )
         self.assertIsNotNone(domain, None)
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 3)
@@ -338,7 +349,7 @@ class TestCustomDomains(TestCase):
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
         with pytest.raises(InvalidResourceException) as e:
-            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+            HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api, self.route53_record_set_groups)
         self.assertEqual(
             e.value.message, "Resource with id [HttpApiId] is invalid. " + "Invalid Basepath name provided."
         )
@@ -351,7 +362,9 @@ class TestCustomDomains(TestCase):
             "Route53": {"HostedZoneId": "xyz", "HostedZoneName": "abc", "IpV6": True},
         }
         http_api = HttpApiGenerator(**self.kwargs)._construct_http_api()
-        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(http_api)
+        domain, basepath, route = HttpApiGenerator(**self.kwargs)._construct_api_domain(
+            http_api, self.route53_record_set_groups
+        )
         self.assertIsNotNone(domain, None)
         self.assertIsNotNone(basepath, None)
         self.assertEqual(len(basepath), 8)
