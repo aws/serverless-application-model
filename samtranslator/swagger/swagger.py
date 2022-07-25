@@ -647,7 +647,10 @@ class SwaggerEditor(object):
             # We want to ensure only a single Authorizer security entry exists while keeping everything else
             for security in existing_security:
                 SwaggerEditor.validate_is_dict(
-                    security, "{} in Security for path {} is not a valid dictionary.".format(security, path)
+                    security,
+                    "{} in Security for path {} method {} is not a valid dictionary.".format(
+                        security, path, method_name
+                    ),
                 )
                 if authorizer_names.isdisjoint(security.keys()):
                     existing_non_authorizer_security.append(security)
@@ -703,7 +706,7 @@ class SwaggerEditor(object):
         :param string path: Path name
         """
 
-        for _, method_definition in self.iter_on_all_methods_for_path(path):
+        for method_name, method_definition in self.iter_on_all_methods_for_path(path):
             existing_security = method_definition.get("security", [])
             apikey_security_names = set(["api_key", "api_key_false"])
             existing_non_apikey_security = []
@@ -714,6 +717,12 @@ class SwaggerEditor(object):
             # (e.g. sigv4 (AWS_IAM), authorizers, NONE (marker for ignoring default authorizer))
             # We want to ensure only a single ApiKey security entry exists while keeping everything else
             for security in existing_security:
+                SwaggerEditor.validate_is_dict(
+                    security,
+                    "{} in Security for path {} method {} is not a valid dictionary.".format(
+                        security, path, method_name
+                    ),
+                )
                 if apikey_security_names.isdisjoint(security.keys()):
                     existing_non_apikey_security.append(security)
                 else:
