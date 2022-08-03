@@ -6,7 +6,11 @@ from integration.helpers.resource import current_region_not_included
 from integration.config.service_names import SELF_MANAGED_KAFKA
 from parameterized import parameterized
 
-@skipIf(current_region_not_included([SELF_MANAGED_KAFKA]), "SelfManagedKafka testing is not performed in this testing region")
+
+@skipIf(
+    current_region_not_included([SELF_MANAGED_KAFKA]),
+    "SelfManagedKafka testing is not performed in this testing region",
+)
 class TestFunctionWithSelfManagedKafka(BaseTest):
     @pytest.mark.flaky(reruns=5)
     @parameterized.expand(
