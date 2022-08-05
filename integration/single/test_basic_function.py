@@ -3,7 +3,16 @@ from unittest.case import skipIf
 
 import pytest
 
-from integration.config.service_names import KMS, XRAY, ARM, CODE_DEPLOY, HTTP_API
+from integration.config.service_names import (
+    EVENT_INVOKE_CONFIG,
+    KMS,
+    LAMBDA_URL,
+    XRAY,
+    ARM,
+    CODE_DEPLOY,
+    HTTP_API,
+    EPHEMERAL_STORAGE,
+)
 from integration.helpers.resource import current_region_does_not_support
 from parameterized import parameterized
 from integration.helpers.base_test import BaseTest
@@ -77,7 +86,7 @@ class TestBasicFunction(BaseTest):
             ("single/basic_function_with_function_url_with_autopuplishalias", "live"),
         ]
     )
-    @skipIf(current_region_does_not_support(["Url"]), "Url is not supported in this testing region")
+    @skipIf(current_region_does_not_support([LAMBDA_URL]), "Lambda Url is not supported in this testing region")
     def test_basic_function_with_url_config(self, file_name, qualifier):
         """
         Creates a basic lambda function with Function Url enabled
@@ -172,6 +181,10 @@ class TestBasicFunction(BaseTest):
         self.assertTrue("TagKey2" in tags)
         self.assertEqual(tags["TagKey2"], "")
 
+    @skipIf(
+        current_region_does_not_support([EVENT_INVOKE_CONFIG]),
+        "EventInvokeConfig is not supported in this testing region",
+    )
     def test_basic_function_event_destinations(self):
         """
         Creates a basic lambda function with event destinations
@@ -249,6 +262,10 @@ class TestBasicFunction(BaseTest):
         [
             "single/function_with_ephemeral_storage",
         ]
+    )
+    @skipIf(
+        current_region_does_not_support([EPHEMERAL_STORAGE]),
+        "Lambda ephemeral storage is not supported in this testing region",
     )
     def test_function_with_ephemeral_storage(self, file_name):
         """

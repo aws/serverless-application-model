@@ -29,6 +29,7 @@ class TestFunctionWithKinesis(BaseTest):
         self.assertEqual(event_source_mapping_kinesis_stream_arn, kinesis_stream["StreamARN"])
 
 
+@skipIf(current_region_does_not_support([KINESIS]), "Kinesis is not supported in this testing region")
 class TestFunctionWithKinesisIntrinsics(BaseTest):
     def test_function_with_kinesis_trigger(self):
         self.create_and_verify_stack("combination/function_with_kinesis_intrinsics")
