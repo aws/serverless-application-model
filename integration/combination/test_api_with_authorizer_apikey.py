@@ -19,12 +19,9 @@ class TestApiWithAuthorizerApiKey(BaseTest):
         apigw_client = self.client_provider.api_client
 
         authorizers = apigw_client.get_authorizers(restApiId=rest_api_id)["items"]
-        lambda_authorizer_uri = (
-            "arn:aws:apigateway:"
-            + self.my_region
-            + ":lambda:path/2015-03-31/functions/"
-            + stack_outputs["AuthorizerFunctionArn"]
-            + "/invocations"
+
+        lambda_authorizer_uri = "arn:{}:apigateway:{}:lambda:path/2015-03-31/functions/{}/invocations".format(
+            self.partition, self.my_region, stack_outputs["AuthorizerFunctionArn"]
         )
 
         lambda_token_authorizer = get_authorizer_by_name(authorizers, "MyLambdaTokenAuth")
