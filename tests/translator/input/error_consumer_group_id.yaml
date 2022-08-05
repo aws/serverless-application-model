@@ -1,0 +1,28 @@
+Resources:
+  NotSupportedPullTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/filtered_events.zip
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        DDBEvent:
+          Type: DynamoDB
+          Properties:
+            Stream: arn:aws:dynamodb:us-east-1:012345678901:table/TestTable/stream/2015-05-11T21:21:33.291
+            StartingPosition: TRIM_HORIZON
+            ConsumerGroupId: consumergroup1
+            
+  NotSupportedPushTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://sam-demo-bucket/filtered_events.zip
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: arn:aws:sns:us-east-1:123456789012:my_topic
+            ConsumerGroupId: consumergroup1
+
