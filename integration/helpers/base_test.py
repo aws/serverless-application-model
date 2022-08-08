@@ -72,7 +72,6 @@ class BaseTest(TestCase):
         cls.code_dir = Path(cls.resources_dir, "code")
         cls.session = boto3.session.Session()
         cls.my_region = cls.session.region_name
-        cls.partition = cls.session.get_partition_for_region(cls.my_region)
         cls.client_provider = ClientProvider()
         cls.file_to_s3_uri_map = read_test_config_file("file_to_s3_map_modified.json")
         cls.code_key_to_file = read_test_config_file("code_key_to_file_map.json")

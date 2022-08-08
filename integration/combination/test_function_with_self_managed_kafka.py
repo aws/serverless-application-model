@@ -1,4 +1,3 @@
-from unittest.case import skipIf
 import pytest
 
 from integration.helpers.base_test import BaseTest
