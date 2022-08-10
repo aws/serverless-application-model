@@ -31,7 +31,6 @@ class TestValidatorRoot(TestValidatorBase):
         [
             "success_minimal_template_with_parameters",
             "success_minimal_template",
-
         ],
     )
     def test_success(self, template):
