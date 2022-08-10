@@ -1,0 +1,108 @@
+# Smallest possible API template
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  StringParameter:
+    Type: String
+    Default: 'String'
+  NumberParameter:
+    Type: Number
+    Default: 2
+  CommaDelimitedListParameter:
+    Type: CommaDelimitedList
+    Default: 'String,1,6'
+  AWSZoneParameter:
+    Type: "AWS::EC2::AvailabilityZone::Name"
+    Default: 'us-east-1'
+  AWSImageId:
+    Type: AWS::EC2::Image::Id
+    Default: 'Image_ID_1'
+  AWSInstanceID:
+    Type: AWS::EC2::Instance::Id
+    Default: 'Instance_ID_1'
+  AWSKeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: 'Key_Name_1'
+  AWSSecurityGroupName:
+    Type: AWS::EC2::SecurityGroup::GroupName
+    Default: 'Group_Name_1'
+  AWSSecurityGroupID:
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: 'Sec_Group_ID_1'
+  AWSSubnetID:
+    Type: AWS::EC2::Subnet::Id
+    Default: 'Sub_net_ID_1'
+  AWSVolumeID:
+    Type: AWS::EC2::Volume::Id
+    Default: 'Vol_ID_1'
+  AWSVPCID:
+    Type: AWS::EC2::VPC::Id
+    Default: 'VPC_ID_1'
+  AWSHostedZoneID:
+    Type: AWS::Route53::HostedZone::Id
+    Default: 'Hosted_Zone_ID_1'
+  AWSParameterValue:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: 'Parameter_SSM_1'
+  StringParameterList:
+    Type: List<String>
+    Default: 
+      - 'String'
+      - 'Other srtring'
+  NumberParameterList:
+    Type: List<Number>
+    Default: 
+      - 1
+      - 2
+  AWSZoneParameterList:
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+    Default: 
+      - 'us-east-1'
+      - 'us-east-2'
+  AWSImageIDList:
+    Type: List<AWS::EC2::Image::Id>
+    Default:
+      - 'Image_ID_1'
+      - 'Image_ID_2'
+  AWSInstanceIDList:
+    Type: List<AWS::EC2::Instance::Id>
+    Default: 
+      - 'Instance_ID_1'
+      - 'Instance_ID_2'
+  AWSSecurityGroupNameList:
+    Type: AWS::EC2::SecurityGroup::GroupName
+    Default: 
+      - 'Group_Name_1'
+      - 'Group_Name_2'
+  AWSSecurityGroupIDList:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Default: 
+      - 'Sec_Group_ID_1'
+      - 'Sec_Group_ID_2'
+  AWSSubnetIDList:
+    Type: List<AWS::EC2::Subnet::Id>
+    Default: 
+      - 'Sub_net_ID_1'
+      - 'Sub_net_ID_2'
+  AWSVolumeIDList:
+    Type: List<AWS::EC2::Volume::Id>
+    Default: 
+      - 'Vol_ID_1'
+      - 'Vol_ID_2'
+  AWSVPCIDList:
+    Type: List<AWS::EC2::VPC::Id>
+    Default: 
+      - 'VPC_ID_1'
+      - 'VPC_ID_2'
+  AWSHostedZoneIDList:
+    Type: List<AWS::Route53::HostedZone::Id>
+    Default: 
+    - 'Hosted_Zone_ID_1'
+    - 'Hosted_Zone_ID_2'
+  BadTypeParameter:
+    Type: OtherThatIsNotOnTheEnumLikeTheOnesAbove
+    Default: 'This will trigger an error'
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Stage Name
