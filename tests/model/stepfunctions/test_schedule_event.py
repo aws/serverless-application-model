@@ -2,6 +2,7 @@ from unittest.mock import Mock
 from unittest import TestCase
 from samtranslator.model.stepfunctions.events import Schedule
 from samtranslator.model.exceptions import InvalidEventException
+from parameterized import parameterized
 
 
 class ScheduleEventSource(TestCase):
@@ -72,12 +73,18 @@ class ScheduleEventSource(TestCase):
     def test_to_cloudformation_throws_when_no_resource(self):
         self.assertRaises(TypeError, self.schedule_event_source.to_cloudformation)
 
-    def test_to_cloudformation_when_event_is_disabled(self):
+    def test_to_cloudformation_transforms_enabled_boolean_to_state(self):
+        self.schedule_event_source.Enabled = True
+        resources = self.schedule_event_source.to_cloudformation(resource=self.state_machine)
+        self.assertEqual(len(resources), 2)
+        schedule = resources[0]
+        self.assertEqual(schedule.State, "ENABLED")
+
         self.schedule_event_source.Enabled = False
         resources = self.schedule_event_source.to_cloudformation(resource=self.state_machine)
         self.assertEqual(len(resources), 2)
-        event_rule = resources[0]
-        self.assertEqual(event_rule.State, "DISABLED")
+        schedule = resources[0]
+        self.assertEqual(schedule.State, "DISABLED")
 
     def test_to_cloudformation_with_input(self):
         input_to_service = '{"test_key": "test_value"}'
@@ -142,5 +149,21 @@ class ScheduleEventSource(TestCase):
     def test_to_cloudformation_with_dlq_generated_with_intrinsic_function_custom_logical_id_raises_exception(self):
         dead_letter_config = {"Type": "SQS", "QueueLogicalId": {"Fn::Sub": "MyDLQ${Env}"}}
         self.schedule_event_source.DeadLetterConfig = dead_letter_config
+        with self.assertRaises(InvalidEventException):
+            self.schedule_event_source.to_cloudformation(resource=self.state_machine)
+
+    @parameterized.expand(
+        [
+            (True, "Enabled"),
+            (True, "Disabled"),
+            (True, {"FN:FakeIntrinsic": "something"}),
+            (False, "Enabled"),
+            (False, "Disabled"),
+            (False, {"FN:FakeIntrinsic": "something"}),
+        ]
+    )
+    def test_to_cloudformation_invalid_defined_both_enabled_and_state_provided(self, enabled_value, state_value):
+        self.schedule_event_source.Enabled = enabled_value
+        self.schedule_event_source.State = state_value
         with self.assertRaises(InvalidEventException):
             self.schedule_event_source.to_cloudformation(resource=self.state_machine)
