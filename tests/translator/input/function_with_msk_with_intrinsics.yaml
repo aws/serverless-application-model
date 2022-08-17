@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  StartingPositionValue:
+    Type: String
+    Default: LATEST
+
+  StreamValue:
+    Type: String
+    Default: arn:aws:kafka:us-east-1:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2
+
+  TopicsValue:
+    Type: CommaDelimitedList
+    Default: Topic
+
+  ConsumerGroupValue:
+    Type: String
+    Default: consumergroup1
+
+
+Resources:
+  MyMskStreamProcessor:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs12.x
+      Handler: index.handler
+      CodeUri: s3://sam-demo-bucket/kafka.zip
+      Events:
+        MyMskEvent:
+          Type: MSK
+          Properties:
+            StartingPosition: !Ref StartingPositionValue
+            Stream: !Ref StreamValue
+            Topics: !Ref TopicsValue
+            ConsumerGroupId: !Ref ConsumerGroupValue
+

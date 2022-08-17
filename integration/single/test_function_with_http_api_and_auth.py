@@ -1,27 +1,19 @@
-import logging
 from unittest.case import skipIf
 
-from tenacity import stop_after_attempt, retry_if_exception_type, after_log, wait_exponential, retry, wait_random
+import pytest
 
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import HTTP_API
 
-LOG = logging.getLogger(__name__)
 
-
-@skipIf(current_region_does_not_support(["HttpApi"]), "HttpApi is not supported in this testing region")
+@skipIf(current_region_does_not_support([HTTP_API]), "HttpApi is not supported in this testing region")
 class TestFunctionWithHttpApiAndAuth(BaseTest):
     """
     AWS::Lambda::Function tests with http api events and auth
     """
 
-    @retry(
-        stop=stop_after_attempt(5),
-        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
-        retry=retry_if_exception_type(AssertionError),
-        after=after_log(LOG, logging.WARNING),
-        reraise=True,
-    )
+    @pytest.mark.flaky(reruns=5)
     def test_function_with_http_api_and_auth(self):
         # If the request is not signed, which none of the below are, IAM will respond with a "Forbidden" message.
         # We are not testing that IAM auth works here, we are simply testing if it was applied.

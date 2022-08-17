@@ -14,8 +14,12 @@ Parameters:
   KafkaBootstrapServersValue:
     Type: CommaDelimitedList
     Default: abc.xyz.com:9092,123.45.67.89:9096
-      
-      
+
+  ConsumerGroupValue:
+    Type: String
+    Default: consumergroup1
+
+
 Resources:
   KafkaFunction:
     Type: 'AWS::Serverless::Function'
@@ -43,6 +47,8 @@ Resources:
               - Type: BASIC_AUTH
                 URI:
                   Ref: KafkaUserSecret
+            ConsumerGroupId:
+              Ref: ConsumerGroupValue
 
   KafkaUserSecret:
     Type: AWS::SecretsManager::Secret

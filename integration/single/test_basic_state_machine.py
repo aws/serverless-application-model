@@ -2,6 +2,7 @@ from unittest.case import skipIf
 
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import XRAY, STATE_MACHINE_INLINE_DEFINITION
 
 
 class TestBasicLayerVersion(BaseTest):
@@ -9,13 +10,17 @@ class TestBasicLayerVersion(BaseTest):
     Basic AWS::Serverless::StateMachine tests
     """
 
+    @skipIf(
+        current_region_does_not_support([STATE_MACHINE_INLINE_DEFINITION]),
+        "StateMachine with inline definition is not supported in this testing region",
+    )
     def test_basic_state_machine_inline_definition(self):
         """
         Creates a State Machine from inline definition
         """
         self.create_and_verify_stack("single/basic_state_machine_inline_definition")
 
-    @skipIf(current_region_does_not_support(["XRay"]), "XRay is not supported in this testing region")
+    @skipIf(current_region_does_not_support([XRAY]), "XRay is not supported in this testing region")
     def test_basic_state_machine_with_tags(self):
         """
         Creates a State Machine with tags

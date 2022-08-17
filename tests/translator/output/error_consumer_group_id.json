@@ -1,0 +1,3 @@
+{
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [NotSupportedPullTrigger] is invalid. Event with id [NotSupportedPullTriggerDDBEvent] is invalid. Property ConsumerGroupId not defined for resource of type DynamoDB. Resource with id [NotSupportedPushTriggerSNSEvent] is invalid. property ConsumerGroupId not defined for resource of type SNS"
+}

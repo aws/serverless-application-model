@@ -114,6 +114,9 @@
               "123.45.67.89:9096"
             ]
           }
+        },
+        "SelfManagedKafkaConfig": {
+          "ConsumerGroupId": "consumergroup1"
         }
       }
     }

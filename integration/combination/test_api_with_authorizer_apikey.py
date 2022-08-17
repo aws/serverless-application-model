@@ -1,8 +1,15 @@
+from unittest.case import skipIf
+
 from integration.helpers.base_test import BaseTest
 from integration.helpers.deployer.utils.retry import retry
 from integration.helpers.exception import StatusCodeError
 
 
+from integration.helpers.resource import current_region_does_not_support
+from integration.config.service_names import REST_API
+
+
+@skipIf(current_region_does_not_support([REST_API]), "RestApi is not supported in this testing region")
 class TestApiWithAuthorizerApiKey(BaseTest):
     def test_authorizer_apikey(self):
         self.create_and_verify_stack("combination/api_with_authorizer_apikey")
@@ -12,12 +19,9 @@ class TestApiWithAuthorizerApiKey(BaseTest):
         apigw_client = self.client_provider.api_client
 
         authorizers = apigw_client.get_authorizers(restApiId=rest_api_id)["items"]
-        lambda_authorizer_uri = (
-            "arn:aws:apigateway:"
-            + self.my_region
-            + ":lambda:path/2015-03-31/functions/"
-            + stack_outputs["AuthorizerFunctionArn"]
-            + "/invocations"
+
+        lambda_authorizer_uri = "arn:{}:apigateway:{}:lambda:path/2015-03-31/functions/{}/invocations".format(
+            self.partition, self.my_region, stack_outputs["AuthorizerFunctionArn"]
         )
 
         lambda_token_authorizer = get_authorizer_by_name(authorizers, "MyLambdaTokenAuth")
