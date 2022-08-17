@@ -15,6 +15,10 @@
     "KafkaBootstrapServersValue": {
       "Type": "CommaDelimitedList",
       "Default": "abc.xyz.com:9092,123.45.67.89:9096"
+    },
+    "ConsumerGroupValue": {
+      "Type": "String",
+      "Default": "consumergroup1"
     }
   },
   "Resources": {
@@ -147,6 +151,11 @@
             "KafkaBootstrapServers": {
               "Ref": "KafkaBootstrapServersValue"
             }
+          }
+        },
+        "SelfManagedKafkaConfig": {
+          "ConsumerGroupId": {
+            "Ref": "ConsumerGroupValue"
           }
         }
       }

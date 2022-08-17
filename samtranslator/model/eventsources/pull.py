@@ -46,6 +46,7 @@ class PullEventSource(ResourceMacro):
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
         "KafkaBootstrapServers": PropertyType(False, is_type(list)),
         "FilterCriteria": PropertyType(False, is_type(dict)),
+        "ConsumerGroupId": PropertyType(False, is_str()),
     }
 
     def get_policy_arn(self):
@@ -112,6 +113,17 @@ class PullEventSource(ResourceMacro):
             lambda_eventsourcemapping.SelfManagedEventSource = {
                 "Endpoints": {"KafkaBootstrapServers": self.KafkaBootstrapServers}
             }
+        if self.ConsumerGroupId:
+            consumer_group_id_structure = {"ConsumerGroupId": self.ConsumerGroupId}
+            if self.resource_type == "MSK":
+                lambda_eventsourcemapping.AmazonManagedKafkaConfig = consumer_group_id_structure
+            elif self.resource_type == "SelfManagedKafka":
+                lambda_eventsourcemapping.SelfManagedKafkaConfig = consumer_group_id_structure
+            else:
+                raise InvalidEventException(
+                    self.logical_id,
+                    "Property ConsumerGroupId not defined for resource of type {}.".format(self.resource_type),
+                )
 
         destination_config_policy = None
         if self.DestinationConfig:
