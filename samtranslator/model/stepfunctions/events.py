@@ -4,15 +4,13 @@ from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import PropertyType, ResourceMacro
 from samtranslator.model.events import EventsRule
 from samtranslator.model.iam import IAMRole, IAMRolePolicies
-from samtranslator.model.types import dict_of, is_str, is_type, list_of, one_of
+from samtranslator.model.types import is_str, is_type
 from samtranslator.model.intrinsics import fnSub
 from samtranslator.translator import logical_id_generator
-from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
+from samtranslator.model.exceptions import InvalidEventException
 from samtranslator.model.eventbridge_utils import EventBridgeRuleUtils
 from samtranslator.model.eventsources.push import Api as PushApi
-from samtranslator.translator.arn_generator import ArnGenerator
 from samtranslator.swagger.swagger import SwaggerEditor
-from samtranslator.open_api.open_api import OpenApiEditor
 
 CONDITION = "Condition"
 SFN_EVETSOURCE_METRIC_PREFIX = "SFNEventSource"
@@ -82,6 +80,7 @@ class Schedule(EventSource):
         "Schedule": PropertyType(True, is_str()),
         "Input": PropertyType(False, is_str()),
         "Enabled": PropertyType(False, is_type(bool)),
+        "State": PropertyType(False, is_str()),
         "Name": PropertyType(False, is_str()),
         "Description": PropertyType(False, is_str()),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
@@ -105,8 +104,16 @@ class Schedule(EventSource):
         resources.append(events_rule)
 
         events_rule.ScheduleExpression = self.Schedule
+
+        if self.State and self.Enabled is not None:
+            raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
+
+        if self.State:
+            events_rule.State = self.State
+
         if self.Enabled is not None:
             events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
+
         events_rule.Name = self.Name
         events_rule.Description = self.Description
 
