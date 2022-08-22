@@ -408,7 +408,7 @@ class S3(PushEventSource):
             properties["NotificationConfiguration"] = notification_config
 
         if not isinstance(notification_config, dict):
-            raise InvalidResourceException(bucket_id, "Invalid type for NotificationConfiguration. Must be a dict.")
+            raise InvalidResourceException(bucket_id, "Invalid type for NotificationConfiguration.")
 
         lambda_notifications = notification_config.get("LambdaConfigurations", None)
         if lambda_notifications is None:
