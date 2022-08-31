@@ -1192,6 +1192,7 @@ class SamHttpApi(SamResourceMacro):
         # In the future, we might rename and expose this property to customers so they can have SAM manage Explicit APIs
         # Swagger.
         "__MANAGE_SWAGGER": PropertyType(False, is_type(bool)),
+        "Name": PropertyType(False, one_of(is_str(), is_type(dict))),
         "StageName": PropertyType(False, one_of(is_str(), is_type(dict))),
         "Tags": PropertyType(False, is_type(dict)),
         "DefinitionBody": PropertyType(False, is_type(dict)),
@@ -1233,6 +1234,7 @@ class SamHttpApi(SamResourceMacro):
             self.depends_on,
             self.DefinitionBody,
             self.DefinitionUri,
+            self.Name,
             self.StageName,
             tags=self.Tags,
             auth=self.Auth,
