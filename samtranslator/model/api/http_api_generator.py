@@ -38,6 +38,7 @@ class HttpApiGenerator(object):
         depends_on,
         definition_body,
         definition_uri,
+        name,
         stage_name,
         tags=None,
         auth=None,
@@ -73,6 +74,7 @@ class HttpApiGenerator(object):
         self.definition_body = definition_body
         self.definition_uri = definition_uri
         self.stage_name = stage_name
+        self.name = name
         if not self.stage_name:
             self.stage_name = DefaultStageName
         self.auth = auth
@@ -112,6 +114,9 @@ class HttpApiGenerator(object):
 
         if self.disable_execute_api_endpoint is not None:
             self._add_endpoint_configuration()
+
+        if self.name:
+            http_api.Name = self.name
 
         self._add_description()
 
