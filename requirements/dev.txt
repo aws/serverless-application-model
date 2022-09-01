@@ -25,3 +25,11 @@ docopt~=0.6.2
 
 # formatter
 black==20.8b1
+
+# type check
+mypy==0.971
+
+# types
+boto3-stubs[appconfig,serverlessrepo]>=1.19.5,==1.*
+types-PyYAML~=5.4
+types-jsonschema~=3.2
