@@ -451,8 +451,8 @@ class BaseTest(TestCase):
             self.fail(error)
 
     @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        stop=stop_after_attempt(6),
+        wait=wait_exponential(multiplier=1, min=16, max=64) + wait_random(0, 1),
         retry=retry_if_exception_type(StatusCodeError),
         after=after_log(LOG, logging.WARNING),
         reraise=True,
@@ -480,8 +480,8 @@ class BaseTest(TestCase):
         return response
 
     @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        stop=stop_after_attempt(6),
+        wait=wait_exponential(multiplier=1, min=16, max=64) + wait_random(0, 1),
         retry=retry_if_exception_type(StatusCodeError),
         after=after_log(LOG, logging.WARNING),
         reraise=True,
