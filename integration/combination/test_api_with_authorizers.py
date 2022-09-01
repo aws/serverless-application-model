@@ -7,7 +7,9 @@ from integration.helpers.resource import current_region_does_not_support
 from integration.config.service_names import API_KEY, COGNITO, REST_API
 
 
-@skipIf(current_region_does_not_support([COGNITO, API_KEY, REST_API]), "Cognito is not supported in this testing region")
+@skipIf(
+    current_region_does_not_support([COGNITO, API_KEY, REST_API]), "Cognito is not supported in this testing region"
+)
 class TestApiWithAuthorizers(BaseTest):
     def test_authorizers_min(self):
         self.create_and_verify_stack("combination/api_with_authorizers_min")

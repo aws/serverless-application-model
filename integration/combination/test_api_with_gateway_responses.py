@@ -11,7 +11,8 @@ LOG = logging.getLogger(__name__)
 
 
 @skipIf(
-    current_region_does_not_support([GATEWAY_RESPONSES, REST_API]), "GatewayResponses is not supported in this testing region"
+    current_region_does_not_support([GATEWAY_RESPONSES, REST_API]),
+    "GatewayResponses is not supported in this testing region",
 )
 class TestApiWithGatewayResponses(BaseTest):
     def test_gateway_responses(self):
