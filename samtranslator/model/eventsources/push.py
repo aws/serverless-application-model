@@ -50,7 +50,10 @@ class PushEventSource(ResourceMacro):
     :cvar str principal: The AWS service principal of the source service.
     """
 
-    principal = None
+    # Note(xinhol): `PushEventSource` should have been an abstract class. Disabling the type check for the next
+    # line to avoid any potential behavior change.
+    # TODO: Make `PushEventSource` an abstract class and not giving `principal` initial value.
+    principal: str = None  # type: ignore
 
     def _construct_permission(
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None

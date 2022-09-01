@@ -1,3 +1,5 @@
+from typing import Dict
+
 from samtranslator.model import PropertyType, Resource
 from samtranslator.model.types import is_type, list_of
 from samtranslator.model.intrinsics import fnGetAtt, ref
@@ -5,7 +7,7 @@ from samtranslator.model.intrinsics import fnGetAtt, ref
 
 class SQSQueue(Resource):
     resource_type = "AWS::SQS::Queue"
-    property_types = {}
+    property_types: Dict[str, PropertyType] = {}
     runtime_attrs = {
         "queue_url": lambda self: ref(self.logical_id),
         "arn": lambda self: fnGetAtt(self.logical_id, "Arn"),

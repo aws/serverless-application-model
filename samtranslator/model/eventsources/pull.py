@@ -23,7 +23,10 @@ class PullEventSource(ResourceMacro):
     # Event types that support `FilterCriteria`, stored as a list to keep the alphabetical order
     RESOURCE_TYPES_WITH_EVENT_FILTERING = ["DynamoDB", "Kinesis", "SQS"]
 
-    resource_type = None
+    # Note(xinhol): `PullEventSource` should have been an abstract class. Disabling the type check for the next
+    # line to avoid any potential behavior change.
+    # TODO: Make `PullEventSource` an abstract class and not giving `resource_type` initial value.
+    resource_type: str = None  # type: ignore
     requires_stream_queue_broker = True
     property_types = {
         "Stream": PropertyType(False, is_str()),

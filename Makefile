@@ -26,6 +26,8 @@ black-check:
 lint:
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
+	# mypy performs type check
+	mypy samtranslator
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup

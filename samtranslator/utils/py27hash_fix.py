@@ -17,8 +17,8 @@ LOG = logging.getLogger(__name__)
 MINSIZE = 8
 PERTURB_SHIFT = 5
 
-unicode_string_type = str if sys.version_info.major >= 3 else unicode
-long_int_type = int if sys.version_info.major >= 3 else long
+unicode_string_type = str  # TODO: remove it, python 2 legacy code
+long_int_type = int  # TODO: remove it, python 2 legacy code
 
 
 def to_py27_compatible_template(template, parameter_values=None):

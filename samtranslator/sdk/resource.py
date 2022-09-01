@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import Any, Dict
+
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
 from samtranslator.model.types import is_str
 
@@ -11,7 +13,7 @@ class SamResource(object):
     """
 
     type = None
-    properties = {}
+    properties: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
 
     def __init__(self, resource_dict):
         """

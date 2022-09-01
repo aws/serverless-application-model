@@ -1,6 +1,8 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
 import re
 import inspect
+from typing import Any, Callable, Dict
+
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import LifeCycleEvents
 from samtranslator.model.tags.resource_tagging import get_tag_list
@@ -37,8 +39,11 @@ class Resource(object):
     be considered invalid.
     """
 
-    resource_type = None
-    property_types = None
+    # Note(xinhol): `Resource` should have been an abstract class. Disabling the type check for the next
+    # two lines to avoid any potential behavior change.
+    # TODO: Make `Resource` an abstract class and not giving `resource_type`/`property_types` initial value.
+    resource_type: str = None  # type: ignore
+    property_types: Dict[str, PropertyType] = None  # type: ignore
     _keywords = ["logical_id", "relative_id", "depends_on", "resource_attributes"]
 
     # For attributes in this list, they will be passed into the translated template for the same resource itself.
@@ -54,7 +59,7 @@ class Resource(object):
     # attrs = {
     #   "arn": fnGetAtt(self.logical_id, "Arn")
     # }
-    runtime_attrs = {}
+    runtime_attrs: Dict[str, Callable[["Resource"], Any]] = {}  # TODO: replace Any with something more explicit
 
     def __init__(self, logical_id, relative_id=None, depends_on=None, attributes=None):
         """Initializes a Resource object with the given logical id.
@@ -387,7 +392,7 @@ class SamResourceMacro(ResourceMacro):
     # resources, there is a separate process that associates this property with LogicalId of the generated CFN resource
     # of the given type.
 
-    referable_properties = {}
+    referable_properties: Dict[str, str] = {}
 
     # Each resource can optionally override this tag:
     _SAM_KEY = "lambda:createdBy"

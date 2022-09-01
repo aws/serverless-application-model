@@ -22,7 +22,10 @@ class EventSource(ResourceMacro):
     :cvar str principal: The AWS service principal of the source service.
     """
 
-    principal = None
+    # Note(xinhol): `EventSource` should have been an abstract class. Disabling the type check for the next
+    # line to avoid any potential behavior change.
+    # TODO: Make `EventSource` an abstract class and not giving `principal` initial value.
+    principal: str = None  # type: ignore
 
     def _generate_logical_id(self, prefix, suffix, resource_type):
         """Helper utility to generate a logicial ID for a new resource
