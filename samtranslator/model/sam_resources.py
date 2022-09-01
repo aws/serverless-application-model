@@ -153,7 +153,7 @@ class SamFunction(SamResourceMacro):
             if not self.AutoPublishAlias:
                 raise InvalidResourceException(
                     self.logical_id,
-                    "To set ProvisionedConcurrencyConfig " "AutoPublishALias must be defined on the function",
+                    "To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function",
                 )
 
         lambda_alias = None
@@ -607,7 +607,7 @@ class SamFunction(SamResourceMacro):
         if not self.DeadLetterQueue.get("Type") or not self.DeadLetterQueue.get("TargetArn"):
             raise InvalidResourceException(
                 self.logical_id,
-                "'DeadLetterQueue' requires Type and TargetArn properties to be specified.".format(valid_dlq_types),
+                "'DeadLetterQueue' requires Type and TargetArn properties to be specified.",
             )
 
         if not (isinstance(self.DeadLetterQueue.get("Type"), str)):

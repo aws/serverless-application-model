@@ -420,7 +420,7 @@ class OpenApiEditor(object):
                         authorizer_list = []
                         if authorizers:
                             authorizer_list.extend(authorizers.keys())
-                        security_dict = dict()
+                        security_dict = {}
                         security_dict[default_authorizer] = self._get_authorization_scopes(
                             api_authorizers, default_authorizer
                         )
@@ -466,7 +466,7 @@ class OpenApiEditor(object):
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):
             existing_security = method_definition.get("security", [])
 
-            security_dict = dict()
+            security_dict = {}
             security_dict[authorizer_name] = []
 
             # Neither the NONE nor the AWS_IAM built-in authorizers support authorization scopes.
@@ -529,7 +529,7 @@ class OpenApiEditor(object):
 
         servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
         for config in servers_configurations:
-            endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, dict())
+            endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, {})
             endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
             config[self._X_APIGW_ENDPOINT_CONFIG] = endpoint_configuration
 
@@ -570,7 +570,7 @@ class OpenApiEditor(object):
         MAX_AGE = "maxAge"
         ALLOW_CREDENTIALS = "allowCredentials"
         cors_headers = [ALLOW_ORIGINS, ALLOW_HEADERS, ALLOW_METHODS, EXPOSE_HEADERS, MAX_AGE, ALLOW_CREDENTIALS]
-        cors_configuration = self._doc.get(self._X_APIGW_CORS, dict())
+        cors_configuration = self._doc.get(self._X_APIGW_CORS, {})
 
         # intrinsics will not work if cors configuration is defined in open api and as a property to the HttpApi
         if allow_origins and is_intrinsic(allow_origins):

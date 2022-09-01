@@ -41,7 +41,7 @@ class SamTemplateValidator:
 
         for sub_schema in os.listdir(definitions_dir):
             if sub_schema.endswith(".json"):
-                with open(os.path.join(definitions_dir, sub_schema)) as f:
+                with open(os.path.join(definitions_dir, sub_schema), encoding="utf-8") as f:
                     schema_content = f.read()
                 schema_store[sub_schema] = json.loads(schema_content)
 
@@ -188,7 +188,7 @@ class SamTemplateValidator:
         dict
             Dictionary representing the JSON content
         """
-        with open(filepath) as fp:
+        with open(filepath, "r", encoding="utf-8") as fp:
             return json.load(fp)
 
 

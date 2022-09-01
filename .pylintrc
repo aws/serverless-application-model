@@ -161,7 +161,7 @@ disable=
     E1133, # not-an-iterable
     E1135, # unsupported-membership-test
     R1705, # no-else-return
-
+    C0209, # consider-using-f-string. There are too many of them
 
 [REPORTS]
 

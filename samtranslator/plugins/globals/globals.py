@@ -179,9 +179,7 @@ class Globals(object):
 
         globals = {}
         if not isinstance(globals_dict, dict):
-            raise InvalidGlobalsSectionException(
-                self._KEYWORD, "It must be a non-empty dictionary".format(self._KEYWORD)
-            )
+            raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary")
 
         for section_name, properties in globals_dict.items():
             resource_type = self._make_resource_type(section_name)

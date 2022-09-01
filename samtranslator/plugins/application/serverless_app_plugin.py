@@ -189,11 +189,8 @@ class ServerlessAppPlugin(BasePlugin):
         :param string logical_id: the logical_id of this application resource
         """
         LOG.info("Getting application {}/{} from serverless application repo...".format(app_id, semver))
-        get_application = lambda app_id, semver: self._sar_client.get_application(
-            ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
-        )
         try:
-            self._sar_service_call(get_application, logical_id, app_id, semver)
+            self._sar_service_call(self._get_application, logical_id, app_id, semver)
             self._applications[key] = {"Available"}
             LOG.info("Finished getting application {}/{}.".format(app_id, semver))
         except EndpointConnectionError as e:
@@ -212,10 +209,7 @@ class ServerlessAppPlugin(BasePlugin):
         :param string logical_id: the logical_id of this application resource
         """
         LOG.info("Requesting to create CFN template {}/{} in serverless application repo...".format(app_id, semver))
-        create_cfn_template = lambda app_id, semver: self._sar_client.create_cloud_formation_template(
-            ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
-        )
-        response = self._sar_service_call(create_cfn_template, logical_id, app_id, semver)
+        response = self._sar_service_call(self._create_cfn_template, logical_id, app_id, semver)
 
         LOG.info("Requested to create CFN template {}/{} in serverless application repo.".format(app_id, semver))
         self._applications[key] = response[self.TEMPLATE_URL_KEY]
@@ -312,7 +306,7 @@ class ServerlessAppPlugin(BasePlugin):
         for key in keys:
             if key not in dictionary:
                 raise InvalidResourceException(
-                    logical_id, "Resource is missing the required [{}] " "property.".format(key)
+                    logical_id, "Resource is missing the required [{}] property.".format(key)
                 )
 
     @cw_timer(prefix=PLUGIN_METRICS_PREFIX)
@@ -334,13 +328,11 @@ class ServerlessAppPlugin(BasePlugin):
             idx = 0
             while idx < len(self._in_progress_templates):
                 application_id, template_id = self._in_progress_templates[idx]
-                get_cfn_template = lambda application_id, template_id: self._sar_client.get_cloud_formation_template(
-                    ApplicationId=self._sanitize_sar_str_param(application_id),
-                    TemplateId=self._sanitize_sar_str_param(template_id),
-                )
 
                 try:
-                    response = self._sar_service_call(get_cfn_template, application_id, application_id, template_id)
+                    response = self._sar_service_call(
+                        self._get_cfn_template, application_id, application_id, template_id
+                    )
                 except ClientError as e:
                     error_code = e.response["Error"]["Code"]
                     if error_code == "TooManyRequestsException":
@@ -369,7 +361,7 @@ class ServerlessAppPlugin(BasePlugin):
         if len(self._in_progress_templates) != 0:
             application_ids = [items[0] for items in self._in_progress_templates]
             raise InvalidResourceException(
-                application_ids, "Timed out waiting for nested stack templates " "to reach ACTIVE status."
+                application_ids, "Timed out waiting for nested stack templates to reach ACTIVE status."
             )
 
     def _get_sleep_time_sec(self):
@@ -387,7 +379,7 @@ class ServerlessAppPlugin(BasePlugin):
         status = response["Status"]  # options: PREPARING, EXPIRED or ACTIVE
 
         if status == "EXPIRED":
-            message = "Template for {} with id {} returned status: {}. Cannot access an expired " "template.".format(
+            message = "Template for {} with id {} returned status: {}. Cannot access an expired template.".format(
                 application_id, template_id, status
             )
             raise InvalidResourceException(application_id, message)
@@ -421,3 +413,19 @@ class ServerlessAppPlugin(BasePlugin):
         :return: True, if this plugin supports this resource. False otherwise
         """
         return resource_type == self.SUPPORTED_RESOURCE_TYPE
+
+    def _get_application(self, app_id, semver):
+        return self._sar_client.get_application(
+            ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
+        )
+
+    def _create_cfn_template(self, app_id, semver):
+        return self._sar_client.create_cloud_formation_template(
+            ApplicationId=self._sanitize_sar_str_param(app_id), SemanticVersion=self._sanitize_sar_str_param(semver)
+        )
+
+    def _get_cfn_template(self, app_id, template_id):
+        return self._sar_client.get_cloud_formation_template(
+            ApplicationId=self._sanitize_sar_str_param(app_id),
+            TemplateId=self._sanitize_sar_str_param(template_id),
+        )

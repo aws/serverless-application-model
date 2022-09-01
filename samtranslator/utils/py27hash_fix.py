@@ -174,7 +174,7 @@ class Py27Keys(object):
     def __init__(self):
         super(Py27Keys, self).__init__()
         self.debug = False
-        self.keyorder = dict()
+        self.keyorder = {}
         self.size = 0  # current size of the keys, equivalent to ma_used in dictobject.c
         self.fill = 0  # increment count when a key is added, equivalent to ma_fill in dictobject.c
         self.mask = MINSIZE - 1  # Python2 default dict size
@@ -236,7 +236,7 @@ class Py27Keys(object):
 
         # Reset key list to simulate the dict resize and copy operation
         oldkeyorder = copy.copy(self.keyorder)
-        self.keyorder = dict()
+        self.keyorder = {}
         self.fill = self.size = 0
         # reinsert all the keys using original order
         for idx in sorted(oldkeyorder.keys()):

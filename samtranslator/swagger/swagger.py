@@ -444,6 +444,10 @@ class SwaggerEditor(object):
         bmt = replace_recursively(binary_media_types)
         self._doc[self._X_APIGW_BINARY_MEDIA_TYPES] = bmt
 
+    @staticmethod
+    def _make_response_header_key(original_header_key: str) -> str:
+        return "method.response.header." + original_header_key
+
     def _options_method_response_for_cors(
         self, allowed_origins, allowed_headers=None, allowed_methods=None, max_age=None, allow_credentials=None
     ):
@@ -471,12 +475,11 @@ class SwaggerEditor(object):
         ALLOW_METHODS = "Access-Control-Allow-Methods"
         MAX_AGE = "Access-Control-Max-Age"
         ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
-        HEADER_RESPONSE = lambda x: "method.response.header." + x
 
         response_parameters = Py27Dict(
             {
                 # AllowedOrigin is always required
-                HEADER_RESPONSE(ALLOW_ORIGIN): allowed_origins
+                self._make_response_header_key(ALLOW_ORIGIN): allowed_origins
             }
         )
 
@@ -494,19 +497,19 @@ class SwaggerEditor(object):
         #    https://fetch.spec.whatwg.org/#http-new-header-syntax
         #
         if allowed_headers:
-            response_parameters[HEADER_RESPONSE(ALLOW_HEADERS)] = allowed_headers
+            response_parameters[self._make_response_header_key(ALLOW_HEADERS)] = allowed_headers
             response_headers[ALLOW_HEADERS] = {"type": "string"}
         if allowed_methods:
-            response_parameters[HEADER_RESPONSE(ALLOW_METHODS)] = allowed_methods
+            response_parameters[self._make_response_header_key(ALLOW_METHODS)] = allowed_methods
             response_headers[ALLOW_METHODS] = {"type": "string"}
         if max_age is not None:
             # MaxAge can be set to 0, which is a valid value. So explicitly check against None
-            response_parameters[HEADER_RESPONSE(MAX_AGE)] = max_age
+            response_parameters[self._make_response_header_key(MAX_AGE)] = max_age
             response_headers[MAX_AGE] = {"type": "integer"}
         if allow_credentials is True:
             # Allow-Credentials only has a valid value of true, it should be omitted otherwise.
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
-            response_parameters[HEADER_RESPONSE(ALLOW_CREDENTIALS)] = "'true'"
+            response_parameters[self._make_response_header_key(ALLOW_CREDENTIALS)] = "'true'"
             response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
 
         # construct snippet and insert key one by one to preserce input order
