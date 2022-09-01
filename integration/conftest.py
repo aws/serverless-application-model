@@ -216,7 +216,9 @@ def _stack_exists(stack_name):
     cloudformation = boto3.resource("cloudformation")
     stack = cloudformation.Stack(stack_name)
     try:
-        stack.stack_status
+        status = stack.stack_status
+        if status == "REVIEW_IN_PROGRESS":
+            return False
     except ClientError as ex:
         if "does not exist" in str(ex):
             return False

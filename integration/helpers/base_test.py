@@ -452,7 +452,7 @@ class BaseTest(TestCase):
 
     @retry(
         stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        wait=wait_exponential(multiplier=1, min=20, max=30) + wait_random(0, 1),
         retry=retry_if_exception_type(StatusCodeError),
         after=after_log(LOG, logging.WARNING),
         reraise=True,
@@ -481,7 +481,7 @@ class BaseTest(TestCase):
 
     @retry(
         stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=10) + wait_random(0, 1),
+        wait=wait_exponential(multiplier=1, min=20, max=30) + wait_random(0, 1),
         retry=retry_if_exception_type(StatusCodeError),
         after=after_log(LOG, logging.WARNING),
         reraise=True,
