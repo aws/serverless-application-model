@@ -59,7 +59,8 @@
             "List<AWS::EC2::Volume::Id>",
             "List<AWS::EC2::VPC::Id>",
             "List<AWS::Route53::HostedZone::Id>",
-            "List<String>"
+            "List<String>",
+            "AWS::SSM::Parameter::Value<String>"
           ],
           "type": "string"
         }
