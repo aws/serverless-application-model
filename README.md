@@ -98,4 +98,4 @@ Read the [SAM Documentation Contribution Guide](https://github.com/awsdocs/aws-s
 started.
 
 ### Join the SAM Community on Slack
-[Join the SAM developers channel (#samdev)](https://join.slack.com/t/awsdevelopers/shared_invite/zt-idww18e8-Z1kXhI7GNuDewkweCF3YjA) on Slack to collaborate with fellow community members and the AWS SAM team.
+[Join the SAM developers channel (#samdev)](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack to collaborate with fellow community members and the AWS SAM team.
