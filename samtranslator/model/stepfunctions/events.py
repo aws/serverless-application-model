@@ -358,7 +358,7 @@ class Api(EventSource):
             condition = resource.resource_attributes[CONDITION]
 
         request_template = (
-            self._generate_request_template_escaped(resource)
+            self._generate_request_template_unescaped(resource)
             if self.Unescape
             else self._generate_request_template(resource)
         )
@@ -461,9 +461,11 @@ class Api(EventSource):
         }
         return request_templates
 
-    def _generate_request_template_escaped(self, resource):
+    def _generate_request_template_unescaped(self, resource):
         """Generates the Body mapping request template for the Api. This allows for the input
         request to the Api to be passed as the execution input to the associated state machine resource.
+
+        Unescapes single quotes such that it's valid JSON.
 
         :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine
                 resource to which the Api event source must be associated
