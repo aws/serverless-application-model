@@ -252,6 +252,7 @@ class Api(EventSource):
         "RestApiId": PropertyType(True, is_str()),
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
+        "Unescape": PropertyType(False, is_type(bool)),
     }
 
     def resources_to_link(self, resources):
@@ -356,12 +357,18 @@ class Api(EventSource):
         if CONDITION in resource.resource_attributes:
             condition = resource.resource_attributes[CONDITION]
 
+        request_template = (
+            self._generate_request_template_escaped(resource)
+            if self.Unescape
+            else self._generate_request_template(resource)
+        )
+
         editor.add_state_machine_integration(
             self.Path,
             self.Method,
             integration_uri,
             role.get_runtime_attr("arn"),
-            self._generate_request_template(resource),
+            request_template,
             condition=condition,
         )
 
@@ -450,6 +457,28 @@ class Api(EventSource):
                         "stateMachineArn": "${" + resource.logical_id + "}",
                     }
                 )
+            )
+        }
+        return request_templates
+
+    def _generate_request_template_escaped(self, resource):
+        """Generates the Body mapping request template for the Api. This allows for the input
+        request to the Api to be passed as the execution input to the associated state machine resource.
+
+        :param model.stepfunctions.resources.StepFunctionsStateMachine resource; the state machine
+                resource to which the Api event source must be associated
+
+        :returns: a body mapping request which passes the Api input to the state machine execution
+        :rtype: dict
+        """
+        request_templates = {
+            "application/json": fnSub(
+                # Need to unescape single quotes escaped by escapeJavaScript.
+                # Also the mapping template isn't valid JSON, so can't use json.dumps().
+                # See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#util-template-reference
+                """{"input": "$util.escapeJavaScript($input.json('$')).replaceAll("\\\\'","'")", "stateMachineArn": "${"""
+                + resource.logical_id
+                + """}"}"""
             )
         }
         return request_templates
