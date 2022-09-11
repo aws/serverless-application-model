@@ -1,0 +1,34 @@
+Transform: "AWS::Serverless-2016-10-31"
+
+Resources:
+  TestBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: test-bucket
+  TestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: test-function
+      InlineCode: |
+        exports.handler = async (event) => {
+          return 'Hello from Lambda!';
+        };
+      Handler: index.handler
+      Runtime: nodejs16.x
+      Events:
+        TestEventBridgeRule:
+          Type: EventBridgeRule
+          Properties:
+            State: ENABLED
+            Pattern:
+              source:
+                - aws.s3
+              detail-type:
+                - Object Created
+              detail:
+                bucket:
+                  name:
+                    - "test-bucket"
+                object:
+                  key:
+                    - prefix: "/"
