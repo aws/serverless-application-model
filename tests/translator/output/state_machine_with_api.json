@@ -60,7 +60,7 @@
      ]
     },
     "ManagedPolicyArns": [
-     "arn:${AWS::Partition}:iam::aws:policy/AWSLambda_FullAccess"
+     "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
     ],
     "Tags": [
      {
