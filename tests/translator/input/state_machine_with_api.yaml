@@ -33,7 +33,3 @@ Resources:
             Path: /echo
             Method: POST
             UnescapeMappingTemplate: true
-
-Outputs:
-  ApiEndpoint:
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/echo"
