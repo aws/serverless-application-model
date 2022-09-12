@@ -32,6 +32,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /echo
             Method: POST
+            UnescapeMappingTemplate: true
 
 Outputs:
   ApiEndpoint:

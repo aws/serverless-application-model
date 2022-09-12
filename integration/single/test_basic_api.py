@@ -2,6 +2,7 @@ import json
 import logging
 from unittest.case import skipIf
 
+import requests
 from tenacity import stop_after_attempt, wait_exponential, retry_if_exception_type, after_log, wait_random
 
 from integration.helpers.base_test import BaseTest
@@ -125,11 +126,11 @@ class TestBasicApi(BaseTest):
         stack_output = self.get_stack_outputs()
         api_endpoint = stack_output.get("ApiEndpoint")
 
-        input = {"f'oo": {"hello": "'wor'l'd'''"}}
-        response = requests.post(api_endpoint, json=input)
-        execution_arn = response.json()["executionArn"]
+        input_json = {"f'oo": {"hello": "'wor'l'd'''"}}
+        response = requests.post(api_endpoint, json=input_json)
         self.assertEqual(response.status_code, 200)
 
+        execution_arn = response.json()["executionArn"]
         execution = self.client_provider.sfn_client.describe_execution(executionArn=execution_arn)
         execution_input = json.loads(execution["input"])
-        self.assertEqual(execution_input, input)
+        self.assertEqual(execution_input, input_json)
