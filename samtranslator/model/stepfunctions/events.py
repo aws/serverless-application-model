@@ -252,7 +252,7 @@ class Api(EventSource):
         "RestApiId": PropertyType(True, is_str()),
         "Stage": PropertyType(False, is_str()),
         "Auth": PropertyType(False, is_type(dict)),
-        "Unescape": PropertyType(False, is_type(bool)),
+        "UnescapeMappingTemplate": PropertyType(False, is_type(bool)),
     }
 
     def resources_to_link(self, resources):
@@ -359,7 +359,7 @@ class Api(EventSource):
 
         request_template = (
             self._generate_request_template_unescaped(resource)
-            if self.Unescape
+            if self.UnescapeMappingTemplate
             else self._generate_request_template(resource)
         )
 
