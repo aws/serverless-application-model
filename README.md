@@ -2,7 +2,6 @@
 
 # AWS Serverless Application Model (AWS SAM)
 
-![Apache-2.0](https://img.shields.io/github/license/aws/serverless-application-model.svg)
 ![SAM_CLI release](https://img.shields.io/github/release/aws/aws-sam-cli.svg?label=CLI%20Version)
 [![codecov](https://codecov.io/gh/aws/serverless-application-model/branch/master/graphs/badge.svg?style=flat)](https://codecov.io/gh/aws/serverless-application-model)
 
