@@ -1,8 +1,6 @@
-<img alt="AWS SAM squirrel" src="https://user-images.githubusercontent.com/1280602/189963632-04e70e1b-ebf4-4885-80ac-b0ab5a809b41.svg" width="250">
+# AWS Serverless Application Model (SAM)
 
-# AWS Serverless Application Model (AWS SAM)
-
-![SAM_CLI release](https://img.shields.io/github/release/aws/aws-sam-cli.svg?label=CLI%20Version)
+[![PyPI](https://img.shields.io/pypi/v/aws-sam-translator)](https://pypi.org/project/aws-sam-translator/)
 [![codecov](https://codecov.io/gh/aws/serverless-application-model/branch/master/graphs/badge.svg?style=flat)](https://codecov.io/gh/aws/serverless-application-model)
 
 The AWS Serverless Application Model (SAM) is an open-source framework for building serverless applications.
