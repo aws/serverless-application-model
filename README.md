@@ -54,7 +54,7 @@ environment that lets you locally build, test, debug, and deploy applications de
 
 + **Extension of AWS CloudFormation**\. Because SAM is an extension of AWS CloudFormation, you get the reliable deployment capabilities of AWS CloudFormation\. You can define resources by using CloudFormation in your SAM template\. Also, you can use the full suite of resources, intrinsic functions, and other template features that are available in CloudFormation\.
 
-## What is this GitHub repository? 💻
+## What is this GitHub repository?
 
 This GitHub repository contains the SAM Specification, the Python code that translates SAM templates into AWS CloudFormation stacks and lots of example applications.
 In the words of SAM developers:
