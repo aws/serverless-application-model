@@ -1,6 +1,6 @@
 # AWS Serverless Application Model (SAM)
 
-[![PyPI](https://img.shields.io/pypi/v/aws-sam-translator)](https://pypi.org/project/aws-sam-translator/)
+[![PyPI](https://img.shields.io/pypi/v/aws-sam-translator?label=PyPI)](https://pypi.org/project/aws-sam-translator/)
 [![codecov](https://codecov.io/gh/aws/serverless-application-model/branch/master/graphs/badge.svg?style=flat)](https://codecov.io/gh/aws/serverless-application-model)
 
 The AWS Serverless Application Model (SAM) is an open-source framework for building serverless applications.
