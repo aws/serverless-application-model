@@ -1,47 +1,40 @@
-<p align="center">
-</p>
-
 # AWS Serverless Application Model (AWS SAM)
 
-![Apache-2.0](https://img.shields.io/github/license/aws/serverless-application-model.svg)
-![SAM_CLI release](https://img.shields.io/github/release/aws/aws-sam-cli.svg?label=CLI%20Version)
+[![Build status](https://ci.appveyor.com/api/projects/status/qlm7sj35nu9o12jc/branch/develop?svg=true)](https://ci.appveyor.com/project/AWSSAMCLI/serverless-application-model/branch/develop)
 [![codecov](https://codecov.io/gh/aws/serverless-application-model/branch/master/graphs/badge.svg?style=flat)](https://codecov.io/gh/aws/serverless-application-model)
+[![PyPI](https://img.shields.io/pypi/v/aws-sam-translator?label=PyPI)](https://pypi.org/project/aws-sam-translator/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aws-sam-translator)](https://pypi.org/project/aws-sam-translator/)
 
-The AWS Serverless Application Model (SAM) is an open-source framework for building serverless applications.
+The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (SAM) is an open-source framework for building serverless applications.
+
 It provides shorthand syntax to express functions, APIs, databases, and event source mappings.
 With just a few lines of configuration, you can define the application you want and model it.
 
-[![Getting Started with AWS SAM](./docs/get-started-youtube.png)](https://www.youtube.com/watch?v=QBBewrKR1qg)
-
 ## Recent blogposts and workshops
 
-* **Develop Node projects with SAM CLI using esbuild (Beta)** - and use SAM Accelerate on Typescript projects. [Read blogpost here](https://s12d.com/5Aa6u0o7)
-
-* **Speed up development with SAM Accelerate (Beta)** - quickly test your changes in the cloud. [Read blogpost here](https://s12d.com/WeMib4nf)
-
-* **Getting started with CI/CD? SAM pipelines can help you get started** - [This workshop](https://s12d.com/_JQ48d5T) walks you through the basics
-
+* **Develop Node projects with SAM CLI using esbuild (Beta)** - And use SAM Accelerate on TypeScript projects. [Read blogpost here](https://s12d.com/5Aa6u0o7).
+* **Speed up development with SAM Accelerate (Beta)** - Quickly test your changes in the cloud. [Read blogpost here](https://s12d.com/WeMib4nf).
+* **Getting started with CI/CD? SAM pipelines can help you get started** - [This workshop](https://s12d.com/_JQ48d5T) walks you through the basics.
 * **Get started with Serverless Application development using SAM CLI** - [This workshop](https://s12d.com/Tq9ZE-Br) walks you through the basics.
 
-## Get Started
+## Get started
 
-To get started with building SAM-based applications, use the SAM CLI. SAM CLI provides a Lambda-like execution
+To get started with building SAM-based applications, use the [AWS SAM CLI](https://github.com/aws/aws-sam-cli). SAM CLI provides a Lambda-like execution
 environment that lets you locally build, test, debug, and deploy applications defined by SAM templates.
 
 * [Install SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* [Build & Deploy a "Hello World" Web App](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-quick-start.html)
-* [Install AWS Toolkit](https://aws.amazon.com/getting-started/tools-sdks/#IDE_and_IDE_Toolkits) to use SAM with your favorite IDEs.
+* [Build & deploy a "hello world" web app](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-quick-start.html)
+* [Install AWS Toolkit](https://aws.amazon.com/getting-started/tools-sdks/#IDE_and_IDE_Toolkits) to use SAM with your favorite IDEs
 
-
-**Next Steps:** Learn to build a more complex serverless application.
+**Next steps:** Learn to build a more complex serverless application.
 * [Extract text from images and store in a database](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-example-s3.html) using Amazon S3 and Amazon Rekognition services.
 * [Detect when records are added to a database](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-example-ddb.html) using Amazon DynamoDB database and asynchronous stream processing.
+* Watch the [Mastering the AWS Serverless Application Model](https://www.youtube.com/watch?v=QBBewrKR1qg) AWS Online Tech Talk.
 
-
-**Detailed References:** Explains SAM commands and usage in depth.
-* [CLI Commands](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-command-reference.html)
-* [SAM Template Specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html)
-* [Policy Templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)
+**Detailed references:** Explains SAM commands and usage in depth.
+* [CLI commands](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-command-reference.html)
+* [SAM template specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html)
+* [Policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)
 
 ## Why SAM
 
@@ -60,7 +53,7 @@ environment that lets you locally build, test, debug, and deploy applications de
 
 + **Extension of AWS CloudFormation**\. Because SAM is an extension of AWS CloudFormation, you get the reliable deployment capabilities of AWS CloudFormation\. You can define resources by using CloudFormation in your SAM template\. Also, you can use the full suite of resources, intrinsic functions, and other template features that are available in CloudFormation\.
 
-## What is this GitHub repository? 💻
+## What is this GitHub repository?
 
 This GitHub repository contains the SAM Specification, the Python code that translates SAM templates into AWS CloudFormation stacks and lots of example applications.
 In the words of SAM developers:
@@ -77,7 +70,7 @@ more about what it was like contributing to SAM.
 
 Depending on your interest and skill, you can help build the different parts of the SAM project;
 
-**Enhance the SAM Specification**
+**Enhance the SAM specification**
 
 Make pull requests, report bugs, and share ideas to improve the full SAM template specification.
 Source code is located on GitHub at [awslabs/serverless-application-model](https://github.com/awslabs/serverless-application-model).
@@ -90,12 +83,12 @@ Add new commands or enhance existing ones, report bugs, or request new features 
 Source code is located on GitHub at [awslabs/aws-sam-cli](https://github.com/awslabs/aws-sam-cli). Read the [SAM CLI Contributing Guide](https://github.com/awslabs/aws-sam-cli/blob/develop/CONTRIBUTING.md) to 
 get started.
 
-**Update SAM Developer Guide**
+**Update SAM developer guide**
 
 [SAM Developer Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/index.html) provides comprehensive getting started guide and reference documentation.
 Source code is located on GitHub at [awsdocs/aws-sam-developer-guide](https://github.com/awsdocs/aws-sam-developer-guide).
 Read the [SAM Documentation Contribution Guide](https://github.com/awsdocs/aws-sam-developer-guide/blob/master/CONTRIBUTING.md) to get
 started.
 
-### Join the SAM Community on Slack
-[Join the SAM developers channel (#samdev)](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack to collaborate with fellow community members and the AWS SAM team.
+### Join the SAM community on Slack
+[Join the `#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack to collaborate with fellow community members and the AWS SAM team.
