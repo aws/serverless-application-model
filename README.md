@@ -1,5 +1,6 @@
 # AWS Serverless Application Model (SAM)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/qlm7sj35nu9o12jc/branch/develop?svg=true)](https://ci.appveyor.com/project/AWSSAMCLI/serverless-application-model/branch/develop)
 [![PyPI](https://img.shields.io/pypi/v/aws-sam-translator?label=PyPI)](https://pypi.org/project/aws-sam-translator/)
 [![codecov](https://codecov.io/gh/aws/serverless-application-model/branch/master/graphs/badge.svg?style=flat)](https://codecov.io/gh/aws/serverless-application-model)
 
