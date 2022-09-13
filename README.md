@@ -17,7 +17,7 @@ With just a few lines of configuration, you can define the application you want 
 * **Getting started with CI/CD? SAM pipelines can help you get started** - [This workshop](https://s12d.com/_JQ48d5T) walks you through the basics.
 * **Get started with Serverless Application development using SAM CLI** - [This workshop](https://s12d.com/Tq9ZE-Br) walks you through the basics.
 
-## Get Started
+## Get started
 
 To get started with building SAM-based applications, use the [AWS SAM CLI](https://github.com/aws/aws-sam-cli). SAM CLI provides a Lambda-like execution
 environment that lets you locally build, test, debug, and deploy applications defined by SAM templates.
@@ -27,12 +27,12 @@ environment that lets you locally build, test, debug, and deploy applications de
 * [Install AWS Toolkit](https://aws.amazon.com/getting-started/tools-sdks/#IDE_and_IDE_Toolkits) to use SAM with your favorite IDEs
 * [Mastering the AWS Serverless Application Model (AWS SAM) - AWS Online Tech Talks](https://www.youtube.com/watch?v=QBBewrKR1qg)
 
-**Next Steps:** Learn to build a more complex serverless application.
+**Next steps:** Learn to build a more complex serverless application.
 * [Extract text from images and store in a database](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-example-s3.html) using Amazon S3 and Amazon Rekognition services.
 * [Detect when records are added to a database](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-example-ddb.html) using Amazon DynamoDB database and asynchronous stream processing.
 * Watch the [Mastering the AWS Serverless Application Model](https://www.youtube.com/watch?v=QBBewrKR1qg) AWS Online Tech Talk.
 
-**Detailed References:** Explains SAM commands and usage in depth.
+**Detailed references:** Explains SAM commands and usage in depth.
 * [CLI commands](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-command-reference.html)
 * [SAM template specification](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification.html)
 * [Policy templates](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html)
