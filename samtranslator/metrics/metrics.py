@@ -93,6 +93,7 @@ class MetricDatum:
         :param value: value of metric
         :param unit: unit of metric (try using values from Unit class)
         :param dimensions: array of dimensions applied to the metric
+        :param timestamp: timestamp of metric (datetime.datetime object)
         """
         self.name = name
         self.value = value
@@ -130,7 +131,7 @@ class Metrics:
             )
             self.publish()
 
-    def _record_metric(self, name, value, unit, dimensions=None):
+    def _record_metric(self, name, value, unit, dimensions=None, timestamp=None):
         """
         Create and save metric object in internal cache.
 
@@ -138,10 +139,11 @@ class Metrics:
         :param value: value of metric
         :param unit: unit of metric (try using values from Unit class)
         :param dimensions: array of dimensions applied to the metric
+        :param timestamp: timestamp of metric (datetime.datetime object)
         """
-        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions))
+        self.metrics_cache.setdefault(name, []).append(MetricDatum(name, value, unit, dimensions, timestamp))
 
-    def record_count(self, name, value, dimensions=None):
+    def record_count(self, name, value, dimensions=None, timestamp=None):
         """
         Create metric with unit Count.
 
@@ -149,10 +151,11 @@ class Metrics:
         :param value: value of metric
         :param unit: unit of metric (try using values from Unit class)
         :param dimensions: array of dimensions applied to the metric
+        :param timestamp: timestamp of metric (datetime.datetime object)
         """
-        self._record_metric(name, value, Unit.Count, dimensions)
+        self._record_metric(name, value, Unit.Count, dimensions, timestamp)
 
-    def record_latency(self, name, value, dimensions=None):
+    def record_latency(self, name, value, dimensions=None, timestamp=None):
         """
         Create metric with unit Milliseconds.
 
@@ -160,8 +163,9 @@ class Metrics:
         :param value: value of metric
         :param unit: unit of metric (try using values from Unit class)
         :param dimensions: array of dimensions applied to the metric
+        :param timestamp: timestamp of metric (datetime.datetime object)
         """
-        self._record_metric(name, value, Unit.Milliseconds, dimensions)
+        self._record_metric(name, value, Unit.Milliseconds, dimensions, timestamp)
 
     def publish(self):
         """Calls publish method from the configured metrics publisher to publish metrics"""

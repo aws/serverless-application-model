@@ -5,13 +5,14 @@ from tenacity import stop_after_attempt, retry_if_exception_type, after_log, wai
 
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
-from integration.config.service_names import GATEWAY_RESPONSES
+from integration.config.service_names import GATEWAY_RESPONSES, REST_API
 
 LOG = logging.getLogger(__name__)
 
 
 @skipIf(
-    current_region_does_not_support([GATEWAY_RESPONSES]), "GatewayResponses is not supported in this testing region"
+    current_region_does_not_support([GATEWAY_RESPONSES, REST_API]),
+    "GatewayResponses is not supported in this testing region",
 )
 class TestApiWithGatewayResponses(BaseTest):
     def test_gateway_responses(self):

@@ -31,13 +31,13 @@ LOG = logging.getLogger(__name__)
 
 _CORS_WILDCARD = "'*'"
 CorsProperties = namedtuple(
-    "_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge", "AllowCredentials"]
+    "CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigin", "MaxAge", "AllowCredentials"]
 )
 # Default the Cors Properties to '*' wildcard and False AllowCredentials. Other properties are actually Optional
 CorsProperties.__new__.__defaults__ = (None, None, _CORS_WILDCARD, None, False)
 
 AuthProperties = namedtuple(
-    "_AuthProperties",
+    "AuthProperties",
     [
         "Authorizers",
         "DefaultAuthorizer",
@@ -50,7 +50,7 @@ AuthProperties = namedtuple(
 )
 AuthProperties.__new__.__defaults__ = (None, None, None, True, None, None, None)
 UsagePlanProperties = namedtuple(
-    "_UsagePlanProperties", ["CreateUsagePlan", "Description", "Quota", "Tags", "Throttle", "UsagePlanName"]
+    "UsagePlanProperties", ["CreateUsagePlan", "Description", "Quota", "Tags", "Throttle", "UsagePlanName"]
 )
 UsagePlanProperties.__new__.__defaults__ = (None, None, None, None, None, None)
 

@@ -46,7 +46,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs14.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
           return {
@@ -114,7 +114,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs14.x
       InlineCode: |
         exports.handler = async (event, context, callback) => {
           const token = event.type === 'TOKEN' ? event.authorizationToken : event.queryStringParameters.authorization

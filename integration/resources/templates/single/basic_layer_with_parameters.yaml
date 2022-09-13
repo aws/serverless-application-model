@@ -7,7 +7,7 @@ Parameters:
         Default: MIT-0
     Runtimes:
         Type: CommaDelimitedList
-        Default: nodejs12.x,nodejs14.x
+        Default: nodejs14.x
     LayerName:
         Type: String
         Default: MyNamedLayerVersion

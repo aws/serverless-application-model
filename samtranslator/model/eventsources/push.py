@@ -50,7 +50,10 @@ class PushEventSource(ResourceMacro):
     :cvar str principal: The AWS service principal of the source service.
     """
 
-    principal = None
+    # Note(xinhol): `PushEventSource` should have been an abstract class. Disabling the type check for the next
+    # line to avoid any potential behavior change.
+    # TODO: Make `PushEventSource` an abstract class and not giving `principal` initial value.
+    principal: str = None  # type: ignore
 
     def _construct_permission(
         self, function, source_arn=None, source_account=None, suffix="", event_source_token=None, prefix=None
@@ -313,7 +316,7 @@ class S3(PushEventSource):
         #   merging is literally "last one wins", which works fine because we linearly loop through the template once.
         #   The de-dupe happens inside `samtranslator.translator.Translator.translate` method when merging results of
         #   to_cloudformation() to output template.
-        self._inject_notification_configuration(function, bucket)
+        self._inject_notification_configuration(function, bucket, bucket_id)
         resources.append(S3Bucket.from_dict(bucket_id, bucket))
 
         return resources
@@ -378,7 +381,7 @@ class S3(PushEventSource):
         properties["Tags"] = tags + get_tag_list(dep_tag)
         return bucket
 
-    def _inject_notification_configuration(self, function, bucket):
+    def _inject_notification_configuration(self, function, bucket, bucket_id):
         base_event_mapping = {"Function": function.get_runtime_attr("arn")}
 
         if self.Filter is not None:
@@ -407,13 +410,16 @@ class S3(PushEventSource):
             notification_config = {}
             properties["NotificationConfiguration"] = notification_config
 
+        if not isinstance(notification_config, dict):
+            raise InvalidResourceException(bucket_id, "Invalid type for NotificationConfiguration.")
+
         lambda_notifications = notification_config.get("LambdaConfigurations", None)
         if lambda_notifications is None:
             lambda_notifications = []
             notification_config["LambdaConfigurations"] = lambda_notifications
 
         if not isinstance(lambda_notifications, list):
-            raise InvalidResourceException(self.logical_id, "Invalid type for LambdaConfigurations. Must be a list.")
+            raise InvalidResourceException(bucket_id, "Invalid type for LambdaConfigurations. Must be a list.")
 
         for event_mapping in event_mappings:
             if event_mapping not in lambda_notifications:

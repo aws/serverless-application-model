@@ -1,6 +1,5 @@
 import re
 
-from samtranslator.utils.py27hash_fix import Py27UniStr
 from samtranslator.model.exceptions import InvalidTemplateException, InvalidDocumentException
 
 
@@ -14,7 +13,11 @@ class Action(object):
     """
 
     _resource_ref_separator = "."
-    intrinsic_name = None
+
+    # Note(xinhol): `Action` should have been an abstract class. Disabling the type check for the next
+    # line to avoid any potential behavior change.
+    # TODO: Make `Action` an abstract class and not giving `intrinsic_name` initial value.
+    intrinsic_name: str = None  # type: ignore
 
     def __init__(self):
         if not self.intrinsic_name:

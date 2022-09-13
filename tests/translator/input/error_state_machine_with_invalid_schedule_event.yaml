@@ -1,0 +1,17 @@
+Transform: "AWS::Serverless-2016-10-31"
+
+Resources:
+  ScheduledStateMachine:
+    Type: 'AWS::Serverless::StateMachine'
+    Properties:
+      DefinitionUri: s3://sam-demo-bucket/my_state_machine.asl.json
+      Role: arn:aws:iam::123456123456:role/service-role/SampleRole
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: 'rate(1 minute)'
+            Name: TestSchedule
+            Description: test schedule
+            State: "Enabled"
+            Enabled: True

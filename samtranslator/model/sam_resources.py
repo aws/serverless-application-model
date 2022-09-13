@@ -1,6 +1,6 @@
 ﻿""" SAM macro definitions """
 import copy
-from typing import Union
+from typing import Any, Dict, Union
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
 
 import samtranslator.model.eventsources
@@ -111,7 +111,7 @@ class SamFunction(SamResourceMacro):
     #
 
     # Conditions
-    conditions = {}
+    conditions: Dict[str, Any] = {}  # TODO: Replace `Any` with something more specific
 
     # Customers can refer to the following properties of SAM function
     referable_properties = {
@@ -607,7 +607,7 @@ class SamFunction(SamResourceMacro):
         if not self.DeadLetterQueue.get("Type") or not self.DeadLetterQueue.get("TargetArn"):
             raise InvalidResourceException(
                 self.logical_id,
-                "'DeadLetterQueue' requires Type and TargetArn properties to be specified.".format(valid_dlq_types),
+                "'DeadLetterQueue' requires Type and TargetArn properties to be specified.",
             )
 
         if not (isinstance(self.DeadLetterQueue.get("Type"), str)):

@@ -129,7 +129,7 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
     """Feature toggle config provider which loads config from AppConfig."""
 
     @cw_timer(prefix="External", name="AppConfig")
-    def __init__(self, application_id, environment_id, configuration_profile_id):
+    def __init__(self, application_id, environment_id, configuration_profile_id, app_config_client=None):
         FeatureToggleConfigProvider.__init__(self)
         try:
             LOG.info("Loading feature toggle config from AppConfig...")
@@ -137,7 +137,9 @@ class FeatureToggleAppConfigConfigProvider(FeatureToggleConfigProvider):
             # (5 + 5) * 2, 20 seconds maximum timeout duration
             # In case of high latency from AppConfig, we can always fall back to use an empty config and continue transform
             client_config = Config(connect_timeout=5, read_timeout=5, retries={"total_max_attempts": 2})
-            self.app_config_client = boto3.client("appconfig", config=client_config)
+            self.app_config_client = (
+                boto3.client("appconfig", config=client_config) if not app_config_client else app_config_client
+            )
             response = self.app_config_client.get_configuration(
                 Application=application_id,
                 Environment=environment_id,

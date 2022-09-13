@@ -20,11 +20,11 @@ from samtranslator.model.route53 import Route53RecordSetGroup
 
 _CORS_WILDCARD = "*"
 CorsProperties = namedtuple(
-    "_CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigins", "MaxAge", "ExposeHeaders", "AllowCredentials"]
+    "CorsProperties", ["AllowMethods", "AllowHeaders", "AllowOrigins", "MaxAge", "ExposeHeaders", "AllowCredentials"]
 )
 CorsProperties.__new__.__defaults__ = (None, None, None, None, None, False)
 
-AuthProperties = namedtuple("_AuthProperties", ["Authorizers", "DefaultAuthorizer", "EnableIamAuthorizer"])
+AuthProperties = namedtuple("AuthProperties", ["Authorizers", "DefaultAuthorizer", "EnableIamAuthorizer"])
 AuthProperties.__new__.__defaults__ = (None, None, False)
 DefaultStageName = "$default"
 HttpApiTagName = "httpapi:createdBy"

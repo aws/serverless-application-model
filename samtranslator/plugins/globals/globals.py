@@ -1,4 +1,6 @@
-﻿from samtranslator.public.sdk.resource import SamResourceType
+﻿from typing import Dict, List
+
+from samtranslator.public.sdk.resource import SamResourceType
 from samtranslator.public.intrinsics import is_intrinsics
 from samtranslator.swagger.swagger import SwaggerEditor
 
@@ -82,7 +84,7 @@ class Globals(object):
         SamResourceType.SimpleTable.value: ["SSESpecification"],
     }
     # unreleased_properties *must be* part of supported_properties too
-    unreleased_properties = {}
+    unreleased_properties: Dict[str, List[str]] = {}
 
     def __init__(self, template):
         """
@@ -179,9 +181,7 @@ class Globals(object):
 
         globals = {}
         if not isinstance(globals_dict, dict):
-            raise InvalidGlobalsSectionException(
-                self._KEYWORD, "It must be a non-empty dictionary".format(self._KEYWORD)
-            )
+            raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary")
 
         for section_name, properties in globals_dict.items():
             resource_type = self._make_resource_type(section_name)

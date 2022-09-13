@@ -1,7 +1,7 @@
 Parameters:
     Runtimes:
         Type: CommaDelimitedList
-        Default: nodejs12.x,nodejs10.x
+        Default: nodejs14.x
     LayerName:
         Type: String
         Default: MyNamedLayerVersion
