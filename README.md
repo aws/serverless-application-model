@@ -10,8 +10,6 @@ The AWS Serverless Application Model (SAM) is an open-source framework for build
 It provides shorthand syntax to express functions, APIs, databases, and event source mappings.
 With just a few lines of configuration, you can define the application you want and model it.
 
-[![Getting Started with AWS SAM](./docs/get-started-youtube.png)](https://www.youtube.com/watch?v=QBBewrKR1qg)
-
 ## Recent blogposts and workshops
 
 * **Develop Node projects with SAM CLI using esbuild (Beta)** - and use SAM Accelerate on Typescript projects. [Read blogpost here](https://s12d.com/5Aa6u0o7)
@@ -30,7 +28,7 @@ environment that lets you locally build, test, debug, and deploy applications de
 * [Install SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 * [Build & Deploy a "Hello World" Web App](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-quick-start.html)
 * [Install AWS Toolkit](https://aws.amazon.com/getting-started/tools-sdks/#IDE_and_IDE_Toolkits) to use SAM with your favorite IDEs.
-
+* [Mastering the AWS Serverless Application Model (AWS SAM) - AWS Online Tech Talks](https://www.youtube.com/watch?v=QBBewrKR1qg).
 
 **Next Steps:** Learn to build a more complex serverless application.
 * [Extract text from images and store in a database](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-example-s3.html) using Amazon S3 and Amazon Rekognition services.
