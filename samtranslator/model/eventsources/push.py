@@ -832,13 +832,12 @@ class Api(PushEventSource):
 
         if self.RequestValidators:
             # default is no Validators
-            validators = {"ValidateBody": None, "ValidateParameters": None}
             # if we have validator configured to a request parameter
             # we want to add it to the editor but remove it from original dict before it iterates
-            validators["ValidateBody"] = self.RequestValidators.get("ValidateBody")
-            validators["ValidateParameters"] = self.RequestValidators.get("ValidateParameters")
             # If validators is present or not, this method will handle the check
-            self._add_validators(editor, validators["ValidateBody"], validators["ValidateParameters"])
+            self._add_validators(
+                editor, self.RequestValidators.get("ValidateBody"), self.RequestValidators.get("ValidateParameters")
+            )
 
         if self.RequestParameters:
 
