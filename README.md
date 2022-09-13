@@ -25,7 +25,6 @@ environment that lets you locally build, test, debug, and deploy applications de
 * [Install SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 * [Build & deploy a "hello world" web app](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-quick-start.html)
 * [Install AWS Toolkit](https://aws.amazon.com/getting-started/tools-sdks/#IDE_and_IDE_Toolkits) to use SAM with your favorite IDEs
-* [Mastering the AWS Serverless Application Model (AWS SAM) - AWS Online Tech Talks](https://www.youtube.com/watch?v=QBBewrKR1qg)
 
 **Next steps:** Learn to build a more complex serverless application.
 * [Extract text from images and store in a database](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-example-s3.html) using Amazon S3 and Amazon Rekognition services.
