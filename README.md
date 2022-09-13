@@ -1,5 +1,4 @@
-<p align="center">
-</p>
+<img alt="AWS SAM squirrel" src="https://user-images.githubusercontent.com/1280602/189963632-04e70e1b-ebf4-4885-80ac-b0ab5a809b41.svg" width="250">
 
 # AWS Serverless Application Model (AWS SAM)
 
