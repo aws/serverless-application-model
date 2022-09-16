@@ -22,6 +22,7 @@ class CognitoUserPool(Resource):
         "SmsAuthenticationMessage": PropertyType(False, is_str()),
         "SmsConfiguration": PropertyType(False, is_type(dict)),
         "SmsVerificationMessage": PropertyType(False, is_str()),
+        "UserAttributeUpdateSettings": PropertyType(False, is_type(dict)),
         "UsernameAttributes": PropertyType(False, list_of(is_str())),
         "UsernameConfiguration": PropertyType(False, is_type(dict)),
         "UserPoolAddOns": PropertyType(False, list_of(dict)),
