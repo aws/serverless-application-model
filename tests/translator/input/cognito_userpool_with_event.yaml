@@ -12,6 +12,9 @@ Resources:
         - AttributeDataType: String
           Name: email
           Required: false
+      UserAttributeUpdateSettings:
+        AttributesRequireVerificationBeforeUpdate: 
+          - email
   ImplicitApiFunction:
     Type: AWS::Serverless::Function
     Properties:
