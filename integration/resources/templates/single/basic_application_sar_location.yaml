@@ -1,9 +1,13 @@
+Parameters:
+  SarApplicationId:
+    Type: String
+
 Resources:
   MyNestedApp:
     Type: AWS::Serverless::Application
     Properties:
       Location:
-        ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
-        SemanticVersion: 1.0.2
+        ApplicationId: !Ref SarApplicationId
+        SemanticVersion: 1.0.3
       Parameters:
         IdentityNameParameter: test

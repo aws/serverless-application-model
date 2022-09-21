@@ -1,40 +1,39 @@
 Parameters:
-  SemanticVersion:
+  SarApplicationId:
     Type: String
-    Default: 1.0.2
 
 Mappings:
   SARApplication:
     us-east-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     us-east-2:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     us-west-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     us-west-2:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     eu-central-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     eu-west-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     eu-west-2:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     eu-west-3:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     ap-south-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     ap-northeast-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     ap-northeast-2:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     ap-southeast-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     ap-southeast-2:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     ca-central-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
     sa-east-1:
-      ApplicationId: arn:aws:serverlessrepo:us-east-1:077246666028:applications/hello-world-python3
+      SemanticVersion: 1.0.3
 
 Resources:
   MyNestedApp:
@@ -42,12 +41,12 @@ Resources:
     Properties:
       Location:
         ApplicationId:
+          Ref: SarApplicationId
+        SemanticVersion:
           Fn::FindInMap:
           - SARApplication
-          - {Ref: 'AWS::Region'}
-          - ApplicationId
-        SemanticVersion:
-          Ref: SemanticVersion
+          - { Ref: 'AWS::Region' }
+          - SemanticVersion
       Parameters:
         IdentityNameParameter: test
       NotificationARNs:

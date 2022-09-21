@@ -3,7 +3,7 @@ from integration.helpers.resource import read_test_config_file
 
 
 @pytest.mark.setup
-def test_setup(setup_companion_stack_once, upload_resources, get_s3):
+def test_setup(setup_companion_stack_once, upload_resources, get_s3, get_serverless_application_repository_app):
     assert s3_upload_successful()
 
 
