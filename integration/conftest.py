@@ -10,8 +10,11 @@ from integration.helpers.deployer.exceptions.exceptions import S3DoesNotExistExc
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.stack import Stack
 from integration.helpers.yaml_utils import load_yaml
-from integration.helpers.resource import read_test_config_file, write_test_config_file_to_json, \
-    current_region_does_not_support
+from integration.helpers.resource import (
+    read_test_config_file,
+    write_test_config_file_to_json,
+    current_region_does_not_support,
+)
 
 try:
     from pathlib import Path
@@ -98,7 +101,7 @@ def get_serverless_application_repository_app():
         Description="SAR Application for Integration Tests",
         Name=SAR_APP_NAME,
         SemanticVersion=SAR_APP_VERSION,
-        TemplateBody=sar_template_contents
+        TemplateBody=sar_template_contents,
     )
     LOG.info("SAR application creation result: %s", create_app_result)
     return create_app_result.get("ApplicationId")
