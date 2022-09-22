@@ -1,3 +1,4 @@
+import jsonschema
 import os.path
 from parameterized import parameterized
 import pytest
@@ -12,6 +13,11 @@ OUTPUT_FOLDER = os.path.join(BASE_PATH, "output", "api")
 
 
 class TestValidatorApi(TestValidatorBase):
+
+    # jsonschema 4.* is more restrictive than 3, so we need a separate check
+    jsonschemaMajorVersion = int(jsonschema.__version__.split(".")[0])
+    _error_definitionuri = "error_definitionuri" if jsonschemaMajorVersion > 3 else "error_definitionuri_jsonschema3"
+
     @parameterized.expand(
         [
             "error_accesslogsetting",
@@ -27,7 +33,7 @@ class TestValidatorApi(TestValidatorBase):
             "error_canarysetting",
             "error_cors",
             "error_definitionbody",
-            "error_definitionuri",
+            _error_definitionuri,
             "error_description",
             "error_domain",
             "error_endpointconfiguration",
