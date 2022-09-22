@@ -24,6 +24,7 @@ class ClientProvider:
         self._iot_client = None
         self._kafka_client = None
         self._code_deploy_client = None
+        self._sar_client = None
 
     @property
     def cfn_client(self):
@@ -205,3 +206,13 @@ class ClientProvider:
             if not self._code_deploy_client:
                 self._code_deploy_client = boto3.client("codedeploy")
         return self._code_deploy_client
+
+    @property
+    def sar_client(self):
+        """
+        Serverless Application Repo. Client
+        """
+        with self._lock:
+            if not self._sar_client:
+                self._sar_client = boto3.client("serverlessrepo")
+        return self._sar_client

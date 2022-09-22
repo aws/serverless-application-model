@@ -10,7 +10,11 @@ from integration.helpers.deployer.exceptions.exceptions import S3DoesNotExistExc
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.stack import Stack
 from integration.helpers.yaml_utils import load_yaml
-from integration.helpers.resource import read_test_config_file, write_test_config_file_to_json
+from integration.helpers.resource import (
+    read_test_config_file,
+    write_test_config_file_to_json,
+    current_region_does_not_support,
+)
 
 try:
     from pathlib import Path
@@ -21,6 +25,9 @@ LOG = logging.getLogger(__name__)
 
 COMPANION_STACK_NAME = "sam-integ-stack-companion"
 COMPANION_STACK_TEMPLATE = "companion-stack.yaml"
+SAR_APP_TEMPLATE = "example-sar-app.yaml"
+SAR_APP_NAME = "sam-integration-test-sar-app"
+SAR_APP_VERSION = "1.0.3"
 
 
 def _get_all_buckets():
@@ -66,6 +73,38 @@ def setup_companion_stack_once(tmpdir_factory, get_prefix):
     stack_name = get_prefix + COMPANION_STACK_NAME
     companion_stack = Stack(stack_name, companion_stack_tempalte_path, cfn_client, output_dir)
     companion_stack.create_or_update(_stack_exists(stack_name))
+
+
+@pytest.fixture()
+def get_serverless_application_repository_app():
+    """Create or re-use a simple SAR app"""
+    if current_region_does_not_support(["ServerlessRepo"]):
+        LOG.info("Creating SAR application is skipped since SAR tests are not supported in this region.")
+        return
+
+    sar_client = ClientProvider().sar_client
+    sar_apps = sar_client.list_applications().get("Applications", [])
+    for sar_app in sar_apps:
+        if sar_app.get("Name") == SAR_APP_NAME:
+            LOG.info("SAR Application was already created, skipping SAR application publish")
+            return sar_app.get("ApplicationId")
+
+    LOG.info("SAR application not found, publishing new one...")
+
+    tests_integ_dir = Path(__file__).resolve().parents[1]
+    template_foler = Path(tests_integ_dir, "integration", "setup")
+    sar_app_template_path = Path(template_foler, SAR_APP_TEMPLATE)
+    with open(sar_app_template_path) as f:
+        sar_template_contents = f.read()
+    create_app_result = sar_client.create_application(
+        Author="SAM Team",
+        Description="SAR Application for Integration Tests",
+        Name=SAR_APP_NAME,
+        SemanticVersion=SAR_APP_VERSION,
+        TemplateBody=sar_template_contents,
+    )
+    LOG.info("SAR application creation result: %s", create_app_result)
+    return create_app_result.get("ApplicationId")
 
 
 @pytest.fixture()
