@@ -64,8 +64,14 @@ class BaseTest(TestCase):
     def case_name(self, request):
         self.testcase = request.node.name
 
+    @pytest.fixture(autouse=True)
+    def internal_check(self, check_internal):
+        self.internal = check_internal
+
     @classmethod
-    @pytest.mark.usefixtures("get_prefix", "get_stage", "check_internal", "parameter_values", "get_s3")
+    @pytest.mark.usefixtures(
+        "get_prefix", "get_stage", "check_internal", "parameter_values", "get_s3", "check_internal"
+    )
     def setUpClass(cls):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
@@ -560,10 +566,11 @@ class BaseTest(TestCase):
         """
         response = requests.get(url, headers=headers) if headers else requests.get(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
-        REQUEST_LOGGER.info(
-            "Request made to " + url,
-            extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
-        )
+        if self.internal:
+            REQUEST_LOGGER.info(
+                "Request made to " + url,
+                extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+            )
         return response
 
     def do_options_request_with_logging(self, url, headers=None):
@@ -578,8 +585,9 @@ class BaseTest(TestCase):
         """
         response = requests.options(url, headers=headers) if headers else requests.options(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
-        REQUEST_LOGGER.info(
-            "Request made to " + url,
-            extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
-        )
+        if self.internal:
+            REQUEST_LOGGER.info(
+                "Request made to " + url,
+                extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+            )
         return response
