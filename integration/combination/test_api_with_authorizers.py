@@ -439,7 +439,7 @@ class TestApiWithAuthorizers(BaseTest):
             response = self.do_get_request_with_logging(url)
         else:
             headers = {header_key: header_value}
-            response = self.Test.do_get_request_with_logging(url, headers)
+            response = self.do_get_request_with_logging(url, headers)
         status = response.status_code
 
         if status != expected_status_code:
