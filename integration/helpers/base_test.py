@@ -60,6 +60,10 @@ class BaseTest(TestCase):
     def s3_bucket(self, get_s3):
         self.s3_bucket_name = get_s3
 
+    @pytest.fixture(autouse=True)
+    def case_name(self, request):
+        self.testcase = request.node.name
+
     @classmethod
     @pytest.mark.usefixtures("get_prefix", "get_stage", "check_internal", "parameter_values", "get_s3")
     def setUpClass(cls):
@@ -470,7 +474,7 @@ class BaseTest(TestCase):
         headers : dict
             headers to use in request
         """
-        response = BaseTest.do_get_request_with_logging(url, headers)
+        response = self.do_get_request_with_logging(url, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
                 "Request to {} failed with status: {}, expected status: {}".format(
@@ -499,7 +503,7 @@ class BaseTest(TestCase):
         headers : dict
             headers to use in request
         """
-        response = BaseTest.do_options_request_with_logging(url, headers)
+        response = self.do_options_request_with_logging(url, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
                 "Request to {} failed with status: {}, expected status: {}".format(
@@ -544,8 +548,7 @@ class BaseTest(TestCase):
         }
         return parameter
 
-    @staticmethod
-    def do_get_request_with_logging(url, headers=None):
+    def do_get_request_with_logging(self, url, headers=None):
         """
         Perform a get request to an APIGW endpoint and log relevant info
         Parameters
@@ -557,11 +560,13 @@ class BaseTest(TestCase):
         """
         response = requests.get(url, headers=headers) if headers else requests.get(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
-        REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
+        REQUEST_LOGGER.info(
+            "Request made to " + url,
+            extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+        )
         return response
 
-    @staticmethod
-    def do_options_request_with_logging(url, headers=None):
+    def do_options_request_with_logging(self, url, headers=None):
         """
         Perform a options request to an APIGW endpoint and log relevant info
         Parameters
@@ -573,5 +578,8 @@ class BaseTest(TestCase):
         """
         response = requests.options(url, headers=headers) if headers else requests.options(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
-        REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
+        REQUEST_LOGGER.info(
+            "Request made to " + url,
+            extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+        )
         return response
