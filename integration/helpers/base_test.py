@@ -69,7 +69,9 @@ class BaseTest(TestCase):
         self.internal = check_internal
 
     @classmethod
-    @pytest.mark.usefixtures("get_prefix", "get_stage", "check_internal", "parameter_values", "get_s3", "check_internal")
+    @pytest.mark.usefixtures(
+        "get_prefix", "get_stage", "check_internal", "parameter_values", "get_s3", "check_internal"
+    )
     def setUpClass(cls):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
