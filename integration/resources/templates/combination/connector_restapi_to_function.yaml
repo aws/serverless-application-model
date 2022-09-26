@@ -67,7 +67,7 @@ Resources:
 
       Environment:
         Variables:
-          API_URL: !Sub "https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/somepath"
+          API_URL: !Sub "https://${RestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod/somepath"
 
   ConnectedFunction:
     Type: AWS::Lambda::Function
