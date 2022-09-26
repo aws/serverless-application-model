@@ -1,0 +1,63 @@
+Resources:
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs16.x
+      Handler: index.handler
+      Timeout: 10  # in case eb has delay
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        
+        exports.handler = async (event) => {
+          const eb = new AWS.EventBridge();
+          const response = await eb.putEvents({
+            Entries: [{
+              Source: process.env.EVENT_SOURCE,
+              Detail: "{}",
+              DetailType: "Test",
+            }]
+          }).promise();
+
+          const sqs = new AWS.SQS();
+          const data = await sqs.receiveMessage({
+            QueueUrl: process.env.QUEUE_URL,
+            WaitTimeSeconds: 5,
+          }).promise();
+
+          if (data.Messages.length == 0) {
+            throw 'No messages in the queue!';
+          }
+        };
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref Queue
+          EVENT_SOURCE: !Sub '${AWS::StackName}-test-event'
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: default
+        - SQSPollerPolicy:
+            QueueName: !GetAtt Queue.QueueName
+
+  EventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: !Sub 'EventRule-${AWS::StackName}'
+      EventPattern:
+        source:
+          - !Sub '${AWS::StackName}-test-event'
+      Targets:
+        - Arn: !GetAtt Queue.Arn
+          Id: "SQSqueue"
+
+  Queue:
+    Type: AWS::SQS::Queue
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: EventRule
+      Destination:
+        Id: Queue
+      Permissions:
+        - Write

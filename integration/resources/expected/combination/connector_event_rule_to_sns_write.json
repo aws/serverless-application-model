@@ -1,0 +1,34 @@
+[
+  {
+    "LogicalResourceId": "TriggerFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "VerificationQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  },
+  {
+    "LogicalResourceId": "Topic",
+    "ResourceType": "AWS::SNS::Topic"
+  },
+  {
+    "LogicalResourceId": "Subscription",
+    "ResourceType": "AWS::SNS::Subscription"
+  },
+  {
+    "LogicalResourceId": "EventRule",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "MyConnectorTopicPolicy",
+    "ResourceType": "AWS::SNS::TopicPolicy"
+  },
+  {
+    "LogicalResourceId": "ConnectorNotBeingTestedQueuePolicy",
+    "ResourceType": "AWS::SQS::QueuePolicy"
+  }
+]

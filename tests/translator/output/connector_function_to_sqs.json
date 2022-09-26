@@ -1,0 +1,218 @@
+{
+  "Resources": {
+    "MyConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnectorWithServerlessFunctionPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnectorWithServerlessFunction": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::Serverless::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:DeleteMessage",
+                "sqs:SendMessage",
+                "sqs:ChangeMessageVisibility",
+                "sqs:PurgeQueue"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyServerlessFunctionRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnectorWithTwoACsPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnectorWithTwoACs": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "sqs:DeleteMessage",
+                "sqs:SendMessage",
+                "sqs:ChangeMessageVisibility",
+                "sqs:PurgeQueue"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "MyTable"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": ["MyRole", "Arn"]
+        },
+        "Runtime": "nodejs14.x"
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyServerlessFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "const AWS = require('aws-sdk');\nexports.handler = async (event) => {\n  console.log(JSON.stringify(event));\n};\n"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": ["MyServerlessFunctionRole", "Arn"]
+        },
+        "Runtime": "nodejs14.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyServerlessFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": ["sts:AssumeRole"],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["lambda.amazonaws.com"]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "Resources": {
+    "MyConnectorTopicPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector": {
+            "Destination": {
+              "Type": "AWS::SNS::Topic"
+            },
+            "Source": {
+              "Type": "AWS::Events::Rule"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sns:Publish",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Fn::GetAtt": ["MyNewEventsRule", "Arn"]
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Resource": {
+                "Ref": "MySNSTopic"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Topics": [
+          {
+            "Ref": "MySNSTopic"
+          }
+        ]
+      },
+      "Type": "AWS::SNS::TopicPolicy"
+    },
+    "MyNewEventsRule": {
+      "Properties": {
+        "EventPattern": {
+          "source": ["aws.ec2"]
+        },
+        "Name": "mynewabc",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": ["StateMachine", "Arn"]
+            },
+            "Id": "StateMachine",
+            "RoleArn": {
+              "Fn::GetAtt": ["MyRuleRole", "Arn"]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyRuleRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Sub": "events.amazonaws.com"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MySNSTopic": {
+      "Type": "AWS::SNS::Topic"
+    }
+  }
+}

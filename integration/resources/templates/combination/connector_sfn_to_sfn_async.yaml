@@ -1,0 +1,41 @@
+Resources:
+  TriggerStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: TryDoSomething
+        States:
+          TryDoSomething:
+            Type: Task
+            Resource: arn:aws:states:::states:startExecution
+            Parameters:
+              StateMachineArn: !Ref MyStateMachine
+            End: True
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingDoesNotMatter"
+
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: Success
+        States:
+          Success:
+            Type: Succeed
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingDoesNotMatter"
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachine
+      Destination:
+        Id: MyStateMachine
+      Permissions:
+        - Read
+        - Write

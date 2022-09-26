@@ -1,0 +1,22 @@
+[
+  {
+    "LogicalResourceId": "TriggerStateMachineRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyStateMachineRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerStateMachine",
+    "ResourceType": "AWS::StepFunctions::StateMachine"
+  },
+  {
+    "LogicalResourceId": "MyStateMachine",
+    "ResourceType": "AWS::StepFunctions::StateMachine"
+  },
+  {
+    "LogicalResourceId": "MyConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

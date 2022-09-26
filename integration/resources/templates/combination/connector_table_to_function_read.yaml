@@ -1,0 +1,106 @@
+Resources:
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Timeout: 100
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+          const docClient = new AWS.DynamoDB.DocumentClient();
+          const response = await docClient.put({ 
+            TableName: process.env.TABLE_NAME, 
+            Item: {
+              Id: 'TestInput1234'
+            }
+          }).promise();
+          await new Promise(resolve => setTimeout(resolve, 10000));
+
+          var retries = 5;
+          while (retries-- > 0) {
+            const data = await new AWS.SQS().receiveMessage({
+              QueueUrl: process.env.VERIFICATION_QUEUE_URL,
+              WaitTimeSeconds: 20,
+            }).promise();
+            console.log(data);
+            if (data.Messages && data.Messages.length > 0) {
+              return;
+            }
+            await new Promise(resolve => setTimeout(resolve, 10000));
+          }
+          throw 'No messages in the queue!';
+        };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref Table
+          VERIFICATION_QUEUE_URL: !Ref VerificationQueue
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt VerificationQueue.QueueName
+
+  InvokedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          const sqs = new AWS.SQS();
+          await sqs.sendMessage({
+            QueueUrl: process.env.VERIFICATION_QUEUE_URL,
+            MessageBody: "test"
+          }).promise();
+        };
+      Environment:
+        Variables:
+          VERIFICATION_QUEUE_URL: !Ref VerificationQueue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt VerificationQueue.QueueName
+
+  VerificationQueue:
+    Type: AWS::SQS::Queue
+
+  Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  DynamoDBTableStream:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      Enabled: True
+      EventSourceArn: !GetAtt Table.StreamArn
+      FunctionName: !GetAtt InvokedFunction.Arn
+      StartingPosition: TRIM_HORIZON
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: Table
+      Destination: 
+        Id: InvokedFunction
+      Permissions:
+        - Read
+
+  ConnectorNotTested:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: TriggerFunction
+      Destination: 
+        Id: Table
+      Permissions:
+        - Write

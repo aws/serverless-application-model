@@ -109,7 +109,8 @@
                       "AWS::Serverless::HttpApi",
                       "AWS::Serverless::LayerVersion",
                       "AWS::Serverless::SimpleTable",
-                      "AWS::Serverless::StateMachine"
+                      "AWS::Serverless::StateMachine",
+                      "AWS::Serverless::Connector"
                     ]
                   }
                 }

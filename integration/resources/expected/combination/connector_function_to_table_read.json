@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "MyRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyTable",
+    "ResourceType": "AWS::DynamoDB::Table"
+  },
+  {
+    "LogicalResourceId": "MyReadConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

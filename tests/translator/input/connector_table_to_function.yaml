@@ -1,0 +1,51 @@
+Resources:
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - arn:{AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt MyRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+            console.log(JSON.stringify(event));
+          };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MyTable
+
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyTable
+      Destination: 
+        Id: MyFunction
+      Permissions:
+        - Read

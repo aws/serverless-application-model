@@ -1,0 +1,33 @@
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log("function")
+        };
+
+  Bucket:
+    # See also https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfig.html
+    DependsOn: [MyConnectorWriteLambdaPermission]
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 'random-bucket-name'
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Function: !GetAtt InvokedFunction.Arn
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::S3::Bucket
+        Arn: !Sub arn:${AWS::Partition}:s3:::random-bucket-name
+      Destination:
+        Id: Function
+      Permissions:
+        - Write

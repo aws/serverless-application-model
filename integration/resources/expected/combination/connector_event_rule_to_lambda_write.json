@@ -1,0 +1,30 @@
+[
+  {
+    "LogicalResourceId": "EventRule",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "Function",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "FunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyConnectorWriteLambdaPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "TriggerFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "VerificationQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  }
+]

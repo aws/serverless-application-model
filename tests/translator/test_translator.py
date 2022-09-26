@@ -156,7 +156,7 @@ class AbstractTestTranslator(TestCase):
         expected_filepath = os.path.join(OUTPUT_FOLDER, partition_folder, testcase + ".json")
         return json.load(open(expected_filepath, "r"))
 
-    def _compare_transform(self, manifest, expected, partition, region):
+    def _compare_transform(self, manifest, expected, partition, region, feature_toggle=None):
         with patch("boto3.session.Session.region_name", region):
             parameter_values = get_template_parameter_values()
             mock_policy_loader = MagicMock()
@@ -177,7 +177,7 @@ class AbstractTestTranslator(TestCase):
                     "AWSXRayDaemonWriteAccess"
                 ] = "arn:{}:iam::aws:policy/AWSXRayDaemonWriteAccess".format(partition)
 
-            output_fragment = transform(manifest, parameter_values, mock_policy_loader)
+            output_fragment = transform(manifest, parameter_values, mock_policy_loader, feature_toggle)
 
         print(json.dumps(output_fragment, indent=2))
 
@@ -278,7 +278,10 @@ class TestTranslatorEndToEnd(AbstractTestTranslator):
         manifest = self._read_input(testcase)
         expected = self._read_expected_output(testcase, partition)
 
-        self._compare_transform(manifest, expected, partition, region)
+        feature_toggle_mock = Mock()
+        feature_toggle_mock.is_enabled.side_effect = lambda feature: feature == "connector"
+
+        self._compare_transform(manifest, expected, partition, region, feature_toggle_mock)
 
     @parameterized.expand(
         itertools.product(
@@ -484,8 +487,11 @@ def test_transform_invalid_document(testcase):
     mock_policy_loader = MagicMock()
     parameter_values = get_template_parameter_values()
 
+    feature_toggle_mock = Mock()
+    feature_toggle_mock.is_enabled.side_effect = lambda feature: feature == "connector"
+
     with pytest.raises(InvalidDocumentException) as e:
-        transform(manifest, parameter_values, mock_policy_loader)
+        transform(manifest, parameter_values, mock_policy_loader, feature_toggle_mock)
 
     error_message = get_exception_error_message(e)
     error_message = re.sub(r"u'([A-Za-z0-9]*)'", r"'\1'", error_message)
@@ -847,6 +853,21 @@ class TestPluginsUsage(TestCase):
         prepare_plugins_mock.assert_called_once_with(
             initial_plugins, {"AWS::Region": "ap-southeast-1", "AWS::Partition": "aws"}
         )
+
+    @patch("boto3.session.Session.region_name", "ap-southeast-1")
+    @patch("botocore.client.ClientEndpointBridge._check_default_region", mock_get_region)
+    def test_connector_not_translated_when_feature_flag_not_on(self):
+        with open(os.path.join(INPUT_FOLDER, "translate_connector_without_feature_toggle_on.yaml"), "r") as f:
+            template = yaml_parse(f.read())
+        with open(os.path.join(OUTPUT_FOLDER, "translate_connector_without_feature_toggle_on.json"), "r") as f:
+            expected = json.loads(f.read())
+
+        mock_policy_loader = get_policy_mock()
+
+        sam_parser = Parser()
+        translator = Translator(mock_policy_loader, sam_parser)
+        actual = translator.translate(template, {})
+        self.assertEqual(expected, actual)
 
 
 def get_policy_mock():

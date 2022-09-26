@@ -1,0 +1,302 @@
+{
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyRule": {
+      "Type": "AWS::Events::Rule"
+    },
+    "MyQueue": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "MyApiV1": {
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiV2": {
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "MySfn": {
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "RuleToTopicTopicPolicy": {
+      "Type": "AWS::SNS::TopicPolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "RuleToTopic": {
+            "Source": {
+              "Type": "AWS::Events::Rule"
+            },
+            "Destination": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Resource": {
+                "Fn::GetAtt": ["Egg", "Baz"]
+              },
+              "Action": "sns:Publish",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Fn::GetAtt": ["MyRule", "Arn"]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "Topics": [
+          {
+            "Fn::GetAtt": ["Egg", "Baz"]
+          }
+        ]
+      }
+    },
+    "TopicToQueueQueuePolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "TopicToQueue": {
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            },
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Resource": {
+                "Ref": "MyQueue"
+              },
+              "Action": "sqs:SendMessage",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "MyTopic"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "Queues": [
+          {
+            "Fn::If": [
+              true,
+              {
+                "Ref": "Foo"
+              },
+              {
+                "Ref": "Bar"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "LambdaToQueuePolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "LambdaToQueue": {
+            "Source": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sqs:DeleteMessage",
+                "sqs:SendMessage",
+                "sqs:ChangeMessageVisibility",
+                "sqs:PurgeQueue"
+              ],
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": ["MyCoolRole"]
+      }
+    },
+    "ApiV1ToLambdaWriteLambdaPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "ApiV1ToLambda": {
+            "Source": {
+              "Type": "AWS::ApiGateway::RestApi"
+            },
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": ["MyFunction", "Arn"]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceResourceId": {
+                "Ref": "MyApiV1"
+              },
+              "SourceQualifier": "Prod/GET/foobar"
+            }
+          ]
+        }
+      }
+    },
+    "ApiV2ToLambdaWriteLambdaPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "ApiV2ToLambda": {
+            "Source": {
+              "Type": "AWS::ApiGatewayV2::Api"
+            },
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": ["MyFunction", "Arn"]
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
+            {
+              "SourceResourceId": {
+                "Ref": "MyApiV2"
+              },
+              "SourceQualifier": "*"
+            }
+          ]
+        }
+      }
+    },
+    "SfnToSfnPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "SfnToSfn": {
+            "Source": {
+              "Type": "AWS::StepFunctions::StateMachine"
+            },
+            "Destination": {
+              "Type": "AWS::StepFunctions::StateMachine"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["states:DescribeExecution"],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": ["MySfn", "Name"]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["events:DescribeRule"],
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["states:StartExecution", "states:StartSyncExecution"],
+              "Resource": ["some-other-arn"]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["states:StopExecution"],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:${DestinationName}:*",
+                    {
+                      "DestinationName": {
+                        "Fn::GetAtt": ["MySfn", "Name"]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["events:PutTargets", "events:PutRule"],
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": ["MyRoleNice"]
+      }
+    }
+  }
+}

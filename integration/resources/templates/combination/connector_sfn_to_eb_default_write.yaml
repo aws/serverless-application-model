@@ -1,0 +1,33 @@
+Resources:
+  TriggerStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: ReadDDB
+        States:
+          ReadDDB:
+            Type: Task
+            Resource: arn:aws:states:::events:putEvents
+            Parameters:
+              Entries:
+                - Detail:
+                    Message: Test
+                  DetailType: Test
+                  EventBusName: default
+                  Source: !Sub "${AWS::StackName}-source"
+            End: True
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingDoesNotMatter"
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachine
+      Destination:
+        Type: AWS::Events::EventBus
+        Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+      Permissions:
+        - Write

@@ -1,0 +1,38 @@
+Resources:
+  TriggerStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: ReadDDB
+        States:
+          ReadDDB:
+            Type: Task
+            Resource: arn:aws:states:::events:putEvents
+            Parameters:
+              Entries:
+                - Detail:
+                    Message: Test
+                  DetailType: Test
+                  EventBusName: !Ref CustomEventBus
+                  Source: !Sub "${AWS::StackName}-source"
+            End: True
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingDoesNotMatter"
+
+  CustomEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub "${AWS::StackName}-EventBus"
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachine
+      Destination:
+        Type: AWS::Events::EventBus
+        Arn: !GetAtt CustomEventBus.Arn
+      Permissions:
+        - Write

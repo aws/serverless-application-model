@@ -1,0 +1,157 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo
+
+  MyFunctionMissingRole:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.9
+      Handler: foo
+      Code:
+        ZipFile: foo
+
+  MyQueue:
+    Type: AWS::SQS::Queue
+
+  MyResourceWithoutType:
+    Properties:
+      Foo: Bar
+
+  MyNonSupportedTypeResource:
+    Type: AWS::Fancy::CoolType
+
+  NoIdMissingType:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Arn: somearn
+      Permissions:
+        - Write
+
+  NonStrId:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Id: 42
+      Permissions:
+        - Write
+
+  NonExistentLogicalId:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: ThisDoesntExist
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Write
+
+  ResourceWithoutType:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyResourceWithoutType
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Write
+
+  UnsupportedType:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyNonSupportedTypeResource
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Write
+
+  UnsupportedAccessCategory:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Id: MyQueue
+      Permissions:
+        - OKAY
+
+  UnsupportedAccessCategoryCombination:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Write
+
+  MissingRole:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunctionMissingRole
+      Destination:
+        Id: MyQueue
+      Permissions:
+        - Write
+
+  MissingRoleDestination:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue
+      Destination:
+        Id: MyFunctionMissingRole
+      Permissions:
+        - Read
+        - Write
+
+  MissingSqsQueueUrl:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Events::Rule
+      Destination:
+        Type: AWS::SQS::Queue
+      Permissions:
+        - Write
+
+  MissingLambdaFunctionArn:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Events::Rule
+      Destination:
+        Type: AWS::Lambda::Function
+      Permissions:
+        - Write
+
+  MissingSnsTopicArn:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Events::Rule
+      Destination:
+        Type: AWS::SNS::Topic
+      Permissions:
+        - Write
+
+  BothIdAndOtherProps:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Id: SomeId
+        Arn:
+      Permissions:
+        - Write

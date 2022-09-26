@@ -1,0 +1,38 @@
+Resources:
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      # Express state machine support sync execution
+      # which allows us to get the error message quickly in trigger function.
+      Type: EXPRESS
+      Definition:
+        StartAt: MyLambdaState
+        States:
+          MyLambdaState:
+            Type: Task
+            Resource: !GetAtt StateMachineFunction.Arn
+            End: true
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingIsNotStateMachineFunction"
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyStateMachine
+      Destination: 
+        Id: MyFunction
+      Permissions:
+        - Write

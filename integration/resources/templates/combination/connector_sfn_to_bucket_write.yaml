@@ -1,0 +1,32 @@
+Resources:
+  Bucket:
+    Type: AWS::S3::Bucket
+
+  TriggerStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: PutObject
+        States:
+          PutObject:
+            Type: Task
+            Parameters:
+              "Bucket": !Ref Bucket
+              "Body": {}
+              "Key": "MyData"
+            Resource: "arn:aws:states:::aws-sdk:s3:putObject"
+            End: true
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingIsNotStateMachineFunction"
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachine
+      Destination:
+        Id: Bucket
+      Permissions:
+        - Write

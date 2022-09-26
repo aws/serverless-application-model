@@ -1,0 +1,43 @@
+Resources:
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+          const docClient = new AWS.DynamoDB.DocumentClient();
+          const response = await docClient.put({ 
+            TableName: process.env.TABLE_NAME, 
+            Item: {
+              Id: 'TestInput1234'
+            }
+          }).promise();
+          return response;
+        };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MyTable
+
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+
+  MyWriteConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: TriggerFunction
+      Destination: 
+        Id: MyTable
+      Permissions:
+        - Write

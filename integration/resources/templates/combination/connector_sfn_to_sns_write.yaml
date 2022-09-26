@@ -1,0 +1,31 @@
+Resources:
+  TriggerStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: TryDoSomething
+        States:
+          TryDoSomething:
+            Type: Task
+            Resource: arn:aws:states:::sns:publish
+            Parameters:
+              TopicArn: !Ref MyTopic
+              Message: hello
+            End: True
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingIsNotStateMachineFunction"
+
+  MyTopic:
+    Type: AWS::SNS::Topic
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachine
+      Destination:
+        Id: MyTopic
+      Permissions:
+        - Write
