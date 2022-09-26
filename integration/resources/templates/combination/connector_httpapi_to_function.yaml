@@ -105,7 +105,7 @@ Resources:
       ApiId: !Ref HttpApi
       IntegrationType: AWS_PROXY
       IntegrationUri: !Sub >-
-        arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectedFunction.Arn}/invocations
+        arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectedFunction.Arn}/invocations
       IntegrationMethod: POST
       PayloadFormatVersion: '2.0'
 

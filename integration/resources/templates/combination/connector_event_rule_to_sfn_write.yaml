@@ -70,7 +70,7 @@ Resources:
         States:
           TryDoSomething:
             Type: Task
-            Resource: arn:aws:states:::sqs:sendMessage
+            Resource: !Sub arn:${AWS::Partition}:states:::sqs:sendMessage
             Parameters:
               QueueUrl: !Ref VerificationQueue
               MessageBody: hello

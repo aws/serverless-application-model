@@ -8,7 +8,7 @@ Resources:
         States:
           ReadDDB:
             Type: Task
-            Resource: arn:aws:states:::dynamodb:getItem
+            Resource: !Sub arn:${AWS::Partition}:states:::dynamodb:getItem
             Parameters:
               TableName: !Ref MyTable
               Key:

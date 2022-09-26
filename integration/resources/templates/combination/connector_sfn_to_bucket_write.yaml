@@ -15,7 +15,7 @@ Resources:
               "Bucket": !Ref Bucket
               "Body": {}
               "Key": "MyData"
-            Resource: "arn:aws:states:::aws-sdk:s3:putObject"
+            Resource: !Sub "arn:${AWS::Partition}:states:::aws-sdk:s3:putObject"
             End: true
       Policies:
         - LambdaInvokePolicy:

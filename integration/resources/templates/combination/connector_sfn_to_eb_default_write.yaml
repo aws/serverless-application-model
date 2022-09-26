@@ -8,7 +8,7 @@ Resources:
         States:
           ReadDDB:
             Type: Task
-            Resource: arn:aws:states:::events:putEvents
+            Resource: !Sub arn:${AWS::Partition}:states:::events:putEvents
             Parameters:
               Entries:
                 - Detail:

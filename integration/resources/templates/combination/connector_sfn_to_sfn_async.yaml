@@ -8,7 +8,7 @@ Resources:
         States:
           TryDoSomething:
             Type: Task
-            Resource: arn:aws:states:::states:startExecution
+            Resource: !Sub arn:${AWS::Partition}:states:::states:startExecution
             Parameters:
               StateMachineArn: !Ref MyStateMachine
             End: True

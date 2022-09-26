@@ -14,7 +14,7 @@ Resources:
             Type: Task
             Parameters: 
               Bucket: !Ref Bucket
-            Resource: "arn:aws:states:::aws-sdk:s3:listObjectsV2"
+            Resource: !Sub "arn:${AWS::Partition}:states:::aws-sdk:s3:listObjectsV2"
             End: true
       Policies:
         - LambdaInvokePolicy:

@@ -77,7 +77,7 @@ Resources:
     Properties:
       Source:
         Type: AWS::S3::Bucket
-        Arn: !Sub arn:aws:s3:::${BucketName}
+        Arn: !Sub arn:${AWS::Partition}:s3:::${BucketName}
       Destination:
         Id: InvokedFunction
       Permissions:

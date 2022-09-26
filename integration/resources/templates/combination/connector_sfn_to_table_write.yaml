@@ -8,7 +8,7 @@ Resources:
         States:
           PutDDB:
             Type: Task
-            Resource: arn:aws:states:::dynamodb:putItem
+            Resource: !Sub arn:${AWS::Partition}:states:::dynamodb:putItem
             Parameters:
               TableName: !Ref MyTable
               Item:

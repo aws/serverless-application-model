@@ -8,7 +8,7 @@ Resources:
         States:
           ReadDDB:
             Type: Task
-            Resource: arn:aws:states:::sqs:sendMessage
+            Resource: !Sub arn:${AWS::Partition}:states:::sqs:sendMessage
             Parameters:
               QueueUrl: !Ref MyQueue
               MessageBody: hello

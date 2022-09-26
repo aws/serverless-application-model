@@ -8,7 +8,7 @@ Resources:
         States:
           TryDoSomething:
             Type: Task
-            Resource: arn:aws:states:::lambda:invoke
+            Resource: !Sub arn:${AWS::Partition}:states:::lambda:invoke
             Parameters:
               FunctionName: !Ref MyFunction
             End: True

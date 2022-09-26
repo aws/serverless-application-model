@@ -8,7 +8,7 @@ Resources:
         States:
           TryDoSomething:
             Type: Task
-            Resource: arn:aws:states:::sns:publish
+            Resource: !Sub arn:${AWS::Partition}:states:::sns:publish
             Parameters:
               TopicArn: !Ref MyTopic
               Message: hello

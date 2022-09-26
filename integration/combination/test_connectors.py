@@ -76,12 +76,19 @@ class TestConnectors(BaseTest):
 
         state_machine_arn = self.get_physical_id_by_logical_id("TriggerStateMachine")
         sfn_client = self.client_provider.sfn_client
+        s3_client = self.client_provider.s3_client
 
         response = sfn_client.start_sync_execution(
             stateMachineArn=state_machine_arn,
         )
         # Without permission, it will be "FAILED"
         self.assertEqual(response.get("status"), "SUCCEEDED")
+
+        # Some tests will create items in S3 Bucket, which result in stack DELETE_FAILED state
+        # manually empty the bucket to allow stacks to be deleted successfully.
+        bucket_name = self.get_physical_id_by_type("AWS::S3::Bucket")
+        if bucket_name:
+            clean_bucket(bucket_name, s3_client)
 
     @parameterized.expand(
         [
