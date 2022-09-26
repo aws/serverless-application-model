@@ -90,6 +90,11 @@ Resources:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: !Sub "${AWS::StackName}-connector-restapi-to-function"
+      EndpointConfiguration:
+        # BJS and gov regions only support REGIONAL endpoints,
+        # using REGIONAL for all regions for simplicity.
+        Types:
+          - REGIONAL
 
   Path:
     Type: AWS::ApiGateway::Resource
