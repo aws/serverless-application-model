@@ -4,7 +4,14 @@ import random
 import string  # pylint: disable=deprecated-module
 from typing import Any, Callable, Dict, List, Set
 
-from integration.config.service_names import DYNAMO_DB, HTTP_API, S3_EVENTS, SQS, STATE_MACHINE_INLINE_DEFINITION
+from integration.config.service_names import (
+    DYNAMO_DB,
+    HTTP_API,
+    REST_API,
+    S3_EVENTS,
+    SQS,
+    STATE_MACHINE_INLINE_DEFINITION,
+)
 from integration.helpers.yaml_utils import load_yaml
 
 try:
@@ -203,6 +210,7 @@ def _resource_using_s3_events(resource: Dict[str, Any]) -> bool:
 
 SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
     HTTP_API: lambda template_dict, cfn_resource_types: "AWS::ApiGatewayV2::Api" in cfn_resource_types,
+    REST_API: lambda template_dict, cfn_resource_types: "AWS::ApiGateway::RestApi" in cfn_resource_types,
     SQS: lambda template_dict, cfn_resource_types: "AWS::SQS::Queue" in cfn_resource_types,
     DYNAMO_DB: lambda template_dict, cfn_resource_types: "AWS::DynamoDB::Table" in cfn_resource_types,
     STATE_MACHINE_INLINE_DEFINITION: lambda template_dict, cfn_resource_types: any(
