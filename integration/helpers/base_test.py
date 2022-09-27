@@ -104,6 +104,9 @@ class BaseTest(TestCase):
         self.deployer = Deployer(self.client_provider.cfn_client)
         self.s3_uploader = S3Uploader(self.client_provider.s3_client, self.s3_bucket_name)
         self.stack_resources = None
+        self.stack_name = None
+        self.output_file_path = None
+        self.sub_input_file_path = None
 
     def tearDown(self):
         if self.stack_name:
