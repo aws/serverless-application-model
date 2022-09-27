@@ -155,3 +155,20 @@ Resources:
         Arn:
       Permissions:
         - Write
+
+  NoPermissionConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Id: MyQueue
+
+  EmptyPermissionConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Id: MyQueue
+      Permission:
