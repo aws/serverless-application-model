@@ -313,6 +313,7 @@
                 {
                   "Effect": "Allow",
                   "Action": [
+                    "states:DescribeStateMachine",
                     "states:ListExecutions"
                   ],
                   "Resource": [
