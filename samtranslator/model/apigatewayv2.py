@@ -216,7 +216,7 @@ class ApiGatewayV2Authorizer(object):
             openapi[APIGATEWAY_AUTHORIZER_KEY] = {"type": "request"}
 
             # Generate the lambda arn
-            partition = ArnGenerator.get_partition_name()
+            partition = "{AWS::Partition}"
             resource = "lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations"
             authorizer_uri = fnSub(
                 ArnGenerator.generate_arn(
