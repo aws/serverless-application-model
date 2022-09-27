@@ -648,8 +648,7 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "states:StartExecution",
-                    "states:StartSyncExecution"
+                    "states:StartExecution"
                   ],
                   "Resource": [
                     "%{Destination.Arn}"

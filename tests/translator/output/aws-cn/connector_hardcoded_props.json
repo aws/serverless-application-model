@@ -265,7 +265,7 @@
             },
             {
               "Effect": "Allow",
-              "Action": ["states:StartExecution", "states:StartSyncExecution"],
+              "Action": ["states:StartExecution"],
               "Resource": ["some-other-arn"]
             },
             {
