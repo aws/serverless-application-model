@@ -103,6 +103,7 @@ class BaseTest(TestCase):
     def setUp(self):
         self.deployer = Deployer(self.client_provider.cfn_client)
         self.s3_uploader = S3Uploader(self.client_provider.s3_client, self.s3_bucket_name)
+        self.stack_resources = None
 
     def tearDown(self):
         if self.stack_name:
