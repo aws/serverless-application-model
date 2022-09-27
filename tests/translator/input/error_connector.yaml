@@ -171,4 +171,13 @@ Resources:
         Id: MyFunction
       Destination:
         Id: MyQueue
-      Permission:
+      Permissions:
+
+  EmptyListPermissionConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyFunction
+      Destination:
+        Id: MyQueue
+      Permissions: []

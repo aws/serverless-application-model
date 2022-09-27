@@ -1653,9 +1653,16 @@ class SamConnector(SamResourceMacro):
         profile_permissions = profile_properties["AccessCategories"]
         valid_permissions_combinations = profile_properties.get("ValidAccessCategories")
 
+        valid_permissions_str = ", ".join(profile_permissions)
+
+        if not self.Permissions:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'Permissions' cannot be empty; valid values are: {valid_permissions_str}.",
+            )
+
         for permission in self.Permissions:
             if permission not in profile_permissions:
-                valid_permissions_str = ", ".join(profile_permissions)
                 raise InvalidResourceException(
                     self.logical_id,
                     f"Unsupported 'Permissions' provided; valid values are: {valid_permissions_str}.",
