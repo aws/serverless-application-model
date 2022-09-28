@@ -131,9 +131,7 @@ class Translator:
         document_errors = []
         changed_logical_ids = {}
         route53_record_set_groups = {}
-        for logical_id, resource_dict in self._get_resources_to_iterate(
-            sam_template, macro_resolver, self.feature_toggle
-        ):
+        for logical_id, resource_dict in self._get_resources_to_iterate(sam_template, macro_resolver):
             try:
                 macro = macro_resolver.resolve_resource_type(resource_dict).from_dict(
                     logical_id, resource_dict, sam_plugins=sam_plugins
@@ -214,7 +212,7 @@ class Translator:
             raise InvalidDocumentException(document_errors)
 
     # private methods
-    def _get_resources_to_iterate(self, sam_template, macro_resolver, feature_toggle: FeatureToggle):
+    def _get_resources_to_iterate(self, sam_template, macro_resolver):
         """
         Returns a list of resources to iterate, order them based on the following order:
 
@@ -253,9 +251,7 @@ class Translator:
             elif resource["Type"] == "AWS::Serverless::Api" or resource["Type"] == "AWS::Serverless::HttpApi":
                 apis.append(data)
             elif resource["Type"] == "AWS::Serverless::Connector":
-                if feature_toggle.is_enabled("connector"):
-                    # Skip connectors if feature toggle is not on
-                    connectors.append(data)
+                connectors.append(data)
             else:
                 others.append(data)
 
