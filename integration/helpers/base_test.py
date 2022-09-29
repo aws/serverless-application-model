@@ -45,6 +45,13 @@ LoggingConfiguration.configure_request_logger(REQUEST_LOGGER)
 
 STACK_NAME_PREFIX = "sam-integ-stack-"
 S3_BUCKET_PREFIX = "sam-integ-bucket-"
+FEATURE_TOGGLE_JSON_FILES = [
+    "http_api_with_custom_domains_regional",
+    "http_api_with_custom_domains_regional_ownership_verification",
+    "api_with_custom_domains_edge",
+    "api_with_custom_domains_regional",
+    "api_with_custom_domains_regional_ownership_verification",
+]
 
 
 class BaseTest(TestCase):
@@ -144,12 +151,18 @@ class BaseTest(TestCase):
         s3_uploader: S3Uploader object
             Object for uploading files to s3
         """
-        folder, file_name = file_path.split("/")
-
         # If template is too large, calling the method with self.s3_uploader to send the template to s3 then deploy
         self.create_stack(file_path, parameters, s3_uploader)
-        self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
+        self.get_expected_json_file_name(file_path)
         self.verify_stack()
+
+    def get_expected_json_file_name(self, file_path):
+        folder, file_name = file_path.split("/")
+
+        if "FeatureToggle" in self.pipeline_prefix and file_name in FEATURE_TOGGLE_JSON_FILES:
+            self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + "_feature_toggle.json"))
+        else:
+            self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
 
     def update_stack(self, parameters=None, file_path=None):
         """

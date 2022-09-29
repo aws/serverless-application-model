@@ -3,6 +3,8 @@ Parameters:
     Type: String
   MyEdgeDomainCert:
     Type: String
+  HostedZoneId:
+    Type: String
 
 Resources:
   MyFunction:
@@ -41,5 +43,6 @@ Resources:
         BasePath:
           - /get
         Route53:
-          HostedZoneId: Z1SKZDMQ2UR7IW
+          HostedZoneId:
+            Ref: HostedZoneId
           IpV6: true
