@@ -12,7 +12,6 @@ from integration.helpers.resource import current_region_not_included
 class TestCustomRestApiDomains(BaseInternalTest):
     def test_custom_rest_api_domains_edge(self):
         self.create_and_verify_stack("combination/api_with_custom_domains_edge")
-
         domain_name_list = self.get_stack_resources("AWS::ApiGateway::DomainName")
         self.assertEqual(1, len(domain_name_list))
 
@@ -20,10 +19,7 @@ class TestCustomRestApiDomains(BaseInternalTest):
         api_gateway_client = self.client_provider.api_client
         result = api_gateway_client.get_domain_name(domainName=domain_name_id)
 
-        if "FeatureToggle" in self.pipeline_prefix:
-            self.assertEqual("ftl.sam-gamma-edge.com", result["domainName"])
-        else:
-            self.assertEqual("sam-gamma-edge.com", result["domainName"])
+        self.assertEqual("sam-gamma-edge.com", result["domainName"])
 
         end_point_config = result["endpointConfiguration"]
         end_point_types = end_point_config["types"]
@@ -41,11 +37,7 @@ class TestCustomRestApiDomains(BaseInternalTest):
         api_gateway_client = self.client_provider.api_client
         result = api_gateway_client.get_domain_name(domainName=domain_name_id)
 
-        if "FeatureToggle" in self.pipeline_prefix:
-            self.assertEqual("ftl.sam-gamma-regional.com", result["domainName"])
-        else:
-            self.assertEqual("sam-gamma-regional.com", result["domainName"])
-
+        self.assertEqual("sam-gamma-regional.com", result["domainName"])
         self.assertEqual("TLS_1_2", result["securityPolicy"])
 
         end_point_config = result["endpointConfiguration"]

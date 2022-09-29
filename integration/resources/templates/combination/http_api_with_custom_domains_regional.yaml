@@ -3,8 +3,6 @@ Parameters:
     Type: String
   MyDomainCert:
     Type: String
-  HostedZoneId:
-    Type: String
 
 Globals:
   HttpApi:
@@ -22,8 +20,7 @@ Globals:
         - /get
         - /post
       Route53:
-        HostedZoneId:
-          Ref: HostedZoneId
+        HostedZoneId: Z1DTV8GVAVOHDR
 
 Resources:
   MyFunction:
