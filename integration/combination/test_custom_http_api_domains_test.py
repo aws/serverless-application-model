@@ -11,10 +11,7 @@ from integration.helpers.resource import current_region_not_included
 )
 class TestCustomHttpApiDomains(BaseInternalTest):
     def test_custom_http_api_domains_regional(self):
-        if self.pipeline_prefix == "SamTransformFeatureToggleLambda-":
-            self.create_and_verify_stack("combination/http_api_with_custom_domains_regional_feature_toggle")
-        else:
-            self.create_and_verify_stack("combination/http_api_with_custom_domains_regional")
+        self.create_and_verify_stack("combination/http_api_with_custom_domains_regional")
 
         domain_name_list = self.get_stack_resources("AWS::ApiGatewayV2::DomainName")
         self.assertEqual(1, len(domain_name_list))
@@ -40,10 +37,7 @@ class TestCustomHttpApiDomains(BaseInternalTest):
         self.assertEqual("TLS_1_2", domain_name_config["SecurityPolicy"])
 
     def test_custom_http_api_domains_regional_ownership_verification(self):
-        if self.pipeline_prefix == "SamTransformFeatureToggleLambda-":
-            self.create_and_verify_stack("combination/http_api_with_custom_domains_regional_ownership_verification_ft")
-        else:
-            self.create_and_verify_stack("combination/http_api_with_custom_domains_regional_ownership_verification")
+        self.create_and_verify_stack("combination/http_api_with_custom_domains_regional_ownership_verification")
 
         domain_name_id = self.get_physical_id_by_type("AWS::ApiGatewayV2::DomainName")
         api_gateway_client = self.client_provider.api_v2_client
@@ -53,5 +47,4 @@ class TestCustomHttpApiDomains(BaseInternalTest):
         self.assertEqual(1, len(domain_name_configs))
         domain_name_config = domain_name_configs[0]
 
-        if self.pipeline_prefix != "SamTransformFeatureToggleLambda-":
-            self.assertIsNotNone(domain_name_config.get("OwnershipVerificationCertificateArn"))
+        self.assertIsNotNone(domain_name_config.get("OwnershipVerificationCertificateArn"))
