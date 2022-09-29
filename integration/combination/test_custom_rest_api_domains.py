@@ -20,7 +20,7 @@ class TestCustomRestApiDomains(BaseInternalTest):
         api_gateway_client = self.client_provider.api_client
         result = api_gateway_client.get_domain_name(domainName=domain_name_id)
 
-        if self.pipeline_prefix == "SamTransformFeatureToggleLambda-":
+        if "FeatureToggle" in self.pipeline_prefix:
             self.assertEqual("ftl.sam-gamma-edge.com", result["domainName"])
         else:
             self.assertEqual("sam-gamma-edge.com", result["domainName"])
@@ -41,7 +41,7 @@ class TestCustomRestApiDomains(BaseInternalTest):
         api_gateway_client = self.client_provider.api_client
         result = api_gateway_client.get_domain_name(domainName=domain_name_id)
 
-        if self.pipeline_prefix == "SamTransformFeatureToggleLambda-":
+        if "FeatureToggle" in self.pipeline_prefix:
             self.assertEqual("ftl.sam-gamma-regional.com", result["domainName"])
         else:
             self.assertEqual("sam-gamma-regional.com", result["domainName"])

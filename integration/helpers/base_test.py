@@ -159,7 +159,7 @@ class BaseTest(TestCase):
     def get_expected_json_file_name(self, file_path):
         folder, file_name = file_path.split("/")
 
-        if self.pipeline_prefix == "SamTransformFeatureToggleLambda-" and file_name in FEATURE_TOGGLE_JSON_FILES:
+        if "FeatureToggle" in self.pipeline_prefix and file_name in FEATURE_TOGGLE_JSON_FILES:
             self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + "_feature_toggle.json"))
         else:
             self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))

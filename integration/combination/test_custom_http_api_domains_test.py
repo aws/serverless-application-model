@@ -21,7 +21,7 @@ class TestCustomHttpApiDomains(BaseInternalTest):
         api_gateway_client = self.client_provider.api_v2_client
         result = api_gateway_client.get_domain_name(DomainName=domain_name_id)
 
-        if self.pipeline_prefix == "SamTransformFeatureToggleLambda-":
+        if "FeatureToggle" in self.pipeline_prefix:
             self.assertEqual("httpapi.ftl.sam-gamma-regional.com", result["DomainName"])
         else:
             self.assertEqual("httpapi.sam-gamma-regional.com", result["DomainName"])
