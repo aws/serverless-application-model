@@ -21,7 +21,10 @@ class TestCustomHttpApiDomains(BaseInternalTest):
         api_gateway_client = self.client_provider.api_v2_client
         result = api_gateway_client.get_domain_name(DomainName=domain_name_id)
 
-        self.assertEqual("httpapi.sam-gamma-regional.com", result["DomainName"])
+        if "FeatureToggle" in self.pipeline_prefix:
+            self.assertEqual("httpapi.ftl.sam-gamma-regional.com", result["DomainName"])
+        else:
+            self.assertEqual("httpapi.sam-gamma-regional.com", result["DomainName"])
 
         mtls_auth_config = result["MutualTlsAuthentication"]
         self.assertEqual(self.file_to_s3_uri_map["MTLSCert.pem"]["uri"], mtls_auth_config["TruststoreUri"])
