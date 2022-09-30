@@ -5,8 +5,6 @@ Parameters:
     Type: String
   MyOwnershipVerificationCert:
     Type: String
-  HostedZoneId:
-    Type: String
 
 Globals:
   HttpApi:
@@ -24,8 +22,7 @@ Globals:
         - /get
         - /post
       Route53:
-        HostedZoneId:
-          Ref: HostedZoneId
+        HostedZoneId: Z1DTV8GVAVOHDR
       OwnershipVerificationCertificateArn:
         Ref: MyOwnershipVerificationCert
 
