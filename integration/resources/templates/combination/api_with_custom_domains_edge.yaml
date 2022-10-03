@@ -43,6 +43,6 @@ Resources:
         BasePath:
           - /get
         Route53:
-            HostedZoneId:
-              Ref: HostedZoneId
+          HostedZoneId:
+            Ref: HostedZoneId
           IpV6: true
