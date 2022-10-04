@@ -1,11 +1,16 @@
 from time import sleep
+from unittest import SkipTest
 from parameterized import parameterized
-from tenacity import retry, stop_after_attempt
+from tenacity import retry, stop_after_attempt, retry_if_exception
 from integration.conftest import clean_bucket
 from integration.helpers.base_test import S3_BUCKET_PREFIX, BaseTest
 from integration.helpers.resource import generate_suffix
 
-retry_once = retry(stop=stop_after_attempt(2))
+retry_once = retry(
+    stop=stop_after_attempt(2),
+    # unittest raises SkipTest for skipping tests
+    retry=retry_if_exception(lambda e: not isinstance(e, SkipTest)),
+)
 
 
 class TestConnectors(BaseTest):
