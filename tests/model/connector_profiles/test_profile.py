@@ -2,7 +2,11 @@ from unittest import TestCase
 
 from parameterized import parameterized
 
-from samtranslator.model.connector_profiles.profile import profile_replace, verify_profile_variables_replaced
+from samtranslator.model.connector_profiles.profile import (
+    get_profile,
+    profile_replace,
+    verify_profile_variables_replaced,
+)
 
 
 class TestProfile(TestCase):
@@ -235,3 +239,9 @@ class TestProfile(TestCase):
         with self.assertRaises(ValueError) as ctx:
             verify_profile_variables_replaced(profile)
         self.assertIn(error_includes, str(ctx.exception))
+
+    def test_get_profile_copied(self):
+        d1 = get_profile("AWS::Lambda::Function", "AWS::DynamoDB::Table")
+        d1["Type"] = "overridden"
+        d2 = get_profile("AWS::Lambda::Function", "AWS::DynamoDB::Table")
+        self.assertNotEqual(d1, d2)

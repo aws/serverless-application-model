@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import re
@@ -10,7 +11,9 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles.jso
 
 
 def get_profile(source_type: str, dest_type: str):
-    return PROFILE["Permissions"].get(source_type, {}).get(dest_type)
+    profile = PROFILE["Permissions"].get(source_type, {}).get(dest_type)
+    # Ensure not passing a mutable shared variable
+    return copy.deepcopy(profile)
 
 
 def verify_profile_variables_replaced(obj: Any) -> None:
