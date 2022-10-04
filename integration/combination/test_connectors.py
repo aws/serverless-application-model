@@ -1,8 +1,11 @@
 from time import sleep
 from parameterized import parameterized
+from tenacity import retry, stop_after_attempt
 from integration.conftest import clean_bucket
 from integration.helpers.base_test import S3_BUCKET_PREFIX, BaseTest
 from integration.helpers.resource import generate_suffix
+
+retry_once = retry(stop=stop_after_attempt(2))
 
 
 class TestConnectors(BaseTest):
@@ -41,6 +44,7 @@ class TestConnectors(BaseTest):
             ("combination/connector_table_to_function_read",),
         ]
     )
+    @retry_once
     def test_connector_by_invoking_a_function(self, template_file_path):
         self.skip_using_service_detector(template_file_path)
         self.create_and_verify_stack(template_file_path)
@@ -72,6 +76,7 @@ class TestConnectors(BaseTest):
             ("combination/connector_sfn_to_eb_custom_write",),
         ]
     )
+    @retry_once
     def test_connector_by_sync_execute_an_state_machine(self, template_file_path):
         self.skip_using_service_detector(template_file_path)
         self.create_and_verify_stack(template_file_path)
@@ -91,6 +96,7 @@ class TestConnectors(BaseTest):
             ("combination/connector_sfn_to_sfn_sync",),
         ]
     )
+    @retry_once
     def test_connector_by_async_execute_an_state_machine(self, template_file_path):
         self.skip_using_service_detector(template_file_path)
         self.create_and_verify_stack(template_file_path)
@@ -123,6 +129,7 @@ class TestConnectors(BaseTest):
             ("combination/connector_bucket_to_function_write",),
         ]
     )
+    @retry_once
     def test_connector_by_execute_a_s3_bucket(self, template_file_path):
         self.skip_using_service_detector(template_file_path)
         bucket_name = S3_BUCKET_PREFIX + "connector" + generate_suffix()
