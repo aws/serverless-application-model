@@ -2,7 +2,16 @@ import json
 import re
 import random
 import string  # pylint: disable=deprecated-module
+from typing import Any, Callable, Dict, List, Set
 
+from integration.config.service_names import (
+    DYNAMO_DB,
+    HTTP_API,
+    REST_API,
+    S3_EVENTS,
+    SQS,
+    STATE_MACHINE_INLINE_DEFINITION,
+)
 from integration.helpers.yaml_utils import load_yaml
 
 try:
@@ -181,6 +190,59 @@ def current_region_does_not_support(services):
 
     # check if any one of the services is in the excluded services for current testing region
     return bool(set(services).intersection(set(region_exclude_services["regions"][region])))
+
+
+def _resource_using_inline_statemachine_definition(resource: Dict[str, Any]) -> bool:
+    resource_type = resource.get("Type")
+    properties = resource.get("Properties", {})
+    if resource_type == "AWS::StepFunctions::StateMachine" and properties.get("DefinitionString"):
+        return True
+    if resource_type == "AWS::Serverless::StateMachine" and properties.get("Definition"):
+        return True
+    return False
+
+
+def _resource_using_s3_events(resource: Dict[str, Any]) -> bool:
+    resource_type = resource.get("Type")
+    properties = resource.get("Properties", {})
+    return resource_type == "AWS::S3::Bucket" and properties.get("NotificationConfiguration")
+
+
+SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
+    HTTP_API: lambda template_dict, cfn_resource_types: "AWS::ApiGatewayV2::Api" in cfn_resource_types,
+    REST_API: lambda template_dict, cfn_resource_types: "AWS::ApiGateway::RestApi" in cfn_resource_types,
+    SQS: lambda template_dict, cfn_resource_types: "AWS::SQS::Queue" in cfn_resource_types,
+    DYNAMO_DB: lambda template_dict, cfn_resource_types: "AWS::DynamoDB::Table" in cfn_resource_types,
+    STATE_MACHINE_INLINE_DEFINITION: lambda template_dict, cfn_resource_types: any(
+        _resource_using_inline_statemachine_definition(resource)
+        for resource in template_dict.get("Resources", {}).values()
+    ),
+    S3_EVENTS: lambda template_dict, cfn_resource_types: any(
+        _resource_using_s3_events(resource) for resource in template_dict.get("Resources", {}).values()
+    ),
+}
+
+
+def detect_services(template_dict: Dict[str, Any], cfn_resource_types: Set[str]):
+    """
+    Detect which services are used in the template.
+
+    TODO: Only used for connector integ testing for now.
+    this is not cannot detect all the services. Adding more if needed.
+
+    Parameters
+    ----------
+    template_dict: Dict[str, Any]
+        the template dict
+    cfn_resource_types : Set[str]
+        the transformed cfn resource types to be created
+
+    Returns
+    -------
+    List[str]
+        List of services in integration/config/service_names.py
+    """
+    return [service for service, detector in SERVICE_DETECTORS.items() if detector(template_dict, cfn_resource_types)]
 
 
 def current_region_not_included(services):

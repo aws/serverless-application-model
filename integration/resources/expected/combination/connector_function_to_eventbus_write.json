@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "LambdaRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "EventBus",
+    "ResourceType": "AWS::Events::EventBus"
+  },
+  {
+    "LogicalResourceId": "ConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

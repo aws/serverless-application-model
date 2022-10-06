@@ -1,0 +1,161 @@
+{
+  "Resources": {
+    "MyConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector": {
+            "Destination": {
+              "Type": "AWS::Serverless::StateMachine"
+            },
+            "Source": {
+              "Type": "AWS::Events::Rule"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": ["states:StartExecution"],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Ref": "StateMachine"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRuleRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyNewEventsRule": {
+      "Properties": {
+        "EventPattern": {
+          "source": ["aws.ec2"]
+        },
+        "Name": "mynewabc",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": ["StateMachine", "Arn"]
+            },
+            "Id": "StateMachine",
+            "RoleArn": {
+              "Fn::GetAtt": ["MyRuleRole", "Arn"]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyRuleRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Sub": "events.amazonaws.com"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachine": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"StartAt\": \"MyLambdaState\",",
+              "    \"States\": {",
+              "        \"MyLambdaState\": {",
+              "            \"End\": true,",
+              "            \"Resource\": \"${definition_substitution_1}\",",
+              "            \"Type\": \"Task\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Fn::GetAtt": ["StateMachineFunction", "Arn"]
+          }
+        },
+        "RoleArn": {
+          "Fn::GetAtt": ["StateMachineRole", "Arn"]
+        },
+        "StateMachineType": "EXPRESS",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "StateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": ["sts:AssumeRole"],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["states.amazonaws.com"]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": ["lambda:InvokeFunction"],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::Sub": [
+                      "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${functionName}*",
+                      {
+                        "functionName": "SomethingIsNotStateMachineFunction"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineRolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

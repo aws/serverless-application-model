@@ -1,0 +1,95 @@
+Parameters:
+  BucketName:
+    Type: String
+
+Resources:
+  VerificationQueue:
+    Type: AWS::SQS::Queue
+
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Timeout: 10  # in case eb has delay
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          var params = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: "MyKey",
+            Body: JSON.stringify("Test Message")
+          };
+          var s3 = new AWS.S3();
+          await s3.putObject(params).promise();
+
+          const data = await new AWS.SQS().receiveMessage({
+            QueueUrl: process.env.VERIFICATION_QUEUE_URL,
+            WaitTimeSeconds: 5,
+          }).promise();
+          if (data.Messages.length == 0) {
+            throw 'No messages in the queue!';
+          }
+        };
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref TriggerBucket
+          VERIFICATION_QUEUE_URL: !Ref VerificationQueue
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt VerificationQueue.QueueName
+
+  InvokedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          const sqs = new AWS.SQS();
+          await sqs.sendMessage({
+            QueueUrl: process.env.VERIFICATION_QUEUE_URL,
+            MessageBody: "test"
+          }).promise();
+        };
+      Environment:
+        Variables:
+          VERIFICATION_QUEUE_URL: !Ref VerificationQueue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt VerificationQueue.QueueName
+
+
+  TriggerBucket:
+    # See also https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfig.html
+    DependsOn: [MyConnectorWriteLambdaPermission]
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Function: !GetAtt InvokedFunction.Arn
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::S3::Bucket
+        Arn: !Sub arn:${AWS::Partition}:s3:::${BucketName}
+      Destination:
+        Id: InvokedFunction
+      Permissions:
+        - Write
+
+  ConnectorNotTested:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerFunction
+      Destination:
+        Id: TriggerBucket
+      Permissions:
+        - Write
+  

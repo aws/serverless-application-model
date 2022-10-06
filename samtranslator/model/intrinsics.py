@@ -196,3 +196,26 @@ def is_intrinsic_no_value(input):
 
     key = list(input.keys())[0]
     return key == "Ref" and input["Ref"] == "AWS::NoValue"
+
+
+def get_logical_id_from_intrinsic(input):
+    """
+    Verify if input is an Fn:GetAtt or Ref intrinsic
+
+    :param input: Input value to check if it is an intrinsic
+    :return: logical id if yes, return input for any other intrinsic function
+    """
+    if not is_intrinsic(input):
+        return None
+
+    # !Ref <logical-id>
+    v = input.get("Ref")
+    if isinstance(v, str):
+        return v
+
+    # !GetAtt <logical-id>.<attribute>
+    v = input.get("Fn::GetAtt")
+    if isinstance(v, list) and len(v) == 2 and isinstance(v[0], str):
+        return v[0]
+
+    return None

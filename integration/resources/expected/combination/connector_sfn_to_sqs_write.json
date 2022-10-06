@@ -1,0 +1,18 @@
+[
+  {
+    "LogicalResourceId": "TriggerStateMachineRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerStateMachine",
+    "ResourceType": "AWS::StepFunctions::StateMachine"
+  },
+  {
+    "LogicalResourceId": "MyQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  },
+  {
+    "LogicalResourceId": "MyConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

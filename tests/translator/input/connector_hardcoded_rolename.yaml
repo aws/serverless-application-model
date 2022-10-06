@@ -1,0 +1,21 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.9
+      InlineCode: foo
+      Handler: foo
+  MyQueue:
+    Type: AWS::SQS::Queue
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Lambda::Function
+        Arn: !GetAtt MyFunction.Arn
+        RoleName: MyCoolRole
+      Destination:
+        Id: MyQueue
+      Permissions:
+        - Write

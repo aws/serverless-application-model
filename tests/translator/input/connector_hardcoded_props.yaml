@@ -1,0 +1,92 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  # Intentionally not complete
+  MyFunction:
+    Type: AWS::Lambda::Function
+  MyRule:
+    Type: AWS::Events::Rule
+  MyQueue:
+    Type: AWS::SQS::Queue
+  MyTopic:
+    Type: AWS::SNS::Topic
+  MyApiV1:
+    Type: AWS::ApiGateway::RestApi
+  MyApiV2:
+    Type: AWS::ApiGatewayV2::Api
+  MySfn:
+    Type: AWS::StepFunctions::StateMachine
+
+  RuleToTopic:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyRule
+      Destination:
+        Type: AWS::SNS::Topic
+        Arn: !GetAtt Egg.Baz
+      Permissions:
+        - Write
+
+  TopicToQueue:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyTopic
+      Destination:
+        Type: AWS::SQS::Queue
+        Arn: !Ref MyQueue
+        QueueUrl: !If [true, !Ref Foo, !Ref Bar]
+      Permissions:
+        - Write
+
+  LambdaToQueue:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::Lambda::Function
+        Arn: !GetAtt MyFunction.Arn
+        RoleName: MyCoolRole
+      Destination:
+        Id: MyQueue
+      Permissions:
+        - Write
+
+  ApiV1ToLambda:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::ApiGateway::RestApi
+        ResourceId: !Ref MyApiV1
+        Qualifier: Prod/GET/foobar
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Write
+
+  ApiV2ToLambda:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::ApiGatewayV2::Api
+        ResourceId: !Ref MyApiV2
+        Qualifier: "*"
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Write
+
+  SfnToSfn:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Type: AWS::StepFunctions::StateMachine
+        Arn: !Sub some-arn
+        RoleName: MyRoleNice
+        Name: ThisIsMySourceSfnName
+      Destination:
+        Type: AWS::StepFunctions::StateMachine
+        Arn: some-other-arn
+        Name: !GetAtt MySfn.Name
+      Permissions:
+        - Read
+        - Write

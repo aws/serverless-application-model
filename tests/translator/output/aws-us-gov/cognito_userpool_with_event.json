@@ -35,6 +35,11 @@
             "Required": false
           }
         ],
+        "UserAttributeUpdateSettings": {
+         "AttributesRequireVerificationBeforeUpdate": [
+          "email"
+         ]
+        },
         "UsernameAttributes": [
           "email"
         ],

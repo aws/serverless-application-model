@@ -1,7 +1,19 @@
 ﻿""" SAM macro definitions """
 import copy
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Union
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
+from samtranslator.model.connector.connector import (
+    ConnectorResourceReference,
+    ConnectorResourceError,
+    add_depends_on,
+    get_event_source_mappings,
+    get_resource_reference,
+)
+from samtranslator.model.connector_profiles.profile import (
+    ConnectorProfile,
+    profile_replace,
+    get_profile,
+)
 
 import samtranslator.model.eventsources
 import samtranslator.model.eventsources.pull
@@ -13,7 +25,7 @@ from .packagetype import ZIP, IMAGE
 from .s3_utils.uri_parser import construct_s3_location_object, construct_image_code_object
 from .tags.resource_tagging import get_tag_list
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import PropertyType, SamResourceMacro, ResourceTypeResolver
+from samtranslator.model import ResourceResolver, PropertyType, SamResourceMacro, Resource, ResourceTypeResolver
 from samtranslator.model.apigateway import (
     ApiGatewayDeployment,
     ApiGatewayStage,
@@ -27,8 +39,8 @@ from samtranslator.model.architecture import ARM64, X86_64
 from samtranslator.model.cloudformation import NestedStack
 from samtranslator.model.dynamodb import DynamoDBTable
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
-from samtranslator.model.resource_policies import ResourcePolicies, PolicyTypes
-from samtranslator.model.iam import IAMRole, IAMRolePolicies
+from samtranslator.model.resource_policies import ResourcePolicies
+from samtranslator.model.iam import IAMManagedPolicy, IAMRolePolicies
 from samtranslator.model.lambda_ import (
     LambdaFunction,
     LambdaVersion,
@@ -49,9 +61,10 @@ from samtranslator.model.intrinsics import (
     make_not_conditional,
     make_conditional,
     make_and_condition,
+    fnGetAtt,
 )
-from samtranslator.model.sqs import SQSQueue
-from samtranslator.model.sns import SNSTopic
+from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
+from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
 from samtranslator.model.stepfunctions import StateMachineGenerator
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.xray_utils import get_xray_managed_policy_name
@@ -1596,3 +1609,271 @@ class SamStateMachine(SamResourceMacro):
                     raise InvalidEventException(logical_id, "{}".format(e))
                 event_resources[logical_id] = event_source.resources_to_link(resources)
         return event_resources
+
+
+class SamConnector(SamResourceMacro):
+    """Sam connector macro.
+    AWS SAM uses the LogicalIds of the AWS SAM resources in your template file to
+    construct the LogicalIds of the AWS CloudFormation resources it generates
+    https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-generated-resources.html
+    """
+
+    Source: Dict[str, Any]
+    Destination: Dict[str, Any]
+    Permissions: List[str]
+
+    resource_type = "AWS::Serverless::Connector"
+    property_types = {
+        "Source": PropertyType(True, dict_of(is_str(), any_type())),
+        "Destination": PropertyType(True, dict_of(is_str(), any_type())),
+        "Permissions": PropertyType(True, list_of(is_str())),
+    }
+
+    @cw_timer
+    def to_cloudformation(self, **kwargs) -> List:
+        resource_resolver: ResourceResolver = kwargs["resource_resolver"]
+        original_template = kwargs["original_template"]
+
+        try:
+            destination = get_resource_reference(self.Destination, resource_resolver, self.Source)
+            source = get_resource_reference(self.Source, resource_resolver, self.Destination)
+        except ConnectorResourceError as e:
+            raise InvalidResourceException(self.logical_id, str(e))
+
+        profile = get_profile(source.resource_type, destination.resource_type)
+        if not profile:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"Unable to create connector from {source.resource_type} to {destination.resource_type}; it's not supported or the template is invalid.",
+            )
+
+        # removing duplicate permissions
+        self.Permissions = list(set(self.Permissions))
+        profile_type, profile_properties = profile["Type"], profile["Properties"]
+        profile_permissions = profile_properties["AccessCategories"]
+        valid_permissions_combinations = profile_properties.get("ValidAccessCategories")
+
+        valid_permissions_str = ", ".join(profile_permissions)
+
+        if not self.Permissions:
+            raise InvalidResourceException(
+                self.logical_id,
+                f"'Permissions' cannot be empty; valid values are: {valid_permissions_str}.",
+            )
+
+        for permission in self.Permissions:
+            if permission not in profile_permissions:
+                raise InvalidResourceException(
+                    self.logical_id,
+                    f"Unsupported 'Permissions' provided; valid values are: {valid_permissions_str}.",
+                )
+
+        if valid_permissions_combinations:
+            sorted_permissions_combinations = [sorted(permission) for permission in valid_permissions_combinations]
+            if sorted(self.Permissions) not in sorted_permissions_combinations:
+                valid_permissions_combination_str = ", ".join(
+                    " + ".join(permission) for permission in sorted_permissions_combinations
+                )
+                raise InvalidResourceException(
+                    self.logical_id,
+                    f"Unsupported 'Permissions' provided; valid combinations are: {valid_permissions_combination_str}.",
+                )
+
+        replacement = {
+            "Source.Arn": source.arn,
+            "Destination.Arn": destination.arn,
+            "Source.ResourceId": source.resource_id,
+            "Destination.ResourceId": destination.resource_id,
+            "Source.Name": source.name,
+            "Destination.Name": destination.name,
+            "Source.Qualifier": source.qualifier,
+            "Destination.Qualifier": destination.qualifier,
+        }
+        try:
+            profile_properties = profile_replace(profile_properties, replacement)
+        except ValueError as e:
+            raise InvalidResourceException(self.logical_id, str(e))
+
+        generated_resources: List[Resource] = []
+        if profile_type == "AWS_IAM_ROLE_MANAGED_POLICY":
+            generated_resources.append(
+                self._construct_iam_policy(source, destination, profile_properties, resource_resolver)
+            )
+        if profile_type == "AWS_SQS_QUEUE_POLICY":
+            generated_resources.append(self._construct_sqs_queue_policy(source, destination, profile_properties))
+        if profile_type == "AWS_SNS_TOPIC_POLICY":
+            generated_resources.append(self._construct_sns_topic_policy(source, destination, profile_properties))
+        if profile_type == "AWS_LAMBDA_PERMISSION":
+            generated_resources.extend(
+                self._construct_lambda_permission_policy(source, destination, profile_properties)
+            )
+
+        self._add_connector_metadata(generated_resources, original_template, source, destination)
+        if generated_resources:
+            return generated_resources
+
+        # Should support all profile types
+        raise TypeError(f"Unknown profile policy type '{profile_type}'")
+
+    def _get_policy_statements(self, profile: ConnectorProfile) -> Dict[str, Any]:
+        policy_statements = []
+        for name, statements in profile["AccessCategories"].items():
+            if name in self.Permissions:
+                policy_statements.extend(statements["Statement"])
+
+        return {
+            "Version": "2012-10-17",
+            "Statement": policy_statements,
+        }
+
+    def _construct_iam_policy(
+        self,
+        source: ConnectorResourceReference,
+        destination: ConnectorResourceReference,
+        profile: ConnectorProfile,
+        resource_resolver: ResourceResolver,
+    ) -> IAMManagedPolicy:
+        source_policy = profile["SourcePolicy"]
+        resource = source if source_policy else destination
+
+        role_name = resource.role_name
+        if not role_name:
+            property_name = "Source" if source_policy else "Destination"
+            raise InvalidResourceException(
+                self.logical_id, f"Unable to get IAM role name from '{property_name}' resource."
+            )
+
+        policy_document = self._get_policy_statements(profile)
+        policy = IAMManagedPolicy(f"{self.logical_id}Policy")
+        policy.PolicyDocument = policy_document
+        policy.Roles = [role_name]
+
+        depended_by = profile.get("DependedBy")
+        if depended_by == "DESTINATION_EVENT_SOURCE_MAPPING":
+            if source.logical_id and destination.logical_id:
+                # The dependency type assumes Destination is a AWS::Lambda::Function
+                esm_ids = list(get_event_source_mappings(source.logical_id, destination.logical_id, resource_resolver))
+                # There can only be a single ESM from a resource to function, otherwise deployment fails
+                if len(esm_ids) == 1:
+                    add_depends_on(esm_ids[0], policy.logical_id, resource_resolver)
+        if depended_by == "SOURCE":
+            if source.logical_id:
+                add_depends_on(source.logical_id, policy.logical_id, resource_resolver)
+
+        return policy
+
+    def _construct_lambda_permission_policy(
+        self,
+        source: ConnectorResourceReference,
+        destination: ConnectorResourceReference,
+        profile: ConnectorProfile,
+    ) -> List[LambdaPermission]:
+        source_policy = profile["SourcePolicy"]
+        lambda_function = source if source_policy else destination
+
+        function_arn = lambda_function.arn
+        if not function_arn:
+            property_name = "Source" if source_policy else "Destination"
+            raise InvalidResourceException(
+                self.logical_id, f"Unable to get Lambda function ARN from '{property_name}' resource."
+            )
+
+        lambda_permissions = []
+        for name in profile["AccessCategories"].keys():
+            if name in self.Permissions:
+                permission = LambdaPermission(f"{self.logical_id}{name}LambdaPermission")
+                permissions = profile["AccessCategories"][name]
+                permission.Action = permissions["Action"]
+                permission.FunctionName = function_arn
+                permission.Principal = permissions["Principal"]
+                permission.SourceArn = permissions["SourceArn"]
+                permission.SourceAccount = permissions.get("SourceAccount")
+                lambda_permissions.append(permission)
+
+        return lambda_permissions
+
+    def _construct_sns_topic_policy(
+        self,
+        source: ConnectorResourceReference,
+        destination: ConnectorResourceReference,
+        profile: ConnectorProfile,
+    ) -> SNSTopicPolicy:
+        source_policy = profile["SourcePolicy"]
+        sns_topic = source if source_policy else destination
+
+        topic_arn = sns_topic.arn
+        if not topic_arn:
+            property_name = "Source" if source_policy else "Destination"
+            raise InvalidResourceException(
+                self.logical_id, f"Unable to get SNS topic ARN from '{property_name}' resource."
+            )
+
+        topic_policy = SNSTopicPolicy(f"{self.logical_id}TopicPolicy")
+        topic_policy.Topics = [topic_arn]
+        topic_policy.PolicyDocument = self._get_policy_statements(profile)
+
+        return topic_policy
+
+    def _construct_sqs_queue_policy(
+        self,
+        source: ConnectorResourceReference,
+        destination: ConnectorResourceReference,
+        profile: ConnectorProfile,
+    ) -> SQSQueuePolicy:
+        source_policy = profile["SourcePolicy"]
+        sqs_queue = source if source_policy else destination
+
+        queue_url = sqs_queue.queue_url
+        if not queue_url:
+            property_name = "Source" if source_policy else "Destination"
+            raise InvalidResourceException(
+                self.logical_id, f"Unable to get SQS queue URL from '{property_name}' resource."
+            )
+
+        queue_policy = SQSQueuePolicy(f"{self.logical_id}QueuePolicy")
+        queue_policy.PolicyDocument = self._get_policy_statements(profile)
+        queue_policy.Queues = [queue_url]
+
+        return queue_policy
+
+    def _add_connector_metadata(
+        self,
+        generated_resources: List[Resource],
+        original_template: Dict[str, Any],
+        source: ConnectorResourceReference,
+        destination: ConnectorResourceReference,
+    ) -> None:
+        """
+        Add metadata attribute to generated resources.
+
+        Metadata:
+          aws:sam:connectors:
+            <connector-logical-id>:
+              Source:
+                Type: <source-type>
+              Destination:
+                Type: <destination-type>
+        """
+        original_resources = original_template.get("Resources", {})
+        original_source_type = original_resources.get(source.logical_id, {}).get("Type")
+        original_dest_type = original_resources.get(destination.logical_id, {}).get("Type")
+        metadata = {
+            "aws:sam:connectors": {
+                self.logical_id: {
+                    # If the source/destination is a serverless resource,
+                    # we prefer to include the original serverless resource type
+                    # over the transformed CFN resource type so it can distinguish
+                    # connector usage between serverless resources and CFN resources.
+                    "Source": {"Type": original_source_type or source.resource_type},
+                    "Destination": {"Type": original_dest_type or destination.resource_type},
+                }
+            }
+        }
+        for resource in generated_resources:
+            # Although as today the generated resources do not have any existing metadata,
+            # To make it future proof, we still does a merge to avoid overwriting.
+            try:
+                original_metadata = resource.get_resource_attribute("Metadata")
+            except KeyError:
+                original_metadata = {}
+            resource.set_resource_attribute("Metadata", {**original_metadata, **metadata})

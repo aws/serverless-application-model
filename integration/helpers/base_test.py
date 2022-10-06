@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import requests
@@ -12,7 +13,12 @@ from integration.helpers.deployer.exceptions.exceptions import ThrottlingError
 from integration.helpers.deployer.utils.retry import retry_with_exponential_backoff_and_jitter
 from integration.helpers.exception import StatusCodeError
 from integration.helpers.request_utils import RequestUtils
-from integration.helpers.resource import generate_suffix, create_bucket, verify_stack_resources
+from integration.helpers.resource import (
+    current_region_does_not_support,
+    detect_services,
+    generate_suffix,
+    verify_stack_resources,
+)
 from integration.helpers.s3_uploader import S3Uploader
 from integration.helpers.yaml_utils import dump_yaml, load_yaml
 from integration.helpers.resource import read_test_config_file
@@ -60,8 +66,18 @@ class BaseTest(TestCase):
     def s3_bucket(self, get_s3):
         self.s3_bucket_name = get_s3
 
+    @pytest.fixture(autouse=True)
+    def case_name(self, request):
+        self.testcase = request.node.name
+
+    @pytest.fixture(autouse=True)
+    def internal_check(self, check_internal):
+        self.internal = check_internal
+
     @classmethod
-    @pytest.mark.usefixtures("get_prefix", "get_stage", "check_internal", "parameter_values", "get_s3")
+    @pytest.mark.usefixtures(
+        "get_prefix", "get_stage", "check_internal", "parameter_values", "get_s3", "check_internal"
+    )
     def setUpClass(cls):
         cls.FUNCTION_OUTPUT = "hello"
         cls.tests_integ_dir = Path(__file__).resolve().parents[1]
@@ -87,6 +103,10 @@ class BaseTest(TestCase):
     def setUp(self):
         self.deployer = Deployer(self.client_provider.cfn_client)
         self.s3_uploader = S3Uploader(self.client_provider.s3_client, self.s3_bucket_name)
+        self.stack_resources = None
+        self.stack_name = None
+        self.output_file_path = None
+        self.sub_input_file_path = None
 
     def tearDown(self):
         if self.stack_name:
@@ -140,6 +160,24 @@ class BaseTest(TestCase):
         self.create_stack(file_path, parameters, s3_uploader)
         self.expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
         self.verify_stack()
+
+    def skip_using_service_detector(self, file_path):
+        """
+        Skips the test if it cannot pass the test of
+        current_region_does_not_support() with detected services.
+        """
+        folder, file_name = file_path.split("/")
+
+        input_file_path = str(Path(self.template_dir, folder, file_name + ".yaml"))
+        expected_resource_path = str(Path(self.expected_dir, folder, file_name + ".json"))
+
+        template_dict = yaml_parse(open(input_file_path).read())
+        cfn_resource_types = {item["ResourceType"] for item in json.load(open(expected_resource_path))}
+
+        detected_services = detect_services(template_dict, cfn_resource_types)
+
+        if current_region_does_not_support(detected_services):
+            self.skipTest(f"Some/All of {detected_services} are not supported in this testing region")
 
     def update_stack(self, parameters=None, file_path=None):
         """
@@ -470,7 +508,7 @@ class BaseTest(TestCase):
         headers : dict
             headers to use in request
         """
-        response = BaseTest.do_get_request_with_logging(url, headers)
+        response = self.do_get_request_with_logging(url, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
                 "Request to {} failed with status: {}, expected status: {}".format(
@@ -499,7 +537,7 @@ class BaseTest(TestCase):
         headers : dict
             headers to use in request
         """
-        response = BaseTest.do_options_request_with_logging(url, headers)
+        response = self.do_options_request_with_logging(url, headers)
         if response.status_code != expected_status_code:
             raise StatusCodeError(
                 "Request to {} failed with status: {}, expected status: {}".format(
@@ -544,8 +582,7 @@ class BaseTest(TestCase):
         }
         return parameter
 
-    @staticmethod
-    def do_get_request_with_logging(url, headers=None):
+    def do_get_request_with_logging(self, url, headers=None):
         """
         Perform a get request to an APIGW endpoint and log relevant info
         Parameters
@@ -557,11 +594,14 @@ class BaseTest(TestCase):
         """
         response = requests.get(url, headers=headers) if headers else requests.get(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
-        REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
+        if self.internal:
+            REQUEST_LOGGER.info(
+                "Request made to " + url,
+                extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+            )
         return response
 
-    @staticmethod
-    def do_options_request_with_logging(url, headers=None):
+    def do_options_request_with_logging(self, url, headers=None):
         """
         Perform a options request to an APIGW endpoint and log relevant info
         Parameters
@@ -573,5 +613,9 @@ class BaseTest(TestCase):
         """
         response = requests.options(url, headers=headers) if headers else requests.options(url)
         amazon_headers = RequestUtils(response).get_amazon_headers()
-        REQUEST_LOGGER.info("Request made to " + url, extra={"status": response.status_code, "headers": amazon_headers})
+        if self.internal:
+            REQUEST_LOGGER.info(
+                "Request made to " + url,
+                extra={"test": self.testcase, "status": response.status_code, "headers": amazon_headers},
+            )
         return response

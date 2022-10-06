@@ -7,6 +7,7 @@ from samtranslator.model.intrinsics import (
     is_intrinsic_if,
     validate_intrinsic_if_items,
     is_intrinsic_no_value,
+    get_logical_id_from_intrinsic,
 )
 
 
@@ -81,3 +82,26 @@ class TestIntrinsics(TestCase):
         self.assertRaises(ValueError, validate_intrinsic_if_items, is_integer)
         self.assertRaises(ValueError, validate_intrinsic_if_items, is_boolean)
         self.assertRaises(ValueError, validate_intrinsic_if_items, is_dict)
+
+    @parameterized.expand(
+        [
+            ({"Fn::GetAtt": ["Foo", "Bar"]}, "Foo"),
+            ({"Ref": "Foo"}, "Foo"),
+        ]
+    )
+    def test_get_logical_id_from_intrinsic_success(self, input, expected):
+        self.assertEqual(get_logical_id_from_intrinsic(input), expected)
+
+    @parameterized.expand(
+        [
+            (None,),
+            ("Foo"),
+            ({"Ref": True}),
+            ({"Fn::GetAtt": "Foo"}),
+            ({"Fn::GetAtt": ["Foo"]}),
+            ({"Fn::GetAtt": [42, "Arn"]}),
+            ({"Fn::If": ["Foo", "Bar"]}),
+        ]
+    )
+    def test_get_logical_id_from_intrinsic_error(self, input):
+        self.assertIsNone(get_logical_id_from_intrinsic(input))

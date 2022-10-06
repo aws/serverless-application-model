@@ -80,10 +80,10 @@ class TestApiWithAuthorizerApiKey(BaseTest):
         header_value=None,
     ):
         if not header_key or not header_value:
-            response = BaseTest.do_get_request_with_logging(url)
+            response = self.do_get_request_with_logging(url)
         else:
             headers = {header_key: header_value}
-            response = BaseTest.do_get_request_with_logging(url, headers)
+            response = self.do_get_request_with_logging(url, headers)
         status = response.status_code
         if status != expected_status_code:
             raise StatusCodeError(

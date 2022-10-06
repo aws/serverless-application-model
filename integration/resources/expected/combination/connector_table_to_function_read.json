@@ -1,0 +1,38 @@
+[
+  {
+    "LogicalResourceId": "TriggerFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "InvokedFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "InvokedFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "Table",
+    "ResourceType": "AWS::DynamoDB::Table"
+  },
+  {
+    "LogicalResourceId": "DynamoDBTableStream",
+    "ResourceType": "AWS::Lambda::EventSourceMapping"
+  },
+  {
+    "LogicalResourceId": "VerificationQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  },
+  {
+    "LogicalResourceId": "ConnectorNotTestedPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  },
+  {
+    "LogicalResourceId": "ConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  }
+]

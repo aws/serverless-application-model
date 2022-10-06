@@ -1,0 +1,14 @@
+Resources:
+  MyTopic:
+    Type: AWS::SNS::Topic
+
+  TopicToLambdaHardcoded:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyTopic
+      Destination:
+        Type: AWS::Lambda::Function
+        Arn: !GetAtt SomeLambda.Arn
+      Permissions:
+        - Write

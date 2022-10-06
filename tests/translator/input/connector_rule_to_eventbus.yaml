@@ -1,0 +1,62 @@
+Resources:
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties: 
+      Name: !Sub '${AWS::StackName}-EventBus'
+
+  MyNewEventsRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Name: mynewabc
+      EventPattern:
+        source:
+          - aws.ec2
+      State: ENABLED
+      Targets:
+        - RoleArn: !GetAtt MyRuleRole.Arn
+          Arn: !GetAtt 'EventBus.Arn'
+          Id: EventBus
+
+  MyNewEventsRuleToDefaultBus:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Name: mynewabc
+      EventPattern:
+        source:
+          - aws.ec2
+      State: ENABLED
+      Targets:
+        - RoleArn: !GetAtt MyRuleRole.Arn
+          Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+          Id: EventBus
+
+  MyRuleRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub events.amazonaws.com
+            Action: 'sts:AssumeRole'
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyNewEventsRule
+      Destination: 
+        Id: EventBus
+      Permissions:
+        - Write
+
+  MyConnectorToDefaultBus:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyNewEventsRuleToDefaultBus
+      Destination:
+        Type: AWS::Events::EventBus
+        Arn: !Sub arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default
+      Permissions:
+        - Write

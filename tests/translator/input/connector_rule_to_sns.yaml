@@ -1,0 +1,36 @@
+Resources:
+  MyNewEventsRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Name: mynewabc
+      EventPattern:
+        source:
+          - aws.ec2
+      State: ENABLED
+      Targets:
+        - RoleArn: !GetAtt MyRuleRole.Arn
+          Arn: !GetAtt 'StateMachine.Arn'
+          Id: StateMachine
+
+  MyRuleRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub events.amazonaws.com
+            Action: 'sts:AssumeRole'
+
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyNewEventsRule
+      Destination: 
+        Id: MySNSTopic
+      Permissions:
+        - Write

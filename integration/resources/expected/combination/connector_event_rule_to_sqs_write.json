@@ -1,0 +1,22 @@
+[
+  {
+    "LogicalResourceId": "TriggerFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "Queue",
+    "ResourceType": "AWS::SQS::Queue"
+  },
+  {
+    "LogicalResourceId": "EventRule",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "MyConnectorQueuePolicy",
+    "ResourceType": "AWS::SQS::QueuePolicy"
+  }
+]

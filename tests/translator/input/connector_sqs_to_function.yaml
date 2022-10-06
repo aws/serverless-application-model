@@ -1,0 +1,82 @@
+Resources:
+  Queue:
+    Type: AWS::SQS::Queue
+
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Timeout: 10  # in case eb has delay
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          var params = {
+            QueueUrl: process.env.QUEUE_URL,
+            MessageBody: "test queue"
+          };
+          var sqs = new AWS.SQS();
+          await sqs.sendMessage(params).promise();
+
+          const data = await sqs.receiveMessage({
+            QueueUrl: process.env.VERIFICATION_QUEUE_URL,
+            WaitTimeSeconds: 5,
+          }).promise();
+          if (data.Messages.length == 0) {
+            throw 'No messages in the queue!';
+          }
+        };
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref Queue
+          VERIFICATION_QUEUE_URL: !Ref VerificationQueue
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt VerificationQueue.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt Queue.QueueName
+
+  InvokedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          const sqs = new AWS.SQS();
+          await sqs.sendMessage({
+            QueueUrl: process.env.VERIFICATION_QUEUE_URL,
+            MessageBody: "test"
+          }).promise();
+        };
+      Environment:
+        Variables:
+          VERIFICATION_QUEUE_URL: !Ref VerificationQueue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt VerificationQueue.QueueName
+
+  SQSEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref InvokedFunction
+      EventSourceArn: 
+        Fn::GetAtt:
+          - "Queue"
+          - "Arn"
+      BatchSize: 10
+
+  VerificationQueue:
+    Type: AWS::SQS::Queue
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: Queue
+      Destination: 
+        Id: InvokedFunction
+      Permissions:
+        - Read
+        - Write

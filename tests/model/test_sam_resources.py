@@ -3,14 +3,20 @@ from unittest.mock import patch
 import pytest
 
 from samtranslator.intrinsics.resolver import IntrinsicsResolver
-from samtranslator.model import InvalidResourceException
+from samtranslator.model import ResourceResolver, InvalidResourceException
 from samtranslator.model.apigatewayv2 import ApiGatewayV2HttpApi
 from samtranslator.model.lambda_ import LambdaFunction, LambdaLayerVersion, LambdaVersion, LambdaUrl, LambdaPermission
 from samtranslator.model.apigateway import ApiGatewayDeployment, ApiGatewayRestApi
 from samtranslator.model.apigateway import ApiGatewayStage
 from samtranslator.model.iam import IAMRole
 from samtranslator.model.packagetype import IMAGE, ZIP
-from samtranslator.model.sam_resources import SamFunction, SamLayerVersion, SamApi, SamHttpApi
+from samtranslator.model.sam_resources import (
+    SamConnector,
+    SamFunction,
+    SamLayerVersion,
+    SamApi,
+    SamHttpApi,
+)
 
 
 class TestArchitecture(TestCase):
@@ -622,3 +628,98 @@ class TestFunctionUrlConfig(TestCase):
             "Resource with id [foo] is invalid. AuthType is required to configure function property "
             + "`FunctionUrlConfig`. Please provide either AWS_IAM or NONE.",
         )
+
+
+class TestInvalidSamConnectors(TestCase):
+    kwargs = {
+        "resource_resolver": ResourceResolver(
+            {
+                "notype": {"Properties": {}},
+                "func": {},
+                "func2": {
+                    "Type": "AWS::Lambda::Function",
+                    "Properties": {},
+                },
+                "func3": {
+                    "Type": "AWS::Lambda::Function",
+                    "Properties": {
+                        "Role": "arn:aws:iam:123456789012:role/roleName",
+                    },
+                },
+                "table": {
+                    "Type": "AWS::DynamoDB::Table",
+                },
+                "sqs": {
+                    "Type": "AWS::SQS::Queue",
+                },
+                "sns": {
+                    "Type": "AWS::SNS::Topic",
+                    "Properties": {
+                        "Subscription": [
+                            {
+                                "Protocol": "lambda",
+                                "Endpoint": {
+                                    "Fn::GetAtt": ["sqs", "Arn"],
+                                },
+                            }
+                        ]
+                    },
+                },
+            }
+        ),
+        "original_template": {},
+    }
+
+    def test_invalid_source_without_id_connector(self):
+        connector = SamConnector("foo")
+        connector.Source = {"1": "2"}
+        connector.Destination = {"1": "2"}
+        connector.Permissions = ["Read"]
+        with self.assertRaisesRegex(InvalidResourceException, ".+'Type' is missing or not a string."):
+            connector.to_cloudformation(**self.kwargs)[0]
+
+    def test_unknown_type_connector(self):
+        connector = SamConnector("foo")
+        connector.Source = {"Id": "notype"}
+        connector.Destination = {"Id": "table"}
+        connector.Permissions = ["Read"]
+        with self.assertRaisesRegex(InvalidResourceException, ".+'Type' is missing or not a string."):
+            connector.to_cloudformation(**self.kwargs)[0]
+
+    def test_unknown_rolename_connector(self):
+        connector = SamConnector("foo")
+        connector.Source = {"Id": "func2"}
+        connector.Destination = {"Id": "table"}
+        connector.Permissions = ["Read"]
+        with self.assertRaisesRegex(InvalidResourceException, ".+Unable to get IAM role name from 'Source' resource.+"):
+            connector.to_cloudformation(**self.kwargs)[0]
+
+    def test_unsupported_permissions_connector(self):
+        connector = SamConnector("foo")
+        connector.Source = {"Id": "func2"}
+        connector.Destination = {"Id": "table"}
+        connector.Permissions = ["INVOKE"]
+        with self.assertRaisesRegex(
+            InvalidResourceException, ".+Unsupported 'Permissions' provided; valid values are: Read, Write."
+        ):
+            connector.to_cloudformation(**self.kwargs)[0]
+
+    def test_unsupported_permissions_connector_with_one_supported_permission(self):
+        connector = SamConnector("foo")
+        connector.Source = {"Id": "table"}
+        connector.Destination = {"Id": "func2"}
+        connector.Permissions = ["INVOKE"]
+        with self.assertRaisesRegex(
+            InvalidResourceException, ".+Unsupported 'Permissions' provided; valid values are: Read."
+        ):
+            connector.to_cloudformation(**self.kwargs)[0]
+
+    def test_unsupported_permissions_combination(self):
+        connector = SamConnector("foo")
+        connector.Source = {"Id": "sqs"}
+        connector.Destination = {"Id": "func2"}
+        connector.Permissions = ["Read"]
+        with self.assertRaisesRegex(
+            InvalidResourceException, "Unsupported 'Permissions' provided; valid combinations are: Read \\+ Write."
+        ):
+            connector.to_cloudformation(**self.kwargs)[0]

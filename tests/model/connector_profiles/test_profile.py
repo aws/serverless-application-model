@@ -1,0 +1,217 @@
+from unittest import TestCase
+
+from samtranslator.model.connector_profiles.profile import profile_replace
+
+
+class TestProfile(TestCase):
+    def test_profile_replace_str_input(self):
+        input = "%{SourceArn}TestingExample"
+        result = profile_replace(input, {"SourceArn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole"})
+
+        self.assertEqual(
+            result,
+            {
+                "Fn::Sub": [
+                    "${SourceArn}TestingExample",
+                    {"SourceArn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole"},
+                ]
+            },
+        )
+
+    def test_profile_replace_multiple_str_input(self):
+        input = "%{SourceArn}TestingExample%{DestinationArn}"
+        result = profile_replace(
+            input,
+            {
+                "SourceArn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole",
+                "DestinationArn": "destinationArn",
+            },
+        )
+
+        self.assertEqual(
+            result,
+            {
+                "Fn::Sub": [
+                    "${SourceArn}TestingExample${DestinationArn}",
+                    {
+                        "DestinationArn": "destinationArn",
+                        "SourceArn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole",
+                    },
+                ]
+            },
+        )
+
+    def test_profile_replace_multiple_direct_replace_str_input(self):
+        input = "%{SourceArn}%{DestinationArn}"
+        result = profile_replace(
+            input,
+            {
+                "SourceArn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole",
+                "DestinationArn": "destinationArn",
+            },
+        )
+
+        self.assertEqual(
+            result,
+            {
+                "Fn::Sub": [
+                    "${SourceArn}${DestinationArn}",
+                    {
+                        "DestinationArn": "destinationArn",
+                        "SourceArn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole",
+                    },
+                ]
+            },
+        )
+
+    def test_profile_replace_invalid_replacement_str_input(self):
+        input = "%{SourceArn}TestingExample%{DestinationArn}"
+        result = profile_replace(
+            input,
+            {
+                "Source1Arn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole",
+                "Destina1tionArn": "destinationArn",
+            },
+        )
+
+        self.assertEqual(result, "%{SourceArn}TestingExample%{DestinationArn}")
+
+    def test_profile_replace_list_input(self):
+        input = ["%{SourceArn}TestingExample", "%{DestinationArn}", "%DestinationArn"]
+        result = profile_replace(
+            input,
+            {
+                "SourceArn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole",
+                "DestinationArn": "random_fake_arn",
+            },
+        )
+
+        self.assertEqual(
+            result,
+            [
+                {
+                    "Fn::Sub": [
+                        "${SourceArn}TestingExample",
+                        {"SourceArn": "arn:aws:iam:policy/service-role/AWSLambdaBasicExecutionRole"},
+                    ],
+                },
+                "random_fake_arn",
+                "%DestinationArn",
+            ],
+        )
+
+    def test_profile_replace_dict_input(self):
+        input = {
+            "Permissions": {
+                "AWS::DynamoDB::Table": {
+                    "AWS::Lambda::Function": {
+                        "Type": "%{TypeName}Type",
+                        "Properties": {
+                            "SourcePolicy": False,
+                            "Permissions": {
+                                "Read": {
+                                    "Statement": [
+                                        {
+                                            "Effect": "Allow",
+                                            "Action": [
+                                                "%{ActionName}",
+                                                "dynamodb:GetRecords",
+                                                "dynamodb:GetShardIterator",
+                                                "dynamodb:ListStreams",
+                                            ],
+                                            "Resource": ["%{SourceArn}/stream/*"],
+                                        }
+                                    ]
+                                }
+                            },
+                        },
+                    }
+                },
+                "AWS::Events::Rule": {
+                    "AWS::Events::EventBus": {
+                        "Type": "AWS_IAM_ROLE_INLINE_POLICY",
+                        "Properties": {
+                            "SourcePolicy": True,
+                            "Permissions": {
+                                "Write": {
+                                    "Statement": [
+                                        {
+                                            "Effect": "Allow",
+                                            "Action": ["events:PutEvents"],
+                                            "Resource": ["%{DestinationArn}"],
+                                        }
+                                    ]
+                                }
+                            },
+                        },
+                    }
+                },
+            }
+        }
+        result = profile_replace(
+            input,
+            {
+                "SourceArn": "dynamodb_table_arn",
+                "TypeName": "AWS_IAM_ROLE_INLINE_POLICY",
+                "ActionName": "dynamodb:DescribeStream",
+                "DestinationArn": "random_destination_arn",
+            },
+        )
+
+        self.assertEqual(
+            result,
+            {
+                "Permissions": {
+                    "AWS::DynamoDB::Table": {
+                        "AWS::Lambda::Function": {
+                            "Properties": {
+                                "Permissions": {
+                                    "Read": {
+                                        "Statement": [
+                                            {
+                                                "Action": [
+                                                    "dynamodb:DescribeStream",
+                                                    "dynamodb:GetRecords",
+                                                    "dynamodb:GetShardIterator",
+                                                    "dynamodb:ListStreams",
+                                                ],
+                                                "Effect": "Allow",
+                                                "Resource": [
+                                                    {
+                                                        "Fn::Sub": [
+                                                            "${SourceArn}/stream/*",
+                                                            {"SourceArn": "dynamodb_table_arn"},
+                                                        ]
+                                                    }
+                                                ],
+                                            }
+                                        ]
+                                    }
+                                },
+                                "SourcePolicy": False,
+                            },
+                            "Type": {"Fn::Sub": ["${TypeName}Type", {"TypeName": "AWS_IAM_ROLE_INLINE_POLICY"}]},
+                        }
+                    },
+                    "AWS::Events::Rule": {
+                        "AWS::Events::EventBus": {
+                            "Properties": {
+                                "Permissions": {
+                                    "Write": {
+                                        "Statement": [
+                                            {
+                                                "Action": ["events:PutEvents"],
+                                                "Effect": "Allow",
+                                                "Resource": ["random_destination_arn"],
+                                            }
+                                        ]
+                                    }
+                                },
+                                "SourcePolicy": True,
+                            },
+                            "Type": "AWS_IAM_ROLE_INLINE_POLICY",
+                        }
+                    },
+                }
+            },
+        )

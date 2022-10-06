@@ -7,7 +7,7 @@ from samtranslator.feature_toggle.feature_toggle import (
     FeatureToggle,
     FeatureToggleDefaultConfigProvider,
 )
-from samtranslator.model import ResourceTypeResolver, sam_resources
+from samtranslator.model import ResourceResolver, ResourceTypeResolver, sam_resources
 from samtranslator.model.api.api_generator import SharedApiUsagePlan
 from samtranslator.translator.verify_logical_id import verify_unique_logical_id
 from samtranslator.model.preferences.deployment_preference_collection import DeploymentPreferenceCollection
@@ -117,6 +117,11 @@ class Translator:
         template = copy.deepcopy(sam_template)
         macro_resolver = ResourceTypeResolver(sam_resources)
         intrinsics_resolver = IntrinsicsResolver(parameter_values)
+
+        # ResourceResolver is used by connector, its "resources" will be
+        # updated in-place by other transforms so connector transform
+        # can see the transformed resources.
+        resource_resolver = ResourceResolver(template.get("Resources", {}))
         mappings_resolver = IntrinsicsResolver(
             template.get("Mappings", {}), {FindInMapAction.intrinsic_name: FindInMapAction()}
         )
@@ -138,6 +143,8 @@ class Translator:
                 kwargs["mappings_resolver"] = mappings_resolver
                 kwargs["deployment_preference_collection"] = deployment_preference_collection
                 kwargs["conditions"] = template.get("Conditions")
+                kwargs["resource_resolver"] = resource_resolver
+                kwargs["original_template"] = sam_template
                 # add the value of FunctionName property if the function is referenced with the api resource
                 self.redeploy_restapi_parameters["function_names"] = self._get_function_names(
                     resource_dict, intrinsics_resolver
@@ -147,7 +154,6 @@ class Translator:
                 kwargs["feature_toggle"] = self.feature_toggle
                 kwargs["route53_record_set_groups"] = route53_record_set_groups
                 translated = macro.to_cloudformation(**kwargs)
-
                 supported_resource_refs = macro.get_resource_references(translated, supported_resource_refs)
 
                 # Some resources mutate their logical ids. Track those to change all references to them:
@@ -214,6 +220,7 @@ class Translator:
             2. AWS::Serverless::StateMachine - because API Events need to modify the corresponding Serverless::Api resource.
             3. AWS::Serverless::Api
             4. Anything else
+            5. AWS::Serverless::Connector - because connector profiles only work with raw CloudFormation resources
 
         This is necessary because a Function or State Machine resource with API Events will modify the API resource's Swagger JSON.
         Therefore API resource needs to be parsed only after all the Swagger modifications are complete.
@@ -227,6 +234,7 @@ class Translator:
         statemachines = []
         apis = []
         others = []
+        connectors = []
         resources = sam_template["Resources"]
 
         for logicalId, resource in resources.items():
@@ -242,10 +250,12 @@ class Translator:
                 statemachines.append(data)
             elif resource["Type"] == "AWS::Serverless::Api" or resource["Type"] == "AWS::Serverless::HttpApi":
                 apis.append(data)
+            elif resource["Type"] == "AWS::Serverless::Connector":
+                connectors.append(data)
             else:
                 others.append(data)
 
-        return functions + statemachines + apis + others
+        return functions + statemachines + apis + others + connectors
 
 
 def prepare_plugins(plugins, parameters=None):

@@ -1,6 +1,7 @@
 from unittest.case import skipIf
 
 import pytest
+import time
 
 from integration.helpers.base_test import BaseTest
 from integration.helpers.resource import current_region_does_not_support
@@ -21,23 +22,22 @@ class TestFunctionWithHttpApiAndAuth(BaseTest):
 
         self.create_and_verify_stack("single/function_with_http_api_events_and_auth")
 
+        # This will be changed according to APIGW suggested wait time
+        time.sleep(10)
+
         implicitEndpoint = self.get_api_v2_endpoint("ServerlessHttpApi")
         self.assertEqual(
-            BaseTest.do_get_request_with_logging(implicitEndpoint + "/default-auth").text, self.FUNCTION_OUTPUT
+            self.do_get_request_with_logging(implicitEndpoint + "/default-auth").text, self.FUNCTION_OUTPUT
         )
-        self.assertEqual(BaseTest.do_get_request_with_logging(implicitEndpoint + "/iam-auth").text, IAM_AUTH_OUTPUT)
+        self.assertEqual(self.do_get_request_with_logging(implicitEndpoint + "/iam-auth").text, IAM_AUTH_OUTPUT)
 
         defaultIamEndpoint = self.get_api_v2_endpoint("MyDefaultIamAuthHttpApi")
-        self.assertEqual(
-            BaseTest.do_get_request_with_logging(defaultIamEndpoint + "/no-auth").text, self.FUNCTION_OUTPUT
-        )
-        self.assertEqual(
-            BaseTest.do_get_request_with_logging(defaultIamEndpoint + "/default-auth").text, IAM_AUTH_OUTPUT
-        )
-        self.assertEqual(BaseTest.do_get_request_with_logging(defaultIamEndpoint + "/iam-auth").text, IAM_AUTH_OUTPUT)
+        self.assertEqual(self.do_get_request_with_logging(defaultIamEndpoint + "/no-auth").text, self.FUNCTION_OUTPUT)
+        self.assertEqual(self.do_get_request_with_logging(defaultIamEndpoint + "/default-auth").text, IAM_AUTH_OUTPUT)
+        self.assertEqual(self.do_get_request_with_logging(defaultIamEndpoint + "/iam-auth").text, IAM_AUTH_OUTPUT)
 
         iamEnabledEndpoint = self.get_api_v2_endpoint("MyIamAuthEnabledHttpApi")
         self.assertEqual(
-            BaseTest.do_get_request_with_logging(iamEnabledEndpoint + "/default-auth").text, self.FUNCTION_OUTPUT
+            self.do_get_request_with_logging(iamEnabledEndpoint + "/default-auth").text, self.FUNCTION_OUTPUT
         )
-        self.assertEqual(BaseTest.do_get_request_with_logging(iamEnabledEndpoint + "/iam-auth").text, IAM_AUTH_OUTPUT)
+        self.assertEqual(self.do_get_request_with_logging(iamEnabledEndpoint + "/iam-auth").text, IAM_AUTH_OUTPUT)

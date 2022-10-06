@@ -1,0 +1,93 @@
+Resources:
+  TriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs16.x
+      Handler: index.handler
+      Timeout: 10  # in case eb has delay
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        
+        exports.handler = async (event) => {
+          const eb = new AWS.EventBridge();
+          const response = await eb.putEvents({
+            Entries: [{
+              Source: process.env.EVENT_SOURCE,
+              Detail: "{}",
+              DetailType: "Test",
+            }]
+          }).promise();
+
+          const sqs = new AWS.SQS();
+          const data = await sqs.receiveMessage({
+            QueueUrl: process.env.QUEUE_URL,
+            WaitTimeSeconds: 5,
+          }).promise();
+
+          if (data.Messages.length == 0) {
+            throw 'No messages in the queue!';
+          }
+        };
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref VerificationQueue
+          EVENT_SOURCE: !Sub '${AWS::StackName}-test-event'
+      Policies:
+        - EventBridgePutEventsPolicy:
+            EventBusName: default
+        - SQSPollerPolicy:
+            QueueName: !GetAtt VerificationQueue.QueueName
+
+  EventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: !Sub 'EventRule-${AWS::StackName}'
+      EventPattern:
+        source:
+          - !Sub '${AWS::StackName}-test-event'
+      Targets:
+        - Arn: !GetAtt StateMachine.Arn
+          Id: "Target"
+          RoleArn: !GetAtt EBRole.Arn
+
+  EBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: TryDoSomething
+        States:
+          TryDoSomething:
+            Type: Task
+            Resource: !Sub arn:${AWS::Partition}:states:::sqs:sendMessage
+            Parameters:
+              QueueUrl: !Ref VerificationQueue
+              MessageBody: hello
+            End: True
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt VerificationQueue.QueueName
+
+  VerificationQueue:
+    Type: AWS::SQS::Queue
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: EventRule
+      Destination:
+        Id: StateMachine
+      Permissions:
+        - Write

@@ -1,0 +1,255 @@
+{
+  "Resources": {
+    "MyFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Role": {
+          "Ref": "SomeRole"
+        }
+      }
+    },
+    "MyQueue1": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyQueue2": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyQueue3": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyTable": {
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "MyEventSourceMapping1": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": ["MyQueue1", "Arn"]
+        }
+      },
+      "DependsOn": ["MyConnector1Policy"]
+    },
+    "MyEventSourceMapping2": {
+      "DependsOn": ["SomeDep", "MyConnector2Policy"],
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": ["MyQueue2", "Arn"]
+        }
+      }
+    },
+    "MyEventSourceMapping3": {
+      "DependsOn": ["SomeOtherDep", "MyConnector3Policy"],
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": ["MyQueue3", "Arn"]
+        }
+      }
+    },
+    "MyEventSourceMapping4": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "EventSourceArn": {
+          "Fn::GetAtt": ["MyTable", "Arn"]
+        }
+      },
+      "DependsOn": ["MyConnector4Policy"]
+    },
+    "MyConnector1Policy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector1": {
+            "Source": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["sqs:DeleteMessage"],
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue1", "Arn"]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue1", "Arn"]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "SomeRole"
+          }
+        ]
+      }
+    },
+    "MyConnector2Policy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector2": {
+            "Source": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["sqs:DeleteMessage"],
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue2", "Arn"]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue2", "Arn"]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "SomeRole"
+          }
+        ]
+      }
+    },
+    "MyConnector3Policy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector3": {
+            "Source": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["sqs:DeleteMessage"],
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue3", "Arn"]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["MyQueue3", "Arn"]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "SomeRole"
+          }
+        ]
+      }
+    },
+    "MyConnector4Policy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector4": {
+            "Source": {
+              "Type": "AWS::DynamoDB::Table"
+            },
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "${SourceArn}/stream/*",
+                    {
+                      "SourceArn": {
+                        "Fn::GetAtt": ["MyTable", "Arn"]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "SomeRole"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -186,6 +186,8 @@ class CloudWatchEvent(PushEventSource):
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
         "Target": PropertyType(False, is_type(dict)),
+        "Enabled": PropertyType(False, is_type(bool)),
+        "State": PropertyType(False, is_str()),
     }
 
     @cw_timer(prefix=FUNCTION_EVETSOURCE_METRIC_PREFIX)
@@ -217,6 +219,15 @@ class CloudWatchEvent(PushEventSource):
                 self, source_arn, passthrough_resource_attributes
             )
             resources.extend(dlq_resources)
+
+        if self.State and self.Enabled is not None:
+            raise InvalidEventException(self.relative_id, "State and Enabled Properties cannot both be specified.")
+
+        if self.State:
+            events_rule.State = self.State
+
+        if self.Enabled is not None:
+            events_rule.State = "ENABLED" if self.Enabled else "DISABLED"
 
         events_rule.Targets = [self._construct_target(function, dlq_queue_arn)]
 

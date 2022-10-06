@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Hello world app with inline code
+
+Parameters:
+  IdentityNameParameter:
+    Type: String
+
+Resources:
+  HelloWorldPython3:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        def handler(*args):
+          return 'Hello world!'
+      Handler: index.handler
+      Runtime: python3.9
+      Timeout: 5
+      Environment:
+        Variables:
+          IdentityNameParameter: !Ref IdentityNameParameter

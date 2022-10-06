@@ -1,0 +1,46 @@
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  TriggerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          var params = {
+            QueueUrl: process.env.QUEUE_NAME,
+            MessageBody: "test queue"
+          };
+          exports.handler = async (event) => {
+            var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+            await sqs.sendMessage(params).promise();
+          };
+      Environment:
+        Variables:
+          QUEUE_NAME: !Ref Queue
+
+  Queue:
+    Type: AWS::SQS::Queue
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerFunction
+      Destination: 
+        Id: Queue
+      Permissions:
+        - Write

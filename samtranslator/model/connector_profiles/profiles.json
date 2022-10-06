@@ -1,0 +1,701 @@
+{
+  "Version": "1",
+  "Permissions": {
+    "AWS::DynamoDB::Table": {
+      "AWS::Lambda::Function": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": false,
+          "DependedBy": "DESTINATION_EVENT_SOURCE_MAPPING",
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:DescribeStream",
+                    "dynamodb:GetRecords",
+                    "dynamodb:GetShardIterator",
+                    "dynamodb:ListStreams"
+                  ],
+                  "Resource": ["%{Source.Arn}/stream/*"]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "AWS::Events::Rule": {
+      "AWS::SNS::Topic": {
+        "Type": "AWS_SNS_TOPIC_POLICY",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": { "Service": "events.amazonaws.com" },
+                  "Resource": "%{Destination.Arn}",
+                  "Action": "sns:Publish",
+                  "Condition": {
+                    "ArnEquals": {
+                      "aws:SourceArn": "%{Source.Arn}"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::Events::EventBus": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["events:PutEvents"],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::StepFunctions::StateMachine": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["states:StartExecution"],
+                  "Resource": [
+                    "%{Destination.Arn}"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::Lambda::Function": {
+        "Type": "AWS_LAMBDA_PERMISSION",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Action": "lambda:InvokeFunction",
+              "Principal": "events.amazonaws.com",
+              "SourceArn": "%{Source.Arn}"
+            }
+          }
+        }
+      },
+      "AWS::SQS::Queue": {
+        "Type": "AWS_SQS_QUEUE_POLICY",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": { "Service": "events.amazonaws.com" },
+                  "Resource": "%{Destination.Arn}",
+                  "Action": "sqs:SendMessage",
+                  "Condition": {
+                    "ArnEquals": {
+                      "aws:SourceArn": "%{Source.Arn}"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "AWS::Lambda::Function": {
+      "AWS::Lambda::Function": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["lambda:InvokeAsync", "lambda:InvokeFunction"],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::S3::Bucket": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:GetObjectAcl",
+                    "s3:GetObjectLegalHold",
+                    "s3:GetObjectRetention",
+                    "s3:GetObjectTorrent",
+                    "s3:GetObjectVersion",
+                    "s3:GetObjectVersionAcl",
+                    "s3:GetObjectVersionForReplication",
+                    "s3:GetObjectVersionTorrent",
+                    "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:ListBucketVersions",
+                    "s3:ListMultipartUploadParts"
+                  ],
+                  "Resource": ["%{Destination.Arn}", "%{Destination.Arn}/*"]
+                }
+              ]
+            },
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:AbortMultipartUpload",
+                    "s3:DeleteObject",
+                    "s3:DeleteObjectVersion",
+                    "s3:PutObject",
+                    "s3:PutObjectLegalHold",
+                    "s3:PutObjectRetention",
+                    "s3:RestoreObject"
+                  ],
+                  "Resource": ["%{Destination.Arn}", "%{Destination.Arn}/*"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::DynamoDB::Table": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:ConditionCheckItem",
+                    "dynamodb:PartiQLSelect"
+                  ],
+                  "Resource": ["%{Destination.Arn}", "%{Destination.Arn}/index/*"]
+                }
+              ]
+            },
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:PartiQLDelete",
+                    "dynamodb:PartiQLInsert",
+                    "dynamodb:PartiQLUpdate"
+                  ],
+                  "Resource": ["%{Destination.Arn}", "%{Destination.Arn}/index/*"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::SQS::Queue": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            },
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:DeleteMessage",
+                    "sqs:SendMessage",
+                    "sqs:ChangeMessageVisibility",
+                    "sqs:PurgeQueue"
+                  ],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::SNS::Topic": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Publish"
+                  ],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::StepFunctions::StateMachine": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StartExecution",
+                    "states:StartSyncExecution"
+                  ],
+                  "Resource": [
+                    "%{Destination.Arn}"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StopExecution"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:%{Destination.Name}:*"
+                  ]
+                }
+              ]
+            },
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:DescribeStateMachine",
+                    "states:ListExecutions"
+                  ],
+                  "Resource": [
+                    "%{Destination.Arn}"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:DescribeExecution",
+                    "states:DescribeStateMachineForExecution",
+                    "states:GetExecutionHistory"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:%{Destination.Name}:*"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::Events::EventBus": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["events:PutEvents"],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "AWS::ApiGatewayV2::Api": {
+      "AWS::Lambda::Function": {
+        "Type": "AWS_LAMBDA_PERMISSION",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:%{Source.ResourceId}/%{Source.Qualifier}"
+            }
+          }
+        }
+      }
+    },
+    "AWS::ApiGateway::RestApi": {
+      "AWS::Lambda::Function": {
+        "Type": "AWS_LAMBDA_PERMISSION",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:%{Source.ResourceId}/%{Source.Qualifier}"
+            }
+          }
+        }
+      }
+    },
+    "AWS::SNS::Topic": {
+      "AWS::SQS::Queue": {
+        "Type": "AWS_SQS_QUEUE_POLICY",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": { "Service": "sns.amazonaws.com" },
+                  "Resource": "%{Destination.Arn}",
+                  "Action": "sqs:SendMessage",
+                  "Condition": {
+                    "ArnEquals": {
+                      "aws:SourceArn": "%{Source.Arn}"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::Lambda::Function": {
+        "Type": "AWS_LAMBDA_PERMISSION",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Action": "lambda:InvokeFunction",
+              "Principal": "sns.amazonaws.com",
+              "SourceArn": "%{Source.Arn}"
+            }
+          }
+        }
+      }
+    },
+    "AWS::SQS::Queue": {
+      "AWS::Lambda::Function": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": false,
+          "DependedBy": "DESTINATION_EVENT_SOURCE_MAPPING",
+          "ValidAccessCategories": [["Read", "Write"]],
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["sqs:DeleteMessage"],
+                  "Resource": ["%{Source.Arn}"]
+                }
+              ]
+            },
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+                  "Resource": ["%{Source.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "AWS::S3::Bucket": {
+      "AWS::Lambda::Function": {
+        "Type": "AWS_LAMBDA_PERMISSION",
+        "Properties": {
+          "SourcePolicy": false,
+          "AccessCategories": {
+            "Write": {
+              "Action": "lambda:InvokeFunction",
+              "Principal": "s3.amazonaws.com",
+              "SourceArn": "%{Source.Arn}",
+              "SourceAccount": "${AWS::AccountId}"
+            }
+          }
+        }
+      }
+    },
+    "AWS::StepFunctions::StateMachine": {
+      "AWS::Lambda::Function": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["lambda:InvokeAsync", "lambda:InvokeFunction"],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::SNS::Topic": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sns:Publish"
+                  ],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::SQS::Queue": {
+        "_comment": "SFN -> SQS only support SendMessage: https://docs.aws.amazon.com/step-functions/latest/dg/sqs-iam.html",
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:SendMessage"
+                  ],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::S3::Bucket": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:GetObjectAcl",
+                    "s3:GetObjectLegalHold",
+                    "s3:GetObjectRetention",
+                    "s3:GetObjectTorrent",
+                    "s3:GetObjectVersion",
+                    "s3:GetObjectVersionAcl",
+                    "s3:GetObjectVersionForReplication",
+                    "s3:GetObjectVersionTorrent",
+                    "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:ListBucketVersions",
+                    "s3:ListMultipartUploadParts"
+                  ],
+                  "Resource": ["%{Destination.Arn}", "%{Destination.Arn}/*"]
+                }
+              ]
+            },
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:AbortMultipartUpload",
+                    "s3:DeleteObject",
+                    "s3:DeleteObjectVersion",
+                    "s3:PutObject",
+                    "s3:PutObjectLegalHold",
+                    "s3:PutObjectRetention",
+                    "s3:RestoreObject"
+                  ],
+                  "Resource": ["%{Destination.Arn}", "%{Destination.Arn}/*"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::DynamoDB::Table": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:ConditionCheckItem",
+                    "dynamodb:PartiQLSelect"
+                  ],
+                  "Resource": ["%{Destination.Arn}", "%{Destination.Arn}/index/*"]
+                }
+              ]
+            },
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:PartiQLDelete",
+                    "dynamodb:PartiQLInsert",
+                    "dynamodb:PartiQLUpdate"
+                  ],
+                  "Resource": ["%{Destination.Arn}", "%{Destination.Arn}/index/*"]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::StepFunctions::StateMachine": {
+        "_comment": "SFN needs setup event rule to sync execute another SFN: https://docs.aws.amazon.com/step-functions/latest/dg/stepfunctions-iam.html. If deployment failed with 'not authorized to create managed-rule', we need to deploy IAM policy before source StateMachine.",
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "DependedBy": "SOURCE",
+          "SourcePolicy": true,
+          "ValidAccessCategories": [["Read"], ["Read", "Write"]],
+          "AccessCategories": {
+            "Read": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:DescribeExecution"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:%{Destination.Name}:*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "events:DescribeRule"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                  ]
+                }
+              ]
+            },
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StartExecution"
+                  ],
+                  "Resource": [
+                    "%{Destination.Arn}"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "states:StopExecution"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:execution:%{Destination.Name}:*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "events:PutTargets",
+                    "events:PutRule"
+                  ],
+                  "Resource": [
+                    "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AWS::Events::EventBus": {
+        "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
+        "Properties": {
+          "SourcePolicy": true,
+          "AccessCategories": {
+            "Write": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["events:PutEvents"],
+                  "Resource": ["%{Destination.Arn}"]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

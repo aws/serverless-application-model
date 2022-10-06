@@ -17,6 +17,19 @@ class IAMRole(Resource):
     runtime_attrs = {"name": lambda self: ref(self.logical_id), "arn": lambda self: fnGetAtt(self.logical_id, "Arn")}
 
 
+class IAMManagedPolicy(Resource):
+    resource_type = "AWS::IAM::ManagedPolicy"
+    property_types = {
+        "Description": PropertyType(False, is_str()),
+        "Groups": PropertyType(False, is_str()),
+        "PolicyDocument": PropertyType(True, is_type(dict)),
+        "ManagedPolicyName": PropertyType(False, is_str()),
+        "Path": PropertyType(False, is_str()),
+        "Roles": PropertyType(False, is_type(list)),
+        "Users": PropertyType(False, list_of(is_str())),
+    }
+
+
 class IAMRolePolicies:
     @classmethod
     def construct_assume_role_policy_for_service_principal(cls, service_principal):

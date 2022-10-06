@@ -1,0 +1,53 @@
+{
+    "errors": [
+      {
+        "errorMessage": "Resource with id [NoIdMissingType] is invalid. 'Type' is missing or not a string."
+      },
+      {
+        "errorMessage": "Resource with id [NonStrId] is invalid. 'Id' is missing or not a string."
+      },
+      {
+        "errorMessage": "Resource with id [NonExistentLogicalId] is invalid. Unable to find resource with logical ID 'ThisDoesntExist'."
+      },
+      {
+        "errorMessage": "Resource with id [ResourceWithoutType] is invalid. 'Type' is missing or not a string."
+      },
+      {
+        "errorMessage": "Resource with id [UnsupportedType] is invalid. Unable to create connector from AWS::Fancy::CoolType to AWS::Lambda::Function; it's not supported or the template is invalid."
+      },
+      {
+        "errorMessage": "Resource with id [UnsupportedAccessCategory] is invalid. Unsupported 'Permissions' provided; valid values are: Read, Write."
+      },
+      {
+        "errorMessage": "Resource with id [UnsupportedAccessCategoryCombination] is invalid. Unsupported 'Permissions' provided; valid combinations are: Read + Write."
+      },
+      {
+        "errorMessage": "Resource with id [MissingRole] is invalid. Unable to get IAM role name from 'Source' resource."
+      },
+      {
+        "errorMessage": "Resource with id [MissingRoleDestination] is invalid. Unable to get IAM role name from 'Destination' resource."
+      },
+      {
+        "errorMessage": "Resource with id [MissingSqsQueueUrl] is invalid. Destination.Arn is missing."
+      },
+      {
+        "errorMessage": "Resource with id [MissingLambdaFunctionArn] is invalid. Source.Arn is missing."
+      },
+      {
+        "errorMessage": "Resource with id [MissingSnsTopicArn] is invalid. Destination.Arn is missing."
+      },
+      {
+        "errorMessage": "Resource with id [BothIdAndOtherProps] is invalid. Must provide either 'Id' or a combination of the other properties, not both."
+      },
+      {
+        "errorMessage": "Resource with id [NoPermissionConnector] is invalid. Missing required property 'Permissions'"
+      },
+      {
+        "errorMessage": "Resource with id [EmptyPermissionConnector] is invalid. property Permission not defined for resource of type AWS::Serverless::Connector"
+      },
+      {
+        "errorMessage": "Resource with id [EmptyListPermissionConnector] is invalid. property Permission not defined for resource of type AWS::Serverless::Connector"
+      }
+    ], 
+    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 16. Resource with id [BothIdAndOtherProps] is invalid. Must provide either 'Id' or a combination of the other properties, not both. Resource with id [EmptyListPermissionConnector] is invalid. 'Permissions' cannot be empty; valid values are: Read, Write. Resource with id [EmptyPermissionConnector] is invalid. Missing required property 'Permissions'. Resource with id [MissingLambdaFunctionArn] is invalid. Source.Arn is missing. Resource with id [MissingRole] is invalid. Unable to get IAM role name from 'Source' resource. Resource with id [MissingRoleDestination] is invalid. Unable to get IAM role name from 'Destination' resource. Resource with id [MissingSnsTopicArn] is invalid. Destination.Arn is missing. Resource with id [MissingSqsQueueUrl] is invalid. Destination.Arn is missing. Resource with id [NoIdMissingType] is invalid. 'Type' is missing or not a string. Resource with id [NoPermissionConnector] is invalid. Missing required property 'Permissions'. Resource with id [NonExistentLogicalId] is invalid. Unable to find resource with logical ID 'ThisDoesntExist'. Resource with id [NonStrId] is invalid. 'Id' is missing or not a string. Resource with id [ResourceWithoutType] is invalid. 'Type' is missing or not a string. Resource with id [UnsupportedAccessCategory] is invalid. Unsupported 'Permissions' provided; valid values are: Read, Write. Resource with id [UnsupportedAccessCategoryCombination] is invalid. Unsupported 'Permissions' provided; valid combinations are: Read + Write. Resource with id [UnsupportedType] is invalid. Unable to create connector from AWS::Fancy::CoolType to AWS::Lambda::Function; it's not supported or the template is invalid."
+  }

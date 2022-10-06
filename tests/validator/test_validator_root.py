@@ -16,6 +16,7 @@ class TestValidatorRoot(TestValidatorBase):
         [
             "error_awstemplateformatversion_unknown",
             "error_empty_template",
+            "error_minimal_template_with_parameters",
             "error_resources_empty",
             "error_resources_missing",
             "error_resources_not_object",
@@ -28,6 +29,7 @@ class TestValidatorRoot(TestValidatorBase):
 
     @parameterized.expand(
         [
+            "success_minimal_template_with_parameters",
             "success_minimal_template",
         ],
     )
