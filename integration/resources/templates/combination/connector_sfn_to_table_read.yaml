@@ -1,0 +1,41 @@
+Resources:
+  TriggerStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: ReadDDB
+        States:
+          ReadDDB:
+            Type: Task
+            Resource: !Sub arn:${AWS::Partition}:states:::dynamodb:getItem
+            Parameters:
+              TableName: !Ref MyTable
+              Key:
+                Id:
+                  S: some-value
+            End: True
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingIsNotStateMachineFunction"
+
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachine
+      Destination:
+        Id: MyTable
+      Permissions:
+        - Read

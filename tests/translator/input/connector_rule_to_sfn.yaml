@@ -1,0 +1,50 @@
+Resources:
+  MyNewEventsRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Name: mynewabc
+      EventPattern:
+        source:
+          - aws.ec2
+      State: ENABLED
+      Targets:
+        - RoleArn: !GetAtt MyRuleRole.Arn
+          Arn: !GetAtt 'StateMachine.Arn'
+          Id: StateMachine
+
+  MyRuleRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub events.amazonaws.com
+            Action: 'sts:AssumeRole'
+
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      # Express state machine support sync execution
+      # which allows us to get the error message quickly in trigger function.
+      Type: EXPRESS
+      Definition:
+        StartAt: MyLambdaState
+        States:
+          MyLambdaState:
+            Type: Task
+            Resource: !GetAtt StateMachineFunction.Arn
+            End: true
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingIsNotStateMachineFunction"
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyNewEventsRule
+      Destination: 
+        Id: StateMachine
+      Permissions:
+        - Write

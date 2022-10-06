@@ -1,0 +1,32 @@
+{
+  "Resources": {
+    "MyTopic": {
+      "Type": "AWS::SNS::Topic"
+    },
+    "TopicToLambdaHardcodedWriteLambdaPermission": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "TopicToLambdaHardcoded": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": ["SomeLambda", "Arn"]
+        },
+        "Principal": "sns.amazonaws.com",
+        "SourceArn": {
+          "Ref": "MyTopic"
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    }
+  }
+}

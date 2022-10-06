@@ -1,0 +1,37 @@
+Resources:
+  TriggerStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: TryDoSomething
+        States:
+          TryDoSomething:
+            Type: Task
+            Resource: !Sub arn:${AWS::Partition}:states:::lambda:invoke
+            Parameters:
+              FunctionName: !Ref MyFunction
+            End: True
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingIsNotStateMachineFunction"
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs16.x
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachine
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Write

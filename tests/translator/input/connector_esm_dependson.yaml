@@ -1,0 +1,83 @@
+Transform: AWS::Serverless-2016-10-31-test
+Resources:
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !Ref SomeRole
+  MyQueue1:
+    Type: AWS::SQS::Queue
+  MyQueue2:
+    Type: AWS::SQS::Queue
+  MyQueue3:
+    Type: AWS::SQS::Queue
+  MyTable:
+    Type: AWS::DynamoDB::Table
+
+  MyEventSourceMapping1:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref MyFunction
+      EventSourceArn: !GetAtt MyQueue1.Arn
+
+  MyEventSourceMapping2:
+    DependsOn: SomeDep
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref MyFunction
+      EventSourceArn: !GetAtt MyQueue2.Arn
+
+  MyEventSourceMapping3:
+    DependsOn: [SomeOtherDep]
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref MyFunction
+      EventSourceArn: !GetAtt MyQueue3.Arn
+
+  MyEventSourceMapping4:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      FunctionName: !Ref MyFunction
+      EventSourceArn: !GetAtt MyTable.Arn
+
+  MyConnector1:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue1
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Write
+        - Read
+
+  MyConnector2:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue2
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Read
+        - Write
+
+  MyConnector3:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyQueue3
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Read
+        - Write
+
+  MyConnector4:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: MyTable
+      Destination:
+        Id: MyFunction
+      Permissions:
+        - Read

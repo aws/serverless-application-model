@@ -1,0 +1,108 @@
+Resources:
+  MyServerlessApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  MyHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: Prod
+
+  MyApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: A test API
+      Name: MyRestAPI
+
+  MyApiGatewayRootMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        Type: MOCK
+      ResourceId: !GetAtt MyApiGateway.RootResourceId
+      RestApiId: !Ref MyApiGateway
+
+  MyApiGatewayV2:
+    Type: 'AWS::ApiGatewayV2::Api'
+    Properties:
+      Name: MyApi
+      ProtocolType: WEBSOCKET
+
+  MyServerlessFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs14.x
+      Handler: index.handler
+      InlineCode: |
+        const AWS = require('aws-sdk');
+        exports.handler = async (event) => {
+          console.log(JSON.stringify(event));
+        };
+
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt MyRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          exports.handler = async (event) => {
+            console.log(JSON.stringify(event));
+          };
+
+  MyConnectorServerlessApiToLambda:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyServerlessApi
+      Destination: 
+        Id: MyFunction
+      Permissions:
+        - Write
+
+  MyConnectorApigwToLambda:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyApiGateway
+      Destination: 
+        Id: MyServerlessFunction
+      Permissions:
+        - Write
+
+  MyConnectorApiV2ToLambda:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyApiGatewayV2
+      Destination: 
+        Id: MyServerlessFunction
+      Permissions:
+        - Write
+
+  MyConnectorServerlessHttpApiToLambda:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyHttpApi
+      Destination: 
+        Id: MyFunction
+      Permissions:
+        - Write

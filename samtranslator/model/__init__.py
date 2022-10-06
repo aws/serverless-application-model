@@ -513,3 +513,34 @@ class ResourceTypeResolver(object):
         if resource_dict["Type"] not in self.resource_types:
             raise TypeError("Invalid resource type {resource_type}".format(resource_type=resource_dict["Type"]))
         return self.resource_types[resource_dict["Type"]]
+
+
+class ResourceResolver:
+    def __init__(self, resources: Dict[str, Any]):
+        """
+        Instantiate the resolver
+        :param dict resources: Map of resource
+        """
+
+        if resources is None or not isinstance(resources, dict):
+            raise TypeError("'Resources' is either null or not a valid dictionary.")
+
+        self.resources = resources
+
+    def get_all_resources(self) -> Dict[str, Any]:
+        """Return a dictionary of all resources from the SAM template."""
+        return self.resources
+
+    def get_resource_by_logical_id(self, input: str) -> Dict[str, Any]:
+        """
+        Recursively find resource with matching Logical ID that are present in the template and returns the value.
+        If it is not in template, this method simply returns the input unchanged.
+
+        :param input: Logical ID of a resource
+
+        :param resources: Dictionary of the resource from the SAM template
+        """
+        if not isinstance(input, str):
+            raise TypeError("Invalid logical ID '{}'. Expected a string.".format(input))
+
+        return self.resources.get(input, None)

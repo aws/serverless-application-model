@@ -1,0 +1,59 @@
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  TriggerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          var put_params = {
+            Entries: [
+              {
+                EventBusName: process.env.EventBusName,
+                Source: "com.mycompany.myapp",
+                Detail:"{ \"key1\": \"value1\", \"key2\": \"value2\" }",
+                Resources:[
+                  "resource1",
+                  "resource2"
+                ],
+                DetailType:"myDetailType"
+              }
+            ]
+          }
+          exports.handler = async (event) => {
+            console.log('REQUEST RECEIVED:', JSON.stringify(event));
+            var eventbridge = new AWS.EventBridge();
+            await eventbridge.putEvents(put_params).promise();
+          };
+      Environment:
+        Variables:
+          EventBusName: !Ref EventBus
+
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties: 
+      Name: TestEventBus
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerFunction
+      Destination: 
+        Id: EventBus
+      Permissions:
+        - Write

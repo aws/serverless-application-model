@@ -1,0 +1,86 @@
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  TriggerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          var params = {
+            Message: 'Test Message',
+            TopicArn: process.env.TOPIC_ARN,
+          };
+          var sqs_params = {
+            QueueUrl: process.env.QUEUE_NAME,
+          };
+          exports.handler = async (event) => {
+            var sns = new AWS.SNS({apiVersion: '2012-11-05'});
+            await sns.publish(params).promise();
+
+            var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+            var data = await sqs.receiveMessage(sqs_params).promise();
+            if (data.Messages.length == 0) {
+              throw 'No messages in the queue!';
+            }
+          };
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref Topic
+          QUEUE_NAME: !Ref Queue
+
+  Topic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint:
+            Fn::GetAtt:
+              - "Queue"
+              - "Arn"
+          Protocol: "sqs"
+
+  Queue:
+    Type: AWS::SQS::Queue
+
+  Connector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerFunction
+      Destination: 
+        Id: Topic
+      Permissions:
+        - Write
+
+  Connector2:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: Topic
+      Destination: 
+        Id: Queue
+      Permissions:
+        - Write
+
+  Connector3:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerFunction
+      Destination: 
+        Id: Queue
+      Permissions:
+        - Read

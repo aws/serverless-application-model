@@ -1,0 +1,38 @@
+[
+  {
+    "LogicalResourceId": "ConnectorNotBeingTestedQueuePolicy",
+    "ResourceType": "AWS::SQS::QueuePolicy"
+  },
+  {
+    "LogicalResourceId": "CustomEventBus",
+    "ResourceType": "AWS::Events::EventBus"
+  },
+  {
+    "LogicalResourceId": "EBRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "EventRule",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "MyConnectorPolicy",
+    "ResourceType": "AWS::IAM::ManagedPolicy"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "TriggerFunctionRole",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "VerificationEventRule",
+    "ResourceType": "AWS::Events::Rule"
+  },
+  {
+    "LogicalResourceId": "VerificationQueue",
+    "ResourceType": "AWS::SQS::Queue"
+  }
+]

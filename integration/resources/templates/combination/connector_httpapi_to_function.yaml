@@ -1,0 +1,127 @@
+Resources:
+  MyRole1:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyRole2:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  TriggerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt MyRole1.Arn
+      Runtime: nodejs16.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const https = require('https');
+
+          exports.handler = (event, context, callback) => {
+            const req = https.get(process.env.API_URL, res => {
+              
+              var body = [];
+          
+              res.on('data', function(chunk) {
+                  body.push(chunk);
+              });
+          
+              res.on('end', function() {
+                  try {
+                    const message = JSON.parse(Buffer.concat(body).toString())['message'];
+                    if (message === "connector works!") {
+                      callback(null, {
+                        StatusCode: res.statusCode,
+                      });
+                    } else {
+                      callback(new Error("Unexpected message"));
+                    }
+                  } catch(error) {
+                    callback(error);
+                  }
+              });
+            });
+            
+            req.on('error', error => {
+              callback(error);
+            });
+            
+            req.end();
+          };
+
+      Environment:
+        Variables:
+          API_URL: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod"
+
+  ConnectedFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt MyRole2.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            return {
+              statusCode: 200,
+              body: JSON.stringify({
+                "message": "connector works!"
+              }),
+            };
+          };
+
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-connector-httpapi-to-function"
+      ProtocolType: HTTP
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: prod
+      AutoDeploy: True
+
+  Integration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub >-
+        arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectedFunction.Arn}/invocations
+      IntegrationMethod: POST
+      PayloadFormatVersion: '2.0'
+
+  HttpRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: $default
+      Target: !Sub "integrations/${Integration}"
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: HttpApi
+      Destination:
+        Id: ConnectedFunction
+      Permissions:
+        - Write

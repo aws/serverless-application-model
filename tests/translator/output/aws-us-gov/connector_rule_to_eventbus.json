@@ -1,0 +1,144 @@
+{
+  "Resources": {
+    "EventBus": {
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-EventBus"
+        }
+      },
+      "Type": "AWS::Events::EventBus"
+    },
+    "MyConnectorPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector": {
+            "Destination": {
+              "Type": "AWS::Events::EventBus"
+            },
+            "Source": {
+              "Type": "AWS::Events::Rule"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": ["events:PutEvents"],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": ["EventBus", "Arn"]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRuleRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnectorToDefaultBusPolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnectorToDefaultBus": {
+            "Destination": {
+              "Type": "AWS::Events::EventBus"
+            },
+            "Source": {
+              "Type": "AWS::Events::Rule"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": ["events:PutEvents"],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default"
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "MyRuleRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyNewEventsRule": {
+      "Properties": {
+        "EventPattern": {
+          "source": ["aws.ec2"]
+        },
+        "Name": "mynewabc",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": ["EventBus", "Arn"]
+            },
+            "Id": "EventBus",
+            "RoleArn": {
+              "Fn::GetAtt": ["MyRuleRole", "Arn"]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyNewEventsRuleToDefaultBus": {
+      "Properties": {
+        "EventPattern": {
+          "source": ["aws.ec2"]
+        },
+        "Name": "mynewabc",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::Sub": "arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default"
+            },
+            "Id": "EventBus",
+            "RoleArn": {
+              "Fn::GetAtt": ["MyRuleRole", "Arn"]
+            }
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "MyRuleRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": {
+                  "Fn::Sub": "events.amazonaws.com"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

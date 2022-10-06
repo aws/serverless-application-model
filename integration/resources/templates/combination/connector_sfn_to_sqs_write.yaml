@@ -1,0 +1,31 @@
+Resources:
+  TriggerStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Type: EXPRESS
+      Definition:
+        StartAt: ReadDDB
+        States:
+          ReadDDB:
+            Type: Task
+            Resource: !Sub arn:${AWS::Partition}:states:::sqs:sendMessage
+            Parameters:
+              QueueUrl: !Ref MyQueue
+              MessageBody: hello
+            End: True
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: "SomethingDoesNotMatter"
+
+  MyQueue:
+    Type: AWS::SQS::Queue
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source:
+        Id: TriggerStateMachine
+      Destination:
+        Id: MyQueue
+      Permissions:
+        - Write

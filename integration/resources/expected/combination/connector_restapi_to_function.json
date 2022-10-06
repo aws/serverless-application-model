@@ -1,0 +1,42 @@
+[
+  {
+    "LogicalResourceId": "ConnectedFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "Method",
+    "ResourceType": "AWS::ApiGateway::Method"
+  },
+  {
+    "LogicalResourceId": "MyConnectorWriteLambdaPermission",
+    "ResourceType": "AWS::Lambda::Permission"
+  },
+  {
+    "LogicalResourceId": "TriggerFunction",
+    "ResourceType": "AWS::Lambda::Function"
+  },
+  {
+    "LogicalResourceId": "MyRole1",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "MyRole2",
+    "ResourceType": "AWS::IAM::Role"
+  },
+  {
+    "LogicalResourceId": "Path",
+    "ResourceType": "AWS::ApiGateway::Resource"
+  },
+  {
+    "LogicalResourceId": "RestAPIDeployment",
+    "ResourceType": "AWS::ApiGateway::Deployment"
+  },
+  {
+    "LogicalResourceId": "RestAPIGatewayStage",
+    "ResourceType": "AWS::ApiGateway::Stage"
+  },
+  {
+    "LogicalResourceId": "RestApi",
+    "ResourceType": "AWS::ApiGateway::RestApi"
+  }
+]

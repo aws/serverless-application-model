@@ -1,6 +1,6 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, is_str
-from samtranslator.model.intrinsics import ref
+from samtranslator.model.types import is_type, is_str, list_of
+from samtranslator.model.intrinsics import fnGetAtt, ref
 
 
 class SNSSubscription(Resource):
@@ -12,6 +12,11 @@ class SNSSubscription(Resource):
         "Region": PropertyType(False, is_str()),
         "FilterPolicy": PropertyType(False, is_type(dict)),
     }
+
+
+class SNSTopicPolicy(Resource):
+    resource_type = "AWS::SNS::TopicPolicy"
+    property_types = {"PolicyDocument": PropertyType(True, is_type(dict)), "Topics": PropertyType(True, list_of(str))}
 
 
 class SNSTopic(Resource):

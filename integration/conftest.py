@@ -35,7 +35,7 @@ def _get_all_buckets():
     return s3.buckets.all()
 
 
-def _clean_bucket(s3_bucket_name, s3_client):
+def clean_bucket(s3_bucket_name, s3_client):
     """
     Empties and deletes the bucket used for the tests
     """
@@ -60,7 +60,7 @@ def clean_all_integ_buckets():
     s3_client = ClientProvider().s3_client
     for bucket in buckets:
         if bucket.name.startswith(S3_BUCKET_PREFIX):
-            _clean_bucket(bucket.name, s3_client)
+            clean_bucket(bucket.name, s3_client)
 
 
 @pytest.fixture()

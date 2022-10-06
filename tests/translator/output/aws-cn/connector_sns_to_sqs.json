@@ -1,0 +1,117 @@
+{
+  "Resources": {
+    "MyQueue1": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyQueue1ConnectorQueuePolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyQueue1Connector": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "MySNSTopic"
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Resource": {
+                "Fn::GetAtt": ["MyQueue1", "Arn"]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Queues": [
+          {
+            "Ref": "MyQueue1"
+          }
+        ]
+      },
+      "Type": "AWS::SQS::QueuePolicy"
+    },
+    "MyQueue2": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "MyQueue2ConnectorQueuePolicy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyQueue2Connector": {
+            "Destination": {
+              "Type": "AWS::SQS::Queue"
+            },
+            "Source": {
+              "Type": "AWS::SNS::Topic"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sqs:SendMessage",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "MySNSTopic"
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Resource": {
+                "Fn::GetAtt": ["MyQueue2", "Arn"]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Queues": [
+          {
+            "Ref": "MyQueue2"
+          }
+        ]
+      },
+      "Type": "AWS::SQS::QueuePolicy"
+    },
+    "MySNSTopic": {
+      "Properties": {
+        "Subscription": [
+          {
+            "Endpoint": {
+              "Fn::GetAtt": ["MyQueue1", "Arn"]
+            },
+            "Protocol": "sqs"
+          },
+          {
+            "Endpoint": {
+              "Fn::GetAtt": ["MyQueue2", "Arn"]
+            },
+            "Protocol": "sqs"
+          }
+        ]
+      },
+      "Type": "AWS::SNS::Topic"
+    }
+  }
+}
