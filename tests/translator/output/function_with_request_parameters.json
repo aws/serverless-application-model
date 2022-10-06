@@ -143,7 +143,7 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiParameterFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiParameterFunction.Arn}/invocations"
                   },
                   "cacheKeyParameters": [
                     "method.request.header.Authorization"
@@ -223,7 +223,7 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NoApiParameterFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NoApiParameterFunction.Arn}/invocations"
                   }
                 },
                 "responses": {},

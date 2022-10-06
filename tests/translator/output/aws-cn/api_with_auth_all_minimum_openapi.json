@@ -270,7 +270,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 },
                 "responses": {},
@@ -287,7 +287,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 },
                 "responses": {},
@@ -370,7 +370,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 },
                 "responses": {},
@@ -387,7 +387,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 },
                 "responses": {},
@@ -411,7 +411,7 @@
                   "type": "token",
                   "authorizerUri": {
                     "Fn::Sub": [
-                      "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                       {
                         "__FunctionArn__": {
                           "Fn::GetAtt": [
@@ -498,7 +498,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 },
                 "responses": {},
@@ -515,7 +515,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                   }
                 },
                 "responses": {},
@@ -539,7 +539,7 @@
                   "type": "request",
                   "authorizerUri": {
                     "Fn::Sub": [
-                      "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                       {
                         "__FunctionArn__": {
                           "Fn::GetAtt": [

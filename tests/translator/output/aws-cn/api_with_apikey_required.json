@@ -113,7 +113,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithApiKeyRequired.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithApiKeyRequired.Arn}/invocations"
                   }
                 },
                 "responses": {},
@@ -130,7 +130,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithApiKeyRequired.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithApiKeyRequired.Arn}/invocations"
                   }
                 },
                 "responses": {},

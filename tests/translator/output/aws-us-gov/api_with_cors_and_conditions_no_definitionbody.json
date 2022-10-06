@@ -222,7 +222,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction2.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction2.Arn}/invocations"
                   }
                 },
                 "responses": {}
@@ -238,7 +238,7 @@
                         "Fn::If": [
                           "MyCondition",
                           {
-                            "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                           },
                           {
                             "Ref": "AWS::NoValue"
@@ -264,7 +264,7 @@
                         "Fn::If": [
                           "MyCondition",
                           {
-                            "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                           },
                           {
                             "Ref": "AWS::NoValue"
@@ -335,7 +335,7 @@
                             "Fn::If": [
                               "MyCondition",
                               {
-                                "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"

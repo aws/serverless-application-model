@@ -124,7 +124,7 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithAwsIamAuth.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithAwsIamAuth.Arn}/invocations"
                   },
                   "credentials": "rn:aws:iam::123:role/AUTH_AWS_IAM"
                 },
@@ -190,7 +190,7 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithAwsIamAuth.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithAwsIamAuth.Arn}/invocations"
                   },
                   "credentials": "arn:aws:iam::*:user/*"
                 },
@@ -232,7 +232,7 @@
                   "httpMethod": "POST",
                   "type": "aws_proxy",
                   "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithAwsIamAuth.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithAwsIamAuth.Arn}/invocations"
                   },
                   "credentials": "arn:aws:iam::*:user/*"
                 },

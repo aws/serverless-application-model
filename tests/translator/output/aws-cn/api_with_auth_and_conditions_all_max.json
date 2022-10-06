@@ -86,7 +86,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -109,7 +109,7 @@
                         "Fn::If": [
                           "PathCondition", 
                           {
-                            "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithConditional.Arn}/invocations"
+                            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithConditional.Arn}/invocations"
                           }, 
                           {
                             "Ref": "AWS::NoValue"
@@ -140,7 +140,7 @@
                         "Fn::If": [
                           "PathCondition", 
                           {
-                            "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithConditional.Arn}/invocations"
+                            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithConditional.Arn}/invocations"
                           }, 
                           {
                             "Ref": "AWS::NoValue"
@@ -165,7 +165,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -180,7 +180,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                   }
                 }, 
                 "security": [
@@ -201,7 +201,7 @@
                         "Fn::If": [
                           "PathCondition", 
                           {
-                            "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithConditional.Arn}/invocations"
+                            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunctionWithConditional.Arn}/invocations"
                           }, 
                           {
                             "Ref": "AWS::NoValue"
@@ -247,7 +247,7 @@
                 "authorizerResultTtlInSeconds": 0, 
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
                     {
                       "__FunctionArn__": "arn:aws"
                     }
@@ -279,7 +279,7 @@
                 "authorizerResultTtlInSeconds": 20, 
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
                     {
                       "__FunctionArn__": "arn:aws"
                     }
@@ -300,7 +300,7 @@
                 "identitySource": "method.request.header.Authorization1, method.request.querystring.Authorization2, stageVariables.Authorization3, context.Authorization4", 
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
                     {
                       "__FunctionArn__": "arn:aws"
                     }

@@ -1538,7 +1538,7 @@ class TestSwaggerEditor_add_authorization_scopes(TestCase):
                                 "httpMethod": "POST",
                                 "type": "aws_proxy",
                                 "uri": {
-                                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
+                                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFn.Arn}/invocations"
                                 },
                             },
                             "security": [],

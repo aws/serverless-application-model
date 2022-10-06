@@ -224,7 +224,7 @@
                   "authorizerResultTtlInSeconds": 37,
                   "authorizerUri": {
                     "Fn::Sub": [
-                      "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                       {
                         "__FunctionArn__": {
                           "Fn::GetAtt": [

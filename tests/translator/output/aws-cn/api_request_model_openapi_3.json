@@ -120,7 +120,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }, 
                   "credentials": "arn:aws:iam::*:user/*"
                 }, 
@@ -148,7 +148,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
                 "responses": {}
@@ -160,7 +160,7 @@
                   "type": "aws_proxy",
                   "httpMethod": "POST",
                   "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   },
                   "credentials": "arn:aws:iam::*:user/*"
                 },

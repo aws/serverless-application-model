@@ -337,7 +337,7 @@
                             "Fn::If": [
                               "explicithello2condition",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello2.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello2.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -373,7 +373,7 @@
                             "Fn::If": [
                               "explicithello1condition",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello1.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${explicithello1.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -486,7 +486,7 @@
                             "Fn::If": [
                               "implicithello1condition",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${implicithello1.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${implicithello1.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -522,7 +522,7 @@
                             "Fn::If": [
                               "implicithello2condition",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${implicithello2.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${implicithello2.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"

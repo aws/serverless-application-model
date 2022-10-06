@@ -648,7 +648,7 @@
                             "Fn::If": [
                               "FunctionCondition",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -689,7 +689,7 @@
                             "Fn::If": [
                               "FunctionCondition6",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction6.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction6.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -723,7 +723,7 @@
                             "Fn::If": [
                               "FunctionCondition4",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction4.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction4.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -754,7 +754,7 @@
                             "Fn::If": [
                               "FunctionCondition2",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction2.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction2.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -785,7 +785,7 @@
                             "Fn::If": [
                               "FunctionCondition3",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction3.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction3.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -816,7 +816,7 @@
                             "Fn::If": [
                               "FunctionCondition5",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction5.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction5.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -854,7 +854,7 @@
                 "authorizerResultTtlInSeconds": 0,
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                     {
                       "__FunctionArn__": "arn:aws"
                     }
@@ -878,7 +878,7 @@
                 "identitySource": "method.request.header.Authorization1, method.request.querystring.Authorization2, stageVariables.Authorization3, context.Authorization4",
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                     {
                       "__FunctionArn__": "arn:aws"
                     }
@@ -910,7 +910,7 @@
                 "authorizerResultTtlInSeconds": 20,
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                     {
                       "__FunctionArn__": "arn:aws"
                     }

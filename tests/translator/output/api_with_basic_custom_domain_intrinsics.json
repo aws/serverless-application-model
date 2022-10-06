@@ -193,7 +193,7 @@
                             "Fn::If": [
                               "C1", 
                               {
-                                "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                               }, 
                               {
                                 "Ref": "AWS::NoValue"
@@ -280,7 +280,7 @@
                             "Fn::If": [
                               "C1", 
                               {
-                                "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyFunction.Arn}/invocations"
                               }, 
                               {
                                 "Ref": "AWS::NoValue"

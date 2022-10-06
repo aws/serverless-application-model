@@ -263,7 +263,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyRequestDefinition.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyRequestDefinition.Arn}/invocations"
                   }
                 }, 
                 "x-amazon-apigateway-request-validator": "params-only", 
@@ -286,7 +286,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
                 }, 
                 "x-amazon-apigateway-request-validator": "body-and-params", 
@@ -309,7 +309,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionMixinValidation.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionMixinValidation.Arn}/invocations"
                   }
                 }, 
                 "x-amazon-apigateway-request-validator": "body-only", 
@@ -332,7 +332,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyRequestDefinitionFalse.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyRequestDefinitionFalse.Arn}/invocations"
                   }
                 }, 
                 "x-amazon-apigateway-request-validator": "no-validation", 
@@ -355,7 +355,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyBodyDefinition.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyBodyDefinition.Arn}/invocations"
                   }
                 }, 
                 "x-amazon-apigateway-request-validator": "body-only", 
@@ -378,7 +378,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionNotDefinedValidation.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionNotDefinedValidation.Arn}/invocations"
                   }
                 }, 
                 "responses": {}, 
@@ -400,7 +400,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionNoValidation.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionNoValidation.Arn}/invocations"
                   }
                 }, 
                 "x-amazon-apigateway-request-validator": "no-validation", 
@@ -423,7 +423,7 @@
                   "httpMethod": "POST", 
                   "type": "aws_proxy", 
                   "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyBodyDefinitionFalse.Arn}/invocations"
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunctionOnlyBodyDefinitionFalse.Arn}/invocations"
                   }
                 }, 
                 "x-amazon-apigateway-request-validator": "no-validation", 

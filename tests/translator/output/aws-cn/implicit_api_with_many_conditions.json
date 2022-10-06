@@ -1031,7 +1031,7 @@
                             "Fn::If": [
                               "Cond",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1057,7 +1057,7 @@
                             "Fn::If": [
                               "MyCondition",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${hello.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${hello.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1093,7 +1093,7 @@
                             "Fn::If": [
                               "Cond8",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld8.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld8.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1129,7 +1129,7 @@
                             "Fn::If": [
                               "Cond9",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld9.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld9.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1165,7 +1165,7 @@
                             "Fn::If": [
                               "Cond1",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld1.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld1.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1201,7 +1201,7 @@
                             "Fn::If": [
                               "Cond2",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld2.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld2.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1237,7 +1237,7 @@
                             "Fn::If": [
                               "Cond3",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld3.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld3.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1273,7 +1273,7 @@
                             "Fn::If": [
                               "Cond4",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld4.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld4.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1309,7 +1309,7 @@
                             "Fn::If": [
                               "Cond5",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld5.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld5.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1345,7 +1345,7 @@
                             "Fn::If": [
                               "Cond6",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld6.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld6.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
@@ -1381,7 +1381,7 @@
                             "Fn::If": [
                               "Cond7",
                               {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld7.Arn}/invocations"
+                                "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${helloworld7.Arn}/invocations"
                               },
                               {
                                 "Ref": "AWS::NoValue"
