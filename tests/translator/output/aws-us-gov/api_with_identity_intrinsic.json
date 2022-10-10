@@ -33,7 +33,7 @@
                 "identitySource": "method.request.header.Accept",
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                     {
                       "__FunctionArn__": "SomeArn"
                     }
@@ -44,32 +44,22 @@
             }
           }
         },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
           ]
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
         }
-      }
-    },
-    "APIGatewayDeploymentbbcece046c": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "APIGateway"
-        },
-        "Description": "RestApi deployment id: bbcece046c6ecd35f10c6ba88cf762d87ef35e8a",
-        "StageName": "Stage"
       }
     },
     "APIGatewaySomeAuthorizerAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": "SomeArn",
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
@@ -82,11 +72,21 @@
         }
       }
     },
+    "APIGatewayDeployment82f3c4df74": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "Description": "RestApi deployment id: 82f3c4df7481a1969c2df51cbf02df891aef4c84",
+        "RestApiId": {
+          "Ref": "APIGateway"
+        },
+        "StageName": "Stage"
+      }
+    },
     "APIGatewayProdStage": {
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "APIGatewayDeploymentbbcece046c"
+          "Ref": "APIGatewayDeployment82f3c4df74"
         },
         "RestApiId": {
           "Ref": "APIGateway"

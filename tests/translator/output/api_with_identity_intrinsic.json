@@ -50,11 +50,11 @@
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": "SomeArn",
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
             {
               "__ApiId__": {
                 "Ref": "APIGateway"
@@ -64,13 +64,13 @@
         }
       }
     },
-    "APIGatewayDeploymenta119f04c8a": {
+    "APIGatewayDeployment82f3c4df74": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
+        "Description": "RestApi deployment id: 82f3c4df7481a1969c2df51cbf02df891aef4c84",
         "RestApiId": {
           "Ref": "APIGateway"
         },
-        "Description": "RestApi deployment id: a119f04c8aba206b5b7db5f232f013b816fe6447",
         "StageName": "Stage"
       }
     },
@@ -78,7 +78,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "APIGatewayDeploymenta119f04c8a"
+          "Ref": "APIGatewayDeployment82f3c4df74"
         },
         "RestApiId": {
           "Ref": "APIGateway"
