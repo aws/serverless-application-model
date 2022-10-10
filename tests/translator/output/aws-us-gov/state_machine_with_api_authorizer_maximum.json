@@ -4,8 +4,8 @@
             "Type": "AWS::Lambda::Permission", 
             "Properties": {
                 "Action": "lambda:InvokeFunction", 
-                "Principal": "apigateway.amazonaws.com", 
                 "FunctionName": "arn:aws", 
+                "Principal": "apigateway.amazonaws.com", 
                 "SourceArn": {
                     "Fn::Sub": [
                         "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
@@ -21,22 +21,6 @@
         "StateMachineWithLambdaRequestAuthorizerRole": {
             "Type": "AWS::IAM::Role", 
             "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineWithLambdaRequestAuthorizerRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17", 
                     "Statement": [
@@ -52,19 +36,28 @@
                             }
                         }
                     ]
-                }
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithLambdaRequestAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
             }
         }, 
         "StateMachine": {
             "Type": "AWS::StepFunctions::StateMachine", 
             "Properties": {
-                "RoleArn": {
-                    "Fn::GetAtt": [
-                        "StateMachineRole", 
-                        "Arn"
-                    ]
-                }, 
-                "StateMachineName": "MyStateMachine", 
                 "DefinitionString": {
                     "Fn::Join": [
                         "\n", 
@@ -88,28 +81,41 @@
                         ]
                     ]
                 }, 
+                "RoleArn": {
+                    "Fn::GetAtt": [
+                        "StateMachineRole", 
+                        "Arn"
+                    ]
+                }, 
+                "StateMachineName": "MyStateMachine", 
                 "StateMachineType": "STANDARD", 
                 "Tags": [
                     {
-                        "Value": "SAM", 
-                        "Key": "stateMachine:createdBy"
+                        "Key": "stateMachine:createdBy",
+                        "Value": "SAM"
                     }
                 ]
-            }
-        }, 
-        "MyApiDeployment2120b73f3e": {
-            "Type": "AWS::ApiGateway::Deployment", 
-            "Properties": {
-                "RestApiId": {
-                    "Ref": "MyApi"
-                }, 
-                "Description": "RestApi deployment id: 2120b73f3e7efc28dc4baca314ee3b30d8d8c783", 
-                "StageName": "Stage"
             }
         }, 
         "StateMachineWithDefaultAuthorizerRole": {
             "Type": "AWS::IAM::Role", 
             "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
                 "Policies": [
                     {
                         "PolicyName": "StateMachineWithDefaultAuthorizerRoleStartExecutionPolicy", 
@@ -117,233 +123,15 @@
                             "Statement": [
                                 {
                                     "Action": "states:StartExecution", 
+                                    "Effect": "Allow",
                                     "Resource": {
                                         "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
+                                    }
                                 }
                             ]
                         }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "MyApiMyLambdaTokenAuthAuthorizerPermission": {
-            "Type": "AWS::Lambda::Permission", 
-            "Properties": {
-                "Action": "lambda:InvokeFunction", 
-                "Principal": "apigateway.amazonaws.com", 
-                "FunctionName": "arn:aws", 
-                "SourceArn": {
-                    "Fn::Sub": [
-                        "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
-                        {
-                            "__ApiId__": {
-                                "Ref": "MyApi"
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "StateMachineRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "states.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }, 
-                "ManagedPolicyArns": [], 
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineRolePolicy0", 
-                        "PolicyDocument": {
-                            "Version": "2012-10-17", 
-                            "Statement": [
-                                {
-                                    "Action": "*", 
-                                    "Resource": "*", 
-                                    "Effect": "Deny"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "Tags": [
-                    {
-                        "Value": "SAM", 
-                        "Key": "stateMachine:createdBy"
                     }
                 ]
-            }
-        }, 
-        "StateMachineWithLambdaTokenAuthorizerRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineWithLambdaTokenAuthorizerRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "MyApiMyLambdaTokenAuthNoneFunctionInvokeRoleAuthorizerPermission": {
-            "Type": "AWS::Lambda::Permission", 
-            "Properties": {
-                "Action": "lambda:InvokeFunction", 
-                "Principal": "apigateway.amazonaws.com", 
-                "FunctionName": "arn:aws", 
-                "SourceArn": {
-                    "Fn::Sub": [
-                        "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
-                        {
-                            "__ApiId__": {
-                                "Ref": "MyApi"
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "MyApiProdStage": {
-            "Type": "AWS::ApiGateway::Stage", 
-            "Properties": {
-                "DeploymentId": {
-                    "Ref": "MyApiDeployment2120b73f3e"
-                }, 
-                "RestApiId": {
-                    "Ref": "MyApi"
-                }, 
-                "StageName": "Prod"
-            }
-        }, 
-        "StateMachineWithCognitoMultipleUserPoolsAuthorizerRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineWithCognitoMultipleUserPoolsAuthorizerRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "StateMachineWithNoAuthorizerRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineWithNoAuthorizerRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
             }
         }, 
         "MyApi": {
@@ -593,7 +381,7 @@
                                 "authorizerResultTtlInSeconds": 0, 
                                 "authorizerUri": {
                                     "Fn::Sub": [
-                                        "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                                        "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
                                         {
                                             "__FunctionArn__": "arn:aws"
                                         }
@@ -626,7 +414,7 @@
                                 "identitySource": "method.request.header.Authorization1, method.request.querystring.Authorization2, stageVariables.Authorization3, context.Authorization4", 
                                 "authorizerUri": {
                                     "Fn::Sub": [
-                                        "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                                        "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
                                         {
                                             "__FunctionArn__": "arn:aws"
                                         }
@@ -658,7 +446,7 @@
                                 "authorizerResultTtlInSeconds": 20, 
                                 "authorizerUri": {
                                     "Fn::Sub": [
-                                        "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
+                                        "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
                                         {
                                             "__FunctionArn__": "arn:aws"
                                         }
@@ -676,13 +464,225 @@
                         }
                     }
                 }, 
+                "Parameters": {
+                    "endpointConfigurationTypes": "REGIONAL"
+                },
                 "EndpointConfiguration": {
                     "Types": [
                         "REGIONAL"
                     ]
+                } 
+            }
+        }, 
+        "MyApiMyLambdaTokenAuthAuthorizerPermission": {
+            "Type": "AWS::Lambda::Permission", 
+            "Properties": {
+                "Action": "lambda:InvokeFunction", 
+                "FunctionName": "arn:aws",
+                "Principal": "apigateway.amazonaws.com", 
+                "SourceArn": {
+                    "Fn::Sub": [
+                        "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+                        {
+                            "__ApiId__": {
+                                "Ref": "MyApi"
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "StateMachineRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "states.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
                 }, 
-                "Parameters": {
-                    "endpointConfigurationTypes": "REGIONAL"
+                "ManagedPolicyArns": [], 
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineRolePolicy0", 
+                        "PolicyDocument": {
+                            "Version": "2012-10-17", 
+                            "Statement": [
+                                {
+                                    "Effect": "Deny",
+                                    "Action": "*", 
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "Tags": [
+                    {
+                        "Key": "stateMachine:createdBy",
+                        "Value": "SAM"
+                    }
+                ]
+            }
+        }, 
+        "MyApiDeployment0ed3eec543": {
+            "Type": "AWS::ApiGateway::Deployment", 
+            "Properties": {
+                "Description": "RestApi deployment id: 0ed3eec5434c9553981dd3ea070ad85a897947b7",
+                "RestApiId": {
+                    "Ref": "MyApi"
+                }, 
+                "StageName": "Stage"
+            }
+        }, 
+        "MyApiProdStage": {
+            "Type": "AWS::ApiGateway::Stage", 
+            "Properties": {
+                "DeploymentId": {
+                    "Ref": "MyApiDeployment0ed3eec543"
+                }, 
+                "RestApiId": {
+                    "Ref": "MyApi"
+                }, 
+                "StageName": "Prod"
+            }
+        },
+        "StateMachineWithLambdaTokenAuthorizerRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithLambdaTokenAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "MyApiMyLambdaTokenAuthNoneFunctionInvokeRoleAuthorizerPermission": {
+            "Type": "AWS::Lambda::Permission", 
+            "Properties": {
+                "Action": "lambda:InvokeFunction", 
+                "FunctionName": "arn:aws", 
+                "Principal": "apigateway.amazonaws.com", 
+                "SourceArn": {
+                    "Fn::Sub": [
+                        "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+                        {
+                            "__ApiId__": {
+                                "Ref": "MyApi"
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "StateMachineWithCognitoMultipleUserPoolsAuthorizerRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithCognitoMultipleUserPoolsAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }, 
+        "StateMachineWithNoAuthorizerRole": {
+            "Type": "AWS::IAM::Role", 
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "StateMachineWithNoAuthorizerRoleStartExecutionPolicy", 
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": "states:StartExecution", 
+                                    "Resource": {
+                                        "Ref": "StateMachine"
+                                    }, 
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        }
+                    }
+                ], 
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17", 
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ], 
+                            "Effect": "Allow", 
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
                 }
             }
         }

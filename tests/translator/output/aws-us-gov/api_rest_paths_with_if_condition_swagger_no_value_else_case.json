@@ -74,16 +74,6 @@
         ]
       }
     },
-    "MyApiDeploymente8d14e9a46": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "Description": "RestApi deployment id: e8d14e9a46ec615e88fcee45775372485f8ed243",
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "StageName": "Stage"
-      }
-    },
     "MyAuthFnRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -112,6 +102,16 @@
             "Value": "SAM"
           }
         ]
+      }
+    },
+    "MyApiDeploymente8d14e9a46": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "Description": "RestApi deployment id: e8d14e9a46ec615e88fcee45775372485f8ed243",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
       }
     },
     "MyApi": {
