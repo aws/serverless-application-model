@@ -237,7 +237,7 @@ class HttpApiGenerator(object):
         domain = ApiGatewayV2DomainName(
             self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes
         )
-        domain_config = dict()
+        domain_config = {}
         domain.DomainName = self.domain.get("DomainName")
         domain.Tags = self.tags
         endpoint = self.domain.get("EndpointConfiguration")

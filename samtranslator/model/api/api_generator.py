@@ -93,7 +93,7 @@ class SharedApiUsagePlan(object):
         self._set_update_replace_policy(resource_attributes.get("UpdateReplacePolicy"))
         self._set_condition(resource_attributes.get("Condition"), conditions)
 
-        combined_resource_attributes = dict()
+        combined_resource_attributes = {}
         if self.deletion_policy:
             combined_resource_attributes["DeletionPolicy"] = self.deletion_policy
         if self.update_replace_policy:
@@ -790,7 +790,7 @@ class ApiGenerator(object):
                 attributes=self.passthrough_resource_attributes,
             )
             api_stages = list()
-            api_stage = dict()
+            api_stage = {}
             api_stage["ApiId"] = ref(self.logical_id)
             api_stage["Stage"] = ref(rest_api_stage.logical_id)
             api_stages.append(api_stage)
@@ -812,7 +812,7 @@ class ApiGenerator(object):
                     self.passthrough_resource_attributes, self.template_conditions
                 ),
             )
-            api_stage = dict()
+            api_stage = {}
             api_stage["ApiId"] = ref(self.logical_id)
             api_stage["Stage"] = ref(rest_api_stage.logical_id)
             if api_stage not in self.shared_api_usage_plan.api_stages_shared:
@@ -853,7 +853,7 @@ class ApiGenerator(object):
                 ),
             )
             api_key.Enabled = True
-            stage_key = dict()
+            stage_key = {}
             stage_key["RestApiId"] = ref(self.logical_id)
             stage_key["StageName"] = ref(rest_api_stage.logical_id)
             if stage_key not in self.shared_api_usage_plan.stage_keys_shared:
@@ -870,7 +870,7 @@ class ApiGenerator(object):
             )
             api_key.Enabled = True
             stage_keys = list()
-            stage_key = dict()
+            stage_key = {}
             stage_key["RestApiId"] = ref(self.logical_id)
             stage_key["StageName"] = ref(rest_api_stage.logical_id)
             stage_keys.append(stage_key)
