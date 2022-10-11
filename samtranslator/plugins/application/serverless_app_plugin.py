@@ -369,7 +369,7 @@ class ServerlessAppPlugin(BasePlugin):
         if len(self._in_progress_templates) != 0:
             application_ids = [items[0] for items in self._in_progress_templates]
             raise InvalidResourceException(
-                application_ids, "Timed out waiting for nested stack templates " "to reach ACTIVE status."
+                application_ids, "Timed out waiting for nested stack templates to reach ACTIVE status."
             )
 
     def _get_sleep_time_sec(self):

@@ -189,7 +189,7 @@ class OpenApiEditor(object):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        "Value of '{}' path must be a dictionary according to Swagger spec.".format(path)
+                        f"Value of '{path}' path must be a dictionary according to Swagger spec."
                     )
                 ]
             )
@@ -395,9 +395,7 @@ class OpenApiEditor(object):
                         raise InvalidDocumentException(
                             [
                                 InvalidTemplateException(
-                                    "Could not find {} in {} within DefinitionBody.".format(
-                                        normalized_method_name, path
-                                    )
+                                    f"Could not find {normalized_method_name} in {path} within DefinitionBody."
                                 )
                             ]
                         )
@@ -496,9 +494,7 @@ class OpenApiEditor(object):
                 raise InvalidDocumentException(
                     [
                         InvalidTemplateException(
-                            "Tags in OpenApi DefinitionBody needs to be a list. {} is a {} not a list.".format(
-                                self.tags, type(self.tags).__name__
-                            )
+                            f"Tags in OpenApi DefinitionBody needs to be a list. {self.tags} is a {type(self.tags).__name__} not a list."
                         )
                     ]
                 )

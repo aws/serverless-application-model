@@ -426,7 +426,7 @@ class ApiGenerator(object):
 
         if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
             raise InvalidResourceException(
-                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn" " are provided."
+                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn are provided."
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
@@ -702,7 +702,7 @@ class ApiGenerator(object):
 
         if self.auth and not self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Auth works only with inline Swagger specified in " "'DefinitionBody' property."
+                self.logical_id, "Auth works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
         # Make sure keys in the dict are recognized
@@ -918,7 +918,7 @@ class ApiGenerator(object):
         if self.gateway_responses and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id,
-                "GatewayResponses works only with inline Swagger specified in " "'DefinitionBody' property.",
+                "GatewayResponses works only with inline Swagger specified in 'DefinitionBody' property.",
             )
 
         # Make sure keys in the dict are recognized
@@ -981,7 +981,7 @@ class ApiGenerator(object):
 
         if self.models and not self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Models works only with inline Swagger specified in " "'DefinitionBody' property."
+                self.logical_id, "Models works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
         if not SwaggerEditor.is_valid(self.definition_body):

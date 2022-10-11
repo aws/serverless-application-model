@@ -227,7 +227,7 @@ class HttpApiGenerator(object):
 
         if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
             raise InvalidResourceException(
-                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn" " are provided."
+                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn are provided."
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(

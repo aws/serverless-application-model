@@ -167,7 +167,7 @@ class SamFunction(SamResourceMacro):
             if not self.AutoPublishAlias:
                 raise InvalidResourceException(
                     self.logical_id,
-                    "To set ProvisionedConcurrencyConfig " "AutoPublishALias must be defined on the function",
+                    "To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function",
                 )
 
         lambda_alias = None

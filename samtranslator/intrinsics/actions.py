@@ -546,7 +546,7 @@ class FindInMapAction(Action):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        "Invalid FindInMap value {}. FindInMap expects an array with 3 values.".format(value)
+                        f"Invalid FindInMap value {value}. FindInMap expects an array with 3 values."
                     )
                 ]
             )
