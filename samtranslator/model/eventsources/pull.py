@@ -21,7 +21,7 @@ class PullEventSource(ResourceMacro):
     """
 
     # Event types that support `FilterCriteria`, stored as a list to keep the alphabetical order
-    RESOURCE_TYPES_WITH_EVENT_FILTERING = ["DynamoDB", "Kinesis", "SQS"]
+    RESOURCE_TYPES_WITH_EVENT_FILTERING = ["DynamoDB", "Kinesis", "MQ", "MSK", "SelfManagedKafka", "SQS"]
 
     # Note(xinhol): `PullEventSource` should have been an abstract class. Disabling the type check for the next
     # line to avoid any potential behavior change.

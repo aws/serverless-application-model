@@ -427,7 +427,7 @@ class TestApiWithAuthorizers(BaseTest):
         auth_type_for_api_event_without_auth = api_event_with_out_auth["authorizationType"]
         self.assertEqual(auth_type_for_api_event_without_auth, "NONE")
 
-    @retry(StatusCodeError, 10)
+    @retry(StatusCodeError, 10, 0.25)
     def verify_authorized_request(
         self,
         url,

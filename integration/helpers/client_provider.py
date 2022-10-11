@@ -25,6 +25,7 @@ class ClientProvider:
         self._kafka_client = None
         self._code_deploy_client = None
         self._sar_client = None
+        self._ec2_client = None
 
     @property
     def cfn_client(self):
@@ -216,3 +217,13 @@ class ClientProvider:
             if not self._sar_client:
                 self._sar_client = boto3.client("serverlessrepo")
         return self._sar_client
+
+    @property
+    def ec2_client(self):
+        """
+        EC2 Client
+        """
+        with self._lock:
+            if not self._ec2_client:
+                self._ec2_client = boto3.client("ec2")
+        return self._ec2_client
