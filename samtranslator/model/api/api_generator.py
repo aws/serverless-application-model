@@ -67,9 +67,9 @@ class SharedApiUsagePlan(object):
 
     def __init__(self):
         self.usage_plan_shared = False
-        self.stage_keys_shared = list()
-        self.api_stages_shared = list()
-        self.depends_on_shared = list()
+        self.stage_keys_shared = []
+        self.api_stages_shared = []
+        self.depends_on_shared = []
 
         # shared resource level attributes
         self.conditions = set()
@@ -458,7 +458,7 @@ class ApiGenerator(object):
         if mutual_tls_auth:
             if isinstance(mutual_tls_auth, dict):
                 if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
-                    invalid_keys = list()
+                    invalid_keys = []
                     for key in mutual_tls_auth.keys():
                         if not key in {"TruststoreUri", "TruststoreVersion"}:
                             invalid_keys.append(key)
@@ -789,7 +789,7 @@ class ApiGenerator(object):
                 depends_on=[self.logical_id],
                 attributes=self.passthrough_resource_attributes,
             )
-            api_stages = list()
+            api_stages = []
             api_stage = {}
             api_stage["ApiId"] = ref(self.logical_id)
             api_stage["Stage"] = ref(rest_api_stage.logical_id)
@@ -869,7 +869,7 @@ class ApiGenerator(object):
                 attributes=self.passthrough_resource_attributes,
             )
             api_key.Enabled = True
-            stage_keys = list()
+            stage_keys = []
             stage_key = {}
             stage_key["RestApiId"] = ref(self.logical_id)
             stage_key["StageName"] = ref(rest_api_stage.logical_id)
