@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import re
@@ -10,7 +11,19 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles.jso
 
 
 def get_profile(source_type: str, dest_type: str):
-    return PROFILE["Permissions"].get(source_type, {}).get(dest_type)
+    profile = PROFILE["Permissions"].get(source_type, {}).get(dest_type)
+    # Ensure not passing a mutable shared variable
+    return copy.deepcopy(profile)
+
+
+def verify_profile_variables_replaced(obj: Any) -> None:
+    """
+    Verifies all profile variables have been replaced; throws ValueError if not.
+    """
+    s = json.dumps(obj)
+    matches = re.findall(r"%{[\w\.]+}", s)
+    if matches:
+        raise ValueError(f"The following variables have not been replaced: {matches}")
 
 
 def profile_replace(obj: Any, replacements: Dict[str, Any]):

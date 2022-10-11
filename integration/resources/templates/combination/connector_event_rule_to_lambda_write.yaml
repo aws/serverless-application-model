@@ -2,7 +2,7 @@ Resources:
   TriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs14.x
       Handler: index.handler
       Timeout: 10  # in case eb has delay
       InlineCode: |
@@ -52,7 +52,7 @@ Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: nodejs16.x
+      Runtime: nodejs14.x
       Handler: index.handler
       InlineCode: |
         const AWS = require('aws-sdk');

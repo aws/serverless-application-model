@@ -1,3 +1,4 @@
+import time
 import boto3
 import botocore
 import pytest
@@ -63,6 +64,26 @@ def clean_all_integ_buckets():
             clean_bucket(bucket.name, s3_client)
 
 
+def _delete_unused_network_interface_by_subnet(ec2_client, subnet_id):
+    """Deletes unused network interface under the provided subnet"""
+    paginator = ec2_client.get_paginator("describe_network_interfaces")
+    response_iterator = paginator.paginate(
+        Filters=[
+            {"Name": "subnet-id", "Values": [subnet_id]},
+            {"Name": "status", "Values": ["available"]},
+        ]
+    )
+    network_interface_ids = []
+    for page in response_iterator:
+        network_interface_ids += [ni["NetworkInterfaceId"] for ni in page["NetworkInterfaces"]]
+
+    for ni_id in network_interface_ids:
+        ec2_client.delete_network_interface(NetworkInterfaceId=ni_id)
+        time.sleep(0.5)
+
+    LOG.info("Deleted %s unused network interfaces under subnet %s", len(network_interface_ids), subnet_id)
+
+
 @pytest.fixture()
 def setup_companion_stack_once(tmpdir_factory, get_prefix):
     tests_integ_dir = Path(__file__).resolve().parents[1]
@@ -73,6 +94,15 @@ def setup_companion_stack_once(tmpdir_factory, get_prefix):
     stack_name = get_prefix + COMPANION_STACK_NAME
     companion_stack = Stack(stack_name, companion_stack_tempalte_path, cfn_client, output_dir)
     companion_stack.create_or_update(_stack_exists(stack_name))
+
+    ec2_client = ClientProvider().ec2_client
+    precreated_subnet_ids = [
+        resource["PhysicalResourceId"]
+        for resource in companion_stack.stack_resources["StackResourceSummaries"]
+        if resource["LogicalResourceId"].startswith("PreCreatedSubnet")
+    ]
+    for subnet_id in precreated_subnet_ids:
+        _delete_unused_network_interface_by_subnet(ec2_client, subnet_id)
 
 
 @pytest.fixture()

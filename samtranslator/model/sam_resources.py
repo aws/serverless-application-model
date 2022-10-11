@@ -13,6 +13,7 @@ from samtranslator.model.connector_profiles.profile import (
     ConnectorProfile,
     profile_replace,
     get_profile,
+    verify_profile_variables_replaced,
 )
 
 import samtranslator.model.eventsources
@@ -1693,6 +1694,8 @@ class SamConnector(SamResourceMacro):
             profile_properties = profile_replace(profile_properties, replacement)
         except ValueError as e:
             raise InvalidResourceException(self.logical_id, str(e))
+
+        verify_profile_variables_replaced(profile_properties)
 
         generated_resources: List[Resource] = []
         if profile_type == "AWS_IAM_ROLE_MANAGED_POLICY":

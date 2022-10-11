@@ -1,6 +1,12 @@
 from unittest import TestCase
 
-from samtranslator.model.connector_profiles.profile import profile_replace
+from parameterized import parameterized
+
+from samtranslator.model.connector_profiles.profile import (
+    get_profile,
+    profile_replace,
+    verify_profile_variables_replaced,
+)
 
 
 class TestProfile(TestCase):
@@ -215,3 +221,27 @@ class TestProfile(TestCase):
                 }
             },
         )
+
+    def test_verify_replaced(self):
+        verify_profile_variables_replaced({"Foo": {"Bar": "${AllGood}something What"}})
+        verify_profile_variables_replaced({"Foo": {"Bar": "${All.Good}something %{What"}})
+        verify_profile_variables_replaced({"Foo": {"${AllGood}": "something %{What"}})
+
+    @parameterized.expand(
+        [
+            ({"Foo": {"Bar": "%{NotGood}something What"}}, "%{NotGood}"),
+            ({"Foo": {"Bar": "%{Not.Good}something What"}}, "%{Not.Good}"),
+            ({"Foo": {"%{NotGood}": "something What"}}, "%{NotGood}"),
+            ({"Foo": {"%{NotGood}": "something %{What.No}"}}, "['%{NotGood}', '%{What.No}']"),
+        ]
+    )
+    def test_verify_not_replaced(self, profile, error_includes):
+        with self.assertRaises(ValueError) as ctx:
+            verify_profile_variables_replaced(profile)
+        self.assertIn(error_includes, str(ctx.exception))
+
+    def test_get_profile_copied(self):
+        d1 = get_profile("AWS::Lambda::Function", "AWS::DynamoDB::Table")
+        d1["Type"] = "overridden"
+        d2 = get_profile("AWS::Lambda::Function", "AWS::DynamoDB::Table")
+        self.assertNotEqual(d1, d2)
