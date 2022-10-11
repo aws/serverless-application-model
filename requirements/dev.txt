@@ -4,6 +4,7 @@ tox~=3.24
 pytest-cov~=2.10.1
 pytest-xdist~=2.5
 pytest-env~=0.6.2
+pytest-rerunfailures~=9.1.1
 pylint~=2.9.0
 pyyaml~=5.4
 
