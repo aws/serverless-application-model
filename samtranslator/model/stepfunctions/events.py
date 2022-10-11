@@ -170,6 +170,7 @@ class CloudWatchEvent(EventSource):
         "InputPath": PropertyType(False, is_str()),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
+        "State": PropertyType(False, is_str()),
     }
 
     @cw_timer(prefix=SFN_EVETSOURCE_METRIC_PREFIX)
@@ -189,6 +190,9 @@ class CloudWatchEvent(EventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
+
+        if self.State:
+            events_rule.State = self.State
 
         resources.append(events_rule)
 
