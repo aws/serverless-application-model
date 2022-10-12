@@ -62,7 +62,6 @@ from samtranslator.model.intrinsics import (
     make_not_conditional,
     make_conditional,
     make_and_condition,
-    fnGetAtt,
 )
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
 from samtranslator.model.sns import SNSTopic, SNSTopicPolicy

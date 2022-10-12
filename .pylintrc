@@ -113,7 +113,7 @@ disable=
     W1202, # Use lazy % formatting in logging functions (logging-format-interpolation)
     E1101, # No member 
     W0622, # Redefining built-in 'property' (redefined-builtin)
-    W0611, # unused imports
+    # W0611, # unused imports
     W0231, # super not called
     W0212, # protected-access
     W0201, # attribute-defined-outside-init

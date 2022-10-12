@@ -14,7 +14,6 @@ from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
-from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
 

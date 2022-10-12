@@ -2,7 +2,7 @@ import boto3
 import json
 from botocore.exceptions import ClientError, EndpointConnectionError
 import logging
-from time import sleep, time
+from time import sleep
 import copy
 
 from samtranslator.metrics.method_decorator import cw_timer

@@ -16,7 +16,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException, InvalidDocumentException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
