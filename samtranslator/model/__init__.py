@@ -534,7 +534,7 @@ class ResourceResolver:
         """
         for logical_id, resource in self.resources.items():
             if resource.get("Type") == resource_type:
-                yield copy.deepcopy(resource.get("Properties") or {})
+                yield logical_id, copy.deepcopy(resource.get("Properties") or {})
 
     def get_resource_by_logical_id(self, input: str) -> Dict[str, Any]:
         """
