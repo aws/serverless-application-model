@@ -130,10 +130,11 @@ class IntrinsicsResolver(object):
 
         if isinstance(input, dict):
             return self._traverse_dict(input, resolution_data, resolver_method)
-        if isinstance(input, list):
+        elif isinstance(input, list):
             return self._traverse_list(input, resolution_data, resolver_method)
-        # We can iterate only over dict or list types. Primitive types are terminals
-        return input
+        else:
+            # We can iterate only over dict or list types. Primitive types are terminals
+            return input
 
     def _traverse_dict(self, input_dict, resolution_data, resolver_method):
         """

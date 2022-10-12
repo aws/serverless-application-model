@@ -691,7 +691,8 @@ class OpenApiEditor(object):
         method = method.lower()
         if method == "any":
             return OpenApiEditor._X_ANY_METHOD
-        return method
+        else:
+            return method
 
     @staticmethod
     def get_openapi_version_3_regex():

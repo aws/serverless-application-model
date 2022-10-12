@@ -926,15 +926,16 @@ class SamFunction(SamResourceMacro):
         # FIXME: We should support not only true/false, but also yes/no, on/off? See https://yaml.org/type/bool.html
         if processed_property_value in [True, "true", "True"]:
             return True
-        if processed_property_value in [False, "false", "False"]:
+        elif processed_property_value in [False, "false", "False"]:
             return False
-        if is_intrinsic(processed_property_value):  # couldn't resolve intrinsic
+        elif is_intrinsic(processed_property_value):  # couldn't resolve intrinsic
             raise InvalidResourceException(
                 self.logical_id,
                 f"Unsupported intrinsic: the only intrinsic functions supported for "
                 f"property {property_name} are FindInMap and parameter Refs.",
             )
-        raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
+        else:
+            raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
 
     def _construct_function_url(self, lambda_function, lambda_alias):
         """
@@ -1501,11 +1502,11 @@ class SamLayerVersion(SamResourceMacro):
 
         if self.RetentionPolicy is None:
             return None
-        if self.RetentionPolicy.lower() == self.RETAIN.lower():
+        elif self.RetentionPolicy.lower() == self.RETAIN.lower():
             return self.RETAIN
-        if self.RetentionPolicy.lower() == self.DELETE.lower():
+        elif self.RetentionPolicy.lower() == self.DELETE.lower():
             return self.DELETE
-        if self.RetentionPolicy.lower() not in self.retention_policy_options:
+        elif self.RetentionPolicy.lower() not in self.retention_policy_options:
             raise InvalidResourceException(
                 self.logical_id,
                 "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),

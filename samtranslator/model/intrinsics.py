@@ -125,9 +125,10 @@ def make_shorthand(intrinsic_dict):
     """
     if "Ref" in intrinsic_dict:
         return "${%s}" % intrinsic_dict["Ref"]
-    if "Fn::GetAtt" in intrinsic_dict:
+    elif "Fn::GetAtt" in intrinsic_dict:
         return "${%s}" % ".".join(intrinsic_dict["Fn::GetAtt"])
-    raise NotImplementedError("Shorthanding is only supported for Ref and Fn::GetAtt")
+    else:
+        raise NotImplementedError("Shorthanding is only supported for Ref and Fn::GetAtt")
 
 
 def is_intrinsic(input):

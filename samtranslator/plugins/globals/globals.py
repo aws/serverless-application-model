@@ -369,16 +369,19 @@ class GlobalProperties(object):
         if token_global != token_local:
             return self._prefer_local(global_value, local_value)
 
-        if self.TOKEN.PRIMITIVE == token_global == token_local:
+        elif self.TOKEN.PRIMITIVE == token_global == token_local:
             return self._prefer_local(global_value, local_value)
 
-        if self.TOKEN.DICT == token_global == token_local:
+        elif self.TOKEN.DICT == token_global == token_local:
             return self._merge_dict(global_value, local_value)
 
-        if self.TOKEN.LIST == token_global == token_local:
+        elif self.TOKEN.LIST == token_global == token_local:
             return self._merge_lists(global_value, local_value)
 
-        raise TypeError("Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local))
+        else:
+            raise TypeError(
+                "Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local)
+            )
 
     def _merge_lists(self, global_list, local_list):
         """
@@ -441,12 +444,14 @@ class GlobalProperties(object):
                 # Intrinsic functions are handled *exactly* like a primitive type because
                 # they resolve to a primitive type when creating a stack with CloudFormation
                 return self.TOKEN.PRIMITIVE
-            return self.TOKEN.DICT
+            else:
+                return self.TOKEN.DICT
 
-        if isinstance(input, list):
+        elif isinstance(input, list):
             return self.TOKEN.LIST
 
-        return self.TOKEN.PRIMITIVE
+        else:
+            return self.TOKEN.PRIMITIVE
 
     class TOKEN:
         """

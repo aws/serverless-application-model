@@ -105,7 +105,8 @@ class RefAction(Action):
 
         if param_name in parameters:
             return parameters[param_name]
-        return input_dict
+        else:
+            return input_dict
 
     def resolve_resource_refs(self, input_dict, supported_resource_refs):
         """
