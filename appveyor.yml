@@ -15,9 +15,8 @@ environment:
 build: off
 
 install:
-- sh: "source ${HOME}/venv${PYTHON_VERSION}/bin/activate"
-- sh: "python --version"
-- make init
+
+- sh: echo "Empty install placeholder"
 
 test_script:
-- tox
+- sh: echo "Empty test_script placeholder"
