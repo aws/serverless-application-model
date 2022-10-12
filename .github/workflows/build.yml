@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Test ${{ matrix.os }} / ${{ matrix.python }}
+    name: ${{ matrix.os }} / ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
