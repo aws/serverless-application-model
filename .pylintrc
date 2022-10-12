@@ -65,6 +65,7 @@ confidence=
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
 disable=
+    C0209, # consider-using-f-string. There are too many of them
     W0613, # Unused argument %r
     W0640, # Cell variable %s defined in loop A variable used in a closure is defined in a loop
     R0902, # Too many instance attributes (%s/%s)
@@ -138,8 +139,8 @@ disable=
     E0602, # undefined-variable
     C0112, # empty-docstring
     C0116, # missing-function-docstring
-    C0200, # consider-using-enumerate
-    R5501, # Consider using "elif" instead of "else if" (else-if-used)
+    # C0200, # consider-using-enumerate
+    # R5501, # Consider using "elif" instead of "else if" (else-if-used)
     W9017, # differing-param-doc
     W9018, # differing-type-doc
     W0511, # fixme
