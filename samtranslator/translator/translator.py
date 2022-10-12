@@ -208,8 +208,7 @@ class Translator:
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
             template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
             return template
-        else:
-            raise InvalidDocumentException(document_errors)
+        raise InvalidDocumentException(document_errors)
 
     # private methods
     def _get_resources_to_iterate(self, sam_template, macro_resolver):

@@ -1301,7 +1301,7 @@ class SwaggerEditor(object):
         if bool(data) and isinstance(data, dict) and isinstance(data.get("paths"), dict):
             if bool(data.get("swagger")):
                 return True
-            elif bool(data.get("openapi")):
+            if bool(data.get("openapi")):
                 return SwaggerEditor.safe_compare_regex_with_string(
                     SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
@@ -1379,8 +1379,7 @@ class SwaggerEditor(object):
         method = method.lower()
         if method == "any":
             return SwaggerEditor._X_ANY_METHOD
-        else:
-            return method
+        return method
 
     @staticmethod
     def get_openapi_versions_supported_regex():
