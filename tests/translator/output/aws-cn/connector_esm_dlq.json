@@ -1,0 +1,187 @@
+{
+ "Resources": {
+  "MyTable": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "BillingMode": "PAY_PER_REQUEST",
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "StreamSpecification": {
+     "StreamViewType": "NEW_IMAGE"
+    }
+   }
+  },
+  "MyRole": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": "sts:AssumeRole",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    ]
+   }
+  },
+  "MyFunction": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Runtime": "nodejs16.x",
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "MyRole",
+      "Arn"
+     ]
+    },
+    "Code": {
+     "ZipFile": "exports.handler = async (event, context) => {\n  console.log(JSON.stringify(event));\n};\n"
+    }
+   }
+  },
+  "MyQueue": {
+   "Type": "AWS::SQS::Queue"
+  },
+  "MyEventSourceMapping": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "MyTable",
+      "StreamArn"
+     ]
+    },
+    "FunctionName": {
+     "Ref": "MyFunction"
+    },
+    "StartingPosition": "TRIM_HORIZON",
+    "DestinationConfig": {
+     "OnFailure": {
+      "Destination": {
+       "Fn::GetAtt": [
+        "MyQueue",
+        "Arn"
+       ]
+      }
+     }
+    }
+   },
+   "DependsOn": [
+    "MyConnectorPolicy",
+    "LambdaToQueuePolicy"
+   ]
+  },
+  "MyConnectorPolicy": {
+   "Type": "AWS::IAM::ManagedPolicy",
+   "Metadata": {
+    "aws:sam:connectors": {
+     "MyConnector": {
+      "Source": {
+       "Type": "AWS::DynamoDB::Table"
+      },
+      "Destination": {
+       "Type": "AWS::Lambda::Function"
+      }
+     }
+    }
+   },
+   "Properties": {
+    "PolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": [
+        "dynamodb:DescribeStream",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:ListStreams"
+       ],
+       "Resource": [
+        {
+         "Fn::Sub": [
+          "${SourceArn}/stream/*",
+          {
+           "SourceArn": {
+            "Fn::GetAtt": [
+             "MyTable",
+             "Arn"
+            ]
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    "Roles": [
+     {
+      "Ref": "MyRole"
+     }
+    ]
+   }
+  },
+  "LambdaToQueuePolicy": {
+   "Type": "AWS::IAM::ManagedPolicy",
+   "Metadata": {
+    "aws:sam:connectors": {
+     "LambdaToQueue": {
+      "Source": {
+       "Type": "AWS::Lambda::Function"
+      },
+      "Destination": {
+       "Type": "AWS::SQS::Queue"
+      }
+     }
+    }
+   },
+   "Properties": {
+    "PolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": [
+        "sqs:DeleteMessage",
+        "sqs:SendMessage",
+        "sqs:ChangeMessageVisibility",
+        "sqs:PurgeQueue"
+       ],
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MyQueue",
+          "Arn"
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    "Roles": [
+     {
+      "Ref": "MyRole"
+     }
+    ]
+   }
+  }
+ }
+}

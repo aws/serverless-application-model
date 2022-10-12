@@ -1,0 +1,71 @@
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  MyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: nodejs16.x
+      Handler: index.handler
+      Role: !GetAtt MyRole.Arn
+      Code:
+        ZipFile: |
+          exports.handler = async (event, context) => {
+            console.log(JSON.stringify(event));
+          };
+
+  MyQueue:
+    Type: AWS::SQS::Queue
+
+  MyEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt MyTable.StreamArn
+      FunctionName: !Ref MyFunction
+      StartingPosition: TRIM_HORIZON
+      DestinationConfig:
+        OnFailure:
+          Destination: !GetAtt MyQueue.Arn
+
+  MyConnector:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyTable
+      Destination: 
+        Id: MyFunction
+      Permissions:
+        - Read
+
+  LambdaToQueue:
+    Type: AWS::Serverless::Connector
+    Properties:
+      Source: 
+        Id: MyFunction
+      Destination: 
+        Id: MyQueue
+      Permissions:
+        - Write
