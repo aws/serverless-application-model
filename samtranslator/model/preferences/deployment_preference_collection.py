@@ -105,7 +105,7 @@ class DeploymentPreferenceCollection(object):
         Returns a list of all conditions associated with the deployment preference resources
         :return: List of condition names
         """
-        conditions_set = set([preference.condition for preference in self._resource_preferences.values()])
+        conditions_set = {preference.condition for preference in self._resource_preferences.values()}
         if None in conditions_set:
             # None can exist if there are disabled deployment preference(s)
             conditions_set.remove(None)
