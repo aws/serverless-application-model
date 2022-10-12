@@ -258,7 +258,7 @@ class StateMachineGenerator(object):
                     for name, resource in self.event_resources[logical_id].items():
                         kwargs[name] = resource
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, f"{e}")
+                    raise InvalidEventException(logical_id, str(e))
                 resources += eventsource.to_cloudformation(resource=self.state_machine, **kwargs)
 
         return resources
