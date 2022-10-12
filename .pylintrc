@@ -105,7 +105,7 @@ disable=
     R0401, # Cyclic import
     C0411, # import ordering
     W9015, # missing parameter in doc strings
-    W0612, # unused variable
+    # W0612, # unused variable
     R0205, # useless-object-inheritanc
     C0301, # line to long
     R0201, # no self use, method could be a function

@@ -252,7 +252,7 @@ class OpenApiEditor(object):
         :yields string: Path name
         """
 
-        for path, value in self.paths.items():
+        for path, _ in self.paths.items():
             yield path
 
     def iter_on_method_definitions_for_path_at_method(
