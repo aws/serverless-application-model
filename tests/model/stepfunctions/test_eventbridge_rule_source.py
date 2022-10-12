@@ -39,3 +39,9 @@ class EventBridgeRuleSourceTests(TestCase):
         resources = self.eb_event_source.to_cloudformation(resource=self.state_machine)
         state = resources[0].State
         self.assertEqual(state, "DISABLED")
+
+    def test_name_when_provided(self):
+        self.eb_event_source.RuleName = "MyRule"
+        resources = self.eb_event_source.to_cloudformation(resource=self.state_machine)
+        event_rule = resources[0]
+        self.assertEqual(event_rule.Name, "MyRule")

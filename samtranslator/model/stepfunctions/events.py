@@ -165,6 +165,7 @@ class CloudWatchEvent(EventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "EventBusName": PropertyType(False, is_str()),
+        "RuleName": PropertyType(False, is_str()),
         "Pattern": PropertyType(False, is_type(dict)),
         "Input": PropertyType(False, is_str()),
         "InputPath": PropertyType(False, is_str()),
@@ -190,6 +191,7 @@ class CloudWatchEvent(EventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
+        events_rule.Name = self.RuleName
 
         if self.State:
             events_rule.State = self.State

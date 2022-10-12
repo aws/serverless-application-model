@@ -374,6 +374,9 @@
         "State": {
           "type": "string"
         },
+        "RuleName": {
+          "type": "string"
+        },
         "DeadLetterConfig": {
           "additionalProperties": false,
           "properties": {

@@ -97,6 +97,7 @@ class Schedule(PushEventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "Schedule": PropertyType(True, is_str()),
+        "RuleName": PropertyType(False, is_str()),
         "Input": PropertyType(False, is_str()),
         "Enabled": PropertyType(False, is_type(bool)),
         "State": PropertyType(False, is_str()),
@@ -180,6 +181,7 @@ class CloudWatchEvent(PushEventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "EventBusName": PropertyType(False, is_str()),
+        "RuleName": PropertyType(False, is_str()),
         "Pattern": PropertyType(False, is_type(dict)),
         "DeadLetterConfig": PropertyType(False, is_type(dict)),
         "RetryPolicy": PropertyType(False, is_type(dict)),
@@ -210,6 +212,7 @@ class CloudWatchEvent(PushEventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)
         events_rule.EventBusName = self.EventBusName
         events_rule.EventPattern = self.Pattern
+        events_rule.Name = self.RuleName
         source_arn = events_rule.get_runtime_attr("arn")
 
         dlq_queue_arn = None
