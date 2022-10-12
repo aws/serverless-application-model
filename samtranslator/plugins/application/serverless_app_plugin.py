@@ -2,7 +2,7 @@ import boto3
 import json
 from botocore.exceptions import ClientError, EndpointConnectionError
 import logging
-from time import sleep, time
+from time import sleep
 import copy
 
 from samtranslator.metrics.method_decorator import cw_timer
@@ -346,8 +346,7 @@ class ServerlessAppPlugin(BasePlugin):
                     if error_code == "TooManyRequestsException":
                         LOG.debug("SAR call timed out for application id {}".format(application_id))
                         break  # We were throttled by SAR, break out to a sleep
-                    else:
-                        raise e
+                    raise e
 
                 if self._is_template_active(response, application_id, template_id):
                     self._in_progress_templates.remove((application_id, template_id))
@@ -369,7 +368,7 @@ class ServerlessAppPlugin(BasePlugin):
         if len(self._in_progress_templates) != 0:
             application_ids = [items[0] for items in self._in_progress_templates]
             raise InvalidResourceException(
-                application_ids, "Timed out waiting for nested stack templates " "to reach ACTIVE status."
+                application_ids, "Timed out waiting for nested stack templates to reach ACTIVE status."
             )
 
     def _get_sleep_time_sec(self):

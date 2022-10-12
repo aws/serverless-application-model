@@ -4,7 +4,7 @@ class TemplateNotFoundException(Exception):
     """
 
     def __init__(self, template_name):
-        super(TemplateNotFoundException, self).__init__("Template with name '{}' is not found".format(template_name))
+        super(TemplateNotFoundException, self).__init__(f"Template with name '{template_name}' is not found")
 
 
 class InsufficientParameterValues(Exception):

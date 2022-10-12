@@ -338,7 +338,6 @@ class Api(EventSource):
         if swagger_body is None:
             return
 
-        resource_arn = resource.get_runtime_attr("arn")
         integration_uri = fnSub("arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution")
 
         editor = SwaggerEditor(swagger_body)

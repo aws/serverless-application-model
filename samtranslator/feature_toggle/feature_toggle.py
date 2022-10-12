@@ -1,9 +1,6 @@
-import os
-import sys
 import json
 import boto3
 import logging
-import hashlib
 
 from botocore.config import Config
 from samtranslator.feature_toggle.dialup import (

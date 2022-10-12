@@ -105,7 +105,7 @@ disable=
     R0401, # Cyclic import
     C0411, # import ordering
     W9015, # missing parameter in doc strings
-    W0612, # unused variable
+    # W0612, # unused variable
     R0205, # useless-object-inheritanc
     C0301, # line to long
     R0201, # no self use, method could be a function
@@ -113,7 +113,7 @@ disable=
     W1202, # Use lazy % formatting in logging functions (logging-format-interpolation)
     E1101, # No member 
     W0622, # Redefining built-in 'property' (redefined-builtin)
-    W0611, # unused imports
+    # W0611, # unused imports
     W0231, # super not called
     W0212, # protected-access
     W0201, # attribute-defined-outside-init
@@ -155,9 +155,9 @@ disable=
     W9013, # missing-yield-doc
     W9014, # missing-yield-type-doc
     C0201, # consider-iterating-dictionary
-    W0237, # arguments-renamed
-    R1718, # consider-using-set-comprehension
-    R1723, # no-else-break
+    # W0237, # arguments-renamed
+    # R1718, # consider-using-set-comprehension
+    # R1723, # no-else-break
     E1133, # not-an-iterable
     E1135, # unsupported-membership-test
     R1705, # no-else-return
