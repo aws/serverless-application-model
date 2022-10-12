@@ -1,7 +1,8 @@
 """ CloudFormation Resource serialization, deserialization, and validation """
+import copy
 import re
 import inspect
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Tuple, Iterator
 
 from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.plugins import LifeCycleEvents
@@ -527,9 +528,13 @@ class ResourceResolver:
 
         self.resources = resources
 
-    def get_all_resources(self) -> Dict[str, Any]:
-        """Return a dictionary of all resources from the SAM template."""
-        return self.resources
+    def get_resources_by_type(self, resource_type: str) -> Iterator[Tuple[str, Dict[str, Any]]]:
+        """
+        Return generator of (logical_id, properties) tuples of resources with specified type.
+        """
+        for logical_id, resource in self.resources.items():
+            if resource.get("Type") == resource_type:
+                yield copy.deepcopy(resource.get("Properties") or {})
 
     def get_resource_by_logical_id(self, input: str) -> Dict[str, Any]:
         """

@@ -234,6 +234,7 @@
         "Type": "AWS_IAM_ROLE_MANAGED_POLICY",
         "Properties": {
           "SourcePolicy": true,
+          "DependedBy": "SOURCE_EVENT_SOURCE_MAPPING_DLQ",
           "AccessCategories": {
             "Read": {
               "Statement": [

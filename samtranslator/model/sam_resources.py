@@ -7,6 +7,7 @@ from samtranslator.model.connector.connector import (
     ConnectorResourceError,
     add_depends_on,
     get_event_source_mappings,
+    get_event_source_mapping_dlqs,
     get_resource_reference,
 )
 from samtranslator.model.connector_profiles.profile import (
@@ -1757,6 +1758,14 @@ class SamConnector(SamResourceMacro):
                 # The dependency type assumes Destination is a AWS::Lambda::Function
                 esm_ids = list(get_event_source_mappings(source.logical_id, destination.logical_id, resource_resolver))
                 # There can only be a single ESM from a resource to function, otherwise deployment fails
+                if len(esm_ids) == 1:
+                    add_depends_on(esm_ids[0], policy.logical_id, resource_resolver)
+        if depended_by == "SOURCE_EVENT_SOURCE_MAPPING_DLQ":
+            if source.logical_id and destination.logical_id:
+                # The dependency type assumes Source is a AWS::Lambda::Function
+                esm_ids = list(
+                    get_event_source_mapping_dlqs(source.logical_id, destination.logical_id, resource_resolver)
+                )
                 if len(esm_ids) == 1:
                     add_depends_on(esm_ids[0], policy.logical_id, resource_resolver)
         if depended_by == "SOURCE":

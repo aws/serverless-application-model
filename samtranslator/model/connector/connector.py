@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 
 from samtranslator.model import ResourceResolver
 from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
+from samtranslator.utils import dictfind
 
 
 # TODO: Switch to dataclass
@@ -54,21 +55,33 @@ def get_event_source_mappings(event_source_id: str, function_id: str, resource_r
     """
     Get logical IDs of `AWS::Lambda::EventSourceMapping`s between resource logical IDs.
     """
-    resources = resource_resolver.get_all_resources()
-    for logical_id, resource in resources.items():
-        if resource.get("Type") == "AWS::Lambda::EventSourceMapping":
-            properties = resource.get("Properties", {})
-            # Not taking intrinsics as input to function as FunctionName could be a number of
-            # formats, which would require parsing it anyway
-            resource_function_id = get_logical_id_from_intrinsic(properties.get("FunctionName"))
-            resource_event_source_id = get_logical_id_from_intrinsic(properties.get("EventSourceArn"))
-            if (
-                resource_function_id
-                and resource_event_source_id
-                and function_id == resource_function_id
-                and event_source_id == resource_event_source_id
-            ):
-                yield logical_id
+    resources = resource_resolver.get_resources_by_type("AWS::Lambda::EventSourceMapping")
+    for logical_id, properties in resources:
+        # Not taking intrinsics as input to function as FunctionName could be a number of
+        # formats, which would require parsing it anyway
+        resource_function_id = get_logical_id_from_intrinsic(properties.get("FunctionName"))
+        resource_event_source_id = get_logical_id_from_intrinsic(properties.get("EventSourceArn"))
+        if (
+            resource_function_id
+            and resource_event_source_id
+            and function_id == resource_function_id
+            and event_source_id == resource_event_source_id
+        ):
+            yield logical_id
+
+
+def get_event_source_mapping_dlqs(function_id: str, dlq_id: str, resource_resolver: ResourceResolver):
+    resources = resource_resolver.get_resources_by_type("AWS::Lambda::EventSourceMapping")
+    for logical_id, properties in resources:
+        resource_function_id = get_logical_id_from_intrinsic(properties.get("FunctionName"))
+        resource_dlq_id = get_logical_id_from_intrinsic(dictfind(properties, "DestinationConfig.OnFailure.Destination"))
+        if (
+            resource_function_id
+            and resource_dlq_id
+            and function_id == resource_function_id
+            and dlq_id == resource_dlq_id
+        ):
+            yield logical_id
 
 
 def _is_valid_resource_reference(obj: Dict[str, Any]) -> bool:
