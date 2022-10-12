@@ -187,11 +187,7 @@ class OpenApiEditor(object):
         if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
             raise InvalidDocumentException(
-                [
-                    InvalidTemplateException(
-                        f"Value of '{path}' path must be a dictionary according to Swagger spec."
-                    )
-                ]
+                [InvalidTemplateException(f"Value of '{path}' path must be a dictionary according to Swagger spec.")]
             )
 
         for path_item in self.get_conditional_contents(path_dict):

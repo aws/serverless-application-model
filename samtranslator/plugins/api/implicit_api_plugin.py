@@ -373,9 +373,7 @@ class ImplicitApiPlugin(BasePlugin):
             editor = self.editor(swagger)
 
             for path in editor.iter_on_path():
-                all_method_conditions = {
-                    condition for _, condition in self.api_conditions[api_id][path].items()
-                }
+                all_method_conditions = {condition for _, condition in self.api_conditions[api_id][path].items()}
                 at_least_one_method = len(all_method_conditions) > 0
                 all_methods_contain_conditions = None not in all_method_conditions
                 if at_least_one_method and all_methods_contain_conditions:

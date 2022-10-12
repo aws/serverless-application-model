@@ -378,9 +378,7 @@ class GlobalProperties(object):
         if self.TOKEN.LIST == token_global == token_local:
             return self._merge_lists(global_value, local_value)
 
-        raise TypeError(
-            "Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local)
-        )
+        raise TypeError("Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local))
 
     def _merge_lists(self, global_list, local_list):
         """
