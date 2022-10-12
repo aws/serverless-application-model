@@ -346,8 +346,7 @@ class ServerlessAppPlugin(BasePlugin):
                     if error_code == "TooManyRequestsException":
                         LOG.debug("SAR call timed out for application id {}".format(application_id))
                         break  # We were throttled by SAR, break out to a sleep
-                    else:
-                        raise e
+                    raise e
 
                 if self._is_template_active(response, application_id, template_id):
                     self._in_progress_templates.remove((application_id, template_id))
