@@ -1,7 +1,7 @@
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import is_type, is_str, list_of
+from samtranslator.model.types import is_type, is_str
 from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping

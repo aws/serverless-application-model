@@ -36,7 +36,7 @@ class SupportedResourceReferences(object):
             self._refs[logical_id] = {}
 
         if property in self._refs[logical_id]:
-            raise ValueError("Cannot add second reference value to {}.{} property".format(logical_id, property))
+            raise ValueError(f"Cannot add second reference value to {logical_id}.{property} property")
 
         self._refs[logical_id][property] = value
 

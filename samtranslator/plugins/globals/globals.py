@@ -202,7 +202,7 @@ class Globals(object):
             supported_displayed = [
                 prop for prop in supported if prop not in self.unreleased_properties.get(resource_type, [])
             ]
-            for key, value in properties.items():
+            for key, _ in properties.items():
                 if key not in supported:
                     raise InvalidGlobalsSectionException(
                         self._KEYWORD,

@@ -62,7 +62,6 @@ from samtranslator.model.intrinsics import (
     make_not_conditional,
     make_conditional,
     make_and_condition,
-    fnGetAtt,
 )
 from samtranslator.model.sqs import SQSQueue, SQSQueuePolicy
 from samtranslator.model.sns import SNSTopic, SNSTopicPolicy
@@ -167,7 +166,7 @@ class SamFunction(SamResourceMacro):
             if not self.AutoPublishAlias:
                 raise InvalidResourceException(
                     self.logical_id,
-                    "To set ProvisionedConcurrencyConfig " "AutoPublishALias must be defined on the function",
+                    "To set ProvisionedConcurrencyConfig AutoPublishALias must be defined on the function",
                 )
 
         lambda_alias = None

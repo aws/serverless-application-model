@@ -103,8 +103,8 @@ class Translator:
             if feature_toggle
             else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)
         )
-        self.function_names = dict()
-        self.redeploy_restapi_parameters = dict()
+        self.function_names = {}
+        self.redeploy_restapi_parameters = {}
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
         sam_parameter_values.add_pseudo_parameter_values(self.boto_session)
