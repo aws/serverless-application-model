@@ -56,7 +56,7 @@ class BasePlugin(object):
         # NoOp implementation
         pass
 
-    def on_before_transform_template(self, template):
+    def on_before_transform_template(self, template_dict):
         """
         Hook method to execute on "before_transform_template" life cycle event. Plugins are free to modify the
         whole template, inject new resources, or modify certain sections of the template.

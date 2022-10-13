@@ -522,7 +522,7 @@ class ResourceResolver:
         :param dict resources: Map of resource
         """
 
-        if resources is None or not isinstance(resources, dict):
+        if not isinstance(resources, dict):
             raise TypeError("'Resources' is either null or not a valid dictionary.")
 
         self.resources = resources

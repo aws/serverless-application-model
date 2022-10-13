@@ -48,7 +48,7 @@ class ImplicitApiPlugin(BasePlugin):
 
     def _setup_api_properties(self):
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
     @cw_timer(prefix="Plugin-ImplicitApi")
@@ -134,19 +134,19 @@ class ImplicitApiPlugin(BasePlugin):
         return api_events
 
     def _process_api_events(
-        self, resource, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
+        self, function, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
     ):
         """
         Actually process given API events. Iteratively adds the APIs to Swagger JSON in the respective Serverless::Api
         resource from the template
 
-        :param SamResource resource: SAM Resource containing the API events to be processed
-        :param dict api_events: API Events extracted from the resource. These events will be processed
+        :param SamResource function: SAM function containing the API events to be processed
+        :param dict api_events: API Events extracted from the function. These events will be processed
         :param SamTemplate template: SAM Template where Serverless::Api resources can be found
         :param str condition: optional; this is the condition that is on the resource with the API event
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
     def _add_implicit_api_id_if_necessary(self, event_properties):
@@ -158,7 +158,7 @@ class ImplicitApiPlugin(BasePlugin):
         :param dict event_properties: Dictionary of event properties
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
     def _add_api_to_swagger(self, event_id, event_properties, template):
@@ -245,13 +245,11 @@ class ImplicitApiPlugin(BasePlugin):
         # Add a condition to the API resource IFF all of its resource+methods are associated with serverless functions
         # containing conditions.
         implicit_api_conditions = self.api_conditions[self.implicit_api_logical_id]
-        all_resource_method_conditions = set(
-            [
-                condition
-                for path, method_conditions in implicit_api_conditions.items()
-                for method, condition in method_conditions.items()
-            ]
-        )
+        all_resource_method_conditions = {
+            condition
+            for _, method_conditions in implicit_api_conditions.items()
+            for _, condition in method_conditions.items()
+        }
         at_least_one_resource_method = len(all_resource_method_conditions) > 0
         all_resource_methods_contain_conditions = None not in all_resource_method_conditions
         if at_least_one_resource_method and all_resource_methods_contain_conditions:
@@ -375,9 +373,7 @@ class ImplicitApiPlugin(BasePlugin):
             editor = self.editor(swagger)
 
             for path in editor.iter_on_path():
-                all_method_conditions = set(
-                    [condition for method, condition in self.api_conditions[api_id][path].items()]
-                )
+                all_method_conditions = {condition for _, condition in self.api_conditions[api_id][path].items()}
                 at_least_one_method = len(all_method_conditions) > 0
                 all_methods_contain_conditions = None not in all_method_conditions
                 if at_least_one_method and all_methods_contain_conditions:
@@ -398,7 +394,7 @@ class ImplicitApiPlugin(BasePlugin):
         Required function that returns the api body from the respective editor
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
     def _path_condition_name(self, api_id, path):
@@ -436,7 +432,7 @@ class ImplicitApiPlugin(BasePlugin):
         Helper function implemented by child classes that create a new implicit API resource
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )
 
     def _get_api_resource_type_name(self):
@@ -444,5 +440,5 @@ class ImplicitApiPlugin(BasePlugin):
         Returns the type of API resource
         """
         raise NotImplementedError(
-            "Method _setup_api_properties() must be implemented in a " "subclass of ImplicitApiPlugin"
+            "Method _setup_api_properties() must be implemented in a subclass of ImplicitApiPlugin"
         )

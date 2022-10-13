@@ -1,5 +1,5 @@
 from samtranslator.model import PropertyType, Resource
-from samtranslator.model.types import is_type, dict_of, list_of, is_str, one_of
+from samtranslator.model.types import is_type, list_of, is_str
 from samtranslator.model.intrinsics import fnGetAtt, ref
 
 

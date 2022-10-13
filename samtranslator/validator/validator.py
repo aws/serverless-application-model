@@ -3,7 +3,6 @@ import os
 import re
 
 import jsonschema
-from jsonschema.exceptions import ValidationError
 
 from . import sam_schema
 

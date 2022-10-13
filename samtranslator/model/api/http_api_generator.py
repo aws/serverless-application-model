@@ -14,7 +14,6 @@ from samtranslator.model.exceptions import InvalidResourceException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.open_api.open_api import OpenApiEditor
 from samtranslator.translator.logical_id_generator import LogicalIdGenerator
-from samtranslator.model.tags.resource_tagging import get_tag_list
 from samtranslator.model.intrinsics import is_intrinsic, is_intrinsic_no_value
 from samtranslator.model.route53 import Route53RecordSetGroup
 
@@ -227,7 +226,7 @@ class HttpApiGenerator(object):
 
         if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
             raise InvalidResourceException(
-                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn" " are provided."
+                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn are provided."
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
@@ -237,7 +236,7 @@ class HttpApiGenerator(object):
         domain = ApiGatewayV2DomainName(
             self.domain.get("ApiDomainName"), attributes=self.passthrough_resource_attributes
         )
-        domain_config = dict()
+        domain_config = {}
         domain.DomainName = self.domain.get("DomainName")
         domain.Tags = self.tags
         endpoint = self.domain.get("EndpointConfiguration")

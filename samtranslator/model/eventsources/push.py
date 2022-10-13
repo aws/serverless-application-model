@@ -608,7 +608,7 @@ class Api(PushEventSource):
                 # RestApiId is a string, not an intrinsic, but we did not find a valid API resource for this ID
                 raise InvalidEventException(
                     self.relative_id,
-                    "RestApiId property of Api event must reference a valid " "resource in the same template.",
+                    "RestApiId property of Api event must reference a valid resource in the same template.",
                 )
 
         return {"explicit_api": explicit_api, "explicit_api_stage": {"suffix": stage_suffix}}
