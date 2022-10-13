@@ -69,7 +69,7 @@ disable=
     W0613, # Unused argument %r
     W0640, # Cell variable %s defined in loop A variable used in a closure is defined in a loop
     R0902, # Too many instance attributes (%s/%s)
-    R0903, # Too few public methods (%s/%s)
+    # R0903, # Too few public methods (%s/%s)
     R0913, # Too many arguments (%s/%s)
     W0703, # Catching too general exception %s
     R0904, # Too many public methods (%s/%s)
@@ -98,9 +98,9 @@ disable=
     C0103, # Class constant name "%s" doesn't conform to UPPER_CASE naming style ('([^\\W\\da-z][^\\Wa-z]*|__.*__)$' pattern) (invalid-name)
     # New recommendations, disable for now to avoid introducing behaviour changes.
     R1729, # Use a generator instead '%s' (use-a-generator)
-    R1732, # Consider using 'with' for resource-allocating operations (consider-using-with)
+    # R1732, # Consider using 'with' for resource-allocating operations (consider-using-with)
     # This applies to CPython only.
-    I1101, # Module 'math' has no 'pow' member, but source is unavailable. Consider adding this module to extension-pkg-allow-list if you want to perform analysis based on run-time introspection of living objects. (c-extension-no-member)    
+    # I1101, # Module 'math' has no 'pow' member, but source is unavailable. Consider adding this module to extension-pkg-allow-list if you want to perform analysis based on run-time introspection of living objects. (c-extension-no-member)    
     # Added to allow linting. Need to work on removing over time
     R0801, # dupilcated code
     R0401, # Cyclic import
@@ -115,7 +115,7 @@ disable=
     E1101, # No member 
     W0622, # Redefining built-in 'property' (redefined-builtin)
     # W0611, # unused imports
-    W0231, # super not called
+    # W0231, # super not called
     W0212, # protected-access
     W0201, # attribute-defined-outside-init
     R1725, # Consider using Python 3 style super() without arguments (super-with-arguments)
@@ -126,8 +126,8 @@ disable=
     W0223, # abstract-method
     W0107, # unnecessary-pass
     W0707, # raise-missing-from
-    R1720, # no-else-raise
-    W0621, # redefined-outer-name
+    # R1720, # no-else-raise
+    # W0621, # redefined-outer-name
     E0203, # access-member-before-definition
     W0221, # arguments-differ
     R1710, # inconsistent-return-statements
@@ -136,7 +136,7 @@ disable=
     W0105, # String statement has no effect (pointless-string-statement)
     C0206, # Consider iterating with .items() (consider-using-dict-items)
     W9008, # Redundant returns documentation (redundant-returns-doc)
-    E0602, # undefined-variable
+    # E0602, # undefined-variable
     C0112, # empty-docstring
     C0116, # missing-function-docstring
     # C0200, # consider-using-enumerate
@@ -144,15 +144,15 @@ disable=
     W9017, # differing-param-doc
     W9018, # differing-type-doc
     W0511, # fixme
-    C0325, # superfluous-parens
-    R1701, # consider-merging-isinstance
+    # C0325, # superfluous-parens
+    # R1701, # consider-merging-isinstance
     C0302, # too-many-lines
     C0303, # trailing-whitespace
-    R1721, # unnecessary-comprehension
-    C0121, # singleton-comparison
-    E1305, # too-many-format-args
-    R1724, # no-else-continue
-    E0611, # no-name-in-module
+    # R1721, # unnecessary-comprehension
+    # C0121, # singleton-comparison
+    # E1305, # too-many-format-args
+    # R1724, # no-else-continue
+    # E0611, # no-name-in-module
     W9013, # missing-yield-doc
     W9014, # missing-yield-type-doc
     C0201, # consider-iterating-dictionary

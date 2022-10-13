@@ -112,7 +112,7 @@ class StateMachineGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "Specify either 'Definition' or 'DefinitionUri' property and not both."
             )
-        elif self.definition:
+        if self.definition:
             processed_definition = deepcopy(self.definition)
             substitutions = self._replace_dynamic_values_with_substitutions(processed_definition)
             if len(substitutions) > 0:
@@ -132,7 +132,7 @@ class StateMachineGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "Specify either 'Role' or 'Policies' property and not both."
             )
-        elif self.role:
+        if self.role:
             self.state_machine.RoleArn = self.role
         elif self.policies:
             if not self.managed_policy_map:

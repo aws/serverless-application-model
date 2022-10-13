@@ -623,7 +623,7 @@ class SamFunction(SamResourceMacro):
                 "'DeadLetterQueue' requires Type and TargetArn properties to be specified.",
             )
 
-        if not (isinstance(self.DeadLetterQueue.get("Type"), str)):
+        if not isinstance(self.DeadLetterQueue.get("Type"), str):
             raise InvalidResourceException(
                 self.logical_id,
                 "'DeadLetterQueue' property 'Type' should be of type str.",
@@ -733,16 +733,16 @@ class SamFunction(SamResourceMacro):
             "ImageUri": construct_image_code_object,
         }
 
-        filtered_artifacts = dict(filter(lambda x: x[1] != None, artifacts.items()))
+        filtered_artifacts = dict(filter(lambda x: x[1] is not None, artifacts.items()))
         # There are more than one allowed artifact types present, raise an Error.
         # There are no valid artifact types present, also raise an Error.
         if len(filtered_artifacts) > 1 or len(filtered_artifacts) == 0:
             if packagetype == ZIP and len(filtered_artifacts) == 0:
                 raise InvalidResourceException(self.logical_id, "Only one of 'InlineCode' or 'CodeUri' can be set.")
-            elif packagetype == IMAGE:
+            if packagetype == IMAGE:
                 raise InvalidResourceException(self.logical_id, "'ImageUri' must be set.")
 
-        filtered_keys = [key for key in filtered_artifacts.keys()]
+        filtered_keys = list(filtered_artifacts.keys())
         # NOTE(sriram-mv): This precedence order is important. It is protect against python2 vs python3
         # dictionary ordering when getting the key values with .keys() on a dictionary.
         # Do not change this precedence order.

@@ -137,8 +137,7 @@ class ServerlessAppPlugin(BasePlugin):
                     sleep(sleep_time)
                     self._total_wait_time += sleep_time
                     continue
-                else:
-                    raise e
+                raise e
             call_succeeded = True
             break
         if not call_succeeded:
