@@ -10,6 +10,7 @@ from integration.config.service_names import (
     REST_API,
     S3_EVENTS,
     SQS,
+    SCHEDULE_EVENT,
     STATE_MACHINE_INLINE_DEFINITION,
 )
 from integration.helpers.yaml_utils import load_yaml
@@ -213,6 +214,7 @@ SERVICE_DETECTORS: Dict[str, Callable[[Dict[str, Any], Set[str]], bool]] = {
     REST_API: lambda template_dict, cfn_resource_types: "AWS::ApiGateway::RestApi" in cfn_resource_types,
     SQS: lambda template_dict, cfn_resource_types: "AWS::SQS::Queue" in cfn_resource_types,
     DYNAMO_DB: lambda template_dict, cfn_resource_types: "AWS::DynamoDB::Table" in cfn_resource_types,
+    SCHEDULE_EVENT: lambda template_dict, cfn_resource_types: "AWS::Events::EventBus" in cfn_resource_types,
     STATE_MACHINE_INLINE_DEFINITION: lambda template_dict, cfn_resource_types: any(
         _resource_using_inline_statemachine_definition(resource)
         for resource in template_dict.get("Resources", {}).values()
