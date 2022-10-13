@@ -33,3 +33,9 @@ class EventBridgeRuleSourceTests(TestCase):
         self.eb_event_source.DeadLetterConfig = dead_letter_config
         with self.assertRaises(InvalidEventException):
             self.eb_event_source.to_cloudformation(resource=self.state_machine)
+
+    def test_to_cloudformation_with_state(self):
+        self.eb_event_source.State = "DISABLED"
+        resources = self.eb_event_source.to_cloudformation(resource=self.state_machine)
+        state = resources[0].State
+        self.assertEqual(state, "DISABLED")

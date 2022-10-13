@@ -10,6 +10,7 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: 'rate(1 minute)'
+            State: ENABLED
             DeadLetterConfig:
               Type: SQS
   TriggeredFunction:
@@ -23,6 +24,7 @@ Resources:
           Type: EventBridgeRule
           Properties:
             EventBusName: ExternalEventBridge
+            State: ENABLED
             Pattern:
               detail:
                 state:
