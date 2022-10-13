@@ -223,7 +223,7 @@ class TestPolicyTemplateProcessor(TestCase):
             result = PolicyTemplatesProcessor._read_json(filepath)
             self.assertEqual(result, json_return)
 
-            open_mock.assert_called_once_with(filepath, "r")
+            open_mock.assert_called_once_with(filepath, "r", encoding="utf-8")
             self.assertEqual(1, json_loads_mock.call_count)
 
     @patch.object(PolicyTemplatesProcessor, "_read_json")

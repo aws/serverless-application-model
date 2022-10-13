@@ -150,5 +150,5 @@ class PolicyTemplatesProcessor(object):
         :param filepath: Path to the file
         :return dict: Dictionary containing file data
         """
-        with open(filepath, "r") as fp:
+        with open(filepath, "r", encoding="utf-8") as fp:
             return json.load(fp)

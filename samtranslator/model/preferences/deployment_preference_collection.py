@@ -270,8 +270,8 @@ class DeploymentPreferenceCollection(object):
 
     def _replace_deployment_types(self, value, key=None):
         if isinstance(value, list):
-            for i in range(len(value)):
-                value[i] = self._replace_deployment_types(value[i])
+            for i, v in enumerate(value):
+                value[i] = self._replace_deployment_types(v)
             return value
         elif is_intrinsic(value):
             for (k, v) in value.items():
