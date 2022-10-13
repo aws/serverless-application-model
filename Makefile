@@ -1,36 +1,41 @@
+PYTHON = python3
+VENV = .venv
+BIN = $(VENV)/bin
+
 target:
 	$(info ${HELP_MESSAGE})
 	@exit 0
 
 init:
-	pip install -e '.[dev]'
+	$(PYTHON) -m venv $(VENV)
+	$(BIN)/pip install -e '.[dev]'
 
 test:
-	AWS_DEFAULT_REGION=us-east-1 pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
+	AWS_DEFAULT_REGION=us-east-1 $(BIN)/pytest --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
 
 test-fast:
-	pytest -x --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
+	$(BIN)/pytest -x --cov samtranslator --cov-report term-missing --cov-fail-under 95 -n auto tests/*
 
 test-cov-report:
-	pytest --cov samtranslator --cov-report term-missing --cov-report html --cov-fail-under 95 tests/*
+	$(BIN)/pytest --cov samtranslator --cov-report term-missing --cov-report html --cov-fail-under 95 tests/*
 
 integ-test:
-	pytest --no-cov integration/*
+	$(BIN)/pytest --no-cov integration/*
 
 black:
-	black setup.py samtranslator/* tests/* integration/* bin/*.py
+	$(BIN)/black setup.py samtranslator/* tests/* integration/* bin/*.py
 
 black-check:
-	black --check setup.py samtranslator/* tests/* integration/* bin/*.py
+	$(BIN)/black --check setup.py samtranslator/* tests/* integration/* bin/*.py
 
 lint:
 	# Linter performs static analysis to catch latent bugs
-	pylint --rcfile .pylintrc samtranslator
+	$(BIN)/pylint --rcfile .pylintrc samtranslator
 	# mypy performs type check
-	mypy samtranslator
+	$(BIN)/mypy samtranslator
 
 prepare-companion-stack:
-	pytest -v --no-cov integration/setup -m setup
+	$(BIN)/pytest -v --no-cov integration/setup -m setup
 
 # Command to run everytime you make changes to verify everything works
 dev: test
