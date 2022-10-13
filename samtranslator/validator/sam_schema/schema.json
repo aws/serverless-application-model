@@ -371,6 +371,9 @@
         "Pattern": {
           "type": "object"
         },
+        "State": {
+          "type": "string"
+        },
         "DeadLetterConfig": {
           "additionalProperties": false,
           "properties": {

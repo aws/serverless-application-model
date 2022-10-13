@@ -10,6 +10,7 @@
             ]
           }
         }, 
+        "State": "ENABLED",
         "Targets": [
           {
             "RoleArn": {

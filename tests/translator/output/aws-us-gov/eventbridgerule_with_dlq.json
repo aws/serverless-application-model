@@ -79,6 +79,7 @@
           }
         }, 
         "EventBusName": "ExternalEventBridge", 
+        "State" : "ENABLED", 
         "Targets": [
           {
             "DeadLetterConfig": {
@@ -213,6 +214,7 @@
       "Type": "AWS::Events::Rule", 
       "Properties": {
         "ScheduleExpression": "rate(1 minute)", 
+        "State" : "ENABLED",
         "Targets": [
           {
             "DeadLetterConfig": {
