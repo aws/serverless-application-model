@@ -266,9 +266,11 @@ class Deployer:
             waiter.wait(ChangeSetName=changeset_id, StackName=stack_name, WaiterConfig=waiter_config)
         except botocore.exceptions.WaiterError as ex:
 
+            LOG.error("Waiter exception waiting for changeset", exc_info=ex)
+
             resp = ex.last_response
-            status = resp["Status"]
-            reason = resp["StatusReason"]
+            status = resp.get("Status", "")
+            reason = resp.get("StatusReason", "")
 
             if (
                 status == "FAILED"
