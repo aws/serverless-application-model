@@ -376,6 +376,7 @@ class ResourceMacro(Resource):
         """
         raise NotImplementedError("Method to_cloudformation() must be implemented in a subclass of ResourceMacro")
 
+
 class SamResourceMacro(ResourceMacro):
     """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources."""
 
