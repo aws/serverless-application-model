@@ -202,6 +202,5 @@ def _get_resource_arn(logical_id: str, resource_type: str) -> Any:
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#aws-resource-stepfunctions-statemachine-return-values
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-topic.html#aws-resource-sns-topic-return-values
         return ref(logical_id)
-    else:
-        # For all other supported resources, we can typically use Fn::GetAtt LogicalId.Arn to obtain ARNs
-        return fnGetAtt(logical_id, "Arn")
+    # For all other supported resources, we can typically use Fn::GetAtt LogicalId.Arn to obtain ARNs
+    return fnGetAtt(logical_id, "Arn")

@@ -147,7 +147,7 @@ disable=
     # C0325, # superfluous-parens
     # R1701, # consider-merging-isinstance
     C0302, # too-many-lines
-    C0303, # trailing-whitespace
+    # C0303, # trailing-whitespace
     # R1721, # unnecessary-comprehension
     # C0121, # singleton-comparison
     # E1305, # too-many-format-args
@@ -161,7 +161,7 @@ disable=
     # R1723, # no-else-break
     E1133, # not-an-iterable
     E1135, # unsupported-membership-test
-    R1705, # no-else-return
+    # R1705, # no-else-return
 
 
 [REPORTS]

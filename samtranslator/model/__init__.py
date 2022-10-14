@@ -331,8 +331,7 @@ class Resource(object):
 
         if attr_name in self.runtime_attrs:
             return self.runtime_attrs[attr_name](self)
-        else:
-            raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
+        raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
 
     def get_passthrough_resource_attributes(self):
         """
