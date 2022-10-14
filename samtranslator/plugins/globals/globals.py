@@ -93,7 +93,7 @@ class Globals(object):
         :param dict template: SAM template to be parsed
         """
         self.supported_resource_section_names = [
-            x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties.keys()
+            x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties
         ]
         # Sort the names for stability in list ordering
         self.supported_resource_section_names.sort()

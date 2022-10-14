@@ -229,7 +229,7 @@ class Resource(object):
         resource_dict.update(self.resource_attributes)
 
         properties_dict = {}
-        for name in self.property_types:
+        for name in self.property_types.keys():
             value = getattr(self, name)
             if value is not None:
                 properties_dict[name] = value
@@ -246,7 +246,7 @@ class Resource(object):
         :param value: the value of the attribute to be set
         :raises InvalidResourceException: if an invalid property is provided
         """
-        if name in self._keywords or name in self.property_types:
+        if name in self._keywords or name in self.property_types.keys():
             return super(Resource, self).__setattr__(name, value)
 
         raise InvalidResourceException(
@@ -375,7 +375,6 @@ class ResourceMacro(Resource):
         :returns: a list of vanilla CloudFormation Resource instances, to which this macro expands
         """
         raise NotImplementedError("Method to_cloudformation() must be implemented in a subclass of ResourceMacro")
-
 
 class SamResourceMacro(ResourceMacro):
     """ResourceMacro that specifically refers to SAM (AWS::Serverless::*) resources."""

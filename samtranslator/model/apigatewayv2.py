@@ -179,7 +179,7 @@ class ApiGatewayV2Authorizer(object):
                 )
             headers = self.identity.get("Headers")
             if headers:
-                if not isinstance(headers, list) or any([not isinstance(header, str) for header in headers]):
+                if not isinstance(headers, list) or any((not isinstance(header, str) for header in headers)):
                     raise InvalidResourceException(
                         self.api_logical_id,
                         self.name + " Lambda Authorizer property identity's 'Headers' is of invalid type.",

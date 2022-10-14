@@ -97,12 +97,12 @@ disable=
     # Constant name style warnings. We will remove them one by one.
     C0103, # Class constant name "%s" doesn't conform to UPPER_CASE naming style ('([^\\W\\da-z][^\\Wa-z]*|__.*__)$' pattern) (invalid-name)
     # New recommendations, disable for now to avoid introducing behaviour changes.
-    R1729, # Use a generator instead '%s' (use-a-generator)
+    # R1729, # Use a generator instead '%s' (use-a-generator)
     # R1732, # Consider using 'with' for resource-allocating operations (consider-using-with)
     # This applies to CPython only.
     # I1101, # Module 'math' has no 'pow' member, but source is unavailable. Consider adding this module to extension-pkg-allow-list if you want to perform analysis based on run-time introspection of living objects. (c-extension-no-member)    
     # Added to allow linting. Need to work on removing over time
-    R0801, # dupilcated code
+    # R0801, # dupilcated code
     R0401, # Cyclic import
     C0411, # import ordering
     W9015, # missing parameter in doc strings
@@ -155,12 +155,12 @@ disable=
     # E0611, # no-name-in-module
     W9013, # missing-yield-doc
     W9014, # missing-yield-type-doc
-    C0201, # consider-iterating-dictionary
+    # C0201, # consider-iterating-dictionary
     # W0237, # arguments-renamed
     # R1718, # consider-using-set-comprehension
     # R1723, # no-else-break
-    E1133, # not-an-iterable
-    E1135, # unsupported-membership-test
+    # E1133, # not-an-iterable
+    # E1135, # unsupported-membership-test
     # R1705, # no-else-return
 
 
