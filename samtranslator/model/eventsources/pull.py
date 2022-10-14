@@ -119,9 +119,9 @@ class PullEventSource(ResourceMacro):
         if self.ConsumerGroupId:
             consumer_group_id_structure = {"ConsumerGroupId": self.ConsumerGroupId}
             if self.resource_type == "MSK":
-                lambda_eventsourcemapping.AmazonManagedKafkaConfig = consumer_group_id_structure
+                lambda_eventsourcemapping.AmazonManagedKafkaEventSourceConfig = consumer_group_id_structure
             elif self.resource_type == "SelfManagedKafka":
-                lambda_eventsourcemapping.SelfManagedKafkaConfig = consumer_group_id_structure
+                lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig = consumer_group_id_structure
             else:
                 raise InvalidEventException(
                     self.logical_id,

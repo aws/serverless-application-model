@@ -88,7 +88,7 @@
         "Topics": {
           "Ref": "TopicsValue"
         },
-        "AmazonManagedKafkaConfig": {
+        "AmazonManagedKafkaEventSourceConfig": {
           "ConsumerGroupId": {
             "Ref": "ConsumerGroupValue"
           }
