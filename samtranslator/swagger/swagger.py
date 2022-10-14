@@ -437,7 +437,7 @@ class SwaggerEditor(object):
                 return to_return
             if isinstance(bmt, list):
                 return [replace_recursively(item) for item in bmt]
-            if isinstance(bmt, str) or isinstance(bmt, Py27UniStr):
+            if isinstance(bmt, (Py27UniStr, str)):
                 return Py27UniStr(bmt.replace("~1", "/"))
             return bmt
 

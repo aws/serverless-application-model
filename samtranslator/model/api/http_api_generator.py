@@ -456,7 +456,7 @@ class HttpApiGenerator(object):
                 self.logical_id,
                 "Unable to add `Tags` because 'DefinitionBody' does not contain a valid OpenApi definition.",
             )
-        elif not OpenApiEditor.is_valid(self.definition_body):
+        if not OpenApiEditor.is_valid(self.definition_body):
             return
 
         if not self.tags:

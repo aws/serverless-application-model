@@ -930,7 +930,7 @@ class ApiGenerator(object):
                     "Unable to set GatewayResponses attribute because "
                     "intrinsic functions are not supported for this field.",
                 )
-            elif not isinstance(responses_value, dict):
+            if not isinstance(responses_value, dict):
                 raise InvalidResourceException(
                     self.logical_id,
                     "Invalid property type '{}' for GatewayResponses. "
