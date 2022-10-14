@@ -50,11 +50,10 @@ def _get_metric_name(prefix, name, func, args):
     """
     if name:
         metric_name = name
+    elif args and isinstance(args[0], Resource):
+        metric_name = args[0].resource_type
     else:
-        if args and isinstance(args[0], Resource):
-            metric_name = args[0].resource_type
-        else:
-            metric_name = func.__name__
+        metric_name = func.__name__
 
     if prefix:
         return "{}-{}".format(prefix, metric_name)

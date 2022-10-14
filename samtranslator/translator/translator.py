@@ -244,7 +244,7 @@ class Translator:
             # Skip over the resource if it is not a SAM defined Resource
             if not macro_resolver.can_resolve(resource):
                 continue
-            elif resource["Type"] == "AWS::Serverless::Function":
+            if resource["Type"] == "AWS::Serverless::Function":
                 functions.append(data)
             elif resource["Type"] == "AWS::Serverless::StateMachine":
                 statemachines.append(data)
