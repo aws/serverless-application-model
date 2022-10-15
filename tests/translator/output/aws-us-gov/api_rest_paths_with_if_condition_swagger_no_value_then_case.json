@@ -43,7 +43,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment9b1182e52b"
+          "Ref": "MyApiDeployment65e79bd323"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -104,10 +104,10 @@
         ]
       }
     },
-    "MyApiDeployment9b1182e52b": {
+    "MyApiDeployment65e79bd323": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Description": "RestApi deployment id: 9b1182e52bcd94d4984db4a1844447cbc60968e5",
+        "Description": "RestApi deployment id: 65e79bd323822aea0581eb329f357d47ceb42ab9",
         "RestApiId": {
           "Ref": "MyApi"
         },
@@ -223,7 +223,7 @@
                 "authorizerResultTtlInSeconds": 37,
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                     {
                       "__FunctionArn__": {
                         "Fn::GetAtt": [

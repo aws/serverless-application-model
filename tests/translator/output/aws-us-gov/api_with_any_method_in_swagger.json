@@ -4,7 +4,7 @@
       "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
-          "Ref": "MyApiDeployment0ebc8893a3"
+          "Ref": "MyApiDeployment541b106906"
         },
         "RestApiId": {
           "Ref": "MyApi"
@@ -14,14 +14,24 @@
         }
       }
     },
+    "MyApiDeployment541b106906": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "Description": "RestApi deployment id: 541b1069064c4205c19bd1bbab57840ee5128275",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
+      }
+    },
     "HttpApiFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "index.restapi",
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "todo_list.zip"
         },
+        "Handler": "index.restapi",
         "Role": {
           "Fn::GetAtt": [
             "HttpApiFunctionRole",
@@ -31,8 +41,8 @@
         "Runtime": "python3.7",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       }
@@ -41,18 +51,18 @@
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "HttpApiFunction"
         },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*",
             {
-              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "MyApi"
-              }
+              },
+              "__Stage__": "*"
             }
           ]
         }
@@ -82,20 +92,10 @@
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    },
-    "MyApiDeployment0ebc8893a3": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "Description": "RestApi deployment id: 0ebc8893a30055fb944d26720dc8ffddacc6d27d",
-        "StageName": "Stage"
       }
     },
     "MyApi": {
@@ -171,7 +171,7 @@
                   "identitySource": "method.request.header.Authorization",
                   "authorizerUri": {
                     "Fn::Sub": [
-                      "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                       {
                         "__FunctionArn__": null
                       }
@@ -183,13 +183,13 @@
             }
           }
         },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
           ]
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
         }
       }
     }

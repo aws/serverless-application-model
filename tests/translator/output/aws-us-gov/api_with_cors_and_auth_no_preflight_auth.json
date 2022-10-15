@@ -1,286 +1,93 @@
 {
   "Resources": {
-    "ServerlessApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0", 
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          }, 
-          "paths": {
-            "/": {
-              "post": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
-                  "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
-                  }
-                }, 
-                "security": [
-                  {
-                    "MyLambdaRequestAuth": []
-                  }
-                ], 
-                "responses": {}
-              }, 
-              "options": {
-                "x-amazon-apigateway-integration": {
-                  "type": "mock", 
-                  "requestTemplates": {
-                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
-                  }, 
-                  "responses": {
-                    "default": {
-                      "statusCode": "200", 
-                      "responseTemplates": {
-                        "application/json": "{}\n"
-                      }, 
-                      "responseParameters": {
-                        "method.response.header.Access-Control-Allow-Origin": "origins", 
-                        "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS,POST'"
-                      }
-                    }
-                  }
-                }, 
-                "consumes": [
-                  "application/json"
-                ], 
-                "summary": "CORS support", 
-                "responses": {
-                  "200": {
-                    "headers": {
-                      "Access-Control-Allow-Origin": {
-                        "type": "string"
-                      }, 
-                      "Access-Control-Allow-Methods": {
-                        "type": "string"
-                      }
-                    }, 
-                    "description": "Default response for CORS method"
-                  }
-                }, 
-                "produces": [
-                  "application/json"
-                ]
-              }, 
-              "get": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
-                  "uri": {
-                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
-                  }
-                }, 
-                "security": [
-                  {
-                    "MyLambdaRequestAuth": []
-                  }
-                ], 
-                "responses": {}
-              }
-            }
-          }, 
-          "swagger": "2.0", 
-          "securityDefinitions": {
-            "MyLambdaRequestAuth": {
-              "in": "header", 
-              "type": "apiKey", 
-              "name": "Unused", 
-              "x-amazon-apigateway-authorizer": {
-                "type": "request", 
-                "identitySource": "method.request.header.Authorization1", 
-                "authorizerUri": {
-                  "Fn::Sub": [
-                    "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations", 
-                    {
-                      "__FunctionArn__": {
-                        "Fn::GetAtt": [
-                          "MyAuthFn", 
-                          "Arn"
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }, 
-              "x-amazon-apigateway-authtype": "custom"
-            }
-          }
-        }, 
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }, 
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        }
-      }
-    }, 
-    "ApiFunctionRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    },
-    "ServerlessApiDeployment0aae939ae6": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessApi"
-        }, 
-        "Description": "RestApi deployment id: 0aae939ae622ada18aa063187fce7bef5605e7a6", 
-        "StageName": "Stage"
-      }
-    }, 
-    "ServerlessApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ServerlessApiDeployment0aae939ae6"
-        }, 
-        "RestApiId": {
-          "Ref": "ServerlessApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
     "ApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+      "Type": "AWS::Lambda::Permission",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
+        "Action": "lambda:InvokeFunction",
         "FunctionName": {
           "Ref": "ApiFunction"
-        }, 
+        },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
-              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessApi"
-              }
+              },
+              "__Stage__": "*"
             }
           ]
         }
       }
     },
     "ApiFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "index.gethtml", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "member_portal.zip"
-        }, 
+        },
+        "Handler": "index.gethtml",
         "Role": {
           "Fn::GetAtt": [
-            "ApiFunctionRole", 
+            "ApiFunctionRole",
             "Arn"
           ]
-        }, 
+        },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       }
-    }, 
+    },
     "MyAuthFn": {
-      "Type": "AWS::Lambda::Function", 
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "index.handler", 
         "Code": {
-          "S3Bucket": "bucket", 
+          "S3Bucket": "bucket",
           "S3Key": "key"
-        }, 
+        },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
-            "MyAuthFnRole", 
+            "MyAuthFnRole",
             "Arn"
           ]
-        }, 
+        },
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       }
-    }, 
-    "ApiFunctionPostHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
+    },
+    "ServerlessApiDeploymentc15e21a482": {
+      "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "ApiFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/", 
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ServerlessApi"
-              }
-            }
-          ]
-        }
+        "Description": "RestApi deployment id: c15e21a482d02f2310cfbfb26109d43f95d23636",
+        "RestApiId": {
+          "Ref": "ServerlessApi"
+        },
+        "StageName": "Stage"
       }
-    }, 
-    "MyAuthFnRole": {
-      "Type": "AWS::IAM::Role", 
+    },
+    "ApiFunctionRole": {
+      "Type": "AWS::IAM::Role",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
+          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
@@ -288,28 +95,221 @@
               }
             }
           ]
-        }
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       }
-    }, 
-    "ServerlessApiMyLambdaRequestAuthAuthorizerPermission": {
-      "Type": "AWS::Lambda::Permission", 
+    },
+    "MyAuthFnRole": {
+      "Type": "AWS::IAM::Role",
       "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "ServerlessApiProdStage": {
+      "Type": "AWS::ApiGateway::Stage",
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessApiDeploymentc15e21a482"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessApi"
+        },
+        "StageName": "Prod"
+      }
+    },
+    "ServerlessApiMyLambdaRequestAuthAuthorizerPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
         "FunctionName": {
           "Fn::GetAtt": [
-            "MyAuthFn", 
+            "MyAuthFn",
             "Arn"
           ]
-        }, 
+        },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
-            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*", 
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
             {
               "__ApiId__": {
                 "Ref": "ServerlessApi"
               }
             }
+          ]
+        }
+      }
+    },
+    "ApiFunctionPostHtmlPermissionProd": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Body": {
+          "info": {
+            "version": "1.0",
+            "title": {
+              "Ref": "AWS::StackName"
+            }
+          },
+          "paths": {
+            "/": {
+              "post": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  }
+                },
+                "security": [
+                  {
+                    "MyLambdaRequestAuth": []
+                  }
+                ],
+                "responses": {}
+              },
+              "options": {
+                "x-amazon-apigateway-integration": {
+                  "type": "mock",
+                  "requestTemplates": {
+                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
+                  },
+                  "responses": {
+                    "default": {
+                      "statusCode": "200",
+                      "responseTemplates": {
+                        "application/json": "{}\n"
+                      },
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Origin": "origins",
+                        "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS,POST'"
+                      }
+                    }
+                  }
+                },
+                "consumes": [
+                  "application/json"
+                ],
+                "summary": "CORS support",
+                "responses": {
+                  "200": {
+                    "headers": {
+                      "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      }
+                    },
+                    "description": "Default response for CORS method"
+                  }
+                },
+                "produces": [
+                  "application/json"
+                ]
+              },
+              "get": {
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-us-gov:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  }
+                },
+                "security": [
+                  {
+                    "MyLambdaRequestAuth": []
+                  }
+                ],
+                "responses": {}
+              }
+            }
+          },
+          "swagger": "2.0",
+          "securityDefinitions": {
+            "MyLambdaRequestAuth": {
+              "in": "header",
+              "type": "apiKey",
+              "name": "Unused",
+              "x-amazon-apigateway-authorizer": {
+                "type": "request",
+                "identitySource": "method.request.header.Authorization1",
+                "authorizerUri": {
+                  "Fn::Sub": [
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    {
+                      "__FunctionArn__": {
+                        "Fn::GetAtt": [
+                          "MyAuthFn",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "x-amazon-apigateway-authtype": "custom"
+            }
+          }
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
           ]
         }
       }

@@ -1,5 +1,41 @@
 {
   "Conditions": {
+    "FunctionCondition": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
+    "FunctionCondition2": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
+    "FunctionCondition3": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
+    "FunctionCondition4": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
+    "FunctionCondition5": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
+    "FunctionCondition6": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
+    },
     "ServerlessRestApiCondition": {
       "Fn::Or": [
         {
@@ -22,36 +58,6 @@
         }
       ]
     },
-    "FunctionCondition6": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "FunctionCondition5": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "FunctionCondition4": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "FunctionCondition3": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
-    "FunctionCondition2": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
-    },
     "ServerlessRestApiSLASHusersPathCondition": {
       "Fn::Or": [
         {
@@ -70,23 +76,49 @@
           "Condition": "FunctionCondition6"
         }
       ]
-    },
-    "FunctionCondition": {
-      "Fn::Equals": [
-        true,
-        false
-      ]
     }
   },
   "Resources": {
+    "MyFunction5Role": {
+      "Type": "AWS::IAM::Role",
+      "Condition": "FunctionCondition5",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
     "MyFunction4": {
       "Type": "AWS::Lambda::Function",
+      "Condition": "FunctionCondition4",
       "Properties": {
-        "Handler": "index.handler",
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "thumbnails.zip"
         },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
             "MyFunction4Role",
@@ -96,21 +128,21 @@
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      },
-      "Condition": "FunctionCondition4"
+      }
     },
     "MyFunction6": {
       "Type": "AWS::Lambda::Function",
+      "Condition": "FunctionCondition6",
       "Properties": {
-        "Handler": "index.handler",
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "thumbnails.zip"
         },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
             "MyFunction6Role",
@@ -120,43 +152,43 @@
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      },
-      "Condition": "FunctionCondition6"
+      }
     },
     "MyFunction2WithCognitoMultipleUserPoolsAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "FunctionCondition2",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction2"
         },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/users",
             {
-              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              }
+              },
+              "__Stage__": "*"
             }
           ]
         }
-      },
-      "Condition": "FunctionCondition2"
+      }
     },
     "MyFunction3": {
       "Type": "AWS::Lambda::Function",
+      "Condition": "FunctionCondition3",
       "Properties": {
-        "Handler": "index.handler",
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "thumbnails.zip"
         },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
             "MyFunction3Role",
@@ -166,21 +198,21 @@
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      },
-      "Condition": "FunctionCondition3"
+      }
     },
     "MyFunction2": {
       "Type": "AWS::Lambda::Function",
+      "Condition": "FunctionCondition2",
       "Properties": {
-        "Handler": "index.handler",
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "thumbnails.zip"
         },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
             "MyFunction2Role",
@@ -190,69 +222,29 @@
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      },
-      "Condition": "FunctionCondition2"
+      }
     },
     "ServerlessRestApiProdStage": {
       "Type": "AWS::ApiGateway::Stage",
+      "Condition": "ServerlessRestApiCondition",
       "Properties": {
         "DeploymentId": {
-          "Ref": "ServerlessRestApiDeploymentcbc79073ff"
+          "Ref": "ServerlessRestApiDeploymentfd098303ee"
         },
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Prod"
-      },
-      "Condition": "ServerlessRestApiCondition"
-    },
-    "MyFunction5Role": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      },
-      "Condition": "FunctionCondition5"
+      }
     },
     "MyFunction2Role": {
       "Type": "AWS::IAM::Role",
+      "Condition": "FunctionCondition2",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -268,33 +260,22 @@
               }
             }
           ]
-        }
-      },
-      "Condition": "FunctionCondition2"
-    },
-    "ServerlessRestApiDeploymentcbc79073ff": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
         },
-        "Description": "RestApi deployment id: cbc79073ff900d53c3f67ea223640210914a672c",
-        "StageName": "Stage"
-      },
-      "Condition": "ServerlessRestApiCondition"
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
     },
     "MyFunction4Role": {
       "Type": "AWS::IAM::Role",
+      "Condition": "FunctionCondition4",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -310,18 +291,27 @@
               }
             }
           ]
-        }
-      },
-      "Condition": "FunctionCondition4"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
     },
     "MyFunction5": {
       "Type": "AWS::Lambda::Function",
+      "Condition": "FunctionCondition5",
       "Properties": {
-        "Handler": "index.handler",
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "thumbnails.zip"
         },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
             "MyFunction5Role",
@@ -331,25 +321,16 @@
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      },
-      "Condition": "FunctionCondition5"
+      }
     },
     "MyFunction6Role": {
       "Type": "AWS::IAM::Role",
+      "Condition": "FunctionCondition6",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -365,16 +346,36 @@
               }
             }
           ]
-        }
-      },
-      "Condition": "FunctionCondition6"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
+    },
+    "ServerlessRestApiDeploymentfd098303ee": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Condition": "ServerlessRestApiCondition",
+      "Properties": {
+        "Description": "RestApi deployment id: fd098303ee0006625afb88634d91c15ad44cd67d",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      }
     },
     "ServerlessRestApiMyLambdaTokenAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "ServerlessRestApiCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": "arn:aws",
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
@@ -385,43 +386,34 @@
             }
           ]
         }
-      },
-      "Condition": "ServerlessRestApiCondition"
+      }
     },
     "MyFunctionWithNoAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "FunctionCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction"
         },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
             {
-              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              }
+              },
+              "__Stage__": "*"
             }
           ]
         }
-      },
-      "Condition": "FunctionCondition"
+      }
     },
     "MyFunction3Role": {
       "Type": "AWS::IAM::Role",
+      "Condition": "FunctionCondition3",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -437,18 +429,27 @@
               }
             }
           ]
-        }
-      },
-      "Condition": "FunctionCondition3"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
     },
     "MyFunction": {
       "Type": "AWS::Lambda::Function",
+      "Condition": "FunctionCondition",
       "Properties": {
-        "Handler": "index.handler",
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "thumbnails.zip"
         },
+        "Handler": "index.handler",
         "Role": {
           "Fn::GetAtt": [
             "MyFunctionRole",
@@ -458,41 +459,41 @@
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      },
-      "Condition": "FunctionCondition"
+      }
     },
     "MyFunction4WithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "FunctionCondition4",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction4"
         },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PATCH/users",
             {
-              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              }
+              },
+              "__Stage__": "*"
             }
           ]
         }
-      },
-      "Condition": "FunctionCondition4"
+      }
     },
     "ServerlessRestApiMyLambdaRequestAuthAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "ServerlessRestApiCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": "arn:aws",
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
@@ -503,37 +504,37 @@
             }
           ]
         }
-      },
-      "Condition": "ServerlessRestApiCondition"
+      }
     },
     "MyFunction5WithLambdaRequestAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "FunctionCondition5",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction5"
         },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/DELETE/users",
             {
-              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              }
+              },
+              "__Stage__": "*"
             }
           ]
         }
-      },
-      "Condition": "FunctionCondition5"
+      }
     },
     "ServerlessRestApiMyLambdaTokenAuthNoneFunctionInvokeRoleAuthorizerPermission": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "ServerlessRestApiCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": "arn:aws",
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
@@ -544,21 +545,12 @@
             }
           ]
         }
-      },
-      "Condition": "ServerlessRestApiCondition"
+      }
     },
     "MyFunctionRole": {
       "Type": "AWS::IAM::Role",
+      "Condition": "FunctionCondition",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -574,56 +566,65 @@
               }
             }
           ]
-        }
-      },
-      "Condition": "FunctionCondition"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      }
     },
     "MyFunction3WithLambdaTokenAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "FunctionCondition3",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction3"
         },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/users",
             {
-              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              }
+              },
+              "__Stage__": "*"
             }
           ]
         }
-      },
-      "Condition": "FunctionCondition3"
+      }
     },
     "MyFunction6WithDefaultAuthorizerPermissionProd": {
       "Type": "AWS::Lambda::Permission",
+      "Condition": "FunctionCondition6",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": {
           "Ref": "MyFunction6"
         },
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/users",
             {
-              "__Stage__": "*",
               "__ApiId__": {
                 "Ref": "ServerlessRestApi"
-              }
+              },
+              "__Stage__": "*"
             }
           ]
         }
-      },
-      "Condition": "FunctionCondition6"
+      }
     },
     "ServerlessRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
+      "Condition": "ServerlessRestApiCondition",
       "Properties": {
         "Body": {
           "info": {
@@ -854,7 +855,7 @@
                 "authorizerResultTtlInSeconds": 0,
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                     {
                       "__FunctionArn__": "arn:aws"
                     }
@@ -878,7 +879,7 @@
                 "identitySource": "method.request.header.Authorization1, method.request.querystring.Authorization2, stageVariables.Authorization3, context.Authorization4",
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                     {
                       "__FunctionArn__": "arn:aws"
                     }
@@ -910,7 +911,7 @@
                 "authorizerResultTtlInSeconds": 20,
                 "authorizerUri": {
                   "Fn::Sub": [
-                    "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                    "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                     {
                       "__FunctionArn__": "arn:aws"
                     }
@@ -937,8 +938,7 @@
             }
           }
         }
-      },
-      "Condition": "ServerlessRestApiCondition"
+      }
     }
   }
 }

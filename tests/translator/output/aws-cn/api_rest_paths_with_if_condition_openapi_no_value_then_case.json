@@ -39,14 +39,16 @@
         }
       }
     },
-    "MyApiDeploymentca11cc1e55": {
-      "Type": "AWS::ApiGateway::Deployment",
+    "MyApidevStage": {
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
-        "Description": "RestApi deployment id: ca11cc1e55c3bb45d10cfaa66b1487834342d5f3",
+        "DeploymentId": {
+          "Ref": "MyApiDeploymenta5e5336988"
+        },
         "RestApiId": {
           "Ref": "MyApi"
         },
-        "StageName": "Stage"
+        "StageName": "dev"
       }
     },
     "MyAuthFn": {
@@ -70,6 +72,16 @@
             "Value": "SAM"
           }
         ]
+      }
+    },
+    "MyApiDeploymenta5e5336988": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "Description": "RestApi deployment id: a5e5336988810c21644ba4eb5fc2c66e397f394f",
+        "RestApiId": {
+          "Ref": "MyApi"
+        },
+        "StageName": "Stage"
       }
     },
     "MyAuthFnRole": {
@@ -100,18 +112,6 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "MyApidevStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiDeploymentca11cc1e55"
-        },
-        "RestApiId": {
-          "Ref": "MyApi"
-        },
-        "StageName": "dev"
       }
     },
     "MyApi": {
@@ -224,7 +224,7 @@
                   "authorizerResultTtlInSeconds": 37,
                   "authorizerUri": {
                     "Fn::Sub": [
-                      "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                       {
                         "__FunctionArn__": {
                           "Fn::GetAtt": [

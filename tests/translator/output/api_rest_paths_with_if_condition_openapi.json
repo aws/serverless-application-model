@@ -39,16 +39,14 @@
         }
       }
     },
-    "MyApidevStage": {
-      "Type": "AWS::ApiGateway::Stage",
+    "MyApiDeployment5372501e20": {
+      "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
-        "DeploymentId": {
-          "Ref": "MyApiDeploymentdd0af0635c"
-        },
+        "Description": "RestApi deployment id: 5372501e2044315cc99376ba97eba127ba78257c",
         "RestApiId": {
           "Ref": "MyApi"
         },
-        "StageName": "dev"
+        "StageName": "Stage"
       }
     },
     "MyAuthFn": {
@@ -104,14 +102,16 @@
         ]
       }
     },
-    "MyApiDeploymentdd0af0635c": {
-      "Type": "AWS::ApiGateway::Deployment",
+    "MyApidevStage": {
+      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
-        "Description": "RestApi deployment id: dd0af0635cf0797adb5e55505bff8349ddcfe008",
+        "DeploymentId": {
+          "Ref": "MyApiDeployment5372501e20"
+        },
         "RestApiId": {
           "Ref": "MyApi"
         },
-        "StageName": "Stage"
+        "StageName": "dev"
       }
     },
     "MyApi": {
@@ -295,7 +295,7 @@
                   "authorizerResultTtlInSeconds": 37,
                   "authorizerUri": {
                     "Fn::Sub": [
-                      "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
                       {
                         "__FunctionArn__": {
                           "Fn::GetAtt": [
