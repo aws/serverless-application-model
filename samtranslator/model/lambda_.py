@@ -81,8 +81,8 @@ class LambdaEventSourceMapping(Resource):
         "FunctionResponseTypes": PropertyType(False, is_type(list)),
         "SelfManagedEventSource": PropertyType(False, is_type(dict)),
         "FilterCriteria": PropertyType(False, is_type(dict)),
-        "AmazonManagedKafkaConfig": PropertyType(False, is_type(dict)),
-        "SelfManagedKafkaConfig": PropertyType(False, is_type(dict)),
+        "AmazonManagedKafkaEventSourceConfig": PropertyType(False, is_type(dict)),
+        "SelfManagedKafkaEventSourceConfig": PropertyType(False, is_type(dict)),
     }
 
     runtime_attrs = {"name": lambda self: ref(self.logical_id)}

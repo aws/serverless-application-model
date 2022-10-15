@@ -19,8 +19,7 @@ def parse_s3_uri(uri):
         if "versionId" in query and len(query["versionId"]) == 1:
             s3_pointer["Version"] = query["versionId"][0]
         return s3_pointer
-    else:
-        return None
+    return None
 
 
 def to_s3_uri(code_dict):

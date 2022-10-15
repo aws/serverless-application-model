@@ -8,6 +8,7 @@ Resources:
         CWEvent:
           Type: CloudWatchEvent
           Properties:
+            State: ENABLED
             Pattern:
               detail:
                 state:

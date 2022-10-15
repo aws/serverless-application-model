@@ -105,7 +105,7 @@ class DeploymentPreferenceCollection(object):
         Returns a list of all conditions associated with the deployment preference resources
         :return: List of condition names
         """
-        conditions_set = set([preference.condition for preference in self._resource_preferences.values()])
+        conditions_set = {preference.condition for preference in self._resource_preferences.values()}
         if None in conditions_set:
             # None can exist if there are disabled deployment preference(s)
             conditions_set.remove(None)
@@ -270,19 +270,18 @@ class DeploymentPreferenceCollection(object):
 
     def _replace_deployment_types(self, value, key=None):
         if isinstance(value, list):
-            for i in range(len(value)):
-                value[i] = self._replace_deployment_types(value[i])
+            for i, v in enumerate(value):
+                value[i] = self._replace_deployment_types(v)
             return value
-        elif is_intrinsic(value):
+        if is_intrinsic(value):
             for (k, v) in value.items():
                 value[k] = self._replace_deployment_types(v, k)
             return value
-        else:
-            if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
-                if key == "Fn::Sub":  # Don't nest a "Sub" in a "Sub"
-                    return ["CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value}]
-                return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
-            return value
+        if value in CODEDEPLOY_PREDEFINED_CONFIGURATIONS_LIST:
+            if key == "Fn::Sub":  # Don't nest a "Sub" in a "Sub"
+                return ["CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value}]
+            return fnSub("CodeDeployDefault.Lambda${ConfigName}", {"ConfigName": value})
+        return value
 
     def update_policy(self, function_logical_id):
         deployment_preference = self.get(function_logical_id)

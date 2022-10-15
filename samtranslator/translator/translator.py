@@ -103,8 +103,8 @@ class Translator:
             if feature_toggle
             else FeatureToggle(FeatureToggleDefaultConfigProvider(), stage=None, account_id=None, region=None)
         )
-        self.function_names = dict()
-        self.redeploy_restapi_parameters = dict()
+        self.function_names = {}
+        self.redeploy_restapi_parameters = {}
         sam_parameter_values = SamParameterValues(parameter_values)
         sam_parameter_values.add_default_parameter_values(sam_template)
         sam_parameter_values.add_pseudo_parameter_values(self.boto_session)
@@ -208,8 +208,7 @@ class Translator:
             template = intrinsics_resolver.resolve_sam_resource_id_refs(template, changed_logical_ids)
             template = intrinsics_resolver.resolve_sam_resource_refs(template, supported_resource_refs)
             return template
-        else:
-            raise InvalidDocumentException(document_errors)
+        raise InvalidDocumentException(document_errors)
 
     # private methods
     def _get_resources_to_iterate(self, sam_template, macro_resolver):
@@ -244,7 +243,7 @@ class Translator:
             # Skip over the resource if it is not a SAM defined Resource
             if not macro_resolver.can_resolve(resource):
                 continue
-            elif resource["Type"] == "AWS::Serverless::Function":
+            if resource["Type"] == "AWS::Serverless::Function":
                 functions.append(data)
             elif resource["Type"] == "AWS::Serverless::StateMachine":
                 statemachines.append(data)

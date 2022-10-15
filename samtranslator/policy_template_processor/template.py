@@ -43,9 +43,7 @@ class Template(object):
         if len(missing) > 0:
             # str() of elements of list to prevent any `u` prefix from being displayed in user-facing error message
             raise InsufficientParameterValues(
-                "Following required parameters of template '{}' don't have values: {}".format(
-                    self.name, [str(m) for m in missing]
-                )
+                f"Following required parameters of template '{self.name}' don't have values: {[str(m) for m in missing]}"
             )
 
         # Select only necessary parameter_values. this is to prevent malicious or accidental

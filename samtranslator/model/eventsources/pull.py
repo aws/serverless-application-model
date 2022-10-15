@@ -1,7 +1,7 @@
 from samtranslator.metrics.method_decorator import cw_timer
 from samtranslator.model import ResourceMacro, PropertyType
 from samtranslator.model.eventsources import FUNCTION_EVETSOURCE_METRIC_PREFIX
-from samtranslator.model.types import is_type, is_str, list_of
+from samtranslator.model.types import is_type, is_str
 from samtranslator.model.intrinsics import is_intrinsic
 
 from samtranslator.model.lambda_ import LambdaEventSourceMapping
@@ -21,7 +21,7 @@ class PullEventSource(ResourceMacro):
     """
 
     # Event types that support `FilterCriteria`, stored as a list to keep the alphabetical order
-    RESOURCE_TYPES_WITH_EVENT_FILTERING = ["DynamoDB", "Kinesis", "SQS"]
+    RESOURCE_TYPES_WITH_EVENT_FILTERING = ["DynamoDB", "Kinesis", "MQ", "MSK", "SelfManagedKafka", "SQS"]
 
     # Note(xinhol): `PullEventSource` should have been an abstract class. Disabling the type check for the next
     # line to avoid any potential behavior change.
@@ -119,9 +119,9 @@ class PullEventSource(ResourceMacro):
         if self.ConsumerGroupId:
             consumer_group_id_structure = {"ConsumerGroupId": self.ConsumerGroupId}
             if self.resource_type == "MSK":
-                lambda_eventsourcemapping.AmazonManagedKafkaConfig = consumer_group_id_structure
+                lambda_eventsourcemapping.AmazonManagedKafkaEventSourceConfig = consumer_group_id_structure
             elif self.resource_type == "SelfManagedKafka":
-                lambda_eventsourcemapping.SelfManagedKafkaConfig = consumer_group_id_structure
+                lambda_eventsourcemapping.SelfManagedKafkaEventSourceConfig = consumer_group_id_structure
             else:
                 raise InvalidEventException(
                     self.logical_id,

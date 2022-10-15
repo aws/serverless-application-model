@@ -1,9 +1,6 @@
-import os
-import sys
 import json
 import boto3
 import logging
-import hashlib
 
 from botocore.config import Config
 from samtranslator.feature_toggle.dialup import (
@@ -116,7 +113,7 @@ class FeatureToggleLocalConfigProvider(FeatureToggleConfigProvider):
 
     def __init__(self, local_config_path):
         FeatureToggleConfigProvider.__init__(self)
-        with open(local_config_path, "r") as f:
+        with open(local_config_path, "r", encoding="utf-8") as f:
             config_json = f.read()
         self.feature_toggle_config = json.loads(config_json)
 
