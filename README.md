@@ -26,6 +26,8 @@ Resources:
 
 ## Contributing
 
+You'll need Python 3.7+ for the following steps.
+
 Create a [virtual environment](https://docs.python.org/3/library/venv.html):
 
 ```bash
