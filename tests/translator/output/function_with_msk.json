@@ -69,7 +69,7 @@
         "Topics": [
           "MyDummyTestTopic"
         ],
-        "AmazonManagedKafkaConfig": {
+        "AmazonManagedKafkaEventSourceConfig": {
           "ConsumerGroupId": "consumergroup1"
         }
       }
