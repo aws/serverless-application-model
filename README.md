@@ -72,6 +72,16 @@ With just a few lines of configuration, you can define the application you want 
 * **Getting started with CI/CD? SAM pipelines can help you get started** - [This workshop](https://s12d.com/_JQ48d5T) walks you through the basics.
 * **Get started with Serverless Application development using SAM CLI** - [This workshop](https://s12d.com/Tq9ZE-Br) walks you through the basics.
 
+https://aws.amazon.com/blogs/compute/building-typescript-projects-with-aws-sam-cli/
+
+https://aws.amazon.com/blogs/compute/accelerating-serverless-development-with-aws-sam-accelerate/?sc_icampaign=launch_sam-accelerate&sc_ichannel=ha&sc_icontent=awssm-9887_launch&sc_iplace=ribbon&trk=ha_awssm-9887_launch
+
+https://cicd.serverlessworkshops.io/
+
+https://catalog.us-east-1.prod.workshops.aws/workshops/d21ec850-bab5-4276-af98-a91664f8b161/en-US/introduction
+
+https://s12d.com/_JQ48d5T
+
 ## Get started
 
 To get started with building SAM-based applications, use the [AWS SAM CLI](https://github.com/aws/aws-sam-cli). SAM CLI provides a Lambda-like execution
