@@ -26,7 +26,7 @@ Resources:
 
 ## Contributing
 
-1. Make sure you have Python 3.7+ installed.
+1. Install Python 3.7+.
 1. Create a [virtual environment](https://docs.python.org/3/library/venv.html):
 
     ```bash
@@ -41,12 +41,6 @@ Resources:
     ```
 
 1. Change the code.
-
-   If you need to locally transform SAM templates, use:
-   
-   ```bash
-   python bin/sam-translate.py --template-file my-template.yaml
-   ```
 
 1. Run tests:
 
