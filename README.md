@@ -26,27 +26,24 @@ Resources:
 
 ## Contributing
 
-1. Install Python 3.7+.
-1. Create a [virtual environment](https://docs.python.org/3/library/venv.html):
+Create a [virtual environment](https://docs.python.org/3/library/venv.html):
 
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    ```
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-1. Set up dependencies:
+Set up dependencies:
 
-    ```bash
-    make init
-    ```
+```bash
+make init
+```
 
-1. Change the code.
+Run tests:
 
-1. Run tests:
-
-    ```bash
-    make pr
-    ```
+```bash
+make pr
+ ```
 
 For more thorough instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md).
 
