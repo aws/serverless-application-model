@@ -26,7 +26,7 @@ Resources:
 
 ## Getting help
 
-The easiest way is to create a GitHub issue.
+[Create an issue](https://github.com/aws/serverless-application-model/issues) or [start a discussion](https://github.com/aws/serverless-application-model/discussions).
 
 Or join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack.
 
