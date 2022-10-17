@@ -115,7 +115,7 @@
             ]
           }
         },
-          "SelfManagedKafkaConfig": {
+          "SelfManagedKafkaEventSourceConfig": {
             "ConsumerGroupId": "consumergroup1"
         }
       }

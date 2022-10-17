@@ -153,7 +153,7 @@
             }
           }
         },
-        "SelfManagedKafkaConfig": {
+        "SelfManagedKafkaEventSourceConfig": {
           "ConsumerGroupId": {
             "Ref": "ConsumerGroupValue"
           }

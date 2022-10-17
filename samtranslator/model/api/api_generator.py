@@ -782,7 +782,7 @@ class ApiGenerator(object):
             return []
 
         # create usage plan for this api only
-        elif usage_plan_properties.get("CreateUsagePlan") == "PER_API":
+        if usage_plan_properties.get("CreateUsagePlan") == "PER_API":
             usage_plan_logical_id = self.logical_id + "UsagePlan"
             usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id,
@@ -930,7 +930,7 @@ class ApiGenerator(object):
                     "Unable to set GatewayResponses attribute because "
                     "intrinsic functions are not supported for this field.",
                 )
-            elif not isinstance(responses_value, dict):
+            if not isinstance(responses_value, dict):
                 raise InvalidResourceException(
                     self.logical_id,
                     "Invalid property type '{}' for GatewayResponses. "

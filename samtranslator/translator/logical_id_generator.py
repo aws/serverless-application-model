@@ -65,7 +65,7 @@ class LogicalIdGenerator(object):
         encoded_data_str = self.data_str
         if sys.version_info.major == 2:
             # In Py2, only unicode needs to be encoded.
-            if isinstance(self.data_str, unicode):
+            if isinstance(self.data_str, unicode):  # pylint: disable=E0602
                 encoded_data_str = self.data_str.encode("utf-8")
         else:
             # data_str should always be unicode on python 3

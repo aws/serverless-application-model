@@ -53,8 +53,7 @@ class SupportedResourceReferences(object):
         prop_values = self.get_all(logical_id)
         if prop_values:
             return prop_values.get(property, None)
-        else:
-            return None
+        return None
 
     def get_all(self, logical_id):
         """

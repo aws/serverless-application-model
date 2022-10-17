@@ -623,7 +623,7 @@ class SamFunction(SamResourceMacro):
                 "'DeadLetterQueue' requires Type and TargetArn properties to be specified.",
             )
 
-        if not (isinstance(self.DeadLetterQueue.get("Type"), str)):
+        if not isinstance(self.DeadLetterQueue.get("Type"), str):
             raise InvalidResourceException(
                 self.logical_id,
                 "'DeadLetterQueue' property 'Type' should be of type str.",
@@ -733,16 +733,16 @@ class SamFunction(SamResourceMacro):
             "ImageUri": construct_image_code_object,
         }
 
-        filtered_artifacts = dict(filter(lambda x: x[1] != None, artifacts.items()))
+        filtered_artifacts = dict(filter(lambda x: x[1] is not None, artifacts.items()))
         # There are more than one allowed artifact types present, raise an Error.
         # There are no valid artifact types present, also raise an Error.
         if len(filtered_artifacts) > 1 or len(filtered_artifacts) == 0:
             if packagetype == ZIP and len(filtered_artifacts) == 0:
                 raise InvalidResourceException(self.logical_id, "Only one of 'InlineCode' or 'CodeUri' can be set.")
-            elif packagetype == IMAGE:
+            if packagetype == IMAGE:
                 raise InvalidResourceException(self.logical_id, "'ImageUri' must be set.")
 
-        filtered_keys = [key for key in filtered_artifacts.keys()]
+        filtered_keys = list(filtered_artifacts.keys())
         # NOTE(sriram-mv): This precedence order is important. It is protect against python2 vs python3
         # dictionary ordering when getting the key values with .keys() on a dictionary.
         # Do not change this precedence order.
@@ -925,16 +925,15 @@ class SamFunction(SamResourceMacro):
         # FIXME: We should support not only true/false, but also yes/no, on/off? See https://yaml.org/type/bool.html
         if processed_property_value in [True, "true", "True"]:
             return True
-        elif processed_property_value in [False, "false", "False"]:
+        if processed_property_value in [False, "false", "False"]:
             return False
-        elif is_intrinsic(processed_property_value):  # couldn't resolve intrinsic
+        if is_intrinsic(processed_property_value):  # couldn't resolve intrinsic
             raise InvalidResourceException(
                 self.logical_id,
                 f"Unsupported intrinsic: the only intrinsic functions supported for "
                 f"property {property_name} are FindInMap and parameter Refs.",
             )
-        else:
-            raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
+        raise InvalidResourceException(self.logical_id, f"Invalid value for property {property_name}.")
 
     def _construct_function_url(self, lambda_function, lambda_alias):
         """
@@ -1501,11 +1500,11 @@ class SamLayerVersion(SamResourceMacro):
 
         if self.RetentionPolicy is None:
             return None
-        elif self.RetentionPolicy.lower() == self.RETAIN.lower():
+        if self.RetentionPolicy.lower() == self.RETAIN.lower():
             return self.RETAIN
-        elif self.RetentionPolicy.lower() == self.DELETE.lower():
+        if self.RetentionPolicy.lower() == self.DELETE.lower():
             return self.DELETE
-        elif self.RetentionPolicy.lower() not in self.retention_policy_options:
+        if self.RetentionPolicy.lower() not in self.retention_policy_options:
             raise InvalidResourceException(
                 self.logical_id,
                 "'RetentionPolicy' must be one of the following options: {}.".format([self.RETAIN, self.DELETE]),
