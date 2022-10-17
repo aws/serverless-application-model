@@ -1,10 +1,39 @@
-# AWS Serverless Application Model (AWS SAM)
+# AWS SAM transform
 
 [![Tests](https://github.com/aws/serverless-application-model/actions/workflows/build.yml/badge.svg)](https://github.com/aws/serverless-application-model/actions/workflows/build.yml)
 [![PyPI](https://img.shields.io/pypi/v/aws-sam-translator?label=PyPI)](https://pypi.org/project/aws-sam-translator/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aws-sam-translator)](https://pypi.org/project/aws-sam-translator/)
 
-The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (SAM) is an open-source framework for building serverless applications.
+This repository hosts the code for the [`AWS::Serverless-2016-10-31` transform](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-aws-serverless.html).
+
+For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
+
+## Getting started
+
+```yaml
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs16.x
+      Handler: index.handler
+      InlineCode: |
+        exports.handler = async (event) => {
+          console.log(event);
+        }
+```
+
+Want:
+- what it is (mention aws sam cli)
+- example
+- development
+- join slack
+
+---
+
+The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (AWS SAM) is an open-source framework for building serverless applications.
+
 
 It provides shorthand syntax to express functions, APIs, databases, and event source mappings.
 With just a few lines of configuration, you can define the application you want and model it.
