@@ -26,28 +26,37 @@ Resources:
 
 ## Contributing
 
-You'll need Python 3.7+ for the following steps.
+1. Make sure you have Python 3.7+ installed.
+1. Create a [virtual environment](https://docs.python.org/3/library/venv.html):
 
-Create a [virtual environment](https://docs.python.org/3/library/venv.html):
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
+1. Set up dependencies:
 
-Set up dependencies:
+    ```bash
+    make init
+    ```
 
-```bash
-make init
-```
+1. Change the code.
 
-Run tests:
+   If you need to locally transform SAM templates, use:
+   
+   ```bash
+   python bin/sam-translate.py --template-file my-template.yaml
+   ```
 
-```bash
-make pr
-```
+1. Run tests:
+
+    ```bash
+    make pr
+    ```
 
 For more thorough instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md).
+
+## Additional resources
 
 ---
 
