@@ -79,6 +79,7 @@
           }
         }, 
         "EventBusName": "ExternalEventBridge", 
+        "Name": "MyRule",
         "State" : "ENABLED", 
         "Targets": [
           {
