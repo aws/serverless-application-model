@@ -28,7 +28,7 @@ Resources:
 
 The easiest way is to create a GitHub issue.
 
-Or [join the `#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack.
+Or join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack.
 
 ## Contributing
 
@@ -146,5 +146,3 @@ Source code is located on GitHub at [awsdocs/aws-sam-developer-guide](https://gi
 Read the [SAM Documentation Contribution Guide](https://github.com/awsdocs/aws-sam-developer-guide/blob/master/CONTRIBUTING.md) to get
 started.
 
-### Join the SAM community on Slack
-[Join the `#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack to collaborate with fellow community members and the AWS SAM team.
