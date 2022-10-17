@@ -24,6 +24,31 @@ Resources:
         }
 ```
 
+## Contributing
+
+Create a [virtual environment](https://docs.python.org/3/library/venv.html):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Set up dependencies:
+
+```bash
+make init
+```
+
+Run tests:
+
+```bash
+make pr
+```
+
+For more thorough instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md).
+
+---
+
 Want:
 - what it is (mention aws sam cli)
 - example
