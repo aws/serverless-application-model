@@ -4,6 +4,10 @@
 [![PyPI](https://img.shields.io/pypi/v/aws-sam-translator?label=PyPI)](https://pypi.org/project/aws-sam-translator/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aws-sam-translator)](https://pypi.org/project/aws-sam-translator/)
 
+The [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/) (AWS SAM) transform 
+
+It allows you to write 
+
 This repository hosts the code for the [`AWS::Serverless-2016-10-31` transform](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-aws-serverless.html).
 
 For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
@@ -30,6 +34,8 @@ Resources:
 
 Or join the [`#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack.
 
+## Learn more
+
 ## Contributing
 
 Create a [virtual environment](https://docs.python.org/3/library/venv.html):
@@ -53,9 +59,13 @@ make pr
 
 For more thorough instructions, see [`DEVELOPMENT_GUIDE.md`](DEVELOPMENT_GUIDE.md).
 
-## Additional resources
-
 ---
+
+- what it is (does it need the whys?)
+- example (link to other detailed docs etc)
+- getting help (slack etc)
+- learn more (docs, tutorials, etc.)
+- contributing (setting up env)
 
 Want:
 - what it is (mention aws sam cli)
