@@ -8,7 +8,7 @@ This repository hosts the code for the [`AWS::Serverless-2016-10-31` transform](
 
 For the `sam` command-line tool, see the [AWS SAM CLI](https://github.com/aws/aws-sam-cli).
 
-## Getting started
+## Example
 
 ```yaml
 Transform: AWS::Serverless-2016-10-31
@@ -23,6 +23,12 @@ Resources:
           console.log(event);
         }
 ```
+
+## Getting help
+
+The easiest way is to create a GitHub issue.
+
+Or [join the `#samdev` channel](https://join.slack.com/t/awsdevelopers/shared_invite/zt-yryddays-C9fkWrmguDv0h2EEDzCqvw) on Slack.
 
 ## Contributing
 
