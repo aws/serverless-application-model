@@ -25,7 +25,7 @@ class IntrinsicsResolver(object):
             )
 
         if not isinstance(supported_intrinsics, dict) or not all(
-            [isinstance(value, Action) for value in supported_intrinsics.values()]
+            (isinstance(value, Action) for value in supported_intrinsics.values())
         ):
             raise TypeError("supported_intrinsics argument must be intrinsic names to corresponding Action classes")
 

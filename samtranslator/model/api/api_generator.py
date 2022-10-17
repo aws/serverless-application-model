@@ -418,6 +418,7 @@ class ApiGenerator(object):
         return stage
 
     def _construct_api_domain(self, rest_api, route53_record_set_groups):
+        # pylint: disable=duplicate-code
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
@@ -574,6 +575,7 @@ class ApiGenerator(object):
         return recordset_list
 
     def _construct_alias_target(self, domain):
+        # pylint: disable=duplicate-code
         alias_target = {}
         route53 = domain.get("Route53")
         target_health = route53.get("EvaluateTargetHealth")
