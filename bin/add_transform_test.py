@@ -17,7 +17,7 @@ import shutil
 import sys
 import yaml
 import tempfile
-from docopt import docopt
+from docopt import docopt  # type: ignore
 from pathlib import Path
 from typing import Any, Dict
 

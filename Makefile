@@ -27,9 +27,7 @@ lint:
 	# Linter performs static analysis to catch latent bugs
 	pylint --rcfile .pylintrc samtranslator
 	# mypy performs type check
-	mypy samtranslator
-	# Add --ignore-missing-imports flag to address Skipping analyzing "docopt": module is installed, but missing library stubs or py.typed marker
-	mypy bin/add_transform_test.py --ignore-missing-imports
+	mypy samtranslator bin/add_transform_test.py
 
 prepare-companion-stack:
 	pytest -v --no-cov integration/setup -m setup
