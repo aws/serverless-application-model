@@ -102,7 +102,7 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
         )
 
         # copy the output files into correct directories
-        transform_test_output_path = os.path.join(TRANSFORM_TEST_DIR, "output/", output_file_option)
+        transform_test_output_path = os.path.join(TRANSFORM_TEST_DIR, "output", output_file_option)
         shutil.copyfile(temp_output_file.name, transform_test_output_path)
 
         regional_transform_test_output_paths = [
