@@ -4,193 +4,193 @@
       "Value": {
         "Ref": "MinimalFunctionAliaslive"
       }
-    }, 
-    "VersionArn": {
-      "Value": {
-        "Ref": "MinimalFunctionVersion640128d35d"
-      }
-    }, 
-    "VersionNumber": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MinimalFunctionVersion640128d35d", 
-          "Version"
-        ]
-      }
-    }, 
-    "AliasName": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MinimalFunctionAliaslive", 
-          "Name"
-        ]
-      }
-    }, 
-    "UnResolvedVersion": {
-      "Value": {
-        "Ref": "FunctionWithoutAlias.Version"
-      }
-    }, 
+    },
     "AliasInSub": {
       "Value": {
         "Fn::Sub": [
-          "Hello ${MinimalFunctionAliaslive} ${MinimalFunctionAliaslive.Name} ${SomeValue}", 
+          "Hello ${MinimalFunctionAliaslive} ${MinimalFunctionAliaslive.Name} ${SomeValue}",
           {
             "SomeValue": "World"
           }
         ]
       }
-    }, 
+    },
+    "AliasName": {
+      "Value": {
+        "Fn::GetAtt": [
+          "MinimalFunctionAliaslive",
+          "Name"
+        ]
+      }
+    },
     "MustNotResolve": {
       "Value": {
         "Fn::GetAtt": [
-          "FunctionWithoutAlias", 
+          "FunctionWithoutAlias",
           "Alias.Name"
         ]
       }
+    },
+    "UnResolvedVersion": {
+      "Value": {
+        "Ref": "FunctionWithoutAlias.Version"
+      }
+    },
+    "VersionArn": {
+      "Value": {
+        "Ref": "MinimalFunctionVersion640128d35d"
+      }
+    },
+    "VersionNumber": {
+      "Value": {
+        "Fn::GetAtt": [
+          "MinimalFunctionVersion640128d35d",
+          "Version"
+        ]
+      }
     }
-  }, 
+  },
   "Resources": {
     "FunctionWithoutAlias": {
-      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "Handler": "hello.handler", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
-        }, 
+        },
+        "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
-            "FunctionWithoutAliasRole", 
+            "FunctionWithoutAliasRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7", 
+        },
+        "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    }, 
-    "MinimalFunctionRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    "MinimalFunction": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Handler": "hello.handler", 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "hello.zip"
-        }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "MinimalFunctionRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "python2.7", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    }, 
+      },
+      "Type": "AWS::Lambda::Function"
+    },
     "FunctionWithoutAliasRole": {
-      "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MinimalFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "MinimalFunctionRole",
+            "Arn"
           ]
-        }
-      }
-    }, 
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MinimalFunctionAliaslive": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        },
+        "FunctionVersion": {
+          "Fn::GetAtt": [
+            "MinimalFunctionVersion640128d35d",
+            "Version"
+          ]
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
+    },
+    "MinimalFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "MinimalFunctionVersion640128d35d": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::Version", 
+      "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "MinimalFunction"
         }
-      }
-    }, 
+      },
+      "Type": "AWS::Lambda::Version"
+    },
     "MyBucket": {
-      "Type": "AWS::S3::Bucket", 
       "Properties": {
         "Name": {
           "Fn::GetAtt": [
-            "MinimalFunctionAliaslive", 
+            "MinimalFunctionAliaslive",
             "Name"
           ]
         }
-      }
-    }, 
-    "MinimalFunctionAliaslive": {
-      "Type": "AWS::Lambda::Alias", 
-      "Properties": {
-        "FunctionVersion": {
-          "Fn::GetAtt": [
-            "MinimalFunctionVersion640128d35d", 
-            "Version"
-          ]
-        }, 
-        "FunctionName": {
-          "Ref": "MinimalFunction"
-        }, 
-        "Name": "live"
-      }
+      },
+      "Type": "AWS::S3::Bucket"
     }
   }
 }

@@ -3,8 +3,10 @@
   "Parameters": {},
   "Resources": {
     "TestFunc": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
+        "Architectures": [
+          "arm64"
+        ],
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
@@ -19,23 +21,19 @@
           ]
         },
         "Runtime": "nodejs12.x",
-        "Timeout": 3,
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
         ],
-        "Architectures": [
-          "arm64"
-        ]
-      }
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "TestFuncRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -48,7 +46,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -59,7 +58,8 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

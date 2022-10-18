@@ -1,85 +1,85 @@
 {
   "Parameters": {
     "SomeManagedPolicyArn": {
-      "Default": "arn:aws:iam::aws:policy/OtherPolicy", 
+      "Default": "arn:aws:iam::aws:policy/OtherPolicy",
       "Type": "String"
     }
-  }, 
+  },
   "Resources": {
     "Function": {
-      "Type": "AWS::Lambda::Function", 
       "Properties": {
-        "Handler": "hello.handler", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
-        }, 
+        },
+        "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
-            "FunctionRole", 
+            "FunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    }, 
-    "FunctionRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", 
-          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess", 
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole", 
-          {
-            "Ref": "SomeManagedPolicyArn"
-          }, 
-          "arn:aws:iam::123456789012:policy/CustomerCreatedManagedPolicy"
-        ],
+        },
+        "Runtime": "python2.7",
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
-        ],
-        "Policies": [
-          {
-            "PolicyName": "FunctionRolePolicy0", 
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": [
-                    "dynamodb:*"
-                  ], 
-                  "Resource": "*", 
-                  "Effect": "Allow"
-                }
-              ]
-            }
-          }
-        ], 
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess",
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaRole",
+          {
+            "Ref": "SomeManagedPolicyArn"
+          },
+          "arn:aws:iam::123456789012:policy/CustomerCreatedManagedPolicy"
+        ],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "dynamodb:*"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            },
+            "PolicyName": "FunctionRolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

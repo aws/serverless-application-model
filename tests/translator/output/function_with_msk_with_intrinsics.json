@@ -1,26 +1,25 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
+    "ConsumerGroupValue": {
+      "Default": "consumergroup1",
+      "Type": "String"
+    },
     "StartingPositionValue": {
-      "Type": "String",
-      "Default": "LATEST"
+      "Default": "LATEST",
+      "Type": "String"
     },
     "StreamValue": {
-      "Type": "String",
-      "Default": "arn:aws:kafka:us-east-1:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2"
+      "Default": "arn:aws:kafka:us-east-1:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2",
+      "Type": "String"
     },
     "TopicsValue": {
-      "Type": "CommaDelimitedList",
-      "Default": "Topic"
-    },
-    "ConsumerGroupValue": {
-      "Type": "String",
-      "Default": "consumergroup1"
+      "Default": "Topic",
+      "Type": "CommaDelimitedList"
     }
   },
   "Resources": {
     "MyMskStreamProcessor": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -40,13 +39,34 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MyMskStreamProcessorMyMskEvent": {
+      "Properties": {
+        "AmazonManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": {
+            "Ref": "ConsumerGroupValue"
+          }
+        },
+        "EventSourceArn": {
+          "Ref": "StreamValue"
+        },
+        "FunctionName": {
+          "Ref": "MyMskStreamProcessor"
+        },
+        "StartingPosition": {
+          "Ref": "StartingPositionValue"
+        },
+        "Topics": {
+          "Ref": "TopicsValue"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
     },
     "MyMskStreamProcessorRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -59,7 +79,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -71,29 +92,8 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "MyMskStreamProcessorMyMskEvent": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "EventSourceArn": {
-          "Ref": "StreamValue"
-        },
-        "FunctionName": {
-          "Ref": "MyMskStreamProcessor"
-        },
-        "StartingPosition": {
-          "Ref": "StartingPositionValue"
-        },
-        "Topics": {
-          "Ref": "TopicsValue"
-        },
-        "AmazonManagedKafkaEventSourceConfig": {
-          "ConsumerGroupId": {
-            "Ref": "ConsumerGroupValue"
-          }
-        }
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

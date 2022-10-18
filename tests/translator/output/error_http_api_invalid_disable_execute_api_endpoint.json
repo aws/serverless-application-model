@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApi] is invalid. Type of property 'DisableExecuteApiEndpoint' is invalid.",
   "errors": [
     {
       "errorMessage": "Resource with id [MyApi] is invalid. Type of property 'DisableExecuteApiEndpoint' is invalid."
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApi] is invalid. Type of property 'DisableExecuteApiEndpoint' is invalid."
+  ]
 }

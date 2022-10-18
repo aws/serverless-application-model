@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [AlexaSkillFunc] is invalid. lambda:createdBy is a reserved Tag key name and cannot be set on your resource. Please change the tag key in the input. Resource with id [SomeApplication] is invalid. lambda:createdBy is a reserved Tag key name and cannot be set on your resource. Please change the tag key in the input.",
   "errors": [
     {
       "errorMessage": "Resource with id [AlexaSkillFunc] is invalid. lambda:createdBy is a reserved Tag key name and cannot be set on your resource. Please change the tag key in the input. Resource with id [SomeApplication] is invalid. stack:createdBy is a reserved Tag key name and cannot be set on your resource. Please change the tag key in the input."
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 2. Resource with id [AlexaSkillFunc] is invalid. lambda:createdBy is a reserved Tag key name and cannot be set on your resource. Please change the tag key in the input. Resource with id [SomeApplication] is invalid. lambda:createdBy is a reserved Tag key name and cannot be set on your resource. Please change the tag key in the input."
+  ]
 }

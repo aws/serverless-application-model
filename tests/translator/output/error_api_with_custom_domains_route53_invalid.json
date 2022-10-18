@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApi] is invalid. HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains.",
   "errors": [
     {
       "errorMessage": "Resource with id [MyApi] is invalid. HostedZoneId is required to enable Route53 support on Custom Domains."
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApi] is invalid. HostedZoneId or HostedZoneName is required to enable Route53 support on Custom Domains."
+  ]
 }

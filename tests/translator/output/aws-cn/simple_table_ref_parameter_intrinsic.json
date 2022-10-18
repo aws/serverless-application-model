@@ -1,5 +1,9 @@
 {
   "Parameters": {
+    "EnableSSE": {
+      "Default": true,
+      "Type": "String"
+    },
     "ReadCapacity": {
       "Default": 15,
       "Type": "Number"
@@ -7,42 +11,38 @@
     "WriteCapacity": {
       "Default": 15,
       "Type": "Number"
-    },
-    "EnableSSE": {
-      "Default": true,
-      "Type": "String"
     }
   },
   "Resources": {
     "MinimalTableRefParamLongForm": {
-      "Type": "AWS::DynamoDB::Table",
       "Properties": {
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": {
-            "Ref": "WriteCapacity"
-          },
-          "ReadCapacityUnits": {
-            "Ref": "ReadCapacity"
-          }
-        },
         "AttributeDefinitions": [
           {
             "AttributeName": "id",
             "AttributeType": "S"
           }
         ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": {
+            "Ref": "ReadCapacity"
+          },
+          "WriteCapacityUnits": {
+            "Ref": "WriteCapacity"
+          }
+        },
         "SSESpecification": {
           "SSEEnabled": {
             "Ref": "EnableSSE"
           }
-        },
-        "KeySchema": [
-          {
-            "KeyType": "HASH",
-            "AttributeName": "id"
-          }
-        ]
-      }
+        }
+      },
+      "Type": "AWS::DynamoDB::Table"
     }
   }
 }

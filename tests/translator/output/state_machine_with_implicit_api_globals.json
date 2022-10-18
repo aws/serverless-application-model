@@ -1,224 +1,224 @@
 {
-    "Resources": {
-        "StateMachineMyApiEventRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineMyApiEventRoleStartExecutionPolicy", 
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Action": "states:StartExecution", 
-                                    "Resource": {
-                                        "Ref": "StateMachine"
-                                    }, 
-                                    "Effect": "Allow"
-                                }
-                            ]
-                        }
-                    }
-                ], 
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "apigateway.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        }, 
-        "StateMachine": {
-            "Type": "AWS::StepFunctions::StateMachine", 
-            "Properties": {
-                "RoleArn": {
+  "Resources": {
+    "ServerlessRestApi": {
+      "Properties": {
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/startMyExecution": {
+              "post": {
+                "responses": {
+                  "200": {
+                    "description": "OK"
+                  },
+                  "400": {
+                    "description": "Bad Request"
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "credentials": {
                     "Fn::GetAtt": [
-                        "StateMachineRole", 
-                        "Arn"
+                      "StateMachineMyApiEventRole",
+                      "Arn"
                     ]
-                }, 
-                "StateMachineName": "MyStateMachine", 
-                "DefinitionString": {
-                    "Fn::Join": [
-                        "\n", 
-                        [
-                            "{", 
-                            "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",", 
-                            "    \"StartAt\": \"Hello\",", 
-                            "    \"States\": {", 
-                            "        \"Hello\": {", 
-                            "            \"Next\": \"World\",", 
-                            "            \"Result\": \"Hello\",", 
-                            "            \"Type\": \"Pass\"", 
-                            "        },", 
-                            "        \"World\": {", 
-                            "            \"End\": true,", 
-                            "            \"Result\": \"World\",", 
-                            "            \"Type\": \"Pass\"", 
-                            "        }", 
-                            "    }", 
-                            "}"
-                        ]
-                    ]
-                }, 
-                "StateMachineType": "STANDARD", 
-                "Tags": [
-                    {
-                        "Value": "SAM", 
-                        "Key": "stateMachine:createdBy"
+                  },
+                  "httpMethod": "POST",
+                  "requestTemplates": {
+                    "application/json": {
+                      "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
                     }
-                ]
-            }
-        }, 
-        "ServerlessRestApiProdStage": {
-            "Type": "AWS::ApiGateway::Stage", 
-            "Properties": {
-                "DeploymentId": {
-                    "Ref": "ServerlessRestApiDeployment1f01b589d4"
-                }, 
-                "RestApiId": {
-                    "Ref": "ServerlessRestApi"
-                }, 
-                "StageName": "Prod"
-            }
-        }, 
-        "ServerlessRestApiDeployment1f01b589d4": {
-            "Type": "AWS::ApiGateway::Deployment", 
-            "Properties": {
-                "RestApiId": {
-                    "Ref": "ServerlessRestApi"
-                }, 
-                "Description": "RestApi deployment id: 1f01b589d4e226c84a3e14ca738b5d060e7b611a", 
-                "StageName": "Stage"
-            }
-        }, 
-        "StateMachineRole": {
-            "Type": "AWS::IAM::Role", 
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17", 
-                    "Statement": [
-                        {
-                            "Action": [
-                                "sts:AssumeRole"
-                            ], 
-                            "Effect": "Allow", 
-                            "Principal": {
-                                "Service": [
-                                    "states.amazonaws.com"
-                                ]
-                            }
-                        }
-                    ]
-                }, 
-                "ManagedPolicyArns": [], 
-                "Policies": [
-                    {
-                        "PolicyName": "StateMachineRolePolicy0", 
-                        "PolicyDocument": {
-                            "Version": "2012-10-17", 
-                            "Statement": [
-                                {
-                                    "Action": "*", 
-                                    "Resource": "*", 
-                                    "Effect": "Deny"
-                                }
-                            ]
-                        }
+                  },
+                  "responses": {
+                    "200": {
+                      "statusCode": "200"
+                    },
+                    "400": {
+                      "statusCode": "400"
                     }
-                ], 
-                "Tags": [
-                    {
-                        "Value": "SAM", 
-                        "Key": "stateMachine:createdBy"
-                    }
-                ]
-            }
-        }, 
-        "ServerlessRestApi": {
-            "Type": "AWS::ApiGateway::RestApi", 
-            "Properties": {
-                "Body": {
-                    "info": {
-                        "version": "1.0", 
-                        "title": {
-                            "Ref": "AWS::StackName"
-                        }
-                    }, 
-                    "paths": {
-                        "/startMyExecution": {
-                            "post": {
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "200": {
-                                            "statusCode": "200"
-                                        }, 
-                                        "400": {
-                                            "statusCode": "400"
-                                        }
-                                    }, 
-                                    "uri": {
-                                        "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
-                                    }, 
-                                    "httpMethod": "POST", 
-                                    "requestTemplates": {
-                                        "application/json": {
-                                            "Fn::Sub": "{\"input\": \"$util.escapeJavaScript($input.json('$'))\", \"stateMachineArn\": \"${StateMachine}\"}"
-                                        }
-                                    }, 
-                                    "credentials": {
-                                        "Fn::GetAtt": [
-                                            "StateMachineMyApiEventRole", 
-                                            "Arn"
-                                        ]
-                                    }, 
-                                    "type": "aws"
-                                }, 
-                                "responses": {
-                                    "200": {
-                                        "description": "OK"
-                                    }, 
-                                    "400": {
-                                        "description": "Bad Request"
-                                    }
-                                }
-                            }
-                        }
-                    }, 
-                    "swagger": "2.0", 
-                    "x-amazon-apigateway-policy": {
-                        "Version": "2012-10-17", 
-                        "Statement": {
-                            "Action": "execute-api:Invoke", 
-                            "Resource": [
-                                {
-                                    "Fn::Sub": [
-                                        "execute-api:/${__Stage__}/POST/startMyExecution", 
-                                        {
-                                            "__Stage__": "Prod"
-                                        }
-                                    ]
-                                }
-                            ], 
-                            "Effect": "Deny", 
-                            "Principal": {
-                                "AWS": [
-                                    "12345"
-                                ]
-                            }
-                        }
-                    }
+                  },
+                  "type": "aws",
+                  "uri": {
+                    "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+                  }
                 }
+              }
             }
+          },
+          "swagger": "2.0",
+          "x-amazon-apigateway-policy": {
+            "Statement": {
+              "Action": "execute-api:Invoke",
+              "Effect": "Deny",
+              "Principal": {
+                "AWS": [
+                  "12345"
+                ]
+              },
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "execute-api:/${__Stage__}/POST/startMyExecution",
+                    {
+                      "__Stage__": "Prod"
+                    }
+                  ]
+                }
+              ]
+            },
+            "Version": "2012-10-17"
+          }
         }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ServerlessRestApiDeployment1f01b589d4": {
+      "Properties": {
+        "Description": "RestApi deployment id: 1f01b589d4e226c84a3e14ca738b5d060e7b611a",
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ServerlessRestApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ServerlessRestApiDeployment1f01b589d4"
+        },
+        "RestApiId": {
+          "Ref": "ServerlessRestApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "StateMachine": {
+      "Properties": {
+        "DefinitionString": {
+          "Fn::Join": [
+            "\n",
+            [
+              "{",
+              "    \"Comment\": \"A Hello World example of the Amazon States Language using Pass states\",",
+              "    \"StartAt\": \"Hello\",",
+              "    \"States\": {",
+              "        \"Hello\": {",
+              "            \"Next\": \"World\",",
+              "            \"Result\": \"Hello\",",
+              "            \"Type\": \"Pass\"",
+              "        },",
+              "        \"World\": {",
+              "            \"End\": true,",
+              "            \"Result\": \"World\",",
+              "            \"Type\": \"Pass\"",
+              "        }",
+              "    }",
+              "}"
+            ]
+          ]
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineRole",
+            "Arn"
+          ]
+        },
+        "StateMachineName": "MyStateMachine",
+        "StateMachineType": "STANDARD",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "StateMachineMyApiEventRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "apigateway.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineMyApiEventRoleStartExecutionPolicy"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "StateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "*",
+                  "Effect": "Deny",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "StateMachineRolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
+  }
 }

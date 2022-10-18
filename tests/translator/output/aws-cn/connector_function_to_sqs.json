@@ -17,11 +17,17 @@
         "PolicyDocument": {
           "Statement": [
             {
-              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
                 }
               ]
             }
@@ -62,7 +68,10 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
                 }
               ]
             }
@@ -94,11 +103,17 @@
         "PolicyDocument": {
           "Statement": [
             {
-              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
                 }
               ]
             },
@@ -112,7 +127,10 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
                 }
               ]
             }
@@ -141,7 +159,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x"
       },
@@ -176,7 +197,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyServerlessFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyServerlessFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -193,10 +217,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],

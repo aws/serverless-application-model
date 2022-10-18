@@ -1,7 +1,6 @@
 {
   "Resources": {
     "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine",
       "Properties": {
         "DefinitionS3Location": {
           "Bucket": "sam-demo-bucket",
@@ -14,7 +13,8 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
     }
   }
 }

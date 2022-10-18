@@ -9,82 +9,233 @@
     }
   },
   "Resources": {
-    "ImplicitApiFunction2": {
-      "Type": "AWS::Lambda::Function",
+    "ExplicitApi": {
       "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "member_portal.zip"
-        },
-        "Handler": "index.gethtml",
-        "Role": {
-          "Fn::GetAtt": [
-            "ImplicitApiFunction2Role",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs12.x",
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "ImplicitApiFunction2Role": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/": {
+              "delete": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction2.Arn}/invocations"
+                  }
+                }
+              },
+              "get": {
+                "Fn::If": [
+                  "MyCondition",
+                  {
+                    "responses": {},
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "type": "aws_proxy",
+                      "uri": {
+                        "Fn::If": [
+                          "MyCondition",
+                          {
+                            "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                          },
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              },
+              "options": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "Default response for CORS method",
+                    "headers": {
+                      "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "summary": "CORS support",
+                "x-amazon-apigateway-integration": {
+                  "requestTemplates": {
+                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
+                  },
+                  "responses": {
+                    "default": {
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,OPTIONS,POST'",
+                        "method.response.header.Access-Control-Allow-Origin": "'www.example.com'"
+                      },
+                      "responseTemplates": {
+                        "application/json": "{}\n"
+                      },
+                      "statusCode": "200"
+                    }
+                  },
+                  "type": "mock"
+                }
+              },
+              "post": {
+                "Fn::If": [
+                  "MyCondition",
+                  {
+                    "responses": {},
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "type": "aws_proxy",
+                      "uri": {
+                        "Fn::If": [
+                          "MyCondition",
+                          {
+                            "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                          },
+                          {
+                            "Ref": "AWS::NoValue"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
                 ]
               }
+            },
+            "/any": {
+              "Fn::If": [
+                "MyCondition",
+                {
+                  "options": {
+                    "consumes": [
+                      "application/json"
+                    ],
+                    "produces": [
+                      "application/json"
+                    ],
+                    "responses": {
+                      "200": {
+                        "description": "Default response for CORS method",
+                        "headers": {
+                          "Access-Control-Allow-Methods": {
+                            "type": "string"
+                          },
+                          "Access-Control-Allow-Origin": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "summary": "CORS support",
+                    "x-amazon-apigateway-integration": {
+                      "requestTemplates": {
+                        "application/json": "{\n  \"statusCode\" : 200\n}\n"
+                      },
+                      "responses": {
+                        "default": {
+                          "responseParameters": {
+                            "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                            "method.response.header.Access-Control-Allow-Origin": "'www.example.com'"
+                          },
+                          "responseTemplates": {
+                            "application/json": "{}\n"
+                          },
+                          "statusCode": "200"
+                        }
+                      },
+                      "type": "mock"
+                    }
+                  },
+                  "x-amazon-apigateway-any-method": {
+                    "Fn::If": [
+                      "MyCondition",
+                      {
+                        "responses": {},
+                        "x-amazon-apigateway-integration": {
+                          "httpMethod": "POST",
+                          "type": "aws_proxy",
+                          "uri": {
+                            "Fn::If": [
+                              "MyCondition",
+                              {
+                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                              },
+                              {
+                                "Ref": "AWS::NoValue"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "Ref": "AWS::NoValue"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Ref": "AWS::NoValue"
+                }
+              ]
             }
+          },
+          "swagger": "2.0"
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
           ]
         },
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "ImplicitApiFunction2DeleteHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "ImplicitApiFunction2"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/DELETE/",
-            {
-              "__ApiId__": {
-                "Ref": "ExplicitApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ExplicitApiDeployment6f2bd0dddd": {
+      "Properties": {
+        "Description": "RestApi deployment id: 6f2bd0dddd4e3f72c4ae0c49eac0238610bfb537",
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ExplicitApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment6f2bd0dddd"
+        },
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
     },
     "ImplicitApiFunction": {
-      "Type": "AWS::Lambda::Function",
       "Condition": "MyCondition",
       "Properties": {
         "Code": {
@@ -105,14 +256,56 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
-    "ImplicitApiFunctionRole": {
-      "Type": "AWS::IAM::Role",
-      "Condition": "MyCondition",
+    "ImplicitApiFunction2": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "member_portal.zip"
+        },
+        "Handler": "index.gethtml",
+        "Role": {
+          "Fn::GetAtt": [
+            "ImplicitApiFunction2Role",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "ImplicitApiFunction2DeleteHtmlPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction2"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/DELETE/",
+            {
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "ImplicitApiFunction2Role": {
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -125,7 +318,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -136,54 +330,10 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "ImplicitApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "MyCondition",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "ImplicitApiFunction"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
-            {
-              "__ApiId__": {
-                "Ref": "ExplicitApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
-    "ImplicitApiFunctionPostHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Condition": "MyCondition",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "ImplicitApiFunction"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/",
-            {
-              "__ApiId__": {
-                "Ref": "ExplicitApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
     "ImplicitApiFunctionAnyHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
       "Condition": "MyCondition",
       "Properties": {
         "Action": "lambda:InvokeFunction",
@@ -202,233 +352,83 @@
             }
           ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "ExplicitApi": {
-      "Type": "AWS::ApiGateway::RestApi",
+    "ImplicitApiFunctionGetHtmlPermissionProd": {
+      "Condition": "MyCondition",
       "Properties": {
-        "Body": {
-          "swagger": "2.0",
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/": {
-              "delete": {
-                "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
-                  "httpMethod": "POST",
-                  "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction2.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              },
-              "get": {
-                "Fn::If": [
-                  "MyCondition",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "MyCondition",
-                          {
-                            "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              },
-              "post": {
-                "Fn::If": [
-                  "MyCondition",
-                  {
-                    "x-amazon-apigateway-integration": {
-                      "type": "aws_proxy",
-                      "httpMethod": "POST",
-                      "uri": {
-                        "Fn::If": [
-                          "MyCondition",
-                          {
-                            "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
-                          },
-                          {
-                            "Ref": "AWS::NoValue"
-                          }
-                        ]
-                      }
-                    },
-                    "responses": {}
-                  },
-                  {
-                    "Ref": "AWS::NoValue"
-                  }
-                ]
-              },
-              "options": {
-                "summary": "CORS support",
-                "consumes": [
-                  "application/json"
-                ],
-                "produces": [
-                  "application/json"
-                ],
-                "x-amazon-apigateway-integration": {
-                  "type": "mock",
-                  "requestTemplates": {
-                    "application/json": "{\n  \"statusCode\" : 200\n}\n"
-                  },
-                  "responses": {
-                    "default": {
-                      "statusCode": "200",
-                      "responseParameters": {
-                        "method.response.header.Access-Control-Allow-Origin": "'www.example.com'",
-                        "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,OPTIONS,POST'"
-                      },
-                      "responseTemplates": {
-                        "application/json": "{}\n"
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "200": {
-                    "description": "Default response for CORS method",
-                    "headers": {
-                      "Access-Control-Allow-Origin": {
-                        "type": "string"
-                      },
-                      "Access-Control-Allow-Methods": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "/any": {
-              "Fn::If": [
-                "MyCondition",
-                {
-                  "x-amazon-apigateway-any-method": {
-                    "Fn::If": [
-                      "MyCondition",
-                      {
-                        "x-amazon-apigateway-integration": {
-                          "type": "aws_proxy",
-                          "httpMethod": "POST",
-                          "uri": {
-                            "Fn::If": [
-                              "MyCondition",
-                              {
-                                "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
-                              },
-                              {
-                                "Ref": "AWS::NoValue"
-                              }
-                            ]
-                          }
-                        },
-                        "responses": {}
-                      },
-                      {
-                        "Ref": "AWS::NoValue"
-                      }
-                    ]
-                  },
-                  "options": {
-                    "summary": "CORS support",
-                    "consumes": [
-                      "application/json"
-                    ],
-                    "produces": [
-                      "application/json"
-                    ],
-                    "x-amazon-apigateway-integration": {
-                      "type": "mock",
-                      "requestTemplates": {
-                        "application/json": "{\n  \"statusCode\" : 200\n}\n"
-                      },
-                      "responses": {
-                        "default": {
-                          "statusCode": "200",
-                          "responseParameters": {
-                            "method.response.header.Access-Control-Allow-Origin": "'www.example.com'",
-                            "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
-                          },
-                          "responseTemplates": {
-                            "application/json": "{}\n"
-                          }
-                        }
-                      }
-                    },
-                    "responses": {
-                      "200": {
-                        "description": "Default response for CORS method",
-                        "headers": {
-                          "Access-Control-Allow-Origin": {
-                            "type": "string"
-                          },
-                          "Access-Control-Allow-Methods": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                {
-                  "Ref": "AWS::NoValue"
-                }
-              ]
-            }
-          }
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
         },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        },
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            {
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              },
+              "__Stage__": "*"
+            }
           ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "ExplicitApiDeployment6f2bd0dddd": {
-      "Type": "AWS::ApiGateway::Deployment",
+    "ImplicitApiFunctionPostHtmlPermissionProd": {
+      "Condition": "MyCondition",
       "Properties": {
-        "Description": "RestApi deployment id: 6f2bd0dddd4e3f72c4ae0c49eac0238610bfb537",
-        "RestApiId": {
-          "Ref": "ExplicitApi"
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
         },
-        "StageName": "Stage"
-      }
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/",
+            {
+              "__ApiId__": {
+                "Ref": "ExplicitApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
+    "ImplicitApiFunctionRole": {
+      "Condition": "MyCondition",
       "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment6f2bd0dddd"
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
         },
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "StageName": "Prod"
-      }
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

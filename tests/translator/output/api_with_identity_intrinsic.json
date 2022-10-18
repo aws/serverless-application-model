@@ -5,24 +5,21 @@
   },
   "Resources": {
     "APIGateway": {
-      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
-            }
+            },
+            "version": "1.0"
           },
           "paths": {},
-          "swagger": "2.0",
           "securityDefinitions": {
             "SomeAuthorizer": {
               "in": "header",
-              "type": "apiKey",
               "name": "Unused",
+              "type": "apiKey",
               "x-amazon-apigateway-authorizer": {
-                "type": "request",
                 "authorizerResultTtlInSeconds": {
                   "Fn::If": [
                     "isProd",
@@ -30,7 +27,6 @@
                     0
                   ]
                 },
-                "identitySource": "method.request.header.Accept",
                 "authorizerUri": {
                   "Fn::Sub": [
                     "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
@@ -38,20 +34,45 @@
                       "__FunctionArn__": "SomeArn"
                     }
                   ]
-                }
+                },
+                "identitySource": "method.request.header.Accept",
+                "type": "request"
               },
               "x-amazon-apigateway-authtype": "custom"
             }
-          }
+          },
+          "swagger": "2.0"
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "APIGatewayDeploymenta119f04c8a": {
+      "Properties": {
+        "Description": "RestApi deployment id: a119f04c8aba206b5b7db5f232f013b816fe6447",
+        "RestApiId": {
+          "Ref": "APIGateway"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "APIGatewayProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "APIGatewayDeploymenta119f04c8a"
+        },
+        "RestApiId": {
+          "Ref": "APIGateway"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
     },
     "APIGatewaySomeAuthorizerAuthorizerPermission": {
-      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
         "FunctionName": "SomeArn",
+        "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
@@ -62,29 +83,8 @@
             }
           ]
         }
-      }
-    },
-    "APIGatewayDeploymenta119f04c8a": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "APIGateway"
-        },
-        "Description": "RestApi deployment id: a119f04c8aba206b5b7db5f232f013b816fe6447",
-        "StageName": "Stage"
-      }
-    },
-    "APIGatewayProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "APIGatewayDeploymenta119f04c8a"
-        },
-        "RestApiId": {
-          "Ref": "APIGateway"
-        },
-        "StageName": "Prod"
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     }
   }
 }
