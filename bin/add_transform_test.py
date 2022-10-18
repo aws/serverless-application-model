@@ -14,6 +14,7 @@ import subprocess
 import re
 import os
 import shutil
+import sys
 import yaml
 import tempfile
 from docopt import docopt
@@ -69,7 +70,7 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
     with tempfile.NamedTemporaryFile() as temp_output_file:
         subprocess.run(
             [
-                "python",
+                sys.executable,
                 SCRIPT_DIR + "/sam-translate.py",
                 "--template-file",
                 input_file_path,
