@@ -18,17 +18,18 @@ import yaml
 import tempfile
 from docopt import docopt
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 from samtranslator.yaml_helper import yaml_parse
 
-cwd = os.getcwd()
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+TRANSFORM_TEST_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../tests/translator/"
 CLI_OPTIONS = docopt(__doc__)
 
 
 def get_input_file_path() -> str:
     input_file_option = CLI_OPTIONS.get("--template-file")
-    return os.path.join(cwd, input_file_option)
+    return os.path.join(os.getcwd(), input_file_option)
 
 
 def copy_input_file_to_transform_test_dir(input_file_path: str, transform_test_input_path: str) -> None:
@@ -38,21 +39,27 @@ def copy_input_file_to_transform_test_dir(input_file_path: str, transform_test_i
     print(f"Transform Test input file generated {transform_test_input_path}")
 
 
-def add_regional_endpoint_configuration_if_needed(temp_output_file_path: str) -> None:
-    with open(temp_output_file_path, "r") as f:
+def read_json_file(file_path: str) -> Dict[str, Any]:
+    with open(file_path, "r") as f:
         sam_template = json.load(f)
+    return sam_template
 
-    for logical_id, resource in sam_template["Resources"].items():
+
+def write_json_file(obj: Dict[str, Any], file_path: str) -> None:
+    with open(file_path, "w") as f:
+        json.dump(obj, f, indent=2)
+
+
+def add_regional_endpoint_configuration_if_needed(template: Dict[str, Any]) -> None:
+    for _, resource in template["Resources"].items():
         if resource["Type"] == "AWS::ApiGateway::RestApi":
-            if "EndpointConfiguration" not in resource["Properties"]:
-                sam_template["Resources"][logical_id]["Properties"]["EndpointConfiguration"] = {"Types": ["REGIONAL"]}
-            if "Parameters" not in resource["Properties"]:
-                sam_template["Resources"][logical_id]["Properties"]["Parameters"] = {
-                    "endpointConfigurationTypes": "REGIONAL"
-                }
+            properties = resource["Properties"]
+            if "EndpointConfiguration" not in properties:
+                properties["EndpointConfiguration"] = {"Types": ["REGIONAL"]}
+            if "Parameters" not in properties:
+                properties["Parameters"] = {"endpointConfigurationTypes": "REGIONAL"}
 
-    with open(temp_output_file_path, "w") as f:
-        json.dump(sam_template, f, indent=2)
+    return template
 
 
 def generate_transform_test_output_files(input_file_path: str, file_basename: str) -> None:
@@ -63,7 +70,7 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
         subprocess.run(
             [
                 "python",
-                os.path.dirname(os.path.realpath(__file__)) + "/sam-translate.py",
+                SCRIPT_DIR + "/sam-translate.py",
                 "--template-file",
                 input_file_path,
                 "--output-template",
@@ -73,19 +80,21 @@ def generate_transform_test_output_files(input_file_path: str, file_basename: st
         )
 
         # copy the output files into correct directories
-        transform_test_output_path = cwd + "/tests/translator/output/" + output_file_option
+        transform_test_output_path = TRANSFORM_TEST_DIR + "/output/" + output_file_option
         shutil.copyfile(temp_output_file.name, transform_test_output_path)
 
         regional_transform_test_output_paths = [
-            cwd + path + output_file_option
+            TRANSFORM_TEST_DIR + path + output_file_option
             for path in [
-                "/tests/translator/output/aws-cn/",
-                "/tests/translator/output/aws-us-gov/",
+                "/output/aws-cn/",
+                "/output/aws-us-gov/",
             ]
         ]
 
         if not CLI_OPTIONS.get("--disable-api-configuration"):
-            add_regional_endpoint_configuration_if_needed(temp_output_file.name)
+            template = read_json_file(temp_output_file.name)
+            template = add_regional_endpoint_configuration_if_needed(template)
+            write_json_file(template, temp_output_file.name)
 
         for output_path in regional_transform_test_output_paths:
             shutil.copyfile(temp_output_file.name, output_path)
@@ -128,7 +137,7 @@ def main() -> None:
     input_file_path = get_input_file_path()
     file_basename = Path(input_file_path).stem
 
-    transform_test_input_path = cwd + "/tests/translator/input/" + file_basename + ".yaml"
+    transform_test_input_path = TRANSFORM_TEST_DIR + "/input/" + file_basename + ".yaml"
     copy_input_file_to_transform_test_dir(input_file_path, transform_test_input_path)
 
     generate_transform_test_output_files(transform_test_input_path, file_basename)
