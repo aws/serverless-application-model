@@ -60,7 +60,6 @@ def replace_arn_partitions(input_file_path: str) -> None:
         yaml.dump(replaced_template, f, default_flow_style=False)
 
 
-
 def read_json_file(file_path: str) -> Dict[str, Any]:
     with open(file_path, "r") as f:
         sam_template: Dict[str, Any] = json.load(f)
