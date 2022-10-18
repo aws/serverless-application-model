@@ -69,7 +69,6 @@ disable=
     W0613, # Unused argument %r
     W0640, # Cell variable %s defined in loop A variable used in a closure is defined in a loop
     R0902, # Too many instance attributes (%s/%s)
-    # R0903, # Too few public methods (%s/%s)
     R0913, # Too many arguments (%s/%s)
     W0703, # Catching too general exception %s
     R0904, # Too many public methods (%s/%s)
@@ -77,36 +76,14 @@ disable=
     R0915, # Too many statements
     C0415, # Import outside toplevel (%s) Used when an import statement is used anywhere other than the module toplevel. Move this import to the top of the file.
     C0115, # missing-class-docstring
-    # below are docstring lint rules, in order to incrementally improve our docstring while
-    # without introduce too much effort at a time, we exclude most of the docstring lint rules.
-    # We will remove them one by one.
-    # W9005, # "%s" has constructor parameters documented in class and __init__
     W9006, # "%s" not documented as being raised
-    # W9008, # Redundant returns documentation
-    # W9010, # Redundant yields documentation
     W9011, # Missing return documentation
     W9012, # Missing return type documentation
-    # W9013, # Missing yield documentation
-    # W9014, # Missing yield type documentation
-    # W9015, # "%s" missing in parameter documentation
     W9016, # "%s" missing in parameter type documentation
-    # W9017, # "%s" differing in parameter documentation
-    # W9018, # "%s" differing in parameter type documentation
-    # W9019, # "%s" useless ignored parameter documentation
-    # W9020, # "%s" useless ignored parameter type documentation
-    # Constant name style warnings. We will remove them one by one.
     C0103, # Class constant name "%s" doesn't conform to UPPER_CASE naming style ('([^\\W\\da-z][^\\Wa-z]*|__.*__)$' pattern) (invalid-name)
-    # New recommendations, disable for now to avoid introducing behaviour changes.
-    R1729, # Use a generator instead '%s' (use-a-generator)
-    # R1732, # Consider using 'with' for resource-allocating operations (consider-using-with)
-    # This applies to CPython only.
-    # I1101, # Module 'math' has no 'pow' member, but source is unavailable. Consider adding this module to extension-pkg-allow-list if you want to perform analysis based on run-time introspection of living objects. (c-extension-no-member)    
-    # Added to allow linting. Need to work on removing over time
-    R0801, # dupilcated code
     R0401, # Cyclic import
     C0411, # import ordering
     W9015, # missing parameter in doc strings
-    # W0612, # unused variable
     R0205, # useless-object-inheritanc
     C0301, # line to long
     R0201, # no self use, method could be a function
@@ -114,8 +91,6 @@ disable=
     W1202, # Use lazy % formatting in logging functions (logging-format-interpolation)
     E1101, # No member 
     W0622, # Redefining built-in 'property' (redefined-builtin)
-    # W0611, # unused imports
-    # W0231, # super not called
     W0212, # protected-access
     W0201, # attribute-defined-outside-init
     R1725, # Consider using Python 3 style super() without arguments (super-with-arguments)
@@ -126,8 +101,6 @@ disable=
     W0223, # abstract-method
     W0107, # unnecessary-pass
     W0707, # raise-missing-from
-    # R1720, # no-else-raise
-    # W0621, # redefined-outer-name
     E0203, # access-member-before-definition
     W0221, # arguments-differ
     R1710, # inconsistent-return-statements
@@ -136,32 +109,14 @@ disable=
     W0105, # String statement has no effect (pointless-string-statement)
     C0206, # Consider iterating with .items() (consider-using-dict-items)
     W9008, # Redundant returns documentation (redundant-returns-doc)
-    # E0602, # undefined-variable
     C0112, # empty-docstring
     C0116, # missing-function-docstring
-    # C0200, # consider-using-enumerate
-    # R5501, # Consider using "elif" instead of "else if" (else-if-used)
     W9017, # differing-param-doc
     W9018, # differing-type-doc
     W0511, # fixme
-    # C0325, # superfluous-parens
-    # R1701, # consider-merging-isinstance
     C0302, # too-many-lines
-    # C0303, # trailing-whitespace
-    # R1721, # unnecessary-comprehension
-    # C0121, # singleton-comparison
-    # E1305, # too-many-format-args
-    # R1724, # no-else-continue
-    # E0611, # no-name-in-module
     W9013, # missing-yield-doc
     W9014, # missing-yield-type-doc
-    C0201, # consider-iterating-dictionary
-    # W0237, # arguments-renamed
-    # R1718, # consider-using-set-comprehension
-    # R1723, # no-else-break
-    E1133, # not-an-iterable
-    E1135, # unsupported-membership-test
-    # R1705, # no-else-return
 
 
 [REPORTS]
