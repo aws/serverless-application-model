@@ -139,7 +139,7 @@ def main() -> None:
     input_file_path = get_input_file_path()
     file_basename = Path(input_file_path).stem
 
-    transform_test_input_path = os.path.join(TRANSFORM_TEST_DIR, "input/", file_basename + ".yaml")
+    transform_test_input_path = os.path.join(TRANSFORM_TEST_DIR, "input", file_basename + ".yaml")
     copy_input_file_to_transform_test_dir(input_file_path, transform_test_input_path)
 
     generate_transform_test_output_files(transform_test_input_path, file_basename)
