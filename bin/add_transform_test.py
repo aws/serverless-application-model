@@ -24,7 +24,7 @@ from typing import Any, Dict
 from samtranslator.yaml_helper import yaml_parse
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-TRANSFORM_TEST_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../tests/translator/"
+TRANSFORM_TEST_DIR = SCRIPT_DIR + "/../tests/translator"
 CLI_OPTIONS = docopt(__doc__)
 
 
