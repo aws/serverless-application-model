@@ -143,6 +143,10 @@ def main() -> None:
 
     generate_transform_test_output_files(transform_test_input_path, file_basename)
 
+    print(
+        "Generating transform test input and output files complete. \n\nPlease check the generated output is as expected. This tool does not guarantee correct output."
+    )
+
 
 if __name__ == "__main__":
     main()
