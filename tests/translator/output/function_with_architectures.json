@@ -2,20 +2,38 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {},
   "Resources": {
-    "TestFuncRole": {
-      "Type": "AWS::IAM::Role",
+    "TestFunc": {
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        "Architectures": [
+          "arm64"
         ],
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Description": "Created by SAM",
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "TestFuncRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "TestFuncRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -28,38 +46,20 @@
                 ]
               }
             }
-          ]
-        }
-      }
-    },
-    "TestFunc": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "hello.zip"
+          ],
+          "Version": "2012-10-17"
         },
-        "Description": "Created by SAM",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ],
-        "MemorySize": 1024,
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "TestFuncRole",
-            "Arn"
-          ]
-        },
-        "Timeout": 3,
-        "Runtime": "nodejs12.x",
-        "Architectures": [
-          "arm64"
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

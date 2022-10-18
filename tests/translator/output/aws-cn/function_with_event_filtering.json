@@ -1,19 +1,9 @@
 {
   "Resources": {
-    "KinesisStream": {
-      "Type": "AWS::Kinesis::Stream",
-      "Properties": {
-        "ShardCount": 1
-      }
-    },
     "DynamoDBTable": {
       "Type": "AWS::DynamoDB::Table"
     },
-    "MySqsQueue": {
-      "Type": "AWS::SQS::Queue"
-    },
     "FilteredEventsFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -33,13 +23,164 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FilteredEventsFunctionDynamoDBStreamEvent": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "DynamoDBTable",
+            "StreamArn"
+          ]
+        },
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{ \"dynamodb\": { \"NewImage\": { \"value\": { \"S\": [\"test\"] } } } }"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "StartingPosition": "TRIM_HORIZON"
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "FilteredEventsFunctionKinesisStream": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "KinesisStream",
+            "Arn"
+          ]
+        },
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"name\": \"value\"}"
+            },
+            {
+              "Pattern": "{\"name2\": \"value2\"}"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "StartingPosition": "LATEST"
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "FilteredEventsFunctionMSKEvent": {
+      "Properties": {
+        "EventSourceArn": "arn:aws:kafka:us-west-2:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2",
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"name\": \"value\"}"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "StartingPosition": "LATEST",
+        "Topics": [
+          "MyDummyTestTopic"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "FilteredEventsFunctionMyKafkaEvent": {
+      "Properties": {
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"name\": \"value\"}"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": [
+              "abc.xyz.com:9092"
+            ]
+          }
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "SASL_SCRAM_512_AUTH",
+            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+          },
+          {
+            "Type": "VPC_SUBNET",
+            "URI": "subnet:subnet-12345"
+          },
+          {
+            "Type": "VPC_SECURITY_GROUP",
+            "URI": "security_group:sg-67890"
+          }
+        ],
+        "Topics": [
+          "Topic1"
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "FilteredEventsFunctionMyMQQueue": {
+      "Properties": {
+        "EventSourceArn": "arn:aws:mq:us-east-2:123456789012:broker:MyBroker:b-1234a5b6-78cd-901e-2fgh-3i45j6k178l9",
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"name\": \"value\"}"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        },
+        "Queues": [
+          "Queue1"
+        ],
+        "SourceAccessConfigurations": [
+          {
+            "Type": "BASIC_AUTH",
+            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "FilteredEventsFunctionMySqsEvent": {
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MySqsQueue",
+            "Arn"
+          ]
+        },
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"name\": \"value\"}"
+            }
+          ]
+        },
+        "FunctionName": {
+          "Ref": "FilteredEventsFunction"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
     },
     "FilteredEventsFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -52,7 +193,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -90,7 +232,6 @@
             "PolicyName": "SelfManagedKafkaExecutionRolePolicy"
           },
           {
-            "PolicyName": "SamAutoGeneratedAMQPolicy",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -115,7 +256,8 @@
                   }
                 }
               ]
-            }
+            },
+            "PolicyName": "SamAutoGeneratedAMQPolicy"
           }
         ],
         "Tags": [
@@ -124,159 +266,17 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
-    "FilteredEventsFunctionDynamoDBStreamEvent": {
-      "Type": "AWS::Lambda::EventSourceMapping",
+    "KinesisStream": {
       "Properties": {
-        "EventSourceArn": {
-          "Fn::GetAtt": [
-            "DynamoDBTable",
-            "StreamArn"
-          ]
-        },
-        "FunctionName": {
-          "Ref": "FilteredEventsFunction"
-        },
-        "StartingPosition": "TRIM_HORIZON",
-        "FilterCriteria": {
-          "Filters": [
-            {
-              "Pattern": "{ \"dynamodb\": { \"NewImage\": { \"value\": { \"S\": [\"test\"] } } } }"
-            }
-          ]
-        }
-      }
+        "ShardCount": 1
+      },
+      "Type": "AWS::Kinesis::Stream"
     },
-    "FilteredEventsFunctionKinesisStream": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "EventSourceArn": {
-          "Fn::GetAtt": [
-            "KinesisStream",
-            "Arn"
-          ]
-        },
-        "FunctionName": {
-          "Ref": "FilteredEventsFunction"
-        },
-        "StartingPosition": "LATEST",
-        "FilterCriteria": {
-          "Filters": [
-            {
-              "Pattern": "{\"name\": \"value\"}"
-            },
-            {
-              "Pattern": "{\"name2\": \"value2\"}"
-            }
-          ]
-        }
-      }
-    },
-    "FilteredEventsFunctionMySqsEvent": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "EventSourceArn": {
-          "Fn::GetAtt": [
-            "MySqsQueue",
-            "Arn"
-          ]
-        },
-        "FunctionName": {
-          "Ref": "FilteredEventsFunction"
-        },
-        "FilterCriteria": {
-          "Filters": [
-            {
-              "Pattern": "{\"name\": \"value\"}"
-            }
-          ]
-        }
-      }
-    },
-    "FilteredEventsFunctionMSKEvent": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "EventSourceArn": "arn:aws:kafka:us-west-2:012345678901:cluster/mycluster/6cc0432b-8618-4f44-bccc-e1fbd8fb7c4d-2",
-        "FunctionName": {
-          "Ref": "FilteredEventsFunction"
-        },
-        "StartingPosition": "LATEST",
-        "Topics": [
-          "MyDummyTestTopic"
-        ],
-        "FilterCriteria": {
-          "Filters": [
-            {
-              "Pattern": "{\"name\": \"value\"}"
-            }
-          ]
-        }
-      }
-    },
-    "FilteredEventsFunctionMyKafkaEvent": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "FilteredEventsFunction"
-        },
-        "Topics": [
-          "Topic1"
-        ],
-        "SourceAccessConfigurations": [
-          {
-            "Type": "SASL_SCRAM_512_AUTH",
-            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
-          },
-          {
-            "Type": "VPC_SUBNET",
-            "URI": "subnet:subnet-12345"
-          },
-          {
-            "Type": "VPC_SECURITY_GROUP",
-            "URI": "security_group:sg-67890"
-          }
-        ],
-        "SelfManagedEventSource": {
-          "Endpoints": {
-            "KafkaBootstrapServers": [
-              "abc.xyz.com:9092"
-            ]
-          }
-        },
-        "FilterCriteria": {
-          "Filters": [
-            {
-              "Pattern": "{\"name\": \"value\"}"
-            }
-          ]
-        }
-      }
-    },
-    "FilteredEventsFunctionMyMQQueue": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "EventSourceArn": "arn:aws:mq:us-east-2:123456789012:broker:MyBroker:b-1234a5b6-78cd-901e-2fgh-3i45j6k178l9",
-        "FunctionName": {
-          "Ref": "FilteredEventsFunction"
-        },
-        "Queues": [
-          "Queue1"
-        ],
-        "SourceAccessConfigurations": [
-          {
-            "Type": "BASIC_AUTH",
-            "URI": "arn:aws:secretsmanager:us-west-2:123456789012:secret:my-path/my-secret-name-1a2b3c"
-          }
-        ],
-        "FilterCriteria": {
-          "Filters": [
-            {
-              "Pattern": "{\"name\": \"value\"}"
-            }
-          ]
-        }
-      }
+    "MySqsQueue": {
+      "Type": "AWS::SQS::Queue"
     }
   }
 }

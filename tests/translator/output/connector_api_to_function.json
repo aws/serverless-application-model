@@ -15,7 +15,10 @@
           "Type": "MOCK"
         },
         "ResourceId": {
-          "Fn::GetAtt": ["MyApiGateway", "RootResourceId"]
+          "Fn::GetAtt": [
+            "MyApiGateway",
+            "RootResourceId"
+          ]
         },
         "RestApiId": {
           "Ref": "MyApiGateway"
@@ -46,17 +49,20 @@
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
-          "Fn::GetAtt": ["MyServerlessFunction", "Arn"]
+          "Fn::GetAtt": [
+            "MyServerlessFunction",
+            "Arn"
+          ]
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
             {
+              "SourceQualifier": "*",
               "SourceResourceId": {
                 "Ref": "MyApiGatewayV2"
-              },
-              "SourceQualifier": "*"
+              }
             }
           ]
         }
@@ -79,17 +85,20 @@
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
-          "Fn::GetAtt": ["MyServerlessFunction", "Arn"]
+          "Fn::GetAtt": [
+            "MyServerlessFunction",
+            "Arn"
+          ]
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
             {
+              "SourceQualifier": "*",
               "SourceResourceId": {
                 "Ref": "MyApiGateway"
-              },
-              "SourceQualifier": "*"
+              }
             }
           ]
         }
@@ -112,17 +121,20 @@
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
-          "Fn::GetAtt": ["MyFunction", "Arn"]
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
             {
+              "SourceQualifier": "*",
               "SourceResourceId": {
                 "Ref": "MyServerlessApi"
-              },
-              "SourceQualifier": "*"
+              }
             }
           ]
         }
@@ -145,17 +157,20 @@
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
-          "Fn::GetAtt": ["MyFunction", "Arn"]
+          "Fn::GetAtt": [
+            "MyFunction",
+            "Arn"
+          ]
         },
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
           "Fn::Sub": [
             "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${SourceResourceId}/${SourceQualifier}",
             {
+              "SourceQualifier": "*",
               "SourceResourceId": {
                 "Ref": "MyHttpApi"
-              },
-              "SourceQualifier": "*"
+              }
             }
           ]
         }
@@ -169,7 +184,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x"
       },
@@ -274,7 +292,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyServerlessFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyServerlessFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -291,10 +312,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],

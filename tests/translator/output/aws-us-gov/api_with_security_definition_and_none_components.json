@@ -1,7 +1,80 @@
 {
   "Resources": {
+    "ExplicitApi": {
+      "Properties": {
+        "Body": {
+          "components": {
+            "securitySchemes": {
+              "CognitoAuthorizer": {
+                "in": "header",
+                "name": "Authorization",
+                "type": "apiKey",
+                "x-amazon-apigateway-authorizer": {
+                  "providerARNs": [
+                    null
+                  ],
+                  "type": "cognito_user_pools"
+                },
+                "x-amazon-apigateway-authtype": "cognito_user_pools"
+              }
+            }
+          },
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.0",
+          "paths": {
+            "/{proxy+}": {
+              "x-amazon-apigateway-any-method": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "EndpointConfiguration": {
+          "Types": [
+            "REGIONAL"
+          ]
+        },
+        "Parameters": {
+          "endpointConfigurationTypes": "REGIONAL"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ExplicitApiDeployment61b3921bb7": {
+      "Properties": {
+        "Description": "RestApi deployment id: 61b3921bb7522c20a8e0de1d24c974267f3ec17b",
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ExplicitApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment61b3921bb7"
+        },
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
     "GetHtmlFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -21,13 +94,12 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "GetHtmlFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -40,7 +112,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -51,81 +124,8 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "ExplicitApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment61b3921bb7"
-        },
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "StageName": "Prod"
-      }
-    },
-    "ExplicitApiDeployment61b3921bb7": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "Description": "RestApi deployment id: 61b3921bb7522c20a8e0de1d24c974267f3ec17b",
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "StageName": "Stage"
-      }
-    },
-    "ExplicitApi": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/{proxy+}": {
-              "x-amazon-apigateway-any-method": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              }
-            }
-          },
-          "openapi": "3.0.0",
-          "components": {
-            "securitySchemes": {
-              "CognitoAuthorizer": {
-                "x-amazon-apigateway-authtype": "cognito_user_pools",
-                "type": "apiKey",
-                "name": "Authorization",
-                "x-amazon-apigateway-authorizer": {
-                  "providerARNs": [
-                    null
-                  ],
-                  "type": "cognito_user_pools"
-                },
-                "in": "header"
-              }
-            }
-          }
-        },
-        "Parameters": {
-          "endpointConfigurationTypes": "REGIONAL"
-        },
-        "EndpointConfiguration": {
-          "Types": [
-            "REGIONAL"
-          ]
-        }
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

@@ -1,22 +1,50 @@
 {
-    "__note__": "This is a dummy config for local testing. Any change here need to be migrated to SAM service.",
-    "feature-1": {
-        "beta": {
-            "us-west-2": {"type": "toggle", "enabled": true},
-            "us-east-1": {"type": "account-percentile", "enabled-%": 10},
-            "default": {"type": "toggle", "enabled": false},
-            "123456789123": {
-                "us-west-2": {"type": "toggle", "enabled": true},
-                "default": {"type": "toggle", "enabled": false}
-            }
+  "__note__": "This is a dummy config for local testing. Any change here need to be migrated to SAM service.",
+  "feature-1": {
+    "beta": {
+      "123456789123": {
+        "default": {
+          "enabled": false,
+          "type": "toggle"
         },
-        "gamma": {
-            "default": {"type": "toggle", "enabled": false},
-            "123456789123": {
-                "us-east-1": {"type": "toggle", "enabled": false},
-                "default": {"type": "toggle", "enabled": false}
-            }
+        "us-west-2": {
+          "enabled": true,
+          "type": "toggle"
+        }
+      },
+      "default": {
+        "enabled": false,
+        "type": "toggle"
+      },
+      "us-east-1": {
+        "enabled-%": 10,
+        "type": "account-percentile"
+      },
+      "us-west-2": {
+        "enabled": true,
+        "type": "toggle"
+      }
+    },
+    "gamma": {
+      "123456789123": {
+        "default": {
+          "enabled": false,
+          "type": "toggle"
         },
-        "prod": {"default": {"enabled": false}}
+        "us-east-1": {
+          "enabled": false,
+          "type": "toggle"
+        }
+      },
+      "default": {
+        "enabled": false,
+        "type": "toggle"
+      }
+    },
+    "prod": {
+      "default": {
+        "enabled": false
+      }
     }
+  }
 }

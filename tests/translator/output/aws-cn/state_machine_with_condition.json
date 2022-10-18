@@ -2,30 +2,30 @@
   "Conditions": {
     "TestCondition": {
       "Fn::Equals": [
-        "test", 
+        "test",
         "test"
       ]
     }
-  }, 
+  },
   "Resources": {
     "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine", 
+      "Condition": "TestCondition",
       "Properties": {
-        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
-        "StateMachineName": "MyStateMachine", 
         "DefinitionS3Location": {
-          "Version": 3, 
-          "Bucket": "sam-demo-bucket", 
-          "Key": "my-state-machine.asl.json"
-        }, 
+          "Bucket": "sam-demo-bucket",
+          "Key": "my-state-machine.asl.json",
+          "Version": 3
+        },
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
+        "StateMachineName": "MyStateMachine",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "stateMachine:createdBy"
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
           }
         ]
-      }, 
-      "Condition": "TestCondition"
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
     }
   }
 }

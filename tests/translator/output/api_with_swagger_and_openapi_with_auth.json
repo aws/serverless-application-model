@@ -1,28 +1,87 @@
 {
   "Resources": {
-    "MyUserPool": {
-      "Type": "AWS::Cognito::UserPool",
+    "ExplicitApi": {
       "Properties": {
-        "UserPoolName": "UserPoolName",
-        "Policies": {
-          "PasswordPolicy": {
-            "MinimumLength": 8
-          }
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.1.1",
+          "paths": {
+            "/": {
+              "get": {
+                "responses": {},
+                "security": [
+                  {
+                    "MyCognitoAuth": []
+                  }
+                ],
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                }
+              }
+            }
+          },
+          "securityDefinitions": {
+            "MyCognitoAuth": {
+              "in": "header",
+              "name": "Authorization",
+              "type": "apiKey",
+              "x-amazon-apigateway-authorizer": {
+                "providerARNs": [
+                  {
+                    "Fn::GetAtt": [
+                      "MyUserPool",
+                      "Arn"
+                    ]
+                  }
+                ],
+                "type": "cognito_user_pools"
+              },
+              "x-amazon-apigateway-authtype": "cognito_user_pools"
+            }
+          },
+          "swagger": 2.0
         },
-        "UsernameAttributes": [
-          "email"
-        ],
-        "Schema": [
-          {
-            "AttributeDataType": "String",
-            "Name": "email",
-            "Required": false
-          }
-        ]
-      }
+        "Name": "some api"
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ExplicitApiDeployment7c4f7dda23": {
+      "Properties": {
+        "Description": "RestApi deployment id: 7c4f7dda23acd71e4a653861510d82ad7809e562",
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "ExplicitApiSomeStageStage": {
+      "Properties": {
+        "CacheClusterEnabled": true,
+        "CacheClusterSize": "1.6",
+        "DeploymentId": {
+          "Ref": "ExplicitApiDeployment7c4f7dda23"
+        },
+        "RestApiId": {
+          "Ref": "ExplicitApi"
+        },
+        "StageName": "SomeStage",
+        "Variables": {
+          "SomeVar": "Value"
+        }
+      },
+      "Type": "AWS::ApiGateway::Stage"
     },
     "ImplicitApiFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -42,61 +101,10 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "ImplicitApiFunctionRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "ImplicitApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "ImplicitApiFunction"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "ImplicitApiFunctionGetHtmlAnyMethodPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -114,144 +122,132 @@
             }
           ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
-    "ExplicitApi": {
-      "Type": "AWS::ApiGateway::RestApi",
+    "ImplicitApiFunctionGetHtmlPermissionProd": {
       "Properties": {
-        "Body": {
-          "openapi": "3.1.1",
-          "swagger": 2.0,
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ImplicitApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
             }
-          },
-          "paths": {
-            "/": {
-              "get": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {},
-                "security": [
-                  {
-                    "MyCognitoAuth": []
-                  }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "ImplicitApiFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
                 ]
               }
             }
-          },
-          "securityDefinitions": {
-            "MyCognitoAuth": {
-              "type": "apiKey",
-              "name": "Authorization",
-              "in": "header",
-              "x-amazon-apigateway-authtype": "cognito_user_pools",
-              "x-amazon-apigateway-authorizer": {
-                "type": "cognito_user_pools",
-                "providerARNs": [
-                  {
-                    "Fn::GetAtt": [
-                      "MyUserPool",
-                      "Arn"
-                    ]
-                  }
-                ]
-              }
-            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyUserPool": {
+      "Properties": {
+        "Policies": {
+          "PasswordPolicy": {
+            "MinimumLength": 8
           }
         },
-        "Name": "some api"
-      }
-    },
-    "ExplicitApiDeployment7c4f7dda23": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "Description": "RestApi deployment id: 7c4f7dda23acd71e4a653861510d82ad7809e562",
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "StageName": "Stage"
-      }
-    },
-    "ExplicitApiSomeStageStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "CacheClusterEnabled": true,
-        "CacheClusterSize": "1.6",
-        "DeploymentId": {
-          "Ref": "ExplicitApiDeployment7c4f7dda23"
-        },
-        "RestApiId": {
-          "Ref": "ExplicitApi"
-        },
-        "StageName": "SomeStage",
-        "Variables": {
-          "SomeVar": "Value"
-        }
-      }
+        "Schema": [
+          {
+            "AttributeDataType": "String",
+            "Name": "email",
+            "Required": false
+          }
+        ],
+        "UserPoolName": "UserPoolName",
+        "UsernameAttributes": [
+          "email"
+        ]
+      },
+      "Type": "AWS::Cognito::UserPool"
     },
     "ServerlessRestApi": {
-      "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
         "Body": {
-          "swagger": "2.0",
           "info": {
-            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
-            }
+            },
+            "version": "1.0"
           },
           "paths": {
             "/": {
               "get": {
-                "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
-                  "httpMethod": "POST",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
-                  }
-                },
                 "responses": {},
                 "security": [
                   {
                     "MyCognitoAuth": []
                   }
-                ]
+                ],
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                }
               }
             },
             "/any": {
               "x-amazon-apigateway-any-method": {
-                "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
-                  "httpMethod": "POST",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
-                  }
-                },
                 "responses": {},
                 "security": [
                   {
                     "MyCognitoAuth": []
                   }
-                ]
+                ],
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ImplicitApiFunction.Arn}/invocations"
+                  }
+                }
               }
             }
           },
           "securityDefinitions": {
             "MyCognitoAuth": {
-              "type": "apiKey",
-              "name": "Authorization",
               "in": "header",
-              "x-amazon-apigateway-authtype": "cognito_user_pools",
+              "name": "Authorization",
+              "type": "apiKey",
               "x-amazon-apigateway-authorizer": {
-                "type": "cognito_user_pools",
                 "providerARNs": [
                   {
                     "Fn::GetAtt": [
@@ -259,26 +255,29 @@
                       "Arn"
                     ]
                   }
-                ]
-              }
+                ],
+                "type": "cognito_user_pools"
+              },
+              "x-amazon-apigateway-authtype": "cognito_user_pools"
             }
-          }
+          },
+          "swagger": "2.0"
         },
         "Name": "some api"
-      }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
     },
     "ServerlessRestApiDeploymente091b9b9a0": {
-      "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "Description": "RestApi deployment id: e091b9b9a0d7b8b9db6fee8c4ad295eb98edde08",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Stage"
-      }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
     },
     "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "CacheClusterEnabled": true,
         "CacheClusterSize": "1.6",
@@ -292,7 +291,8 @@
         "Variables": {
           "SomeVar": "Value"
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::Stage"
     }
   }
 }

@@ -17,20 +17,31 @@
         "PolicyDocument": {
           "Statement": [
             {
-              "Action": ["sqs:DeleteMessage"],
+              "Action": [
+                "sqs:DeleteMessage"
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["Queue", "Arn"]
+                  "Fn::GetAtt": [
+                    "Queue",
+                    "Arn"
+                  ]
                 }
               ]
             },
             {
-              "Action": ["sqs:GetQueueAttributes", "sqs:ReceiveMessage"],
+              "Action": [
+                "sqs:GetQueueAttributes",
+                "sqs:ReceiveMessage"
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["Queue", "Arn"]
+                  "Fn::GetAtt": [
+                    "Queue",
+                    "Arn"
+                  ]
                 }
               ]
             }
@@ -59,7 +70,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["InvokedFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "InvokedFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -76,10 +90,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],
@@ -93,14 +111,19 @@
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Action": ["sqs:SendMessage*"],
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ],
                   "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
                       {
                         "queueName": {
-                          "Fn::GetAtt": ["VerificationQueue", "QueueName"]
+                          "Fn::GetAtt": [
+                            "VerificationQueue",
+                            "QueueName"
+                          ]
                         }
                       }
                     ]
@@ -124,11 +147,16 @@
       "Type": "AWS::SQS::Queue"
     },
     "SQSEventSourceMapping": {
-      "DependsOn": ["ConnectorPolicy"],
+      "DependsOn": [
+        "ConnectorPolicy"
+      ],
       "Properties": {
         "BatchSize": 10,
         "EventSourceArn": {
-          "Fn::GetAtt": ["Queue", "Arn"]
+          "Fn::GetAtt": [
+            "Queue",
+            "Arn"
+          ]
         },
         "FunctionName": {
           "Ref": "InvokedFunction"
@@ -153,7 +181,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["TriggerFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "TriggerFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -171,10 +202,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],
@@ -202,7 +237,10 @@
                       "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
                       {
                         "queueName": {
-                          "Fn::GetAtt": ["VerificationQueue", "QueueName"]
+                          "Fn::GetAtt": [
+                            "VerificationQueue",
+                            "QueueName"
+                          ]
                         }
                       }
                     ]
@@ -216,14 +254,19 @@
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Action": ["sqs:SendMessage*"],
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ],
                   "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
                       {
                         "queueName": {
-                          "Fn::GetAtt": ["Queue", "QueueName"]
+                          "Fn::GetAtt": [
+                            "Queue",
+                            "QueueName"
+                          ]
                         }
                       }
                     ]

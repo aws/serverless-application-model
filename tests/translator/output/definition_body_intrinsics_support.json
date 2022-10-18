@@ -1,146 +1,146 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "DefinitionBody currently only supports intrinsics when SwaggerEditor/OpenApiEditor is not used (as of 2022-05-30). Let's add tests to make sure we keep this support, because we've had a regression where we accidentally removed this intrinsics support by using the SwaggerEditor. Note that the only supported intrinsic function for DefinitionBody is Fn::If. Other intrinsics are not supported because they don't resolve to dictionary. \n",
-    "Conditions": {
-        "FalseCondition": {
-            "Fn::Equals": [
-                true,
-                false
-            ]
-        }
-    },
-    "Resources": {
-        "RestApiIfIntrinsicAndNoSwaggerEditorDeployment2f0411dccd": {
-            "Type": "AWS::ApiGateway::Deployment",
-            "Properties": {
-                "Description": "RestApi deployment id: 2f0411dccde517dcb5c82d3848dbc431e7479ebc",
-                "RestApiId": {
-                    "Ref": "RestApiIfIntrinsicAndNoSwaggerEditor"
-                },
-                "StageName": "Stage"
-            }
-        },
-        "RestApiIfIntrinsicAndNoSwaggerEditorprodStage": {
-            "Type": "AWS::ApiGateway::Stage",
-            "Properties": {
-                "DeploymentId": {
-                    "Ref": "RestApiIfIntrinsicAndNoSwaggerEditorDeployment2f0411dccd"
-                },
-                "RestApiId": {
-                    "Ref": "RestApiIfIntrinsicAndNoSwaggerEditor"
-                },
-                "StageName": "prod"
-            }
-        },
-        "HttpApiIfIntrinsicAndNoOpenApiEditorprodStage": {
-            "Type": "AWS::ApiGatewayV2::Stage",
-            "Properties": {
-                "ApiId": {
-                    "Ref": "HttpApiIfIntrinsicAndNoOpenApiEditor"
-                },
-                "StageName": "prod",
-                "AutoDeploy": true
-            }
-        },
-        "RestApiIfIntrinsicAndNoSwaggerEditor": {
-            "Type": "AWS::ApiGateway::RestApi",
-            "Properties": {
-                "Body": {
-                    "Fn::If": [
-                        "FalseCondition",
-                        {
-                            "info": {
-                                "title": {
-                                    "Fn::Sub": "${AWS::StackName}-Api"
-                                }
-                            },
-                            "paths": {
-                                "/post": {
-                                    "post": {
-                                        "x-amazon-apigateway-integration": {
-                                            "httpMethod": "POST",
-                                            "type": "aws_proxy",
-                                            "uri": "https://www.alphavantage.co/",
-                                            "payloadFormatVersion": "1.0"
-                                        }
-                                    }
-                                }
-                            },
-                            "swagger": "2.0"
-                        },
-                        {
-                            "info": {
-                                "title": {
-                                    "Fn::Sub": "${AWS::StackName}-Api"
-                                }
-                            },
-                            "paths": {
-                                "/post": {
-                                    "post": {
-                                        "x-amazon-apigateway-integration": {
-                                            "httpMethod": "POST",
-                                            "type": "aws_proxy",
-                                            "uri": "https://www.otheruri.co/",
-                                            "payloadFormatVersion": "1.0"
-                                        }
-                                    }
-                                }
-                            },
-                            "swagger": "2.0"
-                        }
-                    ]
-                }
-            }
-        },
-        "HttpApiIfIntrinsicAndNoOpenApiEditor": {
-            "Type": "AWS::ApiGatewayV2::Api",
-            "Properties": {
-                "Body": {
-                    "Fn::If": [
-                        "FalseCondition",
-                        {
-                            "info": {
-                                "title": {
-                                    "Fn::Sub": "${AWS::StackName}-Api"
-                                }
-                            },
-                            "paths": {
-                                "/post": {
-                                    "post": {
-                                        "x-amazon-apigateway-integration": {
-                                            "httpMethod": "POST",
-                                            "type": "aws_proxy",
-                                            "uri": "https://www.alphavantage.co/",
-                                            "payloadFormatVersion": "1.0"
-                                        }
-                                    }
-                                }
-                            },
-                            "openapi": "3.0"
-                        },
-                        {
-                            "info": {
-                                "title": {
-                                    "Fn::Sub": "${AWS::StackName}-Api"
-                                }
-                            },
-                            "paths": {
-                                "/post": {
-                                    "post": {
-                                        "x-amazon-apigateway-integration": {
-                                            "httpMethod": "POST",
-                                            "type": "aws_proxy",
-                                            "uri": "https://www.otheruri.co/",
-                                            "payloadFormatVersion": "1.0"
-                                        }
-                                    }
-                                }
-                            },
-                            "openapi": "3.0"
-                        }
-                    ]
-                }
-            }
-        }
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "FalseCondition": {
+      "Fn::Equals": [
+        true,
+        false
+      ]
     }
+  },
+  "Description": "DefinitionBody currently only supports intrinsics when SwaggerEditor/OpenApiEditor is not used (as of 2022-05-30). Let's add tests to make sure we keep this support, because we've had a regression where we accidentally removed this intrinsics support by using the SwaggerEditor. Note that the only supported intrinsic function for DefinitionBody is Fn::If. Other intrinsics are not supported because they don't resolve to dictionary. \n",
+  "Resources": {
+    "HttpApiIfIntrinsicAndNoOpenApiEditor": {
+      "Properties": {
+        "Body": {
+          "Fn::If": [
+            "FalseCondition",
+            {
+              "info": {
+                "title": {
+                  "Fn::Sub": "${AWS::StackName}-Api"
+                }
+              },
+              "openapi": "3.0",
+              "paths": {
+                "/post": {
+                  "post": {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "payloadFormatVersion": "1.0",
+                      "type": "aws_proxy",
+                      "uri": "https://www.alphavantage.co/"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "info": {
+                "title": {
+                  "Fn::Sub": "${AWS::StackName}-Api"
+                }
+              },
+              "openapi": "3.0",
+              "paths": {
+                "/post": {
+                  "post": {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "payloadFormatVersion": "1.0",
+                      "type": "aws_proxy",
+                      "uri": "https://www.otheruri.co/"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "HttpApiIfIntrinsicAndNoOpenApiEditorprodStage": {
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApiIfIntrinsicAndNoOpenApiEditor"
+        },
+        "AutoDeploy": true,
+        "StageName": "prod"
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "RestApiIfIntrinsicAndNoSwaggerEditor": {
+      "Properties": {
+        "Body": {
+          "Fn::If": [
+            "FalseCondition",
+            {
+              "info": {
+                "title": {
+                  "Fn::Sub": "${AWS::StackName}-Api"
+                }
+              },
+              "paths": {
+                "/post": {
+                  "post": {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "payloadFormatVersion": "1.0",
+                      "type": "aws_proxy",
+                      "uri": "https://www.alphavantage.co/"
+                    }
+                  }
+                }
+              },
+              "swagger": "2.0"
+            },
+            {
+              "info": {
+                "title": {
+                  "Fn::Sub": "${AWS::StackName}-Api"
+                }
+              },
+              "paths": {
+                "/post": {
+                  "post": {
+                    "x-amazon-apigateway-integration": {
+                      "httpMethod": "POST",
+                      "payloadFormatVersion": "1.0",
+                      "type": "aws_proxy",
+                      "uri": "https://www.otheruri.co/"
+                    }
+                  }
+                }
+              },
+              "swagger": "2.0"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "RestApiIfIntrinsicAndNoSwaggerEditorDeployment2f0411dccd": {
+      "Properties": {
+        "Description": "RestApi deployment id: 2f0411dccde517dcb5c82d3848dbc431e7479ebc",
+        "RestApiId": {
+          "Ref": "RestApiIfIntrinsicAndNoSwaggerEditor"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "RestApiIfIntrinsicAndNoSwaggerEditorprodStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "RestApiIfIntrinsicAndNoSwaggerEditorDeployment2f0411dccd"
+        },
+        "RestApiId": {
+          "Ref": "RestApiIfIntrinsicAndNoSwaggerEditor"
+        },
+        "StageName": "prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    }
+  }
 }

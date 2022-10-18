@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ServerlessApi] is invalid. Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity, LambdaRequestAuthorizationIdentity or CognitoAuthorizationIdentity).",
   "errors": [
     {
       "errorMessage": "Resource with id [ServerlessApi] is invalid. Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity, LambdaRequestAuthorizationIdentity or CognitoAuthorizationIdentity)."
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ServerlessApi] is invalid. Auth.Authorizers.<Authorizer>.Identity must be a dict (LambdaTokenAuthorizationIdentity, LambdaRequestAuthorizationIdentity or CognitoAuthorizationIdentity)."
+  ]
 }
