@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from samtranslator.model import ResourceResolver
 from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
@@ -46,7 +46,7 @@ def add_depends_on(logical_id: str, depends_on: str, resource_resolver: Resource
     resource["DependsOn"] = deps
 
 
-def replace_depends_on_logical_id(logical_id: str, replacement: Any, resource_resolver: ResourceResolver):
+def replace_depends_on_logical_id(logical_id: str, replacement: List[str], resource_resolver: ResourceResolver) -> None:
     """
     For every resource's `DependsOn`, replace `logical_id` by `replacement`.
     """
