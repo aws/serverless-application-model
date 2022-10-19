@@ -40,8 +40,9 @@ def add_depends_on(logical_id: str, depends_on: str, resource_resolver: Resource
     if not resource:
         return
 
-    deps = resource.get("DependsOn", [])
-    resource["DependsOn"] = insert_unique(deps, depends_on)
+    current_deps = resource.get("DependsOn", [])
+    deps = insert_unique(deps, depends_on)
+    resource["DependsOn"] = deps
 
 
 def replace_depends_on(logical_id: str, replacement: Any, resource_resolver: ResourceResolver):
@@ -49,7 +50,7 @@ def replace_depends_on(logical_id: str, replacement: Any, resource_resolver: Res
     For every resource's `DependsOn`, replace `logical_id` by `replacement`.
     """
     for resource in resource_resolver.get_all_resources().values():
-        depends_on = as_array(resource.get("DependsOn"))
+        depends_on = as_array(resource.get("DependsOn", []))
         # TODO: What if DependsOn to connector on same connector?
         if logical_id in depends_on:
             depends_on.remove(logical_id)
