@@ -11,17 +11,13 @@ Options:
 """
 import json
 import subprocess
-import re
 import os
 import shutil
 import sys
-import yaml
 import tempfile
 from docopt import docopt  # type: ignore
 from pathlib import Path
 from typing import Any, Dict
-
-from samtranslator.yaml_helper import yaml_parse
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 TRANSFORM_TEST_DIR = os.path.join(SCRIPT_DIR, "..", "tests", "translator")
