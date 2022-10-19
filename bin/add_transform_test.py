@@ -28,38 +28,6 @@ TRANSFORM_TEST_DIR = os.path.join(SCRIPT_DIR, "..", "tests", "translator")
 CLI_OPTIONS = docopt(__doc__)
 
 
-def map_nested(obj: Any, fn) -> Any:
-    if isinstance(obj, dict):
-        return {k: map_nested(v, fn) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [map_nested(v, fn) for v in obj]
-    return fn(obj)
-
-
-def replace_arn(s: Any) -> Any:
-    if not isinstance(s, str):
-        return s
-
-    pattern = "arn:aws:"
-    replaced_pattern = "arn:${AWS::Partition}"
-    if pattern in s:
-        # pattern is substring of s, use Fn::Sub to replace part of s
-        s = s.replace(pattern, replaced_pattern)
-    if re.search(r"\${.+}", s):
-        return {"Fn::Sub": s}
-    return s
-
-
-def replace_arn_partitions(input_file_path: str) -> None:
-    with open(input_file_path, "r") as f:
-        sam_template = yaml_parse(f)
-
-    replaced_template = map_nested(sam_template, lambda v: replace_arn(v))
-
-    with open(input_file_path, "w") as f:
-        yaml.dump(replaced_template, f, default_flow_style=False)
-
-
 def read_json_file(file_path: str) -> Dict[str, Any]:
     with open(file_path, "r") as f:
         sam_template: Dict[str, Any] = json.load(f)
@@ -129,14 +97,23 @@ def get_input_file_path() -> str:
 
 def copy_input_file_to_transform_test_dir(input_file_path: str, transform_test_input_path: str) -> None:
     shutil.copyfile(input_file_path, transform_test_input_path)
-
-    replace_arn_partitions(transform_test_input_path)
     print(f"Transform Test input file generated {transform_test_input_path}")
+
+
+def verify_input_template(input_file_path: str):
+    with open(input_file_path, "r") as f:
+        template = f.read()
+
+    if "arn:aws:" in template:
+        print("ERROR: hardcoded partition name detected. Consider replace it with pseudo parameter {AWS::Partition}")
+        sys.exit(0)
 
 
 def main() -> None:
     input_file_path = get_input_file_path()
     file_basename = Path(input_file_path).stem
+
+    verify_input_template(input_file_path)
 
     transform_test_input_path = os.path.join(TRANSFORM_TEST_DIR, "input", file_basename + ".yaml")
     copy_input_file_to_transform_test_dir(input_file_path, transform_test_input_path)
