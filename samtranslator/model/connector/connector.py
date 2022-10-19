@@ -40,8 +40,8 @@ def add_depends_on(logical_id: str, depends_on: str, resource_resolver: Resource
     if not resource:
         return
 
-    current_deps = resource.get("DependsOn", [])
-    deps = insert_unique(current_deps, depends_on)
+    old_deps = resource.get("DependsOn", [])
+    deps = insert_unique(old_deps, depends_on)
 
     resource["DependsOn"] = deps
 

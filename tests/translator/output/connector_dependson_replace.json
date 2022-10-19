@@ -1,0 +1,260 @@
+{
+ "Resources": {
+  "SomeFunction": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Role": {
+     "Ref": "SomeRole"
+    }
+   }
+  },
+  "SomeTable": {
+   "Type": "AWS::DynamoDB::Table"
+  },
+  "SomeTopic": {
+   "Type": "AWS::SNS::Topic"
+  },
+  "SomeQueue": {
+   "Type": "AWS::SQS::Queue"
+  },
+  "SomeRule": {
+   "Type": "AWS::Events::Rule"
+  },
+  "TestIamRolePolicyConnector": {
+   "DependsOn": [
+    "IamRolePolicyConnectorPolicy"
+   ],
+   "Type": "AWS::Foo::Bar"
+  },
+  "TestIamRolePolicyConnectorMulti": {
+   "DependsOn": [
+    "Foo",
+    "Egg",
+    "IamRolePolicyConnectorPolicy"
+   ],
+   "Type": "AWS::Foo::Bar"
+  },
+  "TestSnsTopicPolicyConnector": {
+   "DependsOn": [
+    "SnsTopicPolicyConnectorTopicPolicy"
+   ],
+   "Type": "AWS::Foo::Bar"
+  },
+  "TestSnsTopicPolicyConnectorMulti": {
+   "DependsOn": [
+    "Foo",
+    "SnsTopicPolicyConnectorTopicPolicy"
+   ],
+   "Type": "AWS::Foo::Bar"
+  },
+  "TestLambdaPermissionConnector": {
+   "DependsOn": [
+    "LambdaPermissionConnectorWriteLambdaPermission"
+   ],
+   "Type": "AWS::Foo::Bar"
+  },
+  "TestLambdaPermissionConnectorMulti": {
+   "DependsOn": [
+    "Foo",
+    "Bar",
+    "LambdaPermissionConnectorWriteLambdaPermission"
+   ],
+   "Type": "AWS::Foo::Bar"
+  },
+  "TestSqsQueuePolicyConnector": {
+   "DependsOn": [
+    "SqsQueuePolicyConnectorQueuePolicy"
+   ],
+   "Type": "AWS::Foo::Bar"
+  },
+  "TestSqsQueuePolicyConnectorMulti": {
+   "DependsOn": [
+    "Foo",
+    "SqsQueuePolicyConnectorQueuePolicy"
+   ],
+   "Type": "AWS::Foo::Bar"
+  },
+  "IamRolePolicyConnectorPolicy": {
+   "Type": "AWS::IAM::ManagedPolicy",
+   "Metadata": {
+    "aws:sam:connectors": {
+     "IamRolePolicyConnector": {
+      "Source": {
+       "Type": "AWS::Lambda::Function"
+      },
+      "Destination": {
+       "Type": "AWS::DynamoDB::Table"
+      }
+     }
+    }
+   },
+   "Properties": {
+    "PolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PartiQLDelete",
+        "dynamodb:PartiQLInsert",
+        "dynamodb:PartiQLUpdate"
+       ],
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "SomeTable",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Sub": [
+          "${DestinationArn}/index/*",
+          {
+           "DestinationArn": {
+            "Fn::GetAtt": [
+             "SomeTable",
+             "Arn"
+            ]
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    "Roles": [
+     {
+      "Ref": "SomeRole"
+     }
+    ]
+   }
+  },
+  "SnsTopicPolicyConnectorTopicPolicy": {
+   "Type": "AWS::SNS::TopicPolicy",
+   "Metadata": {
+    "aws:sam:connectors": {
+     "SnsTopicPolicyConnector": {
+      "Source": {
+       "Type": "AWS::Events::Rule"
+      },
+      "Destination": {
+       "Type": "AWS::SNS::Topic"
+      }
+     }
+    }
+   },
+   "Properties": {
+    "PolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "events.amazonaws.com"
+       },
+       "Resource": {
+        "Ref": "SomeTopic"
+       },
+       "Action": "sns:Publish",
+       "Condition": {
+        "ArnEquals": {
+         "aws:SourceArn": {
+          "Fn::GetAtt": [
+           "SomeRule",
+           "Arn"
+          ]
+         }
+        }
+       }
+      }
+     ]
+    },
+    "Topics": [
+     {
+      "Ref": "SomeTopic"
+     }
+    ]
+   }
+  },
+  "LambdaPermissionConnectorWriteLambdaPermission": {
+   "Type": "AWS::Lambda::Permission",
+   "Metadata": {
+    "aws:sam:connectors": {
+     "LambdaPermissionConnector": {
+      "Source": {
+       "Type": "AWS::SNS::Topic"
+      },
+      "Destination": {
+       "Type": "AWS::Lambda::Function"
+      }
+     }
+    }
+   },
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SomeFunction",
+      "Arn"
+     ]
+    },
+    "Principal": "sns.amazonaws.com",
+    "SourceArn": {
+     "Ref": "SomeTopic"
+    }
+   }
+  },
+  "SqsQueuePolicyConnectorQueuePolicy": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Metadata": {
+    "aws:sam:connectors": {
+     "SqsQueuePolicyConnector": {
+      "Source": {
+       "Type": "AWS::SNS::Topic"
+      },
+      "Destination": {
+       "Type": "AWS::SQS::Queue"
+      }
+     }
+    }
+   },
+   "Properties": {
+    "PolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "sns.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "SomeQueue",
+         "Arn"
+        ]
+       },
+       "Action": "sqs:SendMessage",
+       "Condition": {
+        "ArnEquals": {
+         "aws:SourceArn": {
+          "Ref": "SomeTopic"
+         }
+        }
+       }
+      }
+     ]
+    },
+    "Queues": [
+     {
+      "Ref": "SomeQueue"
+     }
+    ]
+   }
+  }
+ }
+}
