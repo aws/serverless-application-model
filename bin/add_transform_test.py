@@ -25,8 +25,8 @@ CLI_OPTIONS = docopt(__doc__)
 
 
 def read_json_file(file_path: str) -> Dict[str, Any]:
-    return json.loads(Path(file_path).read_text(encoding="utf-8"))
-
+    template: Dict[str, Any] = json.loads(Path(file_path).read_text(encoding="utf-8"))
+    return template
 
 def write_json_file(obj: Dict[str, Any], file_path: str) -> None:
     with open(file_path, "w", encoding="utf-8") as f:
