@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 from samtranslator.model import ResourceResolver
 from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
-from samtranslator.utils import as_array, insert_unique
+from samtranslator.utils.utils import as_array, insert_unique
 
 
 # TODO: Switch to dataclass
@@ -49,7 +49,7 @@ def replace_depends_on(logical_id: str, replacement: Any, resource_resolver: Res
     For every resource's `DependsOn`, replace `logical_id` by `replacement`.
     """
     for resource in resource_resolver.get_all_resources().values():
-        depends_on = as_array(resource.get("DependsOn", []))
+        depends_on = as_array(resource.get("DependsOn"))
         if logical_id in depends_on:
             depends_on.remove(logical_id)
             resource["DependsOn"] = insert_unique(depends_on, replacement)
