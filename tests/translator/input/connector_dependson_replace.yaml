@@ -23,6 +23,7 @@ Resources:
       Destination:
         Id: SomeTable
       Permissions:
+        - Read
         - Write
   TestIamRolePolicyConnector:
     DependsOn: IamRolePolicyConnector
