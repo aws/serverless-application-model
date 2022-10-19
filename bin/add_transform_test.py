@@ -25,13 +25,11 @@ CLI_OPTIONS = docopt(__doc__)
 
 
 def read_json_file(file_path: str) -> Dict[str, Any]:
-    with open(file_path, "r") as f:
-        sam_template: Dict[str, Any] = json.load(f)
-    return sam_template
+    return json.loads(Path(file_path).read_text(encoding="utf-8"))
 
 
 def write_json_file(obj: Dict[str, Any], file_path: str) -> None:
-    with open(file_path, "w") as f:
+    with open(file_path, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2)
 
 
@@ -97,10 +95,7 @@ def copy_input_file_to_transform_test_dir(input_file_path: str, transform_test_i
 
 
 def verify_input_template(input_file_path: str):
-    with open(input_file_path, "r") as f:
-        template = f.read()
-
-    if "arn:aws:" in template:
+    if "arn:aws:" in Path(input_file_path).read_text(encoding="utf-8"):
         print("ERROR: hardcoded partition name detected. Consider replace it with pseudo parameter {AWS::Partition}")
         sys.exit(1)
 
