@@ -6,7 +6,7 @@ from samtranslator.model.connector.connector import (
     ConnectorResourceReference,
     ConnectorResourceError,
     add_depends_on,
-    replace_depends_on,
+    replace_depends_on_logical_id,
     get_event_source_mappings,
     get_resource_reference,
 )
@@ -1711,7 +1711,7 @@ class SamConnector(SamResourceMacro):
             )
 
         generated_logical_ids = [resource.logical_id for resource in generated_resources]
-        replace_depends_on(self.logical_id, generated_logical_ids, resource_resolver)
+        replace_depends_on_logical_id(self.logical_id, generated_logical_ids, resource_resolver)
 
         self._add_connector_metadata(generated_resources, original_template, source, destination)
         if generated_resources:

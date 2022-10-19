@@ -41,11 +41,12 @@ def add_depends_on(logical_id: str, depends_on: str, resource_resolver: Resource
         return
 
     current_deps = resource.get("DependsOn", [])
-    deps = insert_unique(deps, depends_on)
+    deps = insert_unique(current_deps, depends_on)
+
     resource["DependsOn"] = deps
 
 
-def replace_depends_on(logical_id: str, replacement: Any, resource_resolver: ResourceResolver):
+def replace_depends_on_logical_id(logical_id: str, replacement: Any, resource_resolver: ResourceResolver):
     """
     For every resource's `DependsOn`, replace `logical_id` by `replacement`.
     """
