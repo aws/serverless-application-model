@@ -106,7 +106,7 @@ def verify_input_template(input_file_path: str):
 
     if "arn:aws:" in template:
         print("ERROR: hardcoded partition name detected. Consider replace it with pseudo parameter {AWS::Partition}")
-        sys.exit(0)
+        sys.exit(1)
 
 
 def main() -> None:
