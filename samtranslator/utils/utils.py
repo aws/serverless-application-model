@@ -1,5 +1,5 @@
 import copy
-from typing import Any, List
+from typing import cast, Any, List
 
 
 def as_array(x: Any) -> List[Any]:
@@ -20,4 +20,4 @@ def insert_unique(xs: Any, vs: Any) -> List[Any]:
         if v not in xs:
             xs.append(v)
 
-    return xs
+    return cast(List[Any], xs)  # mypy doesn't recognize it
