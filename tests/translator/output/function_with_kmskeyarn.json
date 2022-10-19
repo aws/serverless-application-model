@@ -1,137 +1,137 @@
 {
   "Resources": {
-    "FunctionWithKeyArnRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    },
-    "FunctionWithReferenceToKeyArnRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    },
     "FunctionWithKeyArn": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
         },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "KmsKeyArn": "thisIsaKey",
         "Handler": "hello.handler",
+        "KmsKeyArn": "thisIsaKey",
         "Role": {
           "Fn::GetAtt": [
             "FunctionWithKeyArnRole",
             "Arn"
           ]
         },
-        "Runtime": "python2.7"
-      }
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
     },
-    "myKey": {
-      "Type": "AWS::KMS::Key",
+    "FunctionWithKeyArnRole": {
       "Properties": {
-        "KeyPolicy": {
-          "Version": "2012-10-17",
-          "Id": "key-default-1",
+        "AssumeRolePolicyDocument": {
           "Statement": [
             {
               "Action": [
-                "kms:Create*"
+                "sts:AssumeRole"
               ],
-              "Sid": "Allow administration of the key",
-              "Resource": "*",
               "Effect": "Allow",
               "Principal": {
-                "AWS": "arn:aws:iam::123456789012:user/Alice"
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
-        "Description": "A sample key"
-      }
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     },
     "FunctionWithReferenceToKeyArn": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
         },
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
+        "Handler": "hello.handler",
         "KmsKeyArn": {
           "Ref": "myKey"
         },
-        "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
             "FunctionWithReferenceToKeyArnRole",
             "Arn"
           ]
         },
-        "Runtime": "python2.7"
-      }
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionWithReferenceToKeyArnRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "myKey": {
+      "Properties": {
+        "Description": "A sample key",
+        "KeyPolicy": {
+          "Id": "key-default-1",
+          "Statement": [
+            {
+              "Action": [
+                "kms:Create*"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "arn:aws:iam::123456789012:user/Alice"
+              },
+              "Resource": "*",
+              "Sid": "Allow administration of the key"
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::KMS::Key"
     }
   }
 }

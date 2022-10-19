@@ -229,7 +229,7 @@ class Resource(object):
         resource_dict.update(self.resource_attributes)
 
         properties_dict = {}
-        for name in self.property_types:
+        for name in self.property_types.keys():
             value = getattr(self, name)
             if value is not None:
                 properties_dict[name] = value
@@ -246,7 +246,7 @@ class Resource(object):
         :param value: the value of the attribute to be set
         :raises InvalidResourceException: if an invalid property is provided
         """
-        if name in self._keywords or name in self.property_types:
+        if name in self._keywords or name in self.property_types.keys():
             return super(Resource, self).__setattr__(name, value)
 
         raise InvalidResourceException(
@@ -331,8 +331,7 @@ class Resource(object):
 
         if attr_name in self.runtime_attrs:
             return self.runtime_attrs[attr_name](self)
-        else:
-            raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
+        raise NotImplementedError(f"{attr_name} attribute is not implemented for resource {self.resource_type}")
 
     def get_passthrough_resource_attributes(self):
         """
@@ -522,7 +521,7 @@ class ResourceResolver:
         :param dict resources: Map of resource
         """
 
-        if resources is None or not isinstance(resources, dict):
+        if not isinstance(resources, dict):
             raise TypeError("'Resources' is either null or not a valid dictionary.")
 
         self.resources = resources

@@ -30,7 +30,7 @@ class Parser:
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        "All 'Resources' must be Objects. If you're using YAML, this may be an " "indentation issue."
+                        "All 'Resources' must be Objects. If you're using YAML, this may be an indentation issue."
                     )
                 ]
             )

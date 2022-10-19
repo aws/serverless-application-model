@@ -120,7 +120,7 @@ class Metrics:
         :param metrics_publisher: publisher to publish all metrics
         """
         self.metrics_publisher = metrics_publisher if metrics_publisher else DummyMetricsPublisher()
-        self.metrics_cache = dict()
+        self.metrics_cache = {}
         self.namespace = namespace
 
     def __del__(self):
@@ -175,7 +175,7 @@ class Metrics:
         for m in self.metrics_cache.values():
             all_metrics.extend(m)
         self.metrics_publisher.publish(self.namespace, all_metrics)
-        self.metrics_cache = dict()
+        self.metrics_cache = {}
 
     def get_metric(self, name):
         """

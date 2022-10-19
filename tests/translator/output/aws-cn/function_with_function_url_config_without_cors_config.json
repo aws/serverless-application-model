@@ -3,7 +3,6 @@
   "Parameters": {},
   "Resources": {
     "MyFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -19,40 +18,19 @@
           ]
         },
         "Runtime": "nodejs12.x",
-        "Timeout": 3,
         "Tags": [
           {
             "Key": "lambda:createdBy",
             "Value": "SAM"
           }
-        ]
-      }
-    },
-    "MyFunctionUrl": {
-      "Type": "AWS::Lambda::Url",
-      "Properties": {
-        "TargetFunctionArn": {
-          "Ref": "MyFunction"
-        },
-        "AuthType": "NONE"
-      }
-    },
-    "MyFunctionUrlPublicPermissions": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunctionUrl",
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "Principal": "*",
-        "FunctionUrlAuthType": "NONE"
-      }
+        ],
+        "Timeout": 3
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "MyFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -65,7 +43,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -76,7 +55,28 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyFunctionUrl": {
+      "Properties": {
+        "AuthType": "NONE",
+        "TargetFunctionArn": {
+          "Ref": "MyFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Url"
+    },
+    "MyFunctionUrlPublicPermissions": {
+      "Properties": {
+        "Action": "lambda:InvokeFunctionUrl",
+        "FunctionName": {
+          "Ref": "MyFunction"
+        },
+        "FunctionUrlAuthType": "NONE",
+        "Principal": "*"
+      },
+      "Type": "AWS::Lambda::Permission"
     }
   }
 }

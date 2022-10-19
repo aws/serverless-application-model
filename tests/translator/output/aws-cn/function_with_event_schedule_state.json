@@ -1,176 +1,176 @@
 {
-    "Parameters": {
-      "ScheduleState": {
-        "Type": "String",
-        "Default": "Disabled"
-      }
+  "Parameters": {
+    "ScheduleState": {
+      "Default": "Disabled",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "ScheduledFunction": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip",
+          "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
+        },
+        "Handler": "hello.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ScheduledFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.10",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
     },
-    "Resources": {
-      "ScheduledFunction": {
-        "Type": "AWS::Lambda::Function",
-        "Properties": {
-          "Code": {
-            "S3Bucket": "sam-demo-bucket",
-            "S3Key": "hello.zip",
-            "S3ObjectVersion": "3Tcgv52_0GaDvhDva4YciYeqRyPnpIcO"
-          },
-          "Handler": "hello.handler",
-          "Role": {
-            "Fn::GetAtt": [
-              "ScheduledFunctionRole",
-              "Arn"
-            ]
-          },
-          "Runtime": "python3.10",
-          "Tags": [
+    "ScheduledFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
             {
-              "Key": "lambda:createdBy",
-              "Value": "SAM"
-            }
-          ]
-        }
-      },
-      "ScheduledFunctionRole": {
-        "Type": "AWS::IAM::Role",
-        "Properties": {
-          "AssumeRolePolicyDocument": {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Action": [
-                  "sts:AssumeRole"
-                ],
-                "Effect": "Allow",
-                "Principal": {
-                  "Service": [
-                    "lambda.amazonaws.com"
-                  ]
-                }
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
-            ]
-          },
-          "ManagedPolicyArns": [
-            "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            }
           ],
-          "Tags": [
-            {
-              "Key": "lambda:createdBy",
-              "Value": "SAM"
-            }
-          ]
-        }
-      },
-      "ScheduledFunctionSchedule1": {
-        "Type": "AWS::Events::Rule",
-        "Properties": {
-          "Description": "Test Schedule",
-          "Name": "test-schedule",
-          "ScheduleExpression": "rate(1 minute)",
-          "State": "Enabled",
-          "Targets": [
-            {
-              "Arn": {
-                "Fn::GetAtt": [
-                  "ScheduledFunction",
-                  "Arn"
-                ]
-              },
-              "Id": "ScheduledFunctionSchedule1LambdaTarget"
-            }
-          ]
-        }
-      },
-      "ScheduledFunctionSchedule1Permission": {
-        "Type": "AWS::Lambda::Permission",
-        "Properties": {
-          "Action": "lambda:InvokeFunction",
-          "FunctionName": {
-            "Ref": "ScheduledFunction"
-          },
-          "Principal": "events.amazonaws.com",
-          "SourceArn": {
-            "Fn::GetAtt": [
-              "ScheduledFunctionSchedule1",
-              "Arn"
-            ]
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        }
+        ]
       },
-      "ScheduledFunctionSchedule2": {
-        "Type": "AWS::Events::Rule",
-        "Properties": {
-          "Description": "Test Schedule",
-          "Name": "test-schedule",
-          "ScheduleExpression": "rate(1 minute)",
-          "State": {
-            "Fn::Sub": "Enabled"
-          },
-          "Targets": [
-            {
-              "Arn": {
-                "Fn::GetAtt": [
-                  "ScheduledFunction",
-                  "Arn"
-                ]
-              },
-              "Id": "ScheduledFunctionSchedule2LambdaTarget"
-            }
+      "Type": "AWS::IAM::Role"
+    },
+    "ScheduledFunctionSchedule1": {
+      "Properties": {
+        "Description": "Test Schedule",
+        "Name": "test-schedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "State": "Enabled",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "ScheduledFunction",
+                "Arn"
+              ]
+            },
+            "Id": "ScheduledFunctionSchedule1LambdaTarget"
+          }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "ScheduledFunctionSchedule1Permission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ScheduledFunction"
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "ScheduledFunctionSchedule1",
+            "Arn"
           ]
         }
       },
-      "ScheduledFunctionSchedule2Permission": {
-        "Type": "AWS::Lambda::Permission",
-        "Properties": {
-          "Action": "lambda:InvokeFunction",
-          "FunctionName": {
-            "Ref": "ScheduledFunction"
-          },
-          "Principal": "events.amazonaws.com",
-          "SourceArn": {
-            "Fn::GetAtt": [
-              "ScheduledFunctionSchedule2",
-              "Arn"
-            ]
+      "Type": "AWS::Lambda::Permission"
+    },
+    "ScheduledFunctionSchedule2": {
+      "Properties": {
+        "Description": "Test Schedule",
+        "Name": "test-schedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "State": {
+          "Fn::Sub": "Enabled"
+        },
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "ScheduledFunction",
+                "Arn"
+              ]
+            },
+            "Id": "ScheduledFunctionSchedule2LambdaTarget"
           }
-        }
+        ]
       },
-      "ScheduledFunctionSchedule3": {
-        "Type": "AWS::Events::Rule",
-        "Properties": {
-          "Description": "Test Schedule",
-          "Name": "test-schedule",
-          "ScheduleExpression": "rate(1 minute)",
-          "State": {
-            "Ref": "ScheduleState"
-          },
-          "Targets": [
-            {
-              "Arn": {
-                "Fn::GetAtt": [
-                  "ScheduledFunction",
-                  "Arn"
-                ]
-              },
-              "Id": "ScheduledFunctionSchedule3LambdaTarget"
-            }
+      "Type": "AWS::Events::Rule"
+    },
+    "ScheduledFunctionSchedule2Permission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ScheduledFunction"
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "ScheduledFunctionSchedule2",
+            "Arn"
           ]
         }
       },
-      "ScheduledFunctionSchedule3Permission": {
-        "Type": "AWS::Lambda::Permission",
-        "Properties": {
-          "Action": "lambda:InvokeFunction",
-          "FunctionName": {
-            "Ref": "ScheduledFunction"
-          },
-          "Principal": "events.amazonaws.com",
-          "SourceArn": {
-            "Fn::GetAtt": [
-              "ScheduledFunctionSchedule3",
-              "Arn"
-            ]
+      "Type": "AWS::Lambda::Permission"
+    },
+    "ScheduledFunctionSchedule3": {
+      "Properties": {
+        "Description": "Test Schedule",
+        "Name": "test-schedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "State": {
+          "Ref": "ScheduleState"
+        },
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "ScheduledFunction",
+                "Arn"
+              ]
+            },
+            "Id": "ScheduledFunctionSchedule3LambdaTarget"
           }
+        ]
+      },
+      "Type": "AWS::Events::Rule"
+    },
+    "ScheduledFunctionSchedule3Permission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ScheduledFunction"
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "ScheduledFunctionSchedule3",
+            "Arn"
+          ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission"
     }
   }
+}

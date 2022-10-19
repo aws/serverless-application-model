@@ -105,8 +105,7 @@ class RefAction(Action):
 
         if param_name in parameters:
             return parameters[param_name]
-        else:
-            return input_dict
+        return input_dict
 
     def resolve_resource_refs(self, input_dict, supported_resource_refs):
         """
@@ -546,7 +545,7 @@ class FindInMapAction(Action):
             raise InvalidDocumentException(
                 [
                     InvalidTemplateException(
-                        "Invalid FindInMap value {}. FindInMap expects an array with 3 values.".format(value)
+                        f"Invalid FindInMap value {value}. FindInMap expects an array with 3 values."
                     )
                 ]
             )

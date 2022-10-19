@@ -26,14 +26,19 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyQueue", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyQueue",
+                    "Arn"
+                  ]
                 }
               ]
             }
           ],
           "Version": "2012-10-17"
         },
-        "Roles": ["MyCoolRole"]
+        "Roles": [
+          "MyCoolRole"
+        ]
       },
       "Type": "AWS::IAM::ManagedPolicy"
     },
@@ -44,7 +49,10 @@
         },
         "Handler": "foo",
         "Role": {
-          "Fn::GetAtt": ["MyFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "python3.9",
         "Tags": [
@@ -61,10 +69,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],

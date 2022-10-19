@@ -48,7 +48,7 @@ def parse_s3_url(url, bucket_name_property="Bucket", object_key_property="Key", 
 
             return result
 
-    raise ValueError("URL given to the parse method is not a valid S3 url " "{0}".format(url))
+    raise ValueError(f"URL given to the parse method is not a valid S3 url {url}")
 
 
 @contextmanager

@@ -38,14 +38,20 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyBucket", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyBucket",
+                    "Arn"
+                  ]
                 },
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/*",
                     {
                       "DestinationArn": {
-                        "Fn::GetAtt": ["MyBucket", "Arn"]
+                        "Fn::GetAtt": [
+                          "MyBucket",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -65,14 +71,20 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyBucket", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyBucket",
+                    "Arn"
+                  ]
                 },
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/*",
                     {
                       "DestinationArn": {
-                        "Fn::GetAtt": ["MyBucket", "Arn"]
+                        "Fn::GetAtt": [
+                          "MyBucket",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -97,7 +109,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -114,10 +129,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],

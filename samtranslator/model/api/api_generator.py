@@ -16,7 +16,7 @@ from samtranslator.model.apigateway import (
     ApiGatewayApiKey,
 )
 from samtranslator.model.route53 import Route53RecordSetGroup
-from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException, InvalidDocumentException
+from samtranslator.model.exceptions import InvalidResourceException, InvalidTemplateException
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.region_configuration import RegionConfiguration
 from samtranslator.swagger.swagger import SwaggerEditor
@@ -67,9 +67,9 @@ class SharedApiUsagePlan(object):
 
     def __init__(self):
         self.usage_plan_shared = False
-        self.stage_keys_shared = list()
-        self.api_stages_shared = list()
-        self.depends_on_shared = list()
+        self.stage_keys_shared = []
+        self.api_stages_shared = []
+        self.depends_on_shared = []
 
         # shared resource level attributes
         self.conditions = set()
@@ -93,7 +93,7 @@ class SharedApiUsagePlan(object):
         self._set_update_replace_policy(resource_attributes.get("UpdateReplacePolicy"))
         self._set_condition(resource_attributes.get("Condition"), conditions)
 
-        combined_resource_attributes = dict()
+        combined_resource_attributes = {}
         if self.deletion_policy:
             combined_resource_attributes["DeletionPolicy"] = self.deletion_policy
         if self.update_replace_policy:
@@ -418,6 +418,7 @@ class ApiGenerator(object):
         return stage
 
     def _construct_api_domain(self, rest_api, route53_record_set_groups):
+        # pylint: disable=duplicate-code
         """
         Constructs and returns the ApiGateway Domain and BasepathMapping
         """
@@ -426,7 +427,7 @@ class ApiGenerator(object):
 
         if self.domain.get("DomainName") is None or self.domain.get("CertificateArn") is None:
             raise InvalidResourceException(
-                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn" " are provided."
+                self.logical_id, "Custom Domains only works if both DomainName and CertificateArn are provided."
             )
 
         self.domain["ApiDomainName"] = "{}{}".format(
@@ -458,7 +459,7 @@ class ApiGenerator(object):
         if mutual_tls_auth:
             if isinstance(mutual_tls_auth, dict):
                 if not set(mutual_tls_auth.keys()).issubset({"TruststoreUri", "TruststoreVersion"}):
-                    invalid_keys = list()
+                    invalid_keys = []
                     for key in mutual_tls_auth.keys():
                         if not key in {"TruststoreUri", "TruststoreVersion"}:
                             invalid_keys.append(key)
@@ -574,6 +575,7 @@ class ApiGenerator(object):
         return recordset_list
 
     def _construct_alias_target(self, domain):
+        # pylint: disable=duplicate-code
         alias_target = {}
         route53 = domain.get("Route53")
         target_health = route53.get("EvaluateTargetHealth")
@@ -702,7 +704,7 @@ class ApiGenerator(object):
 
         if self.auth and not self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Auth works only with inline Swagger specified in " "'DefinitionBody' property."
+                self.logical_id, "Auth works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
         # Make sure keys in the dict are recognized
@@ -782,15 +784,15 @@ class ApiGenerator(object):
             return []
 
         # create usage plan for this api only
-        elif usage_plan_properties.get("CreateUsagePlan") == "PER_API":
+        if usage_plan_properties.get("CreateUsagePlan") == "PER_API":
             usage_plan_logical_id = self.logical_id + "UsagePlan"
             usage_plan = ApiGatewayUsagePlan(
                 logical_id=usage_plan_logical_id,
                 depends_on=[self.logical_id],
                 attributes=self.passthrough_resource_attributes,
             )
-            api_stages = list()
-            api_stage = dict()
+            api_stages = []
+            api_stage = {}
             api_stage["ApiId"] = ref(self.logical_id)
             api_stage["Stage"] = ref(rest_api_stage.logical_id)
             api_stages.append(api_stage)
@@ -812,7 +814,7 @@ class ApiGenerator(object):
                     self.passthrough_resource_attributes, self.template_conditions
                 ),
             )
-            api_stage = dict()
+            api_stage = {}
             api_stage["ApiId"] = ref(self.logical_id)
             api_stage["Stage"] = ref(rest_api_stage.logical_id)
             if api_stage not in self.shared_api_usage_plan.api_stages_shared:
@@ -853,7 +855,7 @@ class ApiGenerator(object):
                 ),
             )
             api_key.Enabled = True
-            stage_key = dict()
+            stage_key = {}
             stage_key["RestApiId"] = ref(self.logical_id)
             stage_key["StageName"] = ref(rest_api_stage.logical_id)
             if stage_key not in self.shared_api_usage_plan.stage_keys_shared:
@@ -869,8 +871,8 @@ class ApiGenerator(object):
                 attributes=self.passthrough_resource_attributes,
             )
             api_key.Enabled = True
-            stage_keys = list()
-            stage_key = dict()
+            stage_keys = []
+            stage_key = {}
             stage_key["RestApiId"] = ref(self.logical_id)
             stage_key["StageName"] = ref(rest_api_stage.logical_id)
             stage_keys.append(stage_key)
@@ -918,7 +920,7 @@ class ApiGenerator(object):
         if self.gateway_responses and not self.definition_body:
             raise InvalidResourceException(
                 self.logical_id,
-                "GatewayResponses works only with inline Swagger specified in " "'DefinitionBody' property.",
+                "GatewayResponses works only with inline Swagger specified in 'DefinitionBody' property.",
             )
 
         # Make sure keys in the dict are recognized
@@ -930,7 +932,7 @@ class ApiGenerator(object):
                     "Unable to set GatewayResponses attribute because "
                     "intrinsic functions are not supported for this field.",
                 )
-            elif not isinstance(responses_value, dict):
+            if not isinstance(responses_value, dict):
                 raise InvalidResourceException(
                     self.logical_id,
                     "Invalid property type '{}' for GatewayResponses. "
@@ -981,7 +983,7 @@ class ApiGenerator(object):
 
         if self.models and not self.definition_body:
             raise InvalidResourceException(
-                self.logical_id, "Models works only with inline Swagger specified in " "'DefinitionBody' property."
+                self.logical_id, "Models works only with inline Swagger specified in 'DefinitionBody' property."
             )
 
         if not SwaggerEditor.is_valid(self.definition_body):

@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 ConnectorProfile = Dict[str, Any]
 
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles.json")) as f:
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "profiles.json"), encoding="utf-8") as f:
     PROFILE: ConnectorProfile = json.load(f)
 
 
@@ -40,10 +40,9 @@ def profile_replace(obj: Any, replacements: Dict[str, Any]):
 def _map_nested(obj: Any, fn):
     if isinstance(obj, dict):
         return {k: _map_nested(v, fn) for k, v in obj.items()}
-    elif isinstance(obj, list):
+    if isinstance(obj, list):
         return [_map_nested(v, fn) for v in obj]
-    else:
-        return fn(obj)
+    return fn(obj)
 
 
 def _sanitize(s: str) -> str:

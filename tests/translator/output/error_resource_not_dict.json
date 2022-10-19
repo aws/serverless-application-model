@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Structure of the SAM template is invalid. All 'Resources' must be Objects. If you're using YAML, this may be an indentation issue.",
   "errors": [
     {
       "errorMessage": "Structure of the SAM template is invalid. All 'Resources' must be Objects. If you're using YAML, this may be an indentation issue."
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Structure of the SAM template is invalid. All 'Resources' must be Objects. If you're using YAML, this may be an indentation issue."
+  ]
 }

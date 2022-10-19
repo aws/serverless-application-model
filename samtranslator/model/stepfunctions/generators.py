@@ -1,17 +1,13 @@
 import json
-from uuid import uuid4
 from copy import deepcopy
 
-import samtranslator.model.eventsources.push
 from samtranslator.metrics.method_decorator import cw_timer
-from samtranslator.model import ResourceTypeResolver
 from samtranslator.model.exceptions import InvalidEventException, InvalidResourceException
 from samtranslator.model.iam import IAMRolePolicies
 from samtranslator.model.resource_policies import ResourcePolicies
 from samtranslator.model.role_utils import construct_role_for_resource
 from samtranslator.model.s3_utils.uri_parser import parse_s3_uri
 from samtranslator.model.stepfunctions import StepFunctionsStateMachine
-from samtranslator.model.stepfunctions import events
 from samtranslator.model.intrinsics import fnJoin
 from samtranslator.model.tags.resource_tagging import get_tag_list
 
@@ -116,7 +112,7 @@ class StateMachineGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "Specify either 'Definition' or 'DefinitionUri' property and not both."
             )
-        elif self.definition:
+        if self.definition:
             processed_definition = deepcopy(self.definition)
             substitutions = self._replace_dynamic_values_with_substitutions(processed_definition)
             if len(substitutions) > 0:
@@ -136,7 +132,7 @@ class StateMachineGenerator(object):
             raise InvalidResourceException(
                 self.logical_id, "Specify either 'Role' or 'Policies' property and not both."
             )
-        elif self.role:
+        if self.role:
             self.state_machine.RoleArn = self.role
         elif self.policies:
             if not self.managed_policy_map:
@@ -262,7 +258,7 @@ class StateMachineGenerator(object):
                     for name, resource in self.event_resources[logical_id].items():
                         kwargs[name] = resource
                 except (TypeError, AttributeError) as e:
-                    raise InvalidEventException(logical_id, "{}".format(e))
+                    raise InvalidEventException(logical_id, str(e))
                 resources += eventsource.to_cloudformation(resource=self.state_machine, **kwargs)
 
         return resources

@@ -1,43 +1,43 @@
 {
   "Resources": {
-    "MinimalTable": {
-      "Type": "AWS::DynamoDB::Table", 
-      "Properties": {
-        "BillingMode": "PAY_PER_REQUEST",
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "id", 
-            "AttributeType": "S"
-          }
-        ], 
-        "KeySchema": [
-          {
-            "KeyType": "HASH", 
-            "AttributeName": "id"
-          }
-        ]
-      }
-    }, 
     "CompleteTable": {
-      "Type": "AWS::DynamoDB::Table", 
       "Properties": {
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": 10, 
-          "ReadCapacityUnits": 20
-        }, 
         "AttributeDefinitions": [
           {
-            "AttributeName": "member-number", 
+            "AttributeName": "member-number",
             "AttributeType": "N"
           }
-        ], 
+        ],
         "KeySchema": [
           {
-            "KeyType": "HASH", 
-            "AttributeName": "member-number"
+            "AttributeName": "member-number",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 20,
+          "WriteCapacityUnits": 10
+        }
+      },
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "MinimalTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
           }
         ]
-      }
+      },
+      "Type": "AWS::DynamoDB::Table"
     }
   }
 }

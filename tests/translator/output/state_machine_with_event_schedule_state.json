@@ -1,7 +1,6 @@
 {
   "Resources": {
     "ScheduledStateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine",
       "Properties": {
         "DefinitionS3Location": {
           "Bucket": "sam-demo-bucket",
@@ -14,10 +13,10 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
     },
     "ScheduledStateMachineSchedule1": {
-      "Type": "AWS::Events::Rule",
       "Properties": {
         "Description": "Test Schedule",
         "Name": "test-schedule",
@@ -37,13 +36,12 @@
             }
           }
         ]
-      }
+      },
+      "Type": "AWS::Events::Rule"
     },
     "ScheduledStateMachineSchedule1Role": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -56,11 +54,11 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "Policies": [
           {
-            "PolicyName": "ScheduledStateMachineSchedule1RoleStartExecutionPolicy",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -71,13 +69,14 @@
                   }
                 }
               ]
-            }
+            },
+            "PolicyName": "ScheduledStateMachineSchedule1RoleStartExecutionPolicy"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
     "ScheduledStateMachineSchedule2": {
-      "Type": "AWS::Events::Rule",
       "Properties": {
         "Description": "Test Schedule",
         "Name": "test-schedule",
@@ -99,13 +98,12 @@
             }
           }
         ]
-      }
+      },
+      "Type": "AWS::Events::Rule"
     },
     "ScheduledStateMachineSchedule2Role": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -118,11 +116,11 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "Policies": [
           {
-            "PolicyName": "ScheduledStateMachineSchedule2RoleStartExecutionPolicy",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -133,13 +131,14 @@
                   }
                 }
               ]
-            }
+            },
+            "PolicyName": "ScheduledStateMachineSchedule2RoleStartExecutionPolicy"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
     "ScheduledStateMachineSchedule3": {
-      "Type": "AWS::Events::Rule",
       "Properties": {
         "Description": "Test Schedule",
         "Name": "test-schedule",
@@ -161,13 +160,12 @@
             }
           }
         ]
-      }
+      },
+      "Type": "AWS::Events::Rule"
     },
     "ScheduledStateMachineSchedule3Role": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -180,11 +178,11 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "Policies": [
           {
-            "PolicyName": "ScheduledStateMachineSchedule3RoleStartExecutionPolicy",
             "PolicyDocument": {
               "Statement": [
                 {
@@ -195,10 +193,12 @@
                   }
                 }
               ]
-            }
+            },
+            "PolicyName": "ScheduledStateMachineSchedule3RoleStartExecutionPolicy"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

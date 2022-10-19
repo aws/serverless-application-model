@@ -1,67 +1,67 @@
 {
   "Parameters": {
     "TagValueParam": {
-      "Default": "value", 
+      "Default": "value",
       "Type": "String"
     }
-  }, 
+  },
   "Resources": {
-    "MyApiWithStageTagsDeployment5332c373d4": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "MyApiWithStageTags"
-        }, 
-        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7", 
-        "StageName": "Stage"
-      }
-    }, 
     "MyApiWithStageTags": {
-      "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
             "title": {
               "Ref": "AWS::StackName"
-            }
-          }, 
-          "paths": {}, 
+            },
+            "version": "1.0"
+          },
+          "paths": {},
           "swagger": "2.0"
         }
-      }
-    }, 
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyApiWithStageTagsDeployment5332c373d4": {
+      "Properties": {
+        "Description": "RestApi deployment id: 5332c373d45c69e6c0f562b4a419aa8eb311adc7",
+        "RestApiId": {
+          "Ref": "MyApiWithStageTags"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
     "MyApiWithStageTagsProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
       "Properties": {
         "DeploymentId": {
           "Ref": "MyApiWithStageTagsDeployment5332c373d4"
-        }, 
+        },
         "RestApiId": {
           "Ref": "MyApiWithStageTags"
-        }, 
-        "StageName": "Prod", 
+        },
+        "StageName": "Prod",
         "Tags": [
           {
-            "Value": "TagValue1", 
-            "Key": "TagKey1"
-          }, 
+            "Key": "TagKey1",
+            "Value": "TagValue1"
+          },
           {
-            "Value": "", 
-            "Key": "TagKey2"
-          }, 
+            "Key": "TagKey2",
+            "Value": ""
+          },
           {
+            "Key": "TagKey3",
             "Value": {
               "Ref": "TagValueParam"
-            }, 
-            "Key": "TagKey3"
-          }, 
+            }
+          },
           {
-            "Value": "123", 
-            "Key": "TagKey4"
+            "Key": "TagKey4",
+            "Value": "123"
           }
         ]
-      }
+      },
+      "Type": "AWS::ApiGateway::Stage"
     }
   }
 }

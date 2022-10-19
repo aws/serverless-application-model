@@ -1,13 +1,12 @@
 {
   "Resources": {
     "MyFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "hello.handler",
         "Code": {
           "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
         },
+        "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
             "MyFunctionRole",
@@ -17,65 +16,16 @@
         "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    },
-    "StateMachineRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "states.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [],
-        "Policies": [
-          {
-            "PolicyName": "StateMachineRolePolicy0",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Action": "lambda:InvokeFunction",
-                  "Resource": {
-                    "Fn::GetAtt": [
-                      "MyFunction",
-                      "Arn"
-                    ]
-                  },
-                  "Effect": "Allow"
-                }
-              ]
-            }
-          }
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "stateMachine:createdBy"
-          }
-        ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "MyFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -88,38 +38,23 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
     "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine",
       "Properties": {
-        "DefinitionSubstitutions": {
-          "definition_substitution_1": {
-            "Fn::GetAtt": [
-              "MyFunction",
-              "Arn"
-            ]
-          },
-          "my_state_var_1": "Pass",
-          "my_state_var_2": "Task"
-        },
-        "RoleArn": {
-          "Fn::GetAtt": [
-            "StateMachineRole",
-            "Arn"
-          ]
-        },
         "DefinitionString": {
           "Fn::Join": [
             "\n",
@@ -143,13 +78,78 @@
             ]
           ]
         },
+        "DefinitionSubstitutions": {
+          "definition_substitution_1": {
+            "Fn::GetAtt": [
+              "MyFunction",
+              "Arn"
+            ]
+          },
+          "my_state_var_1": "Pass",
+          "my_state_var_2": "Task"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "StateMachineRole",
+            "Arn"
+          ]
+        },
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "stateMachine:createdBy"
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "StateMachineRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "states.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [],
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "lambda:InvokeFunction",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "MyFunction",
+                      "Arn"
+                    ]
+                  }
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "StateMachineRolePolicy0"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

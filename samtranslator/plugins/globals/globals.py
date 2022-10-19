@@ -93,7 +93,7 @@ class Globals(object):
         :param dict template: SAM template to be parsed
         """
         self.supported_resource_section_names = [
-            x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties.keys()
+            x.replace(self._RESOURCE_PREFIX, "") for x in self.supported_properties
         ]
         # Sort the names for stability in list ordering
         self.supported_resource_section_names.sort()
@@ -202,7 +202,7 @@ class Globals(object):
             supported_displayed = [
                 prop for prop in supported if prop not in self.unreleased_properties.get(resource_type, [])
             ]
-            for key, value in properties.items():
+            for key, _ in properties.items():
                 if key not in supported:
                     raise InvalidGlobalsSectionException(
                         self._KEYWORD,
@@ -369,19 +369,16 @@ class GlobalProperties(object):
         if token_global != token_local:
             return self._prefer_local(global_value, local_value)
 
-        elif self.TOKEN.PRIMITIVE == token_global == token_local:
+        if self.TOKEN.PRIMITIVE == token_global == token_local:
             return self._prefer_local(global_value, local_value)
 
-        elif self.TOKEN.DICT == token_global == token_local:
+        if self.TOKEN.DICT == token_global == token_local:
             return self._merge_dict(global_value, local_value)
 
-        elif self.TOKEN.LIST == token_global == token_local:
+        if self.TOKEN.LIST == token_global == token_local:
             return self._merge_lists(global_value, local_value)
 
-        else:
-            raise TypeError(
-                "Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local)
-            )
+        raise TypeError("Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local))
 
     def _merge_lists(self, global_list, local_list):
         """
@@ -444,14 +441,12 @@ class GlobalProperties(object):
                 # Intrinsic functions are handled *exactly* like a primitive type because
                 # they resolve to a primitive type when creating a stack with CloudFormation
                 return self.TOKEN.PRIMITIVE
-            else:
-                return self.TOKEN.DICT
+            return self.TOKEN.DICT
 
-        elif isinstance(input, list):
+        if isinstance(input, list):
             return self.TOKEN.LIST
 
-        else:
-            return self.TOKEN.PRIMITIVE
+        return self.TOKEN.PRIMITIVE
 
     class TOKEN:
         """

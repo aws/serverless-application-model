@@ -17,11 +17,17 @@
         "PolicyDocument": {
           "Statement": [
             {
-              "Action": ["lambda:InvokeAsync", "lambda:InvokeFunction"],
+              "Action": [
+                "lambda:InvokeAsync",
+                "lambda:InvokeFunction"
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyFunction", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyFunction",
+                    "Arn"
+                  ]
                 }
               ]
             }
@@ -43,7 +49,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -60,10 +69,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],
@@ -102,11 +115,17 @@
         },
         "DefinitionSubstitutions": {
           "definition_substitution_1": {
-            "Fn::GetAtt": ["StateMachineFunction", "Arn"]
+            "Fn::GetAtt": [
+              "StateMachineFunction",
+              "Arn"
+            ]
           }
         },
         "RoleArn": {
-          "Fn::GetAtt": ["MyStateMachineRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyStateMachineRole",
+            "Arn"
+          ]
         },
         "StateMachineType": "EXPRESS",
         "Tags": [
@@ -123,10 +142,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["states.amazonaws.com"]
+                "Service": [
+                  "states.amazonaws.com"
+                ]
               }
             }
           ],
@@ -138,7 +161,9 @@
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Action": ["lambda:InvokeFunction"],
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
                   "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
