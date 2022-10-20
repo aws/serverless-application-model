@@ -337,9 +337,7 @@ class SwaggerEditor(object):
 
         for path_item in self.get_conditional_contents(self.paths.get(path_name)):  # type: ignore[no-untyped-call]
             for method_definition in self.get_conditional_contents(path_item.get(normalized_method_name)):  # type: ignore[no-untyped-call]
-                if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
-                    method_definition
-                ):  # type: ignore[no-untyped-call]
+                if skip_methods_without_apigw_integration and not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                     continue
                 yield method_definition
 
@@ -364,9 +362,7 @@ class SwaggerEditor(object):
                             method_name, method_definition, path_name
                         ),
                     )
-                    if skip_methods_without_apigw_integration and not self.method_definition_has_integration(
-                        method_definition
-                    ):  # type: ignore[no-untyped-call]
+                    if skip_methods_without_apigw_integration and not self.method_definition_has_integration(method_definition):  # type: ignore[no-untyped-call]
                         continue
                     normalized_method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
                     yield normalized_method_name, method_definition
