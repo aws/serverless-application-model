@@ -1,25 +1,25 @@
 {
-    "Resources": {
-        "StateMachine": {
-            "Type": "AWS::StepFunctions::StateMachine",
-            "Properties": {
-                "Tags": [
-                    {
-                        "Value": "SAM",
-                        "Key": "stateMachine:createdBy"
-                    }
-                ],
-                "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
-                "StateMachineName": "MyStateMachineWithXRayTracing",
-                "TracingConfiguration": {
-                    "Enabled": true
-                },
-                "StateMachineType": "STANDARD",
-                "DefinitionS3Location": {
-                    "Bucket": "sam-demo-bucket",
-                    "Key": "my-state-machine.asl.json"
-                }
-            }
+  "Resources": {
+    "StateMachine": {
+      "Properties": {
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my-state-machine.asl.json"
+        },
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
+        "StateMachineName": "MyStateMachineWithXRayTracing",
+        "StateMachineType": "STANDARD",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ],
+        "TracingConfiguration": {
+          "Enabled": true
         }
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
     }
+  }
 }

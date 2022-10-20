@@ -1,80 +1,80 @@
 {
   "Resources": {
-    "StateMachineScheduleEvent": {
-      "Type": "AWS::Events::Rule", 
+    "StateMachine": {
       "Properties": {
-        "State": "DISABLED", 
-        "ScheduleExpression": "rate(1 minute)", 
-        "Name": "TestSchedule", 
-        "Description": "test schedule", 
+        "DefinitionS3Location": {
+          "Bucket": "sam-demo-bucket",
+          "Key": "my_state_machine.asl.json"
+        },
+        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole",
+        "Tags": [
+          {
+            "Key": "stateMachine:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::StepFunctions::StateMachine"
+    },
+    "StateMachineScheduleEvent": {
+      "Properties": {
+        "Description": "test schedule",
+        "Name": "TestSchedule",
+        "ScheduleExpression": "rate(1 minute)",
+        "State": "DISABLED",
         "Targets": [
           {
-            "RoleArn": {
-              "Fn::GetAtt": [
-                "StateMachineScheduleEventRole", 
-                "Arn"
-              ]
-            }, 
-            "Id": "StateMachineScheduleEventStepFunctionsTarget", 
             "Arn": {
               "Ref": "StateMachine"
+            },
+            "Id": "StateMachineScheduleEventStepFunctionsTarget",
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "StateMachineScheduleEventRole",
+                "Arn"
+              ]
             }
           }
         ]
-      }
-    }, 
+      },
+      "Type": "AWS::Events::Rule"
+    },
     "StateMachineScheduleEventRole": {
-      "Type": "AWS::IAM::Role", 
       "Properties": {
-        "Policies": [
-          {
-            "PolicyName": "StateMachineScheduleEventRoleStartExecutionPolicy", 
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": "states:StartExecution", 
-                  "Resource": {
-                    "Ref": "StateMachine"
-                  }, 
-                  "Effect": "Allow"
-                }
-              ]
-            }
-          }
-        ], 
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "events.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "StateMachine": {
-      "Type": "AWS::StepFunctions::StateMachine", 
-      "Properties": {
-        "RoleArn": "arn:aws:iam::123456123456:role/service-role/SampleRole", 
-        "DefinitionS3Location": {
-          "Bucket": "sam-demo-bucket", 
-          "Key": "my_state_machine.asl.json"
-        }, 
-        "Tags": [
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
           {
-            "Value": "SAM", 
-            "Key": "stateMachine:createdBy"
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": "states:StartExecution",
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Ref": "StateMachine"
+                  }
+                }
+              ]
+            },
+            "PolicyName": "StateMachineScheduleEventRoleStartExecutionPolicy"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

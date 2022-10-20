@@ -12,7 +12,7 @@ Resources:
 
   Bucket:
     # See also https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfig.html
-    DependsOn: [MyConnectorWriteLambdaPermission]
+    DependsOn: MyConnector
     Type: AWS::S3::Bucket
     Properties:
       BucketName: 'random-bucket-name'

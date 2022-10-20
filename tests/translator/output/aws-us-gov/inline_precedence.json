@@ -1,56 +1,56 @@
 {
-    "Resources": {
-      "HelloWorldFunctionRole": {
-        "Type": "AWS::IAM::Role",
-        "Properties": {
-          "AssumeRolePolicyDocument": {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Action": [
-                  "sts:AssumeRole"
-                ],
-                "Effect": "Allow",
-                "Principal": {
-                  "Service": [
-                    "lambda.amazonaws.com"
-                  ]
-                }
-              }
-            ]
-          },
-          "ManagedPolicyArns": [
-            "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          ],
-          "Tags": [
-            {
-              "Value": "SAM",
-              "Key": "lambda:createdBy"
-            }
+  "Resources": {
+    "HelloWorldFunction": {
+      "Properties": {
+        "Code": {
+          "ZipFile": "\"def lambda_handler():\n    pass\"\n"
+        },
+        "Handler": "index.lambda_handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "HelloWorldFunctionRole",
+            "Arn"
           ]
-        }
+        },
+        "Runtime": "python3.8",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
       },
-      "HelloWorldFunction": {
-        "Type": "AWS::Lambda::Function",
-        "Properties": {
-          "Handler": "index.lambda_handler",
-          "Code": {
-            "ZipFile": "\"def lambda_handler():\n    pass\"\n"
-          },
-          "Role": {
-            "Fn::GetAtt": [
-              "HelloWorldFunctionRole",
-              "Arn"
-            ]
-          },
-          "Runtime": "python3.8",
-          "Tags": [
+      "Type": "AWS::Lambda::Function"
+    },
+    "HelloWorldFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
             {
-              "Value": "SAM",
-              "Key": "lambda:createdBy"
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
             }
-          ]
-        }
-      }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
+}

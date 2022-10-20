@@ -1,85 +1,27 @@
 {
   "Resources": {
-    "HtmlApiDeploymentfa918fe8b6": {
-      "Type": "AWS::ApiGateway::Deployment", 
-      "Properties": {
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "Description": "RestApi deployment id: fa918fe8b68f65e882542b900cc422005ea1a7f6"
-      }
-    }, 
-    "HtmlFunctionRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }, 
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    }, 
-    "HtmlApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage", 
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "HtmlApiDeploymentfa918fe8b6"
-        }, 
-        "RestApiId": {
-          "Ref": "HtmlApi"
-        }, 
-        "StageName": "Prod"
-      }
-    }, 
-    "HtmlFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "HtmlFunction"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": "HtmlApi"
-            }
-          ]
-        }
-      }
-    }, 
     "HtmlApi": {
-      "Type": "AWS::ApiGateway::RestApi", 
       "Properties": {
         "Body": {
+          "components": {
+            "schemas": {
+              "user": {
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
           "info": {
-            "version": "1.0", 
             "title": {
               "Ref": "AWS::StackName"
-            }
-          }, 
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0",
           "paths": {
             "/": {
               "get": {
@@ -90,73 +32,131 @@
                         "$ref": "#/components/schemas/user"
                       }
                     }
-                  }, 
+                  },
                   "required": true
-                }, 
+                },
+                "responses": {},
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HtmlFunction.Arn}/invocations"
                   }
-                }, 
-                "x-amazon-apigateway-request-validator": "body-and-params", 
-                "responses": {}
+                },
+                "x-amazon-apigateway-request-validator": "body-and-params"
               }
             }
-          }, 
-          "openapi": "3.0", 
-          "components": {
-            "schemas": {
-              "user": {
-                "type": "object", 
-                "properties": {
-                  "username": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }, 
+          },
           "x-amazon-apigateway-request-validators": {
             "body-and-params": {
-              "validateRequestParameters": true, 
-              "validateRequestBody": true
+              "validateRequestBody": true,
+              "validateRequestParameters": true
             }
           }
-        }, 
+        },
         "EndpointConfiguration": {
           "Types": [
             "REGIONAL"
           ]
-        }, 
+        },
         "Parameters": {
           "endpointConfigurationTypes": "REGIONAL"
         }
-      }
-    }, 
-    "HtmlFunction": {
-      "Type": "AWS::Lambda::Function", 
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "HtmlApiDeploymentfa918fe8b6": {
       "Properties": {
-        "Handler": "index.gethtml", 
+        "Description": "RestApi deployment id: fa918fe8b68f65e882542b900cc422005ea1a7f6",
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        }
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "HtmlApiProdStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "HtmlApiDeploymentfa918fe8b6"
+        },
+        "RestApiId": {
+          "Ref": "HtmlApi"
+        },
+        "StageName": "Prod"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
+    "HtmlFunction": {
+      "Properties": {
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "member_portal.zip"
-        }, 
+        },
+        "Handler": "index.gethtml",
         "Role": {
           "Fn::GetAtt": [
-            "HtmlFunctionRole", 
+            "HtmlFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "nodejs12.x", 
+        },
+        "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "HtmlFunctionGetHtmlPermissionProd": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "HtmlFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            {
+              "__ApiId__": "HtmlApi",
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "HtmlFunctionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

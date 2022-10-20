@@ -2,66 +2,66 @@
   "Conditions": {
     "TestCondition": {
       "Fn::Equals": [
-        "test", 
+        "test",
         "test"
       ]
     }
-  }, 
+  },
   "Resources": {
     "ConditionFunction": {
-      "Type": "AWS::Lambda::Function", 
+      "Condition": "TestCondition",
       "Properties": {
-        "Handler": "hello.handler", 
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
-        }, 
+        },
+        "Handler": "hello.handler",
         "Role": {
           "Fn::GetAtt": [
-            "ConditionFunctionRole", 
+            "ConditionFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7", 
+        },
+        "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }, 
-      "Condition": "TestCondition"
-    }, 
+      },
+      "Type": "AWS::Lambda::Function"
+    },
     "ConditionFunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      "Condition": "TestCondition",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }, 
-      "Condition": "TestCondition"
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

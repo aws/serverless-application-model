@@ -33,7 +33,10 @@
                 "Service": "sns.amazonaws.com"
               },
               "Resource": {
-                "Fn::GetAtt": ["MyQueue1", "Arn"]
+                "Fn::GetAtt": [
+                  "MyQueue1",
+                  "Arn"
+                ]
               }
             }
           ],
@@ -80,7 +83,10 @@
                 "Service": "sns.amazonaws.com"
               },
               "Resource": {
-                "Fn::GetAtt": ["MyQueue2", "Arn"]
+                "Fn::GetAtt": [
+                  "MyQueue2",
+                  "Arn"
+                ]
               }
             }
           ],
@@ -99,13 +105,19 @@
         "Subscription": [
           {
             "Endpoint": {
-              "Fn::GetAtt": ["MyQueue1", "Arn"]
+              "Fn::GetAtt": [
+                "MyQueue1",
+                "Arn"
+              ]
             },
             "Protocol": "sqs"
           },
           {
             "Endpoint": {
-              "Fn::GetAtt": ["MyQueue2", "Arn"]
+              "Fn::GetAtt": [
+                "MyQueue2",
+                "Arn"
+              ]
             },
             "Protocol": "sqs"
           }

@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ApiResource] is invalid. Invalid property type 'int' for GatewayResponses. Expected an object of type 'GatewayResponse'.",
   "errors": [
     {
       "errorMessage": "Resource with id [ApiResource] is invalid. Invalid property type 'int' for GatewayResponses. Expected an object of type 'GatewayResponse'."
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [ApiResource] is invalid. Invalid property type 'int' for GatewayResponses. Expected an object of type 'GatewayResponse'."
+  ]
 }

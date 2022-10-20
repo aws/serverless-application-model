@@ -1,161 +1,161 @@
 {
   "Resources": {
-    "Function": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Handler": "index.handler", 
-        "Code": {
-          "S3Bucket": "bucket", 
-          "S3Key": "key"
-        }, 
-        "Role": {
-          "Fn::GetAtt": [
-            "FunctionRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "python3.7", 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    }, 
-    "FunctionApiPermission": {
-      "Type": "AWS::Lambda::Permission", 
-      "Properties": {
-        "Action": "lambda:InvokeFunction", 
-        "Principal": "apigateway.amazonaws.com", 
-        "FunctionName": {
-          "Ref": "Function"
-        }, 
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*", 
-            {
-              "__Stage__": "*", 
-              "__ApiId__": {
-                "Ref": "ServerlessHttpApi"
-              }
-            }
-          ]
-        }
-      }
-    }, 
     "Api": {
-      "Type": "AWS::ApiGatewayV2::Api", 
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
             "title": {
               "Ref": "AWS::StackName"
-            }
-          }, 
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
+          "paths": {},
           "tags": [
             {
-              "name": "httpapi:createdBy", 
+              "name": "httpapi:createdBy",
               "x-amazon-apigateway-tag-value": "SAM"
             }
-          ], 
-          "paths": {}, 
-          "openapi": "3.0.1"
+          ]
         }
-      }
-    }, 
-    "FunctionRole": {
-      "Type": "AWS::IAM::Role", 
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
+    "ApiApiGatewayDefaultStage": {
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ], 
+        "ApiId": {
+          "Ref": "Api"
+        },
+        "AutoDeploy": true,
+        "StageName": "$default",
+        "Tags": {
+          "httpapi:createdBy": "SAM"
+        }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
+    },
+    "Function": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bucket",
+          "S3Key": "key"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionApiPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "Function"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessHttpApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
+    },
+    "FunctionRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }, 
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
-    }, 
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "ServerlessHttpApi": {
-      "Type": "AWS::ApiGatewayV2::Api", 
       "Properties": {
         "Body": {
           "info": {
-            "version": "1.0", 
             "title": {
               "Ref": "AWS::StackName"
-            }
-          }, 
-          "tags": [
-            {
-              "name": "httpapi:createdBy", 
-              "x-amazon-apigateway-tag-value": "SAM"
-            }
-          ], 
+            },
+            "version": "1.0"
+          },
+          "openapi": "3.0.1",
           "paths": {
             "$default": {
               "x-amazon-apigateway-any-method": {
+                "isDefaultRoute": true,
+                "responses": {},
                 "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST", 
-                  "type": "aws_proxy", 
+                  "httpMethod": "POST",
+                  "payloadFormatVersion": "2.0",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations"
-                  }, 
-                  "payloadFormatVersion": "2.0"
-                }, 
-                "isDefaultRoute": true, 
-                "responses": {}
+                  }
+                }
               }
             }
-          }, 
-          "openapi": "3.0.1"
+          },
+          "tags": [
+            {
+              "name": "httpapi:createdBy",
+              "x-amazon-apigateway-tag-value": "SAM"
+            }
+          ]
         }
-      }
-    }, 
+      },
+      "Type": "AWS::ApiGatewayV2::Api"
+    },
     "ServerlessHttpApiApiGatewayDefaultStage": {
-      "Type": "AWS::ApiGatewayV2::Stage", 
       "Properties": {
         "ApiId": {
           "Ref": "ServerlessHttpApi"
-        }, 
-        "AutoDeploy": true, 
-        "StageName": "$default", 
+        },
+        "AutoDeploy": true,
+        "StageName": "$default",
         "Tags": {
           "httpapi:createdBy": "SAM"
         }
-      }
-    }, 
-    "ApiApiGatewayDefaultStage": {
-      "Type": "AWS::ApiGatewayV2::Stage", 
-      "Properties": {
-        "ApiId": {
-          "Ref": "Api"
-        }, 
-        "AutoDeploy": true, 
-        "StageName": "$default", 
-        "Tags": {
-          "httpapi:createdBy": "SAM"
-        }
-      }
+      },
+      "Type": "AWS::ApiGatewayV2::Stage"
     }
   }
 }

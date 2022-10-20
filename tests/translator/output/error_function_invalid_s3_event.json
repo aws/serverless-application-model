@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [FunctionInvalidS3EventS3Event] is invalid. Type of property 'Events' is invalid.",
   "errors": [
     {
       "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [FunctionInvalidS3EventS3Event] is invalid. Type of property 'Events' is invalid."
     }
-  ],
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [FunctionInvalidS3EventS3Event] is invalid. Type of property 'Events' is invalid."
+  ]
 }

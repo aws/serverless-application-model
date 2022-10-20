@@ -1,7 +1,42 @@
 {
   "Resources": {
+    "MyExplicitApi": {
+      "DependsOn": "MySamTable",
+      "Properties": {
+        "BodyS3Location": {
+          "Bucket": "sam-translator-tests-dont-delete",
+          "Key": "swagger-http.json"
+        }
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "MyExplicitApiDeployment74b681ce04": {
+      "Properties": {
+        "Description": "RestApi deployment id: 74b681ce04601a2cf69b6d05d53782b216cf96bb",
+        "RestApiId": {
+          "Ref": "MyExplicitApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
+    },
+    "MyExplicitApidevStage": {
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MyExplicitApiDeployment74b681ce04"
+        },
+        "RestApiId": {
+          "Ref": "MyExplicitApi"
+        },
+        "StageName": "dev"
+      },
+      "Type": "AWS::ApiGateway::Stage"
+    },
     "MyFunction": {
-      "Type": "AWS::Lambda::Function",
+      "DependsOn": [
+        "MyExplicitApi",
+        "MySamTable"
+      ],
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -17,105 +52,35 @@
         "Runtime": "nodejs12.x",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
       },
-      "DependsOn": [
-        "MyExplicitApi",
-        "MySamTable"
-      ]
+      "Type": "AWS::Lambda::Function"
     },
-    "MyExplicitApiDeployment74b681ce04": {
-      "Type": "AWS::ApiGateway::Deployment",
+    "MyFunctionMyApiPermissiondev": {
       "Properties": {
-        "RestApiId": {
-          "Ref": "MyExplicitApi"
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "MyFunction"
         },
-        "Description": "RestApi deployment id: 74b681ce04601a2cf69b6d05d53782b216cf96bb",
-        "StageName": "Stage"
-      }
-    },
-    "MyExplicitApi": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "BodyS3Location": {
-          "Bucket": "sam-translator-tests-dont-delete",
-          "Key": "swagger-http.json"
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            {
+              "__ApiId__": "MyExplicitApi",
+              "__Stage__": "*"
+            }
+          ]
         }
       },
-      "DependsOn": "MySamTable"
-    },
-    "MyOtherTable": {
-      "Type": "AWS::DynamoDB::Table",
-      "Properties": {
-        "KeySchema": [
-          {
-            "KeyType": "HASH",
-            "AttributeName": "id"
-          }
-        ],
-        "StreamSpecification": {
-          "StreamViewType": "NEW_IMAGE"
-        },
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "id",
-            "AttributeType": "S"
-          }
-        ],
-        "ProvisionedThroughput": {
-          "WriteCapacityUnits": 5,
-          "ReadCapacityUnits": 5
-        }
-      },
-      "DependsOn": "MySamTable"
-    },
-    "MyExplicitApidevStage": {
-      "Type": "AWS::ApiGateway::Stage",
-      "Properties": {
-        "DeploymentId": {
-          "Ref": "MyExplicitApiDeployment74b681ce04"
-        },
-        "RestApiId": {
-          "Ref": "MyExplicitApi"
-        },
-        "StageName": "dev"
-      }
-    },
-    "MySamTable": {
-      "Type": "AWS::DynamoDB::Table",
-      "Properties": {
-        "BillingMode": "PAY_PER_REQUEST",
-        "AttributeDefinitions": [
-          {
-            "AttributeName": "id",
-            "AttributeType": "S"
-          }
-        ],
-        "KeySchema": [
-          {
-            "KeyType": "HASH",
-            "AttributeName": "id"
-          }
-        ]
-      }
+      "Type": "AWS::Lambda::Permission"
     },
     "MyFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -128,28 +93,63 @@
                 ]
               }
             }
-          ]
-        }
-      }
-    },
-    "MyFunctionMyApiPermissiondev": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "MyFunction"
+          ],
+          "Version": "2012-10-17"
         },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
-            {
-              "__Stage__": "*",
-              "__ApiId__": "MyExplicitApi"
-            }
-          ]
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyOtherTable": {
+      "DependsOn": "MySamTable",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 5,
+          "WriteCapacityUnits": 5
+        },
+        "StreamSpecification": {
+          "StreamViewType": "NEW_IMAGE"
         }
-      }
+      },
+      "Type": "AWS::DynamoDB::Table"
+    },
+    "MySamTable": {
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ]
+      },
+      "Type": "AWS::DynamoDB::Table"
     }
   }
 }

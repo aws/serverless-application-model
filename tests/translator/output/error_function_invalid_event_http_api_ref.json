@@ -1,8 +1,8 @@
 {
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [FunctionApiHttpApiRefError] is invalid. Event with id [ApiEvent] is invalid. Api Event's ApiId must be a string referencing an Api in the same template.",
   "errors": [
     {
       "errorMessage": "Resource with id [FunctionApiHttpApiRefError] is invalid. Event with id [ApiEvent] is invalid. Api Event's ApiId must be a string referencing an Api in the same template."
     }
-  ], 
-  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [FunctionApiHttpApiRefError] is invalid. Event with id [ApiEvent] is invalid. Api Event's ApiId must be a string referencing an Api in the same template."
+  ]
 }

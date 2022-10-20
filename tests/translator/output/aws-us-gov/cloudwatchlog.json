@@ -1,23 +1,6 @@
 {
   "Resources": {
-    "TriggeredFunctionCWLogEvent": {
-      "Type": "AWS::Logs::SubscriptionFilter",
-      "Properties": {
-        "DestinationArn": {
-          "Fn::GetAtt": [
-            "TriggeredFunction",
-            "Arn"
-          ]
-        },
-        "FilterPattern": "My filter pattern",
-        "LogGroupName": "MyCWLogGroup"
-      },
-      "DependsOn": [
-        "TriggeredFunctionCWLogEventPermission"
-      ]
-    },
     "TriggeredFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -34,26 +17,50 @@
         "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "TriggeredFunctionCWLogEvent": {
+      "DependsOn": [
+        "TriggeredFunctionCWLogEventPermission"
+      ],
+      "Properties": {
+        "DestinationArn": {
+          "Fn::GetAtt": [
+            "TriggeredFunction",
+            "Arn"
+          ]
+        },
+        "FilterPattern": "My filter pattern",
+        "LogGroupName": "MyCWLogGroup"
+      },
+      "Type": "AWS::Logs::SubscriptionFilter"
+    },
+    "TriggeredFunctionCWLogEventPermission": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "TriggeredFunction"
+        },
+        "Principal": "logs.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-us-gov:logs:${AWS::Region}:${AWS::AccountId}:log-group:${__LogGroupName__}:*",
+            {
+              "__LogGroupName__": "MyCWLogGroup"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
     "TriggeredFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -66,27 +73,20 @@
                 ]
               }
             }
-          ]
-        }
-      }
-    },
-    "TriggeredFunctionCWLogEventPermission": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "logs.amazonaws.com",
-        "FunctionName": {
-          "Ref": "TriggeredFunction"
+          ],
+          "Version": "2012-10-17"
         },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-us-gov:logs:${AWS::Region}:${AWS::AccountId}:log-group:${__LogGroupName__}:*",
-            {
-              "__LogGroupName__": "MyCWLogGroup"
-            }
-          ]
-        }
-      }
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
     }
   }
 }

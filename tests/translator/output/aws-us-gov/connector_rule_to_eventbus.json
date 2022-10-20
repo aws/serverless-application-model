@@ -25,11 +25,16 @@
         "PolicyDocument": {
           "Statement": [
             {
-              "Action": ["events:PutEvents"],
+              "Action": [
+                "events:PutEvents"
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["EventBus", "Arn"]
+                  "Fn::GetAtt": [
+                    "EventBus",
+                    "Arn"
+                  ]
                 }
               ]
             }
@@ -61,7 +66,9 @@
         "PolicyDocument": {
           "Statement": [
             {
-              "Action": ["events:PutEvents"],
+              "Action": [
+                "events:PutEvents"
+              ],
               "Effect": "Allow",
               "Resource": [
                 {
@@ -83,18 +90,26 @@
     "MyNewEventsRule": {
       "Properties": {
         "EventPattern": {
-          "source": ["aws.ec2"]
+          "source": [
+            "aws.ec2"
+          ]
         },
         "Name": "mynewabc",
         "State": "ENABLED",
         "Targets": [
           {
             "Arn": {
-              "Fn::GetAtt": ["EventBus", "Arn"]
+              "Fn::GetAtt": [
+                "EventBus",
+                "Arn"
+              ]
             },
             "Id": "EventBus",
             "RoleArn": {
-              "Fn::GetAtt": ["MyRuleRole", "Arn"]
+              "Fn::GetAtt": [
+                "MyRuleRole",
+                "Arn"
+              ]
             }
           }
         ]
@@ -104,7 +119,9 @@
     "MyNewEventsRuleToDefaultBus": {
       "Properties": {
         "EventPattern": {
-          "source": ["aws.ec2"]
+          "source": [
+            "aws.ec2"
+          ]
         },
         "Name": "mynewabc",
         "State": "ENABLED",
@@ -115,7 +132,10 @@
             },
             "Id": "EventBus",
             "RoleArn": {
-              "Fn::GetAtt": ["MyRuleRole", "Arn"]
+              "Fn::GetAtt": [
+                "MyRuleRole",
+                "Arn"
+              ]
             }
           }
         ]

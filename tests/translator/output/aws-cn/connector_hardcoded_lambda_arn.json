@@ -19,7 +19,10 @@
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
-          "Fn::GetAtt": ["SomeLambda", "Arn"]
+          "Fn::GetAtt": [
+            "SomeLambda",
+            "Arn"
+          ]
         },
         "Principal": "sns.amazonaws.com",
         "SourceArn": {

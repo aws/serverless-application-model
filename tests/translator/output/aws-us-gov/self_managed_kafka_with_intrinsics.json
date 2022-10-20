@@ -1,38 +1,28 @@
 {
   "Parameters": {
     "BatchSizeValue": {
-      "Type": "Number",
-      "Default": 100
-    },
-    "EnableValue": {
-      "Type": "String",
-      "Default": true
-    },
-    "TopicsValue": {
-      "Type": "CommaDelimitedList",
-      "Default": "Topic"
-    },
-    "KafkaBootstrapServersValue": {
-      "Type": "CommaDelimitedList",
-      "Default": "abc.xyz.com:9092,123.45.67.89:9096"
+      "Default": 100,
+      "Type": "Number"
     },
     "ConsumerGroupValue": {
-      "Type": "String",
-      "Default": "consumergroup1"
+      "Default": "consumergroup1",
+      "Type": "String"
+    },
+    "EnableValue": {
+      "Default": true,
+      "Type": "String"
+    },
+    "KafkaBootstrapServersValue": {
+      "Default": "abc.xyz.com:9092,123.45.67.89:9096",
+      "Type": "CommaDelimitedList"
+    },
+    "TopicsValue": {
+      "Default": "Topic",
+      "Type": "CommaDelimitedList"
     }
   },
   "Resources": {
-    "KafkaUserSecret": {
-      "Type": "AWS::SecretsManager::Secret",
-      "Properties": {
-        "Name": "KafkaUserPassword",
-        "SecretString": {
-          "Fn::Sub": "{\"username\":\"testBrokerUser\",\"password\":\"testBrokerPassword\"}"
-        }
-      }
-    },
     "KafkaFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -52,13 +42,57 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "KafkaFunctionMyKafkaCluster": {
+      "Properties": {
+        "BatchSize": {
+          "Ref": "BatchSizeValue"
+        },
+        "Enabled": {
+          "Ref": "EnableValue"
+        },
+        "FunctionName": {
+          "Ref": "KafkaFunction"
+        },
+        "SelfManagedEventSource": {
+          "Endpoints": {
+            "KafkaBootstrapServers": {
+              "Ref": "KafkaBootstrapServersValue"
+            }
+          }
+        },
+        "SelfManagedKafkaEventSourceConfig": {
+          "ConsumerGroupId": {
+            "Ref": "ConsumerGroupValue"
+          }
+        },
+        "SourceAccessConfigurations": [
+          {
+            "Type": "VPC_SUBNET",
+            "URI": "subnet:subnet-12345"
+          },
+          {
+            "Type": "VPC_SECURITY_GROUP",
+            "URI": "security_group:sg-67890"
+          },
+          {
+            "Type": "BASIC_AUTH",
+            "URI": {
+              "Ref": "KafkaUserSecret"
+            }
+          }
+        ],
+        "Topics": {
+          "Ref": "TopicsValue"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
     },
     "KafkaFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -71,7 +105,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -113,52 +148,17 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
-    "KafkaFunctionMyKafkaCluster": {
-      "Type": "AWS::Lambda::EventSourceMapping",
+    "KafkaUserSecret": {
       "Properties": {
-        "BatchSize": {
-          "Ref": "BatchSizeValue"
-        },
-        "Enabled": {
-          "Ref": "EnableValue"
-        },
-        "FunctionName": {
-          "Ref": "KafkaFunction"
-        },
-        "Topics": {
-          "Ref": "TopicsValue"
-        },
-        "SourceAccessConfigurations": [
-          {
-            "Type": "VPC_SUBNET",
-            "URI": "subnet:subnet-12345"
-          },
-          {
-            "Type": "VPC_SECURITY_GROUP",
-            "URI": "security_group:sg-67890"
-          },
-          {
-            "Type": "BASIC_AUTH",
-            "URI": {
-              "Ref": "KafkaUserSecret"
-            }
-          }
-        ],
-        "SelfManagedEventSource": {
-          "Endpoints": {
-            "KafkaBootstrapServers": {
-              "Ref": "KafkaBootstrapServersValue"
-            }
-          }
-        },
-        "SelfManagedKafkaEventSourceConfig": {
-          "ConsumerGroupId": {
-            "Ref": "ConsumerGroupValue"
-          }
+        "Name": "KafkaUserPassword",
+        "SecretString": {
+          "Fn::Sub": "{\"username\":\"testBrokerUser\",\"password\":\"testBrokerPassword\"}"
         }
-      }
+      },
+      "Type": "AWS::SecretsManager::Secret"
     }
   }
 }
