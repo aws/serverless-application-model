@@ -1,8 +1,9 @@
 from collections import namedtuple
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from samtranslator.model import ResourceResolver
 from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
+from samtranslator.utils.utils import as_array, insert_unique
 
 
 # TODO: Switch to dataclass
@@ -31,10 +32,6 @@ def _is_nonblank_str(s: Any) -> bool:
     return s and isinstance(s, str)
 
 
-def _as_array(x: Any):
-    return x if isinstance(x, list) else [x]
-
-
 def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver):
     """
     Add DependsOn attribute to resource.
@@ -43,11 +40,21 @@ def add_depends_on(logical_id: str, depends_on: str, resource_resolver: Resource
     if not resource:
         return
 
-    deps = _as_array(resource.get("DependsOn", []))
-    if depends_on not in deps:
-        deps.append(depends_on)
+    old_deps = resource.get("DependsOn", [])
+    deps = insert_unique(old_deps, depends_on)
 
     resource["DependsOn"] = deps
+
+
+def replace_depends_on_logical_id(logical_id: str, replacement: List[str], resource_resolver: ResourceResolver) -> None:
+    """
+    For every resource's `DependsOn`, replace `logical_id` by `replacement`.
+    """
+    for resource in resource_resolver.get_all_resources().values():
+        depends_on = as_array(resource.get("DependsOn", []))
+        if logical_id in depends_on:
+            depends_on.remove(logical_id)
+            resource["DependsOn"] = insert_unique(depends_on, replacement)
 
 
 def get_event_source_mappings(event_source_id: str, function_id: str, resource_resolver: ResourceResolver):
