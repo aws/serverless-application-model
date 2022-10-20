@@ -13,7 +13,7 @@ class SwaggerEditor(object):
     pass the Swagger spec. But this is necessary for SAM because it iteratively builds the Swagger starting from an
     empty skeleton.
 
-    NOTE (hawflau): To ensure the same logical ID will be generate in Py3 as in Py2 for AWS::Serverless::Api resource,
+    NOTE (hawflau): To ensure the same logical ID will be generated in Py3 as in Py2 for AWS::Serverless::Api resource,
     we have to apply py27hash_fix. For any dictionary that is created within the swagger body, we need to initiate it
     with Py27Dict() instead of {}. We also need to add keys into the Py27Dict instance one by one, so that the input
     order could be preserved. This is a must for the purpose of preserving the dict key iteration order, which is
@@ -37,6 +37,7 @@ class SwaggerEditor(object):
     _POLICY_TYPE_IAM = "Iam"
     _POLICY_TYPE_IP = "Ip"
     _POLICY_TYPE_VPC = "Vpc"
+    _SERVERS = "servers"
 
     def __init__(self, doc):
         """
@@ -131,12 +132,25 @@ class SwaggerEditor(object):
         https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-swagger-extensions-endpoint-configuration.html
         :param boolean disable_execute_api_endpoint: Specifies whether clients can invoke your API by using the default execute-api endpoint.
         """
-        if not self._doc.get(self._X_ENDPOINT_CONFIG):
-            self._doc[self._X_ENDPOINT_CONFIG] = {}
-
         DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
         set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
-        self._doc[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
+
+        # Check if the OpenAPI version is 3.0
+        if self._doc.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]
+        ):
+            # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
+            servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
+            for config in servers_configurations:
+                if not config.get(self._X_ENDPOINT_CONFIG):
+                    config[self._X_ENDPOINT_CONFIG] = {}
+                config[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
+
+            self._doc[self._SERVERS] = servers_configurations
+        else:
+            if not self._doc.get(self._X_ENDPOINT_CONFIG):
+                self._doc[self._X_ENDPOINT_CONFIG] = {}
+            self._doc[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
 
     def has_integration(self, path, method):
         """
@@ -1258,7 +1272,6 @@ class SwaggerEditor(object):
                 existing_parameters.append(parameter)
 
                 if request_parameter["Caching"]:
-
                     integration = method_definition[self._X_APIGW_INTEGRATION]
                     cache_parameters = integration.get(self._CACHE_KEY_PARAMETERS, [])
                     cache_parameters.append(parameter_name)
