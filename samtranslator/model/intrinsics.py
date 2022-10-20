@@ -1,40 +1,40 @@
-def fnGetAtt(logical_name, attribute_name):
+def fnGetAtt(logical_name, attribute_name):  # type: ignore[no-untyped-def]
     return {"Fn::GetAtt": [logical_name, attribute_name]}
 
 
-def ref(logical_name):
+def ref(logical_name):  # type: ignore[no-untyped-def]
     return {"Ref": logical_name}
 
 
-def fnJoin(delimiter, values):
+def fnJoin(delimiter, values):  # type: ignore[no-untyped-def]
     return {"Fn::Join": [delimiter, values]}
 
 
-def fnSub(string, variables=None):
+def fnSub(string, variables=None):  # type: ignore[no-untyped-def]
     if variables:
         return {"Fn::Sub": [string, variables]}
     return {"Fn::Sub": string}
 
 
-def fnOr(argument_list):
+def fnOr(argument_list):  # type: ignore[no-untyped-def]
     return {"Fn::Or": argument_list}
 
 
-def fnAnd(argument_list):
+def fnAnd(argument_list):  # type: ignore[no-untyped-def]
     return {"Fn::And": argument_list}
 
 
-def make_conditional(condition, true_data, false_data=None):
+def make_conditional(condition, true_data, false_data=None):  # type: ignore[no-untyped-def]
     if false_data is None:
         false_data = {"Ref": "AWS::NoValue"}
     return {"Fn::If": [condition, true_data, false_data]}
 
 
-def make_not_conditional(condition):
+def make_not_conditional(condition):  # type: ignore[no-untyped-def]
     return {"Fn::Not": [{"Condition": condition}]}
 
 
-def make_condition_or_list(conditions_list):
+def make_condition_or_list(conditions_list):  # type: ignore[no-untyped-def]
     condition_or_list = []
     for condition in conditions_list:
         c = {"Condition": condition}
@@ -42,19 +42,19 @@ def make_condition_or_list(conditions_list):
     return condition_or_list
 
 
-def make_or_condition(conditions_list):
-    or_list = make_condition_or_list(conditions_list)
-    condition = fnOr(or_list)
+def make_or_condition(conditions_list):  # type: ignore[no-untyped-def]
+    or_list = make_condition_or_list(conditions_list)  # type: ignore[no-untyped-call]
+    condition = fnOr(or_list)  # type: ignore[no-untyped-call]
     return condition
 
 
-def make_and_condition(conditions_list):
-    and_list = make_condition_or_list(conditions_list)
-    condition = fnAnd(and_list)
+def make_and_condition(conditions_list):  # type: ignore[no-untyped-def]
+    and_list = make_condition_or_list(conditions_list)  # type: ignore[no-untyped-call]
+    condition = fnAnd(and_list)  # type: ignore[no-untyped-call]
     return condition
 
 
-def calculate_number_of_conditions(conditions_length, max_conditions):
+def calculate_number_of_conditions(conditions_length, max_conditions):  # type: ignore[no-untyped-def]
     """
     Every condition can hold up to max_conditions, which (as of writing this) is 10.
     Every time a condition is created, (max_conditions) are used and 1 new one is added to the conditions list.
@@ -73,7 +73,7 @@ def calculate_number_of_conditions(conditions_length, max_conditions):
     return num_conditions
 
 
-def make_combined_condition(conditions_list, condition_name):
+def make_combined_condition(conditions_list, condition_name):  # type: ignore[no-untyped-def]
     """
     Makes a combined condition using Fn::Or. Since Fn::Or only accepts up to 10 conditions,
     this method optionally creates multiple conditions. These conditions are named based on
@@ -94,7 +94,7 @@ def make_combined_condition(conditions_list, condition_name):
     conditions = {}
     conditions_length = len(conditions_list)
     # Get number of conditions needed, then minus one to use them as 0-based indices
-    zero_based_num_conditions = calculate_number_of_conditions(conditions_length, max_conditions) - 1
+    zero_based_num_conditions = calculate_number_of_conditions(conditions_length, max_conditions) - 1  # type: ignore[no-untyped-call]
 
     while len(conditions_list) > 1:
         new_condition_name = condition_name
@@ -102,14 +102,14 @@ def make_combined_condition(conditions_list, condition_name):
         if zero_based_num_conditions > 0:
             new_condition_name = "{}{}".format(condition_name, zero_based_num_conditions)
             zero_based_num_conditions -= 1
-        new_condition_content = make_or_condition(conditions_list[:max_conditions])
+        new_condition_content = make_or_condition(conditions_list[:max_conditions])  # type: ignore[no-untyped-call]
         conditions_list = conditions_list[max_conditions:]
         conditions_list.append(new_condition_name)
         conditions[new_condition_name] = new_condition_content
     return conditions
 
 
-def make_shorthand(intrinsic_dict):
+def make_shorthand(intrinsic_dict):  # type: ignore[no-untyped-def]
     """
     Converts a given intrinsics dictionary into a short-hand notation that Fn::Sub can use. Only Ref and Fn::GetAtt
     support shorthands.
@@ -130,7 +130,7 @@ def make_shorthand(intrinsic_dict):
     raise NotImplementedError("Shorthanding is only supported for Ref and Fn::GetAtt")
 
 
-def is_intrinsic(input):
+def is_intrinsic(input):  # type: ignore[no-untyped-def]
     """
     Checks if the given input is an intrinsic function dictionary. Intrinsic function is a dictionary with single
     key that is the name of the intrinsics.
@@ -147,7 +147,7 @@ def is_intrinsic(input):
     return False
 
 
-def is_intrinsic_if(input):
+def is_intrinsic_if(input):  # type: ignore[no-untyped-def]
     """
     Is the given input an intrinsic if? Intrinsic function 'if' is a dictionary with single
     key - if
@@ -156,14 +156,14 @@ def is_intrinsic_if(input):
     :return: True, if yes
     """
 
-    if not is_intrinsic(input):
+    if not is_intrinsic(input):  # type: ignore[no-untyped-call]
         return False
 
     key = list(input.keys())[0]
     return key == "Fn::If"
 
 
-def validate_intrinsic_if_items(items):
+def validate_intrinsic_if_items(items):  # type: ignore[no-untyped-def]
     """
     Validates Fn::If items
 
@@ -181,7 +181,7 @@ def validate_intrinsic_if_items(items):
         raise ValueError("Fn::If requires 3 arguments")
 
 
-def is_intrinsic_no_value(input):
+def is_intrinsic_no_value(input):  # type: ignore[no-untyped-def]
     """
     Is the given input an intrinsic Ref: AWS::NoValue? Intrinsic function is a dictionary with single
     key - Ref and value - AWS::NoValue
@@ -190,21 +190,21 @@ def is_intrinsic_no_value(input):
     :return: True, if yes
     """
 
-    if not is_intrinsic(input):
+    if not is_intrinsic(input):  # type: ignore[no-untyped-call]
         return False
 
     key = list(input.keys())[0]
     return key == "Ref" and input["Ref"] == "AWS::NoValue"
 
 
-def get_logical_id_from_intrinsic(input):
+def get_logical_id_from_intrinsic(input):  # type: ignore[no-untyped-def]
     """
     Verify if input is an Fn:GetAtt or Ref intrinsic
 
     :param input: Input value to check if it is an intrinsic
     :return: logical id if yes, return input for any other intrinsic function
     """
-    if not is_intrinsic(input):
+    if not is_intrinsic(input):  # type: ignore[no-untyped-call]
         return None
 
     # !Ref <logical-id>

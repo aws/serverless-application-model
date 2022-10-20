@@ -48,7 +48,7 @@ class PolicyTemplatesProcessor(object):
     # ./policy_templates.json
     DEFAULT_POLICY_TEMPLATES_FILE = policy_templates_data.POLICY_TEMPLATES_FILE
 
-    def __init__(self, policy_templates_dict, schema=None):
+    def __init__(self, policy_templates_dict, schema=None):  # type: ignore[no-untyped-def]
         """
         Initialize the class
 
@@ -56,13 +56,13 @@ class PolicyTemplatesProcessor(object):
         :param dict schema: Dictionary containing the JSON Schema of policy templates
         :raises ValueError: If policy templates does not match up with the schema
         """
-        PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict, schema)
+        PolicyTemplatesProcessor._is_valid_templates_dict(policy_templates_dict, schema)  # type: ignore[no-untyped-call]
 
         self.policy_templates = {}
         for template_name, template_value_dict in policy_templates_dict["Templates"].items():
-            self.policy_templates[template_name] = Template.from_dict(template_name, template_value_dict)
+            self.policy_templates[template_name] = Template.from_dict(template_name, template_value_dict)  # type: ignore[no-untyped-call]
 
-    def has(self, template_name):
+    def has(self, template_name):  # type: ignore[no-untyped-def]
         """
         Is this template available?
 
@@ -71,7 +71,7 @@ class PolicyTemplatesProcessor(object):
         """
         return template_name in self.policy_templates
 
-    def get(self, template_name):
+    def get(self, template_name):  # type: ignore[no-untyped-def]
         """
         Get the template for the given name
 
@@ -81,7 +81,7 @@ class PolicyTemplatesProcessor(object):
         """
         return self.policy_templates.get(template_name, None)
 
-    def convert(self, template_name, parameter_values):
+    def convert(self, template_name, parameter_values):  # type: ignore[no-untyped-def]
         """
         Converts the given template to IAM-ready policy statement by substituting template parameters with the given
         values.
@@ -93,14 +93,14 @@ class PolicyTemplatesProcessor(object):
         :raises InsufficientParameterValues: If the parameter values don't have values for all required parameters
         """
 
-        if not self.has(template_name):
-            raise TemplateNotFoundException(template_name)
+        if not self.has(template_name):  # type: ignore[no-untyped-call]
+            raise TemplateNotFoundException(template_name)  # type: ignore[no-untyped-call]
 
-        template = self.get(template_name)
+        template = self.get(template_name)  # type: ignore[no-untyped-call]
         return template.to_statement(parameter_values)
 
     @staticmethod
-    def _is_valid_templates_dict(policy_templates_dict, schema=None):
+    def _is_valid_templates_dict(policy_templates_dict, schema=None):  # type: ignore[no-untyped-def]
         """
         Is this a valid policy template dictionary
 
@@ -111,7 +111,7 @@ class PolicyTemplatesProcessor(object):
         """
 
         if not schema:
-            schema = PolicyTemplatesProcessor._read_schema()
+            schema = PolicyTemplatesProcessor._read_schema()  # type: ignore[no-untyped-call]
 
         try:
             jsonschema.validate(policy_templates_dict, schema)
@@ -122,17 +122,17 @@ class PolicyTemplatesProcessor(object):
         return True
 
     @staticmethod
-    def get_default_policy_templates_json():
+    def get_default_policy_templates_json():  # type: ignore[no-untyped-def]
         """
         Reads and returns the default policy templates JSON data from file.
 
         :return dict: Dictionary containing data read from default policy templates JSON file
         """
 
-        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.DEFAULT_POLICY_TEMPLATES_FILE)
+        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.DEFAULT_POLICY_TEMPLATES_FILE)  # type: ignore[no-untyped-call]
 
     @staticmethod
-    def _read_schema():
+    def _read_schema():  # type: ignore[no-untyped-def]
         """
         Reads the JSON Schema at given file path
 
@@ -141,10 +141,10 @@ class PolicyTemplatesProcessor(object):
         :return dict: JSON Schema of the policy template
         """
 
-        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.SCHEMA_LOCATION)
+        return PolicyTemplatesProcessor._read_json(PolicyTemplatesProcessor.SCHEMA_LOCATION)  # type: ignore[no-untyped-call]
 
     @staticmethod
-    def _read_json(filepath):
+    def _read_json(filepath):  # type: ignore[no-untyped-def]
         """
         Helper method to read a JSON file
         :param filepath: Path to the file

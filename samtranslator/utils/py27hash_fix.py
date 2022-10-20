@@ -21,7 +21,7 @@ unicode_string_type = str  # TODO: remove it, python 2 legacy code
 long_int_type = int  # TODO: remove it, python 2 legacy code
 
 
-def to_py27_compatible_template(template, parameter_values=None):
+def to_py27_compatible_template(template, parameter_values=None):  # type: ignore[no-untyped-def]
     """
     Convert an input template to a py27hash-compatible template. This function has to be run before any
     manipulation occurs for sake of keeping the same initial state. This function modifies the input template,
@@ -43,9 +43,9 @@ def to_py27_compatible_template(template, parameter_values=None):
     # Passing to parser for a simple validation. Validation is normally done within translator.translate(...).
     # However, becuase this conversion is done before translate and also requires the template to be valid, we
     # perform a simple validation here to just make sure the template is minimally safe for conversion.
-    Parser.validate_datatypes(template)
+    Parser.validate_datatypes(template)  # type: ignore[no-untyped-call]
 
-    if not _template_has_api_resource(template) and not _template_has_httpapi_resource_with_default_authorizer(
+    if not _template_has_api_resource(template) and not _template_has_httpapi_resource_with_default_authorizer(  # type: ignore[no-untyped-call, no-untyped-call]
         template
     ):
         # no need to convert when all of the following conditions are true:
@@ -55,20 +55,20 @@ def to_py27_compatible_template(template, parameter_values=None):
 
     if "Globals" in template and isinstance(template["Globals"], dict) and "Api" in template["Globals"]:
         # "Api" section under "Globals" could affect swagger generation for AWS::Serverless::Api resources
-        template["Globals"]["Api"] = _convert_to_py27_type(template["Globals"]["Api"])
+        template["Globals"]["Api"] = _convert_to_py27_type(template["Globals"]["Api"])  # type: ignore[no-untyped-call]
 
     if "Parameters" in template and isinstance(template["Parameters"], dict):
-        new_parameters_dict = Py27Dict()
+        new_parameters_dict = Py27Dict()  # type: ignore[no-untyped-call]
         for logical_id, param_dict in template["Parameters"].items():
             if isinstance(param_dict, dict) and "Default" in param_dict:
-                param_dict["Default"] = _convert_to_py27_type(param_dict["Default"])
+                param_dict["Default"] = _convert_to_py27_type(param_dict["Default"])  # type: ignore[no-untyped-call]
 
             # dict keys have to be Py27UniStr for correct serialization
             new_parameters_dict[Py27UniStr(logical_id)] = param_dict
         template["Parameters"] = new_parameters_dict
 
     if "Resources" in template and isinstance(template["Resources"], dict):
-        new_resources_dict = Py27Dict()
+        new_resources_dict = Py27Dict()  # type: ignore[no-untyped-call]
         for logical_id, resource_dict in template["Resources"].items():
             if isinstance(resource_dict, dict):
                 resource_type = resource_dict.get("Type")
@@ -79,27 +79,27 @@ def to_py27_compatible_template(template, parameter_values=None):
                         "AWS::Serverless::Api",
                         "AWS::Serverless::HttpApi",
                     ]:
-                        resource_dict["Properties"] = _convert_to_py27_type(resource_properties)
+                        resource_dict["Properties"] = _convert_to_py27_type(resource_properties)  # type: ignore[no-untyped-call]
                     elif resource_type in ["AWS::Serverless::Function", "AWS::Serverless::StateMachine"]:
                         # properties below could affect swagger generation
                         if "Condition" in resource_dict:
-                            resource_dict["Condition"] = _convert_to_py27_type(resource_dict["Condition"])
+                            resource_dict["Condition"] = _convert_to_py27_type(resource_dict["Condition"])  # type: ignore[no-untyped-call]
                         if "FunctionName" in resource_properties:
-                            resource_properties["FunctionName"] = _convert_to_py27_type(
+                            resource_properties["FunctionName"] = _convert_to_py27_type(  # type: ignore[no-untyped-call]
                                 resource_properties["FunctionName"]
                             )
                         if "Events" in resource_properties:
-                            resource_properties["Events"] = _convert_to_py27_type(resource_properties["Events"])
+                            resource_properties["Events"] = _convert_to_py27_type(resource_properties["Events"])  # type: ignore[no-untyped-call]
 
             new_resources_dict[Py27UniStr(logical_id)] = resource_dict
         template["Resources"] = new_resources_dict
 
     if parameter_values:
         for key, val in parameter_values.items():
-            parameter_values[key] = _convert_to_py27_type(val)
+            parameter_values[key] = _convert_to_py27_type(val)  # type: ignore[no-untyped-call]
 
 
-def undo_mark_unicode_str_in_template(template_dict):
+def undo_mark_unicode_str_in_template(template_dict):  # type: ignore[no-untyped-def]
     return json.loads(json.dumps(template_dict))
 
 
@@ -109,37 +109,37 @@ class Py27UniStr(unicode_string_type):
     To preserve the instance type in string operations, we need to override certain methods
     """
 
-    def __add__(self, other):
+    def __add__(self, other):  # type: ignore[no-untyped-def]
         return Py27UniStr(super(Py27UniStr, self).__add__(other))
 
-    def __repr__(self):
+    def __repr__(self):  # type: ignore[no-untyped-def]
         if sys.version_info.major >= 3:
             return "u" + super(Py27UniStr, self).encode("unicode_escape").decode("ascii").__repr__().replace(
                 "\\\\", "\\"
             )
         return super(Py27UniStr, self).__repr__()
 
-    def upper(self):
+    def upper(self):  # type: ignore[no-untyped-def]
         return Py27UniStr(super(Py27UniStr, self).upper())
 
-    def lower(self):
+    def lower(self):  # type: ignore[no-untyped-def]
         return Py27UniStr(super(Py27UniStr, self).lower())
 
-    def replace(self, __old, __new, __count=None):
+    def replace(self, __old, __new, __count=None):  # type: ignore[no-untyped-def]
         if __count:
             return Py27UniStr(super(Py27UniStr, self).replace(__old, __new, __count))
         return Py27UniStr(super(Py27UniStr, self).replace(__old, __new))
 
-    def split(self, sep=None, maxsplit=-1):
+    def split(self, sep=None, maxsplit=-1):  # type: ignore[no-untyped-def]
         return [Py27UniStr(s) for s in super(Py27UniStr, self).split(sep, maxsplit)]
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         return self  # strings are immutable
 
-    def _get_py27_hash(self):
+    def _get_py27_hash(self):  # type: ignore[no-untyped-def]
         h = getattr(self, "_py27_hash", None)
         if h is None:
-            self._py27_hash = h = ctypes.c_size_t(Hash.hash(self)).value
+            self._py27_hash = h = ctypes.c_size_t(Hash.hash(self)).value  # type: ignore[no-untyped-call]
         return h
 
 
@@ -151,12 +151,12 @@ class Py27LongInt(long_int_type):
 
     PY2_MAX_INT = 9223372036854775807  # sys.maxint from Python2.7 Lambda runtime
 
-    def __repr__(self):
+    def __repr__(self):  # type: ignore[no-untyped-def]
         if sys.version_info.major >= 3 and self > Py27LongInt.PY2_MAX_INT:
             return super(Py27LongInt, self).__repr__() + "L"
         return super(Py27LongInt, self).__repr__()
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         return self  # primitive types (ints) are immutable
 
 
@@ -171,7 +171,7 @@ class Py27Keys(object):
 
     DUMMY = ["dummy"]  # marker for deleted keys
 
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         super(Py27Keys, self).__init__()
         self.debug = False
         self.keyorder = {}
@@ -179,24 +179,24 @@ class Py27Keys(object):
         self.fill = 0  # increment count when a key is added, equivalent to ma_fill in dictobject.c
         self.mask = MINSIZE - 1  # Python2 default dict size
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         # add keys in the py2 order -- we can't do a straigh-up deep copy of keyorder because
         # in py2 copy.deepcopy of a dict may result in reordering of the keys
-        ret = Py27Keys()
-        for k in self.keys():
+        ret = Py27Keys()  # type: ignore[no-untyped-call]
+        for k in self.keys():  # type: ignore[no-untyped-call]
             if k is self.DUMMY:
                 continue
-            ret.add(copy.deepcopy(k, memo))
+            ret.add(copy.deepcopy(k, memo))  # type: ignore[no-untyped-call]
         return ret
 
-    def _get_key_idx(self, k):
+    def _get_key_idx(self, k):  # type: ignore[no-untyped-def]
         """Gets insert location for k"""
 
         # Py27UniStr caches the hash to improve performance so use its method instead of always computing the hash
         if isinstance(k, Py27UniStr):
-            h = k._get_py27_hash()
+            h = k._get_py27_hash()  # type: ignore[no-untyped-call]
         else:
-            h = ctypes.c_size_t(Hash.hash(k)).value
+            h = ctypes.c_size_t(Hash.hash(k)).value  # type: ignore[no-untyped-call]
 
         i = h & self.mask
 
@@ -224,7 +224,7 @@ class Py27Keys(object):
             perturb >>= PERTURB_SHIFT
         return i
 
-    def _resize(self, request):
+    def _resize(self, request):  # type: ignore[no-untyped-def]
         """
         Resizes allocated size based
         """
@@ -241,20 +241,20 @@ class Py27Keys(object):
         # reinsert all the keys using original order
         for idx in sorted(oldkeyorder.keys()):
             if oldkeyorder[idx] is not self.DUMMY:
-                self.add(oldkeyorder[idx])
+                self.add(oldkeyorder[idx])  # type: ignore[no-untyped-call]
 
-    def remove(self, key):
+    def remove(self, key):  # type: ignore[no-untyped-def]
         """Removes key"""
-        i = self._get_key_idx(key)
+        i = self._get_key_idx(key)  # type: ignore[no-untyped-call]
         if i in self.keyorder:
             if self.keyorder[i] is not self.DUMMY:
                 self.keyorder[i] = self.DUMMY
                 self.size -= 1
 
-    def add(self, key):
+    def add(self, key):  # type: ignore[no-untyped-def]
         """Adds key"""
         start_size = self.size
-        i = self._get_key_idx(key)
+        i = self._get_key_idx(key)  # type: ignore[no-untyped-call]
         if i not in self.keyorder:
             # We are not replacing an existing key or a DUMMY key, increment fill
             self.size += 1
@@ -269,46 +269,46 @@ class Py27Keys(object):
         # Resize if 2/3 capacity
         if self.size > start_size and self.fill * 3 >= ((self.mask + 1) * 2):
             # Python2 dict increases size by a factor of 4 for small dict, and 2 for large dict
-            self._resize(self.size * (2 if self.size > 50000 else 4))
+            self._resize(self.size * (2 if self.size > 50000 else 4))  # type: ignore[no-untyped-call]
 
-    def keys(self):
+    def keys(self):  # type: ignore[no-untyped-def]
         """Return keys in Python2 order"""
         return [self.keyorder[key] for key in sorted(self.keyorder.keys()) if self.keyorder[key] is not self.DUMMY]
 
-    def __setstate__(self, state):
+    def __setstate__(self, state):  # type: ignore[no-untyped-def]
         """
         Overrides default pickling object to force re-adding all keys and match Python 2.7 deserialization logic.
 
         :param state: input state
         """
         self.__dict__ = state
-        keys = self.keys()
+        keys = self.keys()  # type: ignore[no-untyped-call]
 
         # Clear keys and re-add to match deserialization logic
-        self.__init__()
+        self.__init__()  # type: ignore[misc]
 
         for k in keys:
             if k == self.DUMMY:
                 continue
-            self.add(k)
+            self.add(k)  # type: ignore[no-untyped-call]
 
-    def __iter__(self):
+    def __iter__(self):  # type: ignore[no-untyped-def]
         """
         Default iterator
         """
-        return iter(self.keys())
+        return iter(self.keys())  # type: ignore[no-untyped-call]
 
-    def __eq__(self, other):
+    def __eq__(self, other):  # type: ignore[no-untyped-def]
         if isinstance(other, Py27Keys):
-            return self.keys() == other.keys()
+            return self.keys() == other.keys()  # type: ignore[no-untyped-call]
         if isinstance(other, list):
-            return self.keys() == other
+            return self.keys() == other  # type: ignore[no-untyped-call]
         return False
 
-    def __len__(self):
-        return len(self.keys())
+    def __len__(self):  # type: ignore[no-untyped-def]
+        return len(self.keys())  # type: ignore[no-untyped-call]
 
-    def merge(self, other):
+    def merge(self, other):  # type: ignore[no-untyped-def]
         """
         Merge keys from an exisitng iterable into this key list.
         Equivalent to PyDict_Merge
@@ -321,50 +321,50 @@ class Py27Keys(object):
 
         # PyDict_Merge initial merge size is double the size of current + incoming dict
         if ((self.fill + len(other)) * 3) >= ((self.mask + 1) * 2):
-            self._resize((self.size + len(other)) * 2)
+            self._resize((self.size + len(other)) * 2)  # type: ignore[no-untyped-call]
 
         # Copy actual keys
         for k in other:
-            self.add(k)
+            self.add(k)  # type: ignore[no-untyped-call]
 
-    def copy(self):
+    def copy(self):  # type: ignore[no-untyped-def]
         """
         Makes a copy of self
         """
         # Copy creates a new object and merges keys in
-        new = Py27Keys()
-        new.merge(self.keys())
+        new = Py27Keys()  # type: ignore[no-untyped-call]
+        new.merge(self.keys())  # type: ignore[no-untyped-call, no-untyped-call]
         return new
 
-    def pop(self):
+    def pop(self):  # type: ignore[no-untyped-def]
         """
         Pops the top element from the sorted keys if it exists. Returns None otherwise.
         """
         if self.keyorder:
-            value = self.keys()[0]
-            self.remove(value)
+            value = self.keys()[0]  # type: ignore[no-untyped-call]
+            self.remove(value)  # type: ignore[no-untyped-call]
             return value
         return None
 
 
-class Py27Dict(dict):
+class Py27Dict(dict):  # type: ignore[type-arg]
     """
     Compatibility class to support Python2.7 style iteration in Python3.x
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         """
         Overrides dict logic to always call set item. This allows Python2.7 style iteration
         """
         super(Py27Dict, self).__init__()
 
         # Initialize iteration key list
-        self.keylist = Py27Keys()
+        self.keylist = Py27Keys()  # type: ignore[no-untyped-call]
 
         # Initialize base arguments
-        self.update(*args, **kwargs)
+        self.update(*args, **kwargs)  # type: ignore[no-untyped-call]
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo):  # type: ignore[no-untyped-def]
         cls = self.__class__
         result = cls.__new__(cls)
         for k, v in self.__dict__.items():
@@ -375,14 +375,14 @@ class Py27Dict(dict):
 
         return result
 
-    def __reduce__(self):
+    def __reduce__(self):  # type: ignore[no-untyped-def]
         """
         Method necessary to fully pickle Python 3 subclassed dict objects with attribute fields.
         """
         # pylint: disable = W0235
         return super(Py27Dict, self).__reduce__()
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value):  # type: ignore[no-untyped-def]
         """
         Override of __setitem__ to track keys and simulate Python2.7 dict
 
@@ -392,9 +392,9 @@ class Py27Dict(dict):
         value: Any
         """
         super(Py27Dict, self).__setitem__(key, value)
-        self.keylist.add(key)
+        self.keylist.add(key)  # type: ignore[no-untyped-call]
 
-    def __delitem__(self, key):
+    def __delitem__(self, key):  # type: ignore[no-untyped-def]
         """
         Override of __delitem__ to track kyes and simulate Python2.7 dict.
 
@@ -403,9 +403,9 @@ class Py27Dict(dict):
         key: hashable
         """
         super(Py27Dict, self).__delitem__(key)
-        self.keylist.remove(key)
+        self.keylist.remove(key)  # type: ignore[no-untyped-call]
 
-    def update(self, *args, **kwargs):
+    def update(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         """
         Overrides dict logic to always call set item. This allows Python2.7 style iteration.
 
@@ -418,7 +418,7 @@ class Py27Dict(dict):
             # Cast to dict if applicable. Otherwise, assume it's an iterable of (key, value) pairs
             if isinstance(arg, dict):
                 # Merge incoming keys into keylist
-                self.keylist.merge(arg.keys())
+                self.keylist.merge(arg.keys())  # type: ignore[no-untyped-call]
                 arg = arg.items()
 
             for k, v in arg:
@@ -427,14 +427,14 @@ class Py27Dict(dict):
         for k, v in dict(**kwargs).items():
             self[k] = v
 
-    def clear(self):
+    def clear(self):  # type: ignore[no-untyped-def]
         """
         Clears the dict along with its backing Python2.7 keylist.
         """
         super(Py27Dict, self).clear()
-        self.keylist = Py27Keys()
+        self.keylist = Py27Keys()  # type: ignore[no-untyped-call]
 
-    def copy(self):
+    def copy(self):  # type: ignore[no-untyped-def]
         """
         Copies the dict along with its backing Python2.7 keylist.
 
@@ -443,18 +443,18 @@ class Py27Dict(dict):
         Py27Dict
             copy of self
         """
-        new = Py27Dict()
+        new = Py27Dict()  # type: ignore[no-untyped-call]
 
         # First copy the keylist to the new object
-        new.keylist = self.keylist.copy()
+        new.keylist = self.keylist.copy()  # type: ignore[no-untyped-call]
 
         # Copy keys into backing dict
-        for k, v in self.items():
+        for k, v in self.items():  # type: ignore[no-untyped-call]
             new[k] = v
 
         return new
 
-    def pop(self, key, default=None):
+    def pop(self, key, default=None):  # type: ignore[no-untyped-def]
         """
         Pops the value at key from the dict if it exists, return default otherwise
 
@@ -471,10 +471,10 @@ class Py27Dict(dict):
             value of key if found or default
         """
         value = super(Py27Dict, self).pop(key, default)
-        self.keylist.remove(key)
+        self.keylist.remove(key)  # type: ignore[no-untyped-call]
         return value
 
-    def popitem(self):
+    def popitem(self):  # type: ignore[no-untyped-def]
         """
         Pops an element from the dict and returns the item.
 
@@ -484,15 +484,15 @@ class Py27Dict(dict):
             (key, value) pair of an element if found or None if dict is empty
         """
         if self:
-            key = self.keylist.pop()
+            key = self.keylist.pop()  # type: ignore[no-untyped-call]
             value = self[key] if key else None
 
-            del self[key]
+            del self[key]  # type: ignore[no-untyped-call]
             return key, value
 
         return None
 
-    def __iter__(self):
+    def __iter__(self):  # type: ignore[no-untyped-def]
         """
         Default iterator
 
@@ -500,9 +500,9 @@ class Py27Dict(dict):
         -------
         iterator
         """
-        return self.keylist.__iter__()
+        return self.keylist.__iter__()  # type: ignore[no-untyped-call]
 
-    def __str__(self):
+    def __str__(self):  # type: ignore[no-untyped-def]
         """
         Override to minic exact Python2.7 str(dict_obj)
 
@@ -527,7 +527,7 @@ class Py27Dict(dict):
         string += "}"
         return string
 
-    def __repr__(self):
+    def __repr__(self):  # type: ignore[no-untyped-def]
         """
         Create a string version of this Dict
 
@@ -535,9 +535,9 @@ class Py27Dict(dict):
         -------
         str
         """
-        return self.__str__()
+        return self.__str__()  # type: ignore[no-untyped-call]
 
-    def keys(self):
+    def keys(self):  # type: ignore[no-untyped-def]
         """
         Returns keys ordered using Python2.7 iteration alogrithm
 
@@ -546,9 +546,9 @@ class Py27Dict(dict):
         list
             list of keys
         """
-        return self.keylist.keys()
+        return self.keylist.keys()  # type: ignore[no-untyped-call]
 
-    def values(self):
+    def values(self):  # type: ignore[no-untyped-def]
         """
         Returns values ordered using Python2.7 iteration algorithm
 
@@ -557,9 +557,9 @@ class Py27Dict(dict):
         list
             list of values
         """
-        return [self[k] for k in self.keys()]
+        return [self[k] for k in self.keys()]  # type: ignore[no-untyped-call]
 
-    def items(self):
+    def items(self):  # type: ignore[no-untyped-def]
         """
         Returns items ordered using Python2.7 iteration algorithm
 
@@ -568,9 +568,9 @@ class Py27Dict(dict):
         list
             list of items
         """
-        return [(k, self[k]) for k in self.keys()]
+        return [(k, self[k]) for k in self.keys()]  # type: ignore[no-untyped-call]
 
-    def setdefault(self, key, default):
+    def setdefault(self, key, default):  # type: ignore[no-untyped-def]
         """
         Retruns the value of a key if the key exists. Otherwise inserts key with the default value
 
@@ -588,7 +588,7 @@ class Py27Dict(dict):
         return self[key]
 
 
-def _convert_to_py27_type(original):
+def _convert_to_py27_type(original):  # type: ignore[no-untyped-def]
     if isinstance(original, ("".__class__, bytes)):
         # these are strings, return the Py27UniStr instance of the string
         return Py27UniStr(original)
@@ -598,21 +598,21 @@ def _convert_to_py27_type(original):
         return Py27LongInt(original)
 
     if isinstance(original, list):
-        return [_convert_to_py27_type(item) for item in original]
+        return [_convert_to_py27_type(item) for item in original]  # type: ignore[no-untyped-call]
 
     if isinstance(original, dict):
         # Recursively convert dict items
         key_list = original.keys()
-        new_dict = Py27Dict()
+        new_dict = Py27Dict()  # type: ignore[no-untyped-call]
         for key in key_list:
-            new_dict[Py27UniStr(key)] = _convert_to_py27_type(original[key])
+            new_dict[Py27UniStr(key)] = _convert_to_py27_type(original[key])  # type: ignore[no-untyped-call]
         return new_dict
 
     # Anything else does not require conversion
     return original
 
 
-def _template_has_api_resource(template):
+def _template_has_api_resource(template):  # type: ignore[no-untyped-def]
     """
     Returns true if the template contains at lease one explicit or implicit AWS::Serverless::Api resource
     """
@@ -635,7 +635,7 @@ def _template_has_api_resource(template):
     return False
 
 
-def _template_has_httpapi_resource_with_default_authorizer(template):
+def _template_has_httpapi_resource_with_default_authorizer(template):  # type: ignore[no-untyped-def]
     """
     Returns true if the template contains at least one AWS::Serverless::HttpApi resource with DefaultAuthorizer configured
     """

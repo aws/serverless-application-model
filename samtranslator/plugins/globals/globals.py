@@ -1,7 +1,7 @@
 ﻿from typing import Dict, List
 
-from samtranslator.public.sdk.resource import SamResourceType
-from samtranslator.public.intrinsics import is_intrinsics
+from samtranslator.public.sdk.resource import SamResourceType  # type: ignore[attr-defined]
+from samtranslator.public.intrinsics import is_intrinsics  # type: ignore[attr-defined]
 from samtranslator.swagger.swagger import SwaggerEditor
 
 
@@ -86,7 +86,7 @@ class Globals(object):
     # unreleased_properties *must be* part of supported_properties too
     unreleased_properties: Dict[str, List[str]] = {}
 
-    def __init__(self, template):
+    def __init__(self, template):  # type: ignore[no-untyped-def]
         """
         Constructs an instance of this object
 
@@ -101,9 +101,9 @@ class Globals(object):
         self.template_globals = {}
 
         if self._KEYWORD in template:
-            self.template_globals = self._parse(template[self._KEYWORD])
+            self.template_globals = self._parse(template[self._KEYWORD])  # type: ignore[no-untyped-call]
 
-    def merge(self, resource_type, resource_properties):
+    def merge(self, resource_type, resource_properties):  # type: ignore[no-untyped-def]
         """
         Adds global properties to the resource, if necessary. This method is a no-op if there are no global properties
         for this resource type
@@ -122,7 +122,7 @@ class Globals(object):
         return global_props.merge(resource_properties)
 
     @classmethod
-    def del_section(cls, template):
+    def del_section(cls, template):  # type: ignore[no-untyped-def]
         """
         Helper method to delete the Globals section altogether from the template
 
@@ -134,7 +134,7 @@ class Globals(object):
             del template[cls._KEYWORD]
 
     @classmethod
-    def fix_openapi_definitions(cls, template):
+    def fix_openapi_definitions(cls, template):  # type: ignore[no-untyped-def]
         """
         Helper method to postprocess the resources to make sure the swagger doc version matches
         the one specified on the resource with flag OpenApiVersion.
@@ -157,8 +157,8 @@ class Globals(object):
                 if (
                     (cls._OPENAPIVERSION in properties)
                     and (cls._MANAGE_SWAGGER in properties)
-                    and SwaggerEditor.safe_compare_regex_with_string(
-                        SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]
+                    and SwaggerEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
+                        SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]  # type: ignore[no-untyped-call]
                     )
                 ):
                     if not isinstance(properties[cls._OPENAPIVERSION], str):
@@ -170,7 +170,7 @@ class Globals(object):
                         if definition_body.get("swagger"):
                             del definition_body["swagger"]
 
-    def _parse(self, globals_dict):
+    def _parse(self, globals_dict):  # type: ignore[no-untyped-def]
         """
         Takes a SAM template as input and parses the Globals section
 
@@ -181,13 +181,13 @@ class Globals(object):
 
         globals = {}
         if not isinstance(globals_dict, dict):
-            raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary")
+            raise InvalidGlobalsSectionException(self._KEYWORD, "It must be a non-empty dictionary")  # type: ignore[no-untyped-call]
 
         for section_name, properties in globals_dict.items():
-            resource_type = self._make_resource_type(section_name)
+            resource_type = self._make_resource_type(section_name)  # type: ignore[no-untyped-call]
 
             if resource_type not in self.supported_properties:
-                raise InvalidGlobalsSectionException(
+                raise InvalidGlobalsSectionException(  # type: ignore[no-untyped-call]
                     self._KEYWORD,
                     "'{section}' is not supported. "
                     "Must be one of the following values - {supported}".format(
@@ -196,7 +196,7 @@ class Globals(object):
                 )
 
             if not isinstance(properties, dict):
-                raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")
+                raise InvalidGlobalsSectionException(self._KEYWORD, "Value of ${section} must be a dictionary")  # type: ignore[no-untyped-call]
 
             supported = self.supported_properties[resource_type]
             supported_displayed = [
@@ -204,7 +204,7 @@ class Globals(object):
             ]
             for key, _ in properties.items():
                 if key not in supported:
-                    raise InvalidGlobalsSectionException(
+                    raise InvalidGlobalsSectionException(  # type: ignore[no-untyped-call]
                         self._KEYWORD,
                         "'{key}' is not a supported property of '{section}'. "
                         "Must be one of the following values - {supported}".format(
@@ -213,11 +213,11 @@ class Globals(object):
                     )
 
             # Store all Global properties in a map with key being the AWS::Serverless::* resource type
-            globals[resource_type] = GlobalProperties(properties)
+            globals[resource_type] = GlobalProperties(properties)  # type: ignore[no-untyped-call]
 
         return globals
 
-    def _make_resource_type(self, key):
+    def _make_resource_type(self, key):  # type: ignore[no-untyped-def]
         return self._RESOURCE_PREFIX + key
 
 
@@ -341,18 +341,18 @@ class GlobalProperties(object):
 
     """
 
-    def __init__(self, global_properties):
+    def __init__(self, global_properties):  # type: ignore[no-untyped-def]
         self.global_properties = global_properties
 
-    def merge(self, local_properties):
+    def merge(self, local_properties):  # type: ignore[no-untyped-def]
         """
         Merge Global & local level properties according to the above rules
 
         :return local_properties: Dictionary of local properties
         """
-        return self._do_merge(self.global_properties, local_properties)
+        return self._do_merge(self.global_properties, local_properties)  # type: ignore[no-untyped-call]
 
-    def _do_merge(self, global_value, local_value):
+    def _do_merge(self, global_value, local_value):  # type: ignore[no-untyped-def]
         """
         Actually perform the merge operation for the given inputs. This method is used as part of the recursion.
         Therefore input values can be of any type. So is the output.
@@ -362,25 +362,25 @@ class GlobalProperties(object):
         :return: Merged result
         """
 
-        token_global = self._token_of(global_value)
-        token_local = self._token_of(local_value)
+        token_global = self._token_of(global_value)  # type: ignore[no-untyped-call]
+        token_local = self._token_of(local_value)  # type: ignore[no-untyped-call]
 
         # The following statements codify the rules explained in the doctring above
         if token_global != token_local:
-            return self._prefer_local(global_value, local_value)
+            return self._prefer_local(global_value, local_value)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.PRIMITIVE == token_global == token_local:
-            return self._prefer_local(global_value, local_value)
+            return self._prefer_local(global_value, local_value)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.DICT == token_global == token_local:
-            return self._merge_dict(global_value, local_value)
+            return self._merge_dict(global_value, local_value)  # type: ignore[no-untyped-call]
 
         if self.TOKEN.LIST == token_global == token_local:
-            return self._merge_lists(global_value, local_value)
+            return self._merge_lists(global_value, local_value)  # type: ignore[no-untyped-call]
 
         raise TypeError("Unsupported type of objects. GlobalType={}, LocalType={}".format(token_global, token_local))
 
-    def _merge_lists(self, global_list, local_list):
+    def _merge_lists(self, global_list, local_list):  # type: ignore[no-untyped-def]
         """
         Merges the global list with the local list. List merging is simply a concatenation = global + local
 
@@ -391,7 +391,7 @@ class GlobalProperties(object):
 
         return global_list + local_list
 
-    def _merge_dict(self, global_dict, local_dict):
+    def _merge_dict(self, global_dict, local_dict):  # type: ignore[no-untyped-def]
         """
         Merges the two dictionaries together
 
@@ -407,7 +407,7 @@ class GlobalProperties(object):
 
             if key in global_dict:
                 # Both local & global contains the same key. Let's do a merge.
-                global_dict[key] = self._do_merge(global_dict[key], local_dict[key])
+                global_dict[key] = self._do_merge(global_dict[key], local_dict[key])  # type: ignore[no-untyped-call]
 
             else:
                 # Key is not in globals, just in local. Copy it over
@@ -415,7 +415,7 @@ class GlobalProperties(object):
 
         return global_dict
 
-    def _prefer_local(self, global_value, local_value):
+    def _prefer_local(self, global_value, local_value):  # type: ignore[no-untyped-def]
         """
         Literally returns the local value whatever it may be. This method is useful to provide a unified implementation
         for cases that don't require special handling.
@@ -426,7 +426,7 @@ class GlobalProperties(object):
         """
         return local_value
 
-    def _token_of(self, input):
+    def _token_of(self, input):  # type: ignore[no-untyped-def]
         """
         Returns the token type of the input.
 
@@ -465,10 +465,10 @@ class InvalidGlobalsSectionException(Exception):
         message -- explanation of the error
     """
 
-    def __init__(self, logical_id, message):
+    def __init__(self, logical_id, message):  # type: ignore[no-untyped-def]
         self._logical_id = logical_id
         self._message = message
 
     @property
-    def message(self):
+    def message(self):  # type: ignore[no-untyped-def]
         return "'{}' section is invalid. {}".format(self._logical_id, self._message)
