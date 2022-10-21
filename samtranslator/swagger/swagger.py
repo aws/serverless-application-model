@@ -137,9 +137,7 @@ class SwaggerEditor(object):
 
         # Check if the OpenAPI version is 3.0, if it is then the extension needs to added to the Servers field of the
         # OpenApi object, as per the guide linked above
-        if self._doc.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(
-            SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]
-        ):
+        if self._doc.get("openapi") and self.validate_open_api_version_3(self._doc["openapi"]):
             # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
             servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
             for config in servers_configurations:
@@ -1319,6 +1317,10 @@ class SwaggerEditor(object):
                     SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
         return False
+
+    @staticmethod
+    def validate_open_api_version_3(api_version: str) -> bool:
+        return SwaggerEditor.safe_compare_regex_with_string(SwaggerEditor.get_openapi_version_3_regex(), api_version)
 
     @staticmethod
     def validate_is_dict(obj, exception_message):  # type: ignore[no-untyped-def]
