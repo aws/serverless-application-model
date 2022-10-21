@@ -53,10 +53,10 @@ class SwaggerEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())  # type: ignore[no-untyped-call]
-        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())  # type: ignore[no-untyped-call]
-        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())  # type: ignore[no-untyped-call]
-        self.definitions = self._doc.get("definitions", Py27Dict())  # type: ignore[no-untyped-call]
+        self.security_definitions = self._doc.get("securityDefinitions", Py27Dict())
+        self.gateway_responses = self._doc.get(self._X_APIGW_GATEWAY_RESPONSES, Py27Dict())
+        self.resource_policy = self._doc.get(self._X_APIGW_POLICY, Py27Dict())
+        self.definitions = self._doc.get("definitions", Py27Dict())
 
         # https://swagger.io/specification/#path-item-object
         # According to swagger spec,
@@ -135,12 +135,13 @@ class SwaggerEditor(object):
         DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
         set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
 
-        # Check if the OpenAPI version is 3.0
-        if self._doc.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
-            SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]  # type: ignore[no-untyped-call]
+        # Check if the OpenAPI version is 3.0, if it is then the extension needs to added to the Servers field of the
+        # OpenApi object, as per the guide linked above
+        if self._doc.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]
         ):
             # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
-            servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])  # type: ignore[no-untyped-call]
+            servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
             for config in servers_configurations:
                 if not config.get(self._X_ENDPOINT_CONFIG):
                     config[self._X_ENDPOINT_CONFIG] = {}
@@ -182,10 +183,10 @@ class SwaggerEditor(object):
         """
         method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
 
-        self.paths.setdefault(path, Py27Dict())  # type: ignore[no-untyped-call]
+        self.paths.setdefault(path, Py27Dict())
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
-            path_item.setdefault(method, Py27Dict())  # type: ignore[no-untyped-call]
+            path_item.setdefault(method, Py27Dict())
 
     def add_lambda_integration(  # type: ignore[no-untyped-def]
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
@@ -216,14 +217,14 @@ class SwaggerEditor(object):
             integration_uri = make_conditional(condition, integration_uri)  # type: ignore[no-untyped-call]
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
-            path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()  # type: ignore[no-untyped-call]
+            path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
             # insert key one by one to preserce input order
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
             path_item[method][self._X_APIGW_INTEGRATION]["uri"] = integration_uri
 
-            method_auth_config = method_auth_config or Py27Dict()  # type: ignore[no-untyped-call]
-            api_auth_config = api_auth_config or Py27Dict()  # type: ignore[no-untyped-call]
+            method_auth_config = method_auth_config or Py27Dict()
+            api_auth_config = api_auth_config or Py27Dict()
             if (
                 method_auth_config.get("Authorizer") == "AWS_IAM"
                 or api_auth_config.get("DefaultAuthorizer") == "AWS_IAM"
@@ -242,7 +243,7 @@ class SwaggerEditor(object):
                     path_item[method][self._X_APIGW_INTEGRATION]["credentials"] = credentials
 
             # If 'responses' key is *not* present, add it with an empty dict as value
-            path_item[method].setdefault("responses", Py27Dict())  # type: ignore[no-untyped-call]
+            path_item[method].setdefault("responses", Py27Dict())
 
             # If a condition is present, wrap all method contents up into the condition
             if condition:
@@ -283,17 +284,17 @@ class SwaggerEditor(object):
 
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             # Responses
-            integration_responses = Py27Dict()  # type: ignore[no-untyped-call]
+            integration_responses = Py27Dict()
             # insert key one by one to preserce input order
-            integration_responses["200"] = Py27Dict({"statusCode": "200"})  # type: ignore[no-untyped-call]
-            integration_responses["400"] = Py27Dict({"statusCode": "400"})  # type: ignore[no-untyped-call]
+            integration_responses["200"] = Py27Dict({"statusCode": "200"})
+            integration_responses["400"] = Py27Dict({"statusCode": "400"})
 
-            default_method_responses = Py27Dict()  # type: ignore[no-untyped-call]
+            default_method_responses = Py27Dict()
             # insert key one by one to preserce input order
-            default_method_responses["200"] = Py27Dict({"description": "OK"})  # type: ignore[no-untyped-call]
-            default_method_responses["400"] = Py27Dict({"description": "Bad Request"})  # type: ignore[no-untyped-call]
+            default_method_responses["200"] = Py27Dict({"description": "OK"})
+            default_method_responses["400"] = Py27Dict({"description": "Bad Request"})
 
-            path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()  # type: ignore[no-untyped-call]
+            path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
             # insert key one by one to preserce input order
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws"
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
@@ -441,7 +442,7 @@ class SwaggerEditor(object):
         def replace_recursively(bmt):  # type: ignore[no-untyped-def]
             """replaces "~1" with "/" for the input binary_media_types recursively"""
             if isinstance(bmt, dict):
-                to_return = Py27Dict()  # type: ignore[no-untyped-call]
+                to_return = Py27Dict()
                 for k, v in bmt.items():
                     to_return[Py27UniStr(k.replace("~1", "/"))] = replace_recursively(v)  # type: ignore[no-untyped-call]
                 return to_return
@@ -486,14 +487,14 @@ class SwaggerEditor(object):
         MAX_AGE = "Access-Control-Max-Age"
         ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials"
 
-        response_parameters = Py27Dict(  # type: ignore[no-untyped-call]
+        response_parameters = Py27Dict(
             {
                 # AllowedOrigin is always required
                 self._make_response_header_key(ALLOW_ORIGIN): allowed_origins
             }
         )
 
-        response_headers = Py27Dict(  # type: ignore[no-untyped-call]
+        response_headers = Py27Dict(
             {
                 # Allow Origin is always required
                 ALLOW_ORIGIN: {"type": "string"}
@@ -523,20 +524,20 @@ class SwaggerEditor(object):
             response_headers[ALLOW_CREDENTIALS] = {"type": "string"}
 
         # construct snippet and insert key one by one to preserce input order
-        to_return = Py27Dict()  # type: ignore[no-untyped-call]
+        to_return = Py27Dict()
         to_return["summary"] = "CORS support"
         to_return["consumes"] = ["application/json"]
         to_return["produces"] = ["application/json"]
-        to_return[self._X_APIGW_INTEGRATION] = Py27Dict()  # type: ignore[no-untyped-call]
+        to_return[self._X_APIGW_INTEGRATION] = Py27Dict()
         to_return[self._X_APIGW_INTEGRATION]["type"] = "mock"
         to_return[self._X_APIGW_INTEGRATION]["requestTemplates"] = {"application/json": '{\n  "statusCode" : 200\n}\n'}
-        to_return[self._X_APIGW_INTEGRATION]["responses"] = Py27Dict()  # type: ignore[no-untyped-call]
-        to_return[self._X_APIGW_INTEGRATION]["responses"]["default"] = Py27Dict()  # type: ignore[no-untyped-call]
+        to_return[self._X_APIGW_INTEGRATION]["responses"] = Py27Dict()
+        to_return[self._X_APIGW_INTEGRATION]["responses"]["default"] = Py27Dict()
         to_return[self._X_APIGW_INTEGRATION]["responses"]["default"]["statusCode"] = "200"
         to_return[self._X_APIGW_INTEGRATION]["responses"]["default"]["responseParameters"] = response_parameters
         to_return[self._X_APIGW_INTEGRATION]["responses"]["default"]["responseTemplates"] = {"application/json": "{}\n"}
-        to_return["responses"] = Py27Dict()  # type: ignore[no-untyped-call]
-        to_return["responses"]["200"] = Py27Dict()  # type: ignore[no-untyped-call]
+        to_return["responses"] = Py27Dict()
+        to_return["responses"]["200"] = Py27Dict()
         to_return["responses"]["200"]["description"] = "Default response for CORS method"
         to_return["responses"]["200"]["headers"] = response_headers
         return to_return
@@ -580,7 +581,7 @@ class SwaggerEditor(object):
 
         :param list authorizers: List of Authorizer configurations which get translated to securityDefinitions.
         """
-        self.security_definitions = self.security_definitions or Py27Dict()  # type: ignore[no-untyped-call]
+        self.security_definitions = self.security_definitions or Py27Dict()
 
         for authorizer_name, authorizer in authorizers.items():
             self.security_definitions[authorizer_name] = authorizer.generate_swagger()
@@ -592,14 +593,14 @@ class SwaggerEditor(object):
         """
 
         # construct aws_iam_security_definition as Py27Dict and insert key one by one to preserce input order
-        aws_iam_security_definition = Py27Dict()  # type: ignore[no-untyped-call]
-        aws_iam_security_definition["AWS_IAM"] = Py27Dict()  # type: ignore[no-untyped-call]
+        aws_iam_security_definition = Py27Dict()
+        aws_iam_security_definition["AWS_IAM"] = Py27Dict()
         aws_iam_security_definition["AWS_IAM"]["x-amazon-apigateway-authtype"] = "awsSigv4"
         aws_iam_security_definition["AWS_IAM"]["type"] = "apiKey"
         aws_iam_security_definition["AWS_IAM"]["name"] = "Authorization"
         aws_iam_security_definition["AWS_IAM"]["in"] = "header"
 
-        self.security_definitions = self.security_definitions or Py27Dict()  # type: ignore[no-untyped-call]
+        self.security_definitions = self.security_definitions or Py27Dict()
 
         # Only add the security definition if it doesn't exist.  This helps ensure
         # that we minimize changes to the swagger in the case of user defined swagger
@@ -614,13 +615,13 @@ class SwaggerEditor(object):
 
         # construct api_key_security_definiton as py27 dict
         # and insert keys one by one to preserve input order
-        api_key_security_definition = Py27Dict()  # type: ignore[no-untyped-call]
-        api_key_security_definition["api_key"] = Py27Dict()  # type: ignore[no-untyped-call]
+        api_key_security_definition = Py27Dict()
+        api_key_security_definition["api_key"] = Py27Dict()
         api_key_security_definition["api_key"]["type"] = "apiKey"
         api_key_security_definition["api_key"]["name"] = "x-api-key"
         api_key_security_definition["api_key"]["in"] = "header"
 
-        self.security_definitions = self.security_definitions or Py27Dict()  # type: ignore[no-untyped-call]
+        self.security_definitions = self.security_definitions or Py27Dict()
 
         # Only add the security definition if it doesn't exist.  This helps ensure
         # that we minimize changes to the swagger in the case of user defined swagger
@@ -695,7 +696,7 @@ class SwaggerEditor(object):
 
             # No existing Authorizer found; use default
             else:
-                security_dict = Py27Dict()  # type: ignore[no-untyped-call]
+                security_dict = Py27Dict()
                 security_dict[default_authorizer] = self._get_authorization_scopes(api_authorizers, default_authorizer)  # type: ignore[no-untyped-call]
                 authorizer_security = [security_dict]
 
@@ -760,7 +761,7 @@ class SwaggerEditor(object):
 
             # No existing ApiKey setting found or it's already set to the default
             else:
-                security_dict = Py27Dict()  # type: ignore[no-untyped-call]
+                security_dict = Py27Dict()
                 security_dict["api_key"] = []
                 apikey_security = [security_dict]
 
@@ -802,12 +803,12 @@ class SwaggerEditor(object):
             authorizers param.
         """
         if authorizers is None:
-            authorizers = Py27Dict()  # type: ignore[no-untyped-call]
+            authorizers = Py27Dict()
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
             existing_security = method_definition.get("security", [])
 
-            security_dict = Py27Dict()  # type: ignore[no-untyped-call]
+            security_dict = Py27Dict()
             security_dict[authorizer_name] = []
             authorizer_security = [security_dict]
 
@@ -815,7 +816,7 @@ class SwaggerEditor(object):
             security = existing_security + authorizer_security
 
             if authorizer_name != "NONE" and authorizers:
-                method_auth_scopes = authorizers.get(authorizer_name, Py27Dict()).get("AuthorizationScopes")  # type: ignore[no-untyped-call]
+                method_auth_scopes = authorizers.get(authorizer_name, Py27Dict()).get("AuthorizationScopes")
                 if method_scopes is not None:
                     method_auth_scopes = method_scopes
                 if authorizers.get(authorizer_name) is not None and method_auth_scopes is not None:
@@ -843,7 +844,7 @@ class SwaggerEditor(object):
 
             if apikey_required:
                 # We want to enable apikey required security
-                security_dict = Py27Dict()  # type: ignore[no-untyped-call]
+                security_dict = Py27Dict()
                 security_dict["api_key"] = []
                 apikey_security = [security_dict]
                 self.add_apikey_security_definition()  # type: ignore[no-untyped-call]
@@ -851,7 +852,7 @@ class SwaggerEditor(object):
                 # The method explicitly does NOT require apikey and there is an API default
                 # so let's add a marker 'api_key_false' so that we don't incorrectly override
                 # with the api default
-                security_dict = Py27Dict()  # type: ignore[no-untyped-call]
+                security_dict = Py27Dict()
                 security_dict["api_key_false"] = []
                 apikey_security = [security_dict]
 
@@ -875,20 +876,20 @@ class SwaggerEditor(object):
 
         # Creating validator as py27 dict
         # and insert keys one by one to preserve input order
-        request_validator_definition = Py27Dict()  # type: ignore[no-untyped-call]
-        request_validator_definition[validator_name] = Py27Dict()  # type: ignore[no-untyped-call]
+        request_validator_definition = Py27Dict()
+        request_validator_definition[validator_name] = Py27Dict()
         request_validator_definition[validator_name]["validateRequestBody"] = validate_body
         request_validator_definition[validator_name]["validateRequestParameters"] = validate_parameters
 
         if not self._doc.get(self._X_APIGW_REQUEST_VALIDATORS):
-            self._doc[self._X_APIGW_REQUEST_VALIDATORS] = Py27Dict()  # type: ignore[no-untyped-call]
+            self._doc[self._X_APIGW_REQUEST_VALIDATORS] = Py27Dict()
 
         if not self._doc[self._X_APIGW_REQUEST_VALIDATORS].get(validator_name):
             # Adding only if the validator hasn't been defined already
             self._doc[self._X_APIGW_REQUEST_VALIDATORS].update(request_validator_definition)
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path, method_name):  # type: ignore[no-untyped-call]
-            set_validator_to_method = Py27Dict({self._X_APIGW_REQUEST_VALIDATOR: validator_name})  # type: ignore[no-untyped-call]
+            set_validator_to_method = Py27Dict({self._X_APIGW_REQUEST_VALIDATOR: validator_name})
             # Setting validator to the given method
             method_definition.update(set_validator_to_method)
 
@@ -910,7 +911,7 @@ class SwaggerEditor(object):
 
                 # construct parameter as py27 dict
                 # and insert keys one by one to preserve input order
-                parameter = Py27Dict()  # type: ignore[no-untyped-call]
+                parameter = Py27Dict()
                 parameter["in"] = "body"
                 parameter["name"] = model_name
                 parameter["schema"] = {"$ref": "#/definitions/{}".format(model_name)}
@@ -922,8 +923,8 @@ class SwaggerEditor(object):
 
                 method_definition["parameters"] = existing_parameters
 
-            elif self._doc.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
-                SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]  # type: ignore[no-untyped-call]
+            elif self._doc.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(
+                SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]
             ):
                 method_definition["requestBody"] = {
                     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/{}".format(model_name)}}}
@@ -938,7 +939,7 @@ class SwaggerEditor(object):
 
         :param dict gateway_responses: Dictionary of GatewayResponse configuration which gets translated.
         """
-        self.gateway_responses = self.gateway_responses or Py27Dict()  # type: ignore[no-untyped-call]
+        self.gateway_responses = self.gateway_responses or Py27Dict()
 
         for response_type, response in gateway_responses.items():
             self.gateway_responses[response_type] = response.generate_swagger()
@@ -951,7 +952,7 @@ class SwaggerEditor(object):
         :return:
         """
 
-        self.definitions = self.definitions or Py27Dict()  # type: ignore[no-untyped-call]
+        self.definitions = self.definitions or Py27Dict()
 
         for model_name, schema in models.items():
 
@@ -1070,11 +1071,11 @@ class SwaggerEditor(object):
             policy_list = [policy_list]
 
         self.resource_policy["Version"] = "2012-10-17"
-        policy_statement = Py27Dict()  # type: ignore[no-untyped-call]
+        policy_statement = Py27Dict()
         policy_statement["Effect"] = effect
         policy_statement["Action"] = "execute-api:Invoke"
         policy_statement["Resource"] = resource_list
-        policy_statement["Principal"] = Py27Dict({"AWS": policy_list})  # type: ignore[no-untyped-call]
+        policy_statement["Principal"] = Py27Dict({"AWS": policy_list})
 
         if self.resource_policy.get("Statement") is None:
             self.resource_policy["Statement"] = policy_statement
@@ -1126,13 +1127,13 @@ class SwaggerEditor(object):
             )
 
         self.resource_policy["Version"] = "2012-10-17"
-        allow_statement = Py27Dict()  # type: ignore[no-untyped-call]
+        allow_statement = Py27Dict()
         allow_statement["Effect"] = "Allow"
         allow_statement["Action"] = "execute-api:Invoke"
         allow_statement["Resource"] = resource_list
         allow_statement["Principal"] = "*"
 
-        deny_statement = Py27Dict()  # type: ignore[no-untyped-call]
+        deny_statement = Py27Dict()
         deny_statement["Effect"] = "Deny"
         deny_statement["Action"] = "execute-api:Invoke"
         deny_statement["Resource"] = resource_list
@@ -1163,7 +1164,7 @@ class SwaggerEditor(object):
                 [InvalidTemplateException("Conditional must be one of {}".format(["StringNotEquals", "StringEquals"]))]  # type: ignore[no-untyped-call]
             )
 
-        condition = Py27Dict()  # type: ignore[no-untyped-call]
+        condition = Py27Dict()
         string_endpoint_list = endpoint_dict.get("StringEndpointList")
         intrinsic_vpc_endpoint_list = endpoint_dict.get("IntrinsicVpcList")
         intrinsic_vpce_endpoint_list = endpoint_dict.get("IntrinsicVpceList")
@@ -1192,13 +1193,13 @@ class SwaggerEditor(object):
             return
 
         self.resource_policy["Version"] = "2012-10-17"
-        allow_statement = Py27Dict()  # type: ignore[no-untyped-call]
+        allow_statement = Py27Dict()
         allow_statement["Effect"] = "Allow"
         allow_statement["Action"] = "execute-api:Invoke"
         allow_statement["Resource"] = resource_list
         allow_statement["Principal"] = "*"
 
-        deny_statement = Py27Dict()  # type: ignore[no-untyped-call]
+        deny_statement = Py27Dict()
         deny_statement["Effect"] = "Deny"
         deny_statement["Action"] = "execute-api:Invoke"
         deny_statement["Resource"] = resource_list
@@ -1262,7 +1263,7 @@ class SwaggerEditor(object):
 
                 # create parameter as py27 dict
                 # and insert keys one by one to preserve input orders
-                parameter = Py27Dict()  # type: ignore[no-untyped-call]
+                parameter = Py27Dict()
                 parameter["in"] = location
                 parameter["name"] = name
                 parameter["required"] = request_parameter["Required"]
@@ -1314,8 +1315,8 @@ class SwaggerEditor(object):
             if bool(data.get("swagger")):
                 return True
             if bool(data.get("openapi")):
-                return SwaggerEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
-                    SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]  # type: ignore[no-untyped-call]
+                return SwaggerEditor.safe_compare_regex_with_string(
+                    SwaggerEditor.get_openapi_version_3_regex(), data["openapi"]
                 )
         return False
 
@@ -1351,12 +1352,12 @@ class SwaggerEditor(object):
 
         :return dict: Dictionary of a skeleton swagger document
         """
-        skeleton = Py27Dict()  # type: ignore[no-untyped-call]
+        skeleton = Py27Dict()
         skeleton["swagger"] = "2.0"
-        skeleton["info"] = Py27Dict()  # type: ignore[no-untyped-call]
+        skeleton["info"] = Py27Dict()
         skeleton["info"]["version"] = "1.0"
         skeleton["info"]["title"] = ref("AWS::StackName")  # type: ignore[no-untyped-call]
-        skeleton["paths"] = Py27Dict()  # type: ignore[no-untyped-call]
+        skeleton["paths"] = Py27Dict()
         return skeleton
 
     @staticmethod
@@ -1394,17 +1395,17 @@ class SwaggerEditor(object):
         return method
 
     @staticmethod
-    def get_openapi_versions_supported_regex():  # type: ignore[no-untyped-def]
+    def get_openapi_versions_supported_regex() -> str:
         openapi_version_supported_regex = r"\A[2-3](\.\d)(\.\d)?$"
         return openapi_version_supported_regex
 
     @staticmethod
-    def get_openapi_version_3_regex():  # type: ignore[no-untyped-def]
+    def get_openapi_version_3_regex() -> str:
         openapi_version_3_regex = r"\A3(\.\d)(\.\d)?$"
         return openapi_version_3_regex
 
     @staticmethod
-    def safe_compare_regex_with_string(regex, data):  # type: ignore[no-untyped-def]
+    def safe_compare_regex_with_string(regex: str, data: str) -> bool:
         return re.match(regex, str(data)) is not None
 
     @staticmethod

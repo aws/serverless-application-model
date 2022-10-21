@@ -50,10 +50,10 @@ class OpenApiEditor(object):
 
         self._doc = copy.deepcopy(doc)
         self.paths = self._doc["paths"]
-        self.security_schemes = self._doc.get("components", Py27Dict()).get("securitySchemes", Py27Dict())  # type: ignore[no-untyped-call]
-        self.definitions = self._doc.get("definitions", Py27Dict())  # type: ignore[no-untyped-call]
+        self.security_schemes = self._doc.get("components", Py27Dict()).get("securitySchemes", Py27Dict())
+        self.definitions = self._doc.get("definitions", Py27Dict())
         self.tags = self._doc.get("tags", [])
-        self.info = self._doc.get("info", Py27Dict())  # type: ignore[no-untyped-call]
+        self.info = self._doc.get("info", Py27Dict())
 
     def get_conditional_contents(self, item):  # type: ignore[no-untyped-def]
         """
@@ -106,7 +106,7 @@ class OpenApiEditor(object):
         method_name = self._normalize_method_name(method_name)  # type: ignore[no-untyped-call]
 
         for method_definition in self.iter_on_method_definitions_for_path_at_method(path_name, method_name, False):  # type: ignore[no-untyped-call]
-            integration = method_definition.get(self._X_APIGW_INTEGRATION, Py27Dict())  # type: ignore[no-untyped-call]
+            integration = method_definition.get(self._X_APIGW_INTEGRATION, Py27Dict())
 
             # Extract the integration uri out of a conditional if necessary
             uri = integration.get("uri")
@@ -182,7 +182,7 @@ class OpenApiEditor(object):
         """
         method = self._normalize_method_name(method)  # type: ignore[no-untyped-call]
 
-        path_dict = self.paths.setdefault(path, Py27Dict())  # type: ignore[no-untyped-call]
+        path_dict = self.paths.setdefault(path, Py27Dict())
 
         if not isinstance(path_dict, dict):
             # Either customers has provided us an invalid Swagger, or this class has messed it somehow
@@ -191,7 +191,7 @@ class OpenApiEditor(object):
             )
 
         for path_item in self.get_conditional_contents(path_dict):  # type: ignore[no-untyped-call]
-            path_item.setdefault(method, Py27Dict())  # type: ignore[no-untyped-call]
+            path_item.setdefault(method, Py27Dict())
 
     def add_lambda_integration(  # type: ignore[no-untyped-def]
         self, path, method, integration_uri, method_auth_config=None, api_auth_config=None, condition=None
@@ -219,8 +219,8 @@ class OpenApiEditor(object):
         for path_item in self.get_conditional_contents(self.paths.get(path)):  # type: ignore[no-untyped-call]
             # create as Py27Dict and insert key one by one to preserve input order
             if path_item[method] is None:
-                path_item[method] = Py27Dict()  # type: ignore[no-untyped-call]
-            path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()  # type: ignore[no-untyped-call]
+                path_item[method] = Py27Dict()
+            path_item[method][self._X_APIGW_INTEGRATION] = Py27Dict()
             path_item[method][self._X_APIGW_INTEGRATION]["type"] = "aws_proxy"
             path_item[method][self._X_APIGW_INTEGRATION]["httpMethod"] = "POST"
             path_item[method][self._X_APIGW_INTEGRATION]["payloadFormatVersion"] = "2.0"
@@ -230,7 +230,7 @@ class OpenApiEditor(object):
                 path_item[method]["isDefaultRoute"] = True
 
             # If 'responses' key is *not* present, add it with an empty dict as value
-            path_item[method].setdefault("responses", Py27Dict())  # type: ignore[no-untyped-call]
+            path_item[method].setdefault("responses", Py27Dict())
 
             # If a condition is present, wrap all method contents up into the condition
             if condition:
@@ -332,7 +332,7 @@ class OpenApiEditor(object):
                     existing_parameter["required"] = True
                 else:
                     # create as Py27Dict and insert keys one by one to preserve input order
-                    parameter = Py27Dict()  # type: ignore[no-untyped-call]
+                    parameter = Py27Dict()
                     param = Py27UniStr(param) if isinstance(param, str) else param
                     parameter["name"] = param
                     parameter["in"] = "path"
@@ -357,7 +357,7 @@ class OpenApiEditor(object):
 
         :param list authorizers: List of Authorizer configurations which get translated to securityDefinitions.
         """
-        self.security_schemes = self.security_schemes or Py27Dict()  # type: ignore[no-untyped-call]
+        self.security_schemes = self.security_schemes or Py27Dict()
 
         for authorizer_name, authorizer in authorizers.items():
             self.security_schemes[authorizer_name] = authorizer.generate_openapi()
@@ -497,7 +497,7 @@ class OpenApiEditor(object):
                 existing_tag[self._X_APIGW_TAG_VALUE] = value
             else:
                 # create as Py27Dict and insert key one by one to preserve input order
-                tag = Py27Dict()  # type: ignore[no-untyped-call]
+                tag = Py27Dict()
                 tag["name"] = name
                 tag[self._X_APIGW_TAG_VALUE] = value
                 self.tags.append(tag)
@@ -515,7 +515,7 @@ class OpenApiEditor(object):
 
         DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
 
-        servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])  # type: ignore[no-untyped-call]
+        servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
         for config in servers_configurations:
             endpoint_configuration = config.get(self._X_APIGW_ENDPOINT_CONFIG, {})
             endpoint_configuration[DISABLE_EXECUTE_API_ENDPOINT] = disable_execute_api_endpoint
@@ -615,7 +615,7 @@ class OpenApiEditor(object):
             self._doc["tags"] = self.tags
 
         if self.security_schemes:
-            self._doc.setdefault("components", Py27Dict())  # type: ignore[no-untyped-call]
+            self._doc.setdefault("components", Py27Dict())
             self._doc["components"]["securitySchemes"] = self.security_schemes
 
         if self.info:
@@ -647,12 +647,12 @@ class OpenApiEditor(object):
         :return dict: Dictionary of a skeleton swagger document
         """
         # create as Py27Dict and insert key one by one to preserve input order
-        skeleton = Py27Dict()  # type: ignore[no-untyped-call]
+        skeleton = Py27Dict()
         skeleton["openapi"] = "3.0.1"
-        skeleton["info"] = Py27Dict()  # type: ignore[no-untyped-call]
+        skeleton["info"] = Py27Dict()
         skeleton["info"]["version"] = "1.0"
         skeleton["info"]["title"] = ref("AWS::StackName")  # type: ignore[no-untyped-call]
-        skeleton["paths"] = Py27Dict()  # type: ignore[no-untyped-call]
+        skeleton["paths"] = Py27Dict()
         return skeleton
 
     @staticmethod

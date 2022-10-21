@@ -7,6 +7,8 @@ import json
 import sys
 import logging
 
+from typing import Any
+
 from samtranslator.parser.parser import Parser
 from samtranslator.third_party.py27hash.hash import Hash
 
@@ -58,7 +60,7 @@ def to_py27_compatible_template(template, parameter_values=None):  # type: ignor
         template["Globals"]["Api"] = _convert_to_py27_type(template["Globals"]["Api"])  # type: ignore[no-untyped-call]
 
     if "Parameters" in template and isinstance(template["Parameters"], dict):
-        new_parameters_dict = Py27Dict()  # type: ignore[no-untyped-call]
+        new_parameters_dict = Py27Dict()
         for logical_id, param_dict in template["Parameters"].items():
             if isinstance(param_dict, dict) and "Default" in param_dict:
                 param_dict["Default"] = _convert_to_py27_type(param_dict["Default"])  # type: ignore[no-untyped-call]
@@ -68,7 +70,7 @@ def to_py27_compatible_template(template, parameter_values=None):  # type: ignor
         template["Parameters"] = new_parameters_dict
 
     if "Resources" in template and isinstance(template["Resources"], dict):
-        new_resources_dict = Py27Dict()  # type: ignore[no-untyped-call]
+        new_resources_dict = Py27Dict()
         for logical_id, resource_dict in template["Resources"].items():
             if isinstance(resource_dict, dict):
                 resource_type = resource_dict.get("Type")
@@ -352,7 +354,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
     Compatibility class to support Python2.7 style iteration in Python3.x
     """
 
-    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """
         Overrides dict logic to always call set item. This allows Python2.7 style iteration
         """
@@ -443,7 +445,7 @@ class Py27Dict(dict):  # type: ignore[type-arg]
         Py27Dict
             copy of self
         """
-        new = Py27Dict()  # type: ignore[no-untyped-call]
+        new = Py27Dict()
 
         # First copy the keylist to the new object
         new.keylist = self.keylist.copy()  # type: ignore[no-untyped-call]
@@ -603,7 +605,7 @@ def _convert_to_py27_type(original):  # type: ignore[no-untyped-def]
     if isinstance(original, dict):
         # Recursively convert dict items
         key_list = original.keys()
-        new_dict = Py27Dict()  # type: ignore[no-untyped-call]
+        new_dict = Py27Dict()
         for key in key_list:
             new_dict[Py27UniStr(key)] = _convert_to_py27_type(original[key])  # type: ignore[no-untyped-call]
         return new_dict
