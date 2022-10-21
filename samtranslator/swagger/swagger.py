@@ -135,8 +135,8 @@ class SwaggerEditor(object):
         DISABLE_EXECUTE_API_ENDPOINT = "disableExecuteApiEndpoint"
         set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
 
-        # Check if the OpenAPI version is 3.0, if it is then the extension needs to added to the Servers field of the
-        # OpenApi object, as per the guide linked above
+        # Check if the OpenAPI version is 3.0, if it is then the extension needs to added to the Servers field,
+        # if not then it gets added to the top level (same level as "paths" and "info")
         if self._doc.get("openapi") and self.validate_open_api_version_3(self._doc["openapi"]):
             # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
             servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
