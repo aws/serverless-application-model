@@ -136,11 +136,11 @@ class SwaggerEditor(object):
         set_disable_api_endpoint = {DISABLE_EXECUTE_API_ENDPOINT: disable_execute_api_endpoint}
 
         # Check if the OpenAPI version is 3.0
-        if self._doc.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(
-            SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]
+        if self._doc.get("openapi") and SwaggerEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
+            SwaggerEditor.get_openapi_version_3_regex(), self._doc["openapi"]  # type: ignore[no-untyped-call]
         ):
             # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
-            servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
+            servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])  # type: ignore[no-untyped-call]
             for config in servers_configurations:
                 if not config.get(self._X_ENDPOINT_CONFIG):
                     config[self._X_ENDPOINT_CONFIG] = {}
