@@ -4,7 +4,7 @@ from samtranslator.model.intrinsics import is_intrinsic_if, is_intrinsic_no_valu
 from samtranslator.model.exceptions import InvalidResourceException
 
 
-def construct_role_for_resource(
+def construct_role_for_resource(  # type: ignore[no-untyped-def]
     resource_logical_id,
     attributes,
     managed_policy_map,
@@ -31,7 +31,7 @@ def construct_role_for_resource(
     :rtype: model.iam.IAMRole
     """
     role_logical_id = resource_logical_id + "Role"
-    execution_role = IAMRole(logical_id=role_logical_id, attributes=attributes)
+    execution_role = IAMRole(logical_id=role_logical_id, attributes=attributes)  # type: ignore[no-untyped-call]
     execution_role.AssumeRolePolicyDocument = assume_role_policy_document
 
     if not managed_policy_arns:
@@ -43,20 +43,20 @@ def construct_role_for_resource(
     for index, policy_entry in enumerate(resource_policies.get()):
         if policy_entry.type is PolicyTypes.POLICY_STATEMENT:
 
-            if is_intrinsic_if(policy_entry.data):
+            if is_intrinsic_if(policy_entry.data):  # type: ignore[no-untyped-call]
 
                 intrinsic_if = policy_entry.data
                 then_statement = intrinsic_if["Fn::If"][1]
                 else_statement = intrinsic_if["Fn::If"][2]
 
-                if not is_intrinsic_no_value(then_statement):
+                if not is_intrinsic_no_value(then_statement):  # type: ignore[no-untyped-call]
                     then_statement = {
                         "PolicyName": execution_role.logical_id + "Policy" + str(index),
                         "PolicyDocument": then_statement,
                     }
                     intrinsic_if["Fn::If"][1] = then_statement
 
-                if not is_intrinsic_no_value(else_statement):
+                if not is_intrinsic_no_value(else_statement):  # type: ignore[no-untyped-call]
                     else_statement = {
                         "PolicyName": execution_role.logical_id + "Policy" + str(index),
                         "PolicyDocument": else_statement,
@@ -94,7 +94,7 @@ def construct_role_for_resource(
                 managed_policy_arns.append(policy_arn)
         else:
             # Policy Templates are not supported here in the "core"
-            raise InvalidResourceException(
+            raise InvalidResourceException(  # type: ignore[no-untyped-call]
                 resource_logical_id,
                 "Policy at index {} in the '{}' property is not valid".format(
                     index, resource_policies.POLICIES_PROPERTY_NAME

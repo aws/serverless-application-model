@@ -9,7 +9,7 @@ class LogicalIdGenerator(object):
     #       given by this class
     HASH_LENGTH = 10
 
-    def __init__(self, prefix, data_obj=None, data_hash=None):
+    def __init__(self, prefix, data_obj=None, data_hash=None):  # type: ignore[no-untyped-def]
         """
         Generate logical IDs for resources that are stable, deterministic and platform independent
 
@@ -20,13 +20,13 @@ class LogicalIdGenerator(object):
 
         data_str = ""
         if data_obj:
-            data_str = self._stringify(data_obj)
+            data_str = self._stringify(data_obj)  # type: ignore[no-untyped-call]
 
         self._prefix = prefix
         self.data_str = data_str
         self.data_hash = data_hash
 
-    def gen(self):
+    def gen(self):  # type: ignore[no-untyped-def]
         """
         Generate stable LogicalIds based on the prefix and given data. This method ensures that the logicalId is
         deterministic and stable based on input prefix & data object. In other words:
@@ -44,10 +44,10 @@ class LogicalIdGenerator(object):
         :rtype string
         """
 
-        data_hash = self.get_hash()
+        data_hash = self.get_hash()  # type: ignore[no-untyped-call]
         return "{prefix}{hash}".format(prefix=self._prefix, hash=data_hash)
 
-    def get_hash(self, length=HASH_LENGTH):
+    def get_hash(self, length=HASH_LENGTH):  # type: ignore[no-untyped-def]
         """
         Generate and return a hash of data that can be used as suffix of logicalId
 
@@ -65,17 +65,17 @@ class LogicalIdGenerator(object):
         encoded_data_str = self.data_str
         if sys.version_info.major == 2:
             # In Py2, only unicode needs to be encoded.
-            if isinstance(self.data_str, unicode):  # pylint: disable=E0602
+            if isinstance(self.data_str, unicode):  # type: ignore[name-defined] # pylint: disable=E0602
                 encoded_data_str = self.data_str.encode("utf-8")
         else:
             # data_str should always be unicode on python 3
-            encoded_data_str = self.data_str.encode("utf-8")
+            encoded_data_str = self.data_str.encode("utf-8")  # type: ignore[assignment]
 
-        data_hash = hashlib.sha1(encoded_data_str).hexdigest()
+        data_hash = hashlib.sha1(encoded_data_str).hexdigest()  # type: ignore[arg-type]
 
         return data_hash[:length]
 
-    def _stringify(self, data):
+    def _stringify(self, data):  # type: ignore[no-untyped-def]
         """
         Stable, platform & language-independent stringification of a data with basic Python type.
 

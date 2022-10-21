@@ -1,7 +1,7 @@
 import re
 
 
-def is_dynamic_reference(input):
+def is_dynamic_reference(input):  # type: ignore[no-untyped-def]
     """
     Checks if the given input is a dynamic reference. Dynamic references follow the pattern '{{resolve:service-name:reference-key}}'
 

@@ -1,9 +1,9 @@
 from samtranslator.model.intrinsics import make_conditional
 from samtranslator.model.naming import GeneratedLogicalId
 from samtranslator.plugins.api.implicit_api_plugin import ImplicitApiPlugin
-from samtranslator.public.open_api import OpenApiEditor
-from samtranslator.public.exceptions import InvalidEventException
-from samtranslator.public.sdk.resource import SamResourceType, SamResource
+from samtranslator.public.open_api import OpenApiEditor  # type: ignore[attr-defined]
+from samtranslator.public.exceptions import InvalidEventException  # type: ignore[attr-defined]
+from samtranslator.public.sdk.resource import SamResourceType, SamResource  # type: ignore[attr-defined, attr-defined]
 
 
 class ImplicitHttpApiPlugin(ImplicitApiPlugin):
@@ -24,24 +24,24 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
                                              in OpenApi. Does **not** configure the API by any means.
     """
 
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         """
         Initializes the plugin
         """
-        super(ImplicitHttpApiPlugin, self).__init__(ImplicitHttpApiPlugin.__name__)
+        super(ImplicitHttpApiPlugin, self).__init__(ImplicitHttpApiPlugin.__name__)  # type: ignore[no-untyped-call]
 
-    def _setup_api_properties(self):
+    def _setup_api_properties(self):  # type: ignore[no-untyped-def]
         """
         Sets up properties that are distinct to this plugin
         """
-        self.implicit_api_logical_id = GeneratedLogicalId.implicit_http_api()
+        self.implicit_api_logical_id = GeneratedLogicalId.implicit_http_api()  # type: ignore[no-untyped-call]
         self.implicit_api_condition = "ServerlessHttpApiCondition"
         self.api_event_type = "HttpApi"
         self.api_type = SamResourceType.HttpApi.value
         self.api_id_property = "ApiId"
         self.editor = OpenApiEditor
 
-    def _process_api_events(
+    def _process_api_events(  # type: ignore[no-untyped-def]
         self, function, api_events, template, condition=None, deletion_policy=None, update_replace_policy=None
     ):
         """
@@ -66,9 +66,9 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
 
             if not event_properties:
                 event["Properties"] = event_properties
-            self._add_implicit_api_id_if_necessary(event_properties)
+            self._add_implicit_api_id_if_necessary(event_properties)  # type: ignore[no-untyped-call]
 
-            api_id = self._get_api_id(event_properties)
+            api_id = self._get_api_id(event_properties)  # type: ignore[no-untyped-call]
             path = event_properties.get("Path", "")
             method = event_properties.get("Method", "")
             # If no path and method specified, add the $default path and ANY method
@@ -101,15 +101,15 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
             api_dict_update_replace = self.api_update_replace_policies.setdefault(api_id, set())
             api_dict_update_replace.add(update_replace_policy)
 
-            self._add_api_to_swagger(logicalId, event_properties, template)
+            self._add_api_to_swagger(logicalId, event_properties, template)  # type: ignore[no-untyped-call]
             if "RouteSettings" in event_properties:
-                self._add_route_settings_to_api(logicalId, event_properties, template, condition)
+                self._add_route_settings_to_api(logicalId, event_properties, template, condition)  # type: ignore[no-untyped-call]
             api_events[logicalId] = event
 
         # We could have made changes to the Events structure. Write it back to function
         function.properties["Events"].update(api_events)
 
-    def _add_implicit_api_id_if_necessary(self, event_properties):
+    def _add_implicit_api_id_if_necessary(self, event_properties):  # type: ignore[no-untyped-def]
         """
         Events for implicit APIs will *not* have the RestApiId property. Absence of this property means this event
         is associated with the AWS::Serverless::Api ImplicitAPI resource.
@@ -120,25 +120,25 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         if "ApiId" not in event_properties:
             event_properties["ApiId"] = {"Ref": self.implicit_api_logical_id}
 
-    def _generate_implicit_api_resource(self):
+    def _generate_implicit_api_resource(self):  # type: ignore[no-untyped-def]
         """
         Uses the implicit API in this file to generate an Implicit API resource
         """
-        return ImplicitHttpApiResource().to_dict()
+        return ImplicitHttpApiResource().to_dict()  # type: ignore[no-untyped-call]
 
-    def _get_api_definition_from_editor(self, editor):
+    def _get_api_definition_from_editor(self, editor):  # type: ignore[no-untyped-def]
         """
         Helper function to return the OAS definition from the editor
         """
         return editor.openapi
 
-    def _get_api_resource_type_name(self):
+    def _get_api_resource_type_name(self):  # type: ignore[no-untyped-def]
         """
         Returns the type of API resource
         """
         return "AWS::Serverless::HttpApi"
 
-    def _add_route_settings_to_api(self, event_id, event_properties, template, condition):
+    def _add_route_settings_to_api(self, event_id, event_properties, template, condition):  # type: ignore[no-untyped-def]
         """
         Adds the RouteSettings for this path/method from the given event to the RouteSettings configuration
         on the AWS::Serverless::HttpApi that this refers to.
@@ -149,7 +149,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         :param string condition: Condition on this HttpApi event (if any)
         """
 
-        api_id = self._get_api_id(event_properties)
+        api_id = self._get_api_id(event_properties)  # type: ignore[no-untyped-call]
         resource = template.get(api_id)
 
         path = event_properties["Path"]
@@ -164,7 +164,7 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         api_route_settings = resource.properties.get("RouteSettings", {})
         event_route_settings = event_properties.get("RouteSettings", {})
         if condition:
-            event_route_settings = make_conditional(condition, event_properties.get("RouteSettings", {}))
+            event_route_settings = make_conditional(condition, event_properties.get("RouteSettings", {}))  # type: ignore[no-untyped-call]
 
         # Merge event-level and api-level RouteSettings properties
         api_route_settings.setdefault(route, {})
@@ -173,13 +173,13 @@ class ImplicitHttpApiPlugin(ImplicitApiPlugin):
         template.set(api_id, resource)
 
 
-class ImplicitHttpApiResource(SamResource):
+class ImplicitHttpApiResource(SamResource):  # type: ignore[misc]
     """
     Returns a AWS::Serverless::HttpApi resource representing the Implicit APIs. The returned resource
     includes the empty OpenApi along with default values for other properties.
     """
 
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         open_api = OpenApiEditor.gen_skeleton()
 
         resource = {

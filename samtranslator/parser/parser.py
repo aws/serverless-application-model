@@ -3,33 +3,33 @@ import logging
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException, InvalidResourceException
 from samtranslator.validator.validator import SamTemplateValidator
 from samtranslator.plugins import LifeCycleEvents
-from samtranslator.public.sdk.template import SamTemplate
+from samtranslator.public.sdk.template import SamTemplate  # type: ignore[attr-defined]
 
 LOG = logging.getLogger(__name__)
 
 
 class Parser:
-    def __init__(self):
+    def __init__(self):  # type: ignore[no-untyped-def]
         pass
 
-    def parse(self, sam_template, parameter_values, sam_plugins):
-        self._validate(sam_template, parameter_values)
+    def parse(self, sam_template, parameter_values, sam_plugins):  # type: ignore[no-untyped-def]
+        self._validate(sam_template, parameter_values)  # type: ignore[no-untyped-call]
         sam_plugins.act(LifeCycleEvents.before_transform_template, sam_template)
 
     @staticmethod
-    def validate_datatypes(sam_template):
+    def validate_datatypes(sam_template):  # type: ignore[no-untyped-def]
         """Validates the datatype within the template"""
         if (
             "Resources" not in sam_template
             or not isinstance(sam_template["Resources"], dict)
             or not sam_template["Resources"]
         ):
-            raise InvalidDocumentException([InvalidTemplateException("'Resources' section is required")])
+            raise InvalidDocumentException([InvalidTemplateException("'Resources' section is required")])  # type: ignore[no-untyped-call, no-untyped-call]
 
         if not all(isinstance(sam_resource, dict) for sam_resource in sam_template["Resources"].values()):
-            raise InvalidDocumentException(
+            raise InvalidDocumentException(  # type: ignore[no-untyped-call]
                 [
-                    InvalidTemplateException(
+                    InvalidTemplateException(  # type: ignore[no-untyped-call]
                         "All 'Resources' must be Objects. If you're using YAML, this may be an indentation issue."
                     )
                 ]
@@ -42,9 +42,9 @@ class Parser:
             # `not isinstance(sam_resources.get("Properties"), dict)` as this would be a breaking change.
             # sam_resource.properties defaults to {} in SamTemplate init
             if not isinstance(sam_resource.properties, dict):
-                raise InvalidDocumentException(
+                raise InvalidDocumentException(  # type: ignore[no-untyped-call]
                     [
-                        InvalidResourceException(
+                        InvalidResourceException(  # type: ignore[no-untyped-call]
                             resource_logical_id,
                             "All 'Resources' must be Objects and have a 'Properties' Object. If "
                             "you're using YAML, this may be an indentation issue.",
@@ -53,7 +53,7 @@ class Parser:
                 )
 
     # private methods
-    def _validate(self, sam_template, parameter_values):
+    def _validate(self, sam_template, parameter_values):  # type: ignore[no-untyped-def]
         """Validates the template and parameter values and raises exceptions if there's an issue
 
         :param dict sam_template: SAM template
@@ -62,11 +62,11 @@ class Parser:
         if parameter_values is None:
             raise ValueError("`parameter_values` argument is required")
 
-        Parser.validate_datatypes(sam_template)
+        Parser.validate_datatypes(sam_template)  # type: ignore[no-untyped-call]
 
         try:
-            validator = SamTemplateValidator()
-            validation_errors = validator.validate(sam_template)
+            validator = SamTemplateValidator()  # type: ignore[no-untyped-call]
+            validation_errors = validator.validate(sam_template)  # type: ignore[no-untyped-call]
             if validation_errors:
                 LOG.warning("Template schema validation reported the following errors: %s", validation_errors)
         except Exception as e:

@@ -15,7 +15,7 @@ do_not_verify = {
 }
 
 
-def verify_unique_logical_id(resource, existing_resources):
+def verify_unique_logical_id(resource, existing_resources):  # type: ignore[no-untyped-def]
     # new resource logicalid exists in the template before transform
     if resource.logical_id is not None and resource.logical_id in existing_resources:
         # new resource logicalid is in  the do_not_resolve list

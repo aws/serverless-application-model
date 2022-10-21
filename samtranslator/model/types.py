@@ -11,7 +11,7 @@ either a string or a list of strings, but do not validate whether the string(s) 
 import samtranslator.model.exceptions
 
 
-def is_type(valid_type):
+def is_type(valid_type):  # type: ignore[no-untyped-def]
     """Returns a validator function that succeeds only for inputs of the provided valid_type.
 
     :param type valid_type: the type that should be considered valid for the validator
@@ -19,7 +19,7 @@ def is_type(valid_type):
     :rtype: callable
     """
 
-    def validate(value, should_raise=True):
+    def validate(value, should_raise=True):  # type: ignore[no-untyped-def]
         if not isinstance(value, valid_type):
             if should_raise:
                 raise TypeError(
@@ -33,7 +33,7 @@ def is_type(valid_type):
     return validate
 
 
-def list_of(validate_item):
+def list_of(validate_item):  # type: ignore[no-untyped-def]
     """Returns a validator function that succeeds only if the input is a list, and each item in the list passes as input
     to the provided validator validate_item.
 
@@ -42,8 +42,8 @@ def list_of(validate_item):
     :rtype: callable
     """
 
-    def validate(value, should_raise=True):
-        validate_type = is_type(list)
+    def validate(value, should_raise=True):  # type: ignore[no-untyped-def]
+        validate_type = is_type(list)  # type: ignore[no-untyped-call]
         if not validate_type(value, should_raise=should_raise):
             return False
 
@@ -52,7 +52,7 @@ def list_of(validate_item):
                 validate_item(item)
             except TypeError as e:
                 if should_raise:
-                    samtranslator.model.exceptions.prepend(e, "list contained an invalid item")
+                    samtranslator.model.exceptions.prepend(e, "list contained an invalid item")  # type: ignore[no-untyped-call]
                     raise
                 return False
         return True
@@ -60,7 +60,7 @@ def list_of(validate_item):
     return validate
 
 
-def dict_of(validate_key, validate_item):
+def dict_of(validate_key, validate_item):  # type: ignore[no-untyped-def]
     """Returns a validator function that succeeds only if the input is a dict, and each key and value in the dict passes
     as input to the provided validators validate_key and validate_item, respectively.
 
@@ -70,8 +70,8 @@ def dict_of(validate_key, validate_item):
     :rtype: callable
     """
 
-    def validate(value, should_raise=True):
-        validate_type = is_type(dict)
+    def validate(value, should_raise=True):  # type: ignore[no-untyped-def]
+        validate_type = is_type(dict)  # type: ignore[no-untyped-call]
         if not validate_type(value, should_raise=should_raise):
             return False
 
@@ -80,7 +80,7 @@ def dict_of(validate_key, validate_item):
                 validate_key(key)
             except TypeError as e:
                 if should_raise:
-                    samtranslator.model.exceptions.prepend(e, "dict contained an invalid key")
+                    samtranslator.model.exceptions.prepend(e, "dict contained an invalid key")  # type: ignore[no-untyped-call]
                     raise
                 return False
 
@@ -88,7 +88,7 @@ def dict_of(validate_key, validate_item):
                 validate_item(item)
             except TypeError as e:
                 if should_raise:
-                    samtranslator.model.exceptions.prepend(e, "dict contained an invalid value")
+                    samtranslator.model.exceptions.prepend(e, "dict contained an invalid value")  # type: ignore[no-untyped-call]
                     raise
                 return False
         return True
@@ -96,7 +96,7 @@ def dict_of(validate_key, validate_item):
     return validate
 
 
-def one_of(*validators):
+def one_of(*validators):  # type: ignore[no-untyped-def]
     """Returns a validator function that succeeds only if the input passes at least one of the provided validators.
 
     :param callable validators: the validator functions
@@ -105,7 +105,7 @@ def one_of(*validators):
     :rtype: callable
     """
 
-    def validate(value, should_raise=True):
+    def validate(value, should_raise=True):  # type: ignore[no-untyped-def]
         if any(validate(value, should_raise=False) for validate in validators):
             return True
 
@@ -116,17 +116,17 @@ def one_of(*validators):
     return validate
 
 
-def is_str():
+def is_str():  # type: ignore[no-untyped-def]
     """Returns a validator function that succeeds for input of type str or unicode.
 
     :returns: a string validator
     :rtype: callable
     """
-    return is_type(str)
+    return is_type(str)  # type: ignore[no-untyped-call]
 
 
-def any_type():
-    def validate(value, should_raise=False):
+def any_type():  # type: ignore[no-untyped-def]
+    def validate(value, should_raise=False):  # type: ignore[no-untyped-def]
         return True
 
     return validate
