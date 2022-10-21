@@ -28,14 +28,20 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyTable", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
                 },
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
                       "DestinationArn": {
-                        "Fn::GetAtt": ["MyTable", "Arn"]
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -81,14 +87,20 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyTable", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
                 },
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
                       "DestinationArn": {
-                        "Fn::GetAtt": ["MyTable", "Arn"]
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -108,14 +120,20 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyTable", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
                 },
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
                       "DestinationArn": {
-                        "Fn::GetAtt": ["MyTable", "Arn"]
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -161,14 +179,20 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyTable", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
                 },
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
                       "DestinationArn": {
-                        "Fn::GetAtt": ["MyTable", "Arn"]
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -214,14 +238,20 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["MyTable", "Arn"]
+                  "Fn::GetAtt": [
+                    "MyTable",
+                    "Arn"
+                  ]
                 },
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
                       "DestinationArn": {
-                        "Fn::GetAtt": ["MyTable", "Arn"]
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -253,7 +283,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x"
       },
@@ -292,7 +325,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["MyServerlessFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "MyServerlessFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -309,10 +345,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],

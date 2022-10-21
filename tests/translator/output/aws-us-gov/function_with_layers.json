@@ -1,246 +1,246 @@
 {
   "Resources": {
-    "MinimalLayerFunction": {
-      "Type": "AWS::Lambda::Function", 
+    "FunctionLayerWithSubIntrinsic": {
       "Properties": {
-        "Layers": [
-          "arn:aws:lambda:us-east-1:123456789101:layer:CorpXLayer:1"
-        ], 
         "Code": {
-          "S3Bucket": "sam-demo-bucket", 
+          "S3Bucket": "sam-demo-bucket",
           "S3Key": "hello.zip"
-        }, 
-        "Tags": [
+        },
+        "Handler": "hello.handler",
+        "Layers": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:CorpXLayer:1"
+          },
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:CorpYLayer:1"
           }
-        ], 
-        "Handler": "hello.handler", 
+        ],
         "Role": {
           "Fn::GetAtt": [
-            "MinimalLayerFunctionRole", 
+            "FunctionLayerWithSubIntrinsicRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7"
-      }
-    }, 
-    "MyLayera5167acaba": {
-      "DeletionPolicy": "Retain", 
-      "Type": "AWS::Lambda::LayerVersion", 
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionLayerWithSubIntrinsicRole": {
       "Properties": {
-        "Content": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "layer.zip"
-        }, 
-        "LayerName": "MyLayer"
-      }
-    }, 
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "FunctionNoLayerVersion": {
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
+        "Layers": [
+          "arn:aws:lambda:us-east-1:123456789101:layer:CorpXLayer:1"
+        ],
+        "Role": {
+          "Fn::GetAtt": [
+            "FunctionNoLayerVersionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python2.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "FunctionNoLayerVersionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
     "FunctionReferencesLayer": {
-      "Type": "AWS::Lambda::Function", 
       "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
         "Layers": [
           {
             "Ref": "MyLayera5167acaba"
           }
-        ], 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "hello.zip"
-        }, 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ], 
-        "Handler": "hello.handler", 
+        ],
         "Role": {
           "Fn::GetAtt": [
-            "FunctionReferencesLayerRole", 
+            "FunctionReferencesLayerRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7"
-      }
-    }, 
-    "MinimalLayerFunctionRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
+        },
+        "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
-    }, 
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
     "FunctionReferencesLayerRole": {
-      "Type": "AWS::IAM::Role", 
       "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "FunctionLayerWithSubIntrinsic": {
-      "Type": "AWS::Lambda::Function", 
-      "Properties": {
-        "Layers": [
-          {
-            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:CorpXLayer:1"
-          }, 
-          {
-            "Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:layer:CorpYLayer:1"
-          }
-        ], 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "hello.zip"
-        }, 
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ],
         "Tags": [
           {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ], 
-        "Handler": "hello.handler", 
-        "Role": {
-          "Fn::GetAtt": [
-            "FunctionLayerWithSubIntrinsicRole", 
-            "Arn"
-          ]
-        }, 
-        "Runtime": "python2.7"
-      }
-    }, 
-    "FunctionNoLayerVersion": {
-      "Type": "AWS::Lambda::Function", 
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MinimalLayerFunction": {
       "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "hello.zip"
+        },
+        "Handler": "hello.handler",
         "Layers": [
           "arn:aws:lambda:us-east-1:123456789101:layer:CorpXLayer:1"
-        ], 
-        "Code": {
-          "S3Bucket": "sam-demo-bucket", 
-          "S3Key": "hello.zip"
-        }, 
-        "Tags": [
-          {
-            "Value": "SAM", 
-            "Key": "lambda:createdBy"
-          }
-        ], 
-        "Handler": "hello.handler", 
+        ],
         "Role": {
           "Fn::GetAtt": [
-            "FunctionNoLayerVersionRole", 
+            "MinimalLayerFunctionRole",
             "Arn"
           ]
-        }, 
-        "Runtime": "python2.7"
-      }
-    }, 
-    "FunctionNoLayerVersionRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
-        "ManagedPolicyArns": [
-          "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        ],
+        },
+        "Runtime": "python2.7",
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ],
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "MinimalLayerFunctionRole": {
+      "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
           "Statement": [
             {
               "Action": [
                 "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
+              ],
+              "Effect": "Allow",
               "Principal": {
                 "Service": [
                   "lambda.amazonaws.com"
                 ]
               }
             }
-          ]
-        }
-      }
-    }, 
-    "FunctionLayerWithSubIntrinsicRole": {
-      "Type": "AWS::IAM::Role", 
-      "Properties": {
+          ],
+          "Version": "2012-10-17"
+        },
         "ManagedPolicyArns": [
           "arn:aws-us-gov:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
-        ],
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17", 
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ], 
-              "Effect": "Allow", 
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        }
-      }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MyLayera5167acaba": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Content": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "layer.zip"
+        },
+        "LayerName": "MyLayer"
+      },
+      "Type": "AWS::Lambda::LayerVersion"
     }
   }
 }

@@ -1,12 +1,301 @@
 {
   "Resources": {
+    "MyConnector1Policy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector1": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::SQS::Queue"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:DeleteMessage"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue1",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue1",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SomeRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnector2Policy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector2": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::SQS::Queue"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:DeleteMessage"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue2",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue2",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SomeRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnector3Policy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector3": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::SQS::Queue"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sqs:DeleteMessage"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue3",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "MyQueue3",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SomeRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyConnector4Policy": {
+      "Metadata": {
+        "aws:sam:connectors": {
+          "MyConnector4": {
+            "Destination": {
+              "Type": "AWS::Lambda::Function"
+            },
+            "Source": {
+              "Type": "AWS::DynamoDB::Table"
+            }
+          }
+        }
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "${SourceArn}/stream/*",
+                    {
+                      "SourceArn": {
+                        "Fn::GetAtt": [
+                          "MyTable",
+                          "Arn"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Roles": [
+          {
+            "Ref": "SomeRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::ManagedPolicy"
+    },
+    "MyEventSourceMapping1": {
+      "DependsOn": [
+        "MyConnector1Policy"
+      ],
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyQueue1",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyEventSourceMapping2": {
+      "DependsOn": [
+        "SomeDep",
+        "MyConnector2Policy"
+      ],
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyQueue2",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyEventSourceMapping3": {
+      "DependsOn": [
+        "SomeOtherDep",
+        "MyConnector3Policy"
+      ],
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyQueue3",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
+    "MyEventSourceMapping4": {
+      "DependsOn": [
+        "MyConnector4Policy"
+      ],
+      "Properties": {
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "MyTable",
+            "Arn"
+          ]
+        },
+        "FunctionName": {
+          "Ref": "MyFunction"
+        }
+      },
+      "Type": "AWS::Lambda::EventSourceMapping"
+    },
     "MyFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Role": {
           "Ref": "SomeRole"
         }
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "MyQueue1": {
       "Type": "AWS::SQS::Queue"
@@ -19,237 +308,6 @@
     },
     "MyTable": {
       "Type": "AWS::DynamoDB::Table"
-    },
-    "MyEventSourceMapping1": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "EventSourceArn": {
-          "Fn::GetAtt": ["MyQueue1", "Arn"]
-        }
-      },
-      "DependsOn": ["MyConnector1Policy"]
-    },
-    "MyEventSourceMapping2": {
-      "DependsOn": ["SomeDep", "MyConnector2Policy"],
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "EventSourceArn": {
-          "Fn::GetAtt": ["MyQueue2", "Arn"]
-        }
-      }
-    },
-    "MyEventSourceMapping3": {
-      "DependsOn": ["SomeOtherDep", "MyConnector3Policy"],
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "EventSourceArn": {
-          "Fn::GetAtt": ["MyQueue3", "Arn"]
-        }
-      }
-    },
-    "MyEventSourceMapping4": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "MyFunction"
-        },
-        "EventSourceArn": {
-          "Fn::GetAtt": ["MyTable", "Arn"]
-        }
-      },
-      "DependsOn": ["MyConnector4Policy"]
-    },
-    "MyConnector1Policy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "MyConnector1": {
-            "Source": {
-              "Type": "AWS::SQS::Queue"
-            },
-            "Destination": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": ["sqs:DeleteMessage"],
-              "Resource": [
-                {
-                  "Fn::GetAtt": ["MyQueue1", "Arn"]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
-              "Resource": [
-                {
-                  "Fn::GetAtt": ["MyQueue1", "Arn"]
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": [
-          {
-            "Ref": "SomeRole"
-          }
-        ]
-      }
-    },
-    "MyConnector2Policy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "MyConnector2": {
-            "Source": {
-              "Type": "AWS::SQS::Queue"
-            },
-            "Destination": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": ["sqs:DeleteMessage"],
-              "Resource": [
-                {
-                  "Fn::GetAtt": ["MyQueue2", "Arn"]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
-              "Resource": [
-                {
-                  "Fn::GetAtt": ["MyQueue2", "Arn"]
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": [
-          {
-            "Ref": "SomeRole"
-          }
-        ]
-      }
-    },
-    "MyConnector3Policy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "MyConnector3": {
-            "Source": {
-              "Type": "AWS::SQS::Queue"
-            },
-            "Destination": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": ["sqs:DeleteMessage"],
-              "Resource": [
-                {
-                  "Fn::GetAtt": ["MyQueue3", "Arn"]
-                }
-              ]
-            },
-            {
-              "Effect": "Allow",
-              "Action": ["sqs:ReceiveMessage", "sqs:GetQueueAttributes"],
-              "Resource": [
-                {
-                  "Fn::GetAtt": ["MyQueue3", "Arn"]
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": [
-          {
-            "Ref": "SomeRole"
-          }
-        ]
-      }
-    },
-    "MyConnector4Policy": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Metadata": {
-        "aws:sam:connectors": {
-          "MyConnector4": {
-            "Source": {
-              "Type": "AWS::DynamoDB::Table"
-            },
-            "Destination": {
-              "Type": "AWS::Lambda::Function"
-            }
-          }
-        }
-      },
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:DescribeStream",
-                "dynamodb:GetRecords",
-                "dynamodb:GetShardIterator",
-                "dynamodb:ListStreams"
-              ],
-              "Resource": [
-                {
-                  "Fn::Sub": [
-                    "${SourceArn}/stream/*",
-                    {
-                      "SourceArn": {
-                        "Fn::GetAtt": ["MyTable", "Arn"]
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": [
-          {
-            "Ref": "SomeRole"
-          }
-        ]
-      }
     }
   }
 }

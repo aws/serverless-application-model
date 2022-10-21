@@ -1,8 +1,9 @@
 from collections import namedtuple
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from samtranslator.model import ResourceResolver
 from samtranslator.model.intrinsics import get_logical_id_from_intrinsic, ref, fnGetAtt
+from samtranslator.utils.utils import as_array, insert_unique
 
 
 # TODO: Switch to dataclass
@@ -31,11 +32,7 @@ def _is_nonblank_str(s: Any) -> bool:
     return s and isinstance(s, str)
 
 
-def _as_array(x: Any):
-    return x if isinstance(x, list) else [x]
-
-
-def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver):
+def add_depends_on(logical_id: str, depends_on: str, resource_resolver: ResourceResolver):  # type: ignore[no-untyped-def]
     """
     Add DependsOn attribute to resource.
     """
@@ -43,14 +40,24 @@ def add_depends_on(logical_id: str, depends_on: str, resource_resolver: Resource
     if not resource:
         return
 
-    deps = _as_array(resource.get("DependsOn", []))
-    if depends_on not in deps:
-        deps.append(depends_on)
+    old_deps = resource.get("DependsOn", [])
+    deps = insert_unique(old_deps, depends_on)
 
     resource["DependsOn"] = deps
 
 
-def get_event_source_mappings(event_source_id: str, function_id: str, resource_resolver: ResourceResolver):
+def replace_depends_on_logical_id(logical_id: str, replacement: List[str], resource_resolver: ResourceResolver) -> None:
+    """
+    For every resource's `DependsOn`, replace `logical_id` by `replacement`.
+    """
+    for resource in resource_resolver.get_all_resources().values():
+        depends_on = as_array(resource.get("DependsOn", []))
+        if logical_id in depends_on:
+            depends_on.remove(logical_id)
+            resource["DependsOn"] = insert_unique(depends_on, replacement)
+
+
+def get_event_source_mappings(event_source_id: str, function_id: str, resource_resolver: ResourceResolver):  # type: ignore[no-untyped-def]
     """
     Get logical IDs of `AWS::Lambda::EventSourceMapping`s between resource logical IDs.
     """
@@ -60,8 +67,8 @@ def get_event_source_mappings(event_source_id: str, function_id: str, resource_r
             properties = resource.get("Properties", {})
             # Not taking intrinsics as input to function as FunctionName could be a number of
             # formats, which would require parsing it anyway
-            resource_function_id = get_logical_id_from_intrinsic(properties.get("FunctionName"))
-            resource_event_source_id = get_logical_id_from_intrinsic(properties.get("EventSourceArn"))
+            resource_function_id = get_logical_id_from_intrinsic(properties.get("FunctionName"))  # type: ignore[no-untyped-call]
+            resource_event_source_id = get_logical_id_from_intrinsic(properties.get("EventSourceArn"))  # type: ignore[no-untyped-call]
             if (
                 resource_function_id
                 and resource_event_source_id
@@ -153,7 +160,7 @@ def _get_resource_role_property(
     if resource_type == "AWS::Events::Rule":
         for target in properties.get("Targets", []):
             target_arn = target.get("Arn")
-            target_logical_id = get_logical_id_from_intrinsic(target_arn)
+            target_logical_id = get_logical_id_from_intrinsic(target_arn)  # type: ignore[no-untyped-call]
             if (target_logical_id and target_logical_id == connecting_obj_id) or (
                 connecting_obj_arn and target_arn == connecting_obj_arn
             ):
@@ -168,26 +175,26 @@ def _get_resource_role_name(
     if not role:
         return None
 
-    logical_id = get_logical_id_from_intrinsic(role)
+    logical_id = get_logical_id_from_intrinsic(role)  # type: ignore[no-untyped-call]
     if not logical_id:
         return None
 
-    return ref(logical_id)
+    return ref(logical_id)  # type: ignore[no-untyped-call]
 
 
 def _get_resource_queue_url(logical_id: str, resource_type: str) -> Any:
     if resource_type == "AWS::SQS::Queue":
-        return ref(logical_id)
+        return ref(logical_id)  # type: ignore[no-untyped-call]
 
 
 def _get_resource_id(logical_id: str, resource_type: str) -> Any:
     if resource_type in ["AWS::ApiGateway::RestApi", "AWS::ApiGatewayV2::Api"]:
-        return ref(logical_id)
+        return ref(logical_id)  # type: ignore[no-untyped-call]
 
 
 def _get_resource_name(logical_id: str, resource_type: str) -> Any:
     if resource_type == "AWS::StepFunctions::StateMachine":
-        return fnGetAtt(logical_id, "Name")
+        return fnGetAtt(logical_id, "Name")  # type: ignore[no-untyped-call]
 
 
 def _get_resource_qualifier(resource_type: str) -> Any:
@@ -201,7 +208,6 @@ def _get_resource_arn(logical_id: str, resource_type: str) -> Any:
         # according to documentation, Ref returns ARNs for these two resource types
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-stepfunctions-statemachine.html#aws-resource-stepfunctions-statemachine-return-values
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sns-topic.html#aws-resource-sns-topic-return-values
-        return ref(logical_id)
-    else:
-        # For all other supported resources, we can typically use Fn::GetAtt LogicalId.Arn to obtain ARNs
-        return fnGetAtt(logical_id, "Arn")
+        return ref(logical_id)  # type: ignore[no-untyped-call]
+    # For all other supported resources, we can typically use Fn::GetAtt LogicalId.Arn to obtain ARNs
+    return fnGetAtt(logical_id, "Arn")  # type: ignore[no-untyped-call]

@@ -1,90 +1,7 @@
 {
   "Resources": {
-    "RestApiFunction": {
-      "Type": "AWS::Lambda::Function",
-      "DeletionPolicy": "Delete",
-      "UpdateReplacePolicy": "Retain",
-      "Properties": {
-        "Code": {
-          "S3Bucket": "sam-demo-bucket",
-          "S3Key": "todo_list.zip"
-        },
-        "Handler": "index.restapi",
-        "Role": {
-          "Fn::GetAtt": [
-            "RestApiFunctionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "nodejs12.x",
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "RestApiFunctionRole": {
-      "Type": "AWS::IAM::Role",
-      "DeletionPolicy": "Delete",
-      "UpdateReplacePolicy": "Retain",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
-    },
-    "RestApiFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
-      "DeletionPolicy": "Delete",
-      "UpdateReplacePolicy": "Retain",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Ref": "RestApiFunction"
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/*",
-            {
-              "__ApiId__": {
-                "Ref": "ServerlessRestApi"
-              },
-              "__Stage__": "*"
-            }
-          ]
-        }
-      }
-    },
     "GetHtmlFunction": {
-      "Type": "AWS::Lambda::Function",
       "DeletionPolicy": "Retain",
-      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -104,45 +21,12 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "GetHtmlFunctionRole": {
-      "Type": "AWS::IAM::Role",
-      "DeletionPolicy": "Retain",
-      "UpdateReplacePolicy": "Retain",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "sts:AssumeRole"
-              ],
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
-        ],
-        "Tags": [
-          {
-            "Key": "lambda:createdBy",
-            "Value": "SAM"
-          }
-        ]
-      }
+      },
+      "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain"
     },
     "GetHtmlFunctionGetHtmlPermissionProd": {
-      "Type": "AWS::Lambda::Permission",
       "DeletionPolicy": "Retain",
-      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "Action": "lambda:InvokeFunction",
         "FunctionName": {
@@ -160,74 +44,188 @@
             }
           ]
         }
-      }
+      },
+      "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "GetHtmlFunctionRole": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "RestApiFunction": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "sam-demo-bucket",
+          "S3Key": "todo_list.zip"
+        },
+        "Handler": "index.restapi",
+        "Role": {
+          "Fn::GetAtt": [
+            "RestApiFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "RestApiFunctionGetHtmlPermissionProd": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "RestApiFunction"
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/*",
+            {
+              "__ApiId__": {
+                "Ref": "ServerlessRestApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission",
+      "UpdateReplacePolicy": "Retain"
+    },
+    "RestApiFunctionRole": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws-cn:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          "arn:aws-cn:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ],
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain"
     },
     "ServerlessRestApi": {
-      "Type": "AWS::ApiGateway::RestApi",
       "DeletionPolicy": "Retain",
-      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "Body": {
-          "swagger": "2.0",
           "info": {
-            "version": "1.0",
             "title": {
               "Ref": "AWS::StackName"
-            }
+            },
+            "version": "1.0"
           },
           "paths": {
-            "/{proxy+}": {
-              "x-amazon-apigateway-any-method": {
-                "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
-                  "httpMethod": "POST",
-                  "uri": {
-                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RestApiFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              }
-            },
             "/{proxy++}": {
               "x-amazon-apigateway-any-method": {
+                "responses": {},
                 "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
                   "httpMethod": "POST",
+                  "type": "aws_proxy",
                   "uri": {
                     "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetHtmlFunction.Arn}/invocations"
                   }
-                },
-                "responses": {}
+                }
+              }
+            },
+            "/{proxy+}": {
+              "x-amazon-apigateway-any-method": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RestApiFunction.Arn}/invocations"
+                  }
+                }
               }
             }
-          }
+          },
+          "swagger": "2.0"
         },
         "EndpointConfiguration": {
           "Types": [
-                "REGIONAL"
-            ]
+            "REGIONAL"
+          ]
         },
         "Parameters": {
-            "endpointConfigurationTypes": "REGIONAL"
+          "endpointConfigurationTypes": "REGIONAL"
         }
-      }
+      },
+      "Type": "AWS::ApiGateway::RestApi",
+      "UpdateReplacePolicy": "Retain"
     },
     "ServerlessRestApiDeployment1ec0d29ab5": {
-      "Type": "AWS::ApiGateway::Deployment",
       "DeletionPolicy": "Retain",
-      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "Description": "RestApi deployment id: 1ec0d29ab5c55018bb989df31615c170b707ae21",
         "RestApiId": {
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Stage"
-      }
+      },
+      "Type": "AWS::ApiGateway::Deployment",
+      "UpdateReplacePolicy": "Retain"
     },
     "ServerlessRestApiProdStage": {
-      "Type": "AWS::ApiGateway::Stage",
       "DeletionPolicy": "Retain",
-      "UpdateReplacePolicy": "Retain",
       "Properties": {
         "DeploymentId": {
           "Ref": "ServerlessRestApiDeployment1ec0d29ab5"
@@ -236,7 +234,9 @@
           "Ref": "ServerlessRestApi"
         },
         "StageName": "Prod"
-      }
+      },
+      "Type": "AWS::ApiGateway::Stage",
+      "UpdateReplacePolicy": "Retain"
     }
   }
 }

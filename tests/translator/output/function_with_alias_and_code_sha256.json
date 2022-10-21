@@ -1,14 +1,13 @@
 {
   "Parameters": {
     "AutoPublishCodeSha256": {
-      "Type": "String",
+      "Default": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
       "Description": "Sha256 to uniquely identify creation of the lambda",
-      "Default": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+      "Type": "String"
     }
   },
   "Resources": {
     "MinimalFunction": {
-      "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": "sam-demo-bucket",
@@ -28,22 +27,11 @@
             "Value": "SAM"
           }
         ]
-      }
-    },
-    "MinimalFunctionVersion6b86b273ff": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "Description": "sam-testing",
-        "FunctionName": {
-          "Ref": "MinimalFunction"
-        }
-      }
+      },
+      "Type": "AWS::Lambda::Function"
     },
     "MinimalFunctionAliaslive": {
-      "Type": "AWS::Lambda::Alias",
       "Properties": {
-        "Name": "live",
         "FunctionName": {
           "Ref": "MinimalFunction"
         },
@@ -52,14 +40,14 @@
             "MinimalFunctionVersion6b86b273ff",
             "Version"
           ]
-        }
-      }
+        },
+        "Name": "live"
+      },
+      "Type": "AWS::Lambda::Alias"
     },
     "MinimalFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -72,7 +60,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -83,7 +72,18 @@
             "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "MinimalFunctionVersion6b86b273ff": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "Description": "sam-testing",
+        "FunctionName": {
+          "Ref": "MinimalFunction"
+        }
+      },
+      "Type": "AWS::Lambda::Version"
     }
   }
 }

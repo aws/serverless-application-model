@@ -1,17 +1,17 @@
 {
   "Resources": {
-    "UnknownTypeShouldBeAccepted": {
-      "Type": "AWS::Other::ABCD",
-      "Properties": {
-        "StageName": "Prod",
-        "DefinitionUri": "s3://sam-demo-bucket/webpage_swagger.json"
-      }
-    },
     "ResourceMissingTypeShouldBeAccepted": {
       "Properties": {
-        "StageName": "Prod",
-        "DefinitionUri": "s3://sam-demo-bucket/webpage_swagger.json"
+        "DefinitionUri": "s3://sam-demo-bucket/webpage_swagger.json",
+        "StageName": "Prod"
       }
+    },
+    "UnknownTypeShouldBeAccepted": {
+      "Properties": {
+        "DefinitionUri": "s3://sam-demo-bucket/webpage_swagger.json",
+        "StageName": "Prod"
+      },
+      "Type": "AWS::Other::ABCD"
     }
   }
 }

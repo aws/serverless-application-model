@@ -1,49 +1,51 @@
 {
   "Resources": {
-    "ApiGatewayApi": {
-      "Type": "AWS::ApiGateway::RestApi",
+    "ApiFunction": {
       "Properties": {
-        "Body": {
-          "info": {
-            "version": "1.0",
-            "title": {
-              "Ref": "AWS::StackName"
-            }
-          },
-          "paths": {
-            "/": {
-              "get": {
-                "x-amazon-apigateway-integration": {
-                  "httpMethod": "POST",
-                  "type": "aws_proxy",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
-                  }
-                },
-                "responses": {}
-              }
-            }
-          },
-          "swagger": "2.0"
+        "Code": {
+          "ZipFile": "def handler(event, context):\n    return {'body': 'Hello World!', 'statusCode': 200}\n"
         },
-        "FailOnWarnings": true
-      }
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "ApiFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Tags": [
+          {
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
+          }
+        ]
+      },
+      "Type": "AWS::Lambda::Function"
     },
-    "ApiGatewayApiDeploymentf96bc9abda": {
-      "Type": "AWS::ApiGateway::Deployment",
+    "ApiFunctionApiEventPermissionprod": {
       "Properties": {
-        "RestApiId": {
-          "Ref": "ApiGatewayApi"
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Ref": "ApiFunction"
         },
-        "Description": "RestApi deployment id: f96bc9abdad53c001153ce8ba04f1667c7b0a004",
-        "StageName": "Stage"
-      }
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
+            {
+              "__ApiId__": {
+                "Ref": "ApiGatewayApi"
+              },
+              "__Stage__": "*"
+            }
+          ]
+        }
+      },
+      "Type": "AWS::Lambda::Permission"
     },
     "ApiFunctionRole": {
-      "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
           "Statement": [
             {
               "Action": [
@@ -56,64 +58,61 @@
                 ]
               }
             }
-          ]
+          ],
+          "Version": "2012-10-17"
         },
         "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         ],
         "Tags": [
           {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
+            "Key": "lambda:createdBy",
+            "Value": "SAM"
           }
         ]
-      }
+      },
+      "Type": "AWS::IAM::Role"
     },
-    "ApiFunction": {
-      "Type": "AWS::Lambda::Function",
+    "ApiGatewayApi": {
       "Properties": {
-        "Handler": "index.handler",
-        "Code": {
-          "ZipFile": "def handler(event, context):\n    return {'body': 'Hello World!', 'statusCode': 200}\n"
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "ApiFunctionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "python3.7",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ]
-      }
-    },
-    "ApiFunctionApiEventPermissionprod": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "Principal": "apigateway.amazonaws.com",
-        "FunctionName": {
-          "Ref": "ApiFunction"
-        },
-        "SourceArn": {
-          "Fn::Sub": [
-            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/",
-            {
-              "__Stage__": "*",
-              "__ApiId__": {
-                "Ref": "ApiGatewayApi"
+        "Body": {
+          "info": {
+            "title": {
+              "Ref": "AWS::StackName"
+            },
+            "version": "1.0"
+          },
+          "paths": {
+            "/": {
+              "get": {
+                "responses": {},
+                "x-amazon-apigateway-integration": {
+                  "httpMethod": "POST",
+                  "type": "aws_proxy",
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiFunction.Arn}/invocations"
+                  }
+                }
               }
             }
-          ]
-        }
-      }
+          },
+          "swagger": "2.0"
+        },
+        "FailOnWarnings": true
+      },
+      "Type": "AWS::ApiGateway::RestApi"
+    },
+    "ApiGatewayApiDeploymentf96bc9abda": {
+      "Properties": {
+        "Description": "RestApi deployment id: f96bc9abdad53c001153ce8ba04f1667c7b0a004",
+        "RestApiId": {
+          "Ref": "ApiGatewayApi"
+        },
+        "StageName": "Stage"
+      },
+      "Type": "AWS::ApiGateway::Deployment"
     },
     "ApiGatewayApiprodStage": {
-      "Type": "AWS::ApiGateway::Stage",
       "Properties": {
         "DeploymentId": {
           "Ref": "ApiGatewayApiDeploymentf96bc9abda"
@@ -122,7 +121,8 @@
           "Ref": "ApiGatewayApi"
         },
         "StageName": "prod"
-      }
+      },
+      "Type": "AWS::ApiGateway::Stage"
     }
   }
 }

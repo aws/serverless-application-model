@@ -1,8 +1,8 @@
 {
-    "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApi] is invalid. MyLambdaAuthUpdated Lambda Authorizer property identity's 'Headers' is of invalid type.",
-    "errors": [
-        {
-            "errorMessage": "Resource with id [MyApi] is invalid. MyLambdaAuthUpdated Lambda Authorizer property identity's 'Headers' is of invalid type."
-        }
-    ]
+  "errorMessage": "Invalid Serverless Application Specification document. Number of errors found: 1. Resource with id [MyApi] is invalid. MyLambdaAuthUpdated Lambda Authorizer property identity's 'Headers' is of invalid type.",
+  "errors": [
+    {
+      "errorMessage": "Resource with id [MyApi] is invalid. MyLambdaAuthUpdated Lambda Authorizer property identity's 'Headers' is of invalid type."
+    }
+  ]
 }

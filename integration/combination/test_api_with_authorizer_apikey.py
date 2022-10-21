@@ -71,7 +71,7 @@ class TestApiWithAuthorizerApiKey(BaseTest):
         # ApiKeySourceType is AUTHORIZER. Passing api key via x-api-key will not get authorized
         self.verify_authorized_request(base_url + "lambda-token-api-key", 401, "x-api-key", key["value"])
 
-    @retry(StatusCodeError, 10)
+    @retry(StatusCodeError, 10, 0.25)
     def verify_authorized_request(
         self,
         url,

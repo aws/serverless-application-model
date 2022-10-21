@@ -9,7 +9,7 @@ class SamParameterValues(object):
     Class representing SAM parameter values.
     """
 
-    def __init__(self, parameter_values):
+    def __init__(self, parameter_values):  # type: ignore[no-untyped-def]
         """
         Initialize the object given the parameter values as a dictionary
 
@@ -18,7 +18,7 @@ class SamParameterValues(object):
 
         self.parameter_values = copy.deepcopy(parameter_values)
 
-    def add_default_parameter_values(self, sam_template):
+    def add_default_parameter_values(self, sam_template):  # type: ignore[no-untyped-def]
         """
         Method to read default values for template parameters and merge with user supplied values.
 
@@ -60,7 +60,7 @@ class SamParameterValues(object):
             if param_name not in self.parameter_values and isinstance(value, dict) and "Default" in value:
                 self.parameter_values[param_name] = value["Default"]
 
-    def add_pseudo_parameter_values(self, session=None):
+    def add_pseudo_parameter_values(self, session=None):  # type: ignore[no-untyped-def]
         """
         Add pseudo parameter values
         :return: parameter values that have pseudo parameter in it
@@ -76,4 +76,4 @@ class SamParameterValues(object):
             self.parameter_values["AWS::Region"] = session.region_name
 
         if "AWS::Partition" not in self.parameter_values:
-            self.parameter_values["AWS::Partition"] = ArnGenerator.get_partition_name(session.region_name)
+            self.parameter_values["AWS::Partition"] = ArnGenerator.get_partition_name(session.region_name)  # type: ignore[no-untyped-call]

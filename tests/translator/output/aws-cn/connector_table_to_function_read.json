@@ -29,14 +29,20 @@
               "Effect": "Allow",
               "Resource": [
                 {
-                  "Fn::GetAtt": ["Table", "Arn"]
+                  "Fn::GetAtt": [
+                    "Table",
+                    "Arn"
+                  ]
                 },
                 {
                   "Fn::Sub": [
                     "${DestinationArn}/index/*",
                     {
                       "DestinationArn": {
-                        "Fn::GetAtt": ["Table", "Arn"]
+                        "Fn::GetAtt": [
+                          "Table",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -84,7 +90,10 @@
                     "${SourceArn}/stream/*",
                     {
                       "SourceArn": {
-                        "Fn::GetAtt": ["Table", "Arn"]
+                        "Fn::GetAtt": [
+                          "Table",
+                          "Arn"
+                        ]
                       }
                     }
                   ]
@@ -103,15 +112,23 @@
       "Type": "AWS::IAM::ManagedPolicy"
     },
     "DynamoDBTableStream": {
-      "DependsOn": ["ConnectorPolicy"],
+      "DependsOn": [
+        "ConnectorPolicy"
+      ],
       "Properties": {
         "BatchSize": 1,
         "Enabled": true,
         "EventSourceArn": {
-          "Fn::GetAtt": ["Table", "StreamArn"]
+          "Fn::GetAtt": [
+            "Table",
+            "StreamArn"
+          ]
         },
         "FunctionName": {
-          "Fn::GetAtt": ["InvokedFunction", "Arn"]
+          "Fn::GetAtt": [
+            "InvokedFunction",
+            "Arn"
+          ]
         },
         "StartingPosition": "TRIM_HORIZON"
       },
@@ -131,7 +148,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["InvokedFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "InvokedFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -148,10 +168,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],
@@ -165,14 +189,19 @@
             "PolicyDocument": {
               "Statement": [
                 {
-                  "Action": ["sqs:SendMessage*"],
+                  "Action": [
+                    "sqs:SendMessage*"
+                  ],
                   "Effect": "Allow",
                   "Resource": {
                     "Fn::Sub": [
                       "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
                       {
                         "queueName": {
-                          "Fn::GetAtt": ["VerificationQueue", "QueueName"]
+                          "Fn::GetAtt": [
+                            "VerificationQueue",
+                            "QueueName"
+                          ]
                         }
                       }
                     ]
@@ -230,7 +259,10 @@
         },
         "Handler": "index.handler",
         "Role": {
-          "Fn::GetAtt": ["TriggerFunctionRole", "Arn"]
+          "Fn::GetAtt": [
+            "TriggerFunctionRole",
+            "Arn"
+          ]
         },
         "Runtime": "nodejs14.x",
         "Tags": [
@@ -248,10 +280,14 @@
         "AssumeRolePolicyDocument": {
           "Statement": [
             {
-              "Action": ["sts:AssumeRole"],
+              "Action": [
+                "sts:AssumeRole"
+              ],
               "Effect": "Allow",
               "Principal": {
-                "Service": ["lambda.amazonaws.com"]
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
               }
             }
           ],
@@ -279,7 +315,10 @@
                       "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:${queueName}",
                       {
                         "queueName": {
-                          "Fn::GetAtt": ["VerificationQueue", "QueueName"]
+                          "Fn::GetAtt": [
+                            "VerificationQueue",
+                            "QueueName"
+                          ]
                         }
                       }
                     ]
