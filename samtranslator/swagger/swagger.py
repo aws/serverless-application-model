@@ -128,7 +128,7 @@ class SwaggerEditor(object):
         return False
 
     @staticmethod
-    def _update_dict(obj: Dict[Any,Any], k: str, v: Dict[Any, Any]) -> Dict[Any, Any]:
+    def _update_dict(obj: Dict[Any, Any], k: str, v: Dict[Any, Any]) -> None:
         if not obj.get(k):
             obj[k] = {}
         obj[k].update(v)
