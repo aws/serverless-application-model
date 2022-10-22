@@ -132,13 +132,13 @@ class ApiGatewayResponse(object):
 
         self.api_logical_id = api_logical_id
         # Defaults to Py27Dict() as these will go into swagger
-        self.response_parameters = response_parameters or Py27Dict()  # type: ignore[no-untyped-call]
-        self.response_templates = response_templates or Py27Dict()  # type: ignore[no-untyped-call]
+        self.response_parameters = response_parameters or Py27Dict()
+        self.response_templates = response_templates or Py27Dict()
         self.status_code = status_code_str
 
     def generate_swagger(self):  # type: ignore[no-untyped-def]
         # Applying Py27Dict here as this goes into swagger
-        swagger = Py27Dict()  # type: ignore[no-untyped-call]
+        swagger = Py27Dict()
         swagger["responseParameters"] = self._add_prefixes(self.response_parameters)  # type: ignore[no-untyped-call]
         swagger["responseTemplates"] = self.response_templates
 
@@ -151,7 +151,7 @@ class ApiGatewayResponse(object):
     def _add_prefixes(self, response_parameters):  # type: ignore[no-untyped-def]
         GATEWAY_RESPONSE_PREFIX = "gatewayresponse."
         # applying Py27Dict as this is part of swagger
-        prefixed_parameters = Py27Dict()  # type: ignore[no-untyped-call]
+        prefixed_parameters = Py27Dict()
 
         parameter_prefix_pairs = [("Headers", "header."), ("Paths", "path."), ("QueryStrings", "querystring.")]
         for parameter, prefix in parameter_prefix_pairs:
@@ -296,14 +296,14 @@ class ApiGatewayAuthorizer(object):
     def generate_swagger(self):  # type: ignore[no-untyped-def]
         authorizer_type = self._get_type()  # type: ignore[no-untyped-call]
         APIGATEWAY_AUTHORIZER_KEY = "x-amazon-apigateway-authorizer"
-        swagger = Py27Dict()  # type: ignore[no-untyped-call]
+        swagger = Py27Dict()
         swagger["type"] = "apiKey"
         swagger["name"] = self._get_swagger_header_name()  # type: ignore[no-untyped-call]
         swagger["in"] = "header"
         swagger["x-amazon-apigateway-authtype"] = self._get_swagger_authtype()  # type: ignore[no-untyped-call]
 
         if authorizer_type == "COGNITO_USER_POOLS":
-            authorizer_dict = Py27Dict()  # type: ignore[no-untyped-call]
+            authorizer_dict = Py27Dict()
             authorizer_dict["type"] = self._get_swagger_authorizer_type()  # type: ignore[no-untyped-call]
             authorizer_dict["providerARNs"] = self._get_user_pool_arn_array()  # type: ignore[no-untyped-call]
             swagger[APIGATEWAY_AUTHORIZER_KEY] = authorizer_dict

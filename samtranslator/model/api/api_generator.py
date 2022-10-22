@@ -266,8 +266,8 @@ class ApiGenerator(object):
             )
 
         if self.open_api_version:
-            if not SwaggerEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
-                SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version  # type: ignore[no-untyped-call]
+            if not SwaggerEditor.safe_compare_regex_with_string(
+                SwaggerEditor.get_openapi_versions_supported_regex(), self.open_api_version
             ):
                 raise InvalidResourceException(  # type: ignore[no-untyped-call]
                     self.logical_id, "The OpenApiVersion value must be of the format '3.0.0'."
@@ -356,7 +356,7 @@ class ApiGenerator(object):
                     s3_pointer["Version"] = Py27UniStr(s3_pointer["Version"])
 
         # Construct body_s3 as py27 dict
-        body_s3 = Py27Dict()  # type: ignore[no-untyped-call]
+        body_s3 = Py27Dict()
         body_s3["Bucket"] = s3_pointer["Bucket"]
         body_s3["Key"] = s3_pointer["Key"]
         if "Version" in s3_pointer:
@@ -957,12 +957,12 @@ class ApiGenerator(object):
         swagger_editor = SwaggerEditor(self.definition_body)  # type: ignore[no-untyped-call]
 
         # The dicts below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
-        gateway_responses = Py27Dict()  # type: ignore[no-untyped-call]
+        gateway_responses = Py27Dict()
         for response_type, response in self.gateway_responses.items():
             gateway_responses[response_type] = ApiGatewayResponse(  # type: ignore[no-untyped-call]
                 api_logical_id=self.logical_id,
-                response_parameters=response.get("ResponseParameters", Py27Dict()),  # type: ignore[no-untyped-call]
-                response_templates=response.get("ResponseTemplates", Py27Dict()),  # type: ignore[no-untyped-call]
+                response_parameters=response.get("ResponseParameters", Py27Dict()),
+                response_templates=response.get("ResponseTemplates", Py27Dict()),
                 status_code=response.get("StatusCode", None),
             )
 
@@ -1016,20 +1016,20 @@ class ApiGenerator(object):
         if definition_body.get("openapi") is not None and self.open_api_version is None:
             self.open_api_version = definition_body.get("openapi")
 
-        if self.open_api_version and SwaggerEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
-            SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version  # type: ignore[no-untyped-call]
+        if self.open_api_version and SwaggerEditor.safe_compare_regex_with_string(
+            SwaggerEditor.get_openapi_version_3_regex(), self.open_api_version
         ):
             if definition_body.get("securityDefinitions"):
-                components = definition_body.get("components", Py27Dict())  # type: ignore[no-untyped-call]
+                components = definition_body.get("components", Py27Dict())
                 # In the previous line, the default value `Py27Dict()` will be only returned only if `components`
                 # property is not in definition_body dict, but if it exist, and its value is None, so None will be
                 # returned and not the default value. That is why the below line is required.
-                components = components if components else Py27Dict()  # type: ignore[no-untyped-call]
+                components = components if components else Py27Dict()
                 components["securitySchemes"] = definition_body["securityDefinitions"]
                 definition_body["components"] = components
                 del definition_body["securityDefinitions"]
             if definition_body.get("definitions"):
-                components = definition_body.get("components", Py27Dict())  # type: ignore[no-untyped-call]
+                components = definition_body.get("components", Py27Dict())
                 components["schemas"] = definition_body["definitions"]
                 definition_body["components"] = components
                 del definition_body["definitions"]
@@ -1055,7 +1055,7 @@ class ApiGenerator(object):
                                 if field_val.get("200") and field_val.get("200").get("headers"):
                                     headers = field_val["200"]["headers"]
                                     for header, header_val in headers.items():
-                                        new_header_val_with_schema = Py27Dict()  # type: ignore[no-untyped-call]
+                                        new_header_val_with_schema = Py27Dict()
                                         new_header_val_with_schema["schema"] = header_val
                                         definition_body["paths"][path]["options"][field]["200"]["headers"][
                                             header
@@ -1065,7 +1065,7 @@ class ApiGenerator(object):
 
     def _get_authorizers(self, authorizers_config, default_authorizer=None):  # type: ignore[no-untyped-def]
         # The dict below will eventually become part of swagger/openapi definition, thus requires using Py27Dict()
-        authorizers = Py27Dict()  # type: ignore[no-untyped-call]
+        authorizers = Py27Dict()
         if default_authorizer == "AWS_IAM":
             authorizers[default_authorizer] = ApiGatewayAuthorizer(  # type: ignore[no-untyped-call]
                 api_logical_id=self.logical_id, name=default_authorizer, is_aws_iam_authorizer=True

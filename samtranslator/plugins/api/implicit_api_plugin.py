@@ -123,9 +123,9 @@ class ImplicitApiPlugin(BasePlugin):  # type: ignore[misc]
             and isinstance(resource.properties.get("Events"), dict)
         ):
             # Resource structure is invalid.
-            return Py27Dict()  # type: ignore[no-untyped-call]
+            return Py27Dict()
 
-        api_events = Py27Dict()  # type: ignore[no-untyped-call]
+        api_events = Py27Dict()
         for event_id, event in resource.properties["Events"].items():
 
             if event and isinstance(event, dict) and event.get("Type") == self.api_event_type:

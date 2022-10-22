@@ -157,8 +157,8 @@ class Globals(object):
                 if (
                     (cls._OPENAPIVERSION in properties)
                     and (cls._MANAGE_SWAGGER in properties)
-                    and SwaggerEditor.safe_compare_regex_with_string(  # type: ignore[no-untyped-call]
-                        SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]  # type: ignore[no-untyped-call]
+                    and SwaggerEditor.safe_compare_regex_with_string(
+                        SwaggerEditor.get_openapi_version_3_regex(), properties[cls._OPENAPIVERSION]
                     )
                 ):
                     if not isinstance(properties[cls._OPENAPIVERSION], str):
