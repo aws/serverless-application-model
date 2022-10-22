@@ -1,5 +1,6 @@
 ﻿import copy
 import re
+from typing import Dict, Any
 
 from samtranslator.model.intrinsics import ref, make_conditional, fnSub, is_intrinsic_no_value
 from samtranslator.model.exceptions import InvalidDocumentException, InvalidTemplateException
@@ -126,6 +127,12 @@ class SwaggerEditor(object):
             return True
         return False
 
+    @staticmethod
+    def _update_dict(obj: Dict[Any,Any], k: str, v: Dict[Any, Any]) -> Dict[Any, Any]:
+        if not obj.get(k):
+            obj[k] = {}
+        obj[k].update(v)
+
     def add_disable_execute_api_endpoint_extension(self, disable_execute_api_endpoint):  # type: ignore[no-untyped-def]
         """Add endpoint configuration to _X_APIGW_ENDPOINT_CONFIG in open api definition as extension
         Following this guide:
@@ -141,15 +148,11 @@ class SwaggerEditor(object):
             # Add the x-amazon-apigateway-endpoint-configuration extension to the Servers objects
             servers_configurations = self._doc.get(self._SERVERS, [Py27Dict()])
             for config in servers_configurations:
-                if not config.get(self._X_ENDPOINT_CONFIG):
-                    config[self._X_ENDPOINT_CONFIG] = {}
-                config[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
+                SwaggerEditor._update_dict(config, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
 
             self._doc[self._SERVERS] = servers_configurations
         else:
-            if not self._doc.get(self._X_ENDPOINT_CONFIG):
-                self._doc[self._X_ENDPOINT_CONFIG] = {}
-            self._doc[self._X_ENDPOINT_CONFIG].update(set_disable_api_endpoint)
+            SwaggerEditor._update_dict(self._doc, self._X_ENDPOINT_CONFIG, set_disable_api_endpoint)
 
     def has_integration(self, path, method):  # type: ignore[no-untyped-def]
         """
