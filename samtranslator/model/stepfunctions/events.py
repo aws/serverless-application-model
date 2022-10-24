@@ -165,6 +165,7 @@ class CloudWatchEvent(EventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "EventBusName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "RuleName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
         "Pattern": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
         "Input": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
         "InputPath": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
@@ -190,6 +191,7 @@ class CloudWatchEvent(EventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)  # type: ignore[no-untyped-call]
         events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
         events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
+        events_rule.Name = self.RuleName  # type: ignore[attr-defined]
 
         if self.State:  # type: ignore[attr-defined]
             events_rule.State = self.State  # type: ignore[attr-defined]

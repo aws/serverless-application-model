@@ -97,6 +97,7 @@ class Schedule(PushEventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "Schedule": PropertyType(True, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "RuleName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
         "Input": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
         "Enabled": PropertyType(False, is_type(bool)),  # type: ignore[no-untyped-call, no-untyped-call]
         "State": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
@@ -180,6 +181,7 @@ class CloudWatchEvent(PushEventSource):
     principal = "events.amazonaws.com"
     property_types = {
         "EventBusName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
+        "RuleName": PropertyType(False, is_str()),  # type: ignore[no-untyped-call, no-untyped-call]
         "Pattern": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
         "DeadLetterConfig": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
         "RetryPolicy": PropertyType(False, is_type(dict)),  # type: ignore[no-untyped-call, no-untyped-call]
@@ -210,6 +212,7 @@ class CloudWatchEvent(PushEventSource):
         events_rule = EventsRule(self.logical_id, attributes=passthrough_resource_attributes)  # type: ignore[no-untyped-call]
         events_rule.EventBusName = self.EventBusName  # type: ignore[attr-defined]
         events_rule.EventPattern = self.Pattern  # type: ignore[attr-defined]
+        events_rule.Name = self.RuleName  # type: ignore[attr-defined]
         source_arn = events_rule.get_runtime_attr("arn")  # type: ignore[no-untyped-call]
 
         dlq_queue_arn = None
