@@ -24,7 +24,7 @@
               "terminated"
             ]
           }
-        }, 
+        },
         "Name": "MyRule",
         "State": "ENABLED",
         "Targets": [
